@@ -43,7 +43,8 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 			pkg_name=$(dpkg-deb -f "$deb" Package)
 
 			# Check that this exact .deb filename isn't already published (missed revbump).
-			if grep -q "^Filename:.*/$(basename "$deb")\$" "Packages-${repo}-${arch}"; then
+			deb_name_escaped=$(printf '%s' "$(basename "$deb")" | sed 's/[.[\*^$]/\\&/g')
+			if grep -q "^Filename:.*/${deb_name_escaped}\$" "Packages-${repo}-${arch}"; then
 				echo "[!] \"$(basename "$deb")\" (${repo}/${arch}) already exists on the server"
 				error=1
 			fi
