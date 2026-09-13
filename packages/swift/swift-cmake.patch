@@ -144,9 +144,9 @@ diff --git a/swift/SwiftCompilerSources/CMakeLists.txt b/swift/SwiftCompilerSour
      # resource directory if needed.
      list(PREPEND sdk_option "-resource-dir" "${SWIFTLIB_DIR}")
 @@ -196,6 +196,8 @@
+     string(STRIP "${swiftly_dir}" swiftly_dir)
  
-     # Workaround for https://github.com/swiftlang/llvm-project/issues/7172
-     list(APPEND swift_compile_options "-Xcc" "-Xclang" "-Xcc" "-fmodule-format=raw")
+     list(APPEND sdk_option "-I" "${swiftly_dir}/usr/lib" "-I" "${swiftly_dir}/usr/lib")
 +  elseif(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
 +    list(APPEND sdk_option "-I" "${SWIFTLIB_DIR}/../")
    else()

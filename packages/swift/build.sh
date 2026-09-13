@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@finagolfin"
-TERMUX_PKG_VERSION=6.2.4
+TERMUX_PKG_VERSION=6.3.3
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift/archive/refs/tags/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=3b29b8aecfd6f401a2f46b28947850a53ac1cda46e54380fbd6d391c4f718fad
+TERMUX_PKG_SHA256=a96425b6626ede8518423810450763da541fb28501e27009badb6a6f6534c411
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libandroid-glob, libandroid-posix-semaphore, libandroid-shmem, libandroid-spawn, libandroid-spawn-static, libandroid-sysv-semaphore, libcurl, libuuid, libxml2, libdispatch, llbuild, pkg-config, swift-sdk-${TERMUX_ARCH/_/-}"
@@ -35,56 +35,57 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=6012b59d842b2864623901b1e9d527d5b314af87858e0af8661e191d92d14922
-	library_checksums[llvm-project]=8e02cf861773b8b5b829b208ba892f240a8c3c6d336190c5eca32e393b783e4a
-	library_checksums[swift-experimental-string-processing]=b0ab328fe9f80f08b71ee6c5e81c7c3a001c5d924b207b5a16d8027815ba1998
-	library_checksums[swift-syntax]=53e644fb9c824cea726775e7b48ee5217323922917a7e1bc54fdc86e13058f80
-	library_checksums[swift-corelibs-libdispatch]=09707e4ccdd19d4f23e356bf032b28fbf2b447c3645aff26775e25a97e314486
-	library_checksums[swift-corelibs-foundation]=aa6a1e64b549bab1ea05a7470b3c3836bc1c3422972a3b28829f931593a3227d
-	library_checksums[swift-foundation]=74cab7e91cf083465720f9c82dc57b659ec744d1ceba5964a0fdc4a3134f4687
-	library_checksums[swift-foundation-icu]=ab52bcc8638ec3a88c6931838fcf101e0153a7c67ac359c91a7038a939acce93
-	library_checksums[swift-corelibs-xctest]=ad39de9ecd0e0f08b519bac7ddd97a336e4428a01dd4f85c20575c049e661719
-	library_checksums[swift-toolchain-sqlite]=c8704e70c4847a8dbd47aafb25d293fbe1e1bafade16cfa64e04f751e33db0ca
-	library_checksums[swift-llbuild]=0c86a44d4ecfdb34a7b02fca2088e2a65415f8e91b4a803a6da38e678c92b6c5
-	library_checksums[swift-testing]=5c10ae40206edad84f77c21acf04d7995d0ad3d8ab8af78b70b28aba2573ac4d
-	library_checksums[swift-argument-parser]=d5bad3a1da66d9f4ceb0a347a197b8fdd243a91ff6b2d72b78efb052b9d6dd33
-	library_checksums[swift-collections]=7e5e48d0dc2350bed5919be5cf60c485e72a30bd1f2baf718a619317677b91db
-	library_checksums[swift-crypto]=5c860c0306d0393ff06268f361aaf958656e1288353a0e23c3ad20de04319154
+	library_checksums[swift-cmark]=c9f981c268b4d2beca1d43878f5dd1d69dc629e62157bc400064d6c6111e2020
+	library_checksums[llvm-project]=4e0bfc8045a1036d3a49c65d411ffca1e4b6af117ac2bf5070871f375c097610
+	library_checksums[swift-experimental-string-processing]=1ca338ea222031f5d67fa34922a55111ffb67524197f33a6be0540abaafe0b52
+	library_checksums[swift-syntax]=94d58f82c8d3c1831283f85c64f3485a9caf1e9c0834d7142feac5bfcf6fc3d9
+	library_checksums[swift-corelibs-libdispatch]=c3a61c08387937622a291e08e64eb4ec0be07f1df252574552641129057951bb
+	library_checksums[swift-corelibs-foundation]=cfba08125b15c3138f6d1e2b6cf5058ef2f294f3a08c54ef322d903a5002c20d
+	library_checksums[swift-foundation]=23972ee7ef5e103fa2a9df2704abce787b0f64073fec3df1846c2f2039bf0f3d
+	library_checksums[swift-foundation-icu]=3568e41730bce792bb90fbc592ad37df319a62352587ff134a8e554751063cf8
+	library_checksums[swift-corelibs-xctest]=0255806248b1bb21c09dd7f798b6db8068eb56d88a7e28bb3b667f70277efa66
+	library_checksums[swift-toolchain-sqlite]=5a267a6eff88bd8e7d23ed0713cb8f3955f57ef71539da2d1c64b54c4865b3ea
+	library_checksums[swift-llbuild]=89d9267a1ae741c4d12a58fa3f81a3d07985b5947795eb2edbb41ead373f6a46
+	library_checksums[swift-testing]=926c9bf7c1ad4eaedb7913f0bb79221734adc87c46bc664f40de6f8d78ce9d91
+	library_checksums[swift-argument-parser]=d2fbb15886115bb2d9bfb63d4c1ddd4080cbb4bfef2651335c5d3b9dd5f3c8ba
+	library_checksums[swift-collections]=2f558b33b6eba5b0c263110d7cb1a11b59d63059e845dc1984c65359e36f29da
+	library_checksums[swift-crypto]=cad9b04e5e23706bc3bf00ba6a976c397fea8111d964656a1a459fa4b1dc36a3
 	library_checksums[swift-system]=4bf5d5db04d48f484289371b63dd7bdced0db1ab1307c49127b9f894341a521d
-	library_checksums[swift-asn1]=e0da995ae53e6fcf8251887f44d4030f6600e2f8f8451d9c92fcaf52b41b6c35
-	library_checksums[swift-certificates]=fcaca458aab45ee69b0f678b72c2194b15664cc5f6f5e48d0e3f62bc5d1202ca
-	library_checksums[swift-driver]=6a91a5da6144d677963e155f7d7a35d01f6c1baa05d6293dcf7f8f890b874266
-	library_checksums[swift-tools-support-core]=3ace74183e7eac130ad899820b11570075eec7c80e6199d34a02a7731fad2e51
-	library_checksums[swift-build]=08d8bbe371fb69af0174e706b63e8b8d15a0a1785efedeb8ad9e88f59e31f81c
-	library_checksums[swift-package-manager]=38950fcee19d36cee62ed5e2ac5ac2c63414db9fe857c067f5f99243a1add52f
-	library_checksums[indexstore-db]=c4caf104c2188af7b42ce160d5106b1227e66c358f7368a83e743af5df24d5ad
-	library_checksums[swift-docc]=203ef84b43d586b8906be8537a62960d089c60717d59572d5b7b227c78647090
-	library_checksums[swift-docc-symbolkit]=afb22446e5a37fac62c4dc4bfb9fd79023b1f7130117f9855c2c2604e8e1be4e
-	library_checksums[swift-lmdb]=eb918a4ef4f0786e8ee8c5f64c51ffbb04677a95bb0289d1a81bd5273871d893
-	library_checksums[swift-markdown]=51c2e23b538e45e49b442c50be0fdc0b045fa5b790dfb061d51538dbf2bae0d7
+	library_checksums[swift-asn1]=45061bdf808ed138a71b55abc90c8cbff8980b82e5ffd39d86e65a5cbee31241
+	library_checksums[swift-certificates]=1002a2aa66ced92dd216b9ed236d9ce8c73f98f02810f39f2437d43ba35d60a0
+	library_checksums[swift-driver]=d4fcada9b5ad99ed9194b3fae35de234a56d80e833dc19016ac8e904dcc7cd76
+	library_checksums[swift-tools-protocols]=cc23820a634523d6dac4bb3abd6d659f7ede50a4f38bb4b10188775095d8e000
+	library_checksums[swift-tools-support-core]=df4dc7e94360d3af711b78d28691df1082faf389d0db78c0ea702e2217a4036f
+	library_checksums[swift-build]=8bb78bb89d03489f0e5a529b2a1dbb29e98de947b187b2bc282a6ae4f939d663
+	library_checksums[swift-package-manager]=191a953608b99241cd53e9f02d0ddbdbccd32bb4cb5c6aaff3e47b78003dfa94
+	library_checksums[indexstore-db]=c49a8c3481dfbdd37abd58800a6f6654b52cf051200ea9bcfc2fe2535d3f8841
+	library_checksums[swift-docc]=c785529e3ddcf4ee982a26c9ee4e2ec30175fc9ec0727bf9b0cd26c638b14393
+	library_checksums[swift-docc-symbolkit]=02457ea2dc733f66d39a1db7b9a1bc75b39acaee228da09caaa1a15c5207543c
+	library_checksums[swift-lmdb]=b8b14a954f737e2cc45458c52e17def09a474448346febf4d4f73deaba9905a5
+	library_checksums[swift-markdown]=93684a45e81577a8640292e406c7e645adf9c9e143c59527e833cd49609c98cf
 	library_checksums[swift-nio]=feb16b6d0e6d010be14c6732d7b02ddbbdc15a22e3912903f08ef5d73928f90d
 	library_checksums[swift-atomics]=33d9f4fbaeddee4bda3af2be126791ee8acf3d3c24a2244457641a20d39aec12
-	library_checksums[sourcekit-lsp]=9cd47c04fe1f81cb45d7c5258bb92ba205b6d1b6964147c7b6baf9833a50bbc4
+	library_checksums[sourcekit-lsp]=6f79fb228df8b5c50e8b47ec7ee588de0a8240aaf45a1d5ce7bbf2a733dcaf42
 
 	for library in "${!library_checksums[@]}"; do \
 		GH_ORG="apple"
 		if [ "$library" = "swift-argument-parser" ]; then
-			SRC_VERSION="1.4.0"
+			SRC_VERSION="1.6.1"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-asn1" ]; then
-			SRC_VERSION="1.0.0"
+			SRC_VERSION="1.3.2"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-atomics" ]; then
 			SRC_VERSION="1.2.0"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-certificates" ]; then
-			SRC_VERSION="1.0.1"
+			SRC_VERSION="1.10.1"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-collections" ]; then
-			SRC_VERSION="1.1.3"
+			SRC_VERSION="1.1.6"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-crypto" ]; then
-			SRC_VERSION="3.0.0"
+			SRC_VERSION="3.12.5"
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-nio" ]; then
 			SRC_VERSION="2.65.0"
@@ -94,7 +95,11 @@ termux_step_post_get_source() {
 			TAR_NAME=$SRC_VERSION
 		elif [ "$library" = "swift-toolchain-sqlite" ]; then
 			GH_ORG="swiftlang"
-			SRC_VERSION="1.0.1"
+			SRC_VERSION="1.0.7"
+			TAR_NAME=$SRC_VERSION
+		elif [ "$library" = "swift-tools-protocols" ]; then
+			GH_ORG="swiftlang"
+			SRC_VERSION="0.0.9"
 			TAR_NAME=$SRC_VERSION
 		else
 			GH_ORG="swiftlang"
@@ -181,7 +186,7 @@ termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/swift{,_static}/dispatch/*.h
 	rm $TERMUX_PREFIX/lib/swift/android/lib{dispatch,BlocksRuntime}.so
 	mv $TERMUX_PREFIX/lib/swift/android/lib[^_]*.so $TERMUX_PREFIX/opt/ndk-multilib/$TERMUX_ARCH-linux-android*/lib
-	mv $TERMUX_PREFIX/lib/swift/android/lib_{Testing_,}Foundation*.so $TERMUX_PREFIX/opt/ndk-multilib/$TERMUX_ARCH-linux-android*/lib
+	mv $TERMUX_PREFIX/lib/swift/android/lib_{Testing,Foundation}*.so $TERMUX_PREFIX/opt/ndk-multilib/$TERMUX_ARCH-linux-android*/lib
 	mv $TERMUX_PREFIX/lib/swift/android/lib*.a $TERMUX_PREFIX/lib/swift/android/$SWIFT_ARCH
 	mv $TERMUX_PREFIX/lib/swift_static/android/lib*.a $TERMUX_PREFIX/lib/swift_static/android/$SWIFT_ARCH
 
