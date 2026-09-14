@@ -1,0 +1,309 @@
+diff --git a/build.rs b/build.rs
+index 7a2ac11..46307ab 100644
+--- a/build.rs
++++ b/build.rs
+@@ -11,0 +12,2 @@ fn zig_target(target: &str) -> &str {
++        "x86_64-linux-android" => "x86_64-linux-android.@TERMUX_PKG_API_LEVEL@",
++        "aarch64-linux-android" => "aarch64-linux-android.@TERMUX_PKG_API_LEVEL@",
+diff --git a/src/detect/mod.rs b/src/detect/mod.rs
+index c244dd8..63f8fe3 100644
+--- a/src/detect/mod.rs
++++ b/src/detect/mod.rs
+@@ -375,11 +375,5 @@ fn normalized_process_name(process: &crate::platform::ForegroundProcess) -> Stri
+-    if let Some(runtime) = process.argv.as_deref().and_then(|argv| argv.first()) {
+-        let runtime_name = normalized_agent_lookup_name(path_basename(runtime));
+-        if matches!(runtime_name.as_str(), "node" | "bun") {
+-            if let Some(wrapped_agent) =
+-                wrapped_agent_name_from_runtime_argv(runtime, process.argv.as_deref())
+-            {
+-                if identify_agent(&wrapped_agent) == Some(Agent::Qwen) {
+-                    return wrapped_agent;
+-                }
+-            }
+-        }
++    if let Some(wrapped_agent) = process.argv.as_deref().and_then(|argv| {
++        let runtime = runtime_executable_name(argv.first()?)?;
++        wrapped_agent_name_from_runtime_argv(&runtime, Some(argv))
++    }) {
++        return wrapped_agent;
+@@ -398,2 +392,14 @@ fn wrapped_agent_name_from_runtime_argv(runtime: &str, argv: Option<&[String]>)
+-    let argv = argv?;
+-    let runtime_name = normalized_agent_lookup_name(path_basename(runtime));
++    let runtime_name = runtime_executable_name(runtime)?;
++    let mut argv = argv?;
++    let has_duplicate_runtime = argv
++        .first()
++        .and_then(|arg| runtime_executable_name(arg))
++        .is_some_and(|arg| arg == runtime_name)
++        && argv
++            .get(1)
++            .and_then(|arg| runtime_executable_name(arg))
++            .is_some_and(|arg| arg == runtime_name);
++
++    if has_duplicate_runtime {
++        argv = &argv[1..];
++    }
+@@ -684,0 +691,6 @@ fn path_basename(path: &str) -> &str {
++fn runtime_executable_name(path: &str) -> Option<String> {
++    let name = path_basename(path).trim().to_lowercase();
++    let name = name.strip_suffix(".exe").unwrap_or(&name);
++    is_runtime_or_shell_name(name).then(|| name.to_string())
++}
++
+@@ -697,2 +709,5 @@ fn is_generic_runtime_or_shell(name: &str) -> bool {
+-    let name = normalized_agent_lookup_name(path_basename(name));
+-    is_python_runtime(&name)
++    runtime_executable_name(name).is_some()
++}
++
++fn is_runtime_or_shell_name(name: &str) -> bool {
++    is_python_runtime(name)
+@@ -700 +715 @@ fn is_generic_runtime_or_shell(name: &str) -> bool {
+-            name.as_str(),
++            name,
+@@ -964,0 +980,122 @@ mod tests {
++    #[test]
++    fn identify_agent_in_android_runtime_argv() {
++        type RuntimeCase<'a> = (&'a str, Option<&'a str>, &'a [&'a str], Option<Agent>);
++        let node = "@TERMUX_PREFIX@/bin/node";
++        let codex = "@TERMUX_PREFIX@/bin/codex";
++        let not_agent = "@TERMUX_PREFIX@/tmp/not-an-agent.js";
++        let node_js = "@TERMUX_PREFIX@/tmp/node.js";
++        let cases: &[RuntimeCase<'_>] = &[
++            (
++                "MainThread",
++                None,
++                &["node", node, codex],
++                Some(Agent::Codex),
++            ),
++            ("MainThread", None, &["node", node, not_agent, codex], None),
++            ("MainThread", None, &["node", node_js, codex], None),
++            ("MainThread", None, &[node_js, codex], None),
++            ("node.js", None, &["node.js", codex], None),
++            ("MainThread", Some(node_js), &[node_js, codex], None),
++            ("node", None, &["bun", node, codex], None),
++            ("MainThread", Some(node), &["bun", node, codex], None),
++            ("MainThread", None, &["node", "bun", codex], None),
++            ("MainThread", None, &["node", node, node, codex], None),
++            ("MainThread", None, &["node", "-e", "codex", codex], None),
++            (
++                "MainThread",
++                None,
++                &["python3.12", "-m", "codex", codex],
++                None,
++            ),
++            ("MainThread", None, &["bash", "-c", "codex", codex], None),
++            ("MainThread", None, &["pwsh", "-enc", "codex", codex], None),
++            ("MainThread", Some(node), &[node, codex], Some(Agent::Codex)),
++            (
++                "MainThread",
++                None,
++                &["NODE.EXE", node, codex],
++                Some(Agent::Codex),
++            ),
++            (
++                "MainThread",
++                None,
++                &["node", "--require", not_agent, codex],
++                Some(Agent::Codex),
++            ),
++        ];
++
++        for &(name, argv0, argv, expected) in cases {
++            let mut process = foreground_process(17_024, name, argv);
++            process.argv0 = argv0.map(str::to_string);
++            let job = crate::platform::ForegroundJob {
++                process_group_id: 17_024,
++                processes: vec![process],
++            };
++            assert_eq!(
++                identify_agent_in_job(&job),
++                expected.map(|agent| (agent, "codex".to_string())),
++                "name={name:?}, argv0={argv0:?}, argv={argv:?}"
++            );
++        }
++    }
++
++    #[test]
++    fn runtime_script_suffixes_are_rejected_at_every_ingress() {
++        for runtime in ["node", "bun", "python3.12", "bash", "cmd", "pwsh"] {
++            for suffix in [".js", ".cmd", ".bat", ".ps1", ".exe.js", ".js.exe"] {
++                let script = format!("@TERMUX_PREFIX@/tmp/{runtime}{suffix}");
++                assert_eq!(runtime_executable_name(&script), None);
++                assert!(!is_generic_runtime_or_shell(&script));
++                let argv = [script.as_str(), "@TERMUX_PREFIX@/bin/codex"];
++                let owned_argv: Vec<String> = argv.iter().map(|arg| (*arg).to_string()).collect();
++                assert_eq!(
++                    wrapped_agent_name_from_runtime_argv(&script, Some(&owned_argv)),
++                    None
++                );
++                for (name, argv0) in [
++                    (script.as_str(), None),
++                    ("MainThread", Some(script.as_str())),
++                    ("MainThread", None),
++                ] {
++                    let mut process = foreground_process(17_024, name, &argv);
++                    process.argv0 = argv0.map(str::to_string);
++                    let job = crate::platform::ForegroundJob {
++                        process_group_id: 17_024,
++                        processes: vec![process],
++                    };
++                    assert_eq!(
++                        identify_agent_in_job(&job),
++                        None,
++                        "name={name:?}, argv0={argv0:?}, argv={argv:?}"
++                    );
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn runtime_executable_normalization_preserves_versioned_python() {
++        for runtime in ["python", "python3", "python3.12", "python3.12.exe"] {
++            let normalized = runtime.strip_suffix(".exe").unwrap_or(runtime);
++            assert_eq!(
++                runtime_executable_name(runtime).as_deref(),
++                Some(normalized)
++            );
++            let job = crate::platform::ForegroundJob {
++                process_group_id: 17_024,
++                processes: vec![foreground_process(
++                    17_024,
++                    "MainThread",
++                    &[runtime, runtime, "/tmp/hermes"],
++                )],
++            };
++            assert_eq!(
++                identify_agent_in_job(&job),
++                Some((Agent::Hermes, "hermes".to_string()))
++            );
++        }
++        for runtime in ["python3.", "python.3", "python3..12", "python3.12x"] {
++            assert_eq!(runtime_executable_name(runtime), None);
++        }
++    }
++
+diff --git a/src/pane.rs b/src/pane.rs
+index aa6acb5..1c3663c 100644
+--- a/src/pane.rs
++++ b/src/pane.rs
+@@ -1587 +1587 @@ fn default_pane_shell() -> String {
+-#[cfg(not(windows))]
++#[cfg(all(not(windows), not(target_os = "android")))]
+@@ -1591,0 +1592,5 @@ fn default_pane_shell() -> String {
++#[cfg(target_os = "android")]
++fn default_pane_shell() -> String {
++    "@TERMUX_PREFIX@/bin/sh".into()
++}
++
+@@ -3590,5 +3595,8 @@ mod tests {
+-        assert_eq!(
+-            pane_shell_from("   ", Some("  ".to_string())),
+-            default_pane_shell()
+-        );
+-        assert_eq!(pane_shell_from("", None), default_pane_shell());
++        #[cfg(windows)]
++        let expected = "powershell.exe";
++        #[cfg(target_os = "android")]
++        let expected = "@TERMUX_PREFIX@/bin/sh";
++        #[cfg(all(not(windows), not(target_os = "android")))]
++        let expected = "/bin/sh";
++        assert_eq!(pane_shell_from("   ", Some("  ".to_string())), expected);
++        assert_eq!(pane_shell_from("", None), expected);
+diff --git a/src/platform/linux.rs b/src/platform/linux.rs
+index 6c09667..291ec29 100644
+--- a/src/platform/linux.rs
++++ b/src/platform/linux.rs
+@@ -22,0 +23,9 @@ pub(crate) use super::unix_common::{
++#[cfg(target_os = "linux")]
++const POSIX_SHELL: &str = "/bin/sh";
++#[cfg(target_os = "android")]
++const POSIX_SHELL: &str = "@TERMUX_PREFIX@/bin/sh";
++#[cfg(target_os = "linux")]
++const URL_OPENER: &str = "xdg-open";
++#[cfg(target_os = "android")]
++const URL_OPENER: &str = "@TERMUX_PREFIX@/bin/termux-open-url";
++
+@@ -93 +102 @@ fn raw_command_argv(command: &str, flag: &str) -> Vec<std::ffi::OsString> {
+-    vec!["/bin/sh".into(), flag.into(), command.into()]
++    vec![POSIX_SHELL.into(), flag.into(), command.into()]
+@@ -114 +123 @@ pub(crate) fn scrollback_editor_argv(path: &std::path::Path) -> std::io::Result<
+-    Ok(vec!["/bin/sh".to_string(), "-c".to_string(), command])
++    Ok(vec![POSIX_SHELL.to_string(), "-c".to_string(), command])
+@@ -471 +480 @@ pub fn open_url(url: &str) -> std::io::Result<Option<std::process::Child>> {
+-    Command::new("xdg-open")
++    Command::new(URL_OPENER)
+@@ -1602,0 +1612 @@ mod tests {
++        #[cfg(target_os = "linux")]
+@@ -1603,0 +1614,2 @@ mod tests {
++        #[cfg(target_os = "android")]
++        assert_eq!(argv[0], "@TERMUX_PREFIX@/bin/sh");
+diff --git a/src/platform/mod.rs b/src/platform/mod.rs
+index d48ad4f..eb669b4 100644
+--- a/src/platform/mod.rs
++++ b/src/platform/mod.rs
+@@ -142 +142 @@ pub fn launch_server_daemon_command(command: &mut std::process::Command) -> std:
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -156 +156 @@ pub fn detach_server_daemon_command(command: &mut std::process::Command) {
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -278 +278 @@ pub(crate) fn end_cli_output() {}
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+@@ -280 +280 @@ mod linux;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+@@ -293 +293,6 @@ pub use windows::*;
+-#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
++#[cfg(not(any(
++    target_os = "linux",
++    target_os = "android",
++    target_os = "macos",
++    target_os = "windows"
++)))]
+@@ -295 +300,6 @@ mod fallback;
+-#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
++#[cfg(not(any(
++    target_os = "linux",
++    target_os = "android",
++    target_os = "macos",
++    target_os = "windows"
++)))]
+@@ -298 +308 @@ pub use fallback::*;
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -321 +331 @@ fn normalized_process_name(name: &str) -> String {
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -329 +339 @@ pub(crate) fn is_powershell_process_name(name: &str) -> bool {
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -383 +393 @@ pub(crate) fn is_pane_shell_process_name(name: &str) -> bool {
+-#[cfg(not(any(target_os = "linux", target_os = "macos")))]
++#[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos")))]
+@@ -388 +398 @@ pub fn process_agent_hint(_pid: u32) -> Option<crate::detect::Agent> {
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -470,0 +481,5 @@ mod tests {
++    #[cfg(target_os = "android")]
++    const SHELL: &str = "@TERMUX_PREFIX@/bin/sh";
++    #[cfg(not(target_os = "android"))]
++    const SHELL: &str = "/bin/sh";
++
+@@ -497 +512 @@ mod tests {
+-        assert_eq!(cmd.get_program(), std::ffi::OsStr::new("/bin/sh"));
++        assert_eq!(cmd.get_program(), std::ffi::OsStr::new(SHELL));
+@@ -510 +525 @@ mod tests {
+-            vec!["/bin/sh".into(), "-c".into(), "echo hello".into()];
++            vec![SHELL.into(), "-c".into(), "echo hello".into()];
+@@ -517 +532 @@ mod tests {
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -530 +545 @@ mod tests {
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+@@ -537 +552 @@ mod tests {
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
