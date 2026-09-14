@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=(
 	12.0
 	8.1.2.4
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.zip"
@@ -174,4 +175,19 @@ termux_step_make_install() {
 
 	mkdir -p "${TERMUX_PREFIX}/bin"
 	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF >./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		echo ""
+		echo "jellyfin-server: if you're upgrading from 10.11.x, the database"
+		echo "needs to migrate to the 12.0 schema on first launch."
+		echo "Restart the jellyfin service (e.g. 'sv restart jellyfin' if using"
+		echo "runit) and watch progress at"
+		echo "http://localhost:8096 before using any client - do not force-stop"
+		echo "the server mid-migration."
+		echo ""
+	EOF
+	chmod 0755 ./postinst
 }
