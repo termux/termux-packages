@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://git-annex.branchable.com
 TERMUX_PKG_DESCRIPTION="Manage large files with git, without storing the file contents in git"
 TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
-TERMUX_PKG_VERSION=10.20260717
+TERMUX_PKG_VERSION=10.20260901
 TERMUX_PKG_SRCURL="git+https://git.joeyh.name/git/git-annex.git"
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -46,11 +46,10 @@ termux_step_post_configure() {
 	# NOTE: [crypton]: version >=1.1 has shifted to 'ram' from 'memory' package.
 	# upstream doesn't have guard against it but depends upon API of 'memory' package.
 	# [aws]: also 'memory' to 'ram' switch in >0.25.3.
-	# [magic]: 2.0 breaks build.
 
 	# Unfortunately constraints has to be done here as passing them as flags with
 	# quotes doesn't work due to shell splitting of TERMUX_PKG_EXTRA_CONFIGURE_ARGS.
-	local constraints="persistent-sqlite +systemlib +use-pkgconfig, entropy +donotgetentropy, crypton <1.1, aws <0.25.3, magic <=1.1"
+	local constraints="persistent-sqlite +systemlib +use-pkgconfig, entropy +donotgetentropy, crypton <1.1, aws <0.25.3"
 
 	if [[ "$TERMUX_ARCH" == "aarch64" || "$TERMUX_ARCH" == "arm" ]]; then
 		constraints+=", blake3 -avx512 -avx2 -sse41 -sse2"
