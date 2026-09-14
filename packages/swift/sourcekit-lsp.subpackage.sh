@@ -4,3 +4,4 @@ bin/sourcekit-lsp
 lib/libSwiftSourceKitClientPlugin.so
 lib/libSwiftSourceKitPlugin.so
 "
+TERMUX_SUBPKG_BREAKS="swift (<< 6.3)"
