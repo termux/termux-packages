@@ -3,13 +3,13 @@ index dc3e33f5..a354d3ba 100644
 --- a/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift
 +++ b/swift-docc/Sources/SwiftDocC/Infrastructure/Diagnostics/TerminalHelper.swift
 @@ -14,6 +14,8 @@ import Darwin.C
- import Glibc
+ private import Glibc
  #elseif canImport(Musl)
- import Musl
+ private import Musl
 +#elseif canImport(Android)
-+import Android
++private import Android
  #elseif os(Windows)
- import CRT
+ private import CRT
  #endif
 diff --git a/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift b/swift-docc/Sources/SwiftDocC/Utility/LMDB/LMDB.swift
 index 66795d87..05d40a31 100644
