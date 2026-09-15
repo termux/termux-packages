@@ -1,0 +1,63 @@
+--- procmail-3.24/config.h	2022-03-02 15:22:56.000000000 +0530
++++ procmail-3.24.mod/config.h	2022-05-26 14:29:35.139156671 +0530
+@@ -46,7 +46,7 @@
+  */
+ #define PRESTENV	{"IFS","ENV","PWD",0}
+ 
+-/*#define GROUP_PER_USER			/* uncomment this if each
++#define GROUP_PER_USER			/* uncomment this if each
+ 						   user has his or her own
+ 	group and procmail can therefore trust a $HOME/.procmailrc that
+ 	is group writable or contained in a group writable home directory
+@@ -108,25 +108,25 @@
+ 	recipes will not work.	One reasonable candidate is "/etc/mta/send"
+ 	on systems that support the MTA configuration switch. */
+ 
+-#define DEFmaildir	"$HOME"	     /* default value for the MAILDIR variable;
++#define DEFmaildir	"@TERMUX_ANDROID_HOME@"	     /* default value for the MAILDIR variable;
+ 					this must be an absolute path */
+ 
+-#define PROCMAILRC	"$HOME/.procmailrc"	/* default rcfile for every
++#define PROCMAILRC	"@TERMUX_ANDROID_HOME@/.procmailrc"	/* default rcfile for every
+ 						   recipient;  if this file
+ 	is not found, maildelivery will proceed as normal to the default
+ 	system mailbox.	 This also must be an absolute path */
+ 
+-#define ETCRC	"/etc/procmailrc"	/* optional global procmailrc startup
++#define ETCRC	"@TERMUX_PREFIX@/etc/procmailrc"	/* optional global procmailrc startup
+ 					   file (will only be read if procmail
+ 	is started with no rcfile on the command line). */
+ 
+-#define ETCRCS	"/etc/procmailrcs/"	/* optional trusted path prefix for
++#define ETCRCS	"@TERMUX_PREFIX@/etc/procmailrcs/"	/* optional trusted path prefix for
+ 					   rcfiles which will be executed with
+ 	the uid of the owner of the rcfile (this only happens if procmail is
+ 	called with the -m option, without variable assignments on the command
+ 	line). */
+ 
+-#define CONFRC	"/etc/procmail.conf"	/* optional global procmail
++#define CONFRC	"@TERMUX_PREFIX@/etc/procmail.conf"	/* optional global procmail
+ 					   configuration file.  It is processed
+ 	after all variable except ORGMAIL are preset.  Filtering and delivering
+ 	actions will not be processed in this rcfile. */
+@@ -175,7 +175,7 @@
+ #define INEFFICIENTrealloc			  /* don't pussy-foot around */
+ #endif
+ #define MAXinMEM	(1024*1024)		 /* when to switch to mmap() */
+-#define MMAP_DIR	"/var/spool/procmail/"		     /* where to put */
++#define MMAP_DIR	"@TERMUX_PREFIX@/var/spool/procmail/"		     /* where to put */
+ #endif								/* the files */
+ #define MINlogbuf	81			       /* fit an entire line */
+ #define MAXlogbuf	1000		       /* in case someone abuses LOG */
+@@ -227,9 +227,9 @@
+ #define DEFcomsat	offvalue	/* when an rcfile has been specified */
+ 				      /* set to either "offvalue" or "empty" */
+ 
+-#define BinSh		"/bin/sh"
++#define BinSh		"@TERMUX_PREFIX@/bin/sh"
+ #define ROOT_DIR	"/"
+-#define DEAD_LETTER	"/tmp/dead.letter"    /* $ORGMAIL if no passwd entry */
++#define DEAD_LETTER	"@TERMUX_PREFIX@/tmp/dead.letter"    /* $ORGMAIL if no passwd entry */
+ #define DevNull		"/dev/null"
+ #define NICE_RANGE	39			  /* maximal nice difference */
+ #define chCURDIR	'.'			    /* the current directory */
