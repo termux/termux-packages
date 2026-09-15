@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@Maxython <mixython@gmail.com>"
 TERMUX_PKG_VERSION=7.1.0
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 _PALT_VERSION=1.0.1
 TERMUX_PKG_SRCURL=(https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
 		https://github.com/termux-pacman/pacman-alternatives/archive/refs/tags/v${_PALT_VERSION}.tar.gz)
@@ -51,9 +51,8 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "pacman-db-upgrade" >> postinst
-	if [[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]]; then
-		echo "post_install" > postupg
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "debian" ]]; then
+		echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+		echo "pacman-db-upgrade" >> postinst
 	fi
 }
