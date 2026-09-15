@@ -1,0 +1,22 @@
+# Use tempfile.gettempdir() instead of hardcoded /tmp/app.log which fails with PermissionError on Android
+
+--- a/gui/shredder/logger.py
++++ b/gui/shredder/logger.py
+@@ -10,6 +10,8 @@
+ # Stdlib:
+ import logging
+ import logging.handlers
++import os
++import tempfile
+ 
+ 
+ COLORED_FORMAT = "%(asctime)s%(reset)s %(log_color)s[logsymbol] \
+@@ -80,7 +82,7 @@
+ 
+     # Rotating File-Handler
+     file_stream = logging.handlers.RotatingFileHandler(
+-        filename=path or '/tmp/app.log',
++        filename=path or os.path.join(tempfile.gettempdir(), 'shredder.log'),
+         maxBytes=(1024 ** 2 * 10),  # 10 MB
+         backupCount=2,
+         delay=True
