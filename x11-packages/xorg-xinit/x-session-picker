@@ -8,6 +8,9 @@
 # process group of its own, detached from the terminal's foreground group -
 # fgrun(1) joins it back in for the duration of a single command. See fgrun.c.
 
+# Setup TERMUX_APP_PACKAGE_MANAGER
+source "@TERMUX_PREFIX@/bin/termux-setup-package-manager" || exit 1
+
 LAST_CHOICE=$HOME/.cache/x-session-picker/last
 
 run_chosen() {
@@ -45,11 +48,15 @@ FGRUN=@TERMUX_PREFIX@/libexec/xorg-xinit/fgrun
 # the same session twice under different names. dialog's tag field is the
 # exec path itself, so the selection it returns needs no further lookup.
 menu_args=()
-for group in x-session-manager x-window-manager; do
-	for target in $(update-alternatives --list "$group" 2>/dev/null); do
-		menu_args+=("$target" "${target##*/}")
+if [ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" ]; then
+	for group in x-session-manager x-window-manager; do
+		for target in $(update-alternatives --list "$group" 2>/dev/null); do
+			menu_args+=("$target" "${target##*/}")
+		done
 	done
-done
+elif [ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" ]; then
+	menu_args+=($(pacman-alternatives -Qll x-{session,window}-manager: 2> /dev/null | awk -F ':' '!a[$1 ":" $2]++ {n = split($5, p, "/"); print $5 " " p[n]}'))
+fi
 
 if (( ${#menu_args[@]} == 0 )); then
 	echo "x-session-picker: no desktop environment or window manager found." >&2

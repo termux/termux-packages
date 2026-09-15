@@ -25,12 +25,13 @@ termux_step_pre_configure() {
 }
 
 termux_step_create_debscripts() {
-	# update-alternatives --install does not retire an old registration
-	# under the same group name.
-	cat <<- EOF > ./preinst
-	#!${TERMUX_PREFIX}/bin/sh
-	command -v update-alternatives > /dev/null &&
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "debian" ]]; then
+		# update-alternatives --install does not retire an old registration
+		# under the same group name.
+		cat <<- EOF > ./preinst
+		#!${TERMUX_PREFIX}/bin/sh
 		update-alternatives --remove x-session-manager ${TERMUX_PREFIX}/bin/startxfce4 2>/dev/null
-	exit 0
-	EOF
+		exit 0
+		EOF
+	fi
 }
