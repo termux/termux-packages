@@ -1,0 +1,143 @@
+diff --git a/subprojects/libepoxy/include/epoxy/common.h b/subprojects/libepoxy/include/epoxy/common.h
+--- a/subprojects/libepoxy/include/epoxy/common.h
++++ b/subprojects/libepoxy/include/epoxy/common.h
+@@ -58,6 +58,15 @@
+ EPOXY_PUBLIC bool epoxy_extension_in_string(const char *extension_list,
+                                             const char *ext);
+ 
++/* Termux: override the absolute paths used to dlopen() EGL/GLESv1/GLESv2/GL,
++ * in place of the immutable per-platform EGL_LIB/GLES1_LIB/GLES2_LIB/GLX_LIB
++ * defaults. Pass NULL to leave an individual path at its default. Must be
++ * called before the first real EGL/GL call in the process. */
++EPOXY_PUBLIC void epoxy_set_library_paths(const char *egl_path,
++                                          const char *gles1_path,
++                                          const char *gles2_path,
++                                          const char *gl_path);
++
+ EPOXY_END_DECLS
+ 
+ #endif /* EPOXY_COMMON_H */
+diff --git a/subprojects/libepoxy/include/epoxy/meson.build b/subprojects/libepoxy/include/epoxy/meson.build
+--- a/subprojects/libepoxy/include/epoxy/meson.build
++++ b/subprojects/libepoxy/include/epoxy/meson.build
+@@ -31,7 +31,7 @@
+                               '--outputdir=@OUTDIR@',
+                               '@INPUT@',
+                             ],
+-                            install: true,
++                            install: false,
+                             install_dir: join_paths(epoxy_includedir, 'epoxy'))
+ 
+   gen_headers += [ generated ]
+@@ -40,4 +40,3 @@
+ 
+ epoxy_headers = files(headers) + gen_headers
+ 
+-install_headers(headers, subdir: 'epoxy')
+diff --git a/subprojects/libepoxy/src/dispatch_common.c b/subprojects/libepoxy/src/dispatch_common.c
+--- a/subprojects/libepoxy/src/dispatch_common.c
++++ b/subprojects/libepoxy/src/dispatch_common.c
+@@ -178,23 +178,35 @@
+ #define OPENGL_LIB "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL"
+ #define GLES1_LIB "libGLESv1_CM.so"
+ #define GLES2_LIB "libGLESv2.so"
+-#elif defined(__ANDROID__)
+-#define GLX_LIB "libGLESv2.so"
+-#define EGL_LIB "libEGL.so"
+-#define GLES1_LIB "libGLESv1_CM.so"
+-#define GLES2_LIB "libGLESv2.so"
+ #elif defined(_WIN32)
+ #define EGL_LIB "libEGL.dll"
+ #define GLES1_LIB "libGLES_CM.dll"
+ #define GLES2_LIB "libGLESv2.dll"
+ #define OPENGL_LIB "OPENGL32"
+ #else
++/* Mutable so epoxy_set_library_paths() can redirect these at runtime. */
+ #define GLVND_GLX_LIB "libGLX.so.1"
+-#define GLX_LIB "libGL.so.1"
+-#define EGL_LIB "libEGL.so.1"
+-#define GLES1_LIB "libGLESv1_CM.so.1"
+-#define GLES2_LIB "libGLESv2.so.2"
+-#define OPENGL_LIB "libOpenGL.so.0"
++static char EGL_LIB[256] = "libEGL.so.1";
++static char GLES1_LIB[256] = "libGLESv1_CM.so.1";
++static char GLES2_LIB[256] = "libGLESv2.so.2";
++static char GLX_LIB[256] = "libGL.so.1";
++static char OPENGL_LIB[256] = "libOpenGL.so.0";
++
++void
++epoxy_set_library_paths(const char *egl_path, const char *gles1_path,
++                        const char *gles2_path, const char *gl_path)
++{
++   if (egl_path)
++      snprintf(EGL_LIB, sizeof(EGL_LIB), "%s", egl_path);
++   if (gles1_path)
++      snprintf(GLES1_LIB, sizeof(GLES1_LIB), "%s", gles1_path);
++   if (gles2_path)
++      snprintf(GLES2_LIB, sizeof(GLES2_LIB), "%s", gles2_path);
++   if (gl_path) {
++      snprintf(GLX_LIB, sizeof(GLX_LIB), "%s", gl_path);
++      snprintf(OPENGL_LIB, sizeof(OPENGL_LIB), "%s", gl_path);
++   }
++}
+ #endif
+ 
+ #ifdef __GNUC__
+diff --git a/subprojects/libepoxy/src/meson.build b/subprojects/libepoxy/src/meson.build
+--- a/subprojects/libepoxy/src/meson.build
++++ b/subprojects/libepoxy/src/meson.build
+@@ -71,7 +71,7 @@
+   sources: epoxy_sources + epoxy_headers,
+   version: '0.0.0',
+   darwin_versions: darwin_versions,
+-  install: true,
++  install: false,
+   dependencies: epoxy_deps,
+   include_directories: libepoxy_inc,
+   c_args: common_cflags + visibility_cflags,
+@@ -105,6 +105,7 @@
+   gl_reqs += 'egl'
+ endif
+ 
++if false
+ pkg = import('pkgconfig')
+ pkg.generate(
+   libraries: libepoxy,
+@@ -119,3 +120,4 @@
+   filebase: 'epoxy',
+   requires_private: ' '.join(gl_reqs),
+ )
++endif
+diff --git a/meson.build b/meson.build
+--- a/meson.build
++++ b/meson.build
+@@ -87,7 +87,10 @@
+ not_found = dependency('', required: false)
+ gbm_dep = not_found
+ thread_dep = dependency('threads')
+-epoxy_dep = dependency('epoxy', version: '>= 1.5.4')
++epoxy_proj = subproject('libepoxy', default_options: [
++   'default_library=static', 'egl=yes', 'glx=no', 'x11=false', 'tests=false',
++])
++epoxy_dep = epoxy_proj.get_variable('libepoxy_dep')
+ m_dep = cc.find_library('m', required : false)
+ dl_dep = not_found
+ if not with_host_windows and not with_host_darwin
+@@ -296,7 +299,7 @@
+ have_glx = false
+ 
+ if with_egl
+-   if cc.has_header('epoxy/egl.h', dependencies: epoxy_dep) and epoxy_dep.get_variable(pkgconfig: 'epoxy_has_egl') == '1'
++   if true
+       if with_host_windows or with_host_darwin
+          have_egl = true
+       else
+@@ -318,7 +321,7 @@
+ endif
+ 
+ if with_glx
+-   if cc.has_header('epoxy/glx.h', dependencies: epoxy_dep) and epoxy_dep.get_variable(pkgconfig: 'epoxy_has_glx') == '1'
++   if false
+       glx_dep = dependency('x11', required: require_glx)
+       have_glx = glx_dep.found()
+       conf_data.set('HAVE_EPOXY_GLX_H', 1)
