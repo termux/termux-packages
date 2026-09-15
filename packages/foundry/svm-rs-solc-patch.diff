@@ -1,0 +1,224 @@
+diff --git a/crates/svm-rs/src/platform.rs b/crates/svm-rs/src/platform.rs
+index efa1834..108fa93 100644
+--- a/src/platform.rs
++++ b/src/platform.rs
+@@ -13,6 +13,9 @@ pub enum Platform {
+     WindowsAmd64,
+     WindowsAarch64,
+     AndroidAarch64,
++    AndroidArm,
++    AndroidX86,
++    AndroidX8664,
+     Unsupported,
+ }
+ 
+@@ -26,6 +29,9 @@ impl fmt::Display for Platform {
+             Self::WindowsAmd64 => "windows-amd64",
+             Self::WindowsAarch64 => "windows-aarch64",
+             Self::AndroidAarch64 => "android-aarch64",
++            Self::AndroidArm => "android-arm",
++            Self::AndroidX86 => "android-x86",
++            Self::AndroidX8664 => "android-x86_64",
+             Self::Unsupported => "Unsupported-platform",
+         };
+         f.write_str(s)
+@@ -44,11 +50,29 @@ impl FromStr for Platform {
+             "windows-amd64" => Ok(Self::WindowsAmd64),
+             "windows-aarch64" => Ok(Self::WindowsAarch64),
+             "android-aarch64" => Ok(Self::AndroidAarch64),
++            "android-arm" => Ok(Self::AndroidArm),
++            "android-x86" => Ok(Self::AndroidX86),
++            "android-x86_64" => Ok(Self::AndroidX8664),
+             s => Err(format!("unsupported platform {s}")),
+         }
+     }
+ }
+ 
++impl Platform {
++    /// Returns the Android ABI directory used by the `togashigreat/termux-solidity`
++    /// `solc-bin` branch for this platform, e.g. `android/x86` for `i686` Termux
++    /// builds. Returns `None` for any non-Android platform.
++    pub fn android_abi(self) -> Option<&'static str> {
++        match self {
++            Self::AndroidAarch64 => Some("aarch64"),
++            Self::AndroidArm => Some("arm"),
++            Self::AndroidX86 => Some("x86"),
++            Self::AndroidX8664 => Some("x86_64"),
++            _ => None,
++        }
++    }
++}
++
+ pub fn is_nixos() -> bool {
+     cfg!(target_os = "linux")
+         && (std::path::Path::new("/etc/nixos").exists()
+@@ -66,6 +90,12 @@ pub fn platform() -> Platform {
+         ("windows", "x86_64") => Platform::WindowsAmd64,
+         ("windows", "aarch64") => Platform::WindowsAarch64,
+         ("android", "aarch64") => Platform::AndroidAarch64,
++        // Termux targets built for 32-bit ARM and 32/64-bit x86 use Rust arch
++        // strings ("arm", "x86", "x86_64") that already match the ABI
++        // directory names on the termux-solidity `solc-bin` branch.
++        ("android", "arm") => Platform::AndroidArm,
++        ("android", "x86") => Platform::AndroidX86,
++        ("android", "x86_64") => Platform::AndroidX8664,
+         _ => Platform::Unsupported,
+     }
+ }
+@@ -115,4 +145,22 @@ mod tests {
+     fn get_platform() {
+         assert_eq!(platform(), Platform::AndroidAarch64);
+     }
++
++    #[test]
++    #[cfg(all(target_os = "android", target_arch = "arm"))]
++    fn get_platform() {
++        assert_eq!(platform(), Platform::AndroidArm);
++    }
++
++    #[test]
++    #[cfg(all(target_os = "android", target_arch = "x86"))]
++    fn get_platform() {
++        assert_eq!(platform(), Platform::AndroidX86);
++    }
++
++    #[test]
++    #[cfg(all(target_os = "android", target_arch = "x86_64"))]
++    fn get_platform() {
++        assert_eq!(platform(), Platform::AndroidX8664);
++    }
+ }
+diff --git a/crates/svm-rs/src/releases.rs b/crates/svm-rs/src/releases.rs
+index 673320f..55937fa 100644
+--- a/src/releases.rs
++++ b/src/releases.rs
+@@ -50,11 +50,21 @@ static MACOS_AARCH64_URL_PREFIX: &str = "https://raw.githubusercontent.com/alloy
+ 
+ static MACOS_AARCH64_RELEASES_URL: &str = "https://raw.githubusercontent.com/alloy-rs/solc-builds/e4b80d33bc4d015b2fc3583e217fbf248b2014e1/macosx/aarch64/list.json";
+ 
+-const ANDROID_AARCH64_MIN: Version = Version::new(0, 8, 24);
+-
+-static ANDROID_AARCH64_URL_PREFIX: &str = "https://raw.githubusercontent.com/alloy-rs/solc-builds/ac6f303a04b38e7ec507ced511fd3ed7a605179f/android/aarch64";
+-
+-static ANDROID_AARCH64_RELEASES_URL: &str = "https://raw.githubusercontent.com/alloy-rs/solc-builds/ac6f303a04b38e7ec507ced511fd3ed7a605179f/android/aarch64/list.json";
++// Base URL of the `solc-bin` branch of the `togashigreat/termux-solidity`
++// repository, which publishes Solc binaries compiled for every Termux-supported
++// Android ABI. `<base>/android/<abi>/list.json` lists the releases and
++// `<base>/android/<abi>/<artifact>` serves each binary.
++const TERMUX_SOLC_RELEASES_URL: &str =
++    "https://raw.githubusercontent.com/togashigreat/termux-solidity/solc-bin";
++
++/// Returns the URL prefix for the given platform on the termux-solidity
++/// `solc-bin` branch (e.g. `.../android/x86`), or `None` for non-Android
++/// platforms which keep using the official binary releases.
++fn termux_solc_url_prefix(platform: Platform) -> Option<String> {
++    platform
++        .android_abi()
++        .map(|abi| format!("{TERMUX_SOLC_RELEASES_URL}/android/{abi}"))
++}
+ 
+ /// Defines the struct that the JSON-formatted release list can be deserialized into.
+ ///
+@@ -216,8 +226,16 @@ pub fn blocking_all_releases(platform: Platform) -> Result<Releases, SvmError> {
+             releases.extend(native);
+             Ok(releases)
+         }
+-        Platform::AndroidAarch64 => {
+-            Ok(reqwest::blocking::get(ANDROID_AARCH64_RELEASES_URL)?.json::<Releases>()?)
++        // Termux Android ABIs pull their release lists from the termux-solidity
++        // `solc-bin` branch. No version gating is applied: whatever the branch
++        // publishes for an ABI is authoritative.
++        Platform::AndroidAarch64
++        | Platform::AndroidArm
++        | Platform::AndroidX86
++        | Platform::AndroidX8664 => {
++            let prefix = termux_solc_url_prefix(platform)
++                .expect("android platform must have a termux url prefix");
++            Ok(reqwest::blocking::get(format!("{prefix}/list.json"))?.json::<Releases>()?)
+         }
+         Platform::WindowsAarch64 => {
+             // Windows ARM64 uses x64 binaries via emulation
+@@ -289,10 +307,18 @@ pub async fn all_releases(platform: Platform) -> Result<Releases, SvmError> {
+             releases.extend(native);
+             Ok(releases)
+         }
+-        Platform::AndroidAarch64 => Ok(get(ANDROID_AARCH64_RELEASES_URL)
+-            .await?
+-            .json::<Releases>()
+-            .await?),
++        Platform::AndroidAarch64
++        | Platform::AndroidArm
++        | Platform::AndroidX86
++        | Platform::AndroidX8664 => {
++            // See comment in `blocking_all_releases`.
++            let prefix = termux_solc_url_prefix(platform)
++                .expect("android platform must have a termux url prefix");
++            Ok(get(format!("{prefix}/list.json"))
++                .await?
++                .json::<Releases>()
++                .await?)
++        }
+         Platform::WindowsAarch64 => {
+             // Windows ARM64 uses x64 binaries via emulation
+             // Solidity does not provide native ARM64 Windows binaries
+@@ -398,17 +424,8 @@ pub(crate) fn artifact_url(
+         }
+     }
+ 
+-    if platform == Platform::AndroidAarch64 {
+-        if version.ge(&ANDROID_AARCH64_MIN) {
+-            return Ok(Url::parse(&format!(
+-                "{ANDROID_AARCH64_URL_PREFIX}/{artifact}"
+-            ))?);
+-        } else {
+-            return Err(SvmError::UnsupportedVersion(
+-                version.to_string(),
+-                platform.to_string(),
+-            ));
+-        }
++    if let Some(prefix) = termux_solc_url_prefix(platform) {
++        return Ok(Url::parse(&format!("{prefix}/{artifact}"))?);
+     }
+ 
+     if platform == Platform::WindowsAarch64 {
+@@ -429,6 +446,40 @@ pub(crate) fn artifact_url(
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn test_android_platform_roundtrip() {
++        for (platform_str, platform) in [
++            ("android-aarch64", Platform::AndroidAarch64),
++            ("android-arm", Platform::AndroidArm),
++            ("android-x86", Platform::AndroidX86),
++            ("android-x86_64", Platform::AndroidX8664),
++        ] {
++            assert_eq!(platform_str.parse::<Platform>().unwrap(), platform);
++            assert_eq!(platform.to_string(), platform_str);
++        }
++    }
++
++    #[test]
++    fn test_android_artifact_url_points_to_termux_solc_bin() {
++        let version = Version::new(0, 8, 18);
++        let artifact = "solc-v0.8.18+commit.87f61d96";
++        for (platform, abi) in [
++            (Platform::AndroidAarch64, "aarch64"),
++            (Platform::AndroidArm, "arm"),
++            (Platform::AndroidX86, "x86"),
++            (Platform::AndroidX8664, "x86_64"),
++        ] {
++            assert_eq!(
++                artifact_url(platform, &version, artifact).unwrap().to_string(),
++                format!("{TERMUX_SOLC_RELEASES_URL}/android/{abi}/{artifact}")
++            );
++        }
++        // Non-Android platforms keep using the official releases, not termux-solidity.
++        assert!(termux_solc_url_prefix(Platform::LinuxAmd64).is_none());
++        assert!(termux_solc_url_prefix(Platform::MacOsAarch64).is_none());
++        assert!(termux_solc_url_prefix(Platform::WindowsAarch64).is_none());
++    }
++
+     #[test]
+     fn test_artifact_url() {
+         let version = Version::new(0, 5, 0);
