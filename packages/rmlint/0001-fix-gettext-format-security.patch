@@ -1,0 +1,19 @@
+--- a/lib/config.h.in
++++ b/lib/config.h.in
+@@ -113,10 +113,14 @@
+ #define RM_GETTEXT_PACKAGE "rmlint"
+ 
+ #if HAVE_LIBINTL
+-#  define _(String) gettext (String)
++#  include <libintl.h>
++#  if defined(__ANDROID__)
++#    define _(String) (String)
++#  else
++#    define _(String) gettext (String)
++#  endif
+ #  define gettext_noop(String) String
+ #  define N_(String) gettext_noop (String)
+-#  include <libintl.h>
+ #else
+ #  define _(String) (String)
+ #  define gettext_noop(String) String
