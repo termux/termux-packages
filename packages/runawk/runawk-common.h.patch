@@ -1,0 +1,17 @@
+The mkc_strl* headers come from mk-configure, which we don't build with.
+bionic already provides strlcpy/strlcat in string.h.
+
+diff --git a/runawk/common.h b/runawk/common.h
+index 4db00ce..e1a1d31 100644
+--- a/runawk/common.h
++++ b/runawk/common.h
+@@ -24,8 +24,7 @@
+ #ifndef _COMMON_H_
+ #define _COMMON_H_
+ 
+-#include <mkc_strlcpy.h>
+-#include <mkc_strlcat.h>
++#include <string.h>
+ 
+ #ifndef PATH_MAX
+ #define PATH_MAX 4096 /* Some systems doesn't have PATH_MAX */
