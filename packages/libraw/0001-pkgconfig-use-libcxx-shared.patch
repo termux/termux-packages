@@ -1,0 +1,26 @@
+Termux doesn't ship a real libstdc++, only a stub in the NDK sysroot
+missing newer bionic symbols, so linking it in via the public Libs:
+line of libraw.pc/libraw_r.pc breaks any consumer (e.g. rawtherapee)
+that pulls in libraw via pkg-config. Replace it with the actual C++
+runtime used on Android instead of dropping it.
+
+--- a/libraw.pc.in
++++ b/libraw.pc.in
+@@ -7,6 +7,6 @@
+ Description: Raw image decoder library (non-thread-safe)
+ Requires: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw -lc++_shared@PC_OPENMP@
+ Libs.private: @PACKAGE_LIBS_PRIVATE@
+ Cflags: -I${includedir}/libraw -I${includedir}
+--- a/libraw_r.pc.in
++++ b/libraw_r.pc.in
+@@ -7,6 +7,6 @@
+ Description: Raw image decoder library (thread-safe)
+ Requires: @PACKAGE_REQUIRES@
+ Version: @PACKAGE_VERSION@
+-Libs: -L${libdir} -lraw_r -lstdc++@PC_OPENMP@
++Libs: -L${libdir} -lraw_r -lc++_shared@PC_OPENMP@
+ Libs.private: @PACKAGE_LIBS_PRIVATE@
+ Cflags: -I${includedir}/libraw -I${includedir}
