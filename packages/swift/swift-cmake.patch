@@ -85,6 +85,18 @@ index b7503ecdd6..c643c2c9a5 100644
    include(Libdispatch)
  endif()
  
+diff --git a/swift/cmake/modules/AddPureSwift.cmake b/swift/cmake/modules/AddPureSwift.cmake
+index 30b82241214..3e0d7be7700 100644
+--- a/swift/cmake/modules/AddPureSwift.cmake
++++ b/swift/cmake/modules/AddPureSwift.cmake
+@@ -61,6 +61,7 @@ function(_add_host_swift_compile_options name)
+     add_dependencies(${name} swift-stdlib-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH})
+     target_compile_options(${name} PRIVATE
+       $<$<COMPILE_LANGUAGE:Swift>:-sdk;${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH};>
++      $<$<COMPILE_LANGUAGE:Swift>:-experimental-package-interface-load;>
+       $<$<COMPILE_LANGUAGE:Swift>:-resource-dir;${SWIFTLIB_DIR};>)
+     if(SWIFT_HOST_VARIANT_SDK STREQUAL "ANDROID" AND NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+       swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
 diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
 index ed28ab1891d..b7aa589f909 100644
 --- a/swift/cmake/modules/AddSwift.cmake
@@ -106,18 +118,6 @@ index ed28ab1891d..b7aa589f909 100644
          set(host_lib_dir "${SWIFTLIB_DIR}/${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}")
        endif()
        set(host_lib_arch_dir "${host_lib_dir}/${SWIFT_HOST_VARIANT_ARCH}")
-diff --git a/swift/cmake/modules/SwiftCompilerCapability.cmake b/swift/cmake/modules/SwiftCompilerCapability.cmake
-index d7d4381a1a7..d8c05dc6a75 100644
---- a/swift/cmake/modules/SwiftCompilerCapability.cmake
-+++ b/swift/cmake/modules/SwiftCompilerCapability.cmake
-@@ -39,7 +39,6 @@ function(swift_get_package_cmo_support out_var)
-   # > 6.0 : Fixed feature.
-   swift_supports_compiler_arguments(result
-     -package-name my-package
--    -enable-library-evolution
-     -Xfrontend -package-cmo
-     -Xfrontend -allow-non-resilient-access
-   )
 diff --git a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt b/swift/lib/CompilerSwiftSyntax/CMakeLists.txt
 index 849cf90fee0..f2a08df0e57 100644
 --- a/swift/lib/CompilerSwiftSyntax/CMakeLists.txt

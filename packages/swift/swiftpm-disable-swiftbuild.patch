@@ -1,0 +1,44 @@
+diff --git a/swiftpm/Sources/CoreCommands/Options.swift b/swiftpm/Sources/CoreCommands/Options.swift
+index 97ac88283..d0fd76306 100644
+--- a/swiftpm/Sources/CoreCommands/Options.swift
++++ b/swiftpm/Sources/CoreCommands/Options.swift
+@@ -554,7 +554,7 @@ public struct BuildOptions: ParsableArguments {
+         name: .customLong("build-system"),
+         help: "Specify the build system to use.",
+     )
+-    var _buildSystem: BuildSystemProvider.Kind = .swiftbuild
++    var _buildSystem: BuildSystemProvider.Kind = .native
+ 
+     /// The Debug Information Format to use.
+     @Option(name: .customLong("debug-info-format", withSingleDash: true), help: "The Debug Information Format to use.")
+diff --git a/swiftpm/Sources/CoreCommands/SwiftCommandState.swift b/swiftpm/Sources/CoreCommands/SwiftCommandState.swift
+index 453d08464..e62fecea9 100644
+--- a/swiftpm/Sources/CoreCommands/SwiftCommandState.swift
++++ b/swiftpm/Sources/CoreCommands/SwiftCommandState.swift
+@@ -153,7 +153,7 @@ extension SwiftCommand {
+ 
+         swiftCommandState.releaseLockIfNeeded()
+ 
+-        if globalOptions.build._buildSystem != .swiftbuild {
++        if globalOptions.build._buildSystem == .swiftbuild {
+             swiftCommandState.observabilityScope.emit(
+                 .deprecatedBuildSystem(buildSystem: globalOptions.build._buildSystem)
+             )
+@@ -253,7 +253,7 @@ extension AsyncSwiftCommand {
+ 
+         swiftCommandState.releaseLockIfNeeded()
+ 
+-        if globalOptions.build._buildSystem != .swiftbuild {
++        if globalOptions.build._buildSystem == .swiftbuild {
+             swiftCommandState.observabilityScope.emit(
+                 .deprecatedBuildSystem(buildSystem: globalOptions.build._buildSystem)
+             )
+@@ -1512,7 +1512,7 @@ extension Basics.Diagnostic {
+ 
+     package static func deprecatedBuildSystem(buildSystem: BuildSystemProvider.Kind) -> Self {
+         .warning(
+-            "'--build-system \(buildSystem)' has been deprecated and will be removed in a future release; please report an issue at https://github.com/swiftlang/swift-package-manager/issues if you are unable to adopt the default build system."
++            "'--build-system \(buildSystem)' does not work in Termux yet, it will be added in a future revision."
+         )
+     }
+ }
