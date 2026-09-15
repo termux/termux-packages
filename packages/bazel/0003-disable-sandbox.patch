@@ -1,0 +1,12 @@
+`sandbox` will not work on Android due to SELinux rules
+
+--- a/src/main/tools/BUILD
++++ b/src/main/tools/BUILD
+@@ -75,6 +75,7 @@
+         "//src/conditions:freebsd": ["dummy-sandbox.c"],
+         "//src/conditions:openbsd": ["dummy-sandbox.c"],
+         "//src/conditions:windows": ["dummy-sandbox.c"],
++        "//src/conditions:linux": ["dummy-sandbox.c"],
+         "//conditions:default": [
+             "linux-sandbox.cc",
+             "linux-sandbox.h",
