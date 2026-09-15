@@ -1,0 +1,1 @@
+TERMUX_SUBPKG_DESCRIPTION="Pixi package manager"
