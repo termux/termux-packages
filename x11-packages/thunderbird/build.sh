@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="154.0"
+TERMUX_PKG_VERSION="155.0"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
-TERMUX_PKG_SHA256=d22a5f24549a95ca1e729fbff3e24376b1d2e7eca4a66ba46e20e4e54c54b894
+TERMUX_PKG_SHA256=116a5eff70f3405f62247960ac6ca7c781ae99f313c5fc499c9c93b21f28b242
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -58,7 +58,7 @@ termux_step_post_get_source() {
 		Cargo.toml
 	(
 		termux_setup_rust
-		cargo update -p cc
+		cargo update --offline -p cc || cargo update -p cc || true
 	)
 }
 
@@ -69,7 +69,7 @@ termux_step_pre_configure() {
 	# Out of memory when building gkrust
 	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
 		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
-		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=0"
 	fi
 
 	cargo install cbindgen
@@ -91,22 +91,6 @@ termux_step_pre_configure() {
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
 	fi
-
-	# vendor crates that otherwise cause 'error: failed to calculate checksum of... .gitmodules'
-	# when '--frozen' is removed because the thunderbird archive doesn't contain any .gitmodules files,
-	# then vendor the cc crate last so that the CFLAGS-related patch can be applied to it
-	local crate dir crate_src_dir crate_dest_dir patch
-	for crate in minimal-lexical cubeb-sys sfv glslopt cc; do
-		dir="$TERMUX_PKG_SRCDIR/comm/third_party/rust"
-		crate_src_dir="$dir/$crate"
-		crate_dest_dir="$crate_src_dir-custom"
-		cp -r "$crate_src_dir" "$crate_dest_dir"
-		sed -i "/\[patch.crates-io\]/a $crate = { path = \"$crate_dest_dir\" }" "$TERMUX_PKG_SRCDIR/comm/rust/Cargo.toml"
-	done
-
-	patch="$TERMUX_PKG_BUILDER_DIR/0028-rust-cc-do-not-concatenates-all-the-CFLAGS.patch"
-	echo "Applying patch: $patch"
-	patch -p4 -d "$crate_dest_dir" < "$patch"
 }
 
 termux_step_configure() {
@@ -151,16 +135,21 @@ termux_step_make_install() {
 
 	# Install icons as Arch Linux does
 	local i theme=nightly
+	[ -d "comm/mail/branding/official" ] && theme=official
 	for i in 16 22 24 32 48 64 128 256; do
-		install -Dvm644 "comm/mail/branding/$theme/default$i.png" \
-			"$TERMUX_PREFIX/share/icons/hicolor/${i}x${i}/apps/$TERMUX_PKG_NAME.png"
+		if [ -f "comm/mail/branding/$theme/default$i.png" ]; then
+			install -Dvm644 "comm/mail/branding/$theme/default$i.png" \
+				"$TERMUX_PREFIX/share/icons/hicolor/${i}x${i}/apps/$TERMUX_PKG_NAME.png"
+		fi
 	done
-	install -Dvm644 "comm/mail/branding/$theme/content/about-logo.png" \
-		"$TERMUX_PREFIX/share/icons/hicolor/192x192/apps/$TERMUX_PKG_NAME.png"
-	install -Dvm644 "comm/mail/branding/$theme/content/about-logo@2x.png" \
-		"$TERMUX_PREFIX/share/icons/hicolor/384x384/apps/$TERMUX_PKG_NAME.png"
-	install -Dvm644 "comm/mail/branding/$theme/content/about-logo.svg" \
-		"$TERMUX_PREFIX/share/icons/hicolor/scalable/apps/$TERMUX_PKG_NAME.svg"
+	if [ -f "comm/mail/branding/$theme/content/about-logo.png" ]; then
+		install -Dvm644 "comm/mail/branding/$theme/content/about-logo.png" \
+			"$TERMUX_PREFIX/share/icons/hicolor/192x192/apps/$TERMUX_PKG_NAME.png"
+		install -Dvm644 "comm/mail/branding/$theme/content/about-logo@2x.png" \
+			"$TERMUX_PREFIX/share/icons/hicolor/384x384/apps/$TERMUX_PKG_NAME.png"
+		install -Dvm644 "comm/mail/branding/$theme/content/about-logo.svg" \
+			"$TERMUX_PREFIX/share/icons/hicolor/scalable/apps/$TERMUX_PKG_NAME.svg"
+	fi
 }
 
 termux_step_post_make_install() {
