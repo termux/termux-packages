@@ -1,0 +1,57 @@
+diff --git a/3rdparty/sol2/sol/sol.hpp b/3rdparty/sol2/sol/sol.hpp
+index 04fd7e4958d..7dea524bb16 100644
+--- a/3rdparty/sol2/sol/sol.hpp
++++ b/3rdparty/sol2/sol/sol.hpp
+@@ -3535,7 +3535,7 @@ COMPAT53_API void luaL_requiref(lua_State *L, const char *modname,
+ #endif /* Lua 5.2 only */
+ 
+ /* other Lua versions */
+-#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 501 || LUA_VERSION_NUM > 504
++#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 501 || LUA_VERSION_NUM > 505
+ 
+ #  error "unsupported Lua version (i.e. not Lua 5.1, 5.2, 5.3, or 5.4)"
+ 
+@@ -4419,7 +4419,7 @@ extern "C" {
+ }
+ #endif
+ 
+-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM == 504
++#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 504
+ 
+ #if !defined(LUA_ERRGCMM)
+ /* So Lua 5.4 actually removes this, which breaks sol2...
+@@ -28242,6 +28242,12 @@ namespace sol {
+ 
+ // end of sol/thread.hpp
+ 
++#if LUA_VERSION_NUM >= 505
++#  define sol_lua_newstate(f, ud) lua_newstate(f, ud, 0)
++#else
++#  define sol_lua_newstate(f, ud) lua_newstate(f, ud)
++#endif
++
+ namespace sol {
+ 
+ 	class state : private std::unique_ptr<lua_State, detail::state_deleter>, public state_view {
+@@ -28254,7 +28260,7 @@ namespace sol {
+ 		}
+ 
+ 		state(lua_CFunction panic, lua_Alloc alfunc, void* alpointer = nullptr)
+-		: unique_base(lua_newstate(alfunc, alpointer)), state_view(unique_base::get()) {
++		: unique_base(sol_lua_newstate(alfunc, alpointer)), state_view(unique_base::get()) {
+ 			set_default_state(unique_base::get(), panic);
+ 		}
+ 
+diff --git a/3rdparty/luafilesystem/src/lfs.c b/3rdparty/luafilesystem/src/lfs.c
+index 1b4ef09bfea..6db48072261 100644
+--- a/3rdparty/luafilesystem/src/lfs.c
++++ b/3rdparty/luafilesystem/src/lfs.c
+@@ -324,7 +324,7 @@ static FILE *check_file(lua_State * L, int idx, const char *funcname)
+     return 0;
+   } else
+     return *fh;
+-#elif LUA_VERSION_NUM >= 502 && LUA_VERSION_NUM <= 504
++#elif LUA_VERSION_NUM >= 502 && LUA_VERSION_NUM <= 505
+   luaL_Stream *fh = (luaL_Stream *) luaL_checkudata(L, idx, "FILE*");
+   if (fh->closef == 0 || fh->f == NULL) {
+     luaL_error(L, "%s: closed file", funcname);
