@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=7075f96cbabe45b4ecfc2e6b1745a625f856f695b0827a5506ce9ed85b906a
 TERMUX_PKG_DEPENDS="libedit, openssl"
 TERMUX_PKG_BUILD_DEPENDS="tcl"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # will overwrite libsqlite during installation
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # --enable-editline --disable-readline
