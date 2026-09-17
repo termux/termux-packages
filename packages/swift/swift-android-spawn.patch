@@ -29,7 +29,7 @@ index a64795c..d48876d 100755
      if 'ANDROID_DATA' in os.environ or (args.cross_compile_host and re.match(
              'android-', args.cross_compile_host)):
          swiftpm_args += [
-+            '-Xlinker', '-landroid-spawn',
++            '-Xlinker', '-landroid-spawn', '--build-system', 'native',
              '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
              # SwiftPM will otherwise try to compile against GNU strerror_r on
              # Android and fail.
@@ -65,14 +65,14 @@ diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilit
 index 18f22fb0..bc2b1308 100755
 --- a/swift-driver/Utilities/build-script-helper.py
 +++ b/swift-driver/Utilities/build-script-helper.py
-@@ -103,6 +103,7 @@ def get_swiftpm_options(args):
-     if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
-         'android-', args.cross_compile_hosts[0])):
-       swiftpm_args += [
-+        '-Xlinker', '-landroid-spawn',
-         '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
-         # SwiftPM will otherwise try to compile against GNU strerror_r on
-         # Android and fail.
+@@ -156,6 +156,7 @@ def get_swiftpm_options(args):
+ 
+         if "-android" in args.build_target:
+             swiftpm_args += [
++                "-Xlinker", "-landroid-spawn", "--build-system", "native",
+                 "-Xlinker",
+                 "-rpath",
+                 "-Xlinker",
 diff --git a/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt b/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
 index bbc43d98..bc5ee576 100644
 --- a/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
@@ -90,11 +90,20 @@ diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
 index 085056de..1ded1a90 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
+@@ -523,7 +523,7 @@ def install_dylib(args, library_name, install_dir, module_names, bin_dir):
+ 
+     # Install the swiftmodule/swiftinterface and swiftdoc files for all the modules.
+     for module in module_names:
+-        install_binary(args, module + ".swiftmodule", install_dir, bin_dir, ignored_patterns=['Project'])
++        install_binary(args, module + ".swiftmodule", install_dir, bin_dir, ignored_patterns=['Project'], subpath="Modules")
+ 
+ # Helper function that installs a single built artifact to a particular directory. The source may be either a file or a directory.
+ @log_entry_exit
 @@ -941,6 +941,7 @@ def get_swiftpm_flags(args):
              build_flags += ["--arch", "x86_64", "--arch", "arm64"]
          elif cross_compile_hosts.startswith('android-'):
              build_flags.extend(["--destination", args.cross_compile_config])
-+            build_flags.extend(["-Xlinker", "-landroid-spawn"])
++            build_flags.extend(["-Xlinker", "-landroid-spawn", "--build-system", "native"])
          else:
              logging.error("cannot cross-compile for %s", cross_compile_hosts)
              raise SystemExit(1)
