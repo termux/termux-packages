@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION="1:2026.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/TeX-Live/texlive-source/archive/refs/heads/tags/texlive-${TERMUX_PKG_VERSION:2}.tar.gz"
 TERMUX_PKG_SHA256=f92e1be0fe4b3ad4e596f8443c5e4e7315ecf0554c2fc153d7af52f854865e24
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libandroid-complex-math, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, lua52, libmpfr, libpaper, libpixman, libpng, libsynctex (= $TERMUX_PKG_VERSION), teckit, zlib"
+TERMUX_PKG_DEPENDS="freetype, harfbuzz, harfbuzz-icu, libandroid-complex-math, libc++, libcairo, libgd, libgmp, libgraphite, libiconv, libicu, lua52, libmpfr, libpaper, libpixman, libpng, libsynctex (= ${TERMUX_PKG_VERSION}${TERMUX_PKG_REVISION:+"-${TERMUX_PKG_REVISION}"}), teckit, zlib"
 # libpcre, glib, fontconfig are dependencies of libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools, pcre, glib, fontconfig, libuuid, libxml2"
