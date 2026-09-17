@@ -1,0 +1,34 @@
+diff -uNr emacs-27.2/src/emacs.c emacs-27.2.mod/src/emacs.c
+--- emacs-27.2/src/emacs.c	2021-01-28 19:52:38.000000000 +0200
++++ emacs-27.2.mod/src/emacs.c	2021-04-10 17:04:56.744343967 +0300
+@@ -120,6 +120,11 @@
+ #include "pdumper.h"
+ #include "epaths.h"
+ 
++#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++#endif
++
+ static const char emacs_version[] = PACKAGE_VERSION;
+ static const char emacs_copyright[] = COPYRIGHT;
+ static const char emacs_bugreport[] = PACKAGE_BUGREPORT;
+@@ -954,6 +959,18 @@
+   /* Record (approximately) where the stack begins.  */
+   stack_bottom = (char *) &stack_bottom_variable;
+ 
++#ifdef __ANDROID__
++  // For Android 11+.
++  void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++  if (lib_handle) {
++    void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++    if (set_fdsan_error_level) {
++      set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++    }
++    dlclose(lib_handle);
++  }
++#endif
++
+   const char *dump_mode = NULL;
+   int skip_args = 0;
+   char *temacs = NULL;
