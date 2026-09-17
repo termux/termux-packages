@@ -1,0 +1,33 @@
+Disable numbat's optional "plotting" (plotly) feature for numbat-cli.
+
+plotly 0.12.1's Plot::show()/show_html()/show_image() call the private
+helper Plot::show_with_default_app() unconditionally on every non-wasm
+target (plotly-0.12.1/src/plot.rs:249-315, guarded only by
+`#[cfg(not(target_family = "wasm"))]`), but that helper is itself only
+*defined* for `cfg(all(unix, not(target_os = "android"), not(target_os
+= "macos")))` (plot.rs:550). Android is unix but excluded from the impl,
+so building for any Termux/Android target (aarch64, arm, i686, x86_64)
+fails with:
+
+    error[E0599]: no associated function or constant named
+    `show_with_default_app` found for struct `Plot` in the current scope
+
+This is an upstream bug in the plotly crate itself (the caller-side cfg
+doesn't match the definition-side cfg for Android), not something numbat
+can be expected to work around, and "opening a plot in the OS's default
+viewer app" doesn't make sense in a Termux terminal session anyway.
+Disable numbat's "plotting" feature (default-features = false, keep only
+fetch-exchangerates) so plotly is never compiled in, while still shipping
+currency-conversion support.
+
+--- a/numbat-cli/Cargo.toml
++++ b/numbat-cli/Cargo.toml
+@@ -16,7 +16,7 @@
+ anyhow = "1"
+ rustyline = { version = "16.0.0", features = ["derive"] }
+ dirs = "6"
+-numbat = { version = "1.24.0", path = "../numbat" }
++numbat = { version = "1.24.0", path = "../numbat", default-features = false, features = ["fetch-exchangerates"] }
+ colored = "3"
+ itertools = "0.14"
+ toml = { version = "0.8.8", features = ["parse"] }
