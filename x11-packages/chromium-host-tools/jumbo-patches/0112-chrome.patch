@@ -948,7 +948,7 @@ index 5af8b82010..13c46f4168 100644
      }
 -    std::vector<tabs::TabInterface*> all_tabs = tab_list->GetAllTabs();
 +    std::vector<::tabs::TabInterface*> all_tabs = tab_list->GetAllTabs();
-     if (base::Contains(all_tabs, tab)) {
+     if (std::ranges::contains(all_tabs, tab)) {
        return browser;  // Found it!
      }
 diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/browser/extensions/extension_view_host_factory.cc
