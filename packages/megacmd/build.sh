@@ -2,13 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://mega.io/
 TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=("2.5.2"
-					"10.9.0")
-TERMUX_PKG_SRCURL=("https://github.com/meganz/MEGAcmd/archive/refs/tags/${TERMUX_PKG_VERSION[0]}_Linux.tar.gz"
-					"https://github.com/meganz/sdk/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz")
+TERMUX_PKG_VERSION=(
+	"2.6.0"
+	"10.19.0"
+)
+TERMUX_PKG_SRCURL=(
+	"https://github.com/meganz/MEGAcmd/archive/refs/tags/${TERMUX_PKG_VERSION[0]}_Linux.tar.gz"
+	"https://github.com/meganz/sdk/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz"
+)
 TERMUX_PKG_SHA256=(
-	a088c001e9116357fcac92cd0b3d62fb53cc24ce546eb0fb4cc83c53df5eed7c
-	811fcb952b09e765fa3559e370ae5f9b026cc8a297e125847acc8c77cfda01a8
+	705777008ff0242b539a689aaab22eed27857eec50b2c5596d751db17bf374be
+	dec7cc987988758e3125f39b0202113d1ae7ba0300fb76f4fd47fe5deb12209d
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+_Linux"
