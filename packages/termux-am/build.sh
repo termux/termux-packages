@@ -26,6 +26,9 @@ termux_step_post_get_source() {
 	# which supports compileSdk 35 and works with the Gradle 8.10.2 used
 	# below. The module already declares the required `namespace`.
 	sed -i'' -E -e "s|com\\.android\\.tools\\.build:gradle:7\\.4\\.2|com.android.tools.build:gradle:8.7.3|g" "$TERMUX_PKG_SRCDIR/build.gradle"
+	# AGP 8 requires the BuildConfig feature to be enabled explicitly when
+	# custom buildConfigField entries are declared.
+	sed -i'' -E -e "s|    namespace \"com\\.termux\\.termuxam\"|    namespace \"com.termux.termuxam\"\n    buildFeatures {\n        buildConfig true\n    }|g" "$TERMUX_PKG_SRCDIR/app/build.gradle"
 	# Bake the fork app package name into the APK instead of "com.termux".
 	sed -i'' -E -e "s|\\\\\"com\\.termux\\\\\"|\\\\\"${TERMUX_APP_PACKAGE}\\\\\"|g" "$TERMUX_PKG_SRCDIR/app/build.gradle"
 }
