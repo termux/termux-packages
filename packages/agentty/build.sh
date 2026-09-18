@@ -32,12 +32,19 @@ TERMUX_PKG_BUILD_DEPENDS="nlohmann-json, simdjson"
 #   AGENTTY_STANDALONE=OFF — upstream's release binaries are fully static for
 #   generic Linux. Termux wants an ordinary dynamically-linked PIE against its
 #   own openssl/nghttp2, which is what OFF produces.
+#
+#   MAYA_NATIVE_TUNING=OFF — maya defaults to -march=native, which asks the
+#   compiler about the machine it is RUNNING on. Cross-compiling for aarch64
+#   from an x86_64 builder, that is the wrong CPU entirely. maya also refuses
+#   native tuning when CMAKE_CROSSCOMPILING is set, but stating it here keeps
+#   the package correct regardless of which maya revision gets vendored.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DAGENTTY_AUTO_PULL_SUBMODULES=OFF
 -DAGENTTY_BUILD_TESTS=OFF
 -DAGENTTY_COMPILER_CACHE=OFF
 -DAGENTTY_STANDALONE=OFF
 -DAGENTTY_USE_MIMALLOC=OFF
+-DMAYA_NATIVE_TUNING=OFF
 "
 
 termux_step_make_install() {
