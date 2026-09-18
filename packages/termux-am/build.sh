@@ -15,6 +15,14 @@ _GRADLE_VERSION=8.10.2
 termux_step_post_get_source() {
 	sed -i'' -E -e "s|\@TERMUX_PREFIX\@|${TERMUX_PREFIX}|g" "$TERMUX_PKG_SRCDIR/am-libexec-packaged"
 	sed -i'' -E -e "s|\@TERMUX_APP_PACKAGE\@|${TERMUX_APP_PACKAGE}|g" "$TERMUX_PKG_SRCDIR/app/src/main/java/com/termux/termuxam/FakeContext.java"
+	# Use SDK components preinstalled in the builder image (platform
+	# android-35, build-tools $TERMUX_ANDROID_BUILD_TOOLS_VERSION) since the
+	# ones pinned by TermuxAm (platform android-33, build-tools 30.0.3) are
+	# not available and cannot be downloaded at build time. targetSdkVersion
+	# is intentionally left untouched as it affects runtime behaviour.
+	sed -i'' -E -e "s|    compileSdkVersion 33|    compileSdkVersion 35\n    buildToolsVersion \"$TERMUX_ANDROID_BUILD_TOOLS_VERSION\"|g" "$TERMUX_PKG_SRCDIR/app/build.gradle"
+	# Bake the fork app package name into the APK instead of "com.termux".
+	sed -i'' -E -e "s|\\\\\"com\\.termux\\\\\"|\\\\\"${TERMUX_APP_PACKAGE}\\\\\"|g" "$TERMUX_PKG_SRCDIR/app/build.gradle"
 }
 
 termux_step_make() {
