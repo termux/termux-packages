@@ -1,6 +1,6 @@
 --- a/client/hostinfo_unix.cpp
 +++ b/client/hostinfo_unix.cpp
-@@ -169,6 +169,16 @@
+@@ -165,6 +165,16 @@
  #include <OS.h>
  #endif
  
@@ -17,7 +17,7 @@
  // Some OS define _SC_PAGE_SIZE instead of _SC_PAGESIZE
  #if defined(_SC_PAGE_SIZE) && !defined(_SC_PAGESIZE)
  #define _SC_PAGESIZE _SC_PAGE_SIZE
-@@ -1505,7 +1515,12 @@
+@@ -1675,7 +1685,12 @@
  // return BOINC_SUCCESS if at least version could be found (extra_info may remain empty)
  // return ERR_NOT_FOUND if ldd couldn't be opened or no version information was found
  //
@@ -31,7 +31,7 @@
  int get_libc_version(string& version, string&) {
      version = string(gnu_get_libc_version());
      return BOINC_SUCCESS;
-@@ -1555,16 +1570,24 @@
+@@ -1725,16 +1740,24 @@
  #if HAVE_SYS_UTSNAME_H
      struct utsname u;
      uname(&u);
@@ -60,7 +60,7 @@
      safe_strcpy(os_version, u.release);
  #endif
  #ifdef _HPUX_SOURCE
-@@ -1717,7 +1740,7 @@
+@@ -1888,7 +1911,7 @@
          return false;
      }
  } tty_patterns[] = {
@@ -69,3 +69,30 @@
      { "/dev", "tty",
        {"ttyS", "ttyACM"},
      },
+@@ -2294,7 +2317,7 @@
+ 
+ #endif // LINUX_LIKE_SYSTEM
+ 
+-#ifndef ANDROID     // Android doesn't have shm_open()
++#ifndef __ANDROID__     // Android doesn't have shm_open()
+ // idle time detection.
+ // old approach: do it ourselves by looking at devices
+ //  and trying to get info from X11
+@@ -2459,7 +2482,7 @@
+ long HOST_INFO::user_idle_time(bool check_all_logins) {
+     long idle_time = USER_IDLE_TIME_INF;
+ 
+-#ifndef ANDROID
++#ifndef __ANDROID__
+     static bool show_idle_time_legacy_warning = true;
+     if (get_idle_time_from_daemon(idle_time)) {
+         show_idle_time_legacy_warning = false;
+@@ -2487,7 +2510,7 @@
+ #if LINUX_LIKE_SYSTEM
+ 
+ #if HAVE_XSS
+-#ifndef ANDROID
++#ifndef __ANDROID__
+     // Detect Wayland once. The display server type is not expected to
+     // change while this client process is running.
+     static bool wayland_detected = detect_wayland();
