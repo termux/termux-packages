@@ -96,7 +96,7 @@ jobs:
     permissions:
       issues: write
       contents: write
-    if: github.event_name != 'pull_request' && github.event_name != 'push' && github.repository == 'termux/termux-packages'
+    if: github.event_name != 'pull_request' && github.event_name != 'push' && github.repository == 'Wizk-Modz/termux-packages'
     runs-on: ubuntu-26.04
     steps:
       - name: Clone repository
@@ -123,10 +123,6 @@ jobs:
             curl \
             python3 \
             jq
-      - name: Audit published packages for undeclared conflicts
-        env:
-          GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
-        run: ./scripts/utils/termux_report_published_conflicts.sh
       - name: Process package updates
         env:
           GITHUB_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
@@ -136,8 +132,8 @@ jobs:
           GIT_PUSH_PACKAGES: "true"
           MANUAL_INPUT_PACKAGES: ${{ github.event.inputs.packages }}
         run: |
-          git config --global user.name "Termux Github Actions"
-          git config --global user.email "contact@termux.dev"
+          git config --global user.name "Wizk-BOT"
+          git config --global user.email "wizk-bot@users.noreply.github.com"
 
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             # Ensure MANUAL_INPUT_PACKAGES is newline free, and put it
@@ -147,12 +143,3 @@ jobs:
           else
             ./scripts/bin/update-packages "@all"
           fi
-      - name: Trigger repology metadata generation
-        if: always()
-        run: |
-          curl \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: Bearer ${{ secrets.TERMUXBOT2_TOKEN }}" \
-            -X POST \
-            --data '{"ref":"master"}' \
-            "https://api.github.com/repos/termux/repology-metadata/actions/workflows/repology_metadata.yml/dispatches"
