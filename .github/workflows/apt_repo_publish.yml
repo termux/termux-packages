@@ -13,6 +13,10 @@ name: Publish APT repo (wizk)
 # run ID to import its debs first; with an empty input the current pool
 # state is simply re-published (useful for the first, possibly empty,
 # publish so `apt update` works from day one).
+#
+# It also runs automatically after every successful `Packages` run on
+# master, importing that run's debs, so merged packages reach the repo
+# without manual steps. (Pushes go to wizk-apt-repo, so no loop.)
 
 on:
   workflow_dispatch:
@@ -24,6 +28,10 @@ on:
         description: "Architecture"
         required: false
         default: "aarch64"
+  workflow_run:
+    workflows: ["Packages"]
+    types: [completed]
+    branches: [master]
 
 permissions:
   contents: read
@@ -37,11 +45,21 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    if: github.repository == 'Wizk-Modz/termux-packages'
+    if: github.repository == 'Wizk-Modz/termux-packages' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
     env:
       APT_REPO: Wizk-Modz/wizk-apt-repo
       APT_REPO_BRANCH: master
     steps:
+      - name: Resolve inputs
+        run: |
+          echo "ARCH=${{ inputs.arch || 'aarch64' }}" >> "$GITHUB_ENV"
+          RUN_ID="${{ inputs.packages_run_id }}"
+          if [ -z "$RUN_ID" ] && [ "${{ github.event_name }}" = "workflow_run" ]; then
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          fi
+          echo "RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
+          echo "Importing debs from run: ${RUN_ID:-<none, republish pool>}"
+
       - name: Install tools
         run: |
           command -v aptly >/dev/null || sudo apt-get install -y aptly
@@ -60,16 +78,15 @@ jobs:
           git clone --depth 1 --branch "$APT_REPO_BRANCH" "git@github.com:${APT_REPO}.git" apt-repo
 
       - name: Import debs from Packages run
-        if: inputs.packages_run_id != ''
+        if: env.RUN_ID != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p dl && cd dl
-          gh run download "${{ inputs.packages_run_id }}" --repo "$GITHUB_REPOSITORY"
-          for t in debs-*.tar; do
-            [ -e "$t" ] || continue
-            tar xf "$t"
-          done
+          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY"
+          # Artifacts land in per-artifact subdirectories, so search
+          # recursively for the tarballs instead of globbing top level.
+          find . -name "debs-*.tar" -exec tar -xf {} \;
           mkdir -p ../incoming
           find . -name "*.deb" -exec cp -f "{}" ../incoming/ \;
           cd .. && rm -rf dl
@@ -110,7 +127,7 @@ jobs:
           }
           EOF
           aptly -config="$PWD/aptly.conf" publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
-            -origin="Wizk" -label="Wizk" -architectures="${{ inputs.arch }}" \
+            -origin="Wizk" -label="Wizk"             -architectures="${{ env.ARCH }}" \
             "$SNAPSHOT" filesystem:wizk:
           # Sync aptly output back: dists/ metadata plus the reorganized pool/
           # (which becomes the cumulative store for the next run).
@@ -130,5 +147,5 @@ jobs:
             exit 0
           fi
           git -c user.name="github-actions[bot]" -c user.email="github-actions[bot]@users.noreply.github.com" \
-            commit -m "Publish APT repo (${{ inputs.arch }})"
+            commit -m "Publish APT repo (${{ env.ARCH }})"
           git push origin "$APT_REPO_BRANCH"
