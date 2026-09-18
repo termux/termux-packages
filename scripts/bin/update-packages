@@ -91,9 +91,7 @@ TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$
 # which is what currently ships with Ubuntu 26.04.
 # This commit can be reverted once Ubuntu ships uutils >= 0.9.0 or backports the fix.
 ms_to_human_readable() {
-    local now start
-    printf -v now '%13d' "$1"
-    printf -v start '%13d' "$2"
+    local now="${1:0:13}" start="${2:0:13}"
     local span="$(( now - start ))" hrs=0 mins=0 secs=0 ms=0
 	(( ms = span%1000, span /= 1000, secs = span%60, span /= 60, mins = span%60, hrs = span/60 ))
 	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
