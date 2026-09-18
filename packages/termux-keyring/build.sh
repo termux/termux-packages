@@ -27,6 +27,9 @@ termux_step_make_install() {
 	# Key for automatic builds (via CI).
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/termux-autobuilds.gpg" "$GPG_SHARE_DIR"
 
+	# Key for the Wizk fork repository.
+	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/wizk-archive-keyring.gpg" "$GPG_SHARE_DIR"
+
 	# Key for pacman package manager.
 	install -Dm600 "$TERMUX_PKG_BUILDER_DIR/termux-pacman.gpg" "$GPG_SHARE_DIR"
 

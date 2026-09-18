@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-26.04
     strategy:
       matrix:
-        target_arch: [aarch64, arm, i686, x86_64]
+        target_arch: [aarch64]
       fail-fast: false
     steps:
     - name: Clone repository
@@ -393,7 +393,7 @@ jobs:
           fi
         fi
 
-        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+        for archive in debs-*/debs-aarch64-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
 
@@ -422,7 +422,7 @@ jobs:
       run: |
         source scripts/aptly_api.sh
 
-        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
+        for archive in debs-*/debs-aarch64-${{ github.sha }}.tar; do
           tar xf "$archive"
         done
 
