@@ -1,14 +1,18 @@
 name: Publish APT repo (wizk)
 
 # Publishes *.deb files built by the `Packages` workflow to the fork APT
-# repository at https://wizk-modz.github.io/wizk-apt-repo/ :
-# pool/*.deb + dists/stable/main/binary-<arch>/Packages(+.gz) +
-# signed Release/InRelease, pushed to Wizk-Modz/wizk-apt-repo (master).
+# repository at https://wizk-modz.github.io/wizk-apt-repo/ using `aptly`:
+# pool/ + dists/stable (signed Release/InRelease), pushed to
+# Wizk-Modz/wizk-apt-repo (master).
+#
+# The git repo doubles as the cumulative .deb store: every publish re-adds
+# all debs found under pool/ to a fresh aptly repo, so history is kept in
+# git and no aptly database needs to persist between runs.
 #
 # Run manually from the Actions tab. Optionally pass a `Packages` workflow
 # run ID to import its debs first; with an empty input the current pool
-# state is simply re-signed and re-published (useful for the first,
-# possibly empty, publish so `apt update` works from day one).
+# state is simply re-published (useful for the first, possibly empty,
+# publish so `apt update` works from day one).
 
 on:
   workflow_dispatch:
@@ -40,8 +44,7 @@ jobs:
     steps:
       - name: Install tools
         run: |
-          command -v dpkg-scanpackages >/dev/null || sudo apt-get install -y dpkg-dev
-          command -v apt-ftparchive >/dev/null || sudo apt-get install -y apt
+          command -v aptly >/dev/null || sudo apt-get install -y aptly
 
       - name: Setup SSH for apt repo push
         run: |
@@ -67,48 +70,47 @@ jobs:
             [ -e "$t" ] || continue
             tar xf "$t"
           done
-          mkdir -p ../apt-repo/pool
-          find . -name "*.deb" -exec cp -f "{}" ../apt-repo/pool/ \;
+          mkdir -p ../incoming
+          find . -name "*.deb" -exec cp -f "{}" ../incoming/ \;
           cd .. && rm -rf dl
 
-      - name: Generate Packages index
-        run: |
-          cd apt-repo
-          mkdir -p "pool" "dists/stable/main/binary-${{ inputs.arch }}"
-          if ls pool/*.deb >/dev/null 2>&1; then
-            dpkg-scanpackages --arch "${{ inputs.arch }}" pool /dev/null > "dists/stable/main/binary-${{ inputs.arch }}/Packages"
-          else
-            echo "[!] Pool is empty, publishing empty index."
-            : > "dists/stable/main/binary-${{ inputs.arch }}/Packages"
-          fi
-          gzip -kf "dists/stable/main/binary-${{ inputs.arch }}/Packages"
-
-      - name: Generate and sign Release
+      - name: Import GPG key
         env:
           APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
         run: |
-          cd apt-repo
           export GNUPGHOME="$PWD/.gnupg"
           mkdir -p "$GNUPGHOME" && chmod 700 "$GNUPGHOME"
           printf "%s" "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
-          KEYID=$(gpg --batch --list-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
-          echo "Signing as $KEYID"
-          cat > release.conf <<EOF
-          APT::FTPArchive::Release::Origin "Wizk";
-          APT::FTPArchive::Release::Label "Wizk";
-          APT::FTPArchive::Release::Suite "stable";
-          APT::FTPArchive::Release::Codename "stable";
-          APT::FTPArchive::Release::Architectures "${{ inputs.arch }}";
-          APT::FTPArchive::Release::Components "main";
-          APT::FTPArchive::Release::Description "Wizk Termux fork APT repository";
-          EOF
-          apt-ftparchive -c release.conf release dists/stable > dists/stable/Release
-          rm -f dists/stable/InRelease dists/stable/Release.gpg
-          gpg --batch --yes --pinentry-mode loopback --local-user "$KEYID" \
-            --clearsign -o dists/stable/InRelease dists/stable/Release
-          gpg --batch --yes --pinentry-mode loopback --local-user "$KEYID" \
-            -abs -o dists/stable/Release.gpg dists/stable/Release
-          rm -rf "$GNUPGHOME"
+          echo "KEYID=$(gpg --batch --list-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')" >> "$GITHUB_ENV"
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+
+      - name: Publish with aptly
+        run: |
+          set -e
+          export GNUPGHOME="$PWD/.gnupg"
+          mkdir -p apt-repo/pool incoming
+          SNAPSHOT="wizk-$(date +%Y%m%d%H%M%S)"
+          aptly repo create -distribution=stable -component=main wizk-stable
+          # Cumulative store: re-add every deb already in the repo pool plus
+          # any newly imported ones.
+          mapfile -t ALL_DEBS < <(find apt-repo/pool incoming -name "*.deb" 2>/dev/null) || true
+          if [ "${#ALL_DEBS[@]}" -gt 0 ]; then
+            # shellcheck disable=SC2068
+            aptly repo add wizk-stable ${ALL_DEBS[@]}
+          else
+            echo "[!] Pool is empty, publishing empty repo."
+          fi
+          aptly snapshot create "$SNAPSHOT" from repo wizk-stable
+          rm -rf publish && mkdir -p publish
+          aptly publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
+            -origin="Wizk" -label="Wizk" -architectures="${{ inputs.arch }}" \
+            "$SNAPSHOT" filesystem:./publish:
+          # Sync aptly output back: dists/ metadata plus the reorganized pool/
+          # (which becomes the cumulative store for the next run).
+          rm -rf apt-repo/dists apt-repo/pool
+          cp -r publish/dists apt-repo/dists
+          cp -r publish/pool apt-repo/pool
+          rm -rf publish incoming .gnupg
 
       - name: Push to apt repo
         env:
