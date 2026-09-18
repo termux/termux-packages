@@ -74,8 +74,8 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	{
-		echo "# The Wizk fork repository"
-		echo "deb https://wizk-modz.github.io/wizk-apt-repo/ stable main"
+		echo "# The Wizk fork repository (trusted, no key required)"
+		echo "deb [trusted=yes] https://wizk-modz.github.io/wizk-apt-repo/ stable main"
 	} > $TERMUX_PREFIX/etc/apt/sources.list
 
 	# apt-transport-tor

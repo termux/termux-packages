@@ -2180,13 +2180,13 @@ TERMUX_AM_APP__AM_CLASS__CLASS_NAME="$TERMUX_AM_APP__NAMESPACE.Am"
 # and are compiled locally.
 # FIXME: Checking for all variables will be added later in repo
 # changes pull, currently only `TERMUX_REPO_APP__PACKAGE_NAME` is checked.
-TERMUX_REPO_APP__PACKAGE_NAME="com.termux"
-TERMUX_REPO_APP__DATA_DIR="/data/data/com.termux"
-TERMUX_REPO__CORE_DIR="/data/data/com.termux/termux/core"
-TERMUX_REPO__APPS_DIR="/data/data/com.termux/termux/app"
-TERMUX_REPO__ROOTFS="/data/data/com.termux/files"
-TERMUX_REPO__HOME="/data/data/com.termux/files/home"
-TERMUX_REPO__PREFIX="/data/data/com.termux/files/usr"
+TERMUX_REPO_APP__PACKAGE_NAME="com.wizk"
+TERMUX_REPO_APP__DATA_DIR="/data/data/com.wizk"
+TERMUX_REPO__CORE_DIR="/data/data/com.wizk/termux/core"
+TERMUX_REPO__APPS_DIR="/data/data/com.wizk/termux/app"
+TERMUX_REPO__ROOTFS="/data/data/com.wizk/files"
+TERMUX_REPO__HOME="/data/data/com.wizk/files/home"
+TERMUX_REPO__PREFIX="/data/data/com.wizk/files/usr"
 
 
 
