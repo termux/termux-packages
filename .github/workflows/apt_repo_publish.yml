@@ -156,6 +156,19 @@ jobs:
                 pkgsrc/x11-packages/*) dist="x11"; X11_DEBS+=("$deb");;
               esac
             fi
+            if [ -z "$dist" ] && [[ "$pkg" == *-static ]]; then
+              # Virtual -static subpackages are auto-generated at build time
+              # (see termux_create_debian_subpackages.sh) and have no recipe
+              # file, so map them via the parent package name instead.
+              parent="${pkg%-static}"
+              if [ -f "pkgsrc/packages/$parent/build.sh" ]; then
+                dist="stable"; STABLE_DEBS+=("$deb")
+              elif [ -f "pkgsrc/root-packages/$parent/build.sh" ]; then
+                dist="root"; ROOT_DEBS+=("$deb")
+              elif [ -f "pkgsrc/x11-packages/$parent/build.sh" ]; then
+                dist="x11"; X11_DEBS+=("$deb")
+              fi
+            fi
             if [ -z "$dist" ]; then
               echo "::error ::Cannot map deb '$deb' (package '$pkg') to a distribution."
               exit 1
