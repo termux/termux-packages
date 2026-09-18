@@ -1,0 +1,15 @@
+--- a/frontend/parse.c	2023-12-18 15:34:05.000000000 +0200
++++ b/frontend/parse.c	2026-09-18 12:41:27.038719213 +0300
+@@ -414,10 +414,10 @@
+                 case 't': return id3tag_set_textinfo_utf8(gfp, "TIT2", str);
+                 case 'l': return id3tag_set_textinfo_utf8(gfp, "TALB", str);
+                 case 'g': return id3tag_set_textinfo_utf8(gfp, "TCON", str);
+-                case 'c': return id3tag_set_comment_ucs2(gfp, 0, 0, str);
++                case 'c': return id3tag_set_comment_utf16(gfp, 0, 0, str);
+                 case 'n': return id3tag_set_textinfo_utf8(gfp, "TRCK", str);
+                 case 'y': return id3tag_set_textinfo_utf8(gfp, "TYER", str);
+-                case 'v': return id3tag_set_fieldvalue_ucs2(gfp, str);
++                case 'v': return id3tag_set_fieldvalue_utf16(gfp, str);
+             }
+             ;;
+         case TENC_UTF16:
