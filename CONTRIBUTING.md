@@ -614,7 +614,7 @@ modification is stored in a separate patch file.
 [![asciicast](https://asciinema.org/a/gVwMqf1bGbqrXmuILvxozy3IG.svg)](https://asciinema.org/a/gVwMqf1bGbqrXmuILvxozy3IG?autoplay=1&speed=2.0)
 
 You can check which packages are out-of-date by visiting Termux page on
-[Repology](https://repology.org/projects/?inrepo=termux&outdated=1).
+[Repology](https://repology.amdmi3.ru/projects/?inrepo=termux&outdated=1).
 
 ### General package update procedure
 
