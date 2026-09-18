@@ -1,0 +1,41 @@
+name: Build bootstrap from source (com.wizk, aarch64)
+
+# Builds the bootstrap archive from source with TERMUX_APP__PACKAGE_NAME
+# from scripts/properties.sh (fork package, e.g. com.wizk) instead of
+# repacking official debs (which hardcode the com.termux prefix in ELF
+# binaries and would be broken for a fork).
+#
+# Run manually from the Actions tab (workflow_dispatch). The resulting
+# bootstrap-aarch64.zip is uploaded as an artifact: download it, publish
+# it to a GitHub release, then point termux-app at it.
+
+on:
+  workflow_dispatch:
+
+permissions: {} # none
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    permissions:
+      contents: read # actions/upload-artifact doesn't need contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    if: github.repository == 'Wizk-Modz/termux-packages'
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v7
+      - name: Free disk space
+        run: ./scripts/free-space.sh
+      - name: Build bootstrap from source
+        run: ./scripts/run-docker.sh ./scripts/build-bootstraps.sh --architectures aarch64
+      - name: Show checksums
+        run: sha256sum bootstrap-*.zip
+      - name: Store artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: bootstrap-wizk-aarch64-${{ github.sha }}
+          path: "bootstrap-*.zip"
