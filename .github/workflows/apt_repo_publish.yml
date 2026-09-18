@@ -102,9 +102,16 @@ jobs:
           fi
           aptly snapshot create "$SNAPSHOT" from repo wizk-stable
           rm -rf publish && mkdir -p publish
-          aptly publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
+          cat > aptly.conf <<EOF
+          {
+            "FileSystemPublishEndpoints": {
+              "wizk": { "rootDir": "$PWD/publish" }
+            }
+          }
+          EOF
+          aptly -config="$PWD/aptly.conf" publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
             -origin="Wizk" -label="Wizk" -architectures="${{ inputs.arch }}" \
-            "$SNAPSHOT" filesystem:./publish:
+            "$SNAPSHOT" filesystem:wizk:
           # Sync aptly output back: dists/ metadata plus the reorganized pool/
           # (which becomes the cumulative store for the next run).
           rm -rf apt-repo/dists apt-repo/pool
