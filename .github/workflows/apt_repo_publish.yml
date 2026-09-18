@@ -2,8 +2,10 @@ name: Publish APT repo (wizk)
 
 # Publishes *.deb files built by the `Packages` workflow to the fork APT
 # repository at https://wizk-modz.github.io/wizk-apt-repo/ using `aptly`:
-# pool/ + dists/stable (signed Release/InRelease), pushed to
-# Wizk-Modz/wizk-apt-repo (master).
+# pool/ + dists/stable, dists/root, dists/x11 (signed Release/InRelease),
+# pushed to Wizk-Modz/wizk-apt-repo (master). Each deb is routed to the
+# distribution matching its source directory (packages/ -> stable,
+# root-packages/ -> root, x11-packages/ -> x11).
 #
 # The git repo doubles as the cumulative .deb store: every publish re-adds
 # all debs found under pool/ to a fresh aptly repo, so history is kept in
@@ -91,6 +93,20 @@ jobs:
           find . -name "*.deb" -exec cp -f "{}" ../incoming/ \;
           cd .. && rm -rf dl
 
+      - name: Clone package recipes for repo mapping
+        uses: actions/checkout@v7
+        with:
+          path: pkgsrc
+          filter: blob:none
+          sparse-checkout: |
+            packages/*/build.sh
+            packages/*/*.subpackage.sh
+            root-packages/*/build.sh
+            root-packages/*/*.subpackage.sh
+            x11-packages/*/build.sh
+            x11-packages/*/*.subpackage.sh
+          sparse-checkout-cone-mode: false
+
       - name: Import GPG key
         env:
           APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
@@ -108,21 +124,53 @@ jobs:
           mkdir -p apt-repo/pool incoming
           STAMP="$(date +%Y%m%d%H%M%S)"
           aptly repo create -distribution=stable -component=main wizk-stable
-          # root/x11 distributions stay empty (we only build main); they must
-          # still exist or build-time metadata downloads fail hard.
           aptly repo create -distribution=root -component=stable wizk-root
           aptly repo create -distribution=x11 -component=main wizk-x11
           # Cumulative store: re-add every deb already in the repo pool plus
-          # any newly imported ones.
+          # any newly imported ones. Each deb is routed to the aptly repo
+          # matching the source directory it was built from, so every
+          # distribution gets its Contents metadata (required by
+          # command-not-found's generate-db.js at bootstrap build time).
+          STABLE_DEBS=()
+          ROOT_DEBS=()
+          X11_DEBS=()
           mapfile -t ALL_DEBS < <(find apt-repo/pool incoming -name "*.deb" 2>/dev/null) || true
-          if [ "${#ALL_DEBS[@]}" -gt 0 ]; then
-            # -force-replace: re-adding a deb already in the repo (normal for
-            # the cumulative pool) must not fail the publish.
-            # shellcheck disable=SC2068
-            aptly repo add -force-replace wizk-stable ${ALL_DEBS[@]}
-          else
-            echo "[!] Pool is empty, publishing empty repo."
-          fi
+          for deb in ${ALL_DEBS[@]+"${ALL_DEBS[@]}"}; do
+            pkg="$(dpkg-deb -f "$deb" Package)"
+            dist=""
+            if [ -f "pkgsrc/packages/$pkg/build.sh" ]; then
+              dist="stable"
+              STABLE_DEBS+=("$deb")
+            elif [ -f "pkgsrc/root-packages/$pkg/build.sh" ]; then
+              dist="root"
+              ROOT_DEBS+=("$deb")
+            elif [ -f "pkgsrc/x11-packages/$pkg/build.sh" ]; then
+              dist="x11"
+              X11_DEBS+=("$deb")
+            else
+              # Subpackages (e.g. foo-dev built from foo): find the owning recipe.
+              owner="$(find pkgsrc/packages pkgsrc/root-packages pkgsrc/x11-packages -maxdepth 2 -name "$pkg.subpackage.sh" -print -quit 2>/dev/null)"
+              case "$owner" in
+                pkgsrc/packages/*) dist="stable"; STABLE_DEBS+=("$deb");;
+                pkgsrc/root-packages/*) dist="root"; ROOT_DEBS+=("$deb");;
+                pkgsrc/x11-packages/*) dist="x11"; X11_DEBS+=("$deb");;
+              esac
+            fi
+            if [ -z "$dist" ]; then
+              echo "::error ::Cannot map deb '$deb' (package '$pkg') to a distribution."
+              exit 1
+            fi
+            echo "Routing package '$pkg' -> distribution '$dist'."
+          done
+          # -force-replace: re-adding a deb already in the repo (normal for
+          # the cumulative pool) must not fail the publish.
+          # shellcheck disable=SC2068
+          [ "${#STABLE_DEBS[@]}" -gt 0 ] && aptly repo add -force-replace wizk-stable ${STABLE_DEBS[@]}
+          # shellcheck disable=SC2068
+          [ "${#ROOT_DEBS[@]}" -gt 0 ] && aptly repo add -force-replace wizk-root ${ROOT_DEBS[@]}
+          # shellcheck disable=SC2068
+          [ "${#X11_DEBS[@]}" -gt 0 ] && aptly repo add -force-replace wizk-x11 ${X11_DEBS[@]}
+          [ "${#ALL_DEBS[@]}" -eq 0 ] && echo "[!] Pool is empty, publishing empty repo."
           aptly snapshot create "wizk-$STAMP" from repo wizk-stable
           aptly snapshot create "wizk-$STAMP-root" from repo wizk-root
           aptly snapshot create "wizk-$STAMP-x11" from repo wizk-x11
