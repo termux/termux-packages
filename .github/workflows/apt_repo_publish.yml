@@ -106,8 +106,12 @@ jobs:
           set -e
           export GNUPGHOME="$PWD/.gnupg"
           mkdir -p apt-repo/pool incoming
-          SNAPSHOT="wizk-$(date +%Y%m%d%H%M%S)"
+          STAMP="$(date +%Y%m%d%H%M%S)"
           aptly repo create -distribution=stable -component=main wizk-stable
+          # root/x11 distributions stay empty (we only build main); they must
+          # still exist or build-time metadata downloads fail hard.
+          aptly repo create -distribution=root -component=stable wizk-root
+          aptly repo create -distribution=x11 -component=main wizk-x11
           # Cumulative store: re-add every deb already in the repo pool plus
           # any newly imported ones.
           mapfile -t ALL_DEBS < <(find apt-repo/pool incoming -name "*.deb" 2>/dev/null) || true
@@ -119,7 +123,9 @@ jobs:
           else
             echo "[!] Pool is empty, publishing empty repo."
           fi
-          aptly snapshot create "$SNAPSHOT" from repo wizk-stable
+          aptly snapshot create "wizk-$STAMP" from repo wizk-stable
+          aptly snapshot create "wizk-$STAMP-root" from repo wizk-root
+          aptly snapshot create "wizk-$STAMP-x11" from repo wizk-x11
           rm -rf publish && mkdir -p publish
           cat > aptly.conf <<EOF
           {
@@ -128,9 +134,16 @@ jobs:
             }
           }
           EOF
-          aptly -config="$PWD/aptly.conf" publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
-            -origin="Wizk" -label="Wizk"             -architectures="${{ env.ARCH }}" \
-            "$SNAPSHOT" filesystem:wizk:
+          publish_snapshot() {
+            local snap="$1" dist="$2" comp="$3"
+            aptly -config="$PWD/aptly.conf" publish snapshot -batch -passphrase="" -gpg-key="$KEYID" \
+              -origin="Wizk" -label="Wizk" -architectures="${{ env.ARCH }}" \
+              -distribution="$dist" -component="$comp" \
+              "$snap" filesystem:wizk:
+          }
+          publish_snapshot "wizk-$STAMP" stable main
+          publish_snapshot "wizk-$STAMP-root" root stable
+          publish_snapshot "wizk-$STAMP-x11" x11 main
           # Sync aptly output back: dists/ metadata plus the reorganized pool/
           # (which becomes the cumulative store for the next run).
           rm -rf apt-repo/dists apt-repo/pool
