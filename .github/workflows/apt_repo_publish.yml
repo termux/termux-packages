@@ -112,8 +112,10 @@ jobs:
           # any newly imported ones.
           mapfile -t ALL_DEBS < <(find apt-repo/pool incoming -name "*.deb" 2>/dev/null) || true
           if [ "${#ALL_DEBS[@]}" -gt 0 ]; then
+            # -force-replace: re-adding a deb already in the repo (normal for
+            # the cumulative pool) must not fail the publish.
             # shellcheck disable=SC2068
-            aptly repo add wizk-stable ${ALL_DEBS[@]}
+            aptly repo add -force-replace wizk-stable ${ALL_DEBS[@]}
           else
             echo "[!] Pool is empty, publishing empty repo."
           fi
