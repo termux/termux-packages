@@ -1,0 +1,125 @@
+name: Publish APT repo (wizk)
+
+# Publishes *.deb files built by the `Packages` workflow to the fork APT
+# repository at https://wizk-modz.github.io/wizk-apt-repo/ :
+# pool/*.deb + dists/stable/main/binary-<arch>/Packages(+.gz) +
+# signed Release/InRelease, pushed to Wizk-Modz/wizk-apt-repo (master).
+#
+# Run manually from the Actions tab. Optionally pass a `Packages` workflow
+# run ID to import its debs first; with an empty input the current pool
+# state is simply re-signed and re-published (useful for the first,
+# possibly empty, publish so `apt update` works from day one).
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages_run_id:
+        description: "Packages workflow run ID to import debs from (empty = republish current pool)"
+        required: false
+      arch:
+        description: "Architecture"
+        required: false
+        default: "aarch64"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.repository == 'Wizk-Modz/termux-packages'
+    env:
+      APT_REPO: Wizk-Modz/wizk-apt-repo
+      APT_REPO_BRANCH: master
+    steps:
+      - name: Install tools
+        run: |
+          command -v dpkg-scanpackages >/dev/null || sudo apt-get install -y dpkg-dev
+          command -v apt-ftparchive >/dev/null || sudo apt-get install -y apt
+
+      - name: Setup SSH for apt repo push
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.APT_REPO_DEPLOY_KEY }}" > ~/.ssh/apt_repo
+          chmod 600 ~/.ssh/apt_repo
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Clone apt repo
+        env:
+          GIT_SSH_COMMAND: "ssh -i ~/.ssh/apt_repo -o StrictHostKeyChecking=yes"
+        run: |
+          git clone --depth 1 --branch "$APT_REPO_BRANCH" "git@github.com:${APT_REPO}.git" apt-repo
+
+      - name: Import debs from Packages run
+        if: inputs.packages_run_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dl && cd dl
+          gh run download "${{ inputs.packages_run_id }}" --repo "$GITHUB_REPOSITORY"
+          for t in debs-*.tar; do
+            [ -e "$t" ] || continue
+            tar xf "$t"
+          done
+          mkdir -p ../apt-repo/pool
+          find . -name "*.deb" -exec cp -f "{}" ../apt-repo/pool/ \;
+          cd .. && rm -rf dl
+
+      - name: Generate Packages index
+        run: |
+          cd apt-repo
+          mkdir -p "pool" "dists/stable/main/binary-${{ inputs.arch }}"
+          if ls pool/*.deb >/dev/null 2>&1; then
+            dpkg-scanpackages --arch "${{ inputs.arch }}" pool /dev/null > "dists/stable/main/binary-${{ inputs.arch }}/Packages"
+          else
+            echo "[!] Pool is empty, publishing empty index."
+            : > "dists/stable/main/binary-${{ inputs.arch }}/Packages"
+          fi
+          gzip -kf "dists/stable/main/binary-${{ inputs.arch }}/Packages"
+
+      - name: Generate and sign Release
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        run: |
+          cd apt-repo
+          export GNUPGHOME="$PWD/.gnupg"
+          mkdir -p "$GNUPGHOME" && chmod 700 "$GNUPGHOME"
+          printf "%s" "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          KEYID=$(gpg --batch --list-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
+          echo "Signing as $KEYID"
+          cat > release.conf <<EOF
+          APT::FTPArchive::Release::Origin "Wizk";
+          APT::FTPArchive::Release::Label "Wizk";
+          APT::FTPArchive::Release::Suite "stable";
+          APT::FTPArchive::Release::Codename "stable";
+          APT::FTPArchive::Release::Architectures "${{ inputs.arch }}";
+          APT::FTPArchive::Release::Components "main";
+          APT::FTPArchive::Release::Description "Wizk Termux fork APT repository";
+          EOF
+          apt-ftparchive -c release.conf release dists/stable > dists/stable/Release
+          rm -f dists/stable/InRelease dists/stable/Release.gpg
+          gpg --batch --yes --pinentry-mode loopback --local-user "$KEYID" \
+            --clearsign -o dists/stable/InRelease dists/stable/Release
+          gpg --batch --yes --pinentry-mode loopback --local-user "$KEYID" \
+            -abs -o dists/stable/Release.gpg dists/stable/Release
+          rm -rf "$GNUPGHOME"
+
+      - name: Push to apt repo
+        env:
+          GIT_SSH_COMMAND: "ssh -i ~/.ssh/apt_repo -o StrictHostKeyChecking=yes"
+        run: |
+          cd apt-repo
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to publish."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="github-actions[bot]@users.noreply.github.com" \
+            commit -m "Publish APT repo (${{ inputs.arch }})"
+          git push origin "$APT_REPO_BRANCH"
