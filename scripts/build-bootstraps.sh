@@ -47,7 +47,11 @@ declare -a ADDITIONAL_PACKAGES=()
 declare -a EXTRACTED_PACKAGES=()
 
 # A list of options to pass to build-package.sh
-declare -a BUILD_PACKAGE_OPTIONS=()
+# Fork: pass "-I" so dependency packages already published in our APT repo
+# are downloaded instead of recompiled. Listed bootstrap packages themselves
+# are still compiled fresh. Deps missing from the repo fall back to source
+# builds automatically.
+declare -a BUILD_PACKAGE_OPTIONS=("-I")
 
 # Check for some important utilities that may not be available for
 # some reason.
@@ -429,7 +433,7 @@ main() {
 
 		# Core utilities.
 		PACKAGES+=("bash") # Used by `termux-bootstrap-second-stage.sh`
-		PACKAGES+=("bzip2")
+		PACKAGES+=("libbz2")
 		if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 			PACKAGES+=("command-not-found")
 		else
