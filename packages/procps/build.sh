@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using th
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=9d2021f47a4501c667862c9942a92d1953694b21d11bcd1702e83eb594e3d67d
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-support, ncurses"
