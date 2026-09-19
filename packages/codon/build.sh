@@ -4,17 +4,16 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _LLVM_VERSION=20.1.7
-TERMUX_PKG_VERSION="0.19.6"
-TERMUx_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.20.1"
 TERMUX_PKG_SRCURL=(
 	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
 	https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	e33deefaf7ff3518c838db22d92b31f28cff4675a7ece70b79d5d31be1ce7420
-	38befce9eb87244698014b1fbe56a4102660120f1b82b3c7777c2a98c109770a
-	09df072c95628d9f59f67e0ad309bd3f4387f8cb06ae115f78c496c34f2c1e98
+	8f1b2e1835b42b027dcfb0b2b9b3ae5daa7001e2141f6676af4523aba640d99b
+	3fa970c476acf1056a2460e309ac41557956a1adf499e3e46e8db98ae78a2659
+	eaf15d4367c8553ca26b3dbcf1d84c62ec7439c95f2057d11d355c84f65dcc46
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -162,6 +161,9 @@ termux_step_configure() {
 	if [ "$TERMUX_ARCH" = "x86_64" ] || [ "$TERMUX_ARCH" = "i686" ]; then
 		export OPENBLAS_CROSS_TARGET="TARGET CORE2"
 	fi
+
+	local _libgcc="$($CC -print-libgcc-file-name)"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_LIB=$_libgcc"
 
 	cd "$TERMUX_PKG_BUILDDIR"
 	termux_step_configure_cmake
