@@ -1,6 +1,17 @@
---- ./usr/include/unistd.h.orig	2021-08-16 11:52:08.095542840 +0200
-+++ ./usr/include/unistd.h	2021-08-16 11:52:08.565542673 +0200
-@@ -375,6 +375,74 @@
+--- a/usr/include/unistd.h
++++ b/usr/include/unistd.h
+@@ -151,9 +151,7 @@
+ int execle(const char* _Nonnull __path, const char* _Nullable __arg0, ... /*,  char* const* __envp */)
+     __attribute__((__sentinel__(1)));
+ 
+-#if __BIONIC_AVAILABILITY_GUARD(28)
+-int fexecve(int __fd, char* _Nullable const* _Nullable __argv, char* _Nullable const* _Nullable __envp) __INTRODUCED_IN(28);
+-#endif /* __BIONIC_AVAILABILITY_GUARD(28) */
++int fexecve(int __fd, char* _Nullable const* _Nullable __argv, char* _Nullable const* _Nullable __envp);
+ 
+ 
+ int nice(int __incr);
+@@ -476,6 +474,74 @@
  #undef _UNISTD_H_
  #endif
  
