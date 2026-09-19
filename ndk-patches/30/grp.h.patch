@@ -1,0 +1,34 @@
+--- a/usr/include/grp.h
++++ b/usr/include/grp.h
+@@ -50,20 +50,6 @@
+ struct group* _Nullable getgrgid(gid_t __gid);
+ struct group* _Nullable getgrnam(const char* _Nonnull __name);
+ 
+-/* Note: Android has thousands and thousands of ids to iterate through. */
+-
+-#if __BIONIC_AVAILABILITY_GUARD(26)
+-struct group* _Nullable getgrent(void) __INTRODUCED_IN(26);
+-#endif
+-
+-#if __BIONIC_AVAILABILITY_GUARD(26)
+-void setgrent(void) __INTRODUCED_IN(26);
+-#endif
+-
+-#if __BIONIC_AVAILABILITY_GUARD(26)
+-void endgrent(void) __INTRODUCED_IN(26);
+-#endif
+-
+ #if __BIONIC_AVAILABILITY_GUARD(24)
+ int getgrgid_r(gid_t __gid, struct group* __BIONIC_COMPLICATED_NULLNESS __group, char* _Nonnull __buf, size_t __n, struct group* _Nullable * _Nonnull __result) __INTRODUCED_IN(24);
+ #endif
+@@ -75,6 +61,10 @@
+ int getgrouplist(const char* _Nonnull __user, gid_t __group, gid_t* __BIONIC_COMPLICATED_NULLNESS __groups, int* _Nonnull __group_count);
+ int initgroups(const char* _Nonnull __user, gid_t __group);
+ 
++static struct group* _Nullable getgrent(void) { return 0; }
++static void setgrent(void) {}
++static void endgrent(void) {}
++
+ __END_DECLS
+ 
+ #endif

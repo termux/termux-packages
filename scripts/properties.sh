@@ -305,7 +305,7 @@ TERMUX_ANDROID_BUILD_TOOLS_VERSION=37.0.0
 # change TERMUX_PKG_VERSION (and remove TERMUX_PKG_REVISION if necessary) in:
 #   apksigner, d8
 # and trigger rebuild of them
-: "${TERMUX_NDK_VERSION_NUM:="29"}"
+: "${TERMUX_NDK_VERSION_NUM:="30"}"
 : "${TERMUX_NDK_REVISION:=""}"
 TERMUX_NDK_VERSION="${TERMUX_NDK_VERSION_NUM}${TERMUX_NDK_REVISION}"
 # when changing the above:
