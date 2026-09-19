@@ -46,18 +46,27 @@ def parse_build_file_dependencies_with_vars(path, vars):
             if line.startswith(vars):
                 dependencies_string = remove_nl_and_quotes(line.split('DEPENDS=')[1])
 
-                # Split also on '|' to dependencies with '|', as in 'nodejs | nodejs-current':
-                for dependency_value in re.split(',|\\|', dependencies_string):
-                    # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
-                    dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
-                    arch = os.getenv('TERMUX_ARCH')
-                    if arch is None:
-                        arch = 'aarch64'
-                    if arch == "x86_64":
-                        arch = "x86-64"
-                    dependency_value = re.sub(r'\${TERMUX_ARCH/_/-}', arch, dependency_value)
+                for part in dependencies_string.split(','):
+                    part = part.strip()
+                    if not part:
+                        continue
+                    alts = []
+                    for dependency_value in part.split('|'):
+                        dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
 
-                    dependencies.append(dependency_value)
+                        arch = os.getenv('TERMUX_ARCH')
+                        if arch is None:
+                            arch = 'aarch64'
+                        if arch == "x86_64":
+                            arch = "x86-64"
+                        dependency_value = re.sub(r'\${TERMUX_ARCH/_/-}', arch, dependency_value)
+                        if dependency_value:
+                            alts.append(dependency_value)
+
+                    if len(alts) == 1:
+                        dependencies.append(alts[0])
+                    elif len(alts) > 1:
+                        dependencies.append(tuple(alts))
 
     return set(dependencies)
 
@@ -261,10 +270,28 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
                         pkgs_map[subpkg.name] = new_package
                     all_packages.append(subpkg)
 
+    # Resolve dependencies: pick the first candidate available for the target arch
     for pkg in all_packages:
+        resolved_deps = set()
+        for dep in pkg.deps:
+            if isinstance(dep, tuple):
+                resolved_dep = next((alt for alt in dep if alt in pkgs_map), None)
+                if not resolved_dep:
+                    die('Package %s depends on non-existing package(s) "%s"' % (pkg.name, ' | '.join(dep)))
+
+                missing_alts = [alt for alt in dep if alt not in pkgs_map]
+                if missing_alts:
+                    missing_str = ", ".join(missing_alts)
+                    print(f'WARN: {pkg.name}: missing alt "{missing_str}"', file=sys.stderr)
+
+                resolved_deps.add(resolved_dep)
+            else:
+                if dep not in pkgs_map:
+                    die('Package %s depends on non-existing package "%s"' % (pkg.name, dep))
+                resolved_deps.add(dep)
+        pkg.deps = resolved_deps
+
         for dependency_name in pkg.deps:
-            if dependency_name not in pkgs_map:
-                die('Package %s depends on non-existing package "%s"' % (pkg.name, dependency_name))
             dep_pkg = pkgs_map[dependency_name]
             if fast_build_mode or not isinstance(pkg, TermuxSubPackage):
                 dep_pkg.needed_by.add(pkg)
