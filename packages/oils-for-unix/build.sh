@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://oils.pub/download/oils-for-unix-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256="a33453722819b55ee552bfd7f3c2bab8f1940def55d5c8b46af16ce95bdf8803"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-glob, readline"
+TERMUX_PKG_PROVIDES="oils"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
