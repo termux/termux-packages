@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://orca.gnome.org/
 TERMUX_PKG_DESCRIPTION="A free, open source, flexible, and extensible screen reader"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="50.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="51.0"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/orca/${TERMUX_PKG_VERSION%%.*}/orca-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0714421cde8ec4baf47f18e4b4a12b4e5c4a3cfe3b161569e070fe037713fd04
+TERMUX_PKG_SHA256=8bc3e44bc5b7b66ec7e0cc5c82695c0075661922745d25724f5fc84a25602108
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="at-spi2-core, glib, gsettings-desktop-schemas, gst-python, gstreamer, gtk3, libwnck, pango, pyatspi, pygobject, python, python-pip, speechd, xorg-xkbcomp"
 TERMUX_PKG_SETUP_PYTHON=true
@@ -14,6 +13,7 @@ TERMUX_MESON_WHEEL_CROSSFILE="$TERMUX_PKG_TMPDIR/wheel-cross-file.txt"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --cross-file $TERMUX_MESON_WHEEL_CROSSFILE
+-Dmathcat=false
 "
 
 termux_step_pre_configure() {
