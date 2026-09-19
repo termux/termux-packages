@@ -1,24 +1,31 @@
-diff -uNr openssh-portable-V_9_5_P1/ssh-agent.c openssh-portable-V_9_5_P1.mod/ssh-agent.c
---- openssh-portable-V_9_5_P1/ssh-agent.c	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/ssh-agent.c	2023-11-23 16:29:34.274542842 +0200
-@@ -92,7 +92,7 @@
- #include "myproposal.h"
+diff -uNr openssh-portable-V_10_5_P1/ssh-agent.c openssh-portable-V_10_5_P1.mod/ssh-agent.c
+--- openssh-portable-V_10_5_P1/ssh-agent.c	2026-09-19 09:23:23.732781576 +0000
++++ openssh-portable-V_10_5_P1.mod/ssh-agent.c	2026-09-19 09:23:23.758370575 +0000
+@@ -83,7 +83,7 @@
+ #include "version.h"
  
  #ifndef DEFAULT_ALLOWED_PROVIDERS
 -# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
 +# define DEFAULT_ALLOWED_PROVIDERS "@TERMUX_PREFIX@/lib*/*,@TERMUX_PREFIX@/local/lib*/*"
  #endif
- 
- /* Maximum accepted message length */
-@@ -2036,9 +2036,11 @@
+ #ifndef DEFAULT_WEBSAFE_ALLOWLIST
+ # define DEFAULT_WEBSAFE_ALLOWLIST "ssh:*"
+@@ -2277,11 +2277,18 @@
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
++	/*
++	 * Skipped on Android: /proc is mounted with hidepid=2 there, so a
++	 * non-dumpable process (PR_SET_DUMPABLE=0) becomes invisible in
++	 * /proc - and therefore to ps/pgrep - even for its own uid.
++	 */
 +#ifndef __ANDROID__
  	/* drop */
  	(void)setegid(getgid());
  	(void)setgid(getgid());
-+#endif
  
  	platform_disable_tracing(0);	/* strict=no */
++#endif
  
+ #ifdef RLIMIT_NOFILE
+ 	if (getrlimit(RLIMIT_NOFILE, &rlim) == -1)
