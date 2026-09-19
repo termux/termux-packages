@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.20.3014"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5ee97754ed69f41bccfb6dc00c7f820f76d21526886efd609c99fb28530e138c
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
