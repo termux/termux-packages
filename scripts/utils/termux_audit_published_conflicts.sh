@@ -34,6 +34,8 @@ pkg_arch_for_build_sh() {
 pkg_declares_relation_to() {
 	# $1: package whose declarations to check, $2: package to look for.
 	local pkg="$1" other="$2" dir file declared="" arch
+	local -a fields
+	local field relations
 	if [[ -z "${pkg_relations_cache[$pkg]+x}" ]]; then
 		for dir in packages root-packages x11-packages; do
 			if [[ -f "$dir/$pkg/build.sh" ]]; then
@@ -64,13 +66,17 @@ pkg_declares_relation_to() {
 				break
 			fi
 		done
-		pkg_relations_cache[$pkg]=$(
-			tr ',' '\n' <<< "$declared" |
-				sed -E 's/\(.*\)//; s/^[[:space:]]+//; s/[[:space:]]+$//' |
-				sed '/^$/d'
-		)
+		relations=""
+		IFS=$',\n' read -rd '' -a fields <<< "$declared" || true
+		for field in "${fields[@]}"; do
+			field="${field%%(*}"
+			field="${field#"${field%%[![:space:]]*}"}"
+			field="${field%"${field##*[![:space:]]}"}"
+			[[ -n "$field" ]] && relations+="$field"$'\n'
+		done
+		pkg_relations_cache[$pkg]="${relations%$'\n'}"
 	fi
-	grep -qx "$other" <<< "${pkg_relations_cache[$pkg]}"
+	[[ $'\n'"${pkg_relations_cache[$pkg]}"$'\n' == *$'\n'"$other"$'\n'* ]]
 }
 
 for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
