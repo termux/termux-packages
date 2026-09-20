@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.pgcli.com
 TERMUX_PKG_DESCRIPTION="Postgres CLI with autocompletion and syntax highlighting"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="4.7.0"
+TERMUX_PKG_VERSION="4.7.1"
 TERMUX_PKG_SRCURL="https://github.com/dbcli/pgcli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ac703637ac972b515fa4e0aea04382ab51a120ad16c338649a60b9c096842604
+TERMUX_PKG_SHA256=4aa61f37e2ea9ea0933b0564a0bcc7a24afed28ae1924ecdb5767b39e528264c
 TERMUX_PKG_AUTO_UPDATE=true
 # pgcli only pushes git tags, it doesn't publish GitHub Releases, so the
 # default "latest-release-tag" method 404s against the releases API.
