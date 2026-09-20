@@ -1,0 +1,120 @@
+--- a/csh.c
++++ b/csh.c
+@@ -41,8 +41,10 @@
+ #include <string.h>
+ #include <locale.h>
+ #include <unistd.h>
+-#include <vis.h>
++#include <bsd/vis.h>
+ #include <stdarg.h>
++#include <bsd/stdio.h>
++#include <time.h>
+ 
+ #include "csh.h"
+ #include "proc.h"
+@@ -62,20 +64,95 @@
+  * June, 1991
+  */
+ 
++struct Bin      B;
++struct whyle      *whyles;
++struct varent       shvhed, aliases;
++struct Hist       Histlist;
++FILE *cshin, *cshout, *csherr;
++int    chkstop;		/* Warned of stopped jobs... allow exit */
++int    didfds;			/* Have setup i/o fd's for child */
++int    doneinp;		/* EOF indicator after reset from readc */
++int    exiterr;		/* Exit if error or non-zero exit status */
++int    child;			/* Child shell ... errors cause exit */
++int    haderr;			/* Reset was because of an error */
++int    intty;			/* Input is a tty */
++int    intact;			/* We are interactive... therefore prompt */
++int    justpr;			/* Just print because of :p hist mod */
++int    loginsh;		/* We are a loginsh -> .login/.logout */
++int    neednote;		/* Need to pnotify() */
++int    noexec;			/* Don't execute, just syntax check */
++int    pjobs;			/* want to print jobs if interrupted */
++int    setintr;		/* Set interrupts on/off -> Wait intr... */
++int    timflg;			/* Time the next waited for command */
++int    havhash;		/* path hashing is available */
++int    filec;			/* doing filename expansion */
++Char   *arginp;			/* Argument input for sh -c and internal `xx` */
++int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
++Char   *ffile;			/* Name of shell file for $0 */
++struct timeval time0;		/* Time at which the shell started */
++struct rusage ru0;
++Char   *doldol;			/* Character pid for $$ */
++int	backpid;		/* Pid of the last background process */
++uid_t	uid, euid;		/* Invokers uid */
++gid_t	gid, egid;		/* Invokers gid */
++time_t  chktim;			/* Time mail last checked */
++pid_t	shpgrp;			/* Pgrp of shell */
++pid_t	tpgrp;			/* Terminal process group */
++pid_t	opgrp;			/* Initial pgrp and tty pgrp */
++int   SHIN;			/* Current shell input (script) */
++int   SHOUT;			/* Shell output */
++int   SHERR;			/* Diagnostic output... shell errs go here */
++int   OLDSTD;			/* Old standard input (def for cmds) */
++jmp_buf reslab;
++int exitset;
++Char   *gointr;			/* Label for an onintr transfer */
++sig_t parintr;			/* Parents interrupt catch */
++sig_t parterm;			/* Parents terminate catch */
++int     AsciiOnly;		/* If set only 7 bits is expected in characters */
++struct Ain lineloc;
++int    cantell;		/* Is current source tellable ? */
++Char   *lap;
++struct wordent *alhistp;	/* Argument list (first) */
++struct wordent *alhistt;	/* Node after last in arg list */
++Char  **alvec;		/* The (remnants of) alias vector */
++int   gflag;			/* After tglob -> is globbing needed? */
++Char   *pargs;			/* Pointer to start current word */
++long    pnleft;			/* Number of chars left in pargs */
++Char   *pargcp;			/* Current index into pargs */
++struct wordent paraml;		/* Current lexical word list */
++int     eventno;		/* Next events number */
++int     lastev;			/* Last event reference (default) */
++Char    HIST;			/* history invocation character */
++Char    HISTSUB;		/* auto-substitute character */
++char   *bname;
++Char   *Vsav;
++Char   *Vdp;
++Char   *Vexpath;
++char  **Vt;
++Char  **evalvec;
++Char   *evalp;
++Char   *word_chars;
++Char   *STR_SHELLPATH;
++Char   *STR_BSHELL;
++Char   *STR_WORD_CHARS;
++Char  **STR_environ;
++
+ Char   *dumphist[] = {STRhistory, STRmh, 0, 0};
+ Char   *loadhist[] = {STRsource, STRmh, STRtildothist, 0};
+ 
++FILE *cshin, *cshout, *csherr;
++
+ int     nofile = 0;
+-bool    reenter = 0;
+-bool    nverbose = 0;
+-bool    nexececho = 0;
+-bool    quitit = 0;
+-bool    fast = 0;
+-bool    batch = 0;
+-bool    mflag = 0;
+-bool    prompt = 1;
+-bool    enterhist = 0;
+-bool    tellwhat = 0;
++int    reenter = 0;
++int    nverbose = 0;
++int    nexececho = 0;
++int    quitit = 0;
++int    fast = 0;
++int    batch = 0;
++int    mflag = 0;
++int    prompt = 1;
++int    enterhist = 0;
++int    tellwhat = 0;
+ 
+ extern char **environ;
+ 
