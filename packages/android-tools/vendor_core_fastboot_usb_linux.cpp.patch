@@ -1,4 +1,5 @@
-+++ ./vendor/core/fastboot/usb_linux.cpp
+--- a/vendor/core/fastboot/usb_linux.cpp
++++ b/vendor/core/fastboot/usb_linux.cpp
 @@ -48,6 +48,9 @@
  #include <chrono>
  #include <memory>
@@ -49,9 +50,9 @@
  
    private:
      std::unique_ptr<usb_handle> handle_;
-@@ -151,8 +175,19 @@
+@@ -190,8 +214,19 @@
  
-     return 0;
+     return value;
  }
 + 
 +#ifdef __ANDROID__
@@ -68,8 +69,8 @@
 +#endif
                               char *ptr, int len, int writable,
                               ifc_match_func callback,
-                              int *ept_in_id, int *ept_out_id, int *ifc_id)
-@@ -161,6 +196,9 @@
+                              int *ept_in_id, int *ept_out_id, int *ifc_id,
+@@ -201,6 +236,9 @@
      struct usb_config_descriptor *cfg;
      struct usb_interface_descriptor *ifc;
      struct usb_endpoint_descriptor *ept;
@@ -79,19 +80,30 @@
      struct usb_ifc_info info;
  
      int in, out;
-@@ -179,6 +217,11 @@
-     len -= cfg->bLength;
-     ptr += cfg->bLength;
+@@ -212,9 +250,19 @@
+     len -= dev->bLength;
+     ptr += dev->bLength;
  
+-    *cfg_id = read_sysfs_number(sysfs_name, "bConfigurationValue");
+-    if (*cfg_id == -1)
+-        return -1;
 +#ifdef __ANDROID__
-+    if (is_termux_usb)
-+        libusb_wrap_sys_device(ctx.libusb_ctx, termux_usb_fd, &libusb_handle);
++    if (is_termux_usb) {
++        if (libusb_wrap_sys_device(ctx.libusb_ctx, termux_usb_fd, &libusb_handle) != 0)
++            return -1;
++        if (libusb_get_configuration(libusb_handle, cfg_id) != 0)
++            return -1;
++    } else
 +#endif
-+
-     info.dev_vendor = dev->idVendor;
-     info.dev_product = dev->idProduct;
-     info.dev_class = dev->bDeviceClass;
-@@ -186,6 +229,12 @@
++    {
++        *cfg_id = read_sysfs_number(sysfs_name, "bConfigurationValue");
++        if (*cfg_id == -1)
++            return -1;
++    }
+ 
+     // Find the active configuration
+     do {
+@@ -249,6 +297,12 @@
      info.dev_protocol = dev->bDeviceProtocol;
      info.writable = writable;
  
@@ -104,7 +116,7 @@
      snprintf(info.device_path, sizeof(info.device_path), "usb:%s", sysfs_name);
  
      /* Read device serial number (if there is one).
-@@ -196,6 +245,15 @@
+@@ -259,6 +313,15 @@
       */
      info.serial_number[0] = '\0';
      if (dev->iSerialNumber) {
@@ -117,20 +129,20 @@
 +                     "%s", serial_num);
 +        } else {
 +#endif
-         char path[80];
-         int fd;
+         int chars_read = read_sysfs_string(sysfs_name, "serial", info.serial_number,
+                                            sizeof(info.serial_number) - 1);
  
-@@ -216,6 +274,9 @@
-                 info.serial_number[chars_read - 1] = '\0';
-             }
+@@ -266,6 +329,9 @@
+             // strip trailing newline
+             info.serial_number[chars_read - 1] = '\0';
          }
 +#ifdef __ANDROID__
 +        }
 +#endif
      }
  
-     for(i = 0; i < cfg->bNumInterfaces; i++) {
-@@ -277,6 +338,16 @@
+     while (len > 0) {
+@@ -325,6 +391,16 @@
          info.has_bulk_in = (in != -1);
          info.has_bulk_out = (out != -1);
  
@@ -147,7 +159,7 @@
          std::string interface;
          auto path = android::base::StringPrintf("/sys/bus/usb/devices/%s/%s:1.%d/interface",
                                                  sysfs_name, sysfs_name, ifc->bInterfaceNumber);
-@@ -286,6 +357,9 @@
+@@ -334,6 +410,9 @@
              }
              snprintf(info.interface, sizeof(info.interface), "%s", interface.c_str());
          }
@@ -157,7 +169,12 @@
  
          if(callback(&info) == 0) {
              *ept_in_id = in;
-@@ -368,16 +442,53 @@
+@@ -374,20 +453,57 @@
+     char desc[1024];
+     int n, in, out, ifc, cfg, alt_ifc;
+ 
+-    struct dirent *de;
++    struct dirent *de = nullptr;
      int fd;
      int writable;
  
@@ -211,7 +228,7 @@
              if ((fd = open(devname, O_RDWR)) < 0) {
                  // Check if we have read-only access, so we can give a helpful
                  // diagnostic like "adb devices" does.
-@@ -386,12 +496,25 @@
+@@ -396,13 +512,27 @@
                      continue;
                  }
              }
@@ -222,10 +239,12 @@
              n = read(fd, desc, sizeof(desc));
  
 +#ifdef __ANDROID__
-+            if (filter_usb_device(de->d_name, search_termux_usb, fd, desc, n,
-+                                  writable, callback, &in, &out, &ifc) == 0) {
++            if (filter_usb_device(search_termux_usb ? (char*)"" : de->d_name,
++                                  search_termux_usb, fd, desc, n,
++                                  writable, callback, &in, &out, &ifc, &cfg, &alt_ifc) == 0) {
 +#else
-             if (filter_usb_device(de->d_name, desc, n, writable, callback, &in, &out, &ifc) == 0) {
+             if (filter_usb_device(de->d_name, desc, n, writable, callback,
+                                   &in, &out, &ifc, &cfg, &alt_ifc) == 0) {
 +#endif
                  usb.reset(new usb_handle());
 +#ifdef __ANDROID__
@@ -237,7 +256,32 @@
                  usb->ep_in = in;
                  usb->ep_out = out;
                  usb->desc = fd;
-@@ -593,8 +716,19 @@
+@@ -413,7 +543,12 @@
+                     usb.reset();
+                     continue;
+                 }
++#ifdef __ANDROID__
++                if (!search_termux_usb &&
++                    read_sysfs_number(de->d_name, "bConfigurationValue") != cfg) {
++#else
+                 if (read_sysfs_number(de->d_name, "bConfigurationValue") != cfg) {
++#endif
+                     // Someone changed configuration before we claimed the interface
+                     close(fd);
+                     usb.reset();
+@@ -437,7 +572,11 @@
+                 close(fd);
+             }
+         }
++#ifdef __ANDROID__
++        }
++#else
+     }
++#endif
+ 
+     return usb;
+ }
+@@ -624,8 +763,19 @@
  {
    double deadline = now() + WAIT_FOR_DISCONNECT_TIMEOUT;
    while (now() < deadline) {
