@@ -4,24 +4,25 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
 
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
-@@ -10,7 +10,6 @@ batik               = "1.19"
+@@ -10,7 +10,6 @@
  elk                 = "0.10.0"
  fop                 = "2.11"
  glytching-junit-ext = "2.6.0"
 -gorylenko-gradle-git-properties = "2.5.7"
- graalvm-native      = "0.11.4"
+ graalvm-native      = "1.0.0"
  jdepend             = "2.9.1"
  jlatexmath          = "1.0.7"
-@@ -47,6 +46,5 @@ teavm-jso-apis              = { module = "org.teavm:teavm-jso-apis", version.ref
+@@ -48,7 +47,6 @@
  
  [plugins]
  adarshr-test-logger = { id = "com.adarshr.test-logger", version.ref = "adarshr-test-logger" }
 -gorylenko-gradle-git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gorylenko-gradle-git-properties" }
  graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm-native" }
  teavm = { id = "org.teavm", version.ref = "teavm" }
+ sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -20,7 +20,6 @@ plugins {
+@@ -20,7 +20,6 @@
  	signing
  	eclipse
  	jacoco
@@ -29,7 +30,7 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
  //	alias(libs.plugins.adarshr.test.logger)
  	alias(libs.plugins.teavm)
  }
-@@ -566,43 +566,16 @@ tasks.named("siteAssemble") {
+@@ -653,28 +652,6 @@
  // CompilationInfo - Git commit & timestamp injection
  // ============================================
  
@@ -56,6 +57,10 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
 -}
 -
  val filteredSrcDir = layout.buildDirectory.dir("generated/sources/git-filtered")
+ 
+ // Cleanup of generated filtered sources (avoid leaving copied sources on disk)
+@@ -698,18 +675,13 @@
+ }
  
  val filterSourcesWithBuildInfo by tasks.registering {
 -	dependsOn("generateGitProperties")
