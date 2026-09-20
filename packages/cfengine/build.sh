@@ -3,9 +3,9 @@ TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:3.27.1
+TERMUX_PKG_VERSION=1:3.28.0
 TERMUX_PKG_SRCURL="git+https://github.com/cfengine/core"
-TERMUX_PKG_SHA256=62ecb071fcc2fd57ffd30e9fbea81260334fec63ebe6d1d91306cd8b6938acb4
+TERMUX_PKG_SHA256=26d0074ec54016d02d758a397848fe8bb5ebcbacd5838fe05025b3fca5d1dcd0
 # "-build[n]" suffix in tag name is not a part of version string.
 _CFENGINE_GIT_TAG_SUFFIX=
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}"
@@ -39,7 +39,7 @@ termux_step_post_get_source() {
 	: "${_CFENGINE_GIT_TAG_SUFFIX:=}"
 	local _MASTERFILES_VERSION="${TERMUX_PKG_VERSION#*:}${_CFENGINE_GIT_TAG_SUFFIX}"
 	local _MASTERFILES_SRCURL="https://github.com/cfengine/masterfiles/archive/${_MASTERFILES_VERSION}.zip"
-	local _MASTERFILES_SHA256=f1129c2862979ae62c2a5c533ab8ddbd0c49d4ef2641b87bfbd9f1cf956efac4
+	local _MASTERFILES_SHA256=6e9165dffe5e77e4942f58a3334700741598cde7f47b63c7e4fa5e3184c1d1e2
 
 	local _MASTERFILES_FILE="${TERMUX_PKG_CACHEDIR}/masterfiles-${_MASTERFILES_VERSION}.zip"
 	termux_download \
