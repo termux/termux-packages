@@ -1,0 +1,24 @@
+--- a/media/libyuv/libyuv/source/row_gcc.cc
++++ b/media/libyuv/libyuv/source/row_gcc.cc
+@@ -5526,9 +5526,9 @@
+       "pshufd      $0x0,%%xmm2,%%xmm2            \n"
+       "pcmpeqw     %%xmm5,%%xmm5                 \n"
+       "psrlw       $15,%%xmm5                    \n"
+-      "mov         $2,%%eax                      \n"
+-      "movd        %%eax,%%xmm6                  \n"
+-      "pshufd      $0x0,%%xmm6,%%xmm6            \n"
++      "pcmpeqd     %%xmm6,%%xmm6                 \n"
++      "pslld       $31,%%xmm6                    \n"
++      "psrld       $30,%%xmm6                    \n"
+       "movdqa      %5,%%xmm7                     \n"
+ 
+       // 8 pixels per loop.
+@@ -5564,7 +5564,7 @@
+       : "r"(src_uv_stride),  // %3
+         "r"(scale),          // %4
+         "m"(kShuffleMaskHalfWidth16To8)  // %5
+-      : "eax", "memory", "cc", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
++      : "memory", "cc", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
+         "xmm6", "xmm7");
+ }
+ #endif  // HAS_HALFWIDTHROW_16TO8_SSSE3
