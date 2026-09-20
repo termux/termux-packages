@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python IDE for beginners (Tkinter based, learning-focuse
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="5.0.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/thonny/thonny/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=26645a0fd72ed2d41bc901ba72aa89b09c3b1ec70b16dbad82e8597582c7a462
 TERMUX_PKG_DEPENDS="python, python-tkinter, python-pip, xdg-utils"
@@ -15,8 +15,17 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_make_install() {
 	pip install . --no-deps --prefix="$TERMUX_PREFIX" -vv --no-build-isolation
 
-	install -Dm644 packaging/icons/thonny.png \
-		"$TERMUX_PREFIX/share/icons/hicolor/128x128/apps/thonny.png" 2>/dev/null || true
+	if ! compgen -G "packaging/icons/thonny-[0-9]*x[0-9]*.png" > /dev/null; then
+		termux_error_exit "No icon files found in packaging/icons"
+	fi
+
+	local icon size
+	for icon in packaging/icons/thonny-[0-9]*x[0-9]*.png; do
+		size="${icon##*thonny-}"
+		size="${size%.png}"
+		install -Dm644 "$icon" \
+			"$TERMUX_PREFIX/share/icons/hicolor/${size}/apps/thonny.png"
+	done
 
 	mkdir -p "$TERMUX_PREFIX/share/applications"
 	cat <<- EOF > "$TERMUX_PREFIX/share/applications/thonny.desktop"
