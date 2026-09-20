@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -1,43 +1,60 @@
+@@ -1,43 +1,58 @@
 -#	$OpenBSD: Makefile,v 1.10 2010/01/04 17:50:36 deraadt Exp $
 -#
 -# C Shell with process control; VM/UNIX VAX Makefile
@@ -27,10 +27,8 @@
 -const.h: error.h
 +# Makefile for csh
 +PROG = csh
-+CC = gcc
-+OPT = -O2
 +
-+CFLAGS = -c \
++CFLAGS += \
 +	 -Wall \
 +	 -DNLS=1 \
 +	 -DSHORT_STRINGS=1
@@ -65,9 +63,9 @@
 +	strip ./$(PROG)
 +
 +%.o: %.c
-+	$(CC) $(OPT) $(CFLAGS) $<
++	$(CC) -c -I@TERMUX_PREFIX@/include $(CFLAGS) $<
 +
-+clean: 
++clean:
 +	rm -f errnum.h const.h ./*.o ./$(PROG)
  
  error.h: error.c
