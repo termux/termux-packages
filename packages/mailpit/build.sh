@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mailpit.axllent.org
 TERMUX_PKG_DESCRIPTION="An email and SMTP testing tool with API for developers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.31.0"
+TERMUX_PKG_VERSION="1.31.2"
 TERMUX_PKG_SRCURL="https://github.com/axllent/mailpit/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=010629f1c47c5a7e05818d1a2e2661ced9a16840355f328a68b7f780a4e50d8c
+TERMUX_PKG_SHA256=397d11cc1739f8697699cbea9c58cb68a078e882871ce1bbe019abf8a5d74eb4
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
