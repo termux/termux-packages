@@ -1,0 +1,13 @@
+diff --git a/upscaler/window.py b/upscaler/window.py
+index 764b2f3..0d2607a 100644
+--- a/upscaler/window.py
++++ b/upscaler/window.py
+@@ -445,7 +445,7 @@ class Window(Adw.ApplicationWindow):
+                             bad = bad or re.match(warn, line) is not None
+ 
+                 # Process algorithm output
+-                result = running_row.process.poll()
++                result = running_row.process.wait()
+                 if running_row.canceled:
+                     logger.info("Manually canceled upscaling by the user")
+ 

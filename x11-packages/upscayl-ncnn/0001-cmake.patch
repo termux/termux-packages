@@ -1,0 +1,62 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 77adabe..2c1da6d 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -89,46 +89,24 @@ endif()
+ # enable global link time optimization
+ cmake_policy(SET CMP0069 NEW)
+ set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
+-include(CheckIPOSupported)
+-check_ipo_supported(RESULT ipo_supported OUTPUT ipo_supported_output)
+-if(ipo_supported)
+-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+-else()
+-    message(WARNING "IPO is not supported: ${ipo_supported_output}")
+-endif()
+-
+-if(USE_SYSTEM_NCNN)
+-    set(GLSLANG_TARGET_DIR "GLSLANG-NOTFOUND" CACHE PATH "Absolute path to glslangTargets.cmake directory")
+-    if(NOT GLSLANG_TARGET_DIR AND NOT DEFINED ENV{GLSLANG_TARGET_DIR})
+-        message(WARNING "GLSLANG_TARGET_DIR must be defined! USE_SYSTEM_NCNN will be turned off.")
+-        set(USE_SYSTEM_NCNN OFF)
++if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
++    include(CheckIPOSupported)
++    check_ipo_supported(RESULT ipo_supported OUTPUT ipo_supported_output)
++    if(ipo_supported)
++        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+     else()
+-        message(STATUS "Using glslang install located at ${GLSLANG_TARGET_DIR}")
+-
+-        find_package(Threads)
+-
+-        include("${GLSLANG_TARGET_DIR}/OSDependentTargets.cmake")
+-        include("${GLSLANG_TARGET_DIR}/OGLCompilerTargets.cmake")
+-        if(EXISTS "${GLSLANG_TARGET_DIR}/HLSLTargets.cmake")
+-            # hlsl support can be optional
+-            include("${GLSLANG_TARGET_DIR}/HLSLTargets.cmake")
+-        endif()
+-        include("${GLSLANG_TARGET_DIR}/glslangTargets.cmake")
+-        include("${GLSLANG_TARGET_DIR}/SPIRVTargets.cmake")
+-
+-        if (NOT TARGET glslang OR NOT TARGET SPIRV)
+-            message(WARNING "glslang or SPIRV target not found! USE_SYSTEM_NCNN will be turned off.")
+-            set(USE_SYSTEM_NCNN OFF)
+-        endif()
++        message(WARNING "IPO is not supported: ${ipo_supported_output}")
+     endif()
++else()
++    message(STATUS "IPO disabled for Android cross-compilation")
+ endif()
+ 
+ if(USE_SYSTEM_NCNN)
+-    find_package(ncnn)
++    find_package(ncnn REQUIRED)
+     if(NOT TARGET ncnn)
+-        message(WARNING "ncnn target not found! USE_SYSTEM_NCNN will be turned off.")
+-        set(USE_SYSTEM_NCNN OFF)
++        message(FATAL_ERROR "ncnn target not found! Check that libncnn is installed.")
+     endif()
++    message(STATUS "Using system ncnn")
+ endif()
+ 
+ if(NOT USE_SYSTEM_NCNN)
