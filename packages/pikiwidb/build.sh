@@ -10,6 +10,7 @@ TERMUX_PKG_SRCURL=("https://github.com/OpenAtomFoundation/pikiwidb/archive/refs/
 TERMUX_PKG_SHA256=(b8081375426d1769ecc4a5fe70c5109589ef374f5d9030ea0adc4ea5a1dab9fa
 					6d09b5699030e74914da085a10fd6010336572b30894d93e4f024fa67d36f2a8)
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_DEPENDS="abseil-cpp, fmt, gflags, google-glog, libc++, libprotobuf, librocksdb, zlib"
 # required during build, but binary does not become linked to them
 TERMUX_PKG_BUILD_DEPENDS="googletest, liblz4, libsnappy, zstd"
