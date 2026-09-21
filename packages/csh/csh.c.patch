@@ -1,18 +1,24 @@
 --- a/csh.c
 +++ b/csh.c
-@@ -41,8 +41,10 @@
- #include <string.h>
+@@ -37,12 +37,13 @@
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <pwd.h>
+-#include <stdlib.h>
+-#include <string.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
  #include <locale.h>
- #include <unistd.h>
+-#include <unistd.h>
 -#include <vis.h>
++#include <bsd/unistd.h>
 +#include <bsd/vis.h>
  #include <stdarg.h>
-+#include <bsd/stdio.h>
 +#include <time.h>
  
  #include "csh.h"
  #include "proc.h"
-@@ -62,20 +64,95 @@
+@@ -62,20 +63,95 @@
   * June, 1991
   */
  
@@ -118,3 +124,81 @@
  
  extern char **environ;
  
+@@ -84,9 +160,9 @@ static fpos_t	seekf(void *, fpos_t, int);
+ static int	writef(void *, const char *, int);
+ static int	closef(void *);
+ static int	srccat(Char *, Char *);
+-static int	srcfile(char *, bool, bool);
++static int	srcfile(char *, int, int);
+ static void	phup(int);
+-static void	srcunit(int, bool, bool);
++static void	srcunit(int, int, int);
+ static void	mailchk(void);
+ static Char   **defaultpath(void);
+ 
+@@ -633,7 +709,7 @@ srccat(Char *cp, Char *dp)
+  * Source to a file putting the file descriptor in a safe place (> 2).
+  */
+ static int
+-srcfile(char *f, bool onlyown, bool flag)
++srcfile(char *f, int onlyown, int flag)
+ {
+     int unit;
+ 
+@@ -652,7 +728,7 @@ srcfile(char *f, bool onlyown, bool flag)
+  */
+ int     insource;
+ static void
+-srcunit(int unit, bool onlyown, bool hflg)
++srcunit(int unit, int onlyown, int hflg)
+ {
+     /* We have to push down a lot of state here */
+     /* All this could go into a structure */
+@@ -661,9 +737,9 @@ srcunit(int unit, bool onlyown, bool hflg)
+     Char   *ogointr = gointr, *oarginp = arginp;
+     Char   *oevalp = evalp, **oevalvec = evalvec;
+     int     oonelflg = onelflg;
+-    bool    oenterhist = enterhist;
++    int    oenterhist = enterhist;
+     char    OHIST = HIST;
+-    bool    otell = cantell;
++    int    otell = cantell;
+ 
+     struct Bin saveB;
+     sigset_t sigset, osigset;
+@@ -905,7 +981,7 @@ pintr(int notused)
+ }
+ 
+ void
+-pintr1(bool wantnl)
++pintr1(int wantnl)
+ {
+     Char **v;
+     sigset_t sigset, osigset;
+@@ -965,7 +1041,7 @@ pintr1(bool wantnl)
+  */
+ static struct command *savet = NULL;
+ void
+-process(bool catch)
++process(int catch)
+ {
+     jmp_buf osetexit;
+     struct command *t = savet;
+@@ -1102,7 +1178,7 @@ void
+ dosource(Char **v, struct command *t)
+ {
+     Char *f;
+-    bool    hflg = 0;
++    int    hflg = 0;
+     Char    buf[BUFSIZ];
+     char    sbuf[BUFSIZ];
+ 
+@@ -1137,7 +1213,7 @@ mailchk(void)
+     time_t  t;
+     int     intvl, cnt;
+     struct stat stb;
+-    bool    new;
++    int    new;
+ 
+     v = adrof(STRmail);
+     if (v == 0)
