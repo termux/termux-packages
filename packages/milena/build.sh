@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/46Neon/Milena
 TERMUX_PKG_DESCRIPTION="Spanish programming language for reproducible data analysis"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Milena contributors"
+TERMUX_PKG_MAINTAINER="@46Neon"
 TERMUX_PKG_VERSION=0.2.0
-# Pin the canonical stable Milena release tag.
-TERMUX_PKG_SRCURL="https://github.com/46Neon/Milena/archive/refs/tags/v0.2.0.tar.gz"
+TERMUX_PKG_SRCURL=https://github.com/46Neon/Milena/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=56e189bbd1e89aa25a7e8588e0606f0ea42d3bf5f1086fcfa3442d632d571153
+# Milena only links against the Android/Bionic system libc and libm.
+TERMUX_PKG_DEPENDS=""
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
@@ -20,19 +21,16 @@ termux_step_post_get_source() {
 }
 
 termux_step_make() {
-	make -j "${TERMUX_PKG_MAKE_PROCESSES:-1}" \
-		CC="${CC}" \
-		CFLAGS="${CFLAGS} -std=c17 -Iinclude" \
-		LDFLAGS="${LDFLAGS} -lm"
-}
-
-termux_step_make_test() {
-	make -j "${TERMUX_PKG_MAKE_PROCESSES:-1}" test
+	make -j "${TERMUX_PKG_MAKE_PROCESSES}" \
+		TERMUX=1 \
+		CC="${CC:-clang}" \
+		CFLAGS="${CFLAGS:-} -std=c17 -Iinclude" \
+		LDFLAGS="${LDFLAGS:-} -lm -Wl,--gc-sections" \
+		all
 }
 
 termux_step_make_install() {
 	install -Dm755 milena "${TERMUX_PREFIX}/bin/milena"
-	install -Dm644 LICENSE "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/LICENSE"
 	install -Dm644 README.md "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/README.md"
 }
 
