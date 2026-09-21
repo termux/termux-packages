@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Spanish programming language for reproducible data analy
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Milena contributors"
 TERMUX_PKG_VERSION=0.2.0
-# Pin the source to the canonical Milena commit; the version is not a release tag yet.
-TERMUX_PKG_SRCURL="https://github.com/46Neon/Milena/archive/bba8fa987450a824159c0ec90b8332462c96563d.tar.gz"
-TERMUX_PKG_SHA256=27502b0c1556f68590c84dde856a95656f23af9ed1519301bc35afab2cc3ba53
+# Pin the canonical stable Milena release tag.
+TERMUX_PKG_SRCURL="https://github.com/46Neon/Milena/archive/refs/tags/v0.2.0.tar.gz"
+TERMUX_PKG_SHA256=56e189bbd1e89aa25a7e8588e0606f0ea42d3bf5f1086fcfa3442d632d571153
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_get_source() {
@@ -13,7 +13,7 @@ termux_step_post_get_source() {
 	[[ -f LICENSE ]] || termux_error_exit "Milena source is missing LICENSE."
 	grep -q '^TARGET = milena$' Makefile || \
 		termux_error_exit "Refusing to build a non-canonical Milena target."
-	grep -q '^#define MILENA_VERSION "0.2.0-identity"$' include/common.h || \
+	grep -q '^#define MILENA_VERSION "0.2.0"$' include/common.h || \
 		termux_error_exit "Milena source identity/version check failed."
 	[[ -f src/language_runtime.c && -f src/language_semantic.c ]] || \
 		termux_error_exit "Canonical language runtime sources are missing."
