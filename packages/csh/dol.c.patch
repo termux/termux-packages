@@ -1,0 +1,44 @@
+--- a/dol.c
++++ b/dol.c
+@@ -33,9 +33,9 @@
+ #include <sys/types.h>
+ #include <fcntl.h>
+ #include <errno.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
++#include <bsd/unistd.h>
+ #include <stdarg.h>
+ 
+ #include "csh.h"
+@@ -209,8 +209,8 @@ Dword(void)
+     Char    wbuf[BUFSIZ];
+     Char *wp = wbuf;
+     int i = MAXWLEN;
+-    bool dolflg;
+-    bool    sofar = 0, done = 0;
++    int dolflg;
++    int    sofar = 0, done = 0;
+ 
+     while (!done) {
+ 	done = 1;
+@@ -389,7 +389,7 @@ Dgetdol(void)
+     Char    name[4 * MAXVARLEN + 1];
+     int     c, sc;
+     int     subscr = 0, lwb = 1, upb = 0;
+-    bool    dimen = 0, bitset = 0;
++    int    dimen = 0, bitset = 0;
+     char    tnp;
+     Char    wbuf[BUFSIZ];
+     static Char *dolbang = NULL;
+@@ -824,7 +824,7 @@ heredoc(Char *term)
+     int     ocnt, lcnt, mcnt;
+     Char *lbp, *obp, *mbp;
+     Char  **vp;
+-    bool    quoted;
++    int    quoted;
+     char   tmp[] = "/tmp/sh.XXXXXXXX";
+ 
+     if (mkstemp(tmp) < 0)
