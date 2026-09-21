@@ -1,5 +1,18 @@
 --- a/proc.c
 +++ b/proc.c
+@@ -33,9 +33,9 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <errno.h>
+-#include <unistd.h>
+-#include <stdlib.h>
+-#include <string.h>
++#include <bsd/unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
+ #include <stdarg.h>
+ 
+ #include "csh.h"
 @@ -45,6 +45,13 @@
  
  #define BIGINDEX	9	/* largest desirable job index */
@@ -60,3 +73,36 @@
  	    if (pp->p_reason != 0)
  		pp->p_flags |= PAEXITED;
  	    else
+@@ -641,12 +648,12 @@ pendjob(void)
+  * pprint - print a job
+  */
+ static int
+-pprint(struct process *pp, bool flag)
++pprint(struct process *pp, int flag)
+ {
+     int status, reason;
+     struct process *tp;
+     int     jobflags, pstatus;
+-    bool hadnl = 1;	/* did we just have a newline */
++    int hadnl = 1;	/* did we just have a newline */
+     char   *format;
+ 
+     (void) fpurge(cshout);
+@@ -1123,7 +1130,7 @@ pstart(struct process *pp, int foregnd)
+ }
+ 
+ void
+-panystop(bool neednl)
++panystop(int neednl)
+ {
+     struct process *pp;
+ 
+@@ -1233,7 +1240,7 @@ int
+ pfork(struct command *t, int wanttty)
+ {
+     int pid;
+-    bool    ignint = 0;
++    int    ignint = 0;
+     int     pgrp;
+     sigset_t sigset, osigset;
+ 
