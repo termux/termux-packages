@@ -4,15 +4,15 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
 
 --- a/gradle/libs.versions.toml
 +++ b/gradle/libs.versions.toml
-@@ -10,7 +10,6 @@
- elk                 = "0.10.0"
- fop                 = "2.11"
- glytching-junit-ext = "2.6.0"
--gorylenko-gradle-git-properties = "2.5.7"
- graalvm-native      = "1.0.0"
+@@ -6,7 +6,6 @@
+ [versions]
+ ant                 = "1.10.17"
+ elk                 = "0.12.0"
+-gorylenko-gradle-git-properties = "4.0.1"
+ graalvm-native      = "1.1.11"
  jdepend             = "2.9.1"
  jlatexmath          = "1.0.7"
-@@ -48,7 +47,6 @@
+@@ -43,7 +42,6 @@
  
  [plugins]
  adarshr-test-logger = { id = "com.adarshr.test-logger", version.ref = "adarshr-test-logger" }
@@ -30,17 +30,30 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
  //	alias(libs.plugins.adarshr.test.logger)
  	alias(libs.plugins.teavm)
  }
-@@ -653,28 +652,6 @@
+@@ -629,41 +628,6 @@
  // CompilationInfo - Git commit & timestamp injection
  // ============================================
  
+-// Resolve the git.properties produced by gradle-git-properties from the
+-// generateGitProperties task's own output, so downstream tasks read it from
+-// wherever the plugin writes it (no hard-coded path).
+-val gitPropertiesFile = tasks.named<com.gorylenko.GenerateGitPropertiesTask>("generateGitProperties")
+-	.flatMap { it.output }
+-
 -gitProperties {
 -	dateFormat = "yyyy-MM-dd'T'HH:mm:ssX"
 -}
 -
+-// gradle-git-properties adds its output dir to the main resources, so every Jar
+-// task (jar, sourcesJar, javadocJar) consumes git.properties. Declare the
+-// producer dependency explicitly, as required by Gradle's task validation.
+-tasks.withType<Jar>().configureEach {
+-	dependsOn("generateGitProperties")
+-}
+-
 -tasks.named("generateGitProperties") {
 -	doLast {
--		val propsFile = layout.buildDirectory.file("resources/main/git.properties").get().asFile
+-		val propsFile = gitPropertiesFile.get().asFile
 -		if (propsFile.exists()) {
 -      println("::group::[Git Properties]")
 -			println("----- git.properties -----")
@@ -56,25 +69,24 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
 -	}
 -}
 -
- val filteredSrcDir = layout.buildDirectory.dir("generated/sources/git-filtered")
+ // `patchCompilationInfo` injects build metadata (version, git commit id, compile timestamp)
+ // directly into src/main/java/.../CompilationInfo.java.
+ //
+@@ -686,14 +650,11 @@
+ 	group = "build"
+ 	description = "Patches src/main/java/.../CompilationInfo.java in place with version, git commit id and compile timestamp. NOT wired automatically -- call explicitly (typically from CI)."
  
- // Cleanup of generated filtered sources (avoid leaving copied sources on disk)
-@@ -698,18 +675,13 @@
- }
- 
- val filterSourcesWithBuildInfo by tasks.registering {
 -	dependsOn("generateGitProperties")
- 	mustRunAfter("processResources")
- 
- 	inputs.dir("src/main/java")
- 	outputs.dir(filteredSrcDir)
- 
+-
  	doLast {
 -		// 1) Read git.properties
--		val propsFile = layout.buildDirectory.file("resources/main/git.properties").get().asFile
+-		val propsFile = gitPropertiesFile.get().asFile
 -		val props = Properties().apply { propsFile.inputStream().use { load(it) } }
 -		val commitId = props.getProperty("git.commit.id.abbrev")
 -			?: error("git.commit.id.abbrev not found in ${propsFile.absolutePath}")
++		// 1) Git commit info is not available in Termux builds (no .git directory
++		// in the extracted source tarball), so the gradle-git-properties plugin
++		// and its "generateGitProperties" task are disabled entirely.
 +		val commitId = "N/A"
  
  		// 2) Compute compile timestamp (epoch millis)
