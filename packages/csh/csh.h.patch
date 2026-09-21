@@ -1,15 +1,22 @@
 --- a/csh.h
 +++ b/csh.h
-@@ -90,7 +90,7 @@ typedef void *ptr_t;
+@@ -89,13 +89,11 @@ typedef void *ptr_t;
+ #define xcalloc(n, s)	Calloc(n, s)
  #define xfree(p)	Free(p)
  
- #include <stdio.h>
+-#include <stdio.h>
 -FILE *cshin, *cshout, *csherr;
++#include <bsd/stdio.h>
 +extern FILE *cshin, *cshout, *csherr;
  
  #define	isdir(d)	(S_ISDIR(d.st_mode))
  
-@@ -106,56 +106,56 @@ typedef int bool;
+-typedef int bool;
+-
+ #define	eq(a, b)	(Strcmp(a, b) == 0)
+ 
+ /* globone() flags */
+@@ -106,56 +104,56 @@ typedef int bool;
  /*
   * Global flags
   */
@@ -97,7 +104,7 @@
  
  
  /*
-@@ -165,10 +165,10 @@ pid_t	opgrp;			/* Initial pgrp and tty pgrp */
+@@ -165,10 +163,10 @@ pid_t	opgrp;			/* Initial pgrp and tty pgrp */
   * (this saves work) but for version 6, this is not usually possible.
   * The desired initial values for these descriptors are F{SHIN,...}.
   */
@@ -112,7 +119,7 @@
  
  /*
   * Error control
-@@ -179,8 +179,8 @@ int   OLDSTD;			/* Old standard input (def for cmds) */
+@@ -179,8 +177,8 @@ int   OLDSTD;			/* Old standard input (def for cmds) */
   */
  
  #include <setjmp.h>
@@ -123,7 +130,7 @@
  
  #define	setexit()	(setjmp(reslab))
  #define	reset()		longjmp(reslab, 1)
-@@ -188,11 +188,11 @@ int exitset;
+@@ -188,11 +186,11 @@ int exitset;
  #define	getexit(a)	memcpy((a), reslab, sizeof reslab)
  #define	resexit(a)	memcpy(reslab, (a), sizeof reslab)
  
@@ -138,7 +145,7 @@
  
  /*
   * Lexical definitions.
-@@ -213,7 +213,7 @@ sig_t parterm;			/* Parents terminate catch */
+@@ -213,7 +211,7 @@ sig_t parterm;			/* Parents terminate catch */
  #define	TRIM		0177	/* Mask to strip quote bit */
  #endif
  
@@ -147,7 +154,7 @@
  
  /*
   * Each level of input has a buffered input structure.
-@@ -222,7 +222,7 @@ int     AsciiOnly;		/* If set only 7 bits is expected in characters */
+@@ -222,7 +220,7 @@ int     AsciiOnly;		/* If set only 7 bits is expected in characters */
   * In other cases, the shell buffers enough blocks to keep all loops
   * in the buffer.
   */
@@ -156,7 +163,7 @@
      off_t   Bfseekp;		/* Seek pointer */
      off_t   Bfbobp;		/* Seekp of beginning of buffers */
      off_t   Bfeobp;		/* Seekp of end of buffers */
-@@ -263,9 +263,9 @@ extern int aret;		/* What was the last character returned */
+@@ -263,9 +261,9 @@ extern int aret;		/* What was the last character returned */
   * For whiles, in particular, it re-seeks to the beginning of the
   * line the while was on; hence the while placement restrictions.
   */
@@ -168,7 +175,7 @@
  
  /*
   * Input lines are parsed into doubly linked circular
-@@ -297,7 +297,7 @@ struct wordent {
+@@ -297,7 +295,7 @@ struct wordent {
   * process id's from `$$', and modified variable values (from qualifiers
   * during expansion in sh.dol.c) here.
   */
@@ -177,7 +184,7 @@
  
  /*
   * Parser structure
-@@ -395,7 +395,7 @@ extern int nsrchn;
+@@ -395,7 +393,7 @@ extern int nsrchn;
   * source level.  Loops are implemented by seeking back in the
   * input.  For foreach (fe), the word list is attached here.
   */
@@ -186,7 +193,7 @@
      struct Ain   w_start;	/* Point to restart loop */
      struct Ain   w_end;		/* End of loop (0 if unknown) */
      Char  **w_fe, **w_fe0;	/* Current/initial wordlist for fe */
-@@ -408,7 +408,7 @@ struct whyle {
+@@ -408,7 +406,7 @@ struct whyle {
   *
   * Aliases and variables are stored in AVL balanced binary trees.
   */
@@ -195,7 +202,7 @@
      Char  **vec;		/* Array of words which is the value */
      Char   *v_name;		/* Name of variable/alias */
      struct varent *v_link[3];	/* The links, see below */
-@@ -419,7 +419,7 @@ struct varent {
+@@ -419,7 +417,7 @@ struct varent {
  #define v_right		v_link[1]
  #define v_parent	v_link[2]
  
@@ -204,7 +211,7 @@
  
  #define adrof(v)	adrof1(v, &shvhed)
  #define value(v)	value1(v, &shvhed)
-@@ -428,14 +428,14 @@ struct varent *adrof1(Char *, struct varent *);
+@@ -428,14 +426,14 @@ struct varent *adrof1(Char *, struct varent *);
   * The following are for interfacing redo substitution in
   * aliases to the lexical routines.
   */
@@ -223,7 +230,7 @@
  
  #define MAXVARLEN 30		/* Maximum number of char in a variable name */
  
-@@ -450,9 +450,9 @@ extern long gargc;		/* Number args in gargv */
+@@ -450,9 +448,9 @@ extern long gargc;		/* Number args in gargv */
   */
  extern Char **pargv;		/* Pointer to the argv list space */
  extern long pargc;		/* Count of arguments in pargv */
@@ -236,7 +243,7 @@
  
  /*
   * History list
-@@ -465,19 +465,19 @@ Char   *pargcp;			/* Current index into pargs */
+@@ -465,19 +463,19 @@ Char   *pargcp;			/* Current index into pargs */
   * when history substitution includes modifiers, and thrown away
   * at the next discarding since their event numbers are very negative.
   */
@@ -262,7 +269,7 @@
  
  /*
   * strings.h:
-@@ -518,30 +518,30 @@ Char    HISTSUB;		/* auto-substitute character */
+@@ -518,30 +516,30 @@ Char    HISTSUB;		/* auto-substitute character */
  /*
   * setname is a macro to save space (see sh.err.c)
   */
