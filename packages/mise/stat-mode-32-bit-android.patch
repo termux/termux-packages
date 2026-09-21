@@ -109,3 +109,39 @@ index 2b89e18..0637114 100644
      }
      Ok(())
 
+diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/cask/state.rs
+--- a/src/system/packages/brew/cask/state.rs
++++ b/src/system/packages/brew/cask/state.rs
+@@ -670,7 +670,10 @@
+ ) -> Result<CaskTargetFingerprint> {
+     let stat = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)
+         .wrap_err_with(|| format!("failed to fingerprint {}", Path::new(name).display()))?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
+     if kind.contains(nix::sys::stat::SFlag::S_IFLNK) {
+         let target = read_link_verified_at(&parent, name, &stat)?;
+         return Ok(CaskTargetFingerprint {
+@@ -757,7 +760,10 @@
+ ) -> Result<Vec<u8>> {
+     let target = nix::fcntl::readlinkat(&parent, name)?;
+     let after = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = |mode| nix::sys::stat::SFlag::from_bits_truncate(mode as u16);
+     if after.st_dev != classified.st_dev
+         || after.st_ino != classified.st_ino
+         || kind(after.st_mode) != kind(classified.st_mode)
+@@ -815,7 +821,10 @@
+         let name = std::ffi::OsStr::from_bytes(name.to_bytes());
+         let relative = prefix.join(name);
+         let stat = nix::sys::stat::fstatat(&dir, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
+         if kind.contains(nix::sys::stat::SFlag::S_IFLNK) {
+             out.push((
+                 relative,
