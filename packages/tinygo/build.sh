@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.41.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
 TERMUX_PKG_SHA256=312536239888b84fb217a8c9d63da526374e3475e4abb5bd2ad98a077dab638b
@@ -76,21 +77,29 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_tag}."
+		return
+	fi
+
 	local tmpdir
-	tmpdir="$(mktemp -d)"
-	git clone --branch "v${latest_tag}" --depth=1 --recursive \
-		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
-	make -C "${tmpdir}" llvm-source GO=:
+	tmpdir="$(mktemp -d -p "${TERMUX_PKGS__BUILD__REPO_ROOT_DIR:-$PWD}" tinygo-update.XXXXXX)"
+	if ! git clone --branch "v${latest_tag}" --depth=1 --recursive \
+		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"; then
+		echo "WARN: git clone failed while checking tinygo update, aborting update." >&2
+		rm -fr "${tmpdir}"
+		return
+	fi
+	if ! make -C "${tmpdir}" llvm-source GO=:; then
+		echo "WARN: 'make llvm-source' failed while checking tinygo update, aborting update." >&2
+		rm -fr "${tmpdir}"
+		return
+	fi
 	local s
 	s="$(
 		find "${tmpdir}" -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
 		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
 	)"
-
-	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
-		echo "INFO: package needs to be updated to ${latest_tag}."
-		return
-	fi
 
 	sed \
 		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
