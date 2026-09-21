@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library for reading and writing images, including clas
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.1.17.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=92a26c0af4ffc6676d72d9dfe0e991eb45fdf3192abee3d0855a24d6c721b013
 # configure-time error if ptex and ptex-static are not both installed
