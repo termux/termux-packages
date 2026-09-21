@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=(
 	"4.2.6"
 	"4.2.6" # Web Frontend
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${TERMUX_PKG_VERSION[1]}/openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz"
