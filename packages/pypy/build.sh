@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION="8.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://downloads.python.org/pypy/pypy$_MAJOR_VERSION-v$TERMUX_PKG_VERSION-src.tar.gz"
 	"https://downloads.python.org/pypy/pypy2.7-v$TERMUX_PKG_VERSION-linux64.tar.gz"
