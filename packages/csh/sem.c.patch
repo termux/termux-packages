@@ -1,0 +1,33 @@
+--- a/sem.c
++++ b/sem.c
+@@ -35,9 +35,9 @@
+ #include <sys/stat.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
++#include <bsd/unistd.h>
+ #include <stdarg.h>
+ 
+ #include "csh.h"
+@@ -52,7 +52,7 @@ static void	 chkclob(char *);
+ void
+ execute(struct command *t, int wanttty, int *pipein, int *pipeout)
+ {
+-    bool    forked = 0;
++    int    forked = 0;
+     struct biltins *bifunc;
+     int     pid = 0;
+     int     pv[2];
+@@ -287,7 +287,7 @@ execute(struct command *t, int wanttty, int *pipein, int *pipeout)
+ 		else {		/* child */
+ 		    /* this is from pfork() */
+ 		    int     pgrp;
+-		    bool    ignint = 0;
++		    int    ignint = 0;
+ 
+ 		    if (nosigchld) {
+ 			sigprocmask(SIG_SETMASK, &csigset, NULL);
