@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
-TERMUX_PKG_DESCRIPTION="Unofficial Thunderbird email client"
+TERMUX_PKG_DESCRIPTION="Standalone mail and news reader from mozilla.org"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="154.0"
+TERMUX_PKG_VERSION="156.0"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
-TERMUX_PKG_SHA256=d22a5f24549a95ca1e729fbff3e24376b1d2e7eca4a66ba46e20e4e54c54b894
+TERMUX_PKG_SHA256=d20185160e19a9b483b8e6f21622c185f96c9dea4090feb806531d58cac5928e
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,18 +20,18 @@ termux_pkg_auto_update() {
 	# https://archive.mozilla.org/pub/thunderbird/releases/latest/README.txt
 	local e=0
 	local api_url="https://download.mozilla.org/?product=thunderbird-latest&os=linux64&lang=en-US"
-	local api_url_r=$(curl -s "${api_url}")
-	local latest_version=$(echo "${api_url_r}" | sed -nE "s/.*thunderbird-(.*).tar.xz.*/\1/p")
+	local api_url_r="$(curl -s "${api_url}")"
+	local latest_version="$(sed -nE "s/.*thunderbird-(.*).tar.xz.*/\1/p" <<< "${api_url_r}")"
 	[[ -z "${api_url_r}" ]] && e=1
 	[[ -z "${latest_version}" ]] && e=1
 
-	local uptime_now=$(cat /proc/uptime)
+	local uptime_now="$(< /proc/uptime)"
 	local uptime_s="${uptime_now//.*}"
 	local uptime_h_limit=2
-	local uptime_s_limit=$((uptime_h_limit*60*60))
+	local uptime_s_limit="$((uptime_h_limit*60*60))"
 	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+	(( uptime_s == 0 )) && [[ "$(uname -o)" != "Android" ]] && e=1
+	(( uptime_s > uptime_s_limit )) && e=1
 
 	if [[ "${e}" != 0 ]]; then
 		cat <<- EOL >&2
@@ -67,8 +67,8 @@ termux_step_pre_configure() {
 	termux_setup_rust
 
 	# Out of memory when building gkrust
-	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
-		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+	if [[ "$TERMUX_DEBUG_BUILD" == false ]]; then
+		local -u env_host="${CARGO_TARGET_NAME//-/_}"
 		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
 	fi
 
@@ -79,15 +79,16 @@ termux_step_pre_configure() {
 	export HOST_CC HOST_CXX
 
 	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot"
-	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
-	env_name=${env_name//-/_}
+	local env_name="BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}"
+	env_name="${env_name//-/_}"
 	export "$env_name"="$BINDGEN_CFLAGS"
 
 	# https://reviews.llvm.org/D141184
 	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
 	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog"
 
-	if [ "$TERMUX_ARCH" = "arm" ]; then
+	if [[ "$TERMUX_ARCH" == "arm" ]]; then
+		export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_RUSTFLAGS+=" -C link-arg=-Wl,--threads=1"
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
 	fi
@@ -110,9 +111,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
-	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+	if [[ "$TERMUX_CONTINUE_BUILD" == "true" ]]; then
 		termux_step_pre_configure
-		cd $TERMUX_PKG_SRCDIR
+		cd "$TERMUX_PKG_SRCDIR"
 	fi
 
 	sed \
@@ -121,7 +122,7 @@ termux_step_configure() {
 		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|" \
 		"$TERMUX_PKG_BUILDER_DIR/mozconfig.cfg" > .mozconfig
 
-	if [ "$TERMUX_DEBUG_BUILD" = true ]; then
+	if [[ "$TERMUX_DEBUG_BUILD" == true ]]; then
 		cat >>.mozconfig - <<END
 ac_add_options --enable-debug-symbols
 ac_add_options --disable-install-strip
@@ -168,8 +169,8 @@ termux_step_post_make_install() {
 	# https://phabricator.services.mozilla.com/D181687
 	# Android 8.x and older not support "-z pack-relative-relocs" / DT_RELR
 	local r
-	r=$("${READELF}" -d "${TERMUX_PREFIX}/bin/thunderbird")
-	if [[ -n "$(echo "${r}" | grep "(RELR)")" ]]; then
+	r="$("${READELF}" -d "${TERMUX_PREFIX}/bin/thunderbird")"
+	if [[  "$r" == *"(RELR)"* ]]; then
 		termux_error_exit "DT_RELR is unsupported on Android 8.x and older\n${r}"
 	fi
 }
