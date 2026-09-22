@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE="https://herdr.dev/"
 TERMUX_PKG_DESCRIPTION="Terminal workspace manager for AI coding agents"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.9.0"
+TERMUX_PKG_VERSION="0.9.1"
 TERMUX_PKG_SRCURL="https://github.com/herdrdev/herdr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a
+TERMUX_PKG_SHA256=03403d3ef80dcf2b954dd5d27eb636e6c4f5279d240b48de272b7f53e4b73093
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
-# libghostty-vt has not been ported to Zig 0.16 yet.
-TERMUX_ZIG_VERSION=0.15.2
+# Match the Zig version required by vendored libghostty-vt.
+TERMUX_ZIG_VERSION=0.16.0
 
 termux_step_post_get_source() {
 	local p="$TERMUX_PKG_BUILDER_DIR/termux.diff"

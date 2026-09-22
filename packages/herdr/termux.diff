@@ -1,22 +1,32 @@
 diff --git a/build.rs b/build.rs
-index 7a2ac11..46307ab 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -11,0 +12,2 @@ fn zig_target(target: &str) -> &str {
+@@ -9,6 +9,8 @@
+         "aarch64-unknown-linux-gnu" => "aarch64-linux-gnu",
+         "x86_64-unknown-linux-musl" => "x86_64-linux-musl",
+         "aarch64-unknown-linux-musl" => "aarch64-linux-musl",
 +        "x86_64-linux-android" => "x86_64-linux-android.@TERMUX_PKG_API_LEVEL@",
 +        "aarch64-linux-android" => "aarch64-linux-android.@TERMUX_PKG_API_LEVEL@",
+         "x86_64-apple-darwin" => "x86_64-macos",
+         "aarch64-apple-darwin" => "aarch64-macos",
+         "x86_64-pc-windows-msvc" => "x86_64-windows-msvc",
 diff --git a/src/detect/mod.rs b/src/detect/mod.rs
-index c244dd8..63f8fe3 100644
 --- a/src/detect/mod.rs
 +++ b/src/detect/mod.rs
-@@ -375,11 +375,5 @@ fn normalized_process_name(process: &crate::platform::ForegroundProcess) -> Stri
+@@ -386,20 +386,11 @@
+         return effective.to_string();
+     }
+
 -    if let Some(runtime) = process.argv.as_deref().and_then(|argv| argv.first()) {
 -        let runtime_name = normalized_agent_lookup_name(path_basename(runtime));
 -        if matches!(runtime_name.as_str(), "node" | "bun") {
 -            if let Some(wrapped_agent) =
 -                wrapped_agent_name_from_runtime_argv(runtime, process.argv.as_deref())
 -            {
--                if identify_agent(&wrapped_agent) == Some(Agent::Qwen) {
+-                if matches!(
+-                    identify_agent(&wrapped_agent),
+-                    Some(Agent::Qwen | Agent::Cline | Agent::Letta)
+-                ) {
 -                    return wrapped_agent;
 -                }
 -            }
@@ -26,7 +36,13 @@ index c244dd8..63f8fe3 100644
 +        wrapped_agent_name_from_runtime_argv(&runtime, Some(argv))
 +    }) {
 +        return wrapped_agent;
-@@ -398,2 +392,14 @@ fn wrapped_agent_name_from_runtime_argv(runtime: &str, argv: Option<&[String]>)
+     }
+
+     if let Some(wrapped_agent) = argv0_agent_name(process.argv.as_deref())
+@@ -412,8 +403,20 @@
+ }
+
+ fn wrapped_agent_name_from_runtime_argv(runtime: &str, argv: Option<&[String]>) -> Option<String> {
 -    let argv = argv?;
 -    let runtime_name = normalized_agent_lookup_name(path_basename(runtime));
 +    let runtime_name = runtime_executable_name(runtime)?;
@@ -43,14 +59,26 @@ index c244dd8..63f8fe3 100644
 +    if has_duplicate_runtime {
 +        argv = &argv[1..];
 +    }
-@@ -684,0 +691,6 @@ fn path_basename(path: &str) -> &str {
+
+     match runtime_name.as_str() {
+         "node" => cursor_agent_name_from_bundled_node_argv(argv)
+@@ -819,6 +822,12 @@
+         .unwrap_or(path)
+ }
+
 +fn runtime_executable_name(path: &str) -> Option<String> {
 +    let name = path_basename(path).trim().to_lowercase();
 +    let name = name.strip_suffix(".exe").unwrap_or(&name);
 +    is_runtime_or_shell_name(name).then(|| name.to_string())
 +}
 +
-@@ -697,2 +709,5 @@ fn is_generic_runtime_or_shell(name: &str) -> bool {
+ fn process_priority(process: &crate::platform::ForegroundProcess, normalized_name: &str) -> u8 {
+     let lower_name = normalized_name.to_lowercase();
+     if lower_name != process.name.to_lowercase() {
+@@ -831,10 +840,13 @@
+ }
+
+ fn is_generic_runtime_or_shell(name: &str) -> bool {
 -    let name = normalized_agent_lookup_name(path_basename(name));
 -    is_python_runtime(&name)
 +    runtime_executable_name(name).is_some()
@@ -58,10 +86,17 @@ index c244dd8..63f8fe3 100644
 +
 +fn is_runtime_or_shell_name(name: &str) -> bool {
 +    is_python_runtime(name)
-@@ -700 +715 @@ fn is_generic_runtime_or_shell(name: &str) -> bool {
+         || matches!(
 -            name.as_str(),
 +            name,
-@@ -964,0 +980,122 @@ mod tests {
+             "sh" | "bash"
+                 | "zsh"
+                 | "fish"
+@@ -864,6 +876,128 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++
 +    #[test]
 +    fn identify_agent_in_android_runtime_argv() {
 +        type RuntimeCase<'a> = (&'a str, Option<&'a str>, &'a [&'a str], Option<Agent>);
@@ -183,21 +218,32 @@ index c244dd8..63f8fe3 100644
 +            assert_eq!(runtime_executable_name(runtime), None);
 +        }
 +    }
-+
+
+     fn foreground_process(
+         pid: u32,
 diff --git a/src/pane.rs b/src/pane.rs
-index aa6acb5..1c3663c 100644
 --- a/src/pane.rs
 +++ b/src/pane.rs
-@@ -1587 +1587 @@ fn default_pane_shell() -> String {
+@@ -1599,9 +1599,14 @@
+     "powershell.exe".into()
+ }
+
 -#[cfg(not(windows))]
 +#[cfg(all(not(windows), not(target_os = "android")))]
-@@ -1591,0 +1592,5 @@ fn default_pane_shell() -> String {
+ fn default_pane_shell() -> String {
+     "/bin/sh".into()
++}
++
 +#[cfg(target_os = "android")]
 +fn default_pane_shell() -> String {
 +    "@TERMUX_PREFIX@/bin/sh".into()
-+}
-+
-@@ -3590,5 +3595,8 @@ mod tests {
+ }
+
+ #[derive(Clone, Copy)]
+@@ -3795,11 +3800,14 @@
+
+     #[test]
+     fn pane_shell_ignores_empty_values() {
 -        assert_eq!(
 -            pane_shell_from("   ", Some("  ".to_string())),
 -            default_pane_shell()
@@ -211,11 +257,17 @@ index aa6acb5..1c3663c 100644
 +        let expected = "/bin/sh";
 +        assert_eq!(pane_shell_from("   ", Some("  ".to_string())), expected);
 +        assert_eq!(pane_shell_from("", None), expected);
+     }
+
+     #[test]
 diff --git a/src/platform/linux.rs b/src/platform/linux.rs
-index 6c09667..291ec29 100644
 --- a/src/platform/linux.rs
 +++ b/src/platform/linux.rs
-@@ -22,0 +23,9 @@ pub(crate) use super::unix_common::{
+@@ -22,6 +22,15 @@
+     status_commands_supported, wait_client_stream_readable, write_client_stream,
+     ClientStreamReader, StatusCommandGuard,
+ };
++
 +#[cfg(target_os = "linux")]
 +const POSIX_SHELL: &str = "/bin/sh";
 +#[cfg(target_os = "android")]
@@ -224,38 +276,93 @@ index 6c09667..291ec29 100644
 +const URL_OPENER: &str = "xdg-open";
 +#[cfg(target_os = "android")]
 +const URL_OPENER: &str = "@TERMUX_PREFIX@/bin/termux-open-url";
-+
-@@ -93 +102 @@ fn raw_command_argv(command: &str, flag: &str) -> Vec<std::ffi::OsString> {
+
+ #[cfg(test)]
+ mod config_file_tests;
+@@ -294,7 +303,7 @@
+ }
+
+ fn raw_command_argv(command: &str, flag: &str) -> Vec<std::ffi::OsString> {
 -    vec!["/bin/sh".into(), flag.into(), command.into()]
 +    vec![POSIX_SHELL.into(), flag.into(), command.into()]
-@@ -114 +123 @@ pub(crate) fn scrollback_editor_argv(path: &std::path::Path) -> std::io::Result<
+ }
+
+ pub(crate) fn detached_custom_command_process_platform(command: &str) -> std::process::Command {
+@@ -315,7 +324,7 @@
+     let command = format!(
+         r#"scrollback_file={quoted_path}; eval "${{EDITOR:-vi}} \"\$scrollback_file\""; status=$?; rm -f "$scrollback_file"; exit $status"#
+     );
 -    Ok(vec!["/bin/sh".to_string(), "-c".to_string(), command])
 +    Ok(vec![POSIX_SHELL.to_string(), "-c".to_string(), command])
-@@ -471 +480 @@ pub fn open_url(url: &str) -> std::io::Result<Option<std::process::Child>> {
+ }
+
+ pub(crate) fn interactive_shell_command(argv: &[String], shell_name: &str) -> Option<String> {
+@@ -793,7 +802,7 @@
+ }
+
+ pub fn open_url(url: &str) -> std::io::Result<Option<std::process::Child>> {
 -    Command::new("xdg-open")
 +    Command::new(URL_OPENER)
-@@ -1602,0 +1612 @@ mod tests {
+         .arg(url)
+         .stdin(Stdio::null())
+         .stdout(Stdio::null())
+@@ -2160,7 +2169,10 @@
+         let path = std::path::Path::new("/tmp/herdr scrollback.txt");
+         let argv = scrollback_editor_argv(path).unwrap();
+
 +        #[cfg(target_os = "linux")]
-@@ -1603,0 +1614,2 @@ mod tests {
+         assert_eq!(argv[0], "/bin/sh");
 +        #[cfg(target_os = "android")]
 +        assert_eq!(argv[0], "@TERMUX_PREFIX@/bin/sh");
+         assert_eq!(argv[1], "-c");
+         assert!(argv[2].contains("EDITOR:-vi"));
+         assert!(argv[2].contains("/tmp/herdr scrollback.txt"));
 diff --git a/src/platform/mod.rs b/src/platform/mod.rs
-index d48ad4f..eb669b4 100644
 --- a/src/platform/mod.rs
 +++ b/src/platform/mod.rs
-@@ -142 +142 @@ pub fn launch_server_daemon_command(command: &mut std::process::Command) -> std:
+@@ -55,7 +55,7 @@
+     ChildExitReason::Exited
+ }
+
+-#[cfg(not(target_os = "linux"))]
++#[cfg(not(any(target_os = "linux", target_os = "android")))]
+ pub(crate) fn launch_executable() -> std::io::Result<std::path::PathBuf> {
+     std::env::current_exe()
+ }
+@@ -158,7 +158,7 @@
+     Ok(false)
+ }
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -156 +156 @@ pub fn detach_server_daemon_command(command: &mut std::process::Command) {
+ pub fn detach_server_daemon_command(command: &mut std::process::Command) {
+     use std::os::unix::process::CommandExt;
+
+@@ -175,7 +175,7 @@
+     }
+ }
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -278 +278 @@ pub(crate) fn end_cli_output() {}
+ pub fn current_process_is_detached_server_daemon() -> bool {
+     unsafe { libc::getsid(0) == libc::getpid() }
+ }
+@@ -306,9 +306,9 @@
+ #[cfg(not(unix))]
+ pub(crate) fn end_cli_output() {}
+
 -#[cfg(target_os = "linux")]
 +#[cfg(any(target_os = "linux", target_os = "android"))]
-@@ -280 +280 @@ mod linux;
+ mod linux;
 -#[cfg(target_os = "linux")]
 +#[cfg(any(target_os = "linux", target_os = "android"))]
-@@ -293 +293,6 @@ pub use windows::*;
+ pub use linux::*;
+
+ #[cfg(target_os = "macos")]
+@@ -321,12 +321,22 @@
+ #[cfg(target_os = "windows")]
+ pub use windows::*;
+
 -#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 +#[cfg(not(any(
 +    target_os = "linux",
@@ -263,7 +370,7 @@ index d48ad4f..eb669b4 100644
 +    target_os = "macos",
 +    target_os = "windows"
 +)))]
-@@ -295 +300,6 @@ mod fallback;
+ mod fallback;
 -#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 +#[cfg(not(any(
 +    target_os = "linux",
@@ -271,39 +378,98 @@ index d48ad4f..eb669b4 100644
 +    target_os = "macos",
 +    target_os = "windows"
 +)))]
-@@ -298 +308 @@ pub use fallback::*;
+ pub use fallback::*;
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -321 +331 @@ fn normalized_process_name(name: &str) -> String {
+ pub(crate) fn available_pane_shell_from_job(child_pid: u32, job: ForegroundJob) -> Option<String> {
+     if job.process_group_id != child_pid
+         || job.processes.iter().any(|process| process.pid != child_pid)
+@@ -349,7 +359,7 @@
+         .to_ascii_lowercase()
+ }
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -329 +339 @@ pub(crate) fn is_powershell_process_name(name: &str) -> bool {
+ pub(crate) fn is_powershell_process_name(name: &str) -> bool {
+     matches!(
+         normalized_process_name(name).as_str(),
+@@ -357,7 +367,7 @@
+     )
+ }
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -383 +393 @@ pub(crate) fn is_pane_shell_process_name(name: &str) -> bool {
+ pub(crate) fn interactive_unix_shell_command(
+     argv: &[String],
+     shell_name: &str,
+@@ -440,12 +450,12 @@
+     )
+ }
+
 -#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 +#[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos")))]
-@@ -388 +398 @@ pub fn process_agent_hint(_pid: u32) -> Option<crate::detect::Agent> {
+ pub fn process_agent_hint(_pid: u32) -> Option<crate::detect::Agent> {
+     None
+ }
+
 -#[cfg(any(target_os = "linux", target_os = "macos"))]
 +#[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -470,0 +481,5 @@ mod tests {
+ pub(crate) fn parse_agent_env_hint(environ: &[u8]) -> Option<crate::detect::Agent> {
+     for record in environ.split(|&byte| byte == 0) {
+         let Some(value) = record.strip_prefix(b"HERDR_AGENT=") else {
+@@ -528,6 +538,11 @@
+ mod tests {
+     use super::*;
+
 +    #[cfg(target_os = "android")]
 +    const SHELL: &str = "@TERMUX_PREFIX@/bin/sh";
 +    #[cfg(not(target_os = "android"))]
 +    const SHELL: &str = "/bin/sh";
 +
-@@ -497 +512 @@ mod tests {
+     #[test]
+     fn terminal_resize_signal_is_recorded_once_per_delivery() {
+         watch_terminal_resize_signal();
+@@ -554,7 +569,7 @@
+     #[test]
+     fn detached_custom_command_preserves_unix_login_shell_flag() {
+         let cmd = detached_custom_command_process("echo hello");
 -        assert_eq!(cmd.get_program(), std::ffi::OsStr::new("/bin/sh"));
 +        assert_eq!(cmd.get_program(), std::ffi::OsStr::new(SHELL));
-@@ -510 +525 @@ mod tests {
+         assert_eq!(
+             cmd.get_args().collect::<Vec<_>>(),
+             [
+@@ -567,14 +582,14 @@
+     #[test]
+     fn pane_custom_command_builder_preserves_unix_shell_flag() {
+         let expected: Vec<std::ffi::OsString> =
 -            vec!["/bin/sh".into(), "-c".into(), "echo hello".into()];
 +            vec![SHELL.into(), "-c".into(), "echo hello".into()];
-@@ -517 +532 @@ mod tests {
+         assert_eq!(
+             pane_custom_command_pty_builder("echo hello").get_argv(),
+             &expected
+         );
+     }
+
 -    #[cfg(any(target_os = "linux", target_os = "macos"))]
 +    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -530 +545 @@ mod tests {
+     #[test]
+     fn parse_agent_env_hint_accepts_known_agents() {
+         assert_eq!(
+@@ -587,14 +602,14 @@
+         );
+     }
+
 -    #[cfg(any(target_os = "linux", target_os = "macos"))]
 +    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
-@@ -537 +552 @@ mod tests {
+     #[test]
+     fn parse_agent_env_hint_ignores_missing_or_unknown_agents() {
+         assert_eq!(parse_agent_env_hint(b"PATH=/bin\0TERM=xterm\0"), None);
+         assert_eq!(parse_agent_env_hint(b"HERDR_AGENT=not-an-agent\0"), None);
+     }
+
 -    #[cfg(any(target_os = "linux", target_os = "macos"))]
 +    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+     #[test]
+     fn interactive_shell_command_quotes_for_posix_and_powershell() {
+         let argv = vec![
