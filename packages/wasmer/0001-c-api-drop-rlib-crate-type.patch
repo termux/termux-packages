@@ -1,0 +1,16 @@
+rustc's LTO rejects a crate-type list that also includes "rlib". Drop
+it since only the .so/.a get installed, not the rlib.
+
+diff --git a/lib/c-api/Cargo.toml b/lib/c-api/Cargo.toml
+index b7bd388..bfe6856 100644
+--- a/lib/c-api/Cargo.toml
++++ b/lib/c-api/Cargo.toml
+@@ -20,7 +20,7 @@ exclude = ["examples/assets/**"]
+ # a conflict with the existing `wasmer` crate, see below.
+ name = "wasmer" # ##lib.name##
+ # ^ DO NOT REMOVE, it's used the `Makefile`, see `build-docs-capi`.
+-crate-type = ["staticlib", "cdylib", "rlib"]
++crate-type = ["staticlib", "cdylib"]
+ 
+ [dependencies]
+ # We rename `wasmer` to `wasmer-api` to avoid the conflict with this
