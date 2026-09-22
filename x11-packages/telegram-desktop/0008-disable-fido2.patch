@@ -1,0 +1,140 @@
+diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
+--- a/Telegram/CMakeLists.txt
++++ b/Telegram/CMakeLists.txt
+@@ -29,7 +29,10 @@
+ include(cmake/lib_stripe.cmake)
+ include(cmake/lib_tgcalls.cmake)
+ include(cmake/lib_prisma.cmake)
++if (NOT DESKTOP_APP_DISABLE_FIDO2)
+ include(cmake/lib_fido2.cmake)
++    set(fido2_target tdesktop::lib_fido2)
++endif()
+ include(cmake/td_export.cmake)
+ include(cmake/td_iv.cmake)
+ include(cmake/td_lang.cmake)
+@@ -37,7 +40,10 @@
+ include(cmake/td_scheme.cmake)
+ include(cmake/td_tde2e.cmake)
+ include(cmake/td_ui.cmake)
++if (NOT DESKTOP_APP_DISABLE_FIDO2)
+ include(cmake/td_webauthn.cmake)
++    set(td_webauthn_target tdesktop::td_webauthn)
++endif()
+ include(cmake/telegram_apple_swift_runtime.cmake)
+ include(cmake/generate_appstream_changelog.cmake)
+ 
+@@ -64,7 +70,7 @@
+ 
+ target_link_libraries(Telegram
+ PRIVATE
+-    tdesktop::lib_fido2
++    ${fido2_target}
+     tdesktop::lib_tgcalls
+     tdesktop::td_export
+     tdesktop::td_iv
+@@ -73,7 +79,7 @@
+     tdesktop::td_scheme
+     tdesktop::td_tde2e
+     tdesktop::td_ui
+-    tdesktop::td_webauthn
++    ${td_webauthn_target}
+     desktop-app::lib_webrtc
+     desktop-app::lib_base
+     desktop-app::lib_crl
+@@ -2194,6 +2200,18 @@
+     tray.h
+ )
+ 
++if (DESKTOP_APP_DISABLE_FIDO2)
++    remove_target_sources(Telegram ${src_loc}
++        platform/linux/webauthn_linux.cpp
++        webauthn/cable_ceremony.cpp
++        webauthn/webauthn_common.cpp
++    )
++    nice_target_sources(Telegram ${src_loc}
++    PRIVATE
++        webauthn/webauthn_no_fido.cpp
++    )
++endif()
++
+ if (APPLE)
+     nice_target_sources(Telegram ${src_loc}
+     PRIVATE
+diff --git a/Telegram/SourceFiles/webauthn/webauthn_no_fido.cpp b/Telegram/SourceFiles/webauthn/webauthn_no_fido.cpp
+new file mode 100644
+--- /dev/null
++++ b/Telegram/SourceFiles/webauthn/webauthn_no_fido.cpp
+@@ -0,0 +1,61 @@
++/*
++This file is part of Telegram Desktop,
++the official desktop application for the Telegram messaging service.
++
++For license and copyright information please follow this link:
++https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
++*/
++#include "platform/platform_webauthn.h"
++#include "webauthn/webauthn_common.h"
++
++namespace Platform::WebAuthn {
++
++bool IsSupported() {
++	return false;
++}
++
++void RegisterKey(
++		const Data::Passkey::RegisterData &,
++		Fn<void(RegisterResult)> callback) {
++	callback(RegisterResult{ .error = Error::Other });
++}
++
++void Login(
++		const Data::Passkey::LoginData &,
++		Fn<void(LoginResult)> callback) {
++	callback(LoginResult{ .error = Error::Other });
++}
++
++bool Libfido2DevicePresent() {
++	return false;
++}
++
++void RegisterViaLibfido2(
++		const Data::Passkey::RegisterData &,
++		Fn<void(RegisterResult)> callback) {
++	callback(RegisterResult{ .error = Error::Other });
++}
++
++void LoginViaLibfido2(
++		const Data::Passkey::LoginData &,
++		Fn<void(LoginResult)> callback) {
++	callback(LoginResult{ .error = Error::Other });
++}
++
++bool SecurityKeyPresent() {
++	return false;
++}
++
++void RegisterViaSecurityKey(
++		const Data::Passkey::RegisterData &,
++		Fn<void(RegisterResult)> callback) {
++	callback(RegisterResult{ .error = Error::Other });
++}
++
++void LoginViaSecurityKey(
++		const Data::Passkey::LoginData &,
++		Fn<void(LoginResult)> callback) {
++	callback(LoginResult{ .error = Error::Other });
++}
++
++} // namespace Platform::WebAuthn
+diff --git a/Telegram/cmake/telegram_options.cmake b/Telegram/cmake/telegram_options.cmake
+--- a/Telegram/cmake/telegram_options.cmake
++++ b/Telegram/cmake/telegram_options.cmake
+@@ -52,6 +52,8 @@
+     target_compile_definitions(Telegram PRIVATE TDESKTOP_ALLOW_CLOSED_ALPHA)
+ endif()
+ 
++option(DESKTOP_APP_DISABLE_FIDO2 "Disable FIDO2 security key support." OFF)
++
+ option(DESKTOP_APP_DISABLE_SWIFT6 "Disable local on-device translation (build without Swift 6 on macOS)." OFF)
+ if (DESKTOP_APP_DISABLE_SWIFT6)
+     target_compile_definitions(Telegram PRIVATE TDESKTOP_DISABLE_SWIFT6)
