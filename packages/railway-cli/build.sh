@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://railway.app
 TERMUX_PKG_DESCRIPTION="This is the command line interface for Railway"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.30.4"
+TERMUX_PKG_VERSION="5.59.0"
 TERMUX_PKG_SRCURL="https://github.com/railwayapp/cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=18b14625c98cc90315a2d6416f8a3961f2df0b570fc2fae25f69c8b8db54130d
+TERMUX_PKG_SHA256=83d257bc559f6d6081b113d4e61af77f93e584ff792b2bac6a53fb4fdd1e349d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -16,6 +16,8 @@ termux_step_pre_configure() {
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/arboard \
 		! -wholename ./vendor/x11rb-protocol \
+		! -wholename ./vendor/termios \
+		! -wholename ./vendor/termios-0.2.2 \
 		-exec rm -rf '{}' \;
 
 	find vendor/{arboard,x11rb-protocol} -type f -print0 | \
@@ -23,8 +25,18 @@ termux_step_pre_configure() {
 		-e 's|android|disabling_this_because_it_is_for_building_an_apk|g' \
 		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
 
+	find vendor/termios vendor/termios-0.2.2 -type f -name '*.rs' -print0 | \
+		xargs -0 sed -i \
+		-e 's/target_os = "linux"/any(target_os = "linux", target_os = "android")/g'
+
 	echo "" >> Cargo.toml
 	echo '[patch.crates-io]' >> Cargo.toml
 	echo "arboard = { path = \"./vendor/arboard\" }" >> Cargo.toml
 	echo "x11rb-protocol = { path = \"./vendor/x11rb-protocol\" }" >> Cargo.toml
+	echo "termios = { path = \"./vendor/termios\" }" >> Cargo.toml
+	# A `[patch.crates-io]` table can only have one entry per crate name,
+	# so the second termios version is patched under a different TOML
+	# key with an explicit `package =` to tell Cargo which crate it's
+	# really for (see "Multiple patch locations" in the Cargo book).
+	echo "termios_0_2 = { path = \"./vendor/termios-0.2.2\", package = \"termios\" }" >> Cargo.toml
 }
