@@ -15,6 +15,9 @@
 # or if output of command is redirected to file instead of terminal,
 # like `docker exec cmd &> cmd.log </dev/null`.
 # .
+# Requires RUNTIME ("docker" or "podman"), SUDO (may be empty), and
+# CONTAINER_NAME to be set by the caller.
+# .
 # See Also:
 # - https://github.com/docker/cli/issues/2607
 # - https://github.com/moby/moby/issues/9098
@@ -55,7 +58,7 @@ echo "Docker trap killing DOCKER_PROCESS" && \
 docker_killtree "'"$signal"'" "$DOCKER_PID" || :
         '
         # Exec docker_exec_trap_command inside docker context
-        $SUDO docker exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
+        $SUDO ${RUNTIME:-docker} exec "$CONTAINER_NAME" bash -c "$docker_exec_trap_command"
 
     fi
 
