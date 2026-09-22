@@ -1,0 +1,78 @@
+--- a/src/cups-pdf.c
++++ b/src/cups-pdf.c
+@@ -537,7 +537,7 @@
+ */
+ static int init(char *argv[]) {
+   struct stat fstatus;
+-  struct group *group;
++  struct group *group = NULL;
+   cp_string filename;
+   int grpstat;
+   const char *uri=cupsBackendDeviceURI(argv);
+@@ -557,8 +557,10 @@
+ 
+   (void) umask(0077);
+ 
++#ifndef __ANDROID__
+   group=getgrnam(Conf_Grp);
+     grpstat=setgid(group->gr_gid);
++#endif
+ 
+   if (strlen(Conf_Log)) {
+     if (stat(Conf_Log, &fstatus) || !S_ISDIR(fstatus.st_mode)) {
+@@ -573,6 +575,7 @@
+ 
+   dump_configuration();
+ 
++#ifndef __ANDROID__
+   if (!group) {
+     log_event(CPERROR, "Grp not found: %s", Conf_Grp);
+     return 1;
+@@ -583,6 +586,7 @@
+   }
+   else
+     log_event(CPDEBUG, "set new gid: %s", Conf_Grp);
++#endif
+ 
+   (void) umask(0022);
+ 
+@@ -595,8 +599,10 @@
+       log_event(CPERROR, "failed to set mode on spool directory: %s", Conf_Spool);
+       return 1;
+     }
++#ifndef __ANDROID__
+     if (chown(Conf_Spool, -1, group->gr_gid))
+       log_event(CPERROR, "failed to set group id %s on spool directory: %s (non fatal)", Conf_Grp, Conf_Spool);
++#endif
+     log_event(CPSTATUS, "spool directory created: %s", Conf_Spool);
+   }
+ 
+@@ -1233,10 +1239,12 @@
+   int ngroups;
+   pid_t pid;
+ 
++#ifndef __ANDROID__
+   if (setuid(0)) {
+     (void) fputs("CUPS-PDF cannot be called without root privileges!\n", stderr);
+     return 0;
+   }
++#endif
+ 
+   if (argc==1) {
+     announce_printers();
+@@ -1446,6 +1454,7 @@
+   if (!pid) {
+     log_event(CPDEBUG, "entering child process");
+ 
++#ifndef __ANDROID__
+     if (setgid(passwd->pw_gid))
+       log_event(CPERROR, "failed to set GID for current user");
+     else
+@@ -1458,6 +1467,7 @@
+       log_event(CPERROR, "failed to set UID for current user: %s", passwd->pw_name);
+     else
+       log_event(CPDEBUG, "UID set for current user: %s", passwd->pw_name);
++#endif
+ 
+     (void) umask(0077);
+     size=system(gscall);
