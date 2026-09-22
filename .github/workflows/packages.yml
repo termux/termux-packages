@@ -187,6 +187,19 @@ jobs:
 
         echo "packages: ${packages[*]}"
 
+        skip_building=false
+        if [[ "${#packages[@]}" -gt 0 ]]; then
+          set +e
+          DRY_RUN_OUTPUT=$(./scripts/bin/build-package-dry-run-simulation.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}" 2>&1)
+          DRY_RUN_RC=$?
+          set -e
+          echo "$DRY_RUN_OUTPUT"
+          if [ "$DRY_RUN_RC" -eq 85 ]; then
+            skip_building=true
+          fi
+        fi
+        echo "skip-building=$skip_building" >> $GITHUB_OUTPUT
+
         free_space='false'
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
           free_space=${{ github.event.inputs.free-space }}
