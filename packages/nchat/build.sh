@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="TUI for Telegram and WhatsApp"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.18.20
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/d99kris/nchat/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=49312e609ea3140246ed434c402c714f9e461f2f6381b349046bc3c29d579d5c
-TERMUX_PKG_DEPENDS="file, libandroid-glob, libandroid-wordexp, libpng, libsqlite, ncurses, openssl, zlib"
+TERMUX_PKG_DEPENDS="file, libandroid-execinfo, libandroid-glob, libandroid-wordexp, libpng, libsqlite, ncurses, openssl, zlib"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHAS_TELEGRAM=on
@@ -34,4 +35,7 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 
 	export PATH="${TERMUX_PKG_HOSTBUILD_DIR}/bin:${PATH}"
+
+	# ncutil calls backtrace() when execinfo.h is found, link it explicitly.
+	LDFLAGS+=" -landroid-execinfo"
 }
