@@ -1,0 +1,553 @@
+--- a/src/libpsl-native/test/test-createhardlink.cpp
++++ b/src/libpsl-native/test/test-createhardlink.cpp
+@@ -13,12 +13,13 @@
+ class CreateHardLinkTest : public ::testing::Test
+ {
+ protected:
++    bool hardlink_supported = true;
+ 
+     static const int bufSize = 64;
+-    const string fileTemplate = "/tmp/symlinktest.fXXXXXX";
+-    const string dirTemplate = "/tmp/symlinktest.dXXXXXX";
+-    const string fileHardLink = "/tmp/symlinktest.flink";
+-    const string dirHardLink = "/tmp/symlinktest.dlink";
++    const string fileTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.fXXXXXX";
++    const string dirTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.dXXXXXX";
++    const string fileHardLink = "@TERMUX_PREFIX@/tmp/symlinktest.flink";
++    const string dirHardLink = "@TERMUX_PREFIX@/tmp/symlinktest.dlink";
+     char *file, *dir;
+     char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
+ 
+@@ -39,7 +40,11 @@
+ 
+         // Create hard link to file
+         int ret = CreateHardLink(fileHardLink.c_str(), file);
+-        EXPECT_EQ(ret, 0);
++        if (ret != 0 && (errno == EACCES || errno == EPERM)) {
++            hardlink_supported = false;
++        } else {
++            EXPECT_EQ(ret, 0);
++        }
+ 
+         // Create hard link to directory - should fail
+         ret = CreateHardLink(dirHardLink.c_str(), dir);
+@@ -50,8 +55,7 @@
+     {
+         int ret;
+ 
+-        ret = unlink(fileHardLink.c_str());
+-        EXPECT_EQ(0, ret);
++        if (hardlink_supported) { ret = unlink(fileHardLink.c_str()); EXPECT_EQ(0, ret); }
+ 
+         ret = unlink(file);
+         EXPECT_EQ(0, ret);
+@@ -63,8 +67,9 @@
+ 
+ TEST_F(CreateHardLinkTest, FilePathNameDoesNotExist)
+ {
+-    std::string invalidFile = "/tmp/symlinktest_invalidFile";
+-    std::string invalidLink = "/tmp/symlinktest_invalidLink";
++    if (!hardlink_supported) GTEST_SKIP() << "Hard link not supported on Android";
++    std::string invalidFile = "@TERMUX_PREFIX@/tmp/symlinktest_invalidFile";
++    std::string invalidLink = "@TERMUX_PREFIX@/tmp/symlinktest_invalidLink";
+ 
+     // make sure neither exists
+     unlink(invalidFile.c_str());
+@@ -76,6 +81,7 @@
+ 
+ TEST_F(CreateHardLinkTest, VerifyLinkCount)
+ {
++    if (!hardlink_supported) GTEST_SKIP() << "Hard link not supported on Android";
+     int count = 0;
+     int ret = GetLinkCount(fileHardLink.c_str(), &count);
+     EXPECT_EQ(0, ret);
+--- a/src/libpsl-native/test/test-createsymlink.cpp
++++ b/src/libpsl-native/test/test-createsymlink.cpp
+@@ -17,10 +17,10 @@
+ protected:
+ 
+     static const int bufSize = 64;
+-    const string fileTemplate = "/tmp/symlinktest.fXXXXXX";
+-    const string dirTemplate = "/tmp/symlinktest.dXXXXXX";
+-    const string fileSymLink = "/tmp/symlinktest.flink";
+-    const string dirSymLink = "/tmp/symlinktest.dlink";
++    const string fileTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.fXXXXXX";
++    const string dirTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.dXXXXXX";
++    const string fileSymLink = "@TERMUX_PREFIX@/tmp/symlinktest.flink";
++    const string dirSymLink = "@TERMUX_PREFIX@/tmp/symlinktest.dlink";
+     char *file, *dir;
+     char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
+ 
+@@ -68,8 +68,8 @@
+ 
+ TEST_F(CreateSymLinkTest, FilePathNameDoesNotExist)
+ {
+-    std::string invalidFile = "/tmp/symlinktest_invalidFile";
+-    std::string invalidLink = "/tmp/symlinktest_invalidLink";
++    std::string invalidFile = "@TERMUX_PREFIX@/tmp/symlinktest_invalidFile";
++    std::string invalidLink = "@TERMUX_PREFIX@/tmp/symlinktest_invalidLink";
+ 
+     // make sure neither exists
+     unlink(invalidFile.c_str());
+--- a/src/libpsl-native/test/test-getcommonlstat.cpp
++++ b/src/libpsl-native/test/test-getcommonlstat.cpp
+@@ -40,9 +40,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %u /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %u /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %u /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %u /", "r");
+ #endif
+     int uid = -1;
+     int result = fscanf(p, "%d", &uid);
+@@ -57,9 +57,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %g /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %g /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %g /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %g /", "r");
+ #endif
+     int gid = -1;
+     int result = fscanf(p, "%d", &gid);
+@@ -74,9 +74,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %i /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %i /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %i /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %i /", "r");
+ #endif
+     long inode = -1;
+     int result = fscanf(p, "%ld", &inode);
+@@ -91,9 +91,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %z /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %z /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %s /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %s /", "r");
+ #endif
+     long size = -1;
+     int result = fscanf(p, "%ld", &size);
+@@ -108,9 +108,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %k /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %k /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %o /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %o /", "r");
+ #endif
+     long bSize = -1;
+     int result = fscanf(p, "%ld", &bSize);
+@@ -125,9 +125,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %b /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %b /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %b /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %b /", "r");
+ #endif
+     int bSize = -1;
+     int result = fscanf(p, "%d", &bSize);
+@@ -142,9 +142,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %l /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %l /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %h /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %h /", "r");
+ #endif
+     int linkcount = -1;
+     int result = fscanf(p, "%d", &linkcount);
+@@ -159,9 +159,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %d /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %d /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %d /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %d /", "r");
+ #endif
+     int deviceId = -1;
+     int result = fscanf(p, "%d", &deviceId);
+@@ -176,9 +176,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %a /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %a /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %X /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %X /", "r");
+ #endif
+     long aTime = -1;
+     int result = fscanf(p, "%ld", &aTime);
+@@ -193,9 +193,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %m /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %m /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %Y /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %Y /", "r");
+ #endif
+     long mTime = -1;
+     int result = fscanf(p, "%ld", &mTime);
+@@ -210,9 +210,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %c /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %c /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %Z /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %Z /", "r");
+ #endif
+     long cTime = -1;
+     int result = fscanf(p, "%ld", &cTime);
+@@ -224,7 +224,7 @@
+ 
+ TEST(GetCommonLStat, Mode001)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -241,7 +241,7 @@
+ 
+ TEST(GetCommonLStat, Mode002)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -258,7 +258,7 @@
+ 
+ TEST(GetCommonLStat, Mode003)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -275,14 +275,14 @@
+ 
+ TEST(GetCommonLStat, Mode004)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeD_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeD_XXXXXX";
+     char dname[PATH_MAX];
+     struct stat buffer;
+     char * fd;
+     CommonStat cs;
+     strcpy(dname, ftemplate.c_str());
+     fd = mkdtemp(dname);
+-    EXPECT_NE(fd, ftemplate);
++    EXPECT_NE(fd, nullptr);
+     chmod(dname, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_ISVTX );
+     lstat(dname, &buffer);
+     GetCommonLStat(dname, &cs);
+--- a/src/libpsl-native/test/test-getcommonstat.cpp
++++ b/src/libpsl-native/test/test-getcommonstat.cpp
+@@ -42,9 +42,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %u /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %u /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %u /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %u /", "r");
+ #endif
+     int uid = -1;
+     int result = fscanf(p, "%d", &uid);
+@@ -59,9 +59,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %g /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %g /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %g /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %g /", "r");
+ #endif
+     int gid = -1;
+     int result = fscanf(p, "%d", &gid);
+@@ -76,9 +76,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %i /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %i /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %i /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %i /", "r");
+ #endif
+     long inode = -1;
+     int result = fscanf(p, "%ld", &inode);
+@@ -94,10 +94,10 @@
+     CommonStat cs;
+     unsigned int mode = -1;
+ #if defined (__APPLE__)
+-    p = popen("/usr/bin/stat -f %p /", "r");
++    p = popen("@TERMUX_PREFIX@/bin/stat -f %p /", "r");
+     int result = fscanf(p, "%o", &mode);
+ #else
+-    p = popen("/usr/bin/stat -c %f /", "r");
++    p = popen("@TERMUX_PREFIX@/bin/stat -c %f /", "r");
+     int result = fscanf(p, "%x", &mode);
+ #endif
+     pclose(p);
+@@ -111,9 +111,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %z /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %z /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %s /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %s /", "r");
+ #endif
+     long size = -1;
+     int result = fscanf(p, "%ld", &size);
+@@ -128,9 +128,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %k /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %k /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %o /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %o /", "r");
+ #endif
+     long bSize = -1;
+     int result = fscanf(p, "%ld", &bSize);
+@@ -145,9 +145,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %b /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %b /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %b /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %b /", "r");
+ #endif
+     int bSize = -1;
+     int result = fscanf(p, "%d", &bSize);
+@@ -162,9 +162,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %l /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %l /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %h /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %h /", "r");
+ #endif
+     int linkcount = -1;
+     int result = fscanf(p, "%d", &linkcount);
+@@ -179,9 +179,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %d /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %d /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %d /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %d /", "r");
+ #endif
+     int deviceId = -1;
+     int result = fscanf(p, "%d", &deviceId);
+@@ -196,9 +196,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %a /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %a /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %X /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %X /", "r");
+ #endif
+     long aTime = -1;
+     int result = fscanf(p, "%ld", &aTime);
+@@ -213,9 +213,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %m /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %m /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %Y /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %Y /", "r");
+ #endif
+     long mTime = -1;
+     int result = fscanf(p, "%ld", &mTime);
+@@ -230,9 +230,9 @@
+     FILE *p;
+     CommonStat cs;
+ #if defined (__APPLE__)
+-     p = popen("/usr/bin/stat -f %c /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -f %c /", "r");
+ #else
+-     p = popen("/usr/bin/stat -c %Z /", "r");
++     p = popen("@TERMUX_PREFIX@/bin/stat -c %Z /", "r");
+ #endif
+     long cTime = -1;
+     int result = fscanf(p, "%ld", &cTime);
+@@ -244,7 +244,7 @@
+ 
+ TEST(GetCommonStat, Mode001)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -261,7 +261,7 @@
+ 
+ TEST(GetCommonStat, Mode002)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -279,7 +279,7 @@
+ 
+ TEST(GetCommonStat, Mode003)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeF_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeF_XXXXXX";
+     char fname[PATH_MAX];
+     struct stat buffer;
+     int fd;
+@@ -297,14 +297,14 @@
+ 
+ TEST(GetCommonStat, Mode004)
+ {
+-    const std::string ftemplate = "/tmp/CommonStatModeD_XXXXXX";
++    const std::string ftemplate = "@TERMUX_PREFIX@/tmp/CommonStatModeD_XXXXXX";
+     char dname[PATH_MAX];
+     struct stat buffer;
+     char * fd;
+     CommonStat cs;
+     strcpy(dname, ftemplate.c_str());
+     fd = mkdtemp(dname);
+-    EXPECT_NE(fd, ftemplate);
++    EXPECT_NE(fd, nullptr);
+     chmod(dname, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_ISVTX );
+     stat(dname, &buffer);
+     GetCommonStat(dname, &cs);
+--- a/src/libpsl-native/test/test-getlinkcount.cpp
++++ b/src/libpsl-native/test/test-getlinkcount.cpp
+@@ -17,7 +17,7 @@
+ protected:
+ 
+     static const int bufSize = 64;
+-    const std::string fileTemplate = "/tmp/createFile.XXXXXX";
++    const std::string fileTemplate = "@TERMUX_PREFIX@/tmp/createFile.XXXXXX";
+     char fileTemplateBuf[bufSize];
+ 
+     int32_t count;
+@@ -46,10 +46,15 @@
+         ofs.close();
+     }
+ 
++    bool hardlink_supported = true;
+     std::string createHardLink(const std::string &origFile)
+     {
+         std::string newFile = origFile + "_link";
+         int ret = link(origFile.c_str(), newFile.c_str());
++        if (ret != 0 && (errno == EACCES || errno == EPERM)) {
++            hardlink_supported = false;
++            return "";
++        }
+         EXPECT_EQ(0, ret);
+ 
+         return newFile;
+@@ -64,7 +69,7 @@
+ 
+ TEST_F(getLinkCountTest, FilePathNameDoesNotExist)
+ {
+-    std::string invalidFile = "/tmp/createFile";
++    std::string invalidFile = "@TERMUX_PREFIX@/tmp/createFile";
+     int32_t ret = GetLinkCount(invalidFile.c_str(), &count);
+     ASSERT_EQ(-1, ret);
+     EXPECT_EQ(ENOENT, errno);
+@@ -86,6 +91,10 @@
+ {
+     createFileForTesting(file);
+     std::string newFile = createHardLink(file);
++    if (!hardlink_supported) {
++        removeFile(file);
++        GTEST_SKIP() << "Hard link not supported on Android";
++    }
+     int32_t ret = GetLinkCount(file, &count);
+ 
+     removeFile(file);
+--- a/src/libpsl-native/test/test-isexecutable.cpp
++++ b/src/libpsl-native/test/test-isexecutable.cpp
+@@ -16,7 +16,7 @@
+ protected:
+ 
+     static const int bufSize = 64;
+-    const string fileTemplate = "/tmp/isexecutabletest.fXXXXXXX";
++    const string fileTemplate = "@TERMUX_PREFIX@/tmp/isexecutabletest.fXXXXXXX";
+     const mode_t mode_700 = S_IRUSR | S_IWUSR | S_IXUSR;
+     const mode_t mode_070 = S_IRGRP | S_IWGRP | S_IXGRP;
+     const mode_t mode_007 = S_IROTH | S_IWOTH | S_IXOTH;
+@@ -50,7 +50,7 @@
+ 
+ TEST_F(IsExecutableTest, FilePathNameDoesNotExist)
+ {
+-    std::string invalidFile = "/tmp/isexecutabletest_invalidFile";
++    std::string invalidFile = "@TERMUX_PREFIX@/tmp/isexecutabletest_invalidFile";
+     EXPECT_FALSE(IsExecutable(invalidFile.c_str()));
+     EXPECT_EQ(ENOENT, errno);
+ }
+--- a/src/libpsl-native/test/test-issymlink.cpp
++++ b/src/libpsl-native/test/test-issymlink.cpp
+@@ -15,10 +15,10 @@
+ protected:
+ 
+     static const int bufSize = 64;
+-    const string fileTemplate = "/tmp/symlinktest.fXXXXXX";
+-    const string dirTemplate = "/tmp/symlinktest.dXXXXXX";
+-    const string fileSymLink = "/tmp/symlinktest.flink";
+-    const string dirSymLink = "/tmp/symlinktest.dlink";
++    const string fileTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.fXXXXXX";
++    const string dirTemplate = "@TERMUX_PREFIX@/tmp/symlinktest.dXXXXXX";
++    const string fileSymLink = "@TERMUX_PREFIX@/tmp/symlinktest.flink";
++    const string dirSymLink = "@TERMUX_PREFIX@/tmp/symlinktest.dlink";
+     char *file, *dir;
+     char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
+ 
+@@ -58,7 +58,7 @@
+ 
+ TEST_F(isSymLinkTest, FilePathNameDoesNotExist)
+ {
+-    std::string invalidFile = "/tmp/symlinktest_invalidFile";
++    std::string invalidFile = "@TERMUX_PREFIX@/tmp/symlinktest_invalidFile";
+     EXPECT_FALSE(IsSymLink(invalidFile.c_str()));
+     EXPECT_EQ(ENOENT, errno);
+ }
