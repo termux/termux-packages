@@ -1,0 +1,11 @@
+--- a/src/cmd/sam/disk.c
++++ b/src/cmd/sam/disk.c
+@@ -9,7 +9,7 @@ tempdisk(void)
+ 	char buf[128];
+ 	int i, fd;
+ 
+-	snprint(buf, sizeof buf, "/tmp/X%d.%.4ssam", getpid(), getuser());
++	snprint(buf, sizeof buf, "@TERMUX_PREFIX@/tmp/X%d.%.4ssam", getpid(), getuser());
+ 	for(i='A'; i<='Z'; i++){
+ 		buf[5] = i;
+ 		if(access(buf, AEXIST) == 0)

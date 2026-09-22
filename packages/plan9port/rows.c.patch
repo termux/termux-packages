@@ -1,0 +1,11 @@
+--- a/src/cmd/acme/rows.c
++++ b/src/cmd/acme/rows.c
+@@ -784,7 +784,7 @@ rowload(Row *row, char *file, int initing)
+ 		textinsert(&w->tag, w->tag.file->b.nc, r+n+1, nr-(n+1), TRUE);
+ 		if(ndumped >= 0){
+ 			/* simplest thing is to put it in a file and load that */
+-			sprint(buf, "/tmp/d%d.%.4sacme", getpid(), getuser());
++			sprint(buf, "@TERMUX_PREFIX@/tmp/d%d.%.4sacme", getpid(), getuser());
+ 			fd = create(buf, OWRITE, 0600);
+ 			if(fd < 0){
+ 				free(r);

@@ -1,0 +1,20 @@
+--- a/src/cmd/page/util.c
++++ b/src/cmd/page/util.c
+@@ -42,7 +42,7 @@ estrdup(char *s)
+ }
+ 
+ /*
+- * spool standard input to /tmp.
++ * spool standard input to @TERMUX_PREFIX@/tmp.
+  * we've already read the initial in bytes into ibuf.
+  */
+ int
+@@ -51,7 +51,7 @@ spooltodisk(uchar *ibuf, int in, char **name)
+ 	uchar buf[8192];
+ 	int fd, n;
+ 
+-	strcpy(tempfile, "/tmp/pagespoolXXXXXXXXX");
++	strcpy(tempfile, "@TERMUX_PREFIX@/tmp/pagespoolXXXXXXXXX");
+ 	fd = opentemp(tempfile, ORDWR);
+ 	if(name)
+ 		*name = estrdup(tempfile);

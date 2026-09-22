@@ -1,0 +1,11 @@
+--- a/src/cmd/auth/ssh-agent.c
++++ b/src/cmd/auth/ssh-agent.c
+@@ -144,7 +144,7 @@ threadmain(int argc, char **argv)
+ 	if(0){
+ 		x = ((uvlong)fastrand()<<32) | fastrand();
+ 		x ^= ((uvlong)fastrand()<<32) | fastrand();
+-		snprint(dir, sizeof dir, "/tmp/ssh-%llux", x);
++		snprint(dir, sizeof dir, "@TERMUX_PREFIX@/tmp/ssh-%llux", x);
+ 		if((fd = create(dir, OREAD, DMDIR|0700)) < 0)
+ 			sysfatal("mkdir %s: %r", dir);
+ 		close(fd);
