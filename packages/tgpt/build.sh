@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="AI Chatbots in terminal without needing API keys"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.14.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/aandrew-me/tgpt/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2dd4e1e5c51243e2a373eebaaf85441f4d418def0a962325ff6784bed2aa874d
 TERMUX_PKG_AUTO_UPDATE=true
