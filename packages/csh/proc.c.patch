@@ -18,7 +18,7 @@
  #define BIGINDEX	9	/* largest desirable job index */
  
 +struct process proclist;	/* list head of all processes */
-+int    pnoprocesses;		/* pchild found nothing to wait for */
++bool    pnoprocesses;		/* pchild found nothing to wait for */
 +struct process *pholdjob;	/* one level stack of current jobs */
 +struct process *pcurrjob;	/* current job */
 +struct process *pcurrent;	/* current job in table */
@@ -73,36 +73,3 @@
  	    if (pp->p_reason != 0)
  		pp->p_flags |= PAEXITED;
  	    else
-@@ -641,12 +648,12 @@ pendjob(void)
-  * pprint - print a job
-  */
- static int
--pprint(struct process *pp, bool flag)
-+pprint(struct process *pp, int flag)
- {
-     int status, reason;
-     struct process *tp;
-     int     jobflags, pstatus;
--    bool hadnl = 1;	/* did we just have a newline */
-+    int hadnl = 1;	/* did we just have a newline */
-     char   *format;
- 
-     (void) fpurge(cshout);
-@@ -1123,7 +1130,7 @@ pstart(struct process *pp, int foregnd)
- }
- 
- void
--panystop(bool neednl)
-+panystop(int neednl)
- {
-     struct process *pp;
- 
-@@ -1233,7 +1240,7 @@ int
- pfork(struct command *t, int wanttty)
- {
-     int pid;
--    bool    ignint = 0;
-+    int    ignint = 0;
-     int     pgrp;
-     sigset_t sigset, osigset;
- 
