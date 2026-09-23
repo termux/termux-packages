@@ -10,7 +10,18 @@ TERMUX_PKG_PROVIDES="nc, ncat, netcat"
 TERMUX_PKG_DEPENDS="libbsd"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(
+		curl -fsSL --retry 5 "https://sources.debian.org/api/src/netcat-openbsd/" |
+			jq -r '.versions[] | select(.suites | index("sid")) | .version'
+	)"
+	if [[ -z "$latest_version" ]]; then
+		termux_error_exit "Unable to determine latest netcat-openbsd version."
+	fi
+	termux_pkg_upgrade_version "$latest_version"
+}
 
 termux_step_pre_configure() {
 	local p
