@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="UPL-1.0, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="3.94.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/oracle/oci-cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=a2998917de2be37c4eb5baf21f8fdb0c904b0f3358a64292881281e4c990570a
 TERMUX_PKG_DEPENDS="python, python-pip, python-cryptography, python-crc32c"
