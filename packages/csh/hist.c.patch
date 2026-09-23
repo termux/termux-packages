@@ -9,21 +9,3 @@
  #include <stdarg.h>
  
  #include "csh.h"
-@@ -72,7 +72,7 @@ savehist(struct wordent *sp)
- }
- 
- struct Hist *
--enthist(int event, struct wordent *lp, bool docopy)
-+enthist(int event, struct wordent *lp, int docopy)
- {
-     struct Hist *np;
- 
-@@ -143,7 +143,7 @@ dohist(Char **v, struct command *t)
- static void
- dohist1(struct Hist *hp, int *np, int rflg, int hflg)
- {
--    bool    print = (*np) > 0;
-+    int    print = (*np) > 0;
- 
-     for (; hp != 0; hp = hp->Hnext) {
- 	(*np)--;
