@@ -13,21 +13,3 @@
  #include <stdarg.h>
  
  #include "csh.h"
-@@ -421,7 +421,7 @@ void
- dowhile(Char **v, struct command *t)
- {
-     int status;
--    bool again = whyles != 0 && SEEKEQ(&whyles->w_start, &lineloc) &&
-+    int again = whyles != 0 && SEEKEQ(&whyles->w_start, &lineloc) &&
-     whyles->w_fename == 0;
- 
-     v++;
-@@ -1063,7 +1063,7 @@ doumask(Char **v, struct command *t)
-     (void) umask(i);
- }
- 
--typedef quad_t RLIM_TYPE;
-+typedef int64_t RLIM_TYPE;
- 
- static struct limits {
-     int     limconst;
