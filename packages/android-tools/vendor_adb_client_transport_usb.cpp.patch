@@ -1,0 +1,14 @@
+--- a/vendor/adb/client/transport_usb.cpp
++++ b/vendor/adb/client/transport_usb.cpp
+@@ -181,6 +181,11 @@
+ #if defined(__APPLE__)
+     enable = true;
+ #endif
++#ifdef __ANDROID__
++    if (getenv("TERMUX_USB_FD") != nullptr) {
++        enable = true;
++    }
++#endif
+     char* env = getenv("ADB_LIBUSB");
+     if (env) {
+         enable = (strcmp(env, "1") == 0);

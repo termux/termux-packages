@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=(
 	"4.2.6"
 	"4.2.6" # Web Frontend
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${TERMUX_PKG_VERSION[1]}/openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz"
@@ -44,14 +45,14 @@ termux_pkg_auto_update() {
 
 	local tmpdir
 	tmpdir="$(mktemp -d)"
-	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenListTeam/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
+	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenList/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
 	tar -C "${tmpdir}" -xf "${tmpdir}/openlist-linux-amd64.tar.gz"
 	chmod +x "${tmpdir}/openlist"
 	local latest_web_version
 	latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
 
-	curl -sLo "${tmpdir}/src" "https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
-	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
+	curl -sLo "${tmpdir}/src" "https://github.com/OpenList/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
+	curl -sLo "${tmpdir}/web" "https://github.com/OpenList/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
 	local -a sha=(
 		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
 		"$(sha256sum "${tmpdir}/web" | cut -d ' ' -f 1)"
@@ -102,7 +103,7 @@ termux_step_make() {
 	local ldflags
 	local _builtAt=$(date +'%F %T %z')
 	local _goVersion=$(go version | sed 's/go version //')
-	local _gitAuthor="The OpenList Projects Contributors <noreply@openlist.team>"
+	local _gitAuthor="The OpenList Projects Contributors <noreply@oplist.org>"
 	local _gitCommit=$(git ls-remote https://github.com/OpenListTeam/OpenList "refs/tags/v${TERMUX_PKG_VERSION[0]}" | head -c 7)
 	export CGO_ENABLED=1
 

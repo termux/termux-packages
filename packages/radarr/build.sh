@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://radarr.video"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.3.0.10514"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="6.4.4.10685"
 TERMUX_PKG_SRCURL="https://github.com/Radarr/Radarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=cb5f3c7c8aa41112bc4ab9fa8d92c7f2ed1f30942545b2275792d853d66e0eba
+TERMUX_PKG_SHA256=dde505a58408cb6a88172a226a3e238cbdc7e18304134aaf20d9435ad4718aeb
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, mono, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -30,7 +29,7 @@ termux_step_pre_configure() {
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
 	mkdir -p "$bin"
 	local yarn="$bin/yarn"
-	cat > "$yarn" <<-EOF
+	cat >"$yarn" <<-EOF
 		#!/bin/sh
 		exec node $TERMUX_PREFIX/share/yarn/bin/yarn.js "\$@"
 	EOF
@@ -119,7 +118,7 @@ termux_step_make_install() {
 	ln -sf "${TERMUX_PREFIX}/bin/ffprobe" "${TERMUX_PREFIX}/lib/radarr/ffprobe"
 
 	# Create launch script
-	cat > "${TERMUX_PREFIX}/bin/radarr" <<-HERE
+	cat >"${TERMUX_PREFIX}/bin/radarr" <<-HERE
 		#!${TERMUX_PREFIX}/bin/sh
 		exec dotnet "${TERMUX_PREFIX}/lib/radarr/Radarr.dll" "\$@"
 	HERE

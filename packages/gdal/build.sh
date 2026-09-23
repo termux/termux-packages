@@ -3,14 +3,12 @@ TERMUX_PKG_DESCRIPTION="A translator library for raster and vector geospatial da
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.12.4"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="3.13.3"
 TERMUX_PKG_SRCURL="https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=813094498c17522ac42821a5ea1ea783d8326c0adf286cce86a949038bd09198
+TERMUX_PKG_SHA256=a3348c2102dd91962290007d7c293b467bb1b0cd89f086f24bb97b9b653a9804
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="giflib, json-c, libc++, libcurl, libexpat, libfreexl, libgeos, libiconv, libjpeg-turbo, libjxl, liblzma, libpng, libspatialite, libsqlite, libwebp, libxml2, netcdf-c (>= 4.9.3), openjpeg, openssl, postgresql, proj, xerces-c, zlib, zstd"
+TERMUX_PKG_DEPENDS="cfitsio, giflib, json-c, libc++, libcurl, libexpat, libfreexl, libgeos, libiconv, libjpeg-turbo, libjxl, liblzma, libpng, libspatialite, libsqlite, libwebp, libxml2, netcdf-c (>= 4.9.3), openjpeg, openssl, postgresql, proj, xerces-c, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="cfitsio, json-c-static"
-TERMUX_PKG_BUILD_SUGGESTS="cfitsio"
 TERMUX_PKG_BREAKS="gdal-dev"
 TERMUX_PKG_REPLACES="gdal-dev"
 TERMUX_PKG_GROUPS="science"
@@ -20,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DGDAL_USE_JXL=ON
 -DGDAL_USE_TIFF_INTERNAL=ON
 -DGDAL_USE_GEOTIFF_INTERNAL=ON
+-DGDAL_USE_OPENMP=OFF
 -DBUILD_PYTHON_BINDINGS=OFF
 -DBUILD_JAVA_BINDINGS=OFF
 "

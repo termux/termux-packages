@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Go compiler for microcontrollers, WASM, CLI tools"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.41.1"
+TERMUX_PKG_VERSION="0.42.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/tinygo-org/tinygo
 TERMUX_PKG_GIT_BRANCH="v${TERMUX_PKG_VERSION}"
-TERMUX_PKG_SHA256=312536239888b84fb217a8c9d63da526374e3475e4abb5bd2ad98a077dab638b
+TERMUX_PKG_SHA256=d56b32c2bfc736a5f460d9b717b013c32239f3109033b1ef49e78a4666de5a0b
 TERMUX_PKG_DEPENDS="binaryen, golang, libc++"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="binaryen, golang"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -20,6 +21,9 @@ _LLVM_OPTION="
 -DCLANG_TABLEGEN=${TERMUX_PKG_HOSTBUILD_DIR}/bin/clang-tblgen
 "
 _LLVM_EXTRA_BUILD_TARGETS="
+lib/libLLVMABI.a
+lib/libLLVMCAS.a
+lib/libLLVMDWARFCFIChecker.a
 lib/libLLVMDWARFLinker.a
 lib/libLLVMDWARFLinkerClassic.a
 lib/libLLVMDWARFLinkerParallel.a
@@ -41,6 +45,7 @@ lib/libLLVMOrcJIT.a
 lib/libLLVMTelemetry.a
 lib/libLLVMTextAPIBinaryReader.a
 lib/libLLVMSandboxIR.a
+lib/libLLVMSupportLSP.a
 lib/libLLVMXRay.a
 "
 
@@ -76,21 +81,29 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${latest_tag}."
+		return
+	fi
+
 	local tmpdir
-	tmpdir="$(mktemp -d)"
-	git clone --branch "v${latest_tag}" --depth=1 --recursive \
-		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"
-	make -C "${tmpdir}" llvm-source GO=:
+	tmpdir="$(mktemp -d -p "${TERMUX_PKGS__BUILD__REPO_ROOT_DIR:-$PWD}" tinygo-update.XXXXXX)"
+	if ! git clone --branch "v${latest_tag}" --depth=1 --recursive \
+		"${TERMUX_PKG_SRCURL#git+}" "${tmpdir}"; then
+		echo "WARN: git clone failed while checking tinygo update, aborting update." >&2
+		rm -fr "${tmpdir}"
+		return
+	fi
+	if ! make -C "${tmpdir}" llvm-source GO=:; then
+		echo "WARN: 'make llvm-source' failed while checking tinygo update, aborting update." >&2
+		rm -fr "${tmpdir}"
+		return
+	fi
 	local s
 	s="$(
 		find "${tmpdir}" -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | \
 		cut -d" " -f1 | LC_ALL=C sort | sha256sum | cut -d" " -f1
 	)"
-
-	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
-		echo "INFO: package needs to be updated to ${latest_tag}."
-		return
-	fi
 
 	sed \
 		-e "s|^TERMUX_PKG_SHA256=.*|TERMUX_PKG_SHA256=${s}|" \
@@ -211,7 +224,8 @@ termux_step_make() {
 	-e "s|-lrt|-lc|g"
 	EOF
 
-	make tinygo
+	export CGO_LDFLAGS="-Lllvm-build/lib ${CGO_LDFLAGS}"
+	make tinygo CGO_LDFLAGS_EXTRA=-lz
 	mkdir -p build/release/tinygo/bin
 	cp -fv build/tinygo build/release/tinygo/bin
 

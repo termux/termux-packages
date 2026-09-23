@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.erlang.org/
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="29.0.6"
+TERMUX_PKG_VERSION="29.1.1"
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/refs/tags/OTP-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=7583bd4528a92bfcb0eefa70de2b873ad52275f7825bed46910676df8423e409
+TERMUX_PKG_SHA256=5971c156475408cd77db09a307949b6bcf186a99cde7bc771bb4fef831b1eb13
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='^OTP-[\d.]+$'
 TERMUX_PKG_DEPENDS="libc++, openssl, ncurses, zlib"
@@ -31,15 +31,15 @@ lib/erlang/man
 # conflict with libowfat
 # conflict with manpages
 TERMUX_PKG_RM_AFTER_INSTALL+="
-share/man/man3/zlib.3
-share/man/man3/re.3
-share/man/man3/array.3
-share/man/man3/inet.3
-share/man/man3/queue.3
-share/man/man3/rand.3
-share/man/man3/random.3
-share/man/man3/rpc.3
-share/man/man3/string.3
+share/man/man3/zlib.3.gz
+share/man/man3/re.3.gz
+share/man/man3/array.3.gz
+share/man/man3/inet.3.gz
+share/man/man3/queue.3.gz
+share/man/man3/rand.3.gz
+share/man/man3/random.3.gz
+share/man/man3/rpc.3.gz
+share/man/man3/string.3.gz
 "
 # will overwrite man pages of perl and zlib
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true

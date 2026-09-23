@@ -49,3 +49,16 @@
  }
  
  #endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
+diff --git a/content/browser/service_worker/service_worker_version.cc b/content/browser/service_worker/service_worker_version.cc
+index 87bb4e1789..a390baafc1 100644
+--- a/content/browser/service_worker/service_worker_version.cc
++++ b/content/browser/service_worker/service_worker_version.cc
+@@ -848,7 +848,7 @@ bool ServiceWorkerVersion::FinishRequestWithFetchCount(int request_id,
+     }
+   } else {
+     // Equivalent to the previous, non-optional iterator behavior. Maybe unsafe.
+-    request_timeouts_.erase(request->timeout_iter.value_or({}));
++    request_timeouts_.erase(request->timeout_iter.value_or(std::set<InflightRequestTimeoutInfo>::iterator()));
+   }
+   inflight_requests_.Remove(request_id);
+   // TODO(crbug.com/40864997): remove the following DCHECK when the cause

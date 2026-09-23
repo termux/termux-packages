@@ -1,6 +1,6 @@
 --- a/native/src/console/site.rs
 +++ b/native/src/console/site.rs
-@@ -46,7 +46,7 @@ impl Run for SiteLaunchCommand {
+@@ -46,7 +46,7 @@
              bail!("Runtime not installed");
          }
  
@@ -9,14 +9,15 @@
          {
              use std::fs::File;
              use std::io::Read;
-@@ -62,8 +62,8 @@ impl Run for SiteLaunchCommand {
+@@ -62,9 +62,9 @@
                  hash(&buf)
              }
  
 -            if storage.config.use_linked_runtime
--                && hasher(crate::components::runtime::FFOX) != hasher(&runtime.directory)
 +            if cfg!(platform_termux) || (storage.config.use_linked_runtime
-+                && hasher(crate::components::runtime::FFOX) != hasher(&runtime.directory))
+                 && hasher(crate::components::runtime::ffox_launcher())
+-                    != hasher(runtime.directory.join("firefox"))
++                    != hasher(runtime.directory.join("firefox")))
              {
                  runtime.link()?;
              }

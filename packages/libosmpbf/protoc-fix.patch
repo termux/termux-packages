@@ -1,9 +1,11 @@
 +++ ./CMakeLists.txt
-@@ -1,16 +1,9 @@
- cmake_minimum_required(VERSION 3.7)
+@@ -1,19 +1,11 @@
+ cmake_minimum_required(VERSION 3.10)
  
--project(osmpbf VERSION 1.5.0)
-+project(osmpbf VERSION 1.5.1)
+-project(osmpbf VERSION 1.7.0)
++project(osmpbf VERSION 1.8.0)
+ 
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
  
  include(GNUInstallDirs)
  
@@ -14,11 +16,12 @@
 -# This is needed so that we pick up the (more modern) CONFIG mode cmake file
 -# before the (older) MODULE mode cmake config file. Seems to be needed on macOS.
 -set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
- 
+-
  find_package(Protobuf REQUIRED)
  
+ add_subdirectory(osmpbf)
 +++ ./osmpbf/CMakeLists.txt
-@@ -1,7 +1,7 @@
+@@ -1,13 +1,13 @@
  protobuf_generate_cpp(CPPS HS fileformat.proto osmformat.proto)
  
  add_library(osmpbf STATIC ${CPPS})
@@ -27,4 +30,10 @@
  target_link_libraries(osmpbf PRIVATE protobuf::libprotobuf)
  target_include_directories(osmpbf SYSTEM PUBLIC ${Protobuf_INCLUDE_DIRS})
  install(TARGETS osmpbf ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
+ 
+ add_library(osmpbf_shared SHARED ${CPPS})
+-target_compile_features(osmpbf_shared PUBLIC cxx_std_11)
++target_compile_features(osmpbf_shared PUBLIC cxx_std_17)
+ target_link_libraries(osmpbf_shared PRIVATE protobuf::libprotobuf)
+ target_include_directories(osmpbf_shared SYSTEM PUBLIC ${Protobuf_INCLUDE_DIRS})
+ set_target_properties(osmpbf_shared PROPERTIES OUTPUT_NAME osmpbf
