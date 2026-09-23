@@ -6,7 +6,18 @@ TERMUX_PKG_VERSION="14.0.0"
 TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/media-types/-/archive/debian/${TERMUX_PKG_VERSION}/media-types-debian-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=55224557676d1d073b1c39ab9c26acfaab7ffe52bd1f6e013e652955da8850bb
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(
+		curl -fsSL --retry 5 "https://sources.debian.org/api/src/media-types/" |
+			jq -r '.versions[] | select(.suites | index("sid")) | .version'
+	)"
+	if [[ -z "$latest_version" ]]; then
+		termux_error_exit "Unable to determine latest media-types version."
+	fi
+	termux_pkg_upgrade_version "$latest_version"
+}
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BREAKS="mime-support"
 TERMUX_PKG_REPLACES="mime-support"
