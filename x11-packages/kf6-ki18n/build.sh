@@ -39,4 +39,19 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	rm -rf $TERMUX_HOSTBUILD_MARKER
+
+	# The real GNU libintl.h shipped by `gettext` (see that package) must come
+	# BEFORE the Bionic stub in the include path.
+	#
+	# Why this is required, and why it is not enough to just ship libintl.so:
+	# ki18n uses its own cmake/FindLibIntl.cmake, which runs
+	#   check_cxx_symbol_exists(dngettext libintl.h LibIntl_SYMBOL_FOUND)
+	# The stub provided by ndk-patches/libintl.h declares every gettext
+	# function as `static __inline__`, so that check SUCCEEDS without linking
+	# anything. The module then reports "libintl is part of libc, no extra
+	# library is required" and sets LibIntl_LIBRARIES to the empty string.
+	# ki18n therefore links no gettext library, the inline stubs win, and
+	# every i18n() string stays English — silently, with no build error.
+	export CPPFLAGS="-I$TERMUX_PREFIX/include/gettext-libintl $CPPFLAGS"
+	export CXXFLAGS="-I$TERMUX_PREFIX/include/gettext-libintl $CXXFLAGS"
 }
