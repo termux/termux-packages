@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/openziti/zrok/releases/download/v${TERMUX_P
 TERMUX_PKG_SHA256=374da7b0cea19c2fa284d8dec5145e3b2374976d23d0f432e1dbcf07c0285073
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='^1\.'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^v\K1\.\d+\.\d+'
 
 termux_step_configure() {
 	:
