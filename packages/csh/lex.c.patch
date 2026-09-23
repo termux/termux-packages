@@ -13,3 +13,32 @@
  #include <stdarg.h>
  
  #include "csh.h"
+@@ -1394,10 +1394,10 @@ reread:
+ static int
+ bgetc(void)
+ {
+-    int buf, off, c;
++    int buf, off, c, roomleft;
+ 
+ #ifdef FILEC
+-    int numleft = 0, roomleft;
++    int numleft = 0;
+     Char    ttyline[BUFSIZ];
+ #endif
+     char    tbuf[BUFSIZ + 1];
+@@ -1474,7 +1474,6 @@ again:
+ 		}
+ #ifdef FILEC
+ 	    }
+-#endif
+ 	    if (c >= 0)
+ 		break;
+ 	    if (errno == EWOULDBLOCK) {
+@@ -1485,6 +1484,7 @@ again:
+ 	    else if (errno != EINTR)
+ 		break;
+ 	}
++#endif
+ 	if (c <= 0)
+ 	    return (-1);
+ 	feobp += c;
