@@ -1,6 +1,43 @@
---- a/winpr/libwinpr/path/shell.c
-+++ b/winpr/libwinpr/path/shell.c
-@@ -114,7 +114,7 @@
+diff -uNr FreeRDP-3.32.0/cmake/PlatformDefaults.cmake FreeRDP-3.32.0.mod/cmake/PlatformDefaults.cmake
+--- FreeRDP-3.32.0/cmake/PlatformDefaults.cmake	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/cmake/PlatformDefaults.cmake	2026-09-23 20:55:49.827005929 +0530
+@@ -17,7 +17,7 @@
+   if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+     # Linux already does define _POSIX_C_SOURCE by default, nothing to do
+     add_compile_definitions("_FILE_OFFSET_BITS=64")
+-    set(WINPR_TIMEZONE_FILE "/etc/timezone")
++    set(WINPR_TIMEZONE_FILE "@TERMUX_PREFIX@/etc/timezone")
+   endif()
+ 
+   if("${CMAKE_SYSTEM_NAME}" MATCHES "FreeBSD")
+diff -uNr FreeRDP-3.32.0/libfreerdp/codec/test/TestFreeRDPCodecProgressive.c FreeRDP-3.32.0.mod/libfreerdp/codec/test/TestFreeRDPCodecProgressive.c
+--- FreeRDP-3.32.0/libfreerdp/codec/test/TestFreeRDPCodecProgressive.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/libfreerdp/codec/test/TestFreeRDPCodecProgressive.c	2026-09-23 20:55:10.488992934 +0530
+@@ -1083,7 +1083,7 @@
+ 	{
+ 		*dstImage = *image;
+ 		dstImage->data = resultData;
+-		winpr_image_write(dstImage, "/tmp/test.bmp");
++		winpr_image_write(dstImage, "@TERMUX_PREFIX@/tmp/test.bmp");
+ 	}
+ 	for (size_t y = 0; y < image->height; y++)
+ 	{
+diff -uNr FreeRDP-3.32.0/server/shadow/X11/x11_shadow.c FreeRDP-3.32.0.mod/server/shadow/X11/x11_shadow.c
+--- FreeRDP-3.32.0/server/shadow/X11/x11_shadow.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/server/shadow/X11/x11_shadow.c	2026-09-23 20:51:50.787075060 +0530
+@@ -135,7 +135,7 @@
+ WINPR_ATTR_NODISCARD
+ static BOOL x11_shadow_pam_get_service_name(SHADOW_PAM_AUTH_INFO* info)
+ {
+-	const char* base = "/etc/pam.d";
++	const char* base = "@TERMUX_PREFIX@/etc/pam.d";
+ 	const char* hints[] = { "lightdm", "gdm", "xdm", "login", "sshd" };
+ 
+ 	for (size_t x = 0; x < ARRAYSIZE(hints); x++)
+diff -uNr FreeRDP-3.32.0/winpr/libwinpr/path/shell.c FreeRDP-3.32.0.mod/winpr/libwinpr/path/shell.c
+--- FreeRDP-3.32.0/winpr/libwinpr/path/shell.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/winpr/libwinpr/path/shell.c	2026-09-23 20:48:48.633597824 +0530
+@@ -135,7 +135,7 @@
  	path = GetEnvAlloc("TMPDIR");
  
  	if (!path)
@@ -9,18 +46,19 @@
  
  #endif
  	return path;
---- a/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
-+++ b/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
-@@ -276,7 +276,7 @@
- 	SSL_CTX_set_options(context->ctx, options);
+diff -uNr FreeRDP-3.32.0/winpr/libwinpr/sspi/Schannel/schannel_openssl.c FreeRDP-3.32.0.mod/winpr/libwinpr/sspi/Schannel/schannel_openssl.c
+--- FreeRDP-3.32.0/winpr/libwinpr/sspi/Schannel/schannel_openssl.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/winpr/libwinpr/sspi/Schannel/schannel_openssl.c	2026-09-23 20:51:02.110430113 +0530
+@@ -281,7 +281,7 @@
+ 		if (!key)
+ 			key = "/tmp/localhost.key";
  
- #if defined(WITH_DEBUG_SCHANNEL)
--	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
-+	if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "@TERMUX_PREFIX@/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
- 	{
- 		WLog_ERR(TAG, "SSL_CTX_use_RSAPrivateKey_file failed");
- 		goto fail;
-@@ -291,7 +291,7 @@
+-		if (SSL_CTX_use_PrivateKey_file(context->ctx, key, SSL_FILETYPE_PEM) <= 0)
++		if (SSL_CTX_use_RSAPrivateKey_file(context->ctx, "@TERMUX_PREFIX@/tmp/localhost.key", SSL_FILETYPE_PEM) <= 0)
+ 		{
+ 			WLog_ERR(TAG, "SSL_CTX_use_RSAPrivateKey_file failed");
+ 			goto fail;
+@@ -297,7 +297,7 @@
  		goto fail;
  	}
  
@@ -29,19 +67,9 @@
  	{
  		WLog_ERR(TAG, "SSL_use_certificate_file failed");
  		goto fail;
---- a/server/shadow/X11/x11_shadow.c
-+++ b/server/shadow/X11/x11_shadow.c
-@@ -131,7 +131,7 @@
- 
- static BOOL x11_shadow_pam_get_service_name(SHADOW_PAM_AUTH_INFO* info)
- {
--	const char* base = "/etc/pam.d";
-+	const char* base = "@TERMUX_PREFIX@/etc/pam.d";
- 	const char* hints[] = { "lightdm", "gdm", "xdm", "login", "sshd" };
- 
- 	for (size_t x = 0; x < ARRAYSIZE(hints); x++)
---- a/winpr/libwinpr/timezone/timezone.c
-+++ b/winpr/libwinpr/timezone/timezone.c
+diff -uNr FreeRDP-3.32.0/winpr/libwinpr/timezone/timezone.c FreeRDP-3.32.0.mod/winpr/libwinpr/timezone/timezone.c
+--- FreeRDP-3.32.0/winpr/libwinpr/timezone/timezone.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/winpr/libwinpr/timezone/timezone.c	2026-09-23 20:53:06.436855296 +0530
 @@ -98,7 +98,7 @@
  
  static char* winpr_get_timezone_from_link(const char* links[], size_t count)
@@ -60,9 +88,10 @@
  	char* buf = nullptr;
  	const char* links[] = { buf };
  
---- a/winpr/libwinpr/wtsapi/wtsapi.c
-+++ b/winpr/libwinpr/wtsapi/wtsapi.c
-@@ -740,7 +740,7 @@
+diff -uNr FreeRDP-3.32.0/winpr/libwinpr/wtsapi/wtsapi.c FreeRDP-3.32.0.mod/winpr/libwinpr/wtsapi/wtsapi.c
+--- FreeRDP-3.32.0/winpr/libwinpr/wtsapi/wtsapi.c	2026-09-23 13:00:40.000000000 +0530
++++ FreeRDP-3.32.0.mod/winpr/libwinpr/wtsapi/wtsapi.c	2026-09-23 20:54:14.096143779 +0530
+@@ -750,7 +750,7 @@
  
  	ini = IniFile_New();
  
@@ -71,23 +100,3 @@
  	{
  		IniFile_Free(ini);
  		WLog_ERR(TAG, "failed to parse freerds.instance");
-+++ ./libfreerdp/codec/test/TestFreeRDPCodecProgressive.c
-@@ -1087,7 +1087,7 @@
- 	{
- 		*dstImage = *image;
- 		dstImage->data = resultData;
--		winpr_image_write(dstImage, "/tmp/test.bmp");
-+		winpr_image_write(dstImage, "@TERMUX_PREFIX@/tmp/test.bmp");
- 	}
- 	for (size_t y = 0; y < image->height; y++)
- 	{
-+++ ./cmake/PlatformDefaults.cmake
-@@ -17,7 +17,7 @@
-   if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-     # Linux already does define _POSIX_C_SOURCE by default, nothing to do
-     add_compile_definitions("_FILE_OFFSET_BITS=64")
--    set(WINPR_TIMEZONE_FILE "/etc/timezone")
-+    set(WINPR_TIMEZONE_FILE "@TERMUX_PREFIX@/etc/timezone")
-   endif()
- 
-   if("${CMAKE_SYSTEM_NAME}" MATCHES "FreeBSD")
