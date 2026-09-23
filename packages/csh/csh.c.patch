@@ -18,7 +18,7 @@
  
  #include "csh.h"
  #include "proc.h"
-@@ -62,20 +63,95 @@
+@@ -62,20 +63,96 @@
   * June, 1991
   */
  
@@ -26,24 +26,25 @@
 +struct whyle      *whyles;
 +struct varent       shvhed, aliases;
 +struct Hist       Histlist;
-+FILE *cshin, *cshout, *csherr;
-+int    chkstop;		/* Warned of stopped jobs... allow exit */
-+int    didfds;			/* Have setup i/o fd's for child */
-+int    doneinp;		/* EOF indicator after reset from readc */
-+int    exiterr;		/* Exit if error or non-zero exit status */
-+int    child;			/* Child shell ... errors cause exit */
-+int    haderr;			/* Reset was because of an error */
-+int    intty;			/* Input is a tty */
-+int    intact;			/* We are interactive... therefore prompt */
-+int    justpr;			/* Just print because of :p hist mod */
-+int    loginsh;		/* We are a loginsh -> .login/.logout */
-+int    neednote;		/* Need to pnotify() */
-+int    noexec;			/* Don't execute, just syntax check */
-+int    pjobs;			/* want to print jobs if interrupted */
-+int    setintr;		/* Set interrupts on/off -> Wait intr... */
-+int    timflg;			/* Time the next waited for command */
-+int    havhash;		/* path hashing is available */
-+int    filec;			/* doing filename expansion */
++bool    chkstop;		/* Warned of stopped jobs... allow exit */
++bool    didfds;			/* Have setup i/o fd's for child */
++bool    doneinp;		/* EOF indicator after reset from readc */
++bool    exiterr;		/* Exit if error or non-zero exit status */
++bool    child;			/* Child shell ... errors cause exit */
++bool    haderr;			/* Reset was because of an error */
++bool    intty;			/* Input is a tty */
++bool    intact;			/* We are interactive... therefore prompt */
++bool    justpr;			/* Just print because of :p hist mod */
++bool    loginsh;		/* We are a loginsh -> .login/.logout */
++bool    neednote;		/* Need to pnotify() */
++bool    noexec;			/* Don't execute, just syntax check */
++bool    pjobs;			/* want to print jobs if interrupted */
++bool    setintr;		/* Set interrupts on/off -> Wait intr... */
++bool    timflg;			/* Time the next waited for command */
++bool    havhash;		/* path hashing is available */
++#ifdef FILEC
++bool    filec;			/* doing filename expansion */
++#endif
 +Char   *arginp;			/* Argument input for sh -c and internal `xx` */
 +int     onelflg;		/* 2 -> need line for -t, 1 -> exit on read */
 +Char   *ffile;			/* Name of shell file for $0 */
@@ -124,81 +125,3 @@
  
  extern char **environ;
  
-@@ -84,9 +160,9 @@ static fpos_t	seekf(void *, fpos_t, int);
- static int	writef(void *, const char *, int);
- static int	closef(void *);
- static int	srccat(Char *, Char *);
--static int	srcfile(char *, bool, bool);
-+static int	srcfile(char *, int, int);
- static void	phup(int);
--static void	srcunit(int, bool, bool);
-+static void	srcunit(int, int, int);
- static void	mailchk(void);
- static Char   **defaultpath(void);
- 
-@@ -633,7 +709,7 @@ srccat(Char *cp, Char *dp)
-  * Source to a file putting the file descriptor in a safe place (> 2).
-  */
- static int
--srcfile(char *f, bool onlyown, bool flag)
-+srcfile(char *f, int onlyown, int flag)
- {
-     int unit;
- 
-@@ -652,7 +728,7 @@ srcfile(char *f, bool onlyown, bool flag)
-  */
- int     insource;
- static void
--srcunit(int unit, bool onlyown, bool hflg)
-+srcunit(int unit, int onlyown, int hflg)
- {
-     /* We have to push down a lot of state here */
-     /* All this could go into a structure */
-@@ -661,9 +737,9 @@ srcunit(int unit, bool onlyown, bool hflg)
-     Char   *ogointr = gointr, *oarginp = arginp;
-     Char   *oevalp = evalp, **oevalvec = evalvec;
-     int     oonelflg = onelflg;
--    bool    oenterhist = enterhist;
-+    int    oenterhist = enterhist;
-     char    OHIST = HIST;
--    bool    otell = cantell;
-+    int    otell = cantell;
- 
-     struct Bin saveB;
-     sigset_t sigset, osigset;
-@@ -905,7 +981,7 @@ pintr(int notused)
- }
- 
- void
--pintr1(bool wantnl)
-+pintr1(int wantnl)
- {
-     Char **v;
-     sigset_t sigset, osigset;
-@@ -965,7 +1041,7 @@ pintr1(bool wantnl)
-  */
- static struct command *savet = NULL;
- void
--process(bool catch)
-+process(int catch)
- {
-     jmp_buf osetexit;
-     struct command *t = savet;
-@@ -1102,7 +1178,7 @@ void
- dosource(Char **v, struct command *t)
- {
-     Char *f;
--    bool    hflg = 0;
-+    int    hflg = 0;
-     Char    buf[BUFSIZ];
-     char    sbuf[BUFSIZ];
- 
-@@ -1137,7 +1213,7 @@ mailchk(void)
-     time_t  t;
-     int     intvl, cnt;
-     struct stat stb;
--    bool    new;
-+    int    new;
- 
-     v = adrof(STRmail);
-     if (v == 0)
