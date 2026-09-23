@@ -1,0 +1,90 @@
+--- a/src/supertux/main.cpp
++++ b/src/supertux/main.cpp
+@@ -199,7 +199,7 @@
+ void PhysfsSubsystem::find_mount_datadir()
+ {
+ #ifndef __EMSCRIPTEN__
+-#ifdef __ANDROID__
++#if 0
+     if (!setup_android_datadir())
+     {
+       log_warning << "Couldn't setup android assets: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << std::endl;
+@@ -498,9 +498,8 @@
+     throw std::runtime_error(msg.str());
+   }
+ 
+-#ifdef __ANDROID__
+-  g_config->mobile_controls = SDL_GetNumTouchDevices() > 0;
+-#endif
++  if (SDL_GetNumTouchDevices() > 0)
++    g_config->mobile_controls = true;
+ 
+   if (TTF_Init() < 0)
+   {
+@@ -790,7 +789,7 @@
+       return EXIT_FAILURE;
+     }
+ 
+-#ifdef __ANDROID__
++#if 0
+     m_physfs_subsystem.reset(new PhysfsSubsystem(nullptr, args.datadir, SDL_AndroidGetExternalStoragePath()));
+ #else
+     m_physfs_subsystem.reset(new PhysfsSubsystem(nullptr, args.datadir, args.userdir));
+@@ -842,7 +841,7 @@
+ 
+   g_dictionary_manager.reset();
+ 
+-#ifdef __ANDROID__
++#if 0
+   // SDL2 keeps shared libraries loaded after the app is closed,
+   // when we launch the app again the static initializers will run twice and crash the app.
+   // So we just need to terminate the app process 'gracefully', without running destructors or atexit() functions.
+--- a/src/supertux/menu/options_menu.cpp
++++ b/src/supertux/menu/options_menu.cpp
+@@ -168,9 +168,13 @@
+     {
+       insert_label(_("Controls"));
+ 
++      add_toggle(MNID_MOBILE_CONTROLS, _("On-screen controls"), &g_config->mobile_controls)
++        .set_help(_("Toggle on-screen controls"));
++      add_mobile_control_scales();
++
+       // Separated both translation strings so the latter can be removed if it is
+       // no longer true, without requiring a new round of translating
+-#ifndef __ANDROID__
++#if 1
+       add_toggle(MNID_RUMBLING, _("Enable Rumbling Controllers"), &g_config->multiplayer_buzz_controllers)
+         .set_help(_("Enable vibrating the game controllers.") + " " + _("This feature is currently only used in the multiplayer options menu."));
+ #else
+@@ -242,7 +246,7 @@
+ 
+       // Note: there were complaints about Wayldn for steam (i think from the devs?), so it's off for now.
+ #if (defined(__linux) || defined(__linux__) || defined(linux) || defined(__FreeBSD) || \
+-     defined(__OPENBSD) || defined(__NetBSD)) && !(defined(STEAM_BUILD) || defined(__ANDROID__) || defined(FLATPAK))
++     defined(__OPENBSD) || defined(__NetBSD)) && !(defined(STEAM_BUILD) || 0 || defined(FLATPAK))
+       add_toggle(MNID_PREFER_WAYLAND, _("Prefer Wayland"), &g_config->prefer_wayland)
+         .set_help(_("If you experience any issues with Nvidia cards, your window border, or anything you believe is due to Wayland, disable this. (Requires restart)"));
+ #endif
+--- a/src/control/mobile_controller.cpp
++++ b/src/control/mobile_controller.cpp
+@@ -68,7 +68,7 @@
+   m_haptic(nullptr, SDL_HapticClose),
+   m_haptic_timer(0)
+ {
+-#ifdef __ANDROID__
++#if 0
+   SDL_InitSubSystem(SDL_INIT_HAPTIC | SDL_INIT_TIMER);
+   // ifdef'd just to be safe
+   m_haptic.reset(SDL_HapticOpen(0));
+@@ -120,11 +120,7 @@
+     m_mobile_controls_scale = g_config->m_mobile_controls_scale;
+     // Buttons on Android are bigger, and direction buttons are extra wide
+     // Use screen height to calculate button size, because 20:9 screen ratios are common
+-#ifdef __ANDROID__
+     const float BUTTON_SCALE = 0.4f * g_config->m_mobile_controls_scale;
+-#else
+-    const float BUTTON_SCALE = 0.2f * g_config->m_mobile_controls_scale;
+-#endif
+     m_rect_directions.set_size(height * BUTTON_SCALE * 4 / 3, height * BUTTON_SCALE);
+     m_rect_directions.set_pos(Vector(0, height - height * BUTTON_SCALE));
+     m_draw_directions = Rectf::from_center(m_rect_directions.get_middle(),
