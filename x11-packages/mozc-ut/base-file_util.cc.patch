@@ -1,0 +1,44 @@
+--- a/src/base/file_util.cc
++++ b/src/base/file_util.cc
+@@ -33,7 +33,11 @@
+ #include <cstddef>
+ #include <cstdio>
+ #include <cstring>
++#if 1
++#include <stdlib.h>
++#else
+ #include <filesystem>
++#endif
+ #include <ios>
+ #include <iterator>
+ #include <string>
+@@ -516,6 +520,19 @@ absl::StatusOr<bool> FileUtilImpl::IsEquivalent(
+ #ifdef __APPLE__
+   return absl::UnimplementedError(
+       "std::filesystem is only available on macOS 10.15, iOS 13.0, or later");
++#elif 1
++
++  const char *src = realpath(filename1.c_str(), NULL);
++  const char *dst = realpath(filename2.c_str(), NULL);
++  if (src == NULL || dst == NULL) {
++    free((void*)src);
++    free((void*)dst);
++    return false;
++  }
++  int s = strcmp(src, dst);
++  free((void*)src);
++  free((void*)dst);
++  return s == 0;
+ #else   // __APPLE__
+ 
+   // u8path is deprecated in C++20. The current target is C++17.
+@@ -605,6 +622,9 @@ absl::Status FileUtilImpl::CreateHardLink(const std::string &from,
+ #ifdef __APPLE__
+   return absl::UnimplementedError(
+       "std::filesystem is only available on macOS 10.15, iOS 13.0, or later.");
++#elif 1
++  return absl::UnimplementedError(
++      "Hardlink is not supported on android.");
+ #else   // __APPLE__
+ 
+   // u8path is deprecated in C++20. The current target is C++17.
