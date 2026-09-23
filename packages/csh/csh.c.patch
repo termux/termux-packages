@@ -18,7 +18,7 @@
  
  #include "csh.h"
  #include "proc.h"
-@@ -62,20 +63,96 @@
+@@ -62,9 +63,85 @@
   * June, 1991
   */
  
@@ -69,7 +69,7 @@
 +sig_t parterm;			/* Parents terminate catch */
 +int     AsciiOnly;		/* If set only 7 bits is expected in characters */
 +struct Ain lineloc;
-+int    cantell;		/* Is current source tellable ? */
++bool    cantell;		/* Is current source tellable ? */
 +Char   *lap;
 +struct wordent *alhistp;	/* Argument list (first) */
 +struct wordent *alhistt;	/* Node after last in arg list */
@@ -102,26 +102,5 @@
 +FILE *cshin, *cshout, *csherr;
 +
  int     nofile = 0;
--bool    reenter = 0;
--bool    nverbose = 0;
--bool    nexececho = 0;
--bool    quitit = 0;
--bool    fast = 0;
--bool    batch = 0;
--bool    mflag = 0;
--bool    prompt = 1;
--bool    enterhist = 0;
--bool    tellwhat = 0;
-+int    reenter = 0;
-+int    nverbose = 0;
-+int    nexececho = 0;
-+int    quitit = 0;
-+int    fast = 0;
-+int    batch = 0;
-+int    mflag = 0;
-+int    prompt = 1;
-+int    enterhist = 0;
-+int    tellwhat = 0;
- 
- extern char **environ;
- 
+ bool    reenter = 0;
+ bool    nverbose = 0;
