@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='Edit and paint images'
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.0.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/krita/${TERMUX_PKG_VERSION}/krita-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=904169ff7173fffffc264bb2eca4214431871ab3d17f0b4d461cf6e41468e72b
 TERMUX_PKG_DEPENDS="exiv2, ffmpeg, fftw, fontconfig, freetype, fribidi, giflib, gsl, harfbuzz, imath, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kcoreaddons, kf6-kguiaddons, kf6-ki18n, kf6-kitemviews, kf6-kwidgetsaddons, kf6-kcrash, libjpeg-turbo, libkdcraw, libpng, libtiff, libunibreak, libwebp, libx11, libxkbcommon, littlecms, mlt, opencolorio, openexr, openjpeg, qt6-qt5compat, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, quazip, zlib"
@@ -24,4 +25,5 @@ termux_step_pre_configure() {
 	CFLAGS="-I$TERMUX_PREFIX/include/qt6 -I$TERMUX_PREFIX/include/qt6/QtCore5Compat $CFLAGS"
 	CPPFLAGS="-I$TERMUX_PREFIX/include/qt6 -I$TERMUX_PREFIX/include/qt6/QtCore5Compat $CPPFLAGS"
 	CXXFLAGS="-I$TERMUX_PREFIX/include/qt6 -I$TERMUX_PREFIX/include/qt6/QtCore5Compat $CXXFLAGS"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython_EXECUTABLE=$(command -v python3)"
 }
