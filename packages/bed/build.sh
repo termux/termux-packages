@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/itchyny/bed"
 TERMUX_PKG_DESCRIPTION="Binary editor written in GO"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.2.8"
 TERMUX_PKG_SRCURL="https://github.com/itchyny/bed/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
