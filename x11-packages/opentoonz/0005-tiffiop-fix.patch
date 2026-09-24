@@ -1,0 +1,32 @@
+diff --git a/toonz/sources/image/tzp/tiio_tzp.cpp b/toonz/sources/image/tzp/tiio_tzp.cpp
+index 080f9bd..218f6c7 100644
+--- a/toonz/sources/image/tzp/tiio_tzp.cpp
++++ b/toonz/sources/image/tzp/tiio_tzp.cpp
+@@ -7,7 +7,6 @@
+ #include "texception.h"
+ 
+ #include "tiffio.h"
+-#include "tiffiop.h"
+ // #include "tspecialstyleid.h"
+ #include <set>
+ 
+@@ -225,8 +224,7 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink) {
+       static std::set<int> table;
+ 
+       /// per le tzp che vengono da Irix
+-      bool bigEndian =
+-          (m_tiff->tif_header.classic.tiff_magic == TIFF_BIGENDIAN);
++      bool bigEndian = TIFFIsBigEndian(m_tiff);
+ 
+       for (int i = 0; i < m_lx; i++) {
+         unsigned short inPix = line[i];
+@@ -255,8 +253,7 @@ void TzpReader::readLine(char *buffer, int x0, int x1, int shrink) {
+       static std::set<int> table;
+ 
+       /// per le tzp che vengono da Irix
+-      bool bigEndian =
+-          (m_tiff->tif_header.classic.tiff_magic == TIFF_BIGENDIAN);
++      bool bigEndian = TIFFIsBigEndian(m_tiff);
+ 
+       for (int i = 0; i < m_lx; i++) {
+         unsigned short inPix = line[i];

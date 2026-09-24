@@ -1,0 +1,192 @@
+diff --git a/toonz/cmake/FindTIFF.cmake b/toonz/cmake/FindTIFF.cmake
+index b3db5fa..b4332cd 100644
+--- a/toonz/cmake/FindTIFF.cmake
++++ b/toonz/cmake/FindTIFF.cmake
+@@ -3,28 +3,12 @@ find_path(
+     TIFF_INCLUDE_DIR
+     NAMES
+         tiffio.h
+-    HINTS
+-        ${SDKROOT}
+-    PATH_SUFFIXES
+-        tiff-4.0.3/libtiff/
+-# if mono or another framework with a tif library
+-# is installed, ignore it.
+-if(BUILD_ENV_APPLE)
+-    NO_DEFAULT_PATH
+-    NO_CMAKE_ENVIRONMENTPATH
+-    NO_CMAKE_PATH
+-endif()
+ )
+ 
+ find_library(
+     TIFF_LIBRARY
+     NAMES
+-        libtiff.a
+-    HINTS
+-        ${SDKROOT}
+-    PATH_SUFFIXES
+-        tiff-4.0.3/libtiff/.libs
+-    NO_DEFAULT_PATH
++        libtiff.so
+ )
+ 
+ message("***** libtiff Header path:" ${TIFF_INCLUDE_DIR})
+diff --git a/toonz/sources/image/tif/tiio_tif.cpp b/toonz/sources/image/tif/tiio_tif.cpp
+index c9682f2..ea38b12 100644
+--- a/toonz/sources/image/tif/tiio_tif.cpp
++++ b/toonz/sources/image/tif/tiio_tif.cpp
+@@ -65,7 +65,6 @@ public:
+ 
+   int skipLines(int lineCount) override;
+   void readLine(char *buffer, int x0, int x1, int shrink) override;
+-  void readLine(short *buffer, int x0, int x1, int shrink) override;
+ };
+ 
+ //------------------------------------------------------------
+@@ -422,145 +421,9 @@ int TifReader::skipLines(int lineCount) {
+ 
+ #include "timage_io.h"
+ 
+-void TifReader::readLine(short *buffer, int x0, int x1, int shrink) {
+-  assert(shrink > 0);
+-
+-  const int pixelSize = 8;
+-  int stripRowSize    = m_rowLength * pixelSize;
+-
+-  if (m_row < m_info.m_y0 || m_row > m_info.m_y1) {
+-    memset(buffer, 0, (x1 - x0 + 1) * pixelSize);
+-    m_row++;
+-    return;
+-  }
+-
+-  int stripIndex = m_row / m_rowsPerStrip;
+-  if (m_stripIndex != stripIndex) {
+-    // Retrieve the strip holding current row. Please, observe that
+-    // TIFF functions will return the strip buffer in the BOTTOM-UP orientation,
+-    // no matter the internal tif's orientation storage
+-
+-    m_stripIndex = stripIndex;
+-
+-    if (TIFFIsTiled(m_tiff)) {
+-      // Retrieve tiles size
+-      uint32 tileWidth = 0, tileHeight = 0;
+-      TIFFGetField(m_tiff, TIFFTAG_TILEWIDTH, &tileWidth);
+-      TIFFGetField(m_tiff, TIFFTAG_TILELENGTH, &tileHeight);
+-      assert(tileWidth > 0 && tileHeight > 0);
+-
+-      // Allocate a sufficient buffer to store a single tile
+-      int tileSize = tileWidth * tileHeight;
+-      std::unique_ptr<uint64[]> tile(new uint64[tileSize]);
+-
+-      int x = 0;
+-      int y = tileHeight * m_stripIndex;
+-
+-      // In case it's the last tiles row, the tile size might exceed the image
+-      // bounds
+-      int lastTy = std::min((int)tileHeight, m_info.m_ly - y);
+-
+-      // Traverse the tiles row
+-      while (x < m_info.m_lx) {
+-        int ret = TIFFReadRGBATile_64(m_tiff, x, y, tile.get());
+-        assert(ret);
+-
+-        int tileRowSize = std::min((int)tileWidth, m_info.m_lx - x) * pixelSize;
+-
+-        // Copy the tile rows in the corresponding output strip rows
+-        for (int ty = 0; ty < lastTy; ++ty) {
+-          memcpy(m_stripBuffer + (ty * m_rowLength + x) * pixelSize,
+-                 (UCHAR *)tile.get() + ty * tileWidth * pixelSize, tileRowSize);
+-        }
+-
+-        x += tileWidth;
+-      }
+-    } else {
+-      int y  = m_rowsPerStrip * m_stripIndex;
+-      int ok = TIFFReadRGBAStrip_64(m_tiff, y, (uint64 *)m_stripBuffer);
+-      assert(ok);
+-    }
+-  }
+-
+-  uint16 orient = ORIENTATION_TOPLEFT;
+-  TIFFGetField(m_tiff, TIFFTAG_ORIENTATION, &orient);
+-
+-  int r = m_rowsPerStrip - 1 - (m_row % m_rowsPerStrip);
+-  switch (orient)  // Pretty weak check for top/bottom orientation
+-  {
+-  case ORIENTATION_TOPLEFT:
+-  case ORIENTATION_TOPRIGHT:
+-  case ORIENTATION_LEFTTOP:
+-  case ORIENTATION_RIGHTTOP:
+-    // We have to invert the fixed BOTTOM-UP returned by TIFF functions - since
+-    // this function is
+-    // supposed to ignore orientation issues (which are managed outside).
+-
+-    // The last tiles row will actually start at the END OF THE IMAGE (not
+-    // necessarily at
+-    // m_rowsPerStrip multiples). So, we must adjust for that.
+-
+-    r = std::min(m_rowsPerStrip, m_info.m_ly - m_rowsPerStrip * m_stripIndex) -
+-        1 - (m_row % m_rowsPerStrip);
+-    break;
+-
+-  case ORIENTATION_BOTRIGHT:
+-  case ORIENTATION_BOTLEFT:
+-  case ORIENTATION_RIGHTBOT:
+-  case ORIENTATION_LEFTBOT:
+-    r = m_row % m_rowsPerStrip;
+-    break;
+-  }
+-
+-  // Finally, copy the strip row to the output row buffer
+-  TPixel64 *pix = (TPixel64 *)buffer;
+-  USHORT *v     = (USHORT *)(m_stripBuffer + r * stripRowSize);
+-
+-  pix += x0;
+-  v += 4 * x0;
+-
+-  int width =
+-      (x1 < x0) ? (m_info.m_lx - 1) / shrink + 1 : (x1 - x0) / shrink + 1;
+-
+-  for (int i = 0; i < width; i++) {
+-    USHORT c = *v++;
+-    pix->r   = c;
+-    c        = *v++;
+-    pix->g   = c;
+-    c        = *v++;
+-    pix->b   = c;
+-    c        = *v++;
+-    pix->m   = c;
+-
+-    pix += shrink;
+-    v += 4 * (shrink - 1);
+-  }
+-
+-  m_row++;
+-}
+-
+ //===============================================================
+ 
+ void TifReader::readLine(char *buffer, int x0, int x1, int shrink) {
+-  if (this->m_info.m_bitsPerSample == 16 &&
+-      this->m_info.m_samplePerPixel >= 3) {
+-    std::vector<short> app(4 * (m_info.m_lx));
+-    readLine(&app[0], x0, x1, shrink);
+-
+-    TPixel64 *pixin = (TPixel64 *)&app[0];
+-
+-    TPixel32 *pixout = (TPixel32 *)buffer;
+-    for (int j = 0; j < x0; j++) {
+-      pixout++;
+-      pixin++;
+-    }
+-
+-    for (int i = 0; i < (x1 - x0) + 1; i++)
+-      *pixout++ = PixelConverter<TPixel32>::from(*pixin++);
+-
+-    return;
+-  }
+-
+   assert(shrink > 0);
+ 
+   const int pixelSize = 4;
