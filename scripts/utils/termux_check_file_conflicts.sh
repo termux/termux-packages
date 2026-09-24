@@ -8,6 +8,23 @@ cd "$(realpath "$(dirname "$0")")/../.."
 
 DEBS_DIR="${1:-debs}"
 
+termux_pkg_relations_match() {
+	local relations="$1" package="$2" version="$3" relation relation_regex='^([[:alnum:]][[:alnum:]+.-]*)(:[[:alnum:]][[:alnum:].-]*)?[[:space:]]*\((<<|<=|=|>=|>>)[[:space:]]*([^)]*)\)$'
+
+	while IFS= read -r relation; do
+		relation="${relation#"${relation%%[![:space:]]*}"}"
+		relation="${relation%"${relation##*[![:space:]]}"}"
+		if [[ "$relation" =~ $relation_regex ]]; then
+			[[ "${BASH_REMATCH[1]}" == "$package" ]] || continue
+			dpkg --compare-versions "$version" "${BASH_REMATCH[3]}" "${BASH_REMATCH[4]}" && return 0
+		elif [[ "$relation" == "$package" || "$relation" == "$package:"* ]]; then
+			return 0
+		fi
+	done <<< "${relations//,/$'\n'}"
+
+	return 1
+}
+
 shopt -s nullglob
 debs=("${DEBS_DIR}"/*.deb)
 shopt -u nullglob
@@ -53,8 +70,9 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 			# published package, unless a Conflicts/Replaces/Breaks relation is declared.
 			declared=$(
 				{ dpkg-deb -f "$deb" Conflicts; dpkg-deb -f "$deb" Replaces; dpkg-deb -f "$deb" Breaks; } |
-					tr ',' '\n' | sed -E 's/\(.*\)//; s/^[[:space:]]+//; s/[[:space:]]+$//' | sed '/^$/d'
+					tr ',' '\n' | sed '/^[[:space:]]*$/d'
 			)
+			deb_version=$(dpkg-deb -f "$deb" Version)
 
 			conflicts=$(dpkg-deb --fsys-tarfile "$deb" | tar -t | sed -E 's|^\./||' |
 				awk '
@@ -69,15 +87,14 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 					IFS=',' read -r -a owner_list <<< "$owners"
 					for owner in "${owner_list[@]}"; do
 						[[ "$owner" == "$pkg_name" ]] && continue
-						grep -qx "$owner" <<< "$declared" && continue
+						termux_pkg_relations_match "$declared" "$owner" "$deb_version" && continue
 						owner_declared=$(awk -v pkg="$owner" '
 							$0 == "Package: " pkg { found=1 }
 							found && /^(Conflicts|Replaces|Breaks):/ { print }
 							found && /^$/ { found=0 }
 						' "Packages-${repo}-${arch}" |
-							sed -E 's/^(Conflicts|Replaces|Breaks): *//' | tr ',' '\n' |
-							sed -E 's/\(.*\)//; s/^[[:space:]]+//; s/[[:space:]]+$//')
-						grep -qx "$pkg_name" <<< "$owner_declared" && continue
+							sed -E 's/^(Conflicts|Replaces|Breaks): *//' | tr ',' '\n' | sed '/^[[:space:]]*$/d')
+						termux_pkg_relations_match "$owner_declared" "$pkg_name" "$deb_version" && continue
 						echo "[!] \"$pkg_name\" and \"$owner\" (${repo}/${arch}) both ship \"$path\", with no Conflicts/Replaces/Breaks declared"
 					done
 				done)
