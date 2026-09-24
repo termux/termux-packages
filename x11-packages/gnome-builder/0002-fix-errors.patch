@@ -1,0 +1,374 @@
+diff --git a/src/libide/foundry/ide-config.c b/src/libide/foundry/ide-config.c
+index 8d5729bef..813ffa5e1 100644
+--- a/src/libide/foundry/ide-config.c
++++ b/src/libide/foundry/ide-config.c
+@@ -323,14 +323,14 @@ ide_config_get_supported_runtimes (IdeConfig *self)
+ 
+ static void
+ ide_config_set_environ (IdeConfig          *self,
+-                        const char * const *environ)
++                        const char * const *g_environ)
+ {
+   IdeEnvironment *env;
+ 
+   g_assert (IDE_IS_CONFIG (self));
+ 
+   env = ide_config_get_environment (self);
+-  ide_environment_set_environ (env, environ);
++  ide_environment_set_environ (env, g_environ);
+   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENVIRON]);
+ }
+ 
+diff --git a/src/libide/foundry/ide-foundry-global.c b/src/libide/foundry/ide-foundry-global.c
+index ccc38877c..12d98b222 100644
+--- a/src/libide/foundry/ide-foundry-global.c
++++ b/src/libide/foundry/ide-foundry-global.c
+@@ -225,9 +225,9 @@ ide_foundry_bytes_to_memfd (GBytes     *bytes,
+ 
+   g_return_val_if_fail (name != NULL, -1);
+ 
+-#ifdef __linux__
++/*#ifdef __linux__
+   fd = memfd_create (name, 0);
+-#endif
++#endif*/
+ 
+   if (fd == -1)
+     {
+diff --git a/src/libide/foundry/ide-pipeline.c b/src/libide/foundry/ide-pipeline.c
+index 5de4e7303..81f5d0220 100644
+--- a/src/libide/foundry/ide-pipeline.c
++++ b/src/libide/foundry/ide-pipeline.c
+@@ -3041,7 +3041,7 @@ ide_pipeline_create_launcher (IdePipeline  *self,
+ {
+   g_autoptr(IdeSubprocessLauncher) ret = NULL;
+   g_autoptr(IdeRunContext) run_context = NULL;
+-  g_auto(GStrv) environ = NULL;
++  g_auto(GStrv) g_environ = NULL;
+   IdeRuntime *runtime;
+ 
+   g_return_val_if_fail (IDE_IS_MAIN_THREAD (), NULL);
+@@ -3057,12 +3057,12 @@ ide_pipeline_create_launcher (IdePipeline  *self,
+       return NULL;
+     }
+ 
+-  environ = ide_environment_get_environ (ide_config_get_environment (self->config));
++  g_environ = ide_environment_get_environ (ide_config_get_environment (self->config));
+ 
+   run_context = ide_run_context_new ();
+   ide_runtime_prepare_to_build (runtime, self, run_context);
+   ide_run_context_set_cwd (run_context, ide_pipeline_get_builddir (self));
+-  ide_run_context_add_environ (run_context, (const char * const *)environ);
++  ide_run_context_add_environ (run_context, (const char * const *)g_environ);
+ 
+   /* Always ignore V=1 from configurations */
+   if (ide_run_context_getenv (run_context, "V") != NULL)
+diff --git a/src/libide/foundry/ide-run-command.c b/src/libide/foundry/ide-run-command.c
+index cdd3472ee..ae115d998 100644
+--- a/src/libide/foundry/ide-run-command.c
++++ b/src/libide/foundry/ide-run-command.c
+@@ -116,7 +116,7 @@ ide_run_command_real_prepare_to_run (IdeRunCommand *self,
+ {
+   g_autoptr(GFile) workdir = NULL;
+   IdeBuildManager *build_manager = NULL;
+-  g_auto(GStrv) environ = NULL;
++  g_auto(GStrv) g_environ = NULL;
+   IdePipeline *pipeline = NULL;
+   const char * const *argv;
+   const char * const *env;
+@@ -142,12 +142,12 @@ ide_run_command_real_prepare_to_run (IdeRunCommand *self,
+       srcdir = ide_pipeline_get_srcdir (pipeline);
+     }
+ 
+-  environ = g_environ_setenv (environ, "BUILDDIR", builddir, TRUE);
+-  environ = g_environ_setenv (environ, "SRCDIR", srcdir, TRUE);
+-  environ = g_environ_setenv (environ, "USER", g_get_user_name (), TRUE);
+-  environ = g_environ_setenv (environ, "HOME", g_get_home_dir (), TRUE);
++  g_environ = g_environ_setenv (g_environ, "BUILDDIR", builddir, TRUE);
++  g_environ = g_environ_setenv (g_environ, "SRCDIR", srcdir, TRUE);
++  g_environ = g_environ_setenv (g_environ, "USER", g_get_user_name (), TRUE);
++  g_environ = g_environ_setenv (g_environ, "HOME", g_get_home_dir (), TRUE);
+ 
+-  ide_run_context_push_expansion (run_context, (const char * const *)environ);
++  ide_run_context_push_expansion (run_context, (const char * const *)g_environ);
+ 
+   if ((cwd = ide_run_command_get_cwd (IDE_RUN_COMMAND (self))))
+     ide_run_context_set_cwd (run_context, cwd);
+@@ -549,17 +549,17 @@ ide_run_command_get_environ (IdeRunCommand *self)
+ 
+ void
+ ide_run_command_set_environ (IdeRunCommand      *self,
+-                             const char * const *environ)
++                             const char * const *g_environ)
+ {
+   IdeRunCommandPrivate *priv = ide_run_command_get_instance_private (self);
+ 
+   g_return_if_fail (IDE_IS_RUN_COMMAND (self));
+ 
+-  if (environ == (const char * const *)priv->environ)
++  if (g_environ == (const char * const *)priv->environ)
+     return;
+ 
+   g_strfreev (priv->environ);
+-  priv->environ = g_strdupv ((char **)environ);
++  priv->environ = g_strdupv ((char **)g_environ);
+   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ENVIRON]);
+ }
+ 
+diff --git a/src/libide/foundry/ide-run-command.h b/src/libide/foundry/ide-run-command.h
+index 7d9ebd47d..67f450ac4 100644
+--- a/src/libide/foundry/ide-run-command.h
++++ b/src/libide/foundry/ide-run-command.h
+@@ -94,7 +94,7 @@ IDE_AVAILABLE_IN_ALL
+ const char * const *ide_run_command_get_environ      (IdeRunCommand      *self);
+ IDE_AVAILABLE_IN_ALL
+ void                ide_run_command_set_environ      (IdeRunCommand      *self,
+-                                                      const char * const *environ);
++                                                      const char * const *g_environ);
+ IDE_AVAILABLE_IN_ALL
+ const char         *ide_run_command_getenv           (IdeRunCommand      *self,
+                                                       const char         *key);
+diff --git a/src/libide/foundry/ide-run-context.c b/src/libide/foundry/ide-run-context.c
+index 6acab30a8..e41a09aa6 100644
+--- a/src/libide/foundry/ide-run-context.c
++++ b/src/libide/foundry/ide-run-context.c
+@@ -63,13 +63,13 @@ ide_run_context_new (void)
+ 
+ static void
+ copy_envvar_with_fallback (IdeRunContext      *run_context,
+-                           const char * const *environ,
++                           const char * const *g_environ,
+                            const char         *key,
+                            const char         *fallback)
+ {
+   const char *val;
+ 
+-  if ((val = g_environ_getenv ((char **)environ, key)))
++  if ((val = g_environ_getenv ((char **)g_environ, key)))
+     ide_run_context_setenv (run_context, key, val);
+   else if (fallback != NULL)
+     ide_run_context_setenv (run_context, key, fallback);
+@@ -583,14 +583,14 @@ next_variable (const char *str,
+ 
+ static char *
+ wordexp_with_environ (const char         *input,
+-                      const char * const *environ)
++                      const char * const *g_environ)
+ {
+   g_autoptr(GString) str = NULL;
+   guint cursor = 0;
+   guint begin;
+ 
+   g_assert (input != NULL);
+-  g_assert (environ != NULL);
++  g_assert (g_environ != NULL);
+ 
+   str = g_string_new (input);
+ 
+@@ -604,7 +604,7 @@ wordexp_with_environ (const char         *input,
+       g_assert (str->str[begin] == '$');
+ 
+       key = g_strndup (str->str + begin, key_len);
+-      value = g_environ_getenv ((char **)environ, key+1);
++      value = g_environ_getenv ((char **)g_environ, key+1);
+       value_len = value ? strlen (value) : 0;
+ 
+       if (value != NULL)
+@@ -631,13 +631,13 @@ ide_run_context_expansion_handler (IdeRunContext       *self,
+                                    gpointer             user_data,
+                                    GError             **error)
+ {
+-  const char * const *environ = user_data;
++  const char * const *g_environ = user_data;
+ 
+   IDE_ENTRY;
+ 
+   g_assert (IDE_IS_RUN_CONTEXT (self));
+   g_assert (argv != NULL);
+-  g_assert (environ != NULL);
++  g_assert (g_environ != NULL);
+   g_assert (IDE_IS_UNIX_FD_MAP (unix_fd_map));
+ 
+   if (!ide_run_context_merge_unix_fd_map (self, unix_fd_map, error))
+@@ -645,7 +645,7 @@ ide_run_context_expansion_handler (IdeRunContext       *self,
+ 
+   if (cwd != NULL)
+     {
+-      g_autofree char *newcwd = wordexp_with_environ (cwd, environ);
++      g_autofree char *newcwd = wordexp_with_environ (cwd, g_environ);
+       g_autofree char *expanded = ide_path_expand (newcwd);
+ 
+       ide_run_context_set_cwd (self, expanded);
+@@ -657,7 +657,7 @@ ide_run_context_expansion_handler (IdeRunContext       *self,
+ 
+       for (guint i = 0; env[i]; i++)
+         {
+-          char *expanded = wordexp_with_environ (env[i], environ);
++          char *expanded = wordexp_with_environ (env[i], g_environ);
+           g_ptr_array_add (newenv, expanded);
+         }
+ 
+@@ -670,7 +670,7 @@ ide_run_context_expansion_handler (IdeRunContext       *self,
+ 
+       for (guint i = 0; argv[i]; i++)
+         {
+-          char *expanded = wordexp_with_environ (argv[i], environ);
++          char *expanded = wordexp_with_environ (argv[i], g_environ);
+           g_ptr_array_add (newargv, expanded);
+         }
+ 
+@@ -692,14 +692,14 @@ ide_run_context_expansion_handler (IdeRunContext       *self,
+  */
+ void
+ ide_run_context_push_expansion (IdeRunContext      *self,
+-                                const char * const *environ)
++                                const char * const *g_environ)
+ {
+   g_return_if_fail (IDE_IS_RUN_CONTEXT (self));
+ 
+-  if (environ != NULL)
++  if (g_environ != NULL)
+     ide_run_context_push (self,
+                           ide_run_context_expansion_handler,
+-                          g_strdupv ((char **)environ),
++                          g_strdupv ((char **)g_environ),
+                           (GDestroyNotify)g_strfreev);
+ }
+ 
+@@ -749,7 +749,7 @@ ide_run_context_get_environ (IdeRunContext *self)
+ 
+ void
+ ide_run_context_set_environ (IdeRunContext      *self,
+-                             const char * const *environ)
++                             const char * const *g_environ)
+ {
+   IdeRunContextLayer *layer;
+ 
+@@ -759,9 +759,9 @@ ide_run_context_set_environ (IdeRunContext      *self,
+ 
+   g_array_set_size (layer->env, 0);
+ 
+-  if (environ != NULL && environ[0] != NULL)
++  if (g_environ != NULL && g_environ[0] != NULL)
+     {
+-      char **copy = g_strdupv ((char **)environ);
++      char **copy = g_strdupv ((char **)g_environ);
+       g_array_append_vals (layer->env, copy, g_strv_length (copy));
+       g_free (copy);
+     }
+@@ -769,20 +769,20 @@ ide_run_context_set_environ (IdeRunContext      *self,
+ 
+ void
+ ide_run_context_add_environ (IdeRunContext      *self,
+-                             const char * const *environ)
++                             const char * const *g_environ)
+ {
+   IdeRunContextLayer *layer;
+ 
+   g_return_if_fail (IDE_IS_RUN_CONTEXT (self));
+ 
+-  if (environ == NULL || environ[0] == NULL)
++  if (g_environ == NULL || g_environ[0] == NULL)
+     return;
+ 
+   layer = ide_run_context_current_layer (self);
+ 
+-  for (guint i = 0; environ[i]; i++)
++  for (guint i = 0; g_environ[i]; i++)
+     {
+-      const char *pair = environ[i];
++      const char *pair = g_environ[i];
+       const char *eq = strchr (pair, '=');
+       char **dest = NULL;
+       gsize keylen;
+diff --git a/src/libide/foundry/ide-run-context.h b/src/libide/foundry/ide-run-context.h
+index e0f41b42e..3eb2bc241 100644
+--- a/src/libide/foundry/ide-run-context.h
++++ b/src/libide/foundry/ide-run-context.h
+@@ -88,7 +88,7 @@ void                   ide_run_context_push_user_shell         (IdeRunContext
+                                                                 IdeRunContextShell     shell);
+ IDE_AVAILABLE_IN_ALL
+ void                   ide_run_context_push_expansion          (IdeRunContext         *self,
+-                                                                const char * const    *environ);
++                                                                const char * const    *g_environ);
+ IDE_AVAILABLE_IN_ALL
+ const char * const    *ide_run_context_get_argv                (IdeRunContext         *self);
+ IDE_AVAILABLE_IN_ALL
+@@ -98,10 +98,10 @@ IDE_AVAILABLE_IN_ALL
+ const char * const    *ide_run_context_get_environ             (IdeRunContext         *self);
+ IDE_AVAILABLE_IN_ALL
+ void                   ide_run_context_set_environ             (IdeRunContext         *self,
+-                                                                const char * const    *environ);
++                                                                const char * const    *g_environ);
+ IDE_AVAILABLE_IN_ALL
+ void                   ide_run_context_add_environ             (IdeRunContext         *self,
+-                                                                const char * const    *environ);
++                                                                const char * const    *g_environ);
+ IDE_AVAILABLE_IN_ALL
+ void                   ide_run_context_add_minimal_environment (IdeRunContext         *self);
+ IDE_AVAILABLE_IN_ALL
+diff --git a/src/libide/foundry/ide-run-manager.c b/src/libide/foundry/ide-run-manager.c
+index 34da8626d..313ef30a6 100644
+--- a/src/libide/foundry/ide-run-manager.c
++++ b/src/libide/foundry/ide-run-manager.c
+@@ -945,7 +945,7 @@ ide_run_manager_prepare_run_context (IdeRunManager *self,
+                                      IdeRunCommand *run_command,
+                                      IdePipeline   *pipeline)
+ {
+-  g_auto(GStrv) environ = NULL;
++  g_auto(GStrv) g_environ = NULL;
+ 
+   IDE_ENTRY;
+ 
+@@ -969,11 +969,11 @@ ide_run_manager_prepare_run_context (IdeRunManager *self,
+    * that we can expand common variables at this layer and not allow them
+    * to be visible at lower layers.
+    */
+-  environ = g_environ_setenv (environ, "BUILDDIR", ide_pipeline_get_builddir (pipeline), TRUE);
+-  environ = g_environ_setenv (environ, "SRCDIR", ide_pipeline_get_srcdir (pipeline), TRUE);
+-  environ = g_environ_setenv (environ, "HOME", g_get_home_dir (), TRUE);
+-  environ = g_environ_setenv (environ, "USER", g_get_user_name (), TRUE);
+-  ide_run_context_push_expansion (run_context, (const char * const *)environ);
++  g_environ = g_environ_setenv (g_environ, "BUILDDIR", ide_pipeline_get_builddir (pipeline), TRUE);
++  g_environ = g_environ_setenv (g_environ, "SRCDIR", ide_pipeline_get_srcdir (pipeline), TRUE);
++  g_environ = g_environ_setenv (g_environ, "HOME", g_get_home_dir (), TRUE);
++  g_environ = g_environ_setenv (g_environ, "USER", g_get_user_name (), TRUE);
++  ide_run_context_push_expansion (run_context, (const char * const *)g_environ);
+ 
+   /* Setup working directory */
+   {
+diff --git a/src/libide/terminal/ide-terminal-palettes.h b/src/libide/terminal/ide-terminal-palettes.h
+index b70665f17..c6a03c30f 100644
+--- a/src/libide/terminal/ide-terminal-palettes.h
++++ b/src/libide/terminal/ide-terminal-palettes.h
+@@ -33,7 +33,7 @@ G_BEGIN_DECLS
+     ((_GDK_RGBA_SELECT_COLOR(str, 0, 0) << 4) | _GDK_RGBA_SELECT_COLOR(str, 0, 1)) / 255., \
+     ((_GDK_RGBA_SELECT_COLOR(str, 1, 2) << 4) | _GDK_RGBA_SELECT_COLOR(str, 1, 3)) / 255., \
+     ((_GDK_RGBA_SELECT_COLOR(str, 2, 4) << 4) | _GDK_RGBA_SELECT_COLOR(str, 2, 5)) / 255., \
+-    ((sizeof(str) % 4 == 1) ? ((_GDK_RGBA_SELECT_COLOR(str, 3, 6) << 4) | _GDK_RGBA_SELECT_COLOR(str, 3, 7)) : 0xFF) / 255. })
++    ((sizeof(str) % 4 == 1) ? ((_GDK_RGBA_SELECT_COLOR(str, 3, 6) << 4) | _GDK_RGBA_SELECT_COLOR(str, 3, 0)) : 0xFF) / 255. })
+ 
+ typedef struct _IdeTerminalPaletteData
+ {
+diff --git a/src/plugins/buildconfig/ide-buildconfig-pipeline-addin.c b/src/plugins/buildconfig/ide-buildconfig-pipeline-addin.c
+index cdd0b6ffd..70ecefe4f 100644
+--- a/src/plugins/buildconfig/ide-buildconfig-pipeline-addin.c
++++ b/src/plugins/buildconfig/ide-buildconfig-pipeline-addin.c
+@@ -34,7 +34,7 @@ add_command (IdePipelineAddin   *addin,
+              IdePipelinePhase    phase,
+              int                 priority,
+              const char         *command_text,
+-             const char * const *environ)
++             const char * const *g_environ)
+ {
+   g_autoptr(IdeRunCommand) run_command = NULL;
+   g_autoptr(GError) error = NULL;
+@@ -50,7 +50,7 @@ add_command (IdePipelineAddin   *addin,
+ 
+   run_command = ide_run_command_new ();
+   ide_run_command_set_argv (run_command, (const char * const *)argv);
+-  ide_run_command_set_environ (run_command, environ);
++  ide_run_command_set_environ (run_command, g_environ);
+ 
+   stage_id = ide_pipeline_attach_command (pipeline, phase, priority, run_command);
+   ide_pipeline_addin_track (addin, stage_id);

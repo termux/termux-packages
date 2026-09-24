@@ -1,0 +1,42 @@
+diff --git a/src/plugins/git/daemon/meson.build b/src/plugins/git/daemon/meson.build
+index 1f38a31f1..ec63532ef 100644
+--- a/src/plugins/git/daemon/meson.build
++++ b/src/plugins/git/daemon/meson.build
+@@ -10,12 +10,12 @@ ggit_init ();
+ return ((ggit_get_features() & GGIT_FEATURE_THREADS) != 0) ? 0 : 1;
+ }
+ '''
+-res = cc.run(libgit_thread_safe_check,
+-dependencies: libgit2_glib_dep,
+-)
+-if res.returncode() != 0
+-error('libgit2 was not compiled with -DUSE_THREADS:BOOL=ON')
+-endif
++#res = cc.run(libgit_thread_safe_check,
++#dependencies: libgit2_glib_dep,
++#)
++#if res.returncode() != 0
++#error('libgit2 was not compiled with -DUSE_THREADS:BOOL=ON')
++#endif
+ 
+ libgit_ssh_check = '''
+ #include <libgit2-glib/ggit.h>
+@@ -25,12 +25,12 @@ ggit_init ();
+ return ((ggit_get_features() & GGIT_FEATURE_SSH) != 0) ? 0 : 1;
+ }
+ '''
+-res = cc.run(libgit_ssh_check,
+-dependencies: libgit2_glib_dep,
+-)
+-if res.returncode() != 0
+-error('libgit2 was not compiled with SSH support')
+-endif
++#res = cc.run(libgit_ssh_check,
++#dependencies: libgit2_glib_dep,
++#)
++#if res.returncode() != 0
++#error('libgit2 was not compiled with SSH support')
++#endif
+ 
+ gnome_builder_git_deps = [
+   libgiounix_dep,

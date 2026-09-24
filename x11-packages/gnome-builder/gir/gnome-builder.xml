@@ -1,0 +1,1921 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="IdeActionMuxer" get-type="ide_action_muxer_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+  </class>
+  <class name="IdeObject" get-type="ide_object_get_type" parents="GObject">
+    <property name="cancellable" type="GCancellable" flags="235"/>
+    <property name="parent" type="IdeObject" flags="235"/>
+    <signal name="destroy" return="void" when="cleanup" no-recurse="1" no-hooks="1">
+    </signal>
+  </class>
+  <class name="IdeSettings" get-type="ide_settings_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="path-suffix" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="project-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="changed" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="IdeContext" get-type="ide_context_get_type" parents="IdeObject,GObject" final="1">
+    <property name="project-id" type="gchararray" flags="1073742051" default-value="empty"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="workdir" type="GFile" flags="1073742051"/>
+  </class>
+  <class name="IdeGSettingsActionGroup" get-type="ide_gsettings_action_group_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="settings" type="GSettings" flags="235"/>
+  </class>
+  <class name="IdeLogItem" get-type="ide_log_item_get_type" parents="GObject" final="1">
+    <property name="created-at" type="GDateTime" flags="235"/>
+    <property name="domain" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="message" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="severity" type="guint" flags="235" default-value="0"/>
+  </class>
+  <class name="IdeNotification" get-type="ide_notification_get_type" parents="IdeObject,GObject">
+    <property name="body" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="has-progress" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="priority" type="gint" flags="1073742051" default-value="0"/>
+    <property name="progress" type="gdouble" flags="1073742051" default-value="0.000000"/>
+    <property name="progress-is-imprecise" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="urgent" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="IdeNotifications" get-type="ide_notifications_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="has-progress" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="progress" type="gdouble" flags="225" default-value="0.000000"/>
+    <property name="progress-is-imprecise" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="IdeObjectBox" get-type="ide_object_box_get_type" parents="IdeObject,GObject" final="1">
+    <property name="object" type="GObject" flags="235"/>
+    <property name="propagate-disposal" type="gboolean" flags="235" default-value="TRUE"/>
+  </class>
+  <class name="IdePropertyActionGroup" get-type="ide_property_action_group_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="item" type="GObject" flags="1073742051"/>
+    <property name="item-type" type="GType" flags="235"/>
+  </class>
+  <class name="IdeSettingsFlagAction" get-type="ide_settings_flag_action_get_type" parents="GObject">
+    <implements name="GAction"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-key" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="flag-nick" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="IdeTransfer" get-type="ide_transfer_get_type" parents="IdeObject,GObject">
+    <property name="active" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="completed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="folder-download-symbolic"/>
+    <property name="progress" type="gdouble" flags="1073742051" default-value="0.000000"/>
+    <property name="status" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="cancelled" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeTransferManager" get-type="ide_transfer_manager_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="has-active" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="progress" type="gdouble" flags="225" default-value="0.000000"/>
+    <signal name="all-transfers-completed" return="void" when="last">
+    </signal>
+    <signal name="transfer-completed" return="void" when="last">
+      <param type="IdeTransfer"/>
+    </signal>
+    <signal name="transfer-failed" return="void" when="last">
+      <param type="IdeTransfer"/>
+      <param type="GError"/>
+    </signal>
+  </class>
+  <enum name="IdeAnimationMode" get-type="ide_animation_mode_get_type">
+    <member name="IDE_ANIMATION_LINEAR" nick="linear" value="0"/>
+    <member name="IDE_ANIMATION_EASE_IN_QUAD" nick="ease-in-quad" value="1"/>
+    <member name="IDE_ANIMATION_EASE_OUT_QUAD" nick="ease-out-quad" value="2"/>
+    <member name="IDE_ANIMATION_EASE_IN_OUT_QUAD" nick="ease-in-out-quad" value="3"/>
+    <member name="IDE_ANIMATION_EASE_IN_CUBIC" nick="ease-in-cubic" value="4"/>
+    <member name="IDE_ANIMATION_EASE_OUT_CUBIC" nick="ease-out-cubic" value="5"/>
+    <member name="IDE_ANIMATION_EASE_IN_OUT_CUBIC" nick="ease-in-out-cubic" value="6"/>
+    <member name="IDE_ANIMATION_LAST" nick="last" value="7"/>
+  </enum>  <enum name="IdeScrubberRevealPolicy" get-type="ide_scrubber_reveal_policy_get_type">
+    <member name="IDE_SCRUBBER_REVEAL_POLICY_NEVER" nick="never" value="0"/>
+    <member name="IDE_SCRUBBER_REVEAL_POLICY_AUTO" nick="auto" value="1"/>
+    <member name="IDE_SCRUBBER_REVEAL_POLICY_ALWAYS" nick="always" value="2"/>
+  </enum>  <enum name="IdeSearchCategory" get-type="ide_search_category_get_type">
+    <member name="IDE_SEARCH_CATEGORY_EVERYTHING" nick="everything" value="0"/>
+    <member name="IDE_SEARCH_CATEGORY_ACTIONS" nick="actions" value="1"/>
+    <member name="IDE_SEARCH_CATEGORY_COMMANDS" nick="commands" value="2"/>
+    <member name="IDE_SEARCH_CATEGORY_FILES" nick="files" value="3"/>
+    <member name="IDE_SEARCH_CATEGORY_SYMBOLS" nick="symbols" value="4"/>
+    <member name="IDE_SEARCH_CATEGORY_OTHER" nick="other" value="5"/>
+    <member name="IDE_SEARCH_CATEGORY_DOCUMENTATION" nick="documentation" value="6"/>
+  </enum>  <flags name="IdeBufferOpenFlags" get-type="ide_buffer_open_flags_get_type">
+    <member name="IDE_BUFFER_OPEN_FLAGS_NONE" nick="none" value="0"/>
+    <member name="IDE_BUFFER_OPEN_FLAGS_FORCE_RELOAD" nick="force-reload" value="2"/>
+    <member name="IDE_BUFFER_OPEN_FLAGS_DISABLE_ADDINS" nick="disable-addins" value="4"/>
+  </flags>
+  <enum name="IdeBufferState" get-type="ide_buffer_state_get_type">
+    <member name="IDE_BUFFER_STATE_READY" nick="ready" value="0"/>
+    <member name="IDE_BUFFER_STATE_LOADING" nick="loading" value="1"/>
+    <member name="IDE_BUFFER_STATE_SAVING" nick="saving" value="2"/>
+    <member name="IDE_BUFFER_STATE_FAILED" nick="failed" value="3"/>
+  </enum>  <enum name="IdeDiagnosticSeverity" get-type="ide_diagnostic_severity_get_type">
+    <member name="IDE_DIAGNOSTIC_IGNORED" nick="ignored" value="0"/>
+    <member name="IDE_DIAGNOSTIC_NOTE" nick="note" value="1"/>
+    <member name="IDE_DIAGNOSTIC_UNUSED" nick="unused" value="2"/>
+    <member name="IDE_DIAGNOSTIC_DEPRECATED" nick="deprecated" value="3"/>
+    <member name="IDE_DIAGNOSTIC_WARNING" nick="warning" value="4"/>
+    <member name="IDE_DIAGNOSTIC_ERROR" nick="error" value="5"/>
+    <member name="IDE_DIAGNOSTIC_FATAL" nick="fatal" value="6"/>
+  </enum>  <enum name="IdeIndentStyle" get-type="ide_indent_style_get_type">
+    <member name="IDE_INDENT_STYLE_SPACES" nick="spaces" value="1"/>
+    <member name="IDE_INDENT_STYLE_TABS" nick="tabs" value="2"/>
+  </enum>  <flags name="IdeSpacesStyle" get-type="ide_spaces_style_get_type">
+    <member name="IDE_SPACES_STYLE_IGNORE" nick="ignore" value="0"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_LEFT_PAREN" nick="before-left-paren" value="1"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_LEFT_BRACKET" nick="before-left-bracket" value="2"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_LEFT_BRACE" nick="before-left-brace" value="4"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_LEFT_ANGLE" nick="before-left-angle" value="8"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_COLON" nick="before-colon" value="16"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_COMMA" nick="before-comma" value="32"/>
+    <member name="IDE_SPACES_STYLE_BEFORE_SEMICOLON" nick="before-semicolon" value="64"/>
+  </flags>
+  <enum name="IdeSymbolKind" get-type="ide_symbol_kind_get_type">
+    <member name="IDE_SYMBOL_KIND_NONE" nick="none" value="0"/>
+    <member name="IDE_SYMBOL_KIND_ALIAS" nick="alias" value="1"/>
+    <member name="IDE_SYMBOL_KIND_ARRAY" nick="array" value="2"/>
+    <member name="IDE_SYMBOL_KIND_BOOLEAN" nick="boolean" value="3"/>
+    <member name="IDE_SYMBOL_KIND_CLASS" nick="class" value="4"/>
+    <member name="IDE_SYMBOL_KIND_CONSTANT" nick="constant" value="5"/>
+    <member name="IDE_SYMBOL_KIND_CONSTRUCTOR" nick="constructor" value="6"/>
+    <member name="IDE_SYMBOL_KIND_ENUM" nick="enum" value="7"/>
+    <member name="IDE_SYMBOL_KIND_ENUM_VALUE" nick="enum-value" value="8"/>
+    <member name="IDE_SYMBOL_KIND_FIELD" nick="field" value="9"/>
+    <member name="IDE_SYMBOL_KIND_FILE" nick="file" value="10"/>
+    <member name="IDE_SYMBOL_KIND_FUNCTION" nick="function" value="11"/>
+    <member name="IDE_SYMBOL_KIND_HEADER" nick="header" value="12"/>
+    <member name="IDE_SYMBOL_KIND_INTERFACE" nick="interface" value="13"/>
+    <member name="IDE_SYMBOL_KIND_MACRO" nick="macro" value="14"/>
+    <member name="IDE_SYMBOL_KIND_METHOD" nick="method" value="15"/>
+    <member name="IDE_SYMBOL_KIND_MODULE" nick="module" value="16"/>
+    <member name="IDE_SYMBOL_KIND_NAMESPACE" nick="namespace" value="17"/>
+    <member name="IDE_SYMBOL_KIND_NUMBER" nick="number" value="18"/>
+    <member name="IDE_SYMBOL_KIND_PACKAGE" nick="package" value="19"/>
+    <member name="IDE_SYMBOL_KIND_PROPERTY" nick="property" value="20"/>
+    <member name="IDE_SYMBOL_KIND_SCALAR" nick="scalar" value="21"/>
+    <member name="IDE_SYMBOL_KIND_STRING" nick="string" value="22"/>
+    <member name="IDE_SYMBOL_KIND_STRUCT" nick="struct" value="23"/>
+    <member name="IDE_SYMBOL_KIND_TEMPLATE" nick="template" value="24"/>
+    <member name="IDE_SYMBOL_KIND_UNION" nick="union" value="25"/>
+    <member name="IDE_SYMBOL_KIND_VARIABLE" nick="variable" value="26"/>
+    <member name="IDE_SYMBOL_KIND_KEYWORD" nick="keyword" value="27"/>
+    <member name="IDE_SYMBOL_KIND_UI_ATTRIBUTES" nick="ui-attributes" value="28"/>
+    <member name="IDE_SYMBOL_KIND_UI_CHILD" nick="ui-child" value="29"/>
+    <member name="IDE_SYMBOL_KIND_UI_ITEM" nick="ui-item" value="30"/>
+    <member name="IDE_SYMBOL_KIND_UI_MENU" nick="ui-menu" value="31"/>
+    <member name="IDE_SYMBOL_KIND_UI_MENU_ATTRIBUTE" nick="ui-menu-attribute" value="32"/>
+    <member name="IDE_SYMBOL_KIND_UI_OBJECT" nick="ui-object" value="33"/>
+    <member name="IDE_SYMBOL_KIND_UI_PACKING" nick="ui-packing" value="34"/>
+    <member name="IDE_SYMBOL_KIND_UI_PROPERTY" nick="ui-property" value="35"/>
+    <member name="IDE_SYMBOL_KIND_UI_SECTION" nick="ui-section" value="36"/>
+    <member name="IDE_SYMBOL_KIND_UI_SIGNAL" nick="ui-signal" value="37"/>
+    <member name="IDE_SYMBOL_KIND_UI_STYLE" nick="ui-style" value="38"/>
+    <member name="IDE_SYMBOL_KIND_UI_STYLE_CLASS" nick="ui-style-class" value="39"/>
+    <member name="IDE_SYMBOL_KIND_UI_SUBMENU" nick="ui-submenu" value="40"/>
+    <member name="IDE_SYMBOL_KIND_UI_TEMPLATE" nick="ui-template" value="41"/>
+    <member name="IDE_SYMBOL_KIND_XML_ATTRIBUTE" nick="xml-attribute" value="42"/>
+    <member name="IDE_SYMBOL_KIND_XML_DECLARATION" nick="xml-declaration" value="43"/>
+    <member name="IDE_SYMBOL_KIND_XML_ELEMENT" nick="xml-element" value="44"/>
+    <member name="IDE_SYMBOL_KIND_XML_COMMENT" nick="xml-comment" value="45"/>
+    <member name="IDE_SYMBOL_KIND_XML_CDATA" nick="xml-cdata" value="46"/>
+    <member name="IDE_SYMBOL_KIND_OBJECT" nick="object" value="47"/>
+    <member name="IDE_SYMBOL_KIND_EVENT" nick="event" value="48"/>
+    <member name="IDE_SYMBOL_KIND_OPERATOR" nick="operator" value="49"/>
+    <member name="IDE_SYMBOL_KIND_TYPE_PARAM" nick="type-param" value="50"/>
+    <member name="IDE_SYMBOL_KIND_LAST" nick="last" value="51"/>
+  </enum>  <flags name="IdeSymbolFlags" get-type="ide_symbol_flags_get_type">
+    <member name="IDE_SYMBOL_FLAGS_NONE" nick="none" value="0"/>
+    <member name="IDE_SYMBOL_FLAGS_IS_STATIC" nick="is-static" value="1"/>
+    <member name="IDE_SYMBOL_FLAGS_IS_MEMBER" nick="is-member" value="2"/>
+    <member name="IDE_SYMBOL_FLAGS_IS_DEPRECATED" nick="is-deprecated" value="4"/>
+    <member name="IDE_SYMBOL_FLAGS_IS_DEFINITION" nick="is-definition" value="8"/>
+  </flags>
+  <enum name="IdeVcsConfigType" get-type="ide_vcs_config_type_get_type">
+    <member name="IDE_VCS_CONFIG_FULL_NAME" nick="full-name" value="0"/>
+    <member name="IDE_VCS_CONFIG_EMAIL" nick="email" value="1"/>
+  </enum>  <enum name="IdeVcsFileStatus" get-type="ide_vcs_file_status_get_type">
+    <member name="IDE_VCS_FILE_STATUS_IGNORED" nick="ignored" value="1"/>
+    <member name="IDE_VCS_FILE_STATUS_UNCHANGED" nick="unchanged" value="2"/>
+    <member name="IDE_VCS_FILE_STATUS_UNTRACKED" nick="untracked" value="3"/>
+    <member name="IDE_VCS_FILE_STATUS_ADDED" nick="added" value="4"/>
+    <member name="IDE_VCS_FILE_STATUS_RENAMED" nick="renamed" value="5"/>
+    <member name="IDE_VCS_FILE_STATUS_DELETED" nick="deleted" value="6"/>
+    <member name="IDE_VCS_FILE_STATUS_CHANGED" nick="changed" value="7"/>
+  </enum>  <enum name="IdeTreeNodeVisit" get-type="ide_tree_node_visit_get_type">
+    <member name="IDE_TREE_NODE_VISIT_BREAK" nick="break" value="0"/>
+    <member name="IDE_TREE_NODE_VISIT_CONTINUE" nick="continue" value="1"/>
+    <member name="IDE_TREE_NODE_VISIT_CHILDREN" nick="children" value="3"/>
+  </enum>  <flags name="IdeTreeNodeFlags" get-type="ide_tree_node_flags_get_type">
+    <member name="IDE_TREE_NODE_FLAGS_NONE" nick="none" value="0"/>
+    <member name="IDE_TREE_NODE_FLAGS_DESCENDANT" nick="descendant" value="1"/>
+    <member name="IDE_TREE_NODE_FLAGS_ADDED" nick="added" value="2"/>
+    <member name="IDE_TREE_NODE_FLAGS_CHANGED" nick="changed" value="4"/>
+    <member name="IDE_TREE_NODE_FLAGS_REMOVED" nick="removed" value="8"/>
+  </flags>
+  <enum name="IdeBuildLogStream" get-type="ide_build_log_stream_get_type">
+    <member name="IDE_BUILD_LOG_STDOUT" nick="stdout" value="0"/>
+    <member name="IDE_BUILD_LOG_STDERR" nick="stderr" value="1"/>
+  </enum>  <flags name="IdeBuildLocality" get-type="ide_build_locality_get_type">
+    <member name="IDE_BUILD_LOCALITY_IN_TREE" nick="in-tree" value="1"/>
+    <member name="IDE_BUILD_LOCALITY_OUT_OF_TREE" nick="out-of-tree" value="2"/>
+    <member name="IDE_BUILD_LOCALITY_DEFAULT" nick="default" value="3"/>
+  </flags>
+  <enum name="IdeDeviceKind" get-type="ide_device_kind_get_type">
+    <member name="IDE_DEVICE_KIND_COMPUTER" nick="computer" value="0"/>
+    <member name="IDE_DEVICE_KIND_PHONE" nick="phone" value="1"/>
+    <member name="IDE_DEVICE_KIND_TABLET" nick="tablet" value="2"/>
+    <member name="IDE_DEVICE_KIND_MICRO_CONTROLLER" nick="micro-controller" value="3"/>
+  </enum>  <enum name="IdeDeviceError" get-type="ide_device_error_get_type">
+    <member name="IDE_DEVICE_ERROR_NO_SUCH_DEVICE" nick="device" value="1"/>
+  </enum>  <flags name="IdePipelinePhase" get-type="ide_pipeline_phase_get_type">
+    <member name="IDE_PIPELINE_PHASE_NONE" nick="none" value="0"/>
+    <member name="IDE_PIPELINE_PHASE_PREPARE" nick="prepare" value="1"/>
+    <member name="IDE_PIPELINE_PHASE_DOWNLOADS" nick="downloads" value="2"/>
+    <member name="IDE_PIPELINE_PHASE_DEPENDENCIES" nick="dependencies" value="4"/>
+    <member name="IDE_PIPELINE_PHASE_AUTOGEN" nick="autogen" value="8"/>
+    <member name="IDE_PIPELINE_PHASE_CONFIGURE" nick="configure" value="16"/>
+    <member name="IDE_PIPELINE_PHASE_BUILD" nick="build" value="64"/>
+    <member name="IDE_PIPELINE_PHASE_INSTALL" nick="install" value="128"/>
+    <member name="IDE_PIPELINE_PHASE_COMMIT" nick="commit" value="256"/>
+    <member name="IDE_PIPELINE_PHASE_EXPORT" nick="export" value="512"/>
+    <member name="IDE_PIPELINE_PHASE_FINAL" nick="final" value="1024"/>
+    <member name="IDE_PIPELINE_PHASE_BEFORE" nick="before" value="268435456"/>
+    <member name="IDE_PIPELINE_PHASE_AFTER" nick="after" value="536870912"/>
+    <member name="IDE_PIPELINE_PHASE_FINISHED" nick="finished" value="1073741824"/>
+    <member name="IDE_PIPELINE_PHASE_FAILED" nick="failed" value="2147483648"/>
+  </flags>
+  <enum name="IdeRunCommandKind" get-type="ide_run_command_kind_get_type">
+    <member name="IDE_RUN_COMMAND_KIND_UNKNOWN" nick="unknown" value="0"/>
+    <member name="IDE_RUN_COMMAND_KIND_APPLICATION" nick="application" value="1"/>
+    <member name="IDE_RUN_COMMAND_KIND_UTILITY" nick="utility" value="2"/>
+    <member name="IDE_RUN_COMMAND_KIND_TEST" nick="test" value="3"/>
+    <member name="IDE_RUN_COMMAND_KIND_BENCHMARK" nick="benchmark" value="4"/>
+    <member name="IDE_RUN_COMMAND_KIND_USER_DEFINED" nick="user-defined" value="5"/>
+  </enum>  <enum name="IdeRunContextShell" get-type="ide_run_context_shell_get_type">
+    <member name="IDE_RUN_CONTEXT_SHELL_DEFAULT" nick="default" value="0"/>
+    <member name="IDE_RUN_CONTEXT_SHELL_LOGIN" nick="login" value="1"/>
+    <member name="IDE_RUN_CONTEXT_SHELL_INTERACTIVE" nick="interactive" value="2"/>
+  </enum>  <enum name="IdeRuntimeError" get-type="ide_runtime_error_get_type">
+    <member name="IDE_RUNTIME_ERROR_UNKNOWN" nick="unknown" value="0"/>
+    <member name="IDE_RUNTIME_ERROR_NO_SUCH_RUNTIME" nick="no-such-runtime" value="1"/>
+    <member name="IDE_RUNTIME_ERROR_BUILD_FAILED" nick="build-failed" value="2"/>
+    <member name="IDE_RUNTIME_ERROR_TARGET_NOT_FOUND" nick="target-not-found" value="3"/>
+    <member name="IDE_RUNTIME_ERROR_SPAWN_FAILED" nick="spawn-failed" value="4"/>
+  </enum>  <enum name="IdeTestStatus" get-type="ide_test_status_get_type">
+    <member name="IDE_TEST_STATUS_NONE" nick="none" value="0"/>
+    <member name="IDE_TEST_STATUS_RUNNING" nick="running" value="1"/>
+    <member name="IDE_TEST_STATUS_SUCCESS" nick="success" value="2"/>
+    <member name="IDE_TEST_STATUS_FAILED" nick="failed" value="3"/>
+  </enum>  <class name="IdeExtensionAdapter" get-type="ide_extension_adapter_get_type" parents="IdeObject,GObject" final="1">
+    <property name="engine" type="PeasEngine" flags="235"/>
+    <property name="extension" type="GObject" flags="225"/>
+    <property name="interface-type" type="GType" flags="235"/>
+    <property name="key" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="IdeExtensionSetAdapter" get-type="ide_extension_set_adapter_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="engine" type="PeasEngine" flags="235"/>
+    <property name="interface-type" type="GType" flags="235"/>
+    <property name="key" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="extension-added" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+      <param type="GObject"/>
+    </signal>
+    <signal name="extension-removed" return="void" when="last">
+      <param type="PeasPluginInfo"/>
+      <param type="GObject"/>
+    </signal>
+    <signal name="extensions-loaded" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdePlugin" get-type="ide_plugin_get_type" parents="GObject" final="1">
+    <property name="authors" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="category" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="category-id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="copyright" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="info" type="PeasPluginInfo" flags="235"/>
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="section" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="version" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="website" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="IdePluginSection" get-type="ide_plugin_section_get_type" parents="GObject" final="1">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="plugins" type="GListModel" flags="225"/>
+  </class>
+  <class name="IdeEnvironmentVariable" get-type="ide_environment_variable_get_type" parents="GObject" final="1">
+    <property name="key" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="IdeEnvironment" get-type="ide_environment_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="IdeSubprocess" get-type="ide_subprocess_get_type">
+  </interface>
+  <class name="IdeSubprocessLauncher" get-type="ide_subprocess_launcher_get_type" parents="GObject">
+    <property name="clean-env" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="cwd" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="environ" type="GStrv" flags="1073742051"/>
+    <property name="flags" type="GSubprocessFlags" flags="231" default-value="G_SUBPROCESS_FLAGS_NONE"/>
+    <property name="run-on-host" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="IdeSubprocessSupervisor" get-type="ide_subprocess_supervisor_get_type" parents="GObject">
+    <signal name="spawned" return="void" when="last">
+      <param type="IdeSubprocess"/>
+    </signal>
+    <signal name="supervise" return="gboolean" when="last">
+      <param type="IdeSubprocessLauncher"/>
+    </signal>
+    <signal name="unsupervise" return="gboolean" when="last">
+      <param type="IdeSubprocessLauncher"/>
+    </signal>
+    <signal name="exited" return="void" when="last">
+      <param type="IdeSubprocess"/>
+    </signal>
+  </class>
+  <class name="IdeTask" get-type="ide_task_get_type" parents="GObject" final="1">
+    <implements name="GAsyncResult"/>
+    <property name="completed" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="IdeUnixFDMap" get-type="ide_unix_fd_map_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeCachedListModel" get-type="ide_cached_list_model_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="model" type="GListModel" flags="1073742051"/>
+  </class>
+  <class name="IdeDirectoryReaper" get-type="ide_directory_reaper_get_type" parents="GObject">
+    <signal name="remove-file" return="void" when="last">
+      <param type="GFile"/>
+    </signal>
+  </class>
+  <class name="IdeFileTransfer" get-type="ide_file_transfer_get_type" parents="GObject">
+    <property name="flags" type="IdeFileTransferFlags" flags="1073742051" default-value="IDE_FILE_TRANSFER_FLAGS_NONE"/>
+    <property name="progress" type="gdouble" flags="225" default-value="0.000000"/>
+  </class>
+  <boxed name="IdeHeap" get-type="ide_heap_get_type"/>
+  <boxed name="IdeMarkedContent" get-type="ide_marked_content_get_type"/>
+  <class name="IdePersistentMap" get-type="ide_persistent_map_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdePersistentMapBuilder" get-type="ide_persistent_map_builder_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdePkconTransfer" get-type="ide_pkcon_transfer_get_type" parents="IdeTransfer,IdeObject,GObject" final="1">
+    <property name="packages" type="GStrv" flags="235"/>
+  </class>
+  <class name="IdeRecursiveFileMonitor" get-type="ide_recursive_file_monitor_get_type" parents="GObject">
+    <property name="root" type="GFile" flags="235"/>
+    <signal name="changed" return="void" when="last">
+      <param type="GFile"/>
+      <param type="GFile"/>
+      <param type="GFileMonitorEvent"/>
+    </signal>
+  </class>
+  <class name="IdeTaskCache" get-type="ide_task_cache_get_type" parents="GObject" final="1">
+    <property name="key-copy-func" type="gpointer" flags="234"/>
+    <property name="key-destroy-func" type="gpointer" flags="234"/>
+    <property name="key-equal-func" type="gpointer" flags="234"/>
+    <property name="key-hash-func" type="gpointer" flags="234"/>
+    <property name="populate-callback" type="gpointer" flags="234"/>
+    <property name="populate-callback-data" type="gpointer" flags="234"/>
+    <property name="populate-callback-data-destroy" type="gpointer" flags="234"/>
+    <property name="time-to-live" type="gint64" flags="234" default-value="30000"/>
+    <property name="value-copy-func" type="gpointer" flags="234"/>
+    <property name="value-destroy-func" type="gpointer" flags="234"/>
+  </class>
+  <class name="IdeAnimation" get-type="ide_animation_get_type" parents="GInitiallyUnowned,GObject">
+    <property name="duration" type="guint" flags="234" default-value="250"/>
+    <property name="frame-clock" type="GdkFrameClock" flags="234"/>
+    <property name="mode" type="IdeAnimationMode" flags="234" default-value="IDE_ANIMATION_LINEAR"/>
+    <property name="target" type="GObject" flags="234"/>
+    <signal name="tick" return="void" when="first">
+    </signal>
+  </class>
+  <class name="IdeEntryPopover" get-type="ide_entry_popover_get_type" parents="GtkPopover,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkNative"/>
+    <property name="button-text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="message" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="ready" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="text" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+    <signal name="activate" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="insert-text" return="gboolean" when="last">
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="IdeEnumObject" get-type="ide_enum_object_get_type" parents="GObject" final="1">
+    <property name="description" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="nick" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="IdeInstallButton" get-type="ide_install_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="label" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="install" return="void" when="last">
+      <param type="IdeNotification"/>
+      <param type="GCancellable"/>
+    </signal>
+    <signal name="cancel" return="void" when="last">
+      <param type="IdeNotification"/>
+      <param type="GCancellable"/>
+    </signal>
+  </class>
+  <class name="IdeJoinedMenu" get-type="ide_joined_menu_get_type" parents="GMenuModel,GObject">
+  </class>
+  <class name="IdeMenuManager" get-type="ide_menu_manager_get_type" parents="GObject">
+  </class>
+  <class name="IdeProgressIcon" get-type="ide_progress_icon_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="progress" type="gdouble" flags="227" default-value="0.000000"/>
+  </class>
+  <class name="IdeRadioBox" get-type="ide_radio_box_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="active-id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="has-more" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="show-more" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeScrubberRevealer" get-type="ide_scrubber_revealer_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="content" type="GtkWidget" flags="1073742051"/>
+    <property name="scrubber" type="GtkWidget" flags="1073742051"/>
+    <property name="policy" type="IdeScrubberRevealPolicy" flags="1073742051" default-value="IDE_SCRUBBER_REVEAL_POLICY_NEVER"/>
+  </class>
+  <class name="IdeSearchEntry" get-type="ide_search_entry_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkEditable"/>
+  </class>
+  <class name="IdeShortcutAccelDialog" get-type="ide_shortcut_accel_dialog_get_type" parents="AdwWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="shortcut-title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="shortcut-set" return="void" when="first">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="IdeTreeExpander" get-type="ide_tree_expander_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="expanded" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="expanded-icon" type="GIcon" flags="1073742051"/>
+    <property name="expanded-icon-name" type="gchararray" flags="1073742050" default-value="NULL"/>
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="1073742050" default-value="NULL"/>
+    <property name="item" type="GObject" flags="1073742049"/>
+    <property name="list-row" type="GtkTreeListRow" flags="1073742051"/>
+    <property name="menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="suffix" type="GtkWidget" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="ignored" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="IdeTruncateModel" get-type="ide_truncate_model_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="can-expand" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="child-model" type="GListModel" flags="235"/>
+    <property name="expanded" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="max-items" type="guint" flags="1073742051" default-value="4"/>
+  </class>
+  <class name="IdeUniqueListModel" get-type="ide_unique_list_model_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="incremental" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="model" type="GListModel" flags="1073742051"/>
+    <property name="n-items" type="guint" flags="1073742049" default-value="0"/>
+    <property name="pending" type="guint" flags="1073742049" default-value="0"/>
+    <property name="sorter" type="GtkSorter" flags="1073742051"/>
+  </class>
+  <class name="IdeFuzzyIndexBuilder" get-type="ide_fuzzy_index_builder_get_type" parents="GObject">
+    <property name="case-sensitive" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="IdeFuzzyIndex" get-type="ide_fuzzy_index_get_type" parents="GObject">
+  </class>
+  <class name="IdeFuzzyIndexCursor" get-type="ide_fuzzy_index_cursor_get_type" parents="GObject">
+    <implements name="GAsyncInitable"/>
+    <implements name="GListModel"/>
+    <property name="case-sensitive" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="index" type="IdeFuzzyIndex" flags="234"/>
+    <property name="tables" type="GVariantDict" flags="234"/>
+    <property name="max-matches" type="guint" flags="235" default-value="0"/>
+    <property name="query" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="IdeFuzzyIndexMatch" get-type="ide_fuzzy_index_match_get_type" parents="GObject">
+    <property name="document" type="GVariant" flags="235"/>
+    <property name="key" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="score" type="gfloat" flags="235" default-value="0.000000"/>
+    <property name="priority" type="guint" flags="235" default-value="0"/>
+  </class>
+  <boxed name="IdeFuzzyMutableIndex" get-type="ide_fuzzy_mutable_index_get_type"/>
+  <boxed name="IdePatternSpec" get-type="ide_pattern_spec_get_type"/>
+  <class name="IdeSearchPreview" get-type="ide_search_preview_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="progress" type="gdouble" flags="1073742051" default-value="0.000000"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeSearchResult" get-type="ide_search_result_get_type" parents="GObject">
+    <property name="accelerator" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="paintable" type="GdkPaintable" flags="1073742051"/>
+    <property name="gicon" type="GIcon" flags="1073742051"/>
+    <property name="priority" type="gint" flags="1073742051" default-value="0"/>
+    <property name="score" type="gfloat" flags="1073742051" default-value="0.000000"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="use-underline" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <interface name="IdeSearchProvider" get-type="ide_search_provider_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeSearchResults" get-type="ide_search_results_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+  </class>
+  <class name="IdeSearchEngine" get-type="ide_search_engine_get_type" parents="IdeObject,GObject" final="1">
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <class name="IdeTweaksItem" get-type="ide_tweaks_item_get_type" parents="GObject" abstract="1">
+    <implements name="GtkBuildable"/>
+    <property name="hidden-when" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1073742049" default-value="NULL"/>
+    <property name="keywords" type="GStrv" flags="1073742051"/>
+  </class>
+  <class name="IdeTweaks" get-type="ide_tweaks_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="context" type="IdeContext" flags="235"/>
+    <property name="project-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksAddin" get-type="ide_tweaks_addin_get_type" parents="GObject" abstract="1">
+    <property name="resource-paths" type="GStrv" flags="1073742051"/>
+  </class>
+  <class name="IdeTweaksBinding" get-type="ide_tweaks_binding_get_type" parents="IdeTweaksItem,GObject" abstract="1">
+    <implements name="GtkBuildable"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeTweaksWidget" get-type="ide_tweaks_widget_get_type" parents="IdeTweaksItem,GObject">
+    <implements name="GtkBuildable"/>
+    <property name="binding" type="IdeTweaksBinding" flags="1073742051"/>
+    <signal name="create-for-item" return="GtkWidget" when="last">
+      <param type="IdeTweaksItem"/>
+    </signal>
+  </class>
+  <class name="IdeTweaksCaption" get-type="ide_tweaks_caption_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="text" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksChoice" get-type="ide_tweaks_choice_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="value" type="GVariant" flags="1073742051"/>
+  </class>
+  <class name="IdeTweaksCombo" get-type="ide_tweaks_combo_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksComboRow" get-type="ide_tweaks_combo_row_get_type" parents="AdwComboRow,AdwActionRow,AdwPreferencesRow,GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="binding" type="IdeTweaksBinding" flags="235"/>
+  </class>
+  <class name="IdeTweaksDirectory" get-type="ide_tweaks_directory_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="is-directory" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksEntry" get-type="ide_tweaks_entry_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksFactory" get-type="ide_tweaks_factory_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="item" type="GObject" flags="225"/>
+    <property name="model" type="GListModel" flags="1073742051"/>
+  </class>
+  <class name="IdeTweaksFont" get-type="ide_tweaks_font_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="enabled-binding" type="IdeTweaksBinding" flags="1073742051"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksGroup" get-type="ide_tweaks_group_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksInfo" get-type="ide_tweaks_info_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksPage" get-type="ide_tweaks_page_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="has-subpage" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="section" type="IdeTweaksSection" flags="225"/>
+    <property name="show-icon" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="show-search" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksPassword" get-type="ide_tweaks_password_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksProperty" get-type="ide_tweaks_property_get_type" parents="IdeTweaksBinding,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="object" type="GObject" flags="1073742051"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksRadio" get-type="ide_tweaks_radio_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="value" type="GVariant" flags="1073742051"/>
+  </class>
+  <class name="IdeTweaksSection" get-type="ide_tweaks_section_get_type" parents="IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="show-header" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksSetting" get-type="ide_tweaks_setting_get_type" parents="IdeTweaksBinding,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="schema-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="schema-key" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="path-suffix" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksSpin" get-type="ide_tweaks_spin_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="digits" type="guint" flags="1073742051" default-value="0"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksSwitch" get-type="ide_tweaks_switch_get_type" parents="IdeTweaksWidget,IdeTweaksItem,GObject" final="1">
+    <implements name="GtkBuildable"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeTweaksWindow" get-type="ide_tweaks_window_get_type" parents="AdwWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <property name="folded" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="tweaks" type="IdeTweaks" flags="1073742051"/>
+  </class>
+  <interface name="IdeBufferAddin" get-type="ide_buffer_addin_get_type">
+  </interface>
+  <class name="IdeBufferChangeMonitor" get-type="ide_buffer_change_monitor_get_type" parents="IdeObject,GObject">
+    <property name="buffer" type="IdeBuffer" flags="235"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeDiagnostic" get-type="ide_diagnostic_get_type" parents="IdeObject,GObject">
+    <property name="display-text" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="location" type="IdeLocation" flags="235"/>
+    <property name="severity" type="IdeDiagnosticSeverity" flags="235" default-value="IDE_DIAGNOSTIC_IGNORED"/>
+    <property name="text" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="IdeDiagnostics" get-type="ide_diagnostics_get_type" parents="IdeObject,GObject">
+    <implements name="GListModel"/>
+    <property name="has-errors" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-warnings" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="n-errors" type="guint" flags="225" default-value="0"/>
+    <property name="n-warnings" type="guint" flags="225" default-value="0"/>
+  </class>
+  <interface name="IdeCodeActionProvider" get-type="ide_code_action_provider_get_type">
+  </interface>
+  <class name="IdeFileSettings" get-type="ide_file_settings_get_type" parents="IdeObject,GObject">
+    <property name="file" type="GFile" flags="235"/>
+    <property name="language" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="settled" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="encoding" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="encoding-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="indent-style" type="IdeIndentStyle" flags="227" default-value="IDE_INDENT_STYLE_TABS"/>
+    <property name="indent-style-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="indent-width" type="gint" flags="227" default-value="-1"/>
+    <property name="indent-width-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="auto-indent" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="auto-indent-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="insert-trailing-newline" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="insert-trailing-newline-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="insert-matching-brace" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="insert-matching-brace-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="overwrite-braces" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="overwrite-braces-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="newline-type" type="GtkSourceNewlineType" flags="227" default-value="GTK_SOURCE_NEWLINE_TYPE_LF"/>
+    <property name="newline-type-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="right-margin-position" type="guint" flags="227" default-value="80"/>
+    <property name="right-margin-position-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-right-margin" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-right-margin-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="spaces-style" type="IdeSpacesStyle" flags="227" default-value="IDE_SPACES_STYLE_IGNORE"/>
+    <property name="spaces-style-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="tab-width" type="guint" flags="227" default-value="8"/>
+    <property name="tab-width-set" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="trim-trailing-whitespace" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="trim-trailing-whitespace-set" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <interface name="IdeFormatter" get-type="ide_formatter_get_type">
+  </interface>
+  <class name="IdeLocation" get-type="ide_location_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="235"/>
+    <property name="line" type="gint" flags="235" default-value="-1"/>
+    <property name="line-offset" type="gint" flags="235" default-value="-1"/>
+    <property name="offset" type="gint" flags="235" default-value="-1"/>
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="IdeRange" get-type="ide_range_get_type" parents="GObject">
+    <property name="begin" type="IdeLocation" flags="235"/>
+    <property name="end" type="IdeLocation" flags="235"/>
+  </class>
+  <interface name="IdeRenameProvider" get-type="ide_rename_provider_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeSymbol" get-type="ide_symbol_get_type" parents="GObject">
+    <property name="kind" type="IdeSymbolKind" flags="235" default-value="IDE_SYMBOL_KIND_NONE"/>
+    <property name="flags" type="IdeSymbolFlags" flags="235" default-value="IDE_SYMBOL_FLAGS_NONE"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="location" type="IdeLocation" flags="235"/>
+    <property name="header-location" type="IdeLocation" flags="235"/>
+  </class>
+  <class name="IdeBuffer" get-type="ide_buffer_get_type" parents="GtkSourceBuffer,GtkTextBuffer,GObject" final="1">
+    <property name="buffer-manager" type="IdeBufferManager" flags="234"/>
+    <property name="change-monitor" type="IdeBufferChangeMonitor" flags="1073742051"/>
+    <property name="changed-on-volume" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="charset" type="gchararray" flags="1073742051" default-value="UTF-8"/>
+    <property name="enable-addins" type="gboolean" flags="235" default-value="TRUE"/>
+    <property name="diagnostics" type="IdeDiagnostics" flags="1073742051"/>
+    <property name="failed" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="file" type="GFile" flags="227"/>
+    <property name="file-settings" type="IdeFileSettings" flags="225"/>
+    <property name="formatter" type="IdeFormatter" flags="225"/>
+    <property name="has-diagnostics" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-encoding-error" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="has-symbol-resolvers" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="highlight-diagnostics" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="is-temporary" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="language-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="newline-type" type="GtkSourceNewlineType" flags="1073742051" default-value="GTK_SOURCE_NEWLINE_TYPE_LF"/>
+    <property name="read-only" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="state" type="IdeBufferState" flags="225" default-value="IDE_BUFFER_STATE_READY"/>
+    <property name="symbol-resolvers" type="GListModel" flags="225"/>
+    <property name="style-scheme-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="change-settled" return="void" when="last">
+    </signal>
+    <signal name="line-flags-changed" return="void" when="last">
+    </signal>
+    <signal name="loaded" return="void" when="last">
+    </signal>
+    <signal name="request-scroll-to-insert" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeBufferManager" get-type="ide_buffer_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="max-file-size" type="gint64" flags="1073742051" default-value="10485760"/>
+    <signal name="load-buffer" return="void" when="last">
+      <param type="IdeBuffer"/>
+    </signal>
+    <signal name="buffer-loaded" return="void" when="last">
+      <param type="IdeBuffer"/>
+    </signal>
+    <signal name="buffer-saved" return="void" when="last">
+      <param type="IdeBuffer"/>
+    </signal>
+    <signal name="buffer-unloaded" return="void" when="last">
+      <param type="IdeBuffer"/>
+    </signal>
+  </class>
+  <interface name="IdeCodeAction" get-type="ide_code_action_get_type">
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+  </interface>
+  <interface name="IdeCodeIndexEntries" get-type="ide_code_index_entries_get_type">
+  </interface>
+  <boxed name="IdeCodeIndexEntry" get-type="ide_code_index_entry_get_type"/>
+  <boxed name="IdeCodeIndexEntryBuilder" get-type="ide_code_index_entry_builder_get_type"/>
+  <interface name="IdeCodeIndexer" get-type="ide_code_indexer_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <interface name="IdeDiagnosticProvider" get-type="ide_diagnostic_provider_get_type">
+    <prerequisite name="IdeObject"/>
+    <signal name="invalidated" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="IdeDiagnosticsManager" get-type="ide_diagnostics_manager_get_type" parents="IdeObject,GObject" final="1">
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeFormatterOptions" get-type="ide_formatter_options_get_type" parents="GObject" final="1">
+    <property name="tab-width" type="guint" flags="1073742051" default-value="8"/>
+    <property name="insert-spaces" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="IdeHighlightEngine" get-type="ide_highlight_engine_get_type" parents="IdeObject,GObject" final="1">
+    <property name="buffer" type="IdeBuffer" flags="235"/>
+    <property name="highlighter" type="IdeHighlighter" flags="225"/>
+  </class>
+  <interface name="IdeHighlighter" get-type="ide_highlighter_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <boxed name="IdeHighlightIndex" get-type="ide_highlight_index_get_type"/>
+  <class name="IdeSymbolNode" get-type="ide_symbol_node_get_type" parents="GObject">
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="flags" type="IdeSymbolFlags" flags="227" default-value="IDE_SYMBOL_FLAGS_NONE"/>
+    <property name="kind" type="IdeSymbolKind" flags="227" default-value="IDE_SYMBOL_KIND_NONE"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="use-markup" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <interface name="IdeSymbolResolver" get-type="ide_symbol_resolver_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <interface name="IdeSymbolTree" get-type="ide_symbol_tree_get_type">
+  </interface>
+  <class name="IdeTextEdit" get-type="ide_text_edit_get_type" parents="IdeObject,GObject">
+    <property name="range" type="IdeRange" flags="1073742051"/>
+    <property name="text" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <boxed name="IdeUnsavedFile" get-type="ide_unsaved_file_get_type"/>
+  <class name="IdeUnsavedFiles" get-type="ide_unsaved_files_get_type" parents="IdeObject,GObject" final="1">
+    <property name="project-id" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <interface name="IdeVcsBranch" get-type="ide_vcs_branch_get_type">
+    <property name="id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
+  </interface>
+  <interface name="IdeVcsConfig" get-type="ide_vcs_config_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <interface name="IdeVcs" get-type="ide_vcs_get_type">
+    <prerequisite name="IdeObject"/>
+    <property name="branch-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="workdir" type="GFile" flags="225"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="IdeDirectoryVcs" get-type="ide_directory_vcs_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="IdeVcs"/>
+  </class>
+  <boxed name="IdeVcsUri" get-type="ide_vcs_uri_get_type"/>
+  <interface name="IdeVcsCloner" get-type="ide_vcs_cloner_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeVcsCloneRequest" get-type="ide_vcs_clone_request_get_type" parents="IdeObject,GObject" final="1">
+    <property name="author-email" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="author-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="can-select-branch" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="branch-model" type="GListModel" flags="225"/>
+    <property name="branch-model-busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="branch-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="directory" type="GFile" flags="1073742051"/>
+    <property name="module-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="uri" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeVcsFileInfo" get-type="ide_vcs_file_info_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="235"/>
+    <property name="status" type="IdeVcsFileStatus" flags="1073742051" default-value="IDE_VCS_FILE_STATUS_UNCHANGED"/>
+  </class>
+  <interface name="IdeVcsInitializer" get-type="ide_vcs_initializer_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeVcsMonitor" get-type="ide_vcs_monitor_get_type" parents="IdeObject,GObject" final="1">
+    <property name="root" type="GFile" flags="1073742051"/>
+    <property name="vcs" type="IdeVcs" flags="1073742051"/>
+    <signal name="changed" return="void" when="last">
+      <param type="GFile"/>
+      <param type="GFile"/>
+      <param type="GFileMonitorEvent"/>
+    </signal>
+    <signal name="reloaded" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="IdeVcsTag" get-type="ide_vcs_tag_get_type">
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
+  </interface>
+  <class name="IdeTreeNode" get-type="ide_tree_node_get_type" parents="GObject">
+    <implements name="GListModel"/>
+    <property name="children-possible" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="destroy-item" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="expanded-icon" type="GIcon" flags="1073742051"/>
+    <property name="expanded-icon-name" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="flags" type="IdeTreeNodeFlags" flags="1073742051" default-value="IDE_TREE_NODE_FLAGS_NONE"/>
+    <property name="vcs-ignored" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="has-error" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="is-header" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="item" type="GObject" flags="1073742051"/>
+    <property name="loading" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="parent" type="GObject" flags="1073742051"/>
+    <property name="reset-on-collapse" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="use-markup" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <signal name="show-popover" return="gboolean" when="last">
+      <param type="GtkPopover"/>
+    </signal>
+  </class>
+  <class name="IdeTree" get-type="ide_tree_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="kind" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="root" type="IdeTreeNode" flags="1073742051"/>
+    <property name="selected-node" type="IdeTreeNode" flags="227"/>
+  </class>
+  <interface name="IdeTreeAddin" get-type="ide_tree_addin_get_type">
+  </interface>
+  <class name="IdeDoapPerson" get-type="ide_doap_person_get_type" parents="GObject" final="1">
+    <property name="email" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="IdeDoap" get-type="ide_doap_get_type" parents="GObject" final="1">
+    <property name="bug-database" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="category" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="download-page" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="homepage" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="languages" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="shortdesc" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="IdeProject" get-type="ide_project_get_type" parents="IdeObject,GObject" final="1">
+    <signal name="file-renamed" return="void" when="last">
+      <param type="GFile"/>
+      <param type="GFile"/>
+    </signal>
+    <signal name="file-trashed" return="void" when="last">
+      <param type="GFile"/>
+    </signal>
+  </class>
+  <class name="IdeProjectInfo" get-type="ide_project_info_get_type" parents="GObject" final="1">
+    <property name="build-system-hint" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="build-system-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="directory" type="GFile" flags="1073742051"/>
+    <property name="doap" type="IdeDoap" flags="1073742051"/>
+    <property name="file" type="GFile" flags="1073742051"/>
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="226" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="is-recent" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="languages" type="GStrv" flags="1073742051"/>
+    <property name="last-modified-at" type="GDateTime" flags="1073742051"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="priority" type="gint" flags="1073742051" default-value="0"/>
+    <property name="vcs-uri" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeProjectFile" get-type="ide_project_file_get_type" parents="IdeObject,GObject">
+    <property name="directory" type="GFile" flags="235"/>
+    <property name="file" type="GFile" flags="225"/>
+    <property name="info" type="GFileInfo" flags="235"/>
+  </class>
+  <class name="IdeTemplateBase" get-type="ide_template_base_get_type" parents="GObject" abstract="1">
+    <property name="locator" type="TmplTemplateLocator" flags="1073742051"/>
+  </class>
+  <class name="IdeTemplateInput" get-type="ide_template_input_get_type" parents="GObject" final="1">
+    <property name="app-id" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="author" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="directory" type="GFile" flags="1073742051"/>
+    <property name="language" type="gchararray" flags="1073742051" default-value="C"/>
+    <property name="languages-model" type="GListModel" flags="225"/>
+    <property name="license-name" type="gchararray" flags="1073742051" default-value="GPL-3.0-or-later"/>
+    <property name="licenses-model" type="GListModel" flags="225"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="project-version" type="gchararray" flags="1073742051" default-value="0.1.0"/>
+    <property name="template" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="template-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="templates-model" type="GListModel" flags="225"/>
+    <property name="use-version-control" type="gboolean" flags="1073742051" default-value="TRUE"/>
+  </class>
+  <class name="IdeProjectTemplate" get-type="ide_project_template_get_type" parents="IdeTemplateBase,GObject" abstract="1">
+    <property name="description" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="languages" type="GStrv" flags="235"/>
+    <property name="priority" type="gint" flags="235" default-value="0"/>
+  </class>
+  <interface name="IdeProjectTreeAddin" get-type="ide_project_tree_addin_get_type">
+  </interface>
+  <interface name="IdeSimilarFileLocator" get-type="ide_similar_file_locator_get_type">
+  </interface>
+  <class name="IdeTemplateLocator" get-type="ide_template_locator_get_type" parents="TmplTemplateLocator,GObject">
+    <property name="license-text" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <interface name="IdeTemplateProvider" get-type="ide_template_provider_get_type">
+  </interface>
+  <class name="IdeRecentProjects" get-type="ide_recent_projects_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+  </class>
+  <class name="IdePipeline" get-type="ide_pipeline_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <implements name="GInitable"/>
+    <property name="busy" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="config" type="IdeConfig" flags="235"/>
+    <property name="device" type="IdeDevice" flags="235"/>
+    <property name="message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="phase" type="IdePipelinePhase" flags="225" default-value="IDE_PIPELINE_PHASE_NONE"/>
+    <property name="pty" type="VtePty" flags="225"/>
+    <signal name="loaded" return="void" when="last">
+    </signal>
+    <signal name="diagnostic" return="void" when="last">
+      <param type="IdeDiagnostic"/>
+    </signal>
+    <signal name="started" return="void" when="last">
+      <param type="IdePipelinePhase"/>
+    </signal>
+    <signal name="finished" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+    <signal name="launcher-created" return="void" when="last">
+      <param type="IdeSubprocessLauncher"/>
+    </signal>
+  </class>
+  <class name="IdeBuildManager" get-type="ide_build_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GInitable"/>
+    <implements name="GActionGroup"/>
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-build" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="error-count" type="guint" flags="225" default-value="0"/>
+    <property name="has-diagnostics" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="last-build-time" type="GDateTime" flags="225"/>
+    <property name="message" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="pipeline" type="IdePipeline" flags="225"/>
+    <property name="running-time" type="gint64" flags="225" default-value="0"/>
+    <property name="warning-count" type="guint" flags="225" default-value="0"/>
+    <signal name="build-started" return="void" when="last">
+      <param type="IdePipeline"/>
+    </signal>
+    <signal name="build-failed" return="void" when="last">
+      <param type="IdePipeline"/>
+    </signal>
+    <signal name="build-finished" return="void" when="last">
+      <param type="IdePipeline"/>
+    </signal>
+  </class>
+  <interface name="IdeBuildSystemDiscovery" get-type="ide_build_system_discovery_get_type">
+  </interface>
+  <interface name="IdeBuildSystem" get-type="ide_build_system_get_type">
+    <prerequisite name="IdeObject"/>
+    <property name="project-file" type="GFile" flags="235"/>
+  </interface>
+  <interface name="IdeBuildTargetProvider" get-type="ide_build_target_provider_get_type">
+  </interface>
+  <interface name="IdeBuildTarget" get-type="ide_build_target_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeCompileCommands" get-type="ide_compile_commands_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeConfigManager" get-type="ide_config_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GActionGroup"/>
+    <property name="current" type="IdeConfig" flags="1073742051"/>
+    <property name="current-display-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="ready" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="invalidate" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="IdeConfigProvider" get-type="ide_config_provider_get_type">
+    <prerequisite name="IdeObject"/>
+    <signal name="added" return="void" when="last">
+      <param type="IdeConfig"/>
+    </signal>
+    <signal name="removed" return="void" when="last">
+      <param type="IdeConfig"/>
+    </signal>
+  </interface>
+  <class name="IdeConfig" get-type="ide_config_get_type" parents="IdeObject,GObject" abstract="1">
+    <property name="prepend-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="append-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="app-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="build-commands" type="GStrv" flags="1073742051"/>
+    <property name="build-commands-dir" type="GFile" flags="1073742051"/>
+    <property name="config-opts" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="debug" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="dirty" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="display-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="environ" type="GStrv" flags="1073742051"/>
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="locality" type="IdeBuildLocality" flags="227" default-value="IDE_BUILD_LOCALITY_IN_TREE | IDE_BUILD_LOCALITY_OUT_OF_TREE"/>
+    <property name="parallelism" type="gint" flags="1073742051" default-value="-1"/>
+    <property name="post-install-commands" type="GStrv" flags="1073742051"/>
+    <property name="prefix" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="prefix-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="ready" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="runtime" type="IdeRuntime" flags="1073742051"/>
+    <property name="runtime-id" type="gchararray" flags="1073742051" default-value="host"/>
+    <property name="toolchain-id" type="gchararray" flags="1073742051" default-value="default"/>
+    <property name="toolchain" type="IdeToolchain" flags="1073742051"/>
+    <property name="run-opts" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="supported-runtimes" type="GListModel" flags="225"/>
+    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <interface name="IdeDependencyUpdater" get-type="ide_dependency_updater_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdeDeployStrategy" get-type="ide_deploy_strategy_get_type" parents="IdeObject,GObject" abstract="1">
+  </class>
+  <class name="IdeDeviceInfo" get-type="ide_device_info_get_type" parents="GObject" final="1">
+    <property name="kind" type="IdeDeviceKind" flags="1073742051" default-value="IDE_DEVICE_KIND_COMPUTER"/>
+    <property name="host-triplet" type="IdeTriplet" flags="1073742051"/>
+  </class>
+  <class name="IdeDeviceManager" get-type="ide_device_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GActionGroup"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GListModel"/>
+    <property name="device" type="IdeDevice" flags="1073742051"/>
+    <property name="progress" type="gdouble" flags="225" default-value="0.000000"/>
+    <signal name="deploy-started" return="void" when="last">
+    </signal>
+    <signal name="deploy-finished" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeDeviceProvider" get-type="ide_device_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <signal name="device-added" return="void" when="last">
+      <param type="IdeDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="IdeDevice"/>
+    </signal>
+  </class>
+  <class name="IdeDevice" get-type="ide_device_get_type" parents="IdeObject,GObject" abstract="1">
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <class name="IdeRunContext" get-type="ide_run_context_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeDiagnosticTool" get-type="ide_diagnostic_tool_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="IdeDiagnosticProvider"/>
+    <property name="program-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="bundled-program-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="local-program-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="subprocess-flags" type="GSubprocessFlags" flags="1073742051" default-value="G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_PIPE"/>
+  </class>
+  <class name="IdeFallbackBuildSystem" get-type="ide_fallback_build_system_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="IdeBuildSystem"/>
+    <property name="project-file" type="GFile" flags="235"/>
+  </class>
+  <class name="IdeLocalDevice" get-type="ide_local_device_get_type" parents="IdeDevice,IdeObject,GObject">
+    <property name="triplet" type="IdeTriplet" flags="235"/>
+  </class>
+  <class name="IdePathCache" get-type="ide_path_cache_get_type" parents="GObject" final="1">
+  </class>
+  <interface name="IdePipelineAddin" get-type="ide_pipeline_addin_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <class name="IdePipelineStage" get-type="ide_pipeline_stage_get_type" parents="IdeObject,GObject">
+    <property name="active" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="check-stdout" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="completed" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="disabled" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="stdout-path" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="transient" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="query" return="void" when="last">
+      <param type="IdePipeline"/>
+      <param type="GPtrArray"/>
+      <param type="GCancellable"/>
+    </signal>
+    <signal name="chain" return="gboolean" when="last">
+      <param type="IdePipelineStage"/>
+    </signal>
+    <signal name="reap" return="void" when="last">
+      <param type="IdeDirectoryReaper"/>
+    </signal>
+  </class>
+  <class name="IdePipelineStageCommand" get-type="ide_pipeline_stage_command_get_type" parents="IdePipelineStage,IdeObject,GObject">
+    <property name="build-command" type="IdeRunCommand" flags="227"/>
+    <property name="clean-command" type="IdeRunCommand" flags="227"/>
+    <property name="ignore-exit-status" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="stdout-path" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="create-run-context" return="IdeRunContext" when="last">
+      <param type="IdeRunCommand"/>
+    </signal>
+  </class>
+  <class name="IdePipelineStageLauncher" get-type="ide_pipeline_stage_launcher_get_type" parents="IdePipelineStage,IdeObject,GObject">
+    <property name="clean-launcher" type="IdeSubprocessLauncher" flags="227"/>
+    <property name="use-pty" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="ignore-exit-status" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="launcher" type="IdeSubprocessLauncher" flags="227"/>
+  </class>
+  <class name="IdePipelineStageMkdirs" get-type="ide_pipeline_stage_mkdirs_get_type" parents="IdePipelineStage,IdeObject,GObject">
+  </class>
+  <class name="IdePipelineStageTransfer" get-type="ide_pipeline_stage_transfer_get_type" parents="IdePipelineStage,IdeObject,GObject" final="1">
+    <property name="transfer" type="IdeTransfer" flags="235"/>
+    <property name="disable-when-metered" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="IdeRunCommand" get-type="ide_run_command_get_type" parents="GObject">
+    <property name="argv" type="GStrv" flags="1073742051"/>
+    <property name="shell-command" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="can-default" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="cwd" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="display-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="environ" type="GStrv" flags="1073742051"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="kind" type="IdeRunCommandKind" flags="1073742051" default-value="IDE_RUN_COMMAND_KIND_UNKNOWN"/>
+    <property name="languages" type="GStrv" flags="1073742051"/>
+    <property name="priority" type="gint" flags="1073742051" default-value="0"/>
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="category" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="has-category" type="gboolean" flags="225" default-value="FALSE"/>
+  </class>
+  <interface name="IdeRunCommandProvider" get-type="ide_run_command_provider_get_type">
+    <prerequisite name="IdeObject"/>
+    <signal name="invalidated" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="IdeRunCommands" get-type="ide_run_commands_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+  </class>
+  <class name="IdeRunManager" get-type="ide_run_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GInitable"/>
+    <implements name="GActionGroup"/>
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="run-tool" type="IdeRunTool" flags="225"/>
+    <signal name="started" return="void" when="last">
+    </signal>
+    <signal name="run" return="void" when="last">
+      <param type="IdeRunContext"/>
+    </signal>
+    <signal name="stopped" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeRunTool" get-type="ide_run_tool_get_type" parents="IdeObject,GObject" abstract="1">
+    <signal name="started" return="void" when="last">
+      <param type="IdeSubprocess"/>
+    </signal>
+    <signal name="stopped" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeRuntimeManager" get-type="ide_runtime_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <implements name="GInitable"/>
+  </class>
+  <class name="IdeRuntime" get-type="ide_runtime_get_type" parents="IdeObject,GObject">
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="short-id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="category" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="display-name" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="231" default-value="NULL"/>
+  </class>
+  <class name="IdeRuntimeProvider" get-type="ide_runtime_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="GListModel"/>
+  </class>
+  <class name="IdeSdk" get-type="ide_sdk_get_type" parents="GObject" abstract="1">
+    <property name="can-update" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="installed" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeSdkManager" get-type="ide_sdk_manager_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+    <property name="n-items" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="IdeSdkProvider" get-type="ide_sdk_provider_get_type" parents="GObject" abstract="1">
+    <implements name="GListModel"/>
+    <signal name="sdk-added" return="void" when="last">
+      <param type="IdeSdk"/>
+    </signal>
+    <signal name="sdk-removed" return="void" when="last">
+      <param type="IdeSdk"/>
+    </signal>
+  </class>
+  <class name="IdeSimpleBuildSystemDiscovery" get-type="ide_simple_build_system_discovery_get_type" parents="IdeObject,GObject">
+    <implements name="IdeBuildSystemDiscovery"/>
+    <property name="glob" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="hint" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="priority" type="gint" flags="1073742051" default-value="0"/>
+  </class>
+  <class name="IdeSimpleBuildTarget" get-type="ide_simple_build_target_get_type" parents="IdeObject,GObject">
+    <implements name="IdeBuildTarget"/>
+  </class>
+  <class name="IdeToolchain" get-type="ide_toolchain_get_type" parents="IdeObject,GObject" abstract="1">
+    <property name="id" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="host-triplet" type="IdeTriplet" flags="227"/>
+  </class>
+  <class name="IdeSimpleToolchain" get-type="ide_simple_toolchain_get_type" parents="IdeToolchain,IdeObject,GObject">
+  </class>
+  <class name="IdeTest" get-type="ide_test_get_type" parents="GObject" final="1">
+    <property name="icon-name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="run-command" type="IdeRunCommand" flags="235"/>
+    <property name="status" type="IdeTestStatus" flags="225" default-value="IDE_TEST_STATUS_NONE"/>
+    <property name="title" type="gchararray" flags="225" default-value="NULL"/>
+  </class>
+  <class name="IdeTestManager" get-type="ide_test_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="model" type="GListModel" flags="225"/>
+    <signal name="begin-test-all" return="void" when="last">
+    </signal>
+    <signal name="end-test-all" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeToolchainManager" get-type="ide_toolchain_manager_get_type" parents="IdeObject,GObject" final="1">
+    <implements name="GListModel"/>
+    <implements name="GAsyncInitable"/>
+  </class>
+  <interface name="IdeToolchainProvider" get-type="ide_toolchain_provider_get_type">
+    <prerequisite name="IdeObject"/>
+    <signal name="added" return="void" when="last">
+      <param type="IdeToolchain"/>
+    </signal>
+    <signal name="removed" return="void" when="last">
+      <param type="IdeToolchain"/>
+    </signal>
+  </interface>
+  <boxed name="IdeTriplet" get-type="ide_triplet_get_type"/>
+  <enum name="IdeDebuggerStream" get-type="ide_debugger_stream_get_type">
+    <member name="IDE_DEBUGGER_CONSOLE" nick="console" value="1"/>
+    <member name="IDE_DEBUGGER_EVENT_LOG" nick="log" value="2"/>
+    <member name="IDE_DEBUGGER_TARGET" nick="target" value="0"/>
+  </enum>  <enum name="IdeDebuggerMovement" get-type="ide_debugger_movement_get_type">
+    <member name="IDE_DEBUGGER_MOVEMENT_START" nick="start" value="0"/>
+    <member name="IDE_DEBUGGER_MOVEMENT_CONTINUE" nick="continue" value="1"/>
+    <member name="IDE_DEBUGGER_MOVEMENT_STEP_IN" nick="step-in" value="2"/>
+    <member name="IDE_DEBUGGER_MOVEMENT_STEP_OUT" nick="step-out" value="3"/>
+    <member name="IDE_DEBUGGER_MOVEMENT_FINISH" nick="finish" value="4"/>
+  </enum>  <enum name="IdeDebuggerStopReason" get-type="ide_debugger_stop_reason_get_type">
+    <member name="IDE_DEBUGGER_STOP_BREAKPOINT_HIT" nick="breakpoint-hit" value="0"/>
+    <member name="IDE_DEBUGGER_STOP_CATCH" nick="catch" value="7"/>
+    <member name="IDE_DEBUGGER_STOP_EXITED" nick="stop-exited" value="1"/>
+    <member name="IDE_DEBUGGER_STOP_EXITED_NORMALLY" nick="exited-normally" value="2"/>
+    <member name="IDE_DEBUGGER_STOP_EXITED_SIGNALED" nick="exited-signaled" value="3"/>
+    <member name="IDE_DEBUGGER_STOP_FUNCTION_FINISHED" nick="function-finished" value="4"/>
+    <member name="IDE_DEBUGGER_STOP_LOCATION_REACHED" nick="location-reached" value="5"/>
+    <member name="IDE_DEBUGGER_STOP_SIGNAL_RECEIVED" nick="signal-received" value="6"/>
+    <member name="IDE_DEBUGGER_STOP_UNKNOWN" nick="unknown" value="8"/>
+  </enum>  <enum name="IdeDebuggerBreakMode" get-type="ide_debugger_break_mode_get_type">
+    <member name="IDE_DEBUGGER_BREAK_NONE" nick="none" value="0"/>
+    <member name="IDE_DEBUGGER_BREAK_BREAKPOINT" nick="breakpoint" value="1"/>
+    <member name="IDE_DEBUGGER_BREAK_COUNTPOINT" nick="countpoint" value="2"/>
+    <member name="IDE_DEBUGGER_BREAK_WATCHPOINT" nick="watchpoint" value="3"/>
+  </enum>  <enum name="IdeDebuggerDisposition" get-type="ide_debugger_disposition_get_type">
+    <member name="IDE_DEBUGGER_DISPOSITION_KEEP" nick="keep" value="0"/>
+    <member name="IDE_DEBUGGER_DISPOSITION_DISABLE" nick="disable" value="1"/>
+    <member name="IDE_DEBUGGER_DISPOSITION_DELETE_NEXT_HIT" nick="delete-next-hit" value="2"/>
+    <member name="IDE_DEBUGGER_DISPOSITION_DELETE_NEXT_STOP" nick="delete-next-stop" value="3"/>
+  </enum>  <boxed name="IdeDebuggerAddressRange" get-type="ide_debugger_address_range_get_type"/>
+  <enum name="IdeDebuggerBreakpointChange" get-type="ide_debugger_breakpoint_change_get_type">
+    <member name="IDE_DEBUGGER_BREAKPOINT_CHANGE_ENABLED" nick="enabled" value="1"/>
+  </enum>  <class name="IdeDebuggerFrame" get-type="ide_debugger_frame_get_type" parents="GObject">
+    <property name="address" type="guint64" flags="1073742051" default-value="0"/>
+    <property name="args" type="GStrv" flags="1073742051"/>
+    <property name="depth" type="guint" flags="1073742051" default-value="0"/>
+    <property name="file" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="function" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="library" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="line" type="guint" flags="1073742051" default-value="0"/>
+  </class>
+  <class name="IdeDebuggerBreakpoint" get-type="ide_debugger_breakpoint_get_type" parents="GObject">
+    <property name="address" type="guint64" flags="1073742051" default-value="0"/>
+    <property name="count" type="gint64" flags="1073742051" default-value="0"/>
+    <property name="disposition" type="IdeDebuggerDisposition" flags="1073742051" default-value="IDE_DEBUGGER_DISPOSITION_KEEP"/>
+    <property name="enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="file" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="function" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="line" type="guint" flags="1073742051" default-value="0"/>
+    <property name="mode" type="IdeDebuggerBreakMode" flags="1073742051" default-value="IDE_DEBUGGER_BREAK_BREAKPOINT"/>
+    <property name="spec" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="thread" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="reset" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeDebuggerInstruction" get-type="ide_debugger_instruction_get_type" parents="GObject">
+    <property name="address" type="guint64" flags="235" default-value="0"/>
+    <property name="display" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="function" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebuggerLibrary" get-type="ide_debugger_library_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="host-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="target-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebuggerRegister" get-type="ide_debugger_register_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebuggerThreadGroup" get-type="ide_debugger_thread_group_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="pid" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="exit-code" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebuggerThread" get-type="ide_debugger_thread_get_type" parents="GObject">
+    <property name="id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="group" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebuggerVariable" get-type="ide_debugger_variable_get_type" parents="GObject">
+    <property name="has-children" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="type-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeDebugger" get-type="ide_debugger_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="GActionGroup"/>
+    <property name="display-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="selected-thread" type="IdeDebuggerThread" flags="225"/>
+    <signal name="stopped" return="void" when="last">
+      <param type="IdeDebuggerStopReason"/>
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="log" return="void" when="last">
+      <param type="IdeDebuggerStream"/>
+      <param type="GBytes"/>
+    </signal>
+    <signal name="thread-group-added" return="void" when="last">
+      <param type="IdeDebuggerThreadGroup"/>
+    </signal>
+    <signal name="thread-group-removed" return="void" when="last">
+      <param type="IdeDebuggerThreadGroup"/>
+    </signal>
+    <signal name="thread-group-started" return="void" when="last">
+      <param type="IdeDebuggerThreadGroup"/>
+    </signal>
+    <signal name="thread-group-exited" return="void" when="last">
+      <param type="IdeDebuggerThreadGroup"/>
+    </signal>
+    <signal name="thread-added" return="void" when="last">
+      <param type="IdeDebuggerThread"/>
+    </signal>
+    <signal name="thread-removed" return="void" when="last">
+      <param type="IdeDebuggerThread"/>
+    </signal>
+    <signal name="thread-selected" return="void" when="last">
+      <param type="IdeDebuggerThread"/>
+    </signal>
+    <signal name="breakpoint-added" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="breakpoint-removed" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="breakpoint-modified" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="running" return="void" when="last">
+    </signal>
+    <signal name="library-loaded" return="void" when="last">
+      <param type="IdeDebuggerLibrary"/>
+    </signal>
+    <signal name="library-unloaded" return="void" when="last">
+      <param type="IdeDebuggerLibrary"/>
+    </signal>
+  </class>
+  <class name="IdeDebuggerBreakpoints" get-type="ide_debugger_breakpoints_get_type" parents="GObject" final="1">
+    <property name="file" type="GFile" flags="235"/>
+    <signal name="changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeDebugManager" get-type="ide_debug_manager_get_type" parents="IdeObject,GObject" final="1">
+    <property name="active" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="debugger" type="IdeDebugger" flags="225"/>
+    <signal name="breakpoint-added" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="breakpoint-removed" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+    <signal name="breakpoint-reached" return="void" when="last">
+      <param type="IdeDebuggerBreakpoint"/>
+    </signal>
+  </class>
+  <class name="IdeLineChangeGutterRenderer" get-type="ide_line_change_gutter_renderer_get_type" parents="GtkSourceGutterRenderer,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <interface name="IdeGutter" get-type="ide_gutter_get_type">
+    <prerequisite name="GtkSourceGutterRenderer"/>
+    <property name="show-line-changes" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-line-diagnostics" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-line-numbers" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-line-selection-styling" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="show-relative-line-numbers" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="style-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <class name="IdeSourceView" get-type="ide_source_view_get_type" parents="GtkSourceView,GtkTextView,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkScrollable"/>
+    <implements name="GtkAccessibleText"/>
+    <property name="font-desc" type="PangoFontDescription" flags="1073742051"/>
+    <property name="font-scale" type="gint" flags="1073742051" default-value="0"/>
+    <property name="insert-matching-brace" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="line-height" type="gdouble" flags="1073742051" default-value="1.200000"/>
+    <property name="overwrite-braces" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="zoom-level" type="gdouble" flags="1073742049" default-value="1.000000"/>
+    <signal name="populate-menu" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdePage" get-type="ide_page_get_type" parents="PanelWidget,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="can-split" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="failed" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="menu-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="create-split" return="IdePage" when="last">
+    </signal>
+  </class>
+  <class name="IdeFrame" get-type="ide_frame_get_type" parents="PanelFrame,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <property name="use-tabbar" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="IdeHeaderBar" get-type="ide_header_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="menu-id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="show-start-title-buttons" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-end-title-buttons" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-menu" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <class name="IdePane" get-type="ide_pane_get_type" parents="PanelWidget,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="IdeSessionItem" get-type="ide_session_item_get_type" parents="GObject" final="1">
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="module-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="position" type="PanelPosition" flags="1073742051"/>
+    <property name="type-hint" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="workspace" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="IdeSession" get-type="ide_session_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeWorkspace" get-type="ide_workspace_get_type" parents="AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" abstract="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="context" type="IdeContext" flags="1073742049"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="search-popover" type="IdeSearchPopover" flags="225"/>
+    <property name="toolbar-style" type="AdwToolbarStyle" flags="1073742051" default-value="ADW_TOOLBAR_RAISED"/>
+    <property name="workbench" type="IdeWorkbench" flags="225"/>
+  </class>
+  <class name="IdeWorkbench" get-type="ide_workbench_get_type" parents="GtkWindowGroup,GObject" final="1">
+    <property name="build-system" type="IdeBuildSystem" flags="225"/>
+    <property name="config" type="IdeConfig" flags="225"/>
+    <property name="context" type="IdeContext" flags="235"/>
+    <property name="vcs" type="IdeVcs" flags="1073742051"/>
+  </class>
+  <class name="IdeApplication" get-type="ide_application_get_type" parents="AdwApplication,GtkApplication,GApplication,GObject" final="1">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="style-scheme" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="system-font" type="PangoFontDescription" flags="225"/>
+    <property name="system-font-name" type="gchararray" flags="225" default-value="Monospace 11"/>
+    <signal name="show-help" return="gboolean" when="last">
+    </signal>
+  </class>
+  <interface name="IdeApplicationAddin" get-type="ide_application_addin_get_type">
+  </interface>
+  <class name="IdeEnvironmentEditor" get-type="ide_environment_editor_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="environment" type="IdeEnvironment" flags="227"/>
+  </class>
+  <interface name="IdeFrameAddin" get-type="ide_frame_addin_get_type">
+  </interface>
+  <class name="IdeGrid" get-type="ide_grid_get_type" parents="PanelGrid,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="IdeMarkedView" get-type="ide_marked_view_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="IdeNotificationsButton" get-type="ide_notifications_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="IdeOmniBar" get-type="ide_omni_bar_get_type" parents="PanelOmniBar,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <implements name="GActionGroup"/>
+    <property name="menu-id" type="gchararray" flags="226" default-value="NULL"/>
+  </class>
+  <interface name="IdeOmniBarAddin" get-type="ide_omni_bar_addin_get_type">
+  </interface>
+  <class name="IdePrimaryWorkspace" get-type="ide_primary_workspace_get_type" parents="IdeWorkspace,AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="IdeRunButton" get-type="ide_run_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="IdeSearchPopover" get-type="ide_search_popover_get_type" parents="AdwDialog,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
+    <property name="search-engine" type="IdeSearchEngine" flags="235"/>
+    <property name="show-preview" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <interface name="IdeShortcutProvider" get-type="ide_shortcut_provider_get_type">
+    <prerequisite name="IdeObject"/>
+  </interface>
+  <interface name="IdeWorkbenchAddin" get-type="ide_workbench_addin_get_type">
+  </interface>
+  <interface name="IdeWorkspaceAddin" get-type="ide_workspace_addin_get_type">
+  </interface>
+  <class name="IdeTerminalPalette" get-type="ide_terminal_palette_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeTerminal" get-type="ide_terminal_get_type" parents="VteTerminal,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkScrollable"/>
+    <implements name="GtkAccessibleText"/>
+    <property name="palette" type="IdeTerminalPalette" flags="1073742051"/>
+    <signal name="match-clicked" return="gboolean" when="last">
+      <param type="gdouble"/>
+      <param type="gdouble"/>
+      <param type="gint"/>
+      <param type="GdkModifierType"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="IdeTerminalLauncher" get-type="ide_terminal_launcher_get_type" parents="GObject" final="1">
+    <property name="context" type="IdeContext" flags="235"/>
+    <property name="run-command" type="IdeRunCommand" flags="227"/>
+  </class>
+  <class name="IdeTerminalPage" get-type="ide_terminal_page_get_type" parents="IdePage,PanelWidget,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="close-on-exit" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="launcher" type="IdeTerminalLauncher" flags="1073742051"/>
+    <property name="manage-spawn" type="gboolean" flags="235" default-value="TRUE"/>
+    <property name="respawn-on-exit" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="pty" type="VtePty" flags="235"/>
+  </class>
+  <class name="IdeTerminalPopover" get-type="ide_terminal_popover_get_type" parents="GtkPopover,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkNative"/>
+  </class>
+  <class name="IdeTerminalSearch" get-type="ide_terminal_search_get_type" parents="GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="regex" type="VteRegex" flags="225"/>
+    <property name="case-sensitive" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="use-regex" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="whole-words" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="wrap-around" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="search" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </class>
+  <class name="IdeEditorPage" get-type="ide_editor_page_get_type" parents="IdePage,PanelWidget,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="buffer" type="IdeBuffer" flags="235"/>
+    <property name="gutter" type="IdeGutter" flags="1073742051"/>
+    <property name="view" type="IdeSourceView" flags="225"/>
+  </class>
+  <interface name="IdeEditorPageAddin" get-type="ide_editor_page_addin_get_type">
+  </interface>
+  <class name="IdeEditorWorkspace" get-type="ide_editor_workspace_get_type" parents="IdeWorkspace,AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="IdeFileSearchPreview" get-type="ide_file_search_preview_get_type" parents="IdeSearchPreview,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="file" type="GFile" flags="235"/>
+  </class>
+  <class name="IdeLspClient" get-type="ide_lsp_client_get_type" parents="IdeObject,GObject">
+    <property name="initialization-options" type="GVariant" flags="1073742051"/>
+    <property name="io-stream" type="GIOStream" flags="235"/>
+    <property name="name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="root-uri" type="gchararray" flags="227" default-value=""/>
+    <property name="server-capabilities" type="GVariant" flags="225"/>
+    <property name="trace" type="IdeLspTrace" flags="227" default-value="IDE_LSP_TRACE_OFF"/>
+    <property name="use-markdown-in-diagnostics" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="initialized" return="void" when="last">
+    </signal>
+    <signal name="load-configuration" return="GVariant" when="last">
+    </signal>
+    <signal name="notification" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="supports-language" return="gboolean" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="published-diagnostics" return="void" when="last">
+      <param type="GFile"/>
+      <param type="IdeDiagnostics"/>
+    </signal>
+  </class>
+  <class name="IdeLspWorkspaceEdit" get-type="ide_lsp_workspace_edit_get_type" parents="GObject" final="1">
+  </class>
+  <class name="IdeLspCodeAction" get-type="ide_lsp_code_action_get_type" parents="GObject">
+    <implements name="IdeCodeAction"/>
+    <property name="client" type="IdeLspClient" flags="227"/>
+    <property name="title" type="gchararray" flags="1073742059" default-value="NULL"/>
+  </class>
+  <class name="IdeLspCodeActionProvider" get-type="ide_lsp_code_action_provider_get_type" parents="IdeObject,GObject">
+    <implements name="IdeCodeActionProvider"/>
+    <property name="client" type="IdeLspClient" flags="227"/>
+    <property name="diagnostics" type="IdeDiagnostics" flags="227"/>
+  </class>
+  <class name="IdeLspCompletionItem" get-type="ide_lsp_completion_item_get_type" parents="GObject" final="1">
+    <implements name="GtkSourceCompletionProposal"/>
+  </class>
+  <class name="IdeLspCompletionProvider" get-type="ide_lsp_completion_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="GtkSourceCompletionProvider"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+  </class>
+  <class name="IdeLspCompletionResults" get-type="ide_lsp_completion_results_get_type" parents="GObject" final="1">
+    <implements name="GListModel"/>
+  </class>
+  <class name="IdeLspDiagnostic" get-type="ide_lsp_diagnostic_get_type" parents="IdeDiagnostic,IdeObject,GObject">
+    <property name="raw" type="GVariant" flags="11"/>
+  </class>
+  <class name="IdeLspDiagnosticProvider" get-type="ide_lsp_diagnostic_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="IdeDiagnosticProvider"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+  </class>
+  <class name="IdeLspFormatter" get-type="ide_lsp_formatter_get_type" parents="IdeObject,GObject">
+    <implements name="IdeFormatter"/>
+    <property name="client" type="IdeLspClient" flags="227"/>
+  </class>
+  <class name="IdeLspHighlighter" get-type="ide_lsp_highlighter_get_type" parents="IdeObject,GObject">
+    <implements name="IdeHighlighter"/>
+    <property name="client" type="IdeLspClient" flags="227"/>
+  </class>
+  <class name="IdeLspHoverProvider" get-type="ide_lsp_hover_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="GtkSourceHoverProvider"/>
+    <property name="category" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+    <property name="priority" type="gint" flags="227" default-value="0"/>
+  </class>
+  <class name="IdeLspRenameProvider" get-type="ide_lsp_rename_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="IdeRenameProvider"/>
+    <property name="buffer" type="IdeBuffer" flags="226"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+  </class>
+  <class name="IdeLspSearchProvider" get-type="ide_lsp_search_provider_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="IdeSearchProvider"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+  </class>
+  <class name="IdeLspService" get-type="ide_lsp_service_get_type" parents="IdeObject,GObject" abstract="1">
+    <property name="client" type="IdeLspClient" flags="225"/>
+    <property name="inherit-stderr" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="program" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="search-path" type="GStrv" flags="1073742051"/>
+    <property name="supervisor" type="IdeLspClient" flags="225"/>
+  </class>
+  <class name="IdeLspSymbolNode" get-type="ide_lsp_symbol_node_get_type" parents="IdeSymbolNode,GObject" final="1">
+  </class>
+  <class name="IdeLspSymbolResolver" get-type="ide_lsp_symbol_resolver_get_type" parents="IdeObject,GObject" abstract="1">
+    <implements name="IdeSymbolResolver"/>
+    <property name="client" type="IdeLspClient" flags="1073742051"/>
+  </class>
+  <class name="IdeLspSymbolTree" get-type="ide_lsp_symbol_tree_get_type" parents="GObject" final="1">
+    <implements name="IdeSymbolTree"/>
+  </class>
+  <class name="IdeGreeterRow" get-type="ide_greeter_row_get_type" parents="GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="project-info" type="IdeProjectInfo" flags="227"/>
+    <property name="selected" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <interface name="IdeGreeterSection" get-type="ide_greeter_section_get_type">
+    <prerequisite name="GtkWidget"/>
+    <signal name="project-activated" return="void" when="last">
+      <param type="IdeProjectInfo"/>
+    </signal>
+  </interface>
+  <class name="IdeGreeterWorkspace" get-type="ide_greeter_workspace_get_type" parents="IdeWorkspace,AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="selection-mode" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <signal name="open-project" return="gboolean" when="last">
+      <param type="IdeProjectInfo"/>
+    </signal>
+  </class>
+  <class name="IdeHtmlGenerator" get-type="ide_html_generator_get_type" parents="GObject" abstract="1">
+    <property name="base-uri" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="invalidate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="IdeWebkitPage" get-type="ide_webkit_page_get_type" parents="IdePage,PanelWidget,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="enable-javascript" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="show-toolbar" type="gboolean" flags="227" default-value="TRUE"/>
+  </class>
+  <error-quark function="ide_transfer_error_quark" domain="ide-transfer-error-quark"/>
+  <error-quark function="ide_doap_error_quark" domain="ide_doap_error"/>
+  <error-quark function="ide_build_error_quark" domain="ide_build_error"/>
+  <error-quark function="ide_device_error_quark" domain="ide_device_error_quark"/>
+  <error-quark function="ide_runtime_error_quark" domain="ide_runtime_error_quark"/>
+</dump>

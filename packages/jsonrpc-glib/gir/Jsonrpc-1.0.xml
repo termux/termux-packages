@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="JsonrpcClient" get-type="jsonrpc_client_get_type" parents="GObject">
+    <property name="io-stream" type="GIOStream" flags="234"/>
+    <property name="use-gvariant" type="gboolean" flags="227" default-value="FALSE"/>
+    <signal name="failed" return="void" when="last">
+    </signal>
+    <signal name="handle-call" return="gboolean" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="notification" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </class>
+  <class name="JsonrpcInputStream" get-type="jsonrpc_input_stream_get_type" parents="GDataInputStream,GBufferedInputStream,GFilterInputStream,GInputStream,GObject">
+    <implements name="GSeekable"/>
+  </class>
+  <class name="JsonrpcOutputStream" get-type="jsonrpc_output_stream_get_type" parents="GDataOutputStream,GFilterOutputStream,GOutputStream,GObject">
+    <implements name="GSeekable"/>
+    <property name="use-gvariant" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="JsonrpcServer" get-type="jsonrpc_server_get_type" parents="GObject">
+    <signal name="handle-call" return="gboolean" when="last">
+      <param type="JsonrpcClient"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="notification" return="void" when="last">
+      <param type="JsonrpcClient"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="client-accepted" return="void" when="last">
+      <param type="JsonrpcClient"/>
+    </signal>
+    <signal name="client-closed" return="void" when="last">
+      <param type="JsonrpcClient"/>
+    </signal>
+  </class>
+  <error-quark function="jsonrpc_client_error_quark" domain="jsonrpc-client-error-quark"/>
+</dump>

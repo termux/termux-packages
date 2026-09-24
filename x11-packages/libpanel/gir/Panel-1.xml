@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="PanelArea" get-type="panel_area_get_type">
+    <member name="PANEL_AREA_START" nick="start" value="0"/>
+    <member name="PANEL_AREA_END" nick="end" value="1"/>
+    <member name="PANEL_AREA_TOP" nick="top" value="2"/>
+    <member name="PANEL_AREA_BOTTOM" nick="bottom" value="3"/>
+    <member name="PANEL_AREA_CENTER" nick="center" value="4"/>
+  </enum>  <class name="PanelActionMuxer" get-type="panel_action_muxer_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+  </class>
+  <class name="PanelApplication" get-type="panel_application_get_type" parents="AdwApplication,GtkApplication,GApplication,GObject">
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+  </class>
+  <class name="PanelChangesDialog" get-type="panel_changes_dialog_get_type" parents="AdwAlertDialog,AdwDialog,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkShortcutManager"/>
+    <property name="close-after-save" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="PanelDock" get-type="panel_dock_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="reveal-bottom" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="reveal-end" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="reveal-start" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="reveal-top" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="can-reveal-bottom" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-reveal-end" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-reveal-start" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-reveal-top" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="start-width" type="gint" flags="227" default-value="-1"/>
+    <property name="end-width" type="gint" flags="227" default-value="-1"/>
+    <property name="top-height" type="gint" flags="227" default-value="-1"/>
+    <property name="bottom-height" type="gint" flags="227" default-value="-1"/>
+    <signal name="panel-drag-begin" return="void" when="last">
+      <param type="PanelWidget"/>
+    </signal>
+    <signal name="panel-drag-end" return="void" when="last">
+      <param type="PanelWidget"/>
+    </signal>
+    <signal name="create-frame" return="PanelFrame" when="last">
+      <param type="PanelPosition"/>
+    </signal>
+    <signal name="adopt-widget" return="gboolean" when="last">
+      <param type="PanelWidget"/>
+    </signal>
+  </class>
+  <class name="PanelFrame" get-type="panel_frame_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <property name="closeable" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="empty" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="placeholder" type="GtkWidget" flags="1073742051"/>
+    <property name="visible-child" type="PanelWidget" flags="1073742051"/>
+    <signal name="adopt-widget" return="gboolean" when="last">
+      <param type="PanelWidget"/>
+    </signal>
+    <signal name="page-closed" return="void" when="last">
+      <param type="PanelWidget"/>
+    </signal>
+  </class>
+  <class name="PanelGrid" get-type="panel_grid_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <signal name="create-frame" return="PanelFrame" when="last">
+    </signal>
+  </class>
+  <class name="PanelPosition" get-type="panel_position_get_type" parents="GObject" final="1">
+    <property name="area" type="PanelArea" flags="1073742051" default-value="PANEL_AREA_CENTER"/>
+    <property name="area-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="column" type="guint" flags="1073742051" default-value="0"/>
+    <property name="column-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="depth" type="guint" flags="1073742051" default-value="0"/>
+    <property name="depth-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="row" type="guint" flags="1073742051" default-value="0"/>
+    <property name="row-set" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="PanelStatusbar" get-type="panel_statusbar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="PanelInhibitor" get-type="panel_inhibitor_get_type" parents="GObject" final="1">
+  </class>
+  <class name="PanelWorkbench" get-type="panel_workbench_get_type" parents="GtkWindowGroup,GObject">
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+  <class name="PanelWorkspace" get-type="panel_workspace_get_type" parents="AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="PanelDocumentWorkspace" get-type="panel_document_workspace_get_type" parents="PanelWorkspace,AdwApplicationWindow,GtkApplicationWindow,GtkWindow,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <implements name="GActionGroup"/>
+    <implements name="GActionMap"/>
+    <property name="dock" type="PanelDock" flags="1073742049"/>
+    <property name="grid" type="PanelGrid" flags="1073742049"/>
+    <property name="statusbar" type="PanelStatusbar" flags="1073742049"/>
+    <signal name="create-frame" return="PanelFrame" when="last">
+      <param type="PanelPosition"/>
+    </signal>
+    <signal name="add-widget" return="gboolean" when="last">
+      <param type="PanelWidget"/>
+      <param type="PanelPosition"/>
+    </signal>
+  </class>
+  <interface name="PanelFrameHeader" get-type="panel_frame_header_get_type">
+    <prerequisite name="GtkWidget"/>
+    <property name="frame" type="PanelFrame" flags="227"/>
+  </interface>
+  <class name="PanelFrameHeaderBar" get-type="panel_frame_header_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="PanelFrameHeader"/>
+    <property name="show-icon" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="PanelFrameSwitcher" get-type="panel_frame_switcher_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+    <implements name="PanelFrameHeader"/>
+  </class>
+  <class name="PanelFrameTabBar" get-type="panel_frame_tab_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="PanelFrameHeader"/>
+    <property name="autohide" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="inverted" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="expand-tabs" type="gboolean" flags="1073742051" default-value="TRUE"/>
+  </class>
+  <class name="PanelGridColumn" get-type="panel_grid_column_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+  </class>
+  <class name="PanelGSettingsActionGroup" get-type="panel_gsettings_action_group_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="settings" type="GSettings" flags="235"/>
+  </class>
+  <class name="PanelLayeredSettings" get-type="panel_layered_settings_get_type" parents="GObject">
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="changed" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="PanelMenuManager" get-type="panel_menu_manager_get_type" parents="GObject" final="1">
+  </class>
+  <class name="PanelOmniBar" get-type="panel_omni_bar_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkActionable"/>
+    <property name="action-tooltip" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="popover" type="GtkPopover" flags="1073742051"/>
+    <property name="progress" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="icon-name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="menu-model" type="GMenuModel" flags="227"/>
+  </class>
+  <class name="PanelPaned" get-type="panel_paned_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkOrientable"/>
+  </class>
+  <class name="PanelSaveDelegate" get-type="panel_save_delegate_get_type" parents="GObject">
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="is-draft" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="progress" type="gdouble" flags="1073742051" default-value="0.000000"/>
+    <property name="subtitle" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="save" return="gboolean" when="last">
+      <param type="GTask"/>
+    </signal>
+    <signal name="close" return="void" when="last">
+    </signal>
+    <signal name="discard" return="void" when="last">
+    </signal>
+  </class>
+  <class name="PanelSaveDialog" get-type="panel_save_dialog_get_type" parents="AdwMessageDialog,GtkWindow,GtkWidget,GInitiallyUnowned,GObject" final="1">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <implements name="GtkNative"/>
+    <implements name="GtkShortcutManager"/>
+    <implements name="GtkRoot"/>
+    <property name="close-after-save" type="gboolean" flags="1073742051" default-value="FALSE"/>
+  </class>
+  <class name="PanelSessionItem" get-type="panel_session_item_get_type" parents="GObject" final="1">
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="module-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="position" type="PanelPosition" flags="1073742051"/>
+    <property name="type-hint" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="workspace" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="PanelSession" get-type="panel_session_get_type" parents="GObject" final="1">
+  </class>
+  <class name="PanelThemeSelector" get-type="panel_theme_selector_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="action-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+  </class>
+  <class name="PanelToggleButton" get-type="panel_toggle_button_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="dock" type="PanelDock" flags="227"/>
+    <property name="area" type="PanelArea" flags="235" default-value="PANEL_AREA_START"/>
+  </class>
+  <class name="PanelWidget" get-type="panel_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="busy" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="can-maximize" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="child" type="GtkWidget" flags="1073742051"/>
+    <property name="icon" type="GIcon" flags="1073742051"/>
+    <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="id" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="modified" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="needs-attention" type="gboolean" flags="1073742051" default-value="FALSE"/>
+    <property name="kind" type="gchararray" flags="1073742051" default-value="unknown"/>
+    <property name="reorderable" type="gboolean" flags="1073742051" default-value="TRUE"/>
+    <property name="save-delegate" type="PanelSaveDelegate" flags="1073742051"/>
+    <property name="title" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <property name="tooltip" type="gchararray" flags="1073742051" default-value="NULL"/>
+    <signal name="get-default-focus" return="GtkWidget" when="last">
+    </signal>
+    <signal name="presented" return="void" when="last">
+    </signal>
+  </class>
+  <class name="PanelSettings" get-type="panel_settings_get_type" parents="GObject" final="1">
+    <implements name="GActionGroup"/>
+    <property name="path" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="path-prefix" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="path-suffix" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="identifier" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="schema-id-prefix" type="gchararray" flags="235" default-value="NULL"/>
+    <signal name="changed" return="void" when="last" detailed="1">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+</dump>

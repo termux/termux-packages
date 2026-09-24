@@ -1,0 +1,504 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GgitObjectFactoryBase" get-type="ggit_object_factory_base_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="GgitNative" get-type="ggit_native_get_type" parents="GgitObjectFactoryBase,GObject" abstract="1">
+    <property name="native" type="gpointer" flags="234"/>
+  </class>
+  <class name="GgitConfig" get-type="ggit_config_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitIndex" get-type="ggit_index_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="file" type="GFile" flags="235"/>
+  </class>
+  <class name="GgitObject" get-type="ggit_object_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject" abstract="1">
+  </class>
+  <boxed name="GgitTreeEntry" get-type="ggit_tree_entry_get_type"/>
+  <class name="GgitTree" get-type="ggit_tree_get_type" parents="GgitObject,GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <boxed name="GgitOId" get-type="ggit_oid_get_type"/>
+  <class name="GgitRef" get-type="ggit_ref_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitBranch" get-type="ggit_branch_get_type" parents="GgitRef,GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitBlobOutputStream" get-type="ggit_blob_output_stream_get_type" parents="GOutputStream,GObject">
+    <property name="repository" type="GgitRepository" flags="234"/>
+  </class>
+  <class name="GgitCheckoutOptions" get-type="ggit_checkout_options_get_type" parents="GObject">
+    <property name="strategy" type="GgitCheckoutStrategy" flags="227" default-value="GGIT_CHECKOUT_SAFE"/>
+    <property name="disable-filters" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="dir-mode" type="guint" flags="227" default-value="0"/>
+    <property name="file-mode" type="guint" flags="227" default-value="0"/>
+    <property name="file-open-flags" type="gint" flags="227" default-value="0"/>
+    <property name="notify-flags" type="GgitCheckoutNotifyFlags" flags="227" default-value="GGIT_CHECKOUT_NOTIFY_NONE"/>
+    <property name="baseline" type="GgitTree" flags="227"/>
+    <property name="target-directory" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="ancestor-label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="our-label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="their-label" type="gchararray" flags="227" default-value="NULL"/>
+  </class>
+  <boxed name="GgitNote" get-type="ggit_note_get_type"/>
+  <class name="GgitSignature" get-type="ggit_signature_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+    <property name="encoding" type="gchararray" flags="11" default-value="NULL"/>
+  </class>
+  <class name="GgitBlame" get-type="ggit_blame_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <boxed name="GgitBlameHunk" get-type="ggit_blame_hunk_get_type"/>
+  <class name="GgitCherryPickOptions" get-type="ggit_cherry_pick_options_get_type" parents="GObject">
+    <property name="mainline" type="guint" flags="227" default-value="0"/>
+    <property name="checkout-options" type="GgitCheckoutOptions" flags="227"/>
+    <property name="merge-options" type="GgitMergeOptions" flags="227"/>
+  </class>
+  <class name="GgitCommitParents" get-type="ggit_commit_parents_get_type" parents="GObject">
+    <property name="commit" type="GgitCommit" flags="235"/>
+    <property name="size" type="guint" flags="225" default-value="0"/>
+  </class>
+  <class name="GgitCommit" get-type="ggit_commit_get_type" parents="GgitObject,GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitTreeBuilder" get-type="ggit_tree_builder_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitCred" get-type="ggit_cred_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitRemoteCallbacks" get-type="ggit_remote_callbacks_get_type" parents="GObject">
+    <signal name="update-tips" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="GgitOId"/>
+      <param type="GgitOId"/>
+    </signal>
+    <signal name="progress" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+    <signal name="transfer-progress" return="void" when="last">
+      <param type="GgitTransferProgress"/>
+    </signal>
+    <signal name="completion" return="void" when="last">
+      <param type="GgitRemoteCompletionType"/>
+    </signal>
+  </class>
+  <class name="GgitProxyOptions" get-type="ggit_proxy_options_get_type" parents="GObject">
+  </class>
+  <class name="GgitPushOptions" get-type="ggit_push_options_get_type" parents="GObject">
+    <property name="parallelism" type="gint" flags="231" default-value="1"/>
+    <property name="callbacks" type="GgitRemoteCallbacks" flags="227"/>
+  </class>
+  <class name="GgitRemote" get-type="ggit_remote_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <boxed name="GgitRemoteHead" get-type="ggit_remote_head_get_type"/>
+  <class name="GgitRebase" get-type="ggit_rebase_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitBlob" get-type="ggit_blob_get_type" parents="GgitObject,GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitTag" get-type="ggit_tag_get_type" parents="GgitObject,GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <class name="GgitRepository" get-type="ggit_repository_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="url" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="location" type="GFile" flags="235"/>
+    <property name="is-bare" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="init" type="gboolean" flags="235" default-value="FALSE"/>
+    <property name="workdir" type="GFile" flags="231"/>
+    <property name="head" type="GgitRef" flags="1"/>
+    <property name="clone-options" type="GgitCloneOptions" flags="11"/>
+  </class>
+  <boxed name="GgitAnnotatedCommit" get-type="ggit_annotated_commit_get_type"/>
+  <boxed name="GgitBlameOptions" get-type="ggit_blame_options_get_type"/>
+  <boxed name="GgitBranchEnumerator" get-type="ggit_branch_enumerator_get_type"/>
+  <boxed name="GgitFetchOptions" get-type="ggit_fetch_options_get_type"/>
+  <class name="GgitCloneOptions" get-type="ggit_clone_options_get_type" parents="GObject">
+  </class>
+  <boxed name="GgitConfigEntry" get-type="ggit_config_entry_get_type"/>
+  <class name="GgitCredPlaintext" get-type="ggit_cred_plaintext_get_type" parents="GgitCred,GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="username" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="password" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="GgitDiffFindOptions" get-type="ggit_diff_find_options_get_type" parents="GObject">
+    <property name="flags" type="GgitDiffFindFlags" flags="227" default-value="GGIT_DIFF_FIND_BY_CONFIG"/>
+    <property name="rename-threshold" type="guint" flags="227" default-value="0"/>
+    <property name="rename-from-rewrite-threshold" type="guint" flags="227" default-value="0"/>
+    <property name="copy-threshold" type="guint" flags="227" default-value="0"/>
+    <property name="rename-limit" type="guint" flags="227" default-value="0"/>
+    <property name="metric" type="GgitDiffSimilarityMetric" flags="227"/>
+  </class>
+  <class name="GgitDiffOptions" get-type="ggit_diff_options_get_type" parents="GObject">
+    <property name="flags" type="GgitDiffOption" flags="231" default-value="GGIT_DIFF_NORMAL"/>
+    <property name="n-context-lines" type="gint" flags="231" default-value="3"/>
+    <property name="n-interhunk-lines" type="gint" flags="231" default-value="0"/>
+    <property name="old-prefix" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="new-prefix" type="gchararray" flags="231" default-value="NULL"/>
+    <property name="pathspec" type="GStrv" flags="231"/>
+  </class>
+  <class name="GgitDiffFormatEmailOptions" get-type="ggit_diff_format_email_options_get_type" parents="GObject">
+    <property name="flags" type="GgitDiffFormatEmailFlags" flags="227" default-value="GGIT_DIFF_FORMAT_EMAIL_NONE"/>
+    <property name="patch-number" type="guint64" flags="227" default-value="1"/>
+    <property name="total-patches" type="guint64" flags="227" default-value="1"/>
+    <property name="id" type="GgitOId" flags="227"/>
+    <property name="summary" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="body" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="author" type="GgitSignature" flags="227"/>
+  </class>
+  <class name="GgitDiff" get-type="ggit_diff_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+    <property name="repository" type="GgitRepository" flags="235"/>
+  </class>
+  <boxed name="GgitDiffBinary" get-type="ggit_diff_binary_get_type"/>
+  <boxed name="GgitDiffBinaryFile" get-type="ggit_diff_binary_file_get_type"/>
+  <boxed name="GgitDiffDelta" get-type="ggit_diff_delta_get_type"/>
+  <boxed name="GgitDiffFile" get-type="ggit_diff_file_get_type"/>
+  <boxed name="GgitDiffHunk" get-type="ggit_diff_hunk_get_type"/>
+  <boxed name="GgitDiffLine" get-type="ggit_diff_line_get_type"/>
+  <boxed name="GgitDiffSimilarityMetric" get-type="ggit_diff_similarity_metric_get_type"/>
+  <boxed name="GgitIndexEntries" get-type="ggit_index_entries_get_type"/>
+  <boxed name="GgitIndexEntry" get-type="ggit_index_entry_get_type"/>
+  <boxed name="GgitIndexEntriesResolveUndo" get-type="ggit_index_entries_resolve_undo_get_type"/>
+  <boxed name="GgitIndexEntryResolveUndo" get-type="ggit_index_entry_resolve_undo_get_type"/>
+  <class name="GgitMailmap" get-type="ggit_mailmap_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+  </class>
+  <boxed name="GgitMergeOptions" get-type="ggit_merge_options_get_type"/>
+  <class name="GgitObjectFactory" get-type="ggit_object_factory_get_type" parents="GObject">
+  </class>
+  <boxed name="GgitPatch" get-type="ggit_patch_get_type"/>
+  <boxed name="GgitRebaseOperation" get-type="ggit_rebase_operation_get_type"/>
+  <boxed name="GgitRebaseOptions" get-type="ggit_rebase_options_get_type"/>
+  <boxed name="GgitRefSpec" get-type="ggit_ref_spec_get_type"/>
+  <boxed name="GgitReflog" get-type="ggit_reflog_get_type"/>
+  <boxed name="GgitReflogEntry" get-type="ggit_reflog_entry_get_type"/>
+  <boxed name="GgitRevertOptions" get-type="ggit_revert_options_get_type"/>
+  <class name="GgitRevisionWalker" get-type="ggit_revision_walker_get_type" parents="GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="repository" type="GgitRepository" flags="231"/>
+  </class>
+  <boxed name="GgitStatusOptions" get-type="ggit_status_options_get_type"/>
+  <class name="GgitSubmoduleUpdateOptions" get-type="ggit_submodule_update_options_get_type" parents="GObject">
+    <property name="checkout-options" type="GgitCheckoutOptions" flags="227"/>
+    <property name="fetch-options" type="GgitFetchOptions" flags="227"/>
+  </class>
+  <boxed name="GgitSubmodule" get-type="ggit_submodule_get_type"/>
+  <boxed name="GgitTransferProgress" get-type="ggit_transfer_progress_get_type"/>
+  <class name="GgitCredSshInteractive" get-type="ggit_cred_ssh_interactive_get_type" parents="GgitCred,GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="username" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <boxed name="GgitCredSshInteractivePrompt" get-type="ggit_cred_ssh_interactive_prompt_get_type"/>
+  <class name="GgitCredSshKeyFromAgent" get-type="ggit_cred_ssh_key_from_agent_get_type" parents="GgitCred,GgitNative,GgitObjectFactoryBase,GObject">
+    <implements name="GInitable"/>
+    <property name="username" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <enum name="GgitConfigLevel" get-type="ggit_config_level_get_type">
+    <member name="GGIT_CONFIG_LEVEL_PROGRAMDATA" nick="programdata" value="1"/>
+    <member name="GGIT_CONFIG_LEVEL_SYSTEM" nick="system" value="2"/>
+    <member name="GGIT_CONFIG_LEVEL_XDG" nick="xdg" value="3"/>
+    <member name="GGIT_CONFIG_LEVEL_GLOBAL" nick="global" value="4"/>
+    <member name="GGIT_CONFIG_LEVEL_LOCAL" nick="local" value="5"/>
+    <member name="GGIT_CONFIG_LEVEL_WORKTREE" nick="worktree" value="6"/>
+    <member name="GGIT_CONFIG_LEVEL_APP" nick="app" value="7"/>
+    <member name="GGIT_CONFIG_LEVEL_HIGHEST" nick="highest" value="-1"/>
+  </enum>  <flags name="GgitCheckoutStrategy" get-type="ggit_checkout_strategy_get_type">
+    <member name="GGIT_CHECKOUT_SAFE" nick="safe" value="0"/>
+    <member name="GGIT_CHECKOUT_FORCE" nick="force" value="2"/>
+    <member name="GGIT_CHECKOUT_RECREATE_MISSING" nick="recreate-missing" value="4"/>
+    <member name="GGIT_CHECKOUT_ALLOW_CONFLICTS" nick="allow-conflicts" value="16"/>
+    <member name="GGIT_CHECKOUT_REMOVE_UNTRACKED" nick="remove-untracked" value="32"/>
+    <member name="GGIT_CHECKOUT_REMOVE_IGNORED" nick="remove-ignored" value="64"/>
+    <member name="GGIT_CHECKOUT_UPDATE_ONLY" nick="update-only" value="128"/>
+    <member name="GGIT_CHECKOUT_DONT_UPDATE_INDEX" nick="dont-update-index" value="256"/>
+    <member name="GGIT_CHECKOUT_NO_REFRESH" nick="no-refresh" value="512"/>
+    <member name="GGIT_CHECKOUT_SKIP_UNMERGED" nick="skip-unmerged" value="1024"/>
+    <member name="GGIT_CHECKOUT_USE_OURS" nick="use-ours" value="2048"/>
+    <member name="GGIT_CHECKOUT_USE_THEIRS" nick="use-theirs" value="4096"/>
+    <member name="GGIT_CHECKOUT_DISABLE_PATHSPEC_MATCH" nick="disable-pathspec-match" value="8192"/>
+    <member name="GGIT_CHECKOUT_SKIP_LOCKED_DIRECTORIES" nick="skip-locked-directories" value="262144"/>
+    <member name="GGIT_CHECKOUT_DONT_OVERWRITE_IGNORED" nick="dont-overwrite-ignored" value="524288"/>
+    <member name="GGIT_CHECKOUT_CONFLICT_STYLE_MERGE" nick="conflict-style-merge" value="1048576"/>
+    <member name="GGIT_CHECKOUT_CONFLICT_STYLE_DIFF3" nick="conflict-style-diff3" value="2097152"/>
+    <member name="GGIT_CHECKOUT_DONT_REMOVE_EXISTING" nick="dont-remove-existing" value="4194304"/>
+    <member name="GGIT_CHECKOUT_DONT_WRITE_INDEX" nick="dont-write-index" value="8388608"/>
+    <member name="GGIT_CHECKOUT_DRY_RUN" nick="dry-run" value="16777216"/>
+    <member name="GGIT_CHECKOUT_CONFLICT_STYLE_ZDIFF3" nick="conflict-style-zdiff3" value="33554432"/>
+    <member name="GGIT_CHECKOUT_NONE" nick="none" value="1073741824"/>
+    <member name="GGIT_CHECKOUT_UPDATE_SUBMODULES" nick="update-submodules" value="65536"/>
+    <member name="GGIT_CHECKOUT_UPDATE_SUBMODULES_IF_CHANGED" nick="update-submodules-if-changed" value="131072"/>
+  </flags>
+  <enum name="GgitBranchType" get-type="ggit_branch_type_get_type">
+    <member name="GGIT_BRANCH_LOCAL" nick="local" value="1"/>
+    <member name="GGIT_BRANCH_REMOTE" nick="remote" value="2"/>
+  </enum>  <flags name="GgitFeatureFlags" get-type="ggit_feature_flags_get_type">
+    <member name="GGIT_FEATURE_THREADS" nick="threads" value="1"/>
+    <member name="GGIT_FEATURE_HTTPS" nick="https" value="2"/>
+    <member name="GGIT_FEATURE_SSH" nick="ssh" value="4"/>
+  </flags>
+  <enum name="GgitDiffBinaryType" get-type="ggit_diff_binary_type_get_type">
+    <member name="GGIT_DIFF_BINARY_NONE" nick="none" value="0"/>
+    <member name="GGIT_DIFF_BINARY_LITERAL" nick="literal" value="1"/>
+    <member name="GGIT_DIFF_BINARY_DELTA" nick="delta" value="2"/>
+  </enum>  <flags name="GgitBlameFlags" get-type="ggit_blame_flags_get_type">
+    <member name="GGIT_BLAME_NORMAL" nick="normal" value="0"/>
+    <member name="GGIT_BLAME_TRACK_COPIES_SAME_FILE" nick="track-copies-same-file" value="1"/>
+  </flags>
+  <flags name="GgitCreateFlags" get-type="ggit_create_flags_get_type">
+    <member name="GGIT_CREATE_NONE" nick="none" value="0"/>
+    <member name="GGIT_CREATE_FORCE" nick="force" value="1"/>
+  </flags>
+  <enum name="GgitDeltaType" get-type="ggit_delta_type_get_type">
+    <member name="GGIT_DELTA_UNMODIFIED" nick="unmodified" value="0"/>
+    <member name="GGIT_DELTA_ADDED" nick="added" value="1"/>
+    <member name="GGIT_DELTA_DELETED" nick="deleted" value="2"/>
+    <member name="GGIT_DELTA_MODIFIED" nick="modified" value="3"/>
+    <member name="GGIT_DELTA_RENAMED" nick="renamed" value="4"/>
+    <member name="GGIT_DELTA_COPIED" nick="copied" value="5"/>
+    <member name="GGIT_DELTA_IGNORED" nick="ignored" value="6"/>
+    <member name="GGIT_DELTA_UNTRACKED" nick="untracked" value="7"/>
+    <member name="GGIT_DELTA_TYPECHANGE" nick="typechange" value="8"/>
+    <member name="GGIT_DELTA_UNREADABLE" nick="unreadable" value="9"/>
+    <member name="GGIT_DELTA_CONFLICTED" nick="conflicted" value="10"/>
+  </enum>  <enum name="GgitDiffFormatType" get-type="ggit_diff_format_type_get_type">
+    <member name="GGIT_DIFF_FORMAT_PATCH" nick="patch" value="1"/>
+    <member name="GGIT_DIFF_FORMAT_PATCH_HEADER" nick="patch-header" value="2"/>
+    <member name="GGIT_DIFF_FORMAT_RAW" nick="raw" value="3"/>
+    <member name="GGIT_DIFF_FORMAT_NAME_ONLY" nick="name-only" value="4"/>
+    <member name="GGIT_DIFF_FORMAT_NAME_STATUS" nick="name-status" value="5"/>
+  </enum>  <flags name="GgitDiffOption" get-type="ggit_diff_option_get_type">
+    <member name="GGIT_DIFF_NORMAL" nick="normal" value="0"/>
+    <member name="GGIT_DIFF_REVERSE" nick="reverse" value="1"/>
+    <member name="GGIT_DIFF_INCLUDE_IGNORED" nick="include-ignored" value="2"/>
+    <member name="GGIT_DIFF_RECURSE_IGNORED_DIRS" nick="recurse-ignored-dirs" value="4"/>
+    <member name="GGIT_DIFF_INCLUDE_UNTRACKED" nick="include-untracked" value="8"/>
+    <member name="GGIT_DIFF_RECURSE_UNTRACKED_DIRS" nick="recurse-untracked-dirs" value="16"/>
+    <member name="GGIT_DIFF_INCLUDE_UNMODIFIED" nick="include-unmodified" value="32"/>
+    <member name="GGIT_DIFF_INCLUDE_TYPECHANGE" nick="include-typechange" value="64"/>
+    <member name="GGIT_DIFF_INCLUDE_TYPECHANGE_TREES" nick="include-typechange-trees" value="128"/>
+    <member name="GGIT_DIFF_IGNORE_FILE_MODE" nick="ignore-file-mode" value="256"/>
+    <member name="GGIT_DIFF_IGNORE_SUBMODULES" nick="ignore-submodules" value="512"/>
+    <member name="GGIT_DIFF_IGNORE_CASE" nick="ignore-case" value="1024"/>
+    <member name="GGIT_DIFF_DISABLE_PATHSPEC_MATCH" nick="disable-pathspec-match" value="4096"/>
+    <member name="GGIT_DIFF_SKIP_BINARY_CHECK" nick="skip-binary-check" value="8192"/>
+    <member name="GGIT_DIFF_ENABLE_FAST_UNTRACKED_DIRS" nick="enable-fast-untracked-dirs" value="16384"/>
+    <member name="GGIT_DIFF_FORCE_TEXT" nick="force-text" value="1048576"/>
+    <member name="GGIT_DIFF_FORCE_BINARY" nick="force-binary" value="2097152"/>
+    <member name="GGIT_DIFF_IGNORE_WHITESPACE" nick="ignore-whitespace" value="4194304"/>
+    <member name="GGIT_DIFF_IGNORE_WHITESPACE_CHANGE" nick="ignore-whitespace-change" value="8388608"/>
+    <member name="GGIT_DIFF_IGNORE_WHITESPACE_EOL" nick="ignore-whitespace-eol" value="16777216"/>
+    <member name="GGIT_DIFF_SHOW_UNTRACKED_CONTENT" nick="show-untracked-content" value="33554432"/>
+    <member name="GGIT_DIFF_SHOW_UNMODIFIED" nick="show-unmodified" value="67108864"/>
+    <member name="GGIT_DIFF_PATIENCE" nick="patience" value="268435456"/>
+    <member name="GGIT_DIFF_MINIMAL" nick="minimal" value="536870912"/>
+    <member name="GGIT_DIFF_SHOW_BINARY" nick="show-binary" value="1073741824"/>
+  </flags>
+  <flags name="GgitDiffFlag" get-type="ggit_diff_flag_get_type">
+    <member name="GGIT_DIFF_FLAG_BINARY" nick="binary" value="1"/>
+    <member name="GGIT_DIFF_FLAG_NOT_BINARY" nick="not-binary" value="2"/>
+    <member name="GGIT_DIFF_FLAG_VALID_ID" nick="valid-id" value="4"/>
+  </flags>
+  <enum name="GgitDiffLineType" get-type="ggit_diff_line_type_get_type">
+    <member name="GGIT_DIFF_LINE_CONTEXT" nick="context" value="32"/>
+    <member name="GGIT_DIFF_LINE_ADDITION" nick="addition" value="43"/>
+    <member name="GGIT_DIFF_LINE_DELETION" nick="deletion" value="45"/>
+    <member name="GGIT_DIFF_LINE_CONTEXT_EOFNL" nick="context-eofnl" value="61"/>
+    <member name="GGIT_DIFF_LINE_ADD_EOFNL" nick="add-eofnl" value="62"/>
+    <member name="GGIT_DIFF_LINE_DEL_EOFNL" nick="del-eofnl" value="60"/>
+    <member name="GGIT_DIFF_LINE_FILE_HDR" nick="file-hdr" value="70"/>
+    <member name="GGIT_DIFF_LINE_HUNK_HDR" nick="hunk-hdr" value="72"/>
+    <member name="GGIT_DIFF_LINE_BINARY" nick="binary" value="66"/>
+  </enum>  <enum name="GgitError" get-type="ggit_error_get_type">
+    <member name="GGIT_ERROR_GIT_ERROR" nick="git-error" value="-1"/>
+    <member name="GGIT_ERROR_NOTFOUND" nick="notfound" value="-3"/>
+    <member name="GGIT_ERROR_EXISTS" nick="exists" value="-4"/>
+    <member name="GGIT_ERROR_AMBIGUOUS" nick="ambiguous" value="-5"/>
+    <member name="GGIT_ERROR_BUFS" nick="bufs" value="-6"/>
+    <member name="GGIT_ERROR_PASSTHROUGH" nick="passthrough" value="-30"/>
+    <member name="GGIT_ERROR_ITEROVER" nick="iterover" value="-31"/>
+  </enum>  <enum name="GgitFileMode" get-type="ggit_file_mode_get_type">
+    <member name="GGIT_FILE_MODE_UNREADABLE" nick="unreadable" value="0"/>
+    <member name="GGIT_FILE_MODE_TREE" nick="tree" value="16384"/>
+    <member name="GGIT_FILE_MODE_BLOB" nick="blob" value="33188"/>
+    <member name="GGIT_FILE_MODE_BLOB_EXECUTABLE" nick="blob-executable" value="33261"/>
+    <member name="GGIT_FILE_MODE_LINK" nick="link" value="40960"/>
+    <member name="GGIT_FILE_MODE_COMMIT" nick="commit" value="57344"/>
+  </enum>  <enum name="GgitMergeFileFavor" get-type="ggit_merge_file_favor_get_type">
+    <member name="GGIT_MERGE_FILE_FAVOR_NORMAL" nick="normal" value="0"/>
+    <member name="GGIT_MERGE_FILE_FAVOR_OURS" nick="ours" value="1"/>
+    <member name="GGIT_MERGE_FILE_FAVOR_THEIRS" nick="theirs" value="2"/>
+    <member name="GGIT_MERGE_FILE_FAVOR_UNION" nick="union" value="3"/>
+  </enum>  <flags name="GgitMergeFileFlags" get-type="ggit_merge_file_flags_get_type">
+    <member name="GGIT_MERGE_FILE_DEFAULT" nick="default" value="0"/>
+    <member name="GGIT_MERGE_FILE_STYLE_MERGE" nick="style-merge" value="1"/>
+    <member name="GGIT_MERGE_FILE_STYLE_DIFF3" nick="style-diff3" value="2"/>
+    <member name="GGIT_MERGE_FILE_SIMPLIFY_ALNUM" nick="simplify-alnum" value="4"/>
+    <member name="GGIT_MERGE_FILE_IGNORE_WHITESPACE" nick="ignore-whitespace" value="8"/>
+    <member name="GGIT_MERGE_FILE_IGNORE_WHITESPACE_CHANGE" nick="ignore-whitespace-change" value="16"/>
+    <member name="GGIT_MERGE_FILE_IGNORE_WHITESPACE_EOL" nick="ignore-whitespace-eol" value="32"/>
+    <member name="GGIT_MERGE_FILE_DIFF_PATIENCE" nick="diff-patience" value="64"/>
+    <member name="GGIT_MERGE_FILE_DIFF_MINIMAL" nick="diff-minimal" value="128"/>
+  </flags>
+  <flags name="GgitMergeFlags" get-type="ggit_merge_flags_get_type">
+    <member name="GGIT_MERGE_FIND_RENAMES" nick="find-renames" value="1"/>
+    <member name="GGIT_MERGE_FAIL_ON_CONFLICT" nick="fail-on-conflict" value="2"/>
+    <member name="GGIT_MERGE_SKIP_REUC" nick="skip-reuc" value="4"/>
+    <member name="GGIT_MERGE_NO_RECURSIVE" nick="no-recursive" value="8"/>
+  </flags>
+  <enum name="GgitProxyType" get-type="ggit_proxy_type_get_type">
+    <member name="GGIT_PROXY_NONE" nick="none" value="0"/>
+    <member name="GGIT_PROXY_AUTO" nick="auto" value="1"/>
+    <member name="GGIT_PROXY_SPECIFIED" nick="specified" value="2"/>
+  </enum>  <enum name="GgitRebaseOperationType" get-type="ggit_rebase_operation_type_get_type">
+    <member name="GGIT_REBASE_OPERATION_PICK" nick="pick" value="0"/>
+    <member name="GGIT_REBASE_OPERATION_REWORD" nick="reword" value="1"/>
+    <member name="GGIT_REBASE_OPERATION_EDIT" nick="edit" value="2"/>
+    <member name="GGIT_REBASE_OPERATION_SQUASH" nick="squash" value="3"/>
+    <member name="GGIT_REBASE_OPERATION_FIXUP" nick="fixup" value="4"/>
+    <member name="GGIT_REBASE_OPERATION_EXEC" nick="exec" value="5"/>
+  </enum>  <enum name="GgitRemoteDownloadTagsType" get-type="ggit_remote_download_tags_type_get_type">
+    <member name="GGIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED" nick="unspecified" value="0"/>
+    <member name="GGIT_REMOTE_DOWNLOAD_TAGS_AUTO" nick="auto" value="1"/>
+    <member name="GGIT_REMOTE_DOWNLOAD_TAGS_NONE" nick="none" value="2"/>
+    <member name="GGIT_REMOTE_DOWNLOAD_TAGS_ALL" nick="all" value="3"/>
+  </enum>  <enum name="GgitRemoteCompletionType" get-type="ggit_remote_completion_type_get_type">
+    <member name="GGIT_REMOTE_COMPLETION_DOWNLOAD" nick="download" value="0"/>
+    <member name="GGIT_REMOTE_COMPLETION_INDEXING" nick="indexing" value="1"/>
+    <member name="GGIT_REMOTE_COMPLETION_ERROR" nick="error" value="2"/>
+  </enum>  <enum name="GgitRefType" get-type="ggit_ref_type_get_type">
+    <member name="GGIT_REF_INVALID" nick="invalid" value="0"/>
+    <member name="GGIT_REF_OID" nick="oid" value="1"/>
+    <member name="GGIT_REF_SYMBOLIC" nick="symbolic" value="2"/>
+    <member name="GGIT_REF_LISTALL" nick="listall" value="3"/>
+  </enum>  <enum name="GgitResetType" get-type="ggit_reset_type_get_type">
+    <member name="GGIT_RESET_SOFT" nick="soft" value="1"/>
+    <member name="GGIT_RESET_MIXED" nick="mixed" value="2"/>
+    <member name="GGIT_RESET_HARD" nick="hard" value="3"/>
+  </enum>  <flags name="GgitSortMode" get-type="ggit_sort_mode_get_type">
+    <member name="GGIT_SORT_NONE" nick="none" value="0"/>
+    <member name="GGIT_SORT_TOPOLOGICAL" nick="topological" value="1"/>
+    <member name="GGIT_SORT_TIME" nick="time" value="2"/>
+    <member name="GGIT_SORT_REVERSE" nick="reverse" value="4"/>
+  </flags>
+  <flags name="GgitStashFlags" get-type="ggit_stash_flags_get_type">
+    <member name="GGIT_STASH_DEFAULT" nick="default" value="0"/>
+    <member name="GGIT_STASH_KEEP_INDEX" nick="keep-index" value="1"/>
+    <member name="GGIT_STASH_INCLUDE_UNTRACKED" nick="include-untracked" value="2"/>
+    <member name="GGIT_STASH_INCLUDE_IGNORED" nick="include-ignored" value="4"/>
+  </flags>
+  <flags name="GgitStatusFlags" get-type="ggit_status_flags_get_type">
+    <member name="GGIT_STATUS_CURRENT" nick="current" value="0"/>
+    <member name="GGIT_STATUS_INDEX_NEW" nick="index-new" value="1"/>
+    <member name="GGIT_STATUS_INDEX_MODIFIED" nick="index-modified" value="2"/>
+    <member name="GGIT_STATUS_INDEX_DELETED" nick="index-deleted" value="4"/>
+    <member name="GGIT_STATUS_INDEX_RENAMED" nick="index-renamed" value="8"/>
+    <member name="GGIT_STATUS_INDEX_TYPECHANGE" nick="index-typechange" value="16"/>
+    <member name="GGIT_STATUS_WORKING_TREE_NEW" nick="working-tree-new" value="128"/>
+    <member name="GGIT_STATUS_WORKING_TREE_MODIFIED" nick="working-tree-modified" value="256"/>
+    <member name="GGIT_STATUS_WORKING_TREE_DELETED" nick="working-tree-deleted" value="512"/>
+    <member name="GGIT_STATUS_WORKING_TREE_TYPECHANGE" nick="working-tree-typechange" value="1024"/>
+    <member name="GGIT_STATUS_WORKING_TREE_RENAMED" nick="working-tree-renamed" value="2048"/>
+    <member name="GGIT_STATUS_WORKING_TREE_UNREADABLE" nick="working-tree-unreadable" value="4096"/>
+    <member name="GGIT_STATUS_IGNORED" nick="ignored" value="16384"/>
+    <member name="GGIT_STATUS_CONFLICTED" nick="conflicted" value="32768"/>
+  </flags>
+  <enum name="GgitSubmoduleIgnore" get-type="ggit_submodule_ignore_get_type">
+    <member name="GGIT_SUBMODULE_IGNORE_UNSPECIFIED" nick="unspecified" value="-1"/>
+    <member name="GGIT_SUBMODULE_IGNORE_NONE" nick="none" value="1"/>
+    <member name="GGIT_SUBMODULE_IGNORE_UNTRACKED" nick="untracked" value="2"/>
+    <member name="GGIT_SUBMODULE_IGNORE_DIRTY" nick="dirty" value="3"/>
+    <member name="GGIT_SUBMODULE_IGNORE_ALL" nick="all" value="4"/>
+  </enum>  <enum name="GgitSubmoduleRecurse" get-type="ggit_submodule_recurse_get_type">
+    <member name="GGIT_SUBMODULE_RECURSE_NO" nick="no" value="0"/>
+    <member name="GGIT_SUBMODULE_RECURSE_YES" nick="yes" value="1"/>
+    <member name="GGIT_SUBMODULE_RECURSE_ONDEMAND" nick="ondemand" value="2"/>
+  </enum>  <flags name="GgitSubmoduleStatus" get-type="ggit_submodule_status_get_type">
+    <member name="GGIT_SUBMODULE_STATUS_IN_HEAD" nick="in-head" value="1"/>
+    <member name="GGIT_SUBMODULE_STATUS_IN_INDEX" nick="in-index" value="2"/>
+    <member name="GGIT_SUBMODULE_STATUS_IN_CONFIG" nick="in-config" value="4"/>
+    <member name="GGIT_SUBMODULE_STATUS_IN_WD" nick="in-wd" value="8"/>
+    <member name="GGIT_SUBMODULE_STATUS_INDEX_ADDED" nick="index-added" value="16"/>
+    <member name="GGIT_SUBMODULE_STATUS_INDEX_DELETED" nick="index-deleted" value="32"/>
+    <member name="GGIT_SUBMODULE_STATUS_INDEX_MODIFIED" nick="index-modified" value="64"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_UNINITIALIZED" nick="wd-uninitialized" value="128"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_ADDED" nick="wd-added" value="256"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_DELETED" nick="wd-deleted" value="512"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_MODIFIED" nick="wd-modified" value="1024"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED" nick="wd-index-modified" value="2048"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_WD_MODIFIED" nick="wd-wd-modified" value="4096"/>
+    <member name="GGIT_SUBMODULE_STATUS_WD_UNTRACKED" nick="wd-untracked" value="8192"/>
+  </flags>
+  <enum name="GgitSubmoduleUpdate" get-type="ggit_submodule_update_get_type">
+    <member name="GGIT_SUBMODULE_UPDATE_CHECKOUT" nick="checkout" value="1"/>
+    <member name="GGIT_SUBMODULE_UPDATE_REBASE" nick="rebase" value="2"/>
+    <member name="GGIT_SUBMODULE_UPDATE_MERGE" nick="merge" value="3"/>
+    <member name="GGIT_SUBMODULE_UPDATE_NONE" nick="none" value="4"/>
+    <member name="GGIT_SUBMODULE_UPDATE_DEFAULT" nick="default" value="0"/>
+  </enum>  <enum name="GgitTreeWalkMode" get-type="ggit_tree_walk_mode_get_type">
+    <member name="GGIT_TREE_WALK_MODE_PRE" nick="pre" value="0"/>
+    <member name="GGIT_TREE_WALK_MODE_POST" nick="post" value="1"/>
+  </enum>  <flags name="GgitStatusOption" get-type="ggit_status_option_get_type">
+    <member name="GGIT_STATUS_OPTION_INCLUDE_UNTRACKED" nick="include-untracked" value="1"/>
+    <member name="GGIT_STATUS_OPTION_INCLUDE_IGNORED" nick="include-ignored" value="2"/>
+    <member name="GGIT_STATUS_OPTION_INCLUDE_UNMODIFIED" nick="include-unmodified" value="4"/>
+    <member name="GGIT_STATUS_OPTION_EXCLUDE_SUBMODULES" nick="exclude-submodules" value="8"/>
+    <member name="GGIT_STATUS_OPTION_RECURSE_UNTRACKED_DIRS" nick="recurse-untracked-dirs" value="16"/>
+    <member name="GGIT_STATUS_OPTION_DISABLE_PATHSPEC_MATCH" nick="disable-pathspec-match" value="32"/>
+    <member name="GGIT_STATUS_OPTION_RECURSE_IGNORED_DIRS" nick="recurse-ignored-dirs" value="64"/>
+    <member name="GGIT_STATUS_OPTION_RENAMES_HEAD_TO_INDEX" nick="renames-head-to-index" value="128"/>
+    <member name="GGIT_STATUS_OPTION_RENAMES_INDEX_TO_WORKDIR" nick="renames-index-to-workdir" value="256"/>
+    <member name="GGIT_STATUS_OPTION_SORT_CASE_SENSITIVELY" nick="sort-case-sensitively" value="512"/>
+    <member name="GGIT_STATUS_OPTION_SORT_CASE_INSENSITIVELY" nick="sort-case-insensitively" value="1024"/>
+    <member name="GGIT_STATUS_OPTION_DEFAULT" nick="default" value="19"/>
+  </flags>
+  <enum name="GgitStatusShow" get-type="ggit_status_show_get_type">
+    <member name="GGIT_STATUS_SHOW_INDEX_AND_WORKDIR" nick="index-and-workdir" value="0"/>
+    <member name="GGIT_STATUS_SHOW_INDEX_ONLY" nick="index-only" value="1"/>
+    <member name="GGIT_STATUS_SHOW_WORKDIR_ONLY" nick="workdir-only" value="2"/>
+  </enum>  <flags name="GgitAttributeCheckFlags" get-type="ggit_attribute_check_flags_get_type">
+    <member name="GGIT_ATTRIBUTE_CHECK_FILE_THEN_INDEX" nick="file-then-index" value="0"/>
+    <member name="GGIT_ATTRIBUTE_CHECK_INDEX_THEN_FILE" nick="index-then-file" value="1"/>
+    <member name="GGIT_ATTRIBUTE_CHECK_INDEX_ONLY" nick="index-only" value="2"/>
+    <member name="GGIT_ATTRIBUTE_CHECK_NO_SYSTEM" nick="no-system" value="4"/>
+  </flags>
+  <enum name="GgitPackbuilderStage" get-type="ggit_packbuilder_stage_get_type">
+    <member name="GGIT_PACKBUILDER_STAGE_ADDING_OBJECTS" nick="adding-objects" value="0"/>
+    <member name="GGIT_PACKBUILDER_STAGE_DELTAFICATION" nick="deltafication" value="1"/>
+  </enum>  <flags name="GgitCheckoutNotifyFlags" get-type="ggit_checkout_notify_flags_get_type">
+    <member name="GGIT_CHECKOUT_NOTIFY_NONE" nick="none" value="0"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_CONFLICT" nick="conflict" value="1"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_DIRTY" nick="dirty" value="2"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_UPDATED" nick="updated" value="4"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_UNTRACKED" nick="untracked" value="8"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_IGNORED" nick="ignored" value="16"/>
+    <member name="GGIT_CHECKOUT_NOTIFY_ALL" nick="all" value="65535"/>
+  </flags>
+  <flags name="GgitDiffFindFlags" get-type="ggit_diff_find_flags_get_type">
+    <member name="GGIT_DIFF_FIND_BY_CONFIG" nick="find-by-config" value="0"/>
+    <member name="GGIT_DIFF_FIND_RENAMES" nick="find-renames" value="1"/>
+    <member name="GGIT_DIFF_FIND_RENAMES_FROM_REWRITES" nick="find-renames-from-rewrites" value="2"/>
+    <member name="GGIT_DIFF_FIND_COPIES" nick="find-copies" value="4"/>
+    <member name="GGIT_DIFF_FIND_COPIES_FROM_UNMODIFIED" nick="find-copies-from-unmodified" value="8"/>
+    <member name="GGIT_DIFF_FIND_REWRITES" nick="find-rewrites" value="16"/>
+    <member name="GGIT_DIFF_BREAK_REWRITES" nick="break-rewrites" value="32"/>
+    <member name="GGIT_DIFF_FIND_AND_BREAK_REWRITES" nick="find-and-break-rewrites" value="48"/>
+    <member name="GGIT_DIFF_FIND_FOR_UNTRACKED" nick="find-for-untracked" value="64"/>
+    <member name="GGIT_DIFF_FIND_ALL" nick="find-all" value="255"/>
+    <member name="GGIT_DIFF_FIND_IGNORE_LEADING_WHITESPACE" nick="find-ignore-leading-whitespace" value="0"/>
+    <member name="GGIT_DIFF_FIND_IGNORE_WHITESPACE" nick="find-ignore-whitespace" value="4096"/>
+    <member name="GGIT_DIFF_FIND_DONT_IGNORE_WHITESPACE" nick="find-dont-ignore-whitespace" value="8192"/>
+    <member name="GGIT_DIFF_FIND_EXACT_MATCH_ONLY" nick="find-exact-match-only" value="16384"/>
+    <member name="GGIT_DIFF_BREAK_REWRITES_FOR_RENAMES_ONLY" nick="break-rewrites-for-renames-only" value="32768"/>
+    <member name="GGIT_DIFF_FIND_REMOVE_UNMODIFIED" nick="find-remove-unmodified" value="65536"/>
+  </flags>
+  <flags name="GgitDiffFormatEmailFlags" get-type="ggit_diff_format_email_flags_get_type">
+    <member name="GGIT_DIFF_FORMAT_EMAIL_NONE" nick="none" value="0"/>
+    <member name="GGIT_DIFF_FORMAT_EMAIL_EXCLUDE_SUBJECT_PATCH_MARKER" nick="exclude-subject-patch-marker" value="1"/>
+  </flags>
+  <flags name="GgitCredtype" get-type="ggit_credtype_get_type">
+    <member name="GGIT_CREDTYPE_USERPASS_PLAINTEXT" nick="userpass-plaintext" value="1"/>
+    <member name="GGIT_CREDTYPE_SSH_KEY" nick="ssh-key" value="2"/>
+    <member name="GGIT_CREDTYPE_SSH_CUSTOM" nick="ssh-custom" value="4"/>
+    <member name="GGIT_CREDTYPE_DEFAULT" nick="default" value="8"/>
+    <member name="GGIT_CREDTYPE_SSH_INTERACTIVE" nick="ssh-interactive" value="16"/>
+  </flags>
+  <enum name="GgitDirection" get-type="ggit_direction_get_type">
+    <member name="GGIT_DIRECTION_FETCH" nick="fetch" value="0"/>
+    <member name="GGIT_DIRECTION_PUSH" nick="push" value="1"/>
+  </enum>  <enum name="GgitCloneLocal" get-type="ggit_clone_local_get_type">
+    <member name="GGIT_CLONE_LOCAL_AUTO" nick="auto" value="0"/>
+    <member name="GGIT_CLONE_LOCAL_LOCAL" nick="local" value="1"/>
+    <member name="GGIT_CLONE_LOCAL_NO_LOCAL" nick="no-local" value="2"/>
+    <member name="GGIT_CLONE_LOCAL_NO_LINKS" nick="no-links" value="3"/>
+  </enum>  <error-quark function="ggit_error_quark" domain="ggit-error"/>
+</dump>
