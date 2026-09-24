@@ -14,33 +14,71 @@ shopt -u nullglob
 [[ ${#debs[@]} -eq 0 ]] && exit 0
 
 error=0
+download_jobs=()
+download_file() {
+	if ! curl --fail --silent --show-error --retry 5 --retry-all-errors --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' "$1" -o "$2"; then
+		echo "ERROR: Failed to download $1" >&2
+		return 1
+	fi
+}
+
+filter_dpkg_deb_warnings() {
+	sed -E '
+/^dpkg-deb: warning: parsing file '\''\/tmp\/dpkg-deb\.[[:alnum:]]+\/control'\'' near line 2 package '\''[^'\'']+:x86_64'\'':$/ {
+	N
+	/^dpkg-deb: warning: parsing file '\''\/tmp\/dpkg-deb\.[[:alnum:]]+\/control'\'' near line 2 package '\''[^'\'']+:x86_64'\'':\n '\''x86_64'\'' is not a valid architecture name in '\''Architecture'\'' field: character '\''_'\'' not allowed \(only letters, digits and characters '\''-'\''\)$/d
+}
+'
+}
+
+dpkg_deb_field() {
+	dpkg-deb -f "$1" "$2" 2> >(filter_dpkg_deb_warnings >&2)
+}
+
+download_metadata() (
+	local repo=$1 distribution=$2 component=$3 url=$4 arch=$5
+
+	if [[ ! -f "Packages-${repo}-${arch}" ]]; then
+		echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
+		download_file "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" "Packages-${repo}-${arch}.bz2"
+		7z x "Packages-${repo}-${arch}.bz2" > /dev/null
+	fi
+	if [[ ! -f "Contents-${repo}-${arch}" ]]; then
+		echo "[*] Downloading ${url}/dists/${distribution}/Contents-${arch}.gz"
+		download_file "${url}/dists/${distribution}/Contents-${arch}.gz" "Contents-${repo}-${arch}.gz"
+		gunzip -k "Contents-${repo}-${arch}.gz"
+	fi
+)
+
 for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 	distribution=$(jq --raw-output '.["'"${repo}"'"].distribution' repo.json)
 	component=$(jq --raw-output '.["'"${repo}"'"].component' repo.json)
 	url=$(jq --raw-output '.["'"${repo}"'"].url' repo.json)
 
 	for arch in aarch64 arm i686 x86_64; do
-		if [[ ! -f "Packages-${repo}-${arch}" ]]; then
-			echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
-			curl -s \
-				--user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
-				"${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" \
-				-o "Packages-${repo}-${arch}.bz2"
-			7z x "Packages-${repo}-${arch}.bz2" > /dev/null
+		download_metadata "$repo" "$distribution" "$component" "$url" "$arch" &
+		download_jobs+=("$!")
+		if (( ${#download_jobs[@]} >= 4 )); then
+			wait "${download_jobs[0]}"
+			download_jobs=("${download_jobs[@]:1}")
 		fi
-		if [[ ! -f "Contents-${repo}-${arch}" ]]; then
-			echo "[*] Downloading ${url}/dists/${distribution}/Contents-${arch}.gz"
-			curl -s \
-				--user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
-				"${url}/dists/${distribution}/Contents-${arch}.gz" \
-				-o "Contents-${repo}-${arch}.gz"
-			gunzip -k "Contents-${repo}-${arch}.gz"
-		fi
+	done
+done
 
+for job in "${download_jobs[@]}"; do
+	wait "$job"
+done
+
+for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
+	distribution=$(jq --raw-output '.["'"${repo}"'"].distribution' repo.json)
+	component=$(jq --raw-output '.["'"${repo}"'"].component' repo.json)
+	url=$(jq --raw-output '.["'"${repo}"'"].url' repo.json)
+
+	for arch in aarch64 arm i686 x86_64; do
 		for deb in "${debs[@]}"; do
-			deb_arch=$(dpkg-deb -f "$deb" Architecture)
+			deb_arch=$(dpkg_deb_field "$deb" Architecture)
 			[[ "$deb_arch" == "$arch" || "$deb_arch" == "all" ]] || continue
-			pkg_name=$(dpkg-deb -f "$deb" Package)
+			pkg_name=$(dpkg_deb_field "$deb" Package)
 
 			# Check that this exact .deb filename isn't already published (missed revbump).
 			deb_name_escaped=$(printf '%s' "$(basename "$deb")" | sed 's/[.[\*^$]/\\&/g')
@@ -52,7 +90,7 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 			# Check that this .deb doesn't ship a file already owned by a different
 			# published package, unless a Conflicts/Replaces/Breaks relation is declared.
 			declared=$(
-				{ dpkg-deb -f "$deb" Conflicts; dpkg-deb -f "$deb" Replaces; dpkg-deb -f "$deb" Breaks; } |
+				{ dpkg_deb_field "$deb" Conflicts; dpkg_deb_field "$deb" Replaces; dpkg_deb_field "$deb" Breaks; } |
 					tr ',' '\n' | sed -E 's/\(.*\)//; s/^[[:space:]]+//; s/[[:space:]]+$//' | sed '/^$/d'
 			)
 
