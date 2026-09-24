@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://golangci-lint.run/
 TERMUX_PKG_DESCRIPTION="Fast linters runner for Go, aggregating many Go linters into one tool"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.13.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.14.0"
 TERMUX_PKG_SRCURL="https://github.com/golangci/golangci-lint/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a79a7a1faad9c1538e3f7f8b32843a53bbeedfa9ead45d9e8ca3bb210d55ece0
+TERMUX_PKG_SHA256=f32ec6d5e9ddde780132b808a4ced3de8b5965d99d9771a2b9e68750bb5b0068
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
