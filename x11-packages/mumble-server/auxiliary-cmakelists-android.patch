@@ -1,0 +1,11 @@
+--- a/auxiliary_files/CMakeLists.txt
++++ b/auxiliary_files/CMakeLists.txt
+@@ -67,7 +67,7 @@
+ 	file(COPY "mumble-server.ini" DESTINATION ${CMAKE_BINARY_DIR})
+
+ 	# systemd related files
+-	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+ 		delayed_configure_files(
+ 			TARGET mumble-server
+ 			FILES
