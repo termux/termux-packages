@@ -37,21 +37,83 @@
 +#include <stdatomic.h>
 +
  #endif /* NWIPE_H_ */
---- a/src/pass.c
-+++ b/src/pass.c
-@@ -208,7 +208,10 @@
-         c->pass_done += r;
-         c->round_done += r;
+--- a/src/pass_internal.c
++++ b/src/pass_internal.c
+@@ -98,7 +98,10 @@
+             for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
+             {
+                 sleep( 1 );
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
  
--        pthread_testcancel();
-+        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
-+        {
-+            pthread_exit( NULL );
-+        }
+             if( r > 0 )
+@@ -178,7 +181,10 @@
+             for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
+             {
+                 sleep( 1 );
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+         }
+     }
+@@ -247,7 +253,10 @@
+             for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
+             {
+                 sleep( 1 );
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
  
-     } /* while bytes remaining */
+             if( r > 0 )
+@@ -327,7 +336,10 @@
+             for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
+             {
+                 sleep( 1 );
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+         }
+     }
+--- a/src/pass_random.c
++++ b/src/pass_random.c
+@@ -192,7 +192,10 @@
+                 c->round_done += s;
  
-@@ -416,7 +419,10 @@
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -285,7 +288,10 @@
+                 rev_offset -= (off64_t) rev_blocksize;
+                 rev_blocksize = io_blocksize; /* must be a full I/O block now */
+ 
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+ 
+             nwipe_log( NWIPE_LOG_NOTICE,
+@@ -369,7 +375,10 @@
              }
          }
  
@@ -61,21 +123,33 @@
 +            pthread_exit( NULL );
 +        }
  
-     } /* remaining bytes */
+     } /* /remaining bytes */
  
-@@ -637,7 +643,10 @@
-         c->pass_done += r;
-         c->round_done += r;
+@@ -520,7 +529,10 @@
+                 c->round_done += s;
  
--        pthread_testcancel();
-+        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
-+        {
-+            pthread_exit( NULL );
-+        }
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
  
-     } /* while bytes remaining */
+                 continue;
+             }
+@@ -609,7 +621,10 @@
  
-@@ -836,7 +845,10 @@
+                 fwd_offset += (off64_t) fwd_blocksize;
+ 
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+ 
+             nwipe_log( NWIPE_LOG_NOTICE,
+@@ -682,7 +697,10 @@
              }
          }
  
@@ -85,5 +159,239 @@
 +            pthread_exit( NULL );
 +        }
  
-     } /* remaining bytes */
+     } /* /remaining bytes */
+ 
+@@ -855,7 +873,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -929,7 +950,10 @@
+         c->pass_done += (u64) r;
+         c->round_done += (u64) r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
+ 
+@@ -1058,7 +1082,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -1120,7 +1147,10 @@
+         c->pass_done += (u64) r;
+         c->round_done += (u64) r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
+ 
+--- a/src/pass_scatter.c
++++ b/src/pass_scatter.c
+@@ -404,7 +404,10 @@
+                     c->round_done += (u64) blocksize;
+                     segment_bytes_done += blocksize;
+ 
+-                    pthread_testcancel();
++                    if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                    {
++                        pthread_exit( NULL );
++                    }
+                     continue;
+                 }
+ 
+@@ -470,10 +473,16 @@
+                 }
+             }
+ 
+-            pthread_testcancel();
++            if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++            {
++                pthread_exit( NULL );
++            }
+         } /* while (in a segment) */
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+     } /* for (each segment) */
+ 
+     free( b );
+@@ -588,7 +597,10 @@
+                     c->round_done += (u64) blocksize;
+                     segment_bytes_done += blocksize;
+ 
+-                    pthread_testcancel();
++                    if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                    {
++                        pthread_exit( NULL );
++                    }
+                     continue;
+                 }
+ 
+@@ -643,10 +655,16 @@
+             c->round_done += (u64) r;
+             segment_bytes_done += (size_t) r;
+ 
+-            pthread_testcancel();
++            if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++            {
++                pthread_exit( NULL );
++            }
+         } /* while (in a segment) */
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+     } /* for (each segment) */
+ 
+     free( b );
+--- a/src/pass_static.c
++++ b/src/pass_static.c
+@@ -218,7 +218,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -327,7 +330,10 @@
+                 rev_offset -= (off64_t) rev_blocksize;
+                 rev_blocksize = io_blocksize; /* must be a full I/O block now */
+ 
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+ 
+             nwipe_log( NWIPE_LOG_NOTICE,
+@@ -414,7 +420,10 @@
+             }
+         }
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* /remaining bytes */
+ 
+@@ -589,7 +598,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -694,7 +706,10 @@
+ 
+                 fwd_offset += (off64_t) fwd_blocksize;
+ 
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+             }
+ 
+             nwipe_log( NWIPE_LOG_NOTICE,
+@@ -769,7 +784,10 @@
+             }
+         }
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* /remaining bytes */
+ 
+@@ -946,7 +964,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -1020,7 +1041,10 @@
+         c->pass_done += (u64) r;
+         c->round_done += (u64) r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
+ 
+@@ -1152,7 +1176,10 @@
+                 c->round_done += s;
+ 
+                 /* Allow thread cancellation points and proceed with the next loop iteration. */
+-                pthread_testcancel();
++                if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++                {
++                    pthread_exit( NULL );
++                }
+ 
+                 continue;
+             }
+@@ -1214,7 +1241,10 @@
+         c->pass_done += (u64) r;
+         c->round_done += (u64) r;
+ 
+-        pthread_testcancel();
++        if ( !atomic_flag_test_and_set( &c->thread_cancel ) )
++        {
++            pthread_exit( NULL );
++        }
+ 
+     } /* while bytes remaining */
  
