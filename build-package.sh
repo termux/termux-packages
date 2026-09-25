@@ -541,6 +541,7 @@ _show_usage() {
 	echo "  -o Specify directory where to put built packages. Default: output/"
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
+	echo "  --reuse-built-packages Reuse built packages when unavailable from repositories."
 	exit 1
 }
 
@@ -565,6 +566,7 @@ while (( $# )); do
 			shift 1
 			export TERMUX_PACKAGE_LIBRARY="$1"
 		;;
+		--reuse-built-packages) export TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES=true;;
 		-a)
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
@@ -693,6 +695,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" == "false" ]] && _SELF_ARGS+=("-I")
 			[[ "${TERMUX_GLOBAL_LIBRARY:-}" == "true" ]] && _SELF_ARGS+=("-L")
 			[[ -n "${TERMUX_OUTPUT_DIR:-}" ]] && _SELF_ARGS+=("-o" "$TERMUX_OUTPUT_DIR")
+			[[ "${TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES:-}" == "true" ]] && _SELF_ARGS+=("--reuse-built-packages")
 			[[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" == "true" ]] && _SELF_ARGS+=("-r")
 			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" == "true" ]] && _SELF_ARGS+=("-w")
 			[[ -n "${TERMUX_PACKAGE_FORMAT:-}" ]] && _SELF_ARGS+=("--format" "$TERMUX_PACKAGE_FORMAT")
