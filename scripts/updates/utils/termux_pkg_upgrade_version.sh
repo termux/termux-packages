@@ -154,7 +154,7 @@ termux_pkg_upgrade_version() {
 	local _build_marker
 	_build_marker="$(mktemp)"
 
-	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i "${TERMUX_PKG_NAME}" \
+	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i --reuse-built-packages "${TERMUX_PKG_NAME}" \
 			|| ! _termux_check_new_debs_for_conflicts "${_build_marker}"; then
 		rm -f "${_build_marker}"
 		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
