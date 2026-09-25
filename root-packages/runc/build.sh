@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.opencontainers.org/
 TERMUX_PKG_DESCRIPTION="A tool for spawning and running containers according to the OCI specification"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.4.1"
+TERMUX_PKG_VERSION="1.5.1"
 TERMUX_PKG_SRCURL="https://github.com/opencontainers/runc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a09f5e2f5b3b5e488bd3ee45c0be8f1e9078692174411dc5193f56a7e0de8078
+TERMUX_PKG_SHA256=32286f18899a644ec7c1589688a9600ba54cc65264f23f1f5877ba214ca76e75
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="libseccomp-static"
 
@@ -21,7 +21,7 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/opencontainers"
 	ln -sf "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/opencontainers/runc"
 
-	cd "${GOPATH}/src/github.com/opencontainers/runc" && make static
+	cd "${GOPATH}/src/github.com/opencontainers/runc" && make static RUNC_BUILDTAGS=-libpathrs
 }
 
 termux_step_make_install() {
