@@ -1,8 +1,45 @@
+diff --git a/src/file.rs b/src/file.rs
+--- a/src/file.rs
++++ b/src/file.rs
+@@ -204,7 +204,10 @@
+         };
+     // Compare the whole type field: sockets and block devices share the
+     // directory bit.
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode & nix::libc::S_IFMT);
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = nix::sys::stat::SFlag::from_bits_truncate((stat.st_mode as u16) & nix::libc::S_IFMT);
+     if kind == nix::sys::stat::SFlag::S_IFDIR {
+         let fd = nix::fcntl::openat(
+             &parent,
 diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
-index c2076c0..225b14a 100644
 --- a/src/system/managed_files.rs
 +++ b/src/system/managed_files.rs
-@@ -1604,9 +1604,15 @@ fn open_or_create_directory_tree_inner(
+@@ -1985,7 +1985,14 @@
+     fn from_stat(stat: &nix::sys::stat::FileStat) -> Self {
+         use nix::sys::stat::SFlag;
+ 
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let file_type = SFlag::from_bits_truncate(stat.st_mode) & SFlag::S_IFMT;
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let file_type = SFlag::from_bits_truncate(stat.st_mode as u16) & SFlag::S_IFMT;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++        let mode = mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode));
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let mode = mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode as u16));
+         Self {
+             kind: if file_type == SFlag::S_IFREG {
+                 ManagedPathKind::File
+@@ -1996,7 +2003,7 @@
+             } else {
+                 ManagedPathKind::Other
+             },
+-            mode: mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode)),
++            mode,
+             uid: stat.st_uid,
+             gid: stat.st_gid,
+         }
+@@ -2518,9 +2525,15 @@
              Ok(directory) => directory,
              Err(open_error) => {
                  let metadata = fstatat(&directory, name.as_os_str(), AtFlags::AT_SYMLINK_NOFOLLOW);
@@ -19,12 +56,24 @@ index c2076c0..225b14a 100644
 +                if metadataIsOk {
                      let parent = fstat(&directory)?;
                      if parent.st_uid != 0 || parent.st_mode & 0o022 != 0 {
-                         bail!(
+                         return Err(UntrustedSymlink(component_path).into());
+@@ -2741,7 +2754,11 @@
+     use nix::sys::stat::{SFlag, fstat};
+ 
+     let stat = fstat(file)?;
+-    if stat.st_mode & SFlag::S_IFMT.bits() != SFlag::S_IFREG.bits() {
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++    let file_type = stat.st_mode & SFlag::S_IFMT.bits();
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let file_type = (stat.st_mode as u16) & SFlag::S_IFMT.bits();
++    if file_type != SFlag::S_IFREG.bits() {
+         bail!(
+             "refusing to set permissions on non-file path: {}",
+             path.display()
 diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/brew/cask/app_version.rs
-index ec63887..539fa68 100644
 --- a/src/system/packages/brew/cask/app_version.rs
 +++ b/src/system/packages/brew/cask/app_version.rs
-@@ -56,7 +56,11 @@ pub(super) fn read_app_version(app: &Path) -> Result<AppVersion> {
+@@ -56,7 +56,11 @@
          OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_NONBLOCK,
          Mode::empty(),
      )?;
@@ -38,10 +87,9 @@ index ec63887..539fa68 100644
      }
      let plist = plist::Value::from_reader(std::fs::File::from(fd))?;
 diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cask/mod.rs
-index 2b89e18..0637114 100644
 --- a/src/system/packages/brew/cask/mod.rs
 +++ b/src/system/packages/brew/cask/mod.rs
-@@ -1788,9 +1788,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
+@@ -2584,9 +2584,14 @@
      use std::os::unix::fs::PermissionsExt;
  
      let metadata = from.symlink_metadata()?;
@@ -56,18 +104,7 @@ index 2b89e18..0637114 100644
      if metadata.file_type().is_symlink() {
          nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
      } else if metadata.is_dir() {
-@@ -1859,7 +1864,10 @@ fn remove_all_at<Fd: std::os::fd::AsFd>(parent: Fd, name: &std::ffi::OsStr) -> R
-             Err(nix::errno::Errno::ENOENT) => return Ok(()),
-             Err(err) => return Err(err.into()),
-         };
-+    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
-+    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+    let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
-     if kind.contains(nix::sys::stat::SFlag::S_IFDIR) {
-         let fd = open_dir_nofollow_at(&parent, name)?;
-         let mut directory = nix::dir::Dir::from_fd(fd)?;
-@@ -2055,6 +2063,7 @@ fn open_trusted_directory(
+@@ -2823,6 +2828,7 @@
              || current_groups.contains(&stat.st_gid);
          let writable_by_untrusted = stat.st_mode & 0o002 != 0
              || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
@@ -75,7 +112,7 @@ index 2b89e18..0637114 100644
          if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
              || !trusted_owner
              || writable_by_untrusted
-@@ -2064,6 +2073,17 @@ fn open_trusted_directory(
+@@ -2832,6 +2838,17 @@
                  directory.display()
              );
          }
@@ -93,7 +130,7 @@ index 2b89e18..0637114 100644
          Ok(())
      };
      let mut directory = resolved_root.to_path_buf();
-@@ -2447,9 +2467,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
+@@ -3262,9 +3279,14 @@
      // Restore the bundle's own permissions, which the private staging mode hid.
      if let Ok(metadata) = from.symlink_metadata() {
          use std::os::unix::fs::PermissionsExt;
@@ -108,7 +145,6 @@ index 2b89e18..0637114 100644
          nix::sys::stat::fchmod(&destination, mode)?;
      }
      Ok(())
-
 diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/cask/state.rs
 --- a/src/system/packages/brew/cask/state.rs
 +++ b/src/system/packages/brew/cask/state.rs
