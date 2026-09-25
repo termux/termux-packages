@@ -59,6 +59,14 @@ termux_step_configure() {
 		export LDFLAGS="-Wl,-rpath=$TERMUX_PREFIX/lib -L$TERMUX_PREFIX/lib -landroid-utimes -lm"
 		export CFLAGS="-D_BSD_SOURCE=1"
 
+		# makes the command 'cpan -Ti XML::Parser' work on the system-linker-exec of
+		# a targetSdkVersion 29+ Termux (Google Play Termux), fixing the error
+		# >(error): Could not expand [Makefile.PL]. Check the module name.
+		local procselfexe_settings=''
+		if [[ "$TERMUX_PKG_API_LEVEL" -ge 29 ]]; then
+			procselfexe_settings='-Ud_procselfexe -Uprocselfexe'
+		fi
+
 		cd "$TERMUX_PKG_BUILDDIR"
 		"$TERMUX_PKG_SRCDIR/configure" \
 			--target="$TERMUX_HOST_PLATFORM" \
@@ -73,6 +81,7 @@ termux_step_configure() {
 			-Duseshrplib \
 			-Duseithreads \
 			-Dusemultiplicity \
+			$procselfexe_settings \
 			-Doptimize="-O2" \
 			--with-libs="-lm -L$TERMUX_PREFIX/lib -landroid-utimes"
 	)
