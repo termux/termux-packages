@@ -150,9 +150,6 @@ load_apparmor_profile() {
 	fi
 }
 
-# Load the relaxed AppArmor profile first as we might need to change permissions
-load_apparmor_profile ./scripts/profile-relaxed.apparmor
-
 __change_builder_uid_gid() {
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
@@ -191,6 +188,8 @@ __change_container_pid_max() {
 
 if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 	echo "Creating new container..."
+	# Load the relaxed profile first as we might need to change permissions.
+	load_apparmor_profile ./scripts/profile-relaxed.apparmor
 	$SUDO docker run \
 		--detach \
 		--init \
@@ -202,14 +201,14 @@ if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 		$TERMUX_BUILDER_IMAGE_NAME
 	__change_builder_uid_gid
 	__change_container_pid_max
+	load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
 fi
 
 if [[ "$($SUDO docker container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
+	load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
 	$SUDO docker start $CONTAINER_NAME >/dev/null 2>&1
 	__change_container_pid_max
 fi
-
-load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
 
 # Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
