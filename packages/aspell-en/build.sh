@@ -3,12 +3,22 @@ TERMUX_PKG_DESCRIPTION="English dictionary for aspell"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="Copyright"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:2020.12.07
+TERMUX_PKG_VERSION="1:2026.02.25"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/aspell/dict/en/aspell6-en-${TERMUX_PKG_VERSION:2}-0.tar.bz2
-TERMUX_PKG_SHA256=4c8f734a28a088b88bb6481fcf972d0b2c3dc8da944f7673283ce487eac49fb3
+TERMUX_PKG_SHA256=77a5cb437c45d1115f3b593802c20651d8c93803ed1073278dc1a1240016f10d
 TERMUX_PKG_DEPENDS="aspell"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_AUTO_UPDATE=true
+
+termux_step_post_massage() {
+	local _PACKAGE_GUARD_FILES=(lib/aspell-0.60/en{.dat,_phonet.dat,_affix.dat,-common.rws,.multi,_AU.multi,_CA.multi,_GB.multi,_US.multi})
+
+	local f
+	for f in "${_PACKAGE_GUARD_FILES[@]}"; do
+		[ -e "${f}" ] || termux_error_exit "package file guard check failed: ${f}"
+	done
+}
 
 termux_step_configure() {
 	cat > $TERMUX_PKG_SRCDIR/Makefile <<- EOF
