@@ -21,6 +21,7 @@ __dbeaver_find_product_dir() {
 __dbeaver_resolve_source_pins() {
 	local version="$1"
 	local common_repo="https://github.com/dbeaver/dbeaver-common"
+	local datadam_repo="https://github.com/dbeaver/datadam-api"
 	local swt_repo="https://github.com/eclipse-platform/eclipse.platform.swt"
 	local raw="https://raw.githubusercontent.com/dbeaver"
 	local branch="release_${version//./_}"
@@ -39,6 +40,20 @@ __dbeaver_resolve_source_pins() {
 		termux_error_exit "Could not read the parent POM version of dbeaver ${version}"
 	[[ "${parent_version}" == "${common_version}" ]] ||
 		termux_error_exit "dbeaver ${version} needs dbeaver-common ${parent_version}, but ${branch} is '${common_version}'"
+
+	# datadam-api uses the same release_X_Y_Z branch convention and pins its
+	# own parent POM version to the matching dbeaver-common release.
+	_NEW_DATADAM_COMMIT="$(git ls-remote --heads "${datadam_repo}.git" "refs/heads/${branch}" | cut -f1)"
+	[[ -n "${_NEW_DATADAM_COMMIT}" ]] ||
+		termux_error_exit "Branch ${branch} not found in datadam-api"
+
+	local datadam_parent_version
+	datadam_parent_version="$(curl -fsSL "${raw}/datadam-api/${_NEW_DATADAM_COMMIT}/apis/pom.xml" |
+		sed -n '/<parent>/,/<\/parent>/ s#.*<version>\(.*\)</version>.*#\1#p' | head -n 1)"
+	[[ -n "${datadam_parent_version}" ]] ||
+		termux_error_exit "Could not read the parent POM version of datadam-api ${branch}"
+	[[ "${datadam_parent_version}" == "${common_version}" ]] ||
+		termux_error_exit "datadam-api ${branch} needs dbeaver-common ${datadam_parent_version}, but ${branch} is '${common_version}'"
 
 	# 2026-06 -> Eclipse 4.40 -> R4_40 (one minor version per quarter, 2024-06 is 4.32).
 	local eclipse_version
