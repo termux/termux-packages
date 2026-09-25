@@ -1,8 +1,8 @@
-# Some weird devices hook connect() to connect the socket to fwmarkd instead of port 5037.
-# https://github.com/termux/termux-packages/issues/7946
+Some weird devices hook connect() to connect the socket to fwmarkd instead of its target.
+https://github.com/termux/termux-packages/issues/7946
 --- a/vendor/adb/sysdeps/posix/network.cpp
 +++ b/vendor/adb/sysdeps/posix/network.cpp
-@@ -19,5 +19,9 @@
+@@ -21,6 +21,10 @@
  #include <netinet/in.h>
  #include <sys/socket.h>
  
@@ -12,16 +12,41 @@
 +
  #include <string>
  #include <string.h>
-@@ -73,7 +73,11 @@ static int _network_loopback_client(bool ipv6, int port, int type, std::string* error) {
+ 
+@@ -74,7 +78,11 @@
  
      addr = (ipv6 ? loopback_addr6 : loopback_addr4)(&addr_storage, &addrlen, port);
  
--    if (connect(s.get(), addr, addrlen) != 0) {
 +#ifdef __ANDROID__
 +    if (syscall(__NR_connect, s.get(), addr, addrlen) != 0) {
 +#else
-+    if (connect(s.get(), addr, addrlen) != 0) {
+     if (connect(s.get(), addr, addrlen) != 0) {
 +#endif
          set_error(error);
          return -1;
      }
+--- a/vendor/core/libcutils/socket_network_client_unix.cpp
++++ b/vendor/core/libcutils/socket_network_client_unix.cpp
+@@ -28,6 +28,10 @@
+ #include <netinet/in.h>
+ #include <netdb.h>
+ 
++#if defined(__ANDROID__)
++#include <sys/syscall.h>
++#endif
++
+ #include "sockets_utils.h"
+ 
+ // Connect to the given host and port.
+@@ -57,7 +61,11 @@
+         int s = socket(addr->ai_family, type, addr->ai_protocol);
+         if (s == -1 || toggle_O_NONBLOCK(s) == -1) break;
+ 
++#ifdef __ANDROID__
++        int rc = syscall(__NR_connect, s, addr->ai_addr, addr->ai_addrlen);
++#else
+         int rc = connect(s, addr->ai_addr, addr->ai_addrlen);
++#endif
+         if (rc == 0) {
+             result = toggle_O_NONBLOCK(s);
+             break;
