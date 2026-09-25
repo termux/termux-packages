@@ -288,9 +288,15 @@ termux_step_massage() {
 
 		echo "INFO: Running symbol checks on ${numberOfValid} files with nproc=${nproc}"
 		local t0=$(get_epoch)
-		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_undef}"')
-		local openmp=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_openmp}"')
-		local depend_libomp_so=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so)
+		local undef="" openmp="" depend_libomp_so=""
+		if [[ -n "${valid}" ]]; then
+			undef=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -s 2>/dev/null | grep -Ef "${pattern_file_undef}" || :)
+			openmp=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -s 2>/dev/null | grep -Ef "${pattern_file_openmp}" || :)
+			depend_libomp_so=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so || :)
+		fi
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
 
