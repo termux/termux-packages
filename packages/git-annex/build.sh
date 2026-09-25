@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Manage large files with git, without storing the file co
 TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=10.20260901
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="git+https://git.joeyh.name/git/git-annex.git"
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
