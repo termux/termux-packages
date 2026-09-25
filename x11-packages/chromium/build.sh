@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION=149.0.7827.155
-TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz"
 TERMUX_PKG_SHA256=4e39fd0ae3ad64fd4bff6a523d94fe5e2917ad51a7f46a73c84a5736d9dda862
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
@@ -62,13 +63,6 @@ termux_step_post_get_source() {
 	if [ "${version_tools}" != "${TERMUX_PKG_VERSION}" ]; then
 		termux_error_exit "Version mismatch between chromium-host-tools and chromium."
 	fi
-
-	# Apply patches related to c++23
-	local f
-	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/cxx-patches" -maxdepth 1 -type f -name *.patch | sort); do
-		echo "Applying patch: $(basename $f)"
-		patch -p1 --silent < "$f"
-	done
 
 	# Apply patches related to chromium
 	local f
@@ -224,6 +218,9 @@ print(deps['src/third_party/node/node_modules']['objects'][0]['sha256sum'])
 		# This is needed to build cups
 		cp -Rf $TERMUX_PREFIX/bin/cups-config usr/bin/
 		chmod +x usr/bin/cups-config
+		# Temporarily disable check
+		# Will be enabled after investigating how to correctly append android build target flags to `bindgen`
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/9999-sysroot-disable-target-check.diff
 		popd
 		mv $TERMUX_PKG_TMPDIR/sysroot $TERMUX_PKG_CACHEDIR/sysroot-$TERMUX_ARCH
 	fi
@@ -330,9 +327,6 @@ exclude_unwind_tables = false
 use_jumbo_build = true
 # Compile pdfium as a static library
 pdf_is_complete_lib = true
-# NDK r29 can't compile chromium with cxx23, see
-# https://github.com/termux/termux-packages/issues/28459#issuecomment-3991943697
-use_cxx23 = false
 " > $_common_args_file
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
