@@ -1,0 +1,12 @@
+#!@TERMUX_PREFIX@/bin/sh
+# Node's Happy Eyeballs (autoSelectFamily, on by default since Node 20)
+# races IPv6 and IPv4 addresses with a 250ms per-attempt timeout before
+# falling back. On networks where IPv6 is advertised via DNS but not
+# actually routable (no route, or a silent multi-second timeout instead
+# of a fast refusal -- common on mobile carriers and some routers/VPN
+# apps), that race stalls far longer than intended and can cause the
+# subsequent IPv4 attempt to fail too, producing intermittent 500s on
+# TMDB-backed pages. Same root cause as upstream sct/overseerr#4337.
+# Disabling family autoselection avoids the race entirely.
+export NODE_OPTIONS="--no-network-family-autoselection"
+exec @TERMUX_PREFIX@/bin/seerr 2>&1
