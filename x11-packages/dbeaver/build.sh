@@ -2,26 +2,32 @@ TERMUX_PKG_HOMEPAGE=https://dbeaver.io/
 TERMUX_PKG_DESCRIPTION="Free universal database tool and SQL client (Community Edition)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="26.2.0"
+TERMUX_PKG_VERSION="26.2.1"
 
-# Built from three source trees: dbeaver, dbeaver-common (parent POM) and
-# eclipse.platform.swt. SWT is only used to rebuild the JNI libraries because the
-# prebuilt ones are linked against glibc and can not be loaded on Android.
-# _COMMON_COMMIT and _SWT_TAG are derived from the version and rewritten by
-# termux_pkg_auto_update() at the end of this file. The update fails if the
-# dbeaver-common release branch or the SWT tag of the new release is missing.
-_COMMON_COMMIT="78d77f9769eb7cc1c20091eb26767d90a0267c0e"
-_SWT_TAG="R4_40"
+# Built from four source trees: dbeaver, dbeaver-common (parent POM),
+# datadam-api (API module required by product/aggregate/pom.xml since 26.2.1)
+# and eclipse.platform.swt. SWT is only used to rebuild the JNI libraries
+# because the prebuilt ones are linked against glibc and can not be loaded on
+# Android.
+# _COMMON_COMMIT, _DATADAM_COMMIT and _SWT_TAG are derived from the version
+# and rewritten by termux_pkg_auto_update() at the end of this file. The
+# update fails if the dbeaver-common/datadam-api release branch or the SWT
+# tag of the new release is missing.
+_COMMON_COMMIT="d11df22413e9c48278ee22afbfa9f00f0d54e776"
+_DATADAM_COMMIT="3a5981e58e130909df93aa9b0c8b3e406d46812b"
+_SWT_TAG="R4_41"
 
 TERMUX_PKG_SRCURL=(
 	"https://github.com/dbeaver/dbeaver/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 	"https://github.com/dbeaver/dbeaver-common/archive/${_COMMON_COMMIT}.tar.gz"
+	"https://github.com/dbeaver/datadam-api/archive/${_DATADAM_COMMIT}.tar.gz"
 	"https://github.com/eclipse-platform/eclipse.platform.swt/archive/refs/tags/${_SWT_TAG}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	7fa7c4e3e0558284f4533aef1a0506281597bf48d7bc531e08d781644aca64da
-	4de8beeed4abb653ae8123f23e0c4b0511ab3505390aa8517f43259a45c94ac6
-	2622cce1885c0ca5b9e7f6aeaaf7708fcd384824facfc7a0b17bc9a58e6fd1a9
+	ef422d1af682471741e3d66999eeb57a91ca2bc418103c29bc6e9e1702efc321
+	4a94fc986de5d095eed4f87e9452a039582e593582dd8d5e5a169bea6e43e1aa
+	bfda7a080263d624dd473b9005dd220ce919c5ab10ecfffe3cb52512edecf232
+	4dae25b05a6431d28e7bb18297a89222e2f5d8b4acb797c7ba692e4dcff5bbd9
 )
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -49,12 +55,17 @@ termux_step_post_get_source() {
 		rm -rf "$top/dbeaver-common"
 		mv "$TERMUX_PKG_SRCDIR/dbeaver-common-${_COMMON_COMMIT}" "$top/dbeaver-common"
 	fi
+	if [ -d "$TERMUX_PKG_SRCDIR/datadam-api-${_DATADAM_COMMIT}" ]; then
+		rm -rf "$top/datadam-api"
+		mv "$TERMUX_PKG_SRCDIR/datadam-api-${_DATADAM_COMMIT}" "$top/datadam-api"
+	fi
 	if [ -d "$TERMUX_PKG_SRCDIR/eclipse.platform.swt-${_SWT_TAG}" ]; then
 		rm -rf "$top/eclipse.platform.swt"
 		mv "$TERMUX_PKG_SRCDIR/eclipse.platform.swt-${_SWT_TAG}" "$top/eclipse.platform.swt"
 	fi
 
 	[ -f "$top/dbeaver-common/pom.xml" ] || termux_error_exit "dbeaver-common sources not found in $top"
+	[ -f "$top/datadam-api/apis/pom.xml" ] || termux_error_exit "datadam-api sources not found in $top"
 	[ -d "$top/eclipse.platform.swt/bundles/org.eclipse.swt" ] || termux_error_exit "SWT sources not found in $top"
 }
 
@@ -216,6 +227,7 @@ termux_pkg_auto_update() {
 		__dbeaver_resolve_source_pins "${latest_tag}"
 		sed \
 			-e "s/^\(_COMMON_COMMIT=\).*/\1\"${_NEW_COMMON_COMMIT}\"/" \
+			-e "s/^\(_DATADAM_COMMIT=\).*/\1\"${_NEW_DATADAM_COMMIT}\"/" \
 			-e "s/^\(_SWT_TAG=\).*/\1\"${_NEW_SWT_TAG}\"/" \
 			-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
 	fi
