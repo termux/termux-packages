@@ -1,0 +1,27 @@
+# Some weird devices hook connect() to connect the socket to fwmarkd instead of port 5037.
+# https://github.com/termux/termux-packages/issues/7946
+--- a/vendor/adb/sysdeps/posix/network.cpp
++++ b/vendor/adb/sysdeps/posix/network.cpp
+@@ -19,5 +19,9 @@
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+ 
++#if defined(__ANDROID__)
++#include <sys/syscall.h>
++#endif
++
+ #include <string>
+ #include <string.h>
+@@ -73,7 +73,11 @@ static int _network_loopback_client(bool ipv6, int port, int type, std::string* error) {
+ 
+     addr = (ipv6 ? loopback_addr6 : loopback_addr4)(&addr_storage, &addrlen, port);
+ 
+-    if (connect(s.get(), addr, addrlen) != 0) {
++#ifdef __ANDROID__
++    if (syscall(__NR_connect, s.get(), addr, addrlen) != 0) {
++#else
++    if (connect(s.get(), addr, addrlen) != 0) {
++#endif
+         set_error(error);
+         return -1;
+     }
