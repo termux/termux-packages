@@ -1,15 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/exaloop/codon
 TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python compiler using LLVM"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 _LLVM_VERSION=20.1.7
 TERMUX_PKG_VERSION="0.19.6"
 TERMUx_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
-	https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
-	https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz
-	https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz
+	"https://github.com/exaloop/codon/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+	"https://github.com/exaloop/codon/releases/download/v$TERMUX_PKG_VERSION/codon-linux-x86_64.tar.gz"
+	"https://github.com/exaloop/llvm-project/archive/refs/tags/codon-$_LLVM_VERSION.tar.gz"
 )
 TERMUX_PKG_SHA256=(
 	e33deefaf7ff3518c838db22d92b31f28cff4675a7ece70b79d5d31be1ce7420

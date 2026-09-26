@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://gdal.org
 TERMUX_PKG_DESCRIPTION="A translator library for raster and vector geospatial data formats"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.13.3"
 TERMUX_PKG_SRCURL="https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz"

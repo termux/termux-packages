@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://osmcode.org/osmium-tool/
 TERMUX_PKG_DESCRIPTION="A multipurpose command line tool based on the Osmium Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.19.0"
 TERMUX_PKG_REVISION=1

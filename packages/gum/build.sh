@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/charmbracelet/gum"
 TERMUX_PKG_DESCRIPTION="A tool for creating minimal interactive TUIs for shell scripts"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.0.2"
 TERMUX_PKG_SRCURL="https://github.com/charmbracelet/gum/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"

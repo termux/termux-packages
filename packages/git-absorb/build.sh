@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tummychow/git-absorb
 TERMUX_PKG_DESCRIPTION="git commit --fixup, but automatic"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_SRCURL="https://github.com/tummychow/git-absorb/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
