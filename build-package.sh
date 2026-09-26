@@ -575,6 +575,7 @@ while (( $# )); do
 			shift 1
 			export TERMUX_ARCH="$1"
 		;;
+		-B) export TERMUX_BENCHMARK_COMPRESSION_THREADS=true;;
 		-d) export TERMUX_DEBUG_BUILD=true;;
 		-D) TERMUX_IS_DISABLED=true;;
 		-f) TERMUX_FORCE_BUILD=true;;
@@ -603,6 +604,21 @@ while (( $# )); do
 			fi
 
 			export TERMUX_PKG_MAKE_PROCESSES
+		;;
+		-J|-J[0-9]*)
+			# If we got the 2 arg form discard the "-J".
+			[[ "$1" == "-J" && "${2:-}" == [0-9]* ]] && shift 1
+			# Check that -J's argument exists and is numeric.
+			[[ -n "${1/-J}" && "${1/-J}" =~ ^[0-9]+$ ]] || termux_error_exit "./build-package.sh: option '-J' only takes integers"
+
+			# Assign the requested number of threads.
+			# If the result is 0 or negative then default to `nproc`
+			TERMUX_PKG_XZ_THREADS="${1/-J}"
+			if (( TERMUX_PKG_XZ_THREADS < 1 )); then
+				TERMUX_PKG_XZ_THREADS="$(nproc)"
+			fi
+
+			export TERMUX_PKG_XZ_THREADS
 		;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
@@ -700,6 +716,29 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
+					"${_SELF_ARGS[@]}" "${PACKAGE_LIST[i]}"
+			done
+			exit
+		fi
+
+		if [[ "$TERMUX_BENCHMARK_COMPRESSION_THREADS" == "true" ]]; then
+			_SELF_ARGS=()
+			[[ "${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE:-}" == "true" ]] && _SELF_ARGS+=("-C")
+			[[ "${TERMUX_DEBUG_BUILD:-}" == "true" ]] && _SELF_ARGS+=("-d")
+			[[ "${TERMUX_IS_DISABLED:-}" == "true" ]] && _SELF_ARGS+=("-D")
+			[[ "${TERMUX_FORCE_BUILD:-}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" != "true" ]] && _SELF_ARGS+=("-f")
+			[[ "${TERMUX_FORCE_BUILD:-}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES:-}" == "true" ]] && _SELF_ARGS+=("-F")
+			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" != "false" ]] && _SELF_ARGS+=("-i")
+			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" == "false" ]] && _SELF_ARGS+=("-I")
+			[[ "${TERMUX_GLOBAL_LIBRARY:-}" == "true" ]] && _SELF_ARGS+=("-L")
+			[[ -n "${TERMUX_OUTPUT_DIR:-}" ]] && _SELF_ARGS+=("-o" "$TERMUX_OUTPUT_DIR")
+			[[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" == "true" ]] && _SELF_ARGS+=("-r")
+			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" == "true" ]] && _SELF_ARGS+=("-w")
+			[[ -n "${TERMUX_PACKAGE_FORMAT:-}" ]] && _SELF_ARGS+=("--format" "$TERMUX_PACKAGE_FORMAT")
+			[[ -n "${TERMUX_PACKAGE_LIBRARY:-}" ]] && _SELF_ARGS+=("--library" "$TERMUX_PACKAGE_LIBRARY")
+
+			for run in "" "-J$(nproc)"; do
+				env TERMUX_BENCHMARK_COMPRESSION_THREADS=false TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh $run \
 					"${_SELF_ARGS[@]}" "${PACKAGE_LIST[i]}"
 			done
 			exit

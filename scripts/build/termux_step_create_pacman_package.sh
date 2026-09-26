@@ -36,11 +36,11 @@ termux_step_create_pacman_package() {
 			COMPRESS=(lzip -c -f)
 			PKG_FORMAT="lz";;
 		"xz" | *)
-			COMPRESS=(xz -c -z - -T"$TERMUX_PKG_MAKE_PROCESSES")
+			COMPRESS=(xz -c -z "${TERMUX_PKG_XZ_THREADS:+"-T$TERMUX_PKG_XZ_THREADS"}" -)
 			PKG_FORMAT="xz";;
 	esac
 
-	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${TERMUX_ARCH}.pkg.tar.${PKG_FORMAT}
+	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${TERMUX_PKG_XZ_THREADS:+"_-T$TERMUX_PKG_XZ_THREADS"}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${TERMUX_ARCH}.pkg.tar.${PKG_FORMAT}
 
 	if [ "$TERMUX_GLOBAL_LIBRARY" = "true" ] && [ "$TERMUX_PACKAGE_LIBRARY" = "glibc" ]; then
 		test ! -z "$TERMUX_PKG_DEPENDS" && TERMUX_PKG_DEPENDS=$(termux_package__add_prefix_glibc_to_package_list "$TERMUX_PKG_DEPENDS")
