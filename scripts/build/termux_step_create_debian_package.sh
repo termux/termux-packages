@@ -5,6 +5,7 @@ termux_step_create_debian_package() {
 	fi
 	# Clean up DEBIAN metadata directory from previous runs to prevent bundling it in data.tar.xz on continued builds.
 	rm -rf DEBIAN
+	XZ_OPT="${TERMUX_PKG_XZ_THREADS:+"-T$TERMUX_PKG_XZ_THREADS"}" \
 	tar --sort=name \
 		--mtime="@${SOURCE_DATE_EPOCH}" \
 		--owner=0 --group=0 --numeric-owner \
@@ -65,7 +66,7 @@ termux_step_create_debian_package() {
 		-cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" -H gnu .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
-	TERMUX_PKG_DEBFILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+	TERMUX_PKG_DEBFILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${TERMUX_PKG_XZ_THREADS:+"_-T$TERMUX_PKG_XZ_THREADS"}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 	# Create the actual .deb file:
 	${AR-ar} cr "$TERMUX_PKG_DEBFILE" \
 		"$TERMUX_COMMON_CACHEDIR/debian-binary" \

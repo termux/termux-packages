@@ -197,7 +197,7 @@ termux_create_pacman_subpackages() {
 				COMPRESS=(lzip -c -f)
 				PKG_FORMAT="lz";;
 			"xz" | *)
-				COMPRESS=(xz -c -z -)
+				COMPRESS=(xz -c -z "${TERMUX_PKG_XZ_THREADS:+"-T$TERMUX_PKG_XZ_THREADS"}" -)
 				PKG_FORMAT="xz";;
 		esac
 
@@ -205,7 +205,7 @@ termux_create_pacman_subpackages() {
 		find . -exec touch -h -d @$SOURCE_DATE_EPOCH {} +
 
 		# Create the actual .pkg file:
-		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
+		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${TERMUX_PKG_XZ_THREADS:+"_-T$TERMUX_PKG_XZ_THREADS"}${DEBUG}-${TERMUX_PKG_FULLVERSION_FOR_PACMAN}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		shopt -s dotglob globstar
 		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
