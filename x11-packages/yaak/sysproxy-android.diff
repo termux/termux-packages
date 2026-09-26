@@ -1,0 +1,19 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,6 +1,6 @@
+ //! Get/Set system proxy. Supports Windows, macOS and linux (via gsettings).
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ mod linux;
+ #[cfg(target_os = "macos")]
+ mod macos;
+@@ -32,7 +32,7 @@
+ impl Sysproxy {
+     pub fn is_support() -> bool {
+         cfg!(any(
+-            target_os = "linux",
++            any(target_os = "linux", target_os = "android"),
+             target_os = "macos",
+             target_os = "windows",
+         ))
