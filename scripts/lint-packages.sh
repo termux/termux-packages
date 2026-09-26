@@ -282,7 +282,7 @@ lint_package() {
 
 	echo -n "Layout: "
 	local channel in_dir=''
-	for channel in $TERMUX_PACKAGES_DIRECTORIES; do
+	for channel in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 		[[ -d "$TERMUX_SCRIPTDIR/$channel/$package_name" ]] && {
 			in_dir="$TERMUX_SCRIPTDIR/$channel/$package_name"
 			break

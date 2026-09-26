@@ -2205,8 +2205,7 @@ if [[ ! -f "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json" ]]; then
         exit 1
     fi
 else
-    export TERMUX_PACKAGES_DIRECTORIES
-    TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json")
+    readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json")
 
     for url in $(jq -r 'del(.pkg_format) | .[] | .url' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json"); do
         TERMUX_REPO_URL+=("$url")
