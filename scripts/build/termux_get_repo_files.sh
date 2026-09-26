@@ -60,27 +60,7 @@ termux_get_repo_files() {
 				fi
 			done
 			termux_error_exit "Failed to download package repository metadata. Try to build without -i/-I option."
-		) 2>&1 | (
-			set +e
-			# curl progress meter uses carriage return instead of newlines, fixing it
-			sed -u 's/\r/\n/g' | while :; do
-				local buffer=()
-				# Half second buffer to prevent mixing lines and make output consistent.
-				sleep 0.5;
-				while :; do
-					# read with 0 timeout does not read any data so giving minimal timeout
-					IFS='' read -t 0.001 -r line; rc=$?
-					# append job name to the start for tracking multiple jobs
-					[[ $rc == 0 ]] && buffer+=( "[$TERMUX_REPO_NAME]: $line" )
-					# Probably EOF or timeout
-					[[ $rc == 1 || $rc -ge 128 ]] && break
-				done
-
-				# prevent output garbling by using stdout as a lock file
-				[[ "${#buffer[@]}" -ge 1 ]] && flock --no-fork . printf "%s\n" "${buffer[@]}"
-				[[ $rc == 1 ]] && break # exit on EOF
-			done
-		) &
+		) 2>&1 | termux_buffered_output "$TERMUX_REPO_NAME" &
 		pids+=( $! )
 	done
 
