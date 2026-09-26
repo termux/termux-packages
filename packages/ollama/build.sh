@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://ollama.com/
 TERMUX_PKG_DESCRIPTION="Get up and running with large language models"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.31.1"
-TERMUX_PKG_SRCURL=git+https://github.com/ollama/ollama
+TERMUX_PKG_VERSION="0.34.4"
+TERMUX_PKG_SRCURL="git+https://github.com/ollama/ollama"
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++"
 TERMUX_PKG_BUILD_DEPENDS="spirv-headers, vulkan-headers"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -40,6 +40,15 @@ termux_step_post_get_source() {
 }
 
 termux_step_configure() {
+	# Raise open-files limit as high as allowed (GGML_CPU_ALL_VARIANTS
+	# opens many headers per job); log the result instead of swallowing it.
+	for _fd_limit in 65536 "$(ulimit -Hn 2>/dev/null)" 4096; do
+		[[ -n "$_fd_limit" ]] || continue
+		ulimit -n "$_fd_limit" 2>/dev/null && break
+	done
+	echo "termux-pkg: ollama: open files limit (ulimit -n) is now $(ulimit -n)"
+	unset _fd_limit
+
 	termux_setup_golang
 	termux_setup_cmake
 	termux_setup_ninja
@@ -80,7 +89,12 @@ termux_step_configure() {
 
 	termux_step_configure_cmake
 
+	if (( TERMUX_PKG_MAKE_PROCESSES > 2 )); then
+		TERMUX_PKG_MAKE_PROCESSES=2
+	fi
+	export TERMUX_PKG_MAKE_PROCESSES
 	export CMAKE_BUILD_PARALLEL_LEVEL="$TERMUX_PKG_MAKE_PROCESSES"
+	export MAKEFLAGS="-j${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
 termux_step_make_install() {
