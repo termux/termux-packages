@@ -1,0 +1,103 @@
+diff --git a/build/configure/src/bundle.rs b/build/configure/src/bundle.rs
+index 10a2cf29a..4a0fa77d6 100644
+--- a/build/configure/src/bundle.rs
++++ b/build/configure/src/bundle.rs
+@@ -177,7 +177,7 @@ fn setup_primary_venv(build: &mut Build) -> Result<()> {
+         if cfg!(target_os = "macos") {
+             "python/requirements.qt6_3.txt"
+         } else {
+-            "python/requirements.qt6_4.txt"
++            "python/requirements.qt5_15.txt"
+         }
+     ];
+     if cfg!(windows) {
+diff --git a/build/configure/src/proto.rs b/build/configure/src/proto.rs
+index 263de30b1..574bf87ab 100644
+--- a/build/configure/src/proto.rs
++++ b/build/configure/src/proto.rs
+@@ -17,10 +17,10 @@ use ninja_gen::Utf8Path;
+ pub fn setup_protoc(build: &mut Build) -> Result<()> {
+     let protoc_binary = match env::var("PROTOC_BINARY") {
+         Ok(path) => {
+-            assert!(
+-                Utf8Path::new(&path).is_absolute(),
+-                "PROTOC_BINARY must be absolute"
+-            );
++            // assert!(
++            //     Utf8Path::new(&path).is_absolute(),
++            //     "PROTOC_BINARY must be absolute"
++            // );
+             path.into()
+         }
+         Err(_) => {
+diff --git a/build/configure/src/python.rs b/build/configure/src/python.rs
+index a36332053..77dae783e 100644
+--- a/build/configure/src/python.rs
++++ b/build/configure/src/python.rs
+@@ -26,13 +26,15 @@ pub fn setup_venv(build: &mut Build) -> Result<()> {
+         ]
+     } else if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
+         inputs!["python/requirements.dev.txt"]
++    } else if cfg!(all(target_os = "android", target_arch = "aarch64")) {
++        inputs!["python/requirements.dev.txt"]
+     } else {
+         inputs![
+             "python/requirements.dev.txt",
+             if cfg!(target_os = "macos") {
+                 "python/requirements.qt6_3.txt"
+             } else {
+-                "python/requirements.qt6_4.txt"
++                "python/requirements.qt5_15.txt"
+             }
+         ]
+     };
+diff --git a/build/ninja_gen/src/node.rs b/build/ninja_gen/src/node.rs
+index df05e149d..58d624bce 100644
+--- a/build/ninja_gen/src/node.rs
++++ b/build/ninja_gen/src/node.rs
+@@ -117,10 +117,10 @@ pub fn setup_node(
+ 
+     let node_binary = match std::env::var("NODE_BINARY") {
+         Ok(path) => {
+-            assert!(
+-                Utf8Path::new(&path).is_absolute(),
+-                "NODE_BINARY must be absolute"
+-            );
++            // assert!(
++            //     Utf8Path::new(&path).is_absolute(),
++            //     "NODE_BINARY must be absolute"
++            // );
+             path.into()
+         }
+         Err(_) => {
+diff --git a/build/ninja_gen/src/python.rs b/build/ninja_gen/src/python.rs
+index 736812ffe..405fd365f 100644
+--- a/build/ninja_gen/src/python.rs
++++ b/build/ninja_gen/src/python.rs
+@@ -57,10 +57,10 @@ pub fn setup_python(build: &mut Build) -> Result<()> {
+     // if changing this, make sure you remove out/pyenv
+     let python_binary = match env::var("PYTHON_BINARY") {
+         Ok(path) => {
+-            assert!(
+-                Utf8Path::new(&path).is_absolute(),
+-                "PYTHON_BINARY must be absolute"
+-            );
++            // assert!(
++            //     Utf8Path::new(&path).is_absolute(),
++            //     "PYTHON_BINARY must be absolute"
++            // );
+             path.into()
+         }
+         Err(_) => {
+diff --git a/build/runner/src/pyenv.rs b/build/runner/src/pyenv.rs
+index 491f0b80d..acf6c5635 100644
+--- a/build/runner/src/pyenv.rs
++++ b/build/runner/src/pyenv.rs
+@@ -31,6 +31,7 @@ pub fn setup_pyenv(args: PyenvArgs) {
+         run_silent(
+             Command::new(&args.python_bin)
+                 .args(["-m", "venv"])
++                .args(["--system-site-packages"])
+                 .args(args.venv_args)
+                 .arg(pyenv_folder),
+         );
