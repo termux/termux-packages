@@ -47,6 +47,7 @@ PACKAGES+=" texinfo"
 PACKAGES+=" spirv-tools"			# Needed by mesa
 PACKAGES+=" uuid-utils"
 PACKAGES+=" valac"
+PACKAGES+=" which"              # Needed by plan9port (TUR)
 PACKAGES+=" xmlto"				# Needed by git's manpage generation
 PACKAGES+=" zip"
 PACKAGES+=" file"				# Needed by nchat
