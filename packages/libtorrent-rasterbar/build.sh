@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://libtorrent.org/
 TERMUX_PKG_DESCRIPTION="A feature complete C++ bittorrent implementation focusing on efficiency and scalability"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.1.1"
+TERMUX_PKG_VERSION="2.1.2"
 TERMUX_PKG_SRCURL="https://github.com/arvidn/libtorrent/releases/download/v${TERMUX_PKG_VERSION}/libtorrent-rasterbar-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=0f163516ecef2e3331500266751de3098835a3c3ae0c2290448046c632bc0e93
+TERMUX_PKG_SHA256=3362546d9cd71b9e49ee6cac7d3f1f914ce9cdb217c86b63d5b22cbed0334dbc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="boost, libc++, openssl, python"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers"
@@ -17,12 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	# We don't get build-python in path until termux_setup_python_pip is called in
+	# We don't get python in path until termux_setup_python_pip is called in
 	# termux_step_get_dependencies_python
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython3_EXECUTABLE=$(command -v build-python)"
-}
-
-termux_step_post_make_install() {
-	install -Dm600 "$TERMUX_PKG_BUILDDIR/bindings/python/libtorrent.so" \
-		-t "$TERMUX_PYTHON_HOME/site-packages"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython3_EXECUTABLE=$(command -v python)"
 }
