@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for handling mail messages and newsgroup article
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.30.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kmime-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=2969a5ef484e98f91bf78e88c98a9d613bdd3bb86ac154ceece0557b70f373bc
 TERMUX_PKG_AUTO_UPDATE=true
