@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://android.googlesource.com/platform/frameworks/base/+/
 TERMUX_PKG_DESCRIPTION="Stub libandroid.so for non-Android certified environment"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_REVISION=1
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=30
