@@ -1,0 +1,7 @@
+Disable Rust LTO for gkrust to avoid out-of-memory failures on ARM builds.
+
+--- a/config/makefiles/rust.mk
++++ b/config/makefiles/rust.mk
+@@ -120,1 +120,1 @@
+-ifeq (,$(findstring gkrust_gtest,$(RUST_LIBRARY_FILE)))
++ifeq (,$(filter libgkrust.a libgkrust_gtest.a,$(notdir $(RUST_LIBRARY_FILE))))
