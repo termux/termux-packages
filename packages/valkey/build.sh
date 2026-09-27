@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="In-memory data structure store used as a database, cache
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.1.2"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/valkey-io/valkey/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=19c23908e7d57e8d91ef85b41f5646307582f10f4f0fb999bbf89ed24ec9c983
 TERMUX_PKG_AUTO_UPDATE=true
