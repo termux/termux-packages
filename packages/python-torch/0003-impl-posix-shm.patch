@@ -1,10 +1,10 @@
-diff -uNr pytorch-v1.12.1/torch/lib/libshm/manager.cpp pytorch-v1.12.1.mod/torch/lib/libshm/manager.cpp
---- pytorch-v1.12.1/torch/lib/libshm/manager.cpp	2022-08-06 04:37:12.000000000 +0900
-+++ pytorch-v1.12.1.mod/torch/lib/libshm/manager.cpp	2022-09-05 00:26:25.218153450 +0900
+--- a/torch/lib/libshm/manager.cpp
++++ b/torch/lib/libshm/manager.cpp
 @@ -25,6 +25,65 @@
+ #else
  #define DEBUG(...) (void)0
  #endif
- 
++
 +static int shm_unlink(const char *name) {
 +    size_t namelen;
 +    char *fname;
@@ -63,17 +63,16 @@ diff -uNr pytorch-v1.12.1/torch/lib/libshm/manager.cpp pytorch-v1.12.1.mod/torch
 +
 +    return fd;
 +}
-+
+ 
  struct ClientSession {
-   ClientSession(ManagerSocket s) : socket(std::move(s)), pid(0) {}
-
-diff -uNr a/aten/src/ATen/MapAllocator.cpp b/aten/src/ATen/MapAllocator.cpp
---- a/aten/src/ATen/MapAllocator.cpp	2023-04-28 19:28:54.000000000 +0900
-+++ b/aten/src/ATen/MapAllocator.cpp	2023-04-28 19:30:12.000000000 +0900
-@@ -29,6 +29,69 @@
+   ClientSession(ManagerSocket s) : socket(std::move(s)) {}
+--- a/aten/src/ATen/MapAllocator.cpp
++++ b/aten/src/ATen/MapAllocator.cpp
+@@ -26,6 +26,69 @@
  #include <c10/util/win32-headers.h>
  #endif
- 
+ #include <fmt/format.h>
++
 +#define HAVE_SHM_OPEN 1
 +#define HAVE_SHM_UNLINK 1
 +
@@ -136,7 +135,6 @@ diff -uNr a/aten/src/ATen/MapAllocator.cpp b/aten/src/ATen/MapAllocator.cpp
 +    return fd;
 +}
 +
-+
+ 
  namespace at {
  
- static constexpr int64_t map_alloc_alignment = 64;

@@ -1,0 +1,14 @@
+Keep the AOTI tensor descriptor layout consistent across 32-bit and 64-bit targets.
+
+--- a/torch/csrc/inductor/aoti_runtime/interface.h
++++ b/torch/csrc/inductor/aoti_runtime/interface.h
+@@ -52,6 +52,9 @@
+ struct AOTInductorArrayRefTensor {
+   // Pointer to the raw data buffer.  Not owned.
+   void* data;
++#if __SIZEOF_POINTER__ == 4
++  uint32_t data_padding;
++#endif
+ 
+   // Number of elements in the data buffer (product of sizes for contiguous
+   // tensors).

@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://pytorch.org/
 TERMUX_PKG_DESCRIPTION="Tensors and Dynamic neural networks in Python"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.11.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.14.0"
 TERMUX_PKG_SRCURL=git+https://github.com/pytorch/pytorch
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_DEPENDS="abseil-cpp, libandroid-execinfo, libc++, libopenblas, libprotobuf, python, python-numpy, python-pip"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, pyyaml, typing_extensions"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, pyyaml, typing_extensions, 'scikit-build-core>=1.0', six"
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="numpy"
 # USE_DISTRIBUTED=ON fixes
 # ModuleNotFoundError: No module named 'torch._C._distributed_c10d'; 'torch._C' is not a package
@@ -56,6 +55,10 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -fopenmp -static-openmp"
+	local libomp_a
+	libomp_a=$("${TERMUX_HOST_PLATFORM}-clang" -print-file-name=libomp.a)
+	[[ -f "$libomp_a" ]] || termux_error_exit "Static OpenMP library not found: $libomp_a"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DOpenMP_libomp_LIBRARY=$libomp_a"
 
 	export PYTHONPATH="${PYTHONPATH}:${TERMUX_PKG_SRCDIR}"
 	find "$TERMUX_PKG_SRCDIR" -name CMakeLists.txt -o -name '*.cmake' ! -name 'VulkanCodegen*' | \
@@ -82,6 +85,7 @@ termux_step_pre_configure() {
 termux_step_make_install() {
 	export PYTORCH_BUILD_VERSION=${TERMUX_PKG_VERSION}
 	export PYTORCH_BUILD_NUMBER=0
+	export CMAKE_ARGS="-DCMAKE_ASM_FLAGS=--target=${TERMUX_HOST_PLATFORM}${TERMUX_PKG_API_LEVEL}"
 	pip -v install --no-deps --no-build-isolation --prefix $TERMUX_PREFIX "$TERMUX_PKG_SRCDIR"
 	ln -sfr ${TERMUX_PYTHON_HOME}/site-packages/torch/lib/*.so ${TERMUX_PREFIX}/lib
 }

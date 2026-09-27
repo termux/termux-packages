@@ -4,12 +4,12 @@ Fixes https://github.com/termux/termux-packages/issues/29198
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -403,7 +403,7 @@
+@@ -452,7 +452,7 @@
  # Enable third party mimalloc library to improve memory allocation performance
  # on Windows and AArch64.
  option(USE_MIMALLOC_ON_MKL "Use mimalloc on MKL" OFF)
 -if(WIN32 OR (CPU_AARCH64 AND NOT APPLE))
 +if(FALSE)
    set(USE_MIMALLOC ON)
- 
-   # Not enable USE_MIMALLOC_ON_MKL due to it caused issue:
+   # Disable OPT flags for mimalloc on aarch64 as it breaks ARMv8.0
+   # See https://github.com/pytorch/pytorch/issues/174344
