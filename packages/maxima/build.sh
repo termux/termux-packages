@@ -4,12 +4,12 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(5.47.0)
-TERMUX_PKG_VERSION+=(24.5.10) # ECL version
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION+=(26.5.5) # ECL version
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=(https://downloads.sourceforge.net/sourceforge/maxima/Maxima-source/$TERMUX_PKG_VERSION-source/maxima-$TERMUX_PKG_VERSION.tar.gz
                    https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION[1]}.tgz)
 TERMUX_PKG_SHA256=(9104021b24fd53e8c03a983509cb42e937a925e8c0c85c335d7709a14fd40f7a
-                   e4ea65bb1861e0e495386bfa8bc673bd014e96d3cf9d91e9038f91435cbe622b)
+                   a01a5bcda8c5b73e59dda3494fd13e5fec5db6aa1dad782c3cc3bb57f1633435)
 TERMUX_PKG_DEPENDS="ecl"
 TERMUX_PKG_EXCLUDED_ARCHES="i686, x86_64"
 TERMUX_PKG_BUILD_IN_SRC="true"
@@ -29,13 +29,13 @@ termux_step_host_build() {
 	local ecl_srcdir=$TERMUX_PKG_SRCDIR/ecl/src
 	autoreconf -fi $ecl_srcdir/gmp
 	$ecl_srcdir/configure ABI=${TERMUX_ARCH_BITS} \
-		CFLAGS=-m${TERMUX_ARCH_BITS} LDFLAGS=-m${TERMUX_ARCH_BITS} \
+		CFLAGS="-m${TERMUX_ARCH_BITS} -std=gnu17" LDFLAGS=-m${TERMUX_ARCH_BITS} \
 		--prefix=$_PREFIX_FOR_BUILD --srcdir=$ecl_srcdir --disable-c99complex
 	make -j $TERMUX_PKG_MAKE_PROCESSES
 	make install
 	popd
 
-	PATH=$_PREFIX_FOR_BUILD/bin:$PATH
+	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	mkdir maxima
 	pushd maxima
@@ -47,6 +47,7 @@ termux_step_host_build() {
 
 termux_step_make() {
 	local _PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
+	export PATH=$_PREFIX_FOR_BUILD/bin:$PATH
 
 	cat > $_PREFIX_FOR_BUILD/bin/gcc <<-EOF
 		#!/bin/sh
