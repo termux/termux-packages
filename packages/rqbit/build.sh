@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ikatson/rqbit
 TERMUX_PKG_DESCRIPTION="A bittorrent command line client and server"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="DevGitPit <106362593+DevGitPit@users.noreply.github.com>"
 TERMUX_PKG_VERSION="9.0.1"
 TERMUX_PKG_AUTO_UPDATE=true
