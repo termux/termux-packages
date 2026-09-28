@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A full-featured port of the WebKit rendering engine"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.54.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=846fd19ccedbae1dbfe904f26dbf2d68a800a33a50caf2ad5222c8dcb3f25682
 TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libavif, libc++, libcairo, libdrm, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2, zlib"
@@ -81,6 +82,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_massage() {
+	# Do not package bundled mimalloc development files.
+	rm -rf include/mimalloc-* lib/cmake/mimalloc-* lib/mimalloc-*
+	rm -f lib/pkgconfig/mimalloc.pc
+
 	local _GUARD_FILE="lib/lib${TERMUX_PKG_NAME}.so"
 	if [ ! -e "${_GUARD_FILE}" ]; then
 		termux_error_exit "file ${_GUARD_FILE} not found."
