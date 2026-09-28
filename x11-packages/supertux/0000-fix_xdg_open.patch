@@ -1,0 +1,20 @@
+--- a/src/util/file_system.cpp
++++ b/src/util/file_system.cpp
+@@ -266,7 +266,7 @@
+ 
+ void open_path(const std::string& path)
+ {
+-#ifdef __ANDROID__
++#if 0
+   // SDL >= 2.0.14 is strictly required for Android
+   SDL_OpenURL(("file://" + path).c_str());
+ #elif defined(_WIN32) || defined (_WIN64)
+@@ -278,7 +278,7 @@
+   #if defined(__APPLE__)
+   std::string cmd = "open \"" + path + "\"";
+   #else
+-  std::string cmd = "xdg-open \"" + path + "\"";
++  std::string cmd = "xdg-utils-xdg-open \"" + path + "\"";
+   #endif
+ 
+   int ret = system(cmd.c_str());
