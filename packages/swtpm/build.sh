@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/stefanberger/swtpm
 TERMUX_PKG_DESCRIPTION="Software TPM Emulator"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.10.2"
 TERMUX_PKG_SRCURL="https://github.com/stefanberger/swtpm/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"

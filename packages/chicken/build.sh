@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.call-cc.org
 TERMUX_PKG_DESCRIPTION="A feature rich Scheme compiler and interpreter"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.0.0"
 TERMUX_PKG_SRCURL="https://code.call-cc.org/releases/${TERMUX_PKG_VERSION}/chicken-${TERMUX_PKG_VERSION}.tar.gz"

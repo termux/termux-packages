@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/exaloop/codon
 TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python compiler using LLVM"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
 	"0.20.2"

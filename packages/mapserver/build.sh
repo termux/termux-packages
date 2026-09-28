@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE=https://mapserver.org/
 TERMUX_PKG_DESCRIPTION="MapServer is CGI-based platform for publishing spatial data and interactive mapping applications to the web"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_VERSION=8.2.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://download.osgeo.org/mapserver/mapserver-${TERMUX_PKG_VERSION}.tar.gz"

@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://xff.cz/megatools/
 TERMUX_PKG_DESCRIPTION="Open-source command line tools and C library (libmega) for accessing Mega.co.nz cloud storage"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.11.5.20250706
 TERMUX_PKG_REVISION=1
