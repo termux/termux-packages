@@ -1,6 +1,6 @@
 --- a/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp
 +++ b/Source/WebKit/NetworkProcess/cache/NetworkCacheBlobStorage.cpp
-@@ -99,8 +99,10 @@ BlobStorage::Blob BlobStorage::add(const
+@@ -161,8 +161,10 @@ BlobStorage::Blob BlobStorage::add(const
          if (FileSystem::makeSafeToUseMemoryMapForPath(blobPath)) {
              auto existingData = mapFile(blobPath);
              if (bytesEqual(existingData, data)) {
@@ -11,7 +11,7 @@
                  BlobStorage::Blob result { existingData, hash };
  #if ENABLE(NETWORK_CACHE_BLOB_STORAGE_MEMORY_CACHE)
                  if (addToMemoryCache && m_memoryCache)
-@@ -111,8 +113,10 @@ BlobStorage::Blob BlobStorage::add(const
+@@ -178,8 +180,10 @@ BlobStorage::Blob BlobStorage::add(const
      if (mappedData.isNull())
          return { };
  

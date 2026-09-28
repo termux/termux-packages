@@ -2,7 +2,7 @@ diff --git a/Source/JavaScriptCore/jsc.cpp b/Source/JavaScriptCore/jsc.cpp
 index 31d9abcb31..863514e97c 100644
 --- a/Source/JavaScriptCore/jsc.cpp
 +++ b/Source/JavaScriptCore/jsc.cpp
-@@ -127,7 +127,7 @@
+@@ -162,7 +162,7 @@
 
  #if OS(DARWIN)
  #include <wtf/spi/darwin/ProcessMemoryFootprint.h>
@@ -11,7 +11,7 @@ index 31d9abcb31..863514e97c 100644
  #include <wtf/linux/ProcessMemoryFootprint.h>
  #endif
 
-@@ -2662,7 +2662,7 @@ JSC_DEFINE_HOST_FUNCTION(functionDropAllLocks, (JSGlobalObject* globalObject, Ca
+@@ -3513,7 +3513,7 @@ JSC_DEFINE_HOST_FUNCTION(functionDropAllLocks, (JSGlobalObject* globalObject, Ca
 
  int jscmain(int argc, char** argv);
 
@@ -20,7 +20,7 @@ index 31d9abcb31..863514e97c 100644
  static size_t memoryLimit;
 
  static void crashIfExceedingMemoryLimit()
-@@ -2697,7 +2697,7 @@ static void startMemoryMonitoringThreadIfNeeded()
+@@ -3548,7 +3548,7 @@ static void startMemoryMonitoringThreadIfNeeded()
          }
      });
  }
@@ -29,11 +29,13 @@ index 31d9abcb31..863514e97c 100644
 
  static double s_desiredTimeout;
  static double s_timeoutMultiplier = 1.0;
-@@ -3498,7 +3498,7 @@ int jscmain(int argc, char** argv)
- #endif
+@@ -4613,8 +4613,8 @@ int jscmain(int argc, char** argv)
+ 
      initializeTimeoutIfNeeded();
 
 -#if OS(DARWIN) || OS(LINUX)
 +#if OS(DARWIN) || OS(LINUX) || OS(ANDROID)
      startMemoryMonitoringThreadIfNeeded();
  #endif
+ 
+     if (Options::useSuperSampler())
