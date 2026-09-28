@@ -29,6 +29,9 @@ PACKAGES+=" zstd"
 # Used to setup NDK toolchain without having to copy the whole toolchain to save some disk space
 PACKAGES+=" fuse-overlayfs"
 
+# Used to bootstrap the persistent user/mount namespace in run-docker.sh.
+PACKAGES+=" libcap2-bin"
+
 # Used by common build systems.
 PACKAGES+=" autoconf"
 PACKAGES+=" autogen"

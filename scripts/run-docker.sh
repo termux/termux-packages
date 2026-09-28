@@ -92,7 +92,10 @@ if [ "$UNAME" = Darwin ]; then
 	SEC_OPT=""
 else
 	REPOROOT="$(dirname $(readlink -f $0))/../"
-	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --security-opt apparmor=_custom-termux-package-builder-$CONTAINER_NAME --cap-add CAP_SYS_ADMIN --device /dev/fuse"
+	SEC_OPT=" --security-opt seccomp=$REPOROOT/scripts/profile.json --device /dev/fuse"
+	if [ -r /sys/module/apparmor/parameters/enabled ] && grep -q '^Y' /sys/module/apparmor/parameters/enabled; then
+		SEC_OPT+=" --security-opt apparmor=unconfined"
+	fi
 fi
 
 if [ "${CI:-}" = "true" ]; then
@@ -101,14 +104,14 @@ else
 	CI_OPT=""
 fi
 
-# Required for Linux with SELinux and btrfs to avoid permission issues, eg: Fedora
-# To reset, use "restorecon -Fr ."
-# To check, use "ls -Z ."
+mkdir -p "$REPOROOT/output"
+
 if [ -n "$(command -v getenforce)" ] && [ "$(getenforce)" = Enforcing ]; then
-	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages:z
+	REPO_MOUNT=(--volume "$REPOROOT:$CONTAINER_HOME_DIR/termux-packages:ro,z")
 else
-	VOLUME=$REPOROOT:$CONTAINER_HOME_DIR/termux-packages
+	REPO_MOUNT=(--mount "type=bind,src=$REPOROOT,dst=$CONTAINER_HOME_DIR/termux-packages,readonly,bind-recursive=disabled")
 fi
+OUTPUT_MOUNT=(--volume "$REPOROOT/output:$CONTAINER_HOME_DIR/termux-packages/output")
 
 USER=builder
 
@@ -127,37 +130,12 @@ else
 	DOCKER_TTY=""
 fi
 
-APPARMOR_PARSER=""
-if command -v apparmor_parser > /dev/null; then
-	APPARMOR_PARSER="apparmor_parser"
-fi
-
-if [ -z "$APPARMOR_PARSER" ] || ! $SUDO aa-status --enabled; then
-	echo "WARNING: apparmor_parser not found, AppArmor profiles will not be loaded!"
-	echo "         This is not recommended, as it may cause security issues and unexpected behavior"
-	echo "         Avoid executing untrusted code in the container"
-	APPARMOR_PARSER=""
-fi
-
-load_apparmor_profile() {
-	local profile_path="$1"
-	local msg="${2:-}"
-	if [ -n "$APPARMOR_PARSER" ]; then
-		if [ -n "$msg" ]; then
-			echo "$msg..."
-		fi
-		cat "$profile_path" | sed -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" | sudo "$APPARMOR_PARSER" -rK
-	fi
-}
-
-# Load the relaxed AppArmor profile first as we might need to change permissions
-load_apparmor_profile ./scripts/profile-relaxed.apparmor
 
 __change_builder_uid_gid() {
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
-			echo "Changed builder uid/gid... (this may take a while)"
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) $CONTAINER_HOME_DIR
+			echo "Changing builder uid/gid... (this may take a while)"
+			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo find $CONTAINER_HOME_DIR -xdev ! -path $CONTAINER_HOME_DIR/termux-packages -exec chown $(id -u):$(id -g) {} +
 			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) /data
 			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u $(id -u) builder
 			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g $(id -g) builder
@@ -188,6 +166,42 @@ __change_container_pid_max() {
 	fi
 }
 
+NAMESPACE_HOLDER_PID_FILE=/tmp/termux-build-namespace.pid
+
+__get_namespace_holder_pid() {
+	local pid
+	pid="$($SUDO docker exec $CONTAINER_NAME cat $NAMESPACE_HOLDER_PID_FILE 2>/dev/null || :)"
+	if [[ "$pid" =~ ^[0-9]+$ ]] && $SUDO docker exec $CONTAINER_NAME test -r /proc/$pid/ns/user; then
+		echo "$pid"
+		return 0
+	fi
+	return 1
+}
+
+__ensure_namespace_holder() {
+	if [ "$UNAME" = Darwin ]; then
+		return
+	fi
+	if __get_namespace_holder_pid >/dev/null; then
+		return
+	fi
+
+	echo "Creating persistent user/mount namespace for package builds..."
+	$SUDO docker exec --detach --privileged --user 0 $CONTAINER_NAME \
+		capsh --keep=1 --user=builder --caps=cap_sys_admin+eip --addamb=cap_sys_admin -- -c \
+		"exec unshare -U --map-current-user --keep-caps -m --propagation unchanged sh -c 'echo \$\$ > $NAMESPACE_HOLDER_PID_FILE; exec sleep infinity'"
+
+	local i
+	for i in {1..50}; do
+		if __get_namespace_holder_pid >/dev/null; then
+			return
+		fi
+		sleep 0.1
+	done
+	echo "Failed to create persistent build namespace" >&2
+	exit 1
+}
+
 
 if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 	echo "Creating new container..."
@@ -195,21 +209,24 @@ if ! $SUDO docker container inspect $CONTAINER_NAME > /dev/null 2>&1; then
 		--detach \
 		--init \
 		--name $CONTAINER_NAME \
-		--volume $VOLUME \
+		"${REPO_MOUNT[@]}" \
+		"${OUTPUT_MOUNT[@]}" \
 		$SEC_OPT \
 		--tty \
 		$TERMUX_DOCKER_RUN_EXTRA_ARGS \
 		$TERMUX_BUILDER_IMAGE_NAME
 	__change_builder_uid_gid
 	__change_container_pid_max
+	__ensure_namespace_holder
 fi
 
 if [[ "$($SUDO docker container inspect -f '{{ .State.Running }}' $CONTAINER_NAME)" == "false" ]]; then
 	$SUDO docker start $CONTAINER_NAME >/dev/null 2>&1
 	__change_container_pid_max
+	__ensure_namespace_holder
 fi
 
-load_apparmor_profile ./scripts/profile-restricted.apparmor "Loading restricted AppArmor profile"
+__ensure_namespace_holder
 
 # Set traps to ensure that the process started with docker exec and all its children are killed.
 . "$TERMUX_SCRIPTDIR/scripts/utils/docker/docker.sh"; docker__setup_docker_exec_traps
@@ -218,4 +235,10 @@ if [ "$#" -eq "0" ]; then
 	set -- bash
 fi
 
-$SUDO docker exec $CI_OPT --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME "$@"
+if [ "$UNAME" = Darwin ]; then
+	$SUDO docker exec $CI_OPT --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME "$@"
+else
+	NAMESPACE_HOLDER_PID="$(__get_namespace_holder_pid)"
+	$SUDO docker exec $CI_OPT --env "DOCKER_EXEC_PID_FILE_PATH=$DOCKER_EXEC_PID_FILE_PATH" --interactive $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME \
+		nsenter --target "$NAMESPACE_HOLDER_PID" --user -m --preserve-credentials --keep-caps --wdns="$CONTAINER_HOME_DIR/termux-packages" "$@"
+fi
