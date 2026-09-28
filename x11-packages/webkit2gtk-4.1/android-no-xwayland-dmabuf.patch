@@ -1,0 +1,39 @@
+--- a/Source/ThirdParty/ANGLE/src/libANGLE/renderer/driver_utils.cpp
++++ b/Source/ThirdParty/ANGLE/src/libANGLE/renderer/driver_utils.cpp
+@@ -395,7 +395,7 @@
+ 
+ bool IsXWayland()
+ {
+-#if defined(ANGLE_PLATFORM_LINUX)
++#if defined(ANGLE_PLATFORM_LINUX) && !defined(__ANDROID__)
+     // Detects the Wayland session rather than the connection, so callers must be
+     // on an X11 code path for this to mean XWayland. Cached: the session type is
+     // fixed for the life of the process.
+--- a/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
++++ b/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
+@@ -106 +106,2 @@
+-        if (auto* glDisplay = Display::singleton().glDisplay()) {
++#if USE(GBM)
++        if (auto* glDisplay = Display::singleton().glDisplay()) {
+@@ -110 +111,2 @@
+-        }
++        }
++#endif
+@@ -390,6 +390,9 @@
+ 
+ RefPtr<AcceleratedBackingStore::Buffer> AcceleratedBackingStore::BufferEGLImage::create(WebPageProxy& webPage, uint64_t id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes)
+ {
++#if !USE(GBM)
++    return nullptr;
++#else
+     auto* glDisplay = Display::singleton().glDisplay();
+     if (!glDisplay)
+         return nullptr;
+@@ -401,6 +404,7 @@
+     }
+ 
+     return adoptRef(*new BufferEGLImage(webPage, id, surfaceID, size, usage, WTF::move(dmaBufAttributes), image));
++#endif
+ }
+ 
+ AcceleratedBackingStore::BufferEGLImage::BufferEGLImage(WebPageProxy& webPage, uint64_t id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes, EGLImage image)

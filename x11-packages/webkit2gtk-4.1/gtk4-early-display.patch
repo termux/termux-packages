@@ -1,0 +1,17 @@
+Avoid probing GTK4 GL before a default display exists.
+
+--- a/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
++++ b/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
+@@ -121,7 +121,11 @@ static bool gtkCanUseHardwareAcceleration()
+     std::call_once(onceFlag, [] {
+         GUniqueOutPtr<GError> error;
+ #if USE(GTK4)
+-        canUseHardwareAcceleration = gdk_display_prepare_gl(gdk_display_get_default(), &error.outPtr());
++        auto* display = gdk_display_get_default();
++        if (!display)
++            return;
++
++        canUseHardwareAcceleration = gdk_display_prepare_gl(display, &error.outPtr());
+ #else
+         auto* window = gtk_window_new(GTK_WINDOW_POPUP);
+         gtk_widget_realize(window);
