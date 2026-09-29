@@ -1,0 +1,43 @@
+--- a/src/main/native/jansi_structs.c
++++ b/src/main/native/jansi_structs.c
+@@ -34,8 +34,10 @@ void cacheTermiosFields(JNIEnv *env, job
+ 	TermiosFc.c_cflag = (*env)->GetFieldID(env, TermiosFc.clazz, "c_cflag", "J");
+ 	TermiosFc.c_lflag = (*env)->GetFieldID(env, TermiosFc.clazz, "c_lflag", "J");
+ 	TermiosFc.c_cc = (*env)->GetFieldID(env, TermiosFc.clazz, "c_cc", "[B");
++#ifndef __ANDROID__
+ 	TermiosFc.c_ispeed = (*env)->GetFieldID(env, TermiosFc.clazz, "c_ispeed", "J");
+ 	TermiosFc.c_ospeed = (*env)->GetFieldID(env, TermiosFc.clazz, "c_ospeed", "J");
++#endif
+ 	hawtjni_w_barrier();
+ 	TermiosFc.cached = 1;
+ }
+@@ -61,12 +63,14 @@ struct termios *getTermiosFields(JNIEnv
+ 	(*env)->GetByteArrayRegion(env, lpObject1, 0, sizeof(lpStruct->c_cc), (jbyte *)lpStruct->c_cc);
+ 	}
+ #endif
++#ifndef __ANDROID__
+ #if defined(HAVE_IOCTL)
+ 	lpStruct->c_ispeed = (*env)->GetLongField(env, lpObject, TermiosFc.c_ispeed);
+ #endif
+ #if defined(HAVE_IOCTL)
+ 	lpStruct->c_ospeed = (*env)->GetLongField(env, lpObject, TermiosFc.c_ospeed);
+ #endif
++#endif
+ 	return lpStruct;
+ }
+ 
+@@ -91,12 +95,14 @@ void setTermiosFields(JNIEnv *env, jobje
+ 	(*env)->SetByteArrayRegion(env, lpObject1, 0, sizeof(lpStruct->c_cc), (jbyte *)lpStruct->c_cc);
+ 	}
+ #endif
++#ifndef __ANDROID__
+ #if defined(HAVE_IOCTL)
+ 	(*env)->SetLongField(env, lpObject, TermiosFc.c_ispeed, (jlong)lpStruct->c_ispeed);
+ #endif
+ #if defined(HAVE_IOCTL)
+ 	(*env)->SetLongField(env, lpObject, TermiosFc.c_ospeed, (jlong)lpStruct->c_ospeed);
+ #endif
++#endif
+ }
+ #endif
+ 
