@@ -1,0 +1,94 @@
+--- a/native/src/components/runtime.rs
++++ b/native/src/components/runtime.rs
+@@ -13,7 +13,14 @@
+ use crate::components::site::Site;
+ use crate::directories::ProjectDirs;
+ 
+-pub const FFOX_PATHS: [&str; 2] = ["/usr/lib/firefox/", "/usr/lib/firefox-esr/"];
++pub const FFOX_PATHS: [&str; 2] = {
++    cfg_if! {
++    if #[cfg(platform_termux)] {
++        ["@TERMUX_PREFIX@/lib/firefox/", "@TERMUX_PREFIX@/lib/firefox-esr/"]
++    } else {
++    ["/usr/lib/firefox/", "/usr/lib/firefox-esr/"]
++    }}
++};
+ pub const FFOX_BINS: [&str; 2] = ["firefox", "firefox-esr"];
+ 
+ // Returns the first system Firefox directory that exists,
+@@ -37,7 +44,7 @@
+ }
+ 
+ cfg_if! {
+-    if #[cfg(any(platform_linux, platform_bsd))] {
++    if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+         use std::fs::{set_permissions, DirEntry};
+         use std::os::unix::fs::PermissionsExt;
+ 
+@@ -207,7 +214,7 @@
+             cfg_if! {
+                 if #[cfg(platform_windows)] {
+                     directory.join("firefox.exe")
+-                } else if #[cfg(any(platform_linux, platform_bsd))] {
++                } else if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+                     directory.join("firefox")
+                 } else if #[cfg(platform_macos)] {
+                     directory.join("Firefox.app/Contents/MacOS/firefox")
+@@ -219,7 +226,7 @@
+ 
+         let config = {
+             cfg_if! {
+-                if #[cfg(any(platform_windows, platform_linux, platform_bsd))] {
++                if #[cfg(any(platform_windows, platform_linux, platform_bsd, platform_termux))] {
+                     directory.join("application.ini")
+                 } else if #[cfg(platform_macos)] {
+                     directory.join("Firefox.app/Contents/Resources/application.ini")
+@@ -262,7 +269,7 @@
+         const COPY_ERROR: &str = "Failed to copy the runtime";
+         const CLEANUP_ERROR: &str = "Failed to clean up the runtime";
+ 
+-        #[cfg(platform_linux)]
++        #[cfg(any(platform_linux, platform_termux))]
+         {
+             use crate::storage::Storage;
+ 
+@@ -315,7 +322,7 @@
+ 
+                 source.push("core");
+ 
+-            } else if #[cfg(platform_linux)] {
++            } else if #[cfg(any(platform_linux, platform_termux))] {
+                 use std::fs::File;
+                 use xz2::read::XzDecoder;
+                 use tar::Archive;
+@@ -361,7 +368,7 @@
+         Ok(())
+     }
+ 
+-    #[cfg(all(platform_linux, not(feature = "immutable-runtime")))]
++    #[cfg(all(any(platform_linux, platform_termux), not(feature = "immutable-runtime")))]
+     pub fn link(&self) -> Result<()> {
+         use std::fs::{copy, create_dir_all};
+         use std::os::unix::fs::symlink;
+@@ -377,6 +384,12 @@
+ 
+         info!("Linking the runtime");
+ 
++        // Prevents 'No such file or directory (os error 2)' during 'firefoxpwa runtime install --link'
++        // by creating the '~/.local/share/firefoxpwa/runtime/' directory.
++        if !Path::new(&self.directory).exists() {
++            create_dir_all(&self.directory)?;
++        }
++
+         if Path::new(ffox()).exists() {
+             for entry in read_dir(ffox())?.flatten() {
+                 let entry = entry.path();
+@@ -444,7 +457,7 @@
+         copy(&source, &target, &options).context("Failed to patch the runtime")?;
+ 
+         cfg_if! {
+-            if #[cfg(any(platform_linux, platform_bsd))] {
++            if #[cfg(any(platform_linux, platform_bsd, platform_termux))] {
+                 visit_dirs(&source, &source, target, &make_writable)?;
+             }
+         }

@@ -1,0 +1,54 @@
+--- a/abc/src/base/abci/abc.c
++++ b/abc/src/base/abci/abc.c
+@@ -278,7 +278,9 @@
+ static int Abc_CommandMatch                  ( Abc_Frame_t * pAbc, int argc, char ** argv );
+ //static int Abc_CommandHaig                   ( Abc_Frame_t * pAbc, int argc, char ** argv );
+ static int Abc_CommandQbf                    ( Abc_Frame_t * pAbc, int argc, char ** argv );
++#ifdef __LP64__
+ static int Abc_CommandAigSim                 ( Abc_Frame_t * pAbc, int argc, char ** argv );
++#endif
+ 
+ static int Abc_CommandFraig                  ( Abc_Frame_t * pAbc, int argc, char ** argv );
+ static int Abc_CommandFraigTrust             ( Abc_Frame_t * pAbc, int argc, char ** argv );
+@@ -1113,7 +1115,9 @@
+     Cmd_CommandAdd( pAbc, "New AIG",      "csweep",        Abc_CommandCSweep,           1 );
+ //    Cmd_CommandAdd( pAbc, "New AIG",      "haig",          Abc_CommandHaig,             1 );
+     Cmd_CommandAdd( pAbc, "New AIG",      "qbf",           Abc_CommandQbf,              0 );
++#ifdef __LP64__
+     Cmd_CommandAdd( pAbc, "New AIG",      "aigsim",        Abc_CommandAigSim,           0 );
++#endif
+ 
+     Cmd_CommandAdd( pAbc, "Fraiging",     "fraig",         Abc_CommandFraig,            1 );
+     Cmd_CommandAdd( pAbc, "Fraiging",     "fraig_trust",   Abc_CommandFraigTrust,       1 );
+@@ -19293,6 +19297,7 @@
+   SeeAlso     []
+ 
+ ***********************************************************************/
++#ifdef __LP64__
+ int Abc_CommandAigSim( Abc_Frame_t * pAbc, int argc, char ** argv )
+ {
+     extern int SimulateAigTop( char *fname1, char *fname2, char * mask, int verbose );
+@@ -19342,6 +19347,7 @@
+     Abc_Print( -2, "\t<file2>  : the second file to simulate\n");
+     return 1;
+ }
++#endif
+ 
+ /**Function*************************************************************
+ 
+--- a/abc/src/misc/util/utilAigSim.c
++++ b/abc/src/misc/util/utilAigSim.c
+@@ -29,6 +29,8 @@
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ 
++#ifdef __LP64__
++
+ #define AIGSIM_LIBRARY_ONLY
+ 
+ #ifdef AIGSIM_LIBRARY_ONLY
+@@ -679,3 +681,4 @@
+ #endif
+ 
+ 
++#endif

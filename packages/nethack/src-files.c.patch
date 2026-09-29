@@ -1,0 +1,13 @@
+--- a/src/files.c
++++ b/src/files.c
+@@ -1052,8 +1052,8 @@
+     regularize_it = FALSE;
+ #endif
+ #ifdef UNIX
+-    Sprintf(gs.SAVEF, "save/%d%s", (int) getuid(), svp.plname);
+-    regoffset = 5;
++    Sprintf(gs.SAVEF, "@TERMUX_PREFIX@/games/nethackdir/save/termux_%s", svp.plname);
++    regoffset = 0;
+     indicator_spot = 2;
+ #endif
+ #if defined(MSDOS)

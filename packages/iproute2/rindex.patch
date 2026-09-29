@@ -1,0 +1,31 @@
+--- iproute2-5.15.0/tc/f_flower.c.orig
++++ iproute2-5.15.0/tc/f_flower.c
+@@ -304,7 +304,7 @@
+ 	char *slash, *mask = NULL;
+ 	size_t slen, slen_mask = 0;
+ 
+-	slash = index(str, '/');
++	slash = strchr(str, '/');
+ 	if (slash) {
+ 		*slash = 0;
+ 		mask = slash + 1;
+@@ -1087,7 +1087,7 @@
+ 			if (mask_len + strlen(token) > XATTR_SIZE_MAX)
+ 				return -1;
+ 
+-			data_len = strlen(rindex(token, ':'));
++			data_len = strlen(strrchr(token, ':'));
+ 			sprintf(&mask[mask_len], "ffff:ff:");
+ 			mask_len += 8;
+ 			memset(&mask[mask_len], 'f', data_len - 1);
+--- iproute2-5.15.0/tc/m_ct.c.orig
++++ iproute2-5.15.0/tc/m_ct.c
+@@ -163,7 +163,7 @@
+ 	char *slash, *mask = NULL;
+ 	size_t slen, slen_mask = 0;
+ 
+-	slash = index(str, '/');
++	slash = strchr(str, '/');
+ 	if (slash) {
+ 		*slash = 0;
+ 		mask = slash+1;

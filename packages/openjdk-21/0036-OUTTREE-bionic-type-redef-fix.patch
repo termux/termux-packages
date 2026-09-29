@@ -1,0 +1,26 @@
+From 8af2360f4c09afc7a2899f93391cd75ecd8e2b75 Mon Sep 17 00:00:00 2001
+From: Robert Kirkman <31490854+robertkirkman@users.noreply.github.com>
+Date: Fri, 11 Jul 2025 14:40:58 +0800
+Subject: [PATCH 36/40] OUTTREE bionic type redef fix
+
+Co-authored-by: eval Nya <11857526-nexplorer-3e@users.noreply.gitlab.com>
+---
+ src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
+index e470bbc4e03..2cd14f259c4 100644
+--- a/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
++++ b/src/java.base/unix/native/libnio/fs/UnixNativeDispatcher.c
+@@ -79,7 +79,7 @@
+ // by defining binary compatible statx structs in this file and
+ // not relying on included headers.
+ 
+-#ifndef __GLIBC__
++#if !defined(__BIONIC__) && !defined(__GLIBC__)
+ // Alpine doesn't know these types, define them
+ typedef unsigned int       __uint32_t;
+ typedef unsigned short     __uint16_t;
+-- 
+2.50.1
+

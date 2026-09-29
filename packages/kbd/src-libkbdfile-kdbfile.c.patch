@@ -1,0 +1,10 @@
++++ ./src/libkbdfile/kbdfile.c
+@@ -107,7 +107,7 @@
+ {
+ 	*buf = '\0';
+ 
+-#if defined(__GLIBC__) && defined(_GNU_SOURCE)
++#if (defined(__GLIBC__) || defined(__ANDROID__)) && defined(_GNU_SOURCE)
+ 	return strerror_r(errnum, buf, buflen);
+ #else
+ 	int sv_errno = errno;

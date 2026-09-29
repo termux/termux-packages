@@ -1,0 +1,29 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+DUMP_DIR="$TERMUX_PKG_GIR_PRE_GENERATED_DUMP_DIR"
+mkdir -p "$DUMP_DIR" || exit 1
+
+ERROR_HEADER="gi-cross-launcher: ERROR:"
+
+#logfile="$(readlink -f "$(dirname "$0")")/../gi-cross-launcher.log"
+#echo "$@" >> "$logfile"
+
+cmd="$1"
+case "$cmd" in
+    */g-ir-compiler | g-ir-compiler ) exec "$@" ;;
+esac
+
+arg="$2"
+case "$arg" in
+    --introspect-dump=*,* ) ;;
+    * ) echo "$ERROR_HEADER Unsupported command: $@" >&2; exit 1 ;;
+esac
+
+cmd_base="$(basename "$cmd")"
+dest_xml="${arg##*,}"
+"$@"
+ret="$?"
+if [ "$ret" -ne 0 ]; then
+    exit "$ret"
+fi
+cp "$dest_xml" "$DUMP_DIR/${cmd_base}.xml" || exit 1

@@ -1,0 +1,59 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -191,7 +191,7 @@
+ ifeq ($(BUILD_OS),Darwin)
+ MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ else ifneq ($(BUILD_OS),Windows)
+-MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB) -Wl,-rpath,.
++MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ else
+ MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ endif
+@@ -367,8 +367,8 @@
+ GMIC_STD_CFLAGS = $(MANDATORY_CFLAGS) $(DISPLAY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_STD_LIBS = $(MANDATORY_LIBS) $(DISPLAY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+ ifeq ($(BUILD_OS),Unix) # Unix
+-GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
+-GMIC_STD_LIBS += $(OPENMP_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
++GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
++GMIC_STD_LIBS += $(OPENEXR_LIBS) $(WEBP_LIBS)
+ else ifeq ($(BUILD_OS),Darwin) # MacOSX
+ GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS)
+ GMIC_STD_LIBS += $(OPENEXR_LIBS)
+@@ -442,9 +442,13 @@
+ # Regular builds.
+ #
+ cli: # Default: Without OpenCV support
+-	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
++	$(MAKE) --no-print-directory "CFLAGS+=$(OPT_CFLAGS) $(GMIC_STD_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
+ 	$(STRIP) gmic$(EXE)
+ 
++cli_gm:
++	$(MAKE) --no-print-directory "CFLAGS+=$(OPT_CFLAGS) $(GMIC_STD_CFLAGS)" "LIBS+=gmic_gm.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic_gm.o _cli_gm
++	$(STRIP) gmic-gm$(EXE)
++
+ opencv: # Default: With OpenCV support
+ 	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) $(OPENCV_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS) $(OPENCV_LIBS)" gmic.o _cli
+ 	$(STRIP) gmic$(EXE)
+@@ -482,13 +486,20 @@
+ 	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) -g -pg" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
+ 
+ _cli: gmic$(EXE)
++_cli_gm: gmic-gm$(EXE)
+ 
+ gmic$(EXE): gmic_cli.cpp gmic.o
+-	$(CXX) -o gmic$(EXE) gmic_cli.cpp $(CFLAGS) $(LIBS)
++	$(CXX) $(LDFLAGS) -o gmic$(EXE) gmic_cli.cpp $(CFLAGS) $(LIBS)
++
++gmic-gm$(EXE): gmic_cli.cpp gmic_gm.o
++	$(CXX) $(LDFLAGS) -o gmic-gm$(EXE) gmic_cli.cpp $(CFLAGS) $(MAGICK_CFLAGS) $(LIBS) $(MAGICK_LIBS)
+ 
+ gmic.o: gmic.cpp gmic.h gmic_stdlib_community.h CImg.h
+ 	$(CXX) -o gmic.o -c gmic.cpp -Dgmic_core $(CFLAGS)
+ 
++gmic_gm.o: gmic.cpp gmic.h gmic_stdlib_community.h CImg.h
++	$(CXX) -o gmic_gm.o -c gmic.cpp -Dgmic_core $(CFLAGS) $(MAGICK_CFLAGS)
++
+ # Testing builds.
+ #
+ cli_sdl3:

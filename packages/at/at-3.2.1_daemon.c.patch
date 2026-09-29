@@ -1,0 +1,15 @@
+diff -uNr at-3.2.1/daemon.c at-3.2.1.mod/daemon.c
+--- at-3.2.1/daemon.c	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/daemon.c	2020-01-02 20:33:14.107959511 +0200
+@@ -51,6 +51,11 @@
+ int daemon_debug = 0;
+ int daemon_foreground = 0;
+ 
++#ifdef PIDFILE
++#undef PIDFILE
++#define PIDFILE "@TERMUX_PREFIX@/var/run/atd.pid"
++#endif
++
+ static int
+ lock_fd(int fd)
+ {

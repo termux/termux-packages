@@ -1,0 +1,21 @@
+--- a/Telegram/SourceFiles/platform/linux/specific_linux.cpp
++++ b/Telegram/SourceFiles/platform/linux/specific_linux.cpp
+@@ -51,9 +51,11 @@
+ namespace {
+ 
+ using namespace gi::repository;
+-namespace GObject = gi::repository::GObject;
++namespace GObjectNamespace = gi::repository::GObject;
+ using namespace Platform;
+ 
++#define GObject GObjectNamespace
++
+ void PortalAutostart(bool enabled, Fn<void(bool)> done) {
+ 	const auto executable = ExecutablePathForShortcuts();
+ 	if (executable.isEmpty()) {
+@@ -894,3 +896,5 @@
+ 
+ 	return true;
+ }
++
++#undef GObject

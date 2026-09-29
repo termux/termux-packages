@@ -1,0 +1,89 @@
+PREFIX ?= /usr
+LIBDIR ?= $(PREFIX)/lib
+INCLUDEDIR ?= $(PREFIX)/include
+
+LIBSEPOL_BASE := ../libsepol
+
+OBJS := src/android/android.o \
+        src/android/android_seapp.o \
+        src/avc.o \
+        src/avc_internal.o \
+        src/avc_sidtab.o \
+        src/booleans.o \
+        src/callbacks.o \
+        src/canonicalize_context.o \
+        src/checkAccess.o \
+        src/check_context.o \
+        src/compute_av.o \
+        src/compute_create.o \
+        src/compute_member.o \
+        src/context.o \
+        src/deny_unknown.o \
+        src/disable.o \
+        src/enabled.o \
+        src/fgetfilecon.o \
+        src/freecon.o \
+        src/fsetfilecon.o \
+        src/get_initial_context.o \
+        src/getenforce.o \
+        src/getfilecon.o \
+        src/getpeercon.o \
+        src/init.o \
+        src/label.o \
+        src/label_backends_android.o \
+        src/label_file.o \
+        src/label_support.o \
+        src/lgetfilecon.o \
+        src/load_policy.o \
+        src/lsetfilecon.o \
+        src/mapping.o \
+        src/matchpathcon.o \
+        src/policyvers.o \
+        src/procattr.o \
+        src/regex.o \
+        src/reject_unknown.o \
+        src/selinux_internal.o \
+        src/sestatus.o \
+        src/setenforce.o \
+        src/setfilecon.o \
+        src/setrans_client.o \
+        src/sha1.o \
+        src/stringrep.o
+
+CFLAGS := -DNO_PERSISTENTLY_STORED_PATTERNS \
+          -DDISABLE_SETRANS \
+          -DDISABLE_BOOL \
+          -D_GNU_SOURCE \
+          -DNO_MEDIA_BACKEND \
+          -DNO_X_BACKEND \
+          -DNO_DB_BACKEND \
+          -DANDROID \
+          -Wall \
+          -Werror \
+          -Wno-error=missing-noreturn \
+          -Wno-error=unused-function \
+          -Wno-error=unused-variable \
+          -DUSE_PCRE2 \
+          '-DAUDITD_LOG_TAG="auditd"' \
+          -DPCRE2_CODE_UNIT_WIDTH=8 \
+          -fPIC \
+          -I include \
+          -I src \
+          -I $(LIBSEPOL_BASE)/include
+
+LIBSELINUX := src/libandroid-selinux.so
+LIBSEPOL := $(LIBSEPOL_BASE)/src/libsepol.a
+
+$(LIBSELINUX): $(OBJS) $(LIBSEPOL)
+	$(CC) -o $@ $^ -shared -lpcre2-8 -llog $(LDFLAGS)
+
+$(LIBSEPOL):
+	$(MAKE) -C $(LIBSEPOL_BASE)/src libsepol.a
+
+install: $(LIBSELINUX)
+	test -d $(PREFIX) || install -d -m 755 $(PREFIX)
+	test -d $(LIBDIR) || install -d -m 755 $(LIBDIR)
+	install -m 755 $(LIBSELINUX) $(LIBDIR)
+	test -d $(INCLUDEDIR) || install -d -m 755 $(INCLUDEDIR)
+	test -d $(INCLUDEDIR)/selinux || install -d -m 755 $(INCLUDEDIR)/selinux
+	install -m 644 $(wildcard include/selinux/*.h) $(INCLUDEDIR)/selinux

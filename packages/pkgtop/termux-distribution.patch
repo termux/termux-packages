@@ -1,0 +1,32 @@
+diff -uNr pkgtop-2.4.1/cmd/pkgtop.go pkgtop-2.4.1.mod/cmd/pkgtop.go
+--- pkgtop-2.4.1/cmd/pkgtop.go	2022-10-16 01:36:46.000000000 +0300
++++ pkgtop-2.4.1.mod/cmd/pkgtop.go	2023-09-20 17:07:04.930371896 +0300
+@@ -35,7 +35,9 @@
+ 	cmdPrefix               = " λ ~ "                 /* Prefix for prepending to the commands */
+ 	cmdConfirm              = " [y] "                 /* Confirmation string for commands to execute */
+ 	osIDCmd                 = "awk -F '=' '/^ID=/ " + /* Print the OS ID information (for distro checking) */
+-		"{print tolower($2)}' /etc/*-release 2>/dev/null"
++		"{print tolower($2)}' /etc/*-release 2>/dev/null || " +
++		"{ [ -f \"@TERMUX_PREFIX@/bin/apt\" ] && echo \\\"termux-apt\\\"; } || " +
++		"{ [ -f \"@TERMUX_PREFIX@/bin/pacman\" ] && echo \\\"termux-pacman\\\"; }"
+ 	sysInfoCmd = "printf \"Hostname: $(uname -n)\\n" + /* Print the system information with 'uname' */
+ 		" Kernel: $(uname -s)\\n" +
+ 		" Kernel Release: $(uname -r)\\n" +
+@@ -46,7 +48,7 @@
+ 		" OS: $(uname -o)\\n\""
+ 	dfCmd   = "df -h 2> /dev/null | awk '{$1=$1};1 {if(NR>1)print}'" /* Print the disk usage with 'df' */
+ 	pkgsCmd = map[string]string{                                     /* Commands for listing the installed packages */
+-		"arch,manjaro,endeavouros": "pacman -Qi | awk '/^Name/{name=$3} " +
++		"arch,manjaro,endeavouros,termux-pacman": "pacman -Qi | awk '/^Name/{name=$3} " +
+ 			"/^Version/{ver=$3} " +
+ 			"/^Description/{desc=substr($0,index($0,$3))} " +
+ 			"/^Installed Size/{size=$4$5; " +
+@@ -56,7 +58,7 @@
+ 			"pacman -Rcns %s --noconfirm;pacman -S %s --noconfirm;" +
+ 			"pacman -Syu %s --noconfirm;x\"" +
+ 			"&& echo 'Name|Version|Installed Size|Description'",
+-		"debian,ubuntu,mint": "dpkg-query -W --showformat='${Package};${Version};" +
++		"debian,ubuntu,mint,termux,termux-apt": "dpkg-query -W --showformat='${Package};${Version};" +
+ 			"${Installed-Size};${binary:Summary}\\n' | sort -n -r -t ';' -k3 " +
+ 			"&& echo \"apt-cache show %s | sed -e 's/^/  /';apt-get -y remove %s;" +
+ 			"apt-get -y install %s;apt-get -y install --only-upgrade %s;x\" " +

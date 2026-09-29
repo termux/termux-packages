@@ -1,0 +1,24 @@
+erlang for Termux does not currently seem to support the odbc or jinterface
+features, so to avoid errors when building docs, they must be disabled
+from the docs Makefile. If the enabled features change in the future, this
+patch should be changed to match.
+
+Configure log summary report of these features being disabled
+(both in hostbuild and main build):
+jinterface     : Java compiler disabled by user
+odbc           : ODBC library - link check failed
+
+--- a/system/doc/top/Makefile
++++ b/system/doc/top/Makefile
+@@ -32,9 +32,9 @@ HTMLDIR=../../../doc
+ RELSYS_HTMLDIR=$(RELEASE_PATH)/doc
+ 
+ CORE=compiler erts kernel sasl stdlib
+-DATABASE=mnesia odbc
++DATABASE=mnesia
+ OAM=os_mon snmp
+-INTERFACES=asn1 crypto diameter eldap erl_interface ftp inets jinterface megaco \
++INTERFACES=asn1 crypto diameter eldap erl_interface ftp inets megaco \
+ 	public_key ssh ssl tftp wx xmerl
+ TOOLS=debugger dialyzer et observer parsetools reltool runtime_tools syntax_tools tools
+ TESTING=common_test eunit

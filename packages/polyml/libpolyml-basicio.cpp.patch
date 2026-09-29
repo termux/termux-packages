@@ -1,0 +1,11 @@
+--- a/libpolyml/basicio.cpp
++++ b/libpolyml/basicio.cpp
+@@ -993,7 +993,7 @@
+             if (buff == 0) raise_syscall(taskData, "Insufficient memory", NOMEMORY);
+             strcpy(buff, P_tmpdir);
+ #else
+-            const char *tmpdir = "/tmp";
++            const char *tmpdir = "@TERMUX_PREFIX@/tmp";
+             TempString buff((char *)malloc(strlen(tmpdir) + strlen(template_subdir) + 1));
+             if (buff == 0) raise_syscall(taskData, "Insufficient memory", NOMEMORY);
+             strcpy(buff, tmpdir);

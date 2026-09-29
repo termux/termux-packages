@@ -1,0 +1,70 @@
+Borrowed from https://github.com/gentoo/gentoo/blob/3b362ebdc0e307a3ab0f6975a8902acd1a294ea2/net-fs/nfs-utils/files/nfs-utils-2.5.2-no-werror.patch
+
+From 6ab8c7c186bd4a547a0ca435ecabe10ee50039c5 Mon Sep 17 00:00:00 2001
+From: Mike Frysinger <vapier@gentoo.org>
+Date: Thu, 22 Oct 2020 19:44:34 +0200
+Subject: [PATCH] Don't build with -Werror flags
+
+https://bugs.gentoo.org/656984
+
+Signed-off-by: Lars Wendler <polynomial-c@gentoo.org>
+---
+ configure.ac | 34 +---------------------------------
+ 1 file changed, 1 insertion(+), 33 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 50847d8a..6bc18e93 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -631,47 +631,15 @@ AC_SUBST(CPPFLAGS_FOR_BUILD)
+ AC_SUBST(LDFLAGS_FOR_BUILD)
+ 
+ my_am_cflags="\
+- -pipe \
+  -Wall \
+  -Wextra \
+  $rpcgen_cflags \
+- -Werror=missing-prototypes \
+- -Werror=missing-declarations \
+- -Werror=format=2 \
+- -Werror=undef \
+- -Werror=missing-include-dirs \
+- -Werror=strict-aliasing=2 \
+- -Werror=init-self \
+- -Werror=implicit-function-declaration \
+- -Werror=return-type \
+- -Werror=switch \
+- -Werror=overflow \
+- -Werror=parentheses \
+- -Werror=aggregate-return \
+- -Werror=unused-result \
+  -fno-strict-aliasing \
+ "
+ 
+-AC_DEFUN([CHECK_CCSUPPORT], [
+-  my_save_cflags="$CFLAGS"
+-  CFLAGS="-Werror $1"
+-  AC_MSG_CHECKING([whether CC supports $1])
+-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+-    [AC_MSG_RESULT([yes])]
+-    [$2+=$1],
+-    [AC_MSG_RESULT([no])]
+-  )
+-  CFLAGS="$my_save_cflags"
+-])
+-
+-CHECK_CCSUPPORT([-Werror=format-overflow=2], [flg1])
+-CHECK_CCSUPPORT([-Werror=int-conversion], [flg2])
+-CHECK_CCSUPPORT([-Werror=incompatible-pointer-types], [flg3])
+-CHECK_CCSUPPORT([-Werror=misleading-indentation], [flg4])
+-CHECK_CCSUPPORT([-Wno-cast-function-type], [flg5])
+ AX_GCC_FUNC_ATTRIBUTE([format])
+ 
+-AC_SUBST([AM_CFLAGS], ["$my_am_cflags $flg1 $flg2 $flg3 $flg4 $flg5"])
++AC_SUBST([AM_CFLAGS], ["$my_am_cflags"])
+ 
+ # Make sure that $ACLOCAL_FLAGS are used during a rebuild
+ AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \$(ACLOCAL_FLAGS)"])
+-- 
+2.29.0
+

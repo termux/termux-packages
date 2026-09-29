@@ -1,0 +1,38 @@
+--- a/dbus/dbus-sysdeps-unix.c
++++ b/dbus/dbus-sysdeps-unix.c
+@@ -144,7 +144,8 @@
+ 
+ #endif /* Solaris */
+ 
+-#if defined(__linux__) && defined(__NR_close_range) && !defined(HAVE_CLOSE_RANGE)
++#if defined(__linux__) && defined(__NR_close_range) && !defined(HAVE_CLOSE_RANGE) && \
++    !defined(__ANDROID__)
+ /* The kernel headers are new enough to have the close_range syscall,
+  * but glibc isn't new enough to have the syscall wrapper, so call the
+  * syscall directly. */
+@@ -1958,9 +1958,11 @@
+ #if defined(__linux__) && defined(SO_PEERGROUPS)
+   _DBUS_STATIC_ASSERT (sizeof (gid_t) <= sizeof (dbus_gid_t));
+   /* This function assumes socklen_t is unsigned, which is true on Linux */
+-  _DBUS_STATIC_ASSERT (((socklen_t) -1) > 0);
++  // But for some reason bionic 32-bit platforms have signed socklet_t so we will use casts.
++  //_DBUS_STATIC_ASSERT (((socklen_t) -1) > 0);
+   gid_t *buf = NULL;
+-  socklen_t len = 1024;
++  socklen_t _len = 1024; // in 32-bit
++  size_t len = _len;
+   dbus_bool_t oom = FALSE;
+   /* libdbus has a different representation of group IDs just to annoy you */
+   dbus_gid_t *converted_gids = NULL;
+@@ -1974,8 +1976,9 @@
+   if (buf == NULL)
+     return FALSE;
+ 
+-  while (getsockopt (client_fd, SOL_SOCKET, SO_PEERGROUPS, buf, &len) < 0)
+-    {
++  while (getsockopt (client_fd, SOL_SOCKET, SO_PEERGROUPS, buf, &_len) < 0)
++  {
++      len = (size_t) _len; // cast
+       int e = errno;
+       gid_t *replacement;
+ 

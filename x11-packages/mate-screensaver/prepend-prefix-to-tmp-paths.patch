@@ -1,0 +1,22 @@
+--- a/savers/slideshow.c
++++ b/savers/slideshow.c
+@@ -103,7 +103,7 @@ main (int argc, char **argv)
+ 	{
+ 		location = xdg_user_dir_lookup ("PICTURES");
+ 		if (location == NULL ||
+-		        strcmp (location, "/tmp") == 0 ||
++		        strcmp (location, "@TERMUX_PREFIX@/tmp") == 0 ||
+ 		        strcmp (location, g_get_home_dir ()) == 0)
+ 		{
+ 			free (location);
+--- a/savers/xdg-user-dir-lookup.c
++++ b/savers/xdg-user-dir-lookup.c
+@@ -45,7 +45,7 @@ xdg_user_dir_lookup (const char *type)
+ 	home_dir = getenv ("HOME");
+ 
+ 	if (home_dir == NULL)
+-		return strdup ("/tmp");
++		return strdup ("@TERMUX_PREFIX@/tmp");
+ 
+ 	config_home = getenv ("XDG_CONFIG_HOME");
+ 	if (config_home == NULL || config_home[0] == 0)

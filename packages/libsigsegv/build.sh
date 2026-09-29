@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libsigsegv/
+TERMUX_PKG_DESCRIPTION="GNU libsigsegv is a library for handling page faults in user mode"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.15"
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/libsigsegv/libsigsegv-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=036855660225cb3817a190fc00e6764ce7836051bacb48d35e26444b8c1729d9
+TERMUX_PKG_BREAKS="libsigsegv-dev"
+TERMUX_PKG_REPLACES="libsigsegv-dev"

@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Utility to print information about X11 windows"
+TERMUX_PKG_LICENSE="MIT, HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.1.7
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xwininfo-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=bee14d594cc86cc59aae1015c1b452a71bf60c304131e2716ca1cf0df733b4ac
+TERMUX_PKG_DEPENDS="libiconv, libxcb"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_DEPENDS="libx11, xorg-util-macros"

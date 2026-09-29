@@ -1,0 +1,11 @@
+--- a/plugins/multiarc/src/formats/rar/unrar/os.hpp	2025-11-16 22:41:01.289387098 +0530
++++ b/plugins/multiarc/src/formats/rar/unrar/os.hpp	2025-11-16 22:41:11.123385382 +0530
+@@ -175,7 +175,7 @@
+ #define SAVE_LINKS
+ #endif
+ 
+-#if defined(__linux) || defined(__FreeBSD__)
++#if (defined(__linux) && !defined(__ANDROID__)) || defined(__FreeBSD__)
+ #include <sys/time.h>
+ #define USE_LUTIMES
+ #endif

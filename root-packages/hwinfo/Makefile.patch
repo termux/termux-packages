@@ -1,0 +1,49 @@
+--- a/Makefile
++++ b/Makefile
+@@ -22,17 +22,11 @@
+ 
+ include Makefile.common
+ 
+-INSTALL_PREFIX = /usr
++INSTALL_PREFIX =
+ 
+ BASHCOMP_DIR ?= $(INSTALL_PREFIX)/share/bash-completion/completions
+ 
+-ifeq "$(ARCH)" "x86_64"
+-LIBDIR		?= $(INSTALL_PREFIX)/lib64
+-else ifeq "$(ARCH)" "loongarch64"
+-LIBDIR		?= $(INSTALL_PREFIX)/lib64
+-else
+-LIBDIR		?= $(INSTALL_PREFIX)/lib
+-endif
++LIBDIR		= /lib
+ ULIBDIR		= $(LIBDIR)
+ 
+ # ia64
+@@ -108,11 +102,11 @@
+ 	@cd doc ; doxygen libhd.doxy
+ 
+ install:
+-	install -d -m 755 $(DESTDIR)$(INSTALL_PREFIX)/sbin $(DESTDIR)$(ULIBDIR) \
++	install -d -m 755 $(DESTDIR)$(INSTALL_PREFIX)/bin $(DESTDIR)$(ULIBDIR) \
+ 		$(DESTDIR)$(ULIBDIR)/pkgconfig $(DESTDIR)$(INSTALL_PREFIX)/include
+-	install -m 755 hwinfo $(DESTDIR)$(INSTALL_PREFIX)/sbin
+-	install -m 755 src/ids/check_hd $(DESTDIR)$(INSTALL_PREFIX)/sbin
+-	install -m 755 src/ids/convert_hd $(DESTDIR)$(INSTALL_PREFIX)/sbin
++	install -m 755 hwinfo $(DESTDIR)$(INSTALL_PREFIX)/bin
++	install -m 755 src/ids/check_hd $(DESTDIR)$(INSTALL_PREFIX)/bin
++	install -m 755 src/ids/convert_hd $(DESTDIR)$(INSTALL_PREFIX)/bin
+ 	if [ -f $(LIBHD_SO) ] ; then \
+ 		install $(LIBHD_SO) $(DESTDIR)$(ULIBDIR) ; \
+ 		ln -snf $(LIBHD_NAME) $(DESTDIR)$(ULIBDIR)/$(LIBHD_SONAME) ; \
+@@ -124,8 +118,8 @@
+ 	install -m 644 src/hd/hd.h $(DESTDIR)$(INSTALL_PREFIX)/include
+ 	perl -pi -e "s/define\s+HD_VERSION\b.*/define HD_VERSION\t\t$(LIBHD_MAJOR_VERSION)/" $(DESTDIR)$(INSTALL_PREFIX)/include/hd.h
+ 	perl -pi -e "s/define\s+HD_MINOR_VERSION\b.*/define HD_MINOR_VERSION\t$(LIBHD_MINOR_VERSION)/" $(DESTDIR)$(INSTALL_PREFIX)/include/hd.h
+-	install -m 755 getsysinfo $(DESTDIR)$(INSTALL_PREFIX)/sbin
+-	install -m 755 src/isdn/cdb/mk_isdnhwdb $(DESTDIR)$(INSTALL_PREFIX)/sbin
++	install -m 755 getsysinfo $(DESTDIR)$(INSTALL_PREFIX)/bin
++	install -m 755 src/isdn/cdb/mk_isdnhwdb $(DESTDIR)$(INSTALL_PREFIX)/bin
+ 	install -d -m 755 $(DESTDIR)$(INSTALL_PREFIX)/share/hwinfo
+ 	install -d -m 755 $(DESTDIR)/var/lib/hardware/udi
+ 	install -m 644 src/isdn/cdb/ISDN.CDB.txt $(DESTDIR)$(INSTALL_PREFIX)/share/hwinfo

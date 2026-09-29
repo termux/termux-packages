@@ -1,0 +1,20 @@
+--- a/src/pref_dialog.c
++++ b/src/pref_dialog.c
+@@ -384,7 +384,7 @@
+ 	prefs_dialog->preferred_temp_dir = gtk_combo_box_text_new();
+ 	gtk_table_attach(GTK_TABLE(table), prefs_dialog->preferred_temp_dir,
+ 	                 1, 2, 5, 6, GTK_EXPAND | GTK_FILL, GTK_SHRINK, 0, 0);
+-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_temp_dir), _("/tmp"));
++	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_temp_dir), _("@TERMUX_PREFIX@/tmp"));
+ 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_temp_dir), _("choose..."));
+ 	gtk_combo_box_set_focus_on_click(GTK_COMBO_BOX(prefs_dialog->preferred_temp_dir), FALSE);
+ 	g_signal_connect(prefs_dialog->preferred_temp_dir, "changed", G_CALLBACK(xa_prefs_combo_changed), GUINT_TO_POINTER(1));
+@@ -397,7 +397,7 @@
+ 	prefs_dialog->preferred_extract_dir = gtk_combo_box_text_new();
+ 	gtk_table_attach(GTK_TABLE(table), prefs_dialog->preferred_extract_dir,
+ 	                 1, 2, 6, 7, GTK_EXPAND | GTK_FILL, GTK_SHRINK, 0, 0);
+-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_extract_dir), _("/tmp"));
++	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_extract_dir), _("@TERMUX_PREFIX@/tmp"));
+ 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_dialog->preferred_extract_dir), _("choose..."));
+ 	gtk_combo_box_set_focus_on_click(GTK_COMBO_BOX(prefs_dialog->preferred_extract_dir), FALSE);
+ 	g_signal_connect(prefs_dialog->preferred_extract_dir, "changed", G_CALLBACK(xa_prefs_combo_changed), GUINT_TO_POINTER(1));

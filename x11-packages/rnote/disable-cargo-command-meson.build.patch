@@ -1,0 +1,66 @@
+--- a/meson.build
++++ b/meson.build
+@@ -1,4 +1,4 @@
+-project('rnote', ['rust', 'cpp'], version: '0.14.2', meson_version: '>= 1.0')
++project('rnote', ['cpp'], version: '0.14.2', meson_version: '>= 1.0')
+ # add a patch suffix for alpha or beta versions in format '-<alpha|beta>.<x>'.
+ patch = ''
+ 
+@@ -63,7 +63,6 @@ dependency('gio-2.0', version: '>= 2.76')
+ dependency('cairo', version: '>= 1.18')
+ # UI/CLI specific dependencies are declared below
+ 
+-cargo = find_program('cargo', required: true)
+ # cmake is needed by the "ink-stroke-modeler-rs" bindings crate to build the C++ library
+ find_program('cmake', required: true)
+ find_program('glib-compile-resources', required: true)
+@@ -91,6 +90,7 @@ subdir('crates/rnote-compose')
+ subdir('crates/rnote-engine')
+ 
+ # cargo fmt check
++if false
+ run_target(
+     'cargo-fmt-check',
+     command: [
+@@ -132,6 +132,7 @@ run_target(
+     ],
+     env: cargo_env,
+ )
++endif
+ 
+ # build/install the ui
+ if build_ui == true
+@@ -173,6 +174,7 @@ if build_ui == true
+         ui_output = app_name
+     endif
+ 
++if false
+     # ui cargo check
+     run_target(
+         'ui-cargo-check',
+@@ -214,6 +216,7 @@ if build_ui == true
+             meson.project_build_root() / '@OUTPUT@',
+         ],
+     )
++endif
+ 
+     meson.add_install_script(
+         'build-aux/meson_post_install.py',
+@@ -226,7 +229,7 @@ if build_ui == true
+         glib_compile_schemas: true,
+         gtk_update_icon_cache: true,
+         update_desktop_database: true,
+-        update_mime_database: true,
++        update_mime_database: false,
+     )
+ 
+     # Windows installer
+@@ -288,7 +288,7 @@ endif
+ endif
+ 
+ # build/install the cli
+-if build_cli == true
++if false
+     # cli crate
+     subdir('crates/rnote-cli')
+ 

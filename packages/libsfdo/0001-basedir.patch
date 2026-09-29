@@ -1,0 +1,24 @@
+--- a/sfdo-basedir/basedir.c
++++ b/sfdo-basedir/basedir.c
+@@ -14,8 +14,8 @@
+ #define STATE_HOME_FALLBACK "/.local/state/"
+ #define CACHE_HOME_FALLBACK "/.cache/"
+ 
+-#define DATA_DIRS_FALLBACK "/usr/local/share/:/usr/share/"
+-#define CONFIG_DIRS_FALLBACK "/etc/xdg/"
++#define DATA_DIRS_FALLBACK "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/"
++#define CONFIG_DIRS_FALLBACK "@TERMUX_PREFIX@/etc/xdg/"
+ 
+ // Lists in ctx include home directories
+ 
+--- a/sfdo-icon/icon.c
++++ b/sfdo-icon/icon.c
+@@ -11,7 +11,7 @@
+ 
+ #define ICONS_HOME_DIR "/.icons/"
+ #define ICONS_SUFFIX "icons/"
+-#define PIXMAPS_BASE_DIR "/usr/share/pixmaps/"
++#define PIXMAPS_BASE_DIR "@TERMUX_PREFIX@/share/pixmaps/"
+ 
+ SFDO_API struct sfdo_icon_ctx *sfdo_icon_ctx_create(struct sfdo_basedir_ctx *basedir_ctx) {
+ 	struct sfdo_icon_ctx *ctx = calloc(1, sizeof(*ctx));

@@ -1,0 +1,15 @@
+diff -uNr openssh-portable-V_9_5_P1/hostfile.c openssh-portable-V_9_5_P1.mod/hostfile.c
+--- openssh-portable-V_9_5_P1/hostfile.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/hostfile.c	2023-11-23 16:29:34.261209272 +0200
+@@ -700,7 +700,11 @@
+ 			r = SSH_ERR_SYSTEM_ERROR;
+ 			goto fail;
+ 		}
++#ifdef __ANDROID__
++		if (rename(filename, back) == -1) {
++#else
+ 		if (link(filename, back) == -1) {
++#endif
+ 			oerrno = errno;
+ 			error_f("link %.100s to %.100s: %s", filename,
+ 			    back, strerror(errno));

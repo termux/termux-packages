@@ -1,0 +1,20 @@
+--- a/src/common/msgout.cpp
++++ b/src/common/msgout.cpp
+@@ -148,7 +148,7 @@ void wxMessageOutputStderr::Output(const wxString& str)
+ {
+     const wxCharBuffer& buf = PrepareForOutput(str);
+ 
+-#if defined(__ANDROID__)
++#if 0
+     __android_log_write(ANDROID_LOG_INFO, "wxWidgets", buf.data());
+ #else
+     fwrite(buf, buf.length(), 1, m_fp);
+@@ -171,7 +171,7 @@ void wxMessageOutputDebug::Output(const wxString& str)
+     // If we have a console under Windows, send this there too (if not, this
+     // won't do anything, so it's safe to call it unconditionally).
+     wxMessageOutputStderr::Output(str);
+-#elif defined(__ANDROID__)
++#elif 0
+     const wxCharBuffer& buf = PrepareForOutput(str);
+ 
+     __android_log_write(ANDROID_LOG_DEBUG, "wxWidgets", buf.data());

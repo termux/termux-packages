@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.enlightenment.org/e16
+TERMUX_PKG_DESCRIPTION="Enlightenment DR16 window manager"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.32"
+TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/enlightenment/e16-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=031c8b776bde05433e80519c785693d51f25a55fa370eabc0913468a04767add
+TERMUX_PKG_DEPENDS="glib, imlib2, libiconv, libx11, libxext, libxft, libxrender, pango"
+TERMUX_PKG_AUTO_UPDATE=true

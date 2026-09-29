@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://libimobiledevice.org/
+TERMUX_PKG_DESCRIPTION="Library with common code used by the libraries and tools around the libimobiledevice project"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.3.3"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libimobiledevice-glue/releases/download/${TERMUX_PKG_VERSION}/libimobiledevice-glue-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=920ce01382a32695f49b23292b4979a03f0afd16c58e8755d8b7f41804acc1a9
+TERMUX_PKG_DEPENDS="libplist"

@@ -1,0 +1,22 @@
+--- a/src/bootstrap/bootstrap.py
++++ b/src/bootstrap/bootstrap.py
+@@ -1152,7 +1152,7 @@ class RustBuild(object):
+ 
+         if self.use_locked_deps:
+             args.append("--locked")
+-        if self.use_vendored_sources:
++        if False:
+             args.append("--frozen")
+         if self.get_toml("metrics", "build"):
+             args.append("--features")
+--- a/src/bootstrap/src/core/builder/cargo.rs
++++ b/src/bootstrap/src/core/builder/cargo.rs
+@@ -1290,7 +1290,7 @@ impl Builder<'_> {
+         if self.config.locked_deps {
+             cargo.arg("--locked");
+         }
+-        if self.config.vendor || self.is_sudo {
++        if false && (self.config.vendor || self.is_sudo) {
+             cargo.arg("--frozen");
+         }
+ 

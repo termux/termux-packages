@@ -1,0 +1,12 @@
+diff -u -r ../rustc-1.82.0-src/src/bootstrap/src/utils/cc_detect.rs ./src/bootstrap/src/utils/cc_detect.rs
+--- ../rustc-1.82.0-src/src/bootstrap/src/utils/cc_detect.rs	2024-10-15 17:22:50.000000000 +0000
++++ ./src/bootstrap/src/utils/cc_detect.rs	2024-10-17 17:36:32.716107741 +0000
+@@ -248,7 +248,7 @@
+     };
+ 
+     // The earliest API supported by NDK r26d is 21.
+-    let api_level = "21";
++    let api_level = "@TERMUX_PKG_API_LEVEL@";
+     let compiler = format!("{}{}-{}", triple_translated, api_level, compiler.clang());
+     let host_tag = if cfg!(target_os = "macos") {
+         // The NDK uses universal binaries, so this is correct even on ARM.

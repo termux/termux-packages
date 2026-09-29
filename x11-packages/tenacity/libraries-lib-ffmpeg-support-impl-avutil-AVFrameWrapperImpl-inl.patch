@@ -1,0 +1,76 @@
+--- a/libraries/lib-ffmpeg-support/impl/avutil/AVFrameWrapperImpl.inl	2025-01-01 07:28:49.000000000 -0500
++++ b/libraries/lib-ffmpeg-support/impl/avutil/AVFrameWrapperImpl.inl	2026-02-23 15:43:06.000000000 -0500
+@@ -97,8 +97,13 @@
+ 
+    int GetKeyFrame() const noexcept override
+    {
+-      if (mAVFrame != nullptr)
++      if (mAVFrame != nullptr) {
++      #if LIBAVUTIL_VERSION_MAJOR <= 59
+          return mAVFrame->key_frame;
++      #else
++         return (mAVFrame->flags & AV_FRAME_FLAG_KEY) ? 1 : 0;
++      #endif
++      }
+ 
+       return {};
+    }
+@@ -172,24 +177,39 @@
+ 
+    int GetInterlacedFrame() const noexcept override
+    {
+-      if (mAVFrame != nullptr)
++      if (mAVFrame != nullptr) {
++      #if LIBAVUTIL_VERSION_MAJOR <= 59
+          return mAVFrame->interlaced_frame;
++      #else
++         return (mAVFrame->flags & AV_FRAME_FLAG_INTERLACED) ? 1 : 0;
++      #endif
++      }
+ 
+       return {};
+    }
+ 
+    int GetTopFieldFirst() const noexcept override
+    {
+-      if (mAVFrame != nullptr)
++      if (mAVFrame != nullptr) {
++      #if LIBAVUTIL_VERSION_MAJOR <= 59
+          return mAVFrame->top_field_first;
+-
++      #else
++         return (mAVFrame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) ? 1 : 0;
++      #endif
++      }
+       return {};
+    }
+ 
+    int GetPaletteHasChanged() const noexcept override
+    {
+-      if (mAVFrame != nullptr)
++      if (mAVFrame != nullptr) {
++      #if LIBAVUTIL_VERSION_MAJOR <= 59
+          return mAVFrame->palette_has_changed;
++      #else
++         // Deprecated without replacement
++         return {};
++      #endif
++      }
+ 
+       return {};
+    }
+@@ -269,14 +289,6 @@
+ 
+       return {};
+    }
+-
+-   int GetPacketSize() const noexcept override
+-   {
+-      if (mAVFrame != nullptr)
+-         return mAVFrame->pkt_size;
+-
+-      return {};
+-   }
+ 
+ private:
+    const AVChannelLayoutWrapper* GetChannelLayoutSafe() const noexcept

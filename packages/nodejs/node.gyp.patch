@@ -1,0 +1,21 @@
+--- ./node.gyp.orig	2026-06-24 12:32:38.000000000 +0530
++++ ./node.gyp	2026-07-06 20:22:01.916604894 +0530
+@@ -568,7 +568,7 @@
+           '-Wl,-bnoerrmsg',
+         ],
+       }],
+-      ['OS=="linux" and clang==1', {
++      ['(OS=="linux" or OS=="android") and clang==1', {
+         'libraries': ['-latomic'],
+       }],
+     ],
+@@ -609,7 +609,8 @@
+       ],
+ 
+       'sources': [
+-        'src/node_main.cc'
++        'src/node_main.cc',
++        'src/getaddrinfo.c'
+       ],
+ 
+       'dependencies': [

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/dloebl/cgif
+TERMUX_PKG_DESCRIPTION="A fast and lightweight GIF encoding library"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.5.4"
+TERMUX_PKG_SRCURL=https://github.com/dloebl/cgif/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(\.\d+)*'

@@ -1,0 +1,35 @@
+Prevents:
+In file included from /home/builder/.termux-build/gawk/src/gawkmisc.c:38:
+In file included from /home/builder/.termux-build/gawk/src/posix/gawkmisc.c:35:
+In file included from /data/data/com.termux/files/usr/include/spawn.h:34:
+In file included from /home/builder/.termux-build/_cache/android-r29-api-24-v3/bin/../sysroot/usr/include/sched.h:39:
+/home/builder/.termux-build/_cache/android-r29-api-24-v3/bin/../sysroot/usr/include/linux/sched.h:45:17:
+error: expected ';' at end of declaration list
+   45 |   __aligned_u64 stack;
+      |                 ^
+/home/builder/.termux-build/gawk/src/awk.h:550:25: note: expanded from macro 'stack'
+  550 | #define stack        sub.nodep.r.av
+      |                         ^
+1 error generated.
+
+--- a/gawkmisc.c
++++ b/gawkmisc.c
+@@ -24,7 +24,6 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+  */
+ 
+-#include "awk.h"
+ 
+ #if defined(HAVE_FCNTL_H)
+ #include <fcntl.h>
+--- a/posix/gawkmisc.c
++++ b/posix/gawkmisc.c
+@@ -35,6 +35,8 @@
+ #include <spawn.h>	// for macos
+ #endif
+ 
++#include "awk.h"
++
+ const char quote = '\'';
+ const char *defpath = DEFPATH;
+ const char *deflibpath = DEFLIBPATH;

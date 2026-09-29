@@ -1,0 +1,91 @@
+--- a/nsswitch/wbinfo.c
++++ b/nsswitch/wbinfo.c
+@@ -183,7 +183,7 @@
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+@@ -210,7 +210,7 @@
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+@@ -238,7 +238,7 @@
+ 		 pwd->pw_passwd,
+ 		 (unsigned int)pwd->pw_uid,
+ 		 (unsigned int)pwd->pw_gid,
+-		 pwd->pw_gecos,
++		 pwd->pw_name,
+ 		 pwd->pw_dir,
+ 		 pwd->pw_shell);
+ 
+--- a/nsswitch/winbind_nss_linux.c
++++ b/nsswitch/winbind_nss_linux.c
+@@ -197,19 +197,6 @@
+ 	result->pw_uid = pw->pw_uid;
+ 	result->pw_gid = pw->pw_gid;
+ 
+-	/* GECOS */
+-	len = strlen(pw->pw_gecos) + 1;
+-
+-	if ((result->pw_gecos =
+-	     get_static(buffer, buflen, len)) == NULL) {
+-
+-		/* Out of memory */
+-
+-		return NSS_STATUS_TRYAGAIN;
+-	}
+-
+-	memcpy(result->pw_gecos, pw->pw_gecos, len);
+-
+ 	/* Home directory */
+ 	len = strlen(pw->pw_dir) + 1;
+ 
+--- a/source3/passdb/passdb.c
++++ b/source3/passdb/passdb.c
+@@ -154,24 +154,10 @@
+ 
+ 	fullname = NULL;
+ 
+-	if (count_commas(pwd->pw_gecos) == 3) {
+-		/*
+-		 * Heuristic: This seems to be a gecos field that has been
+-		 * edited by chfn(1). Only use the part before the first
+-		 * comma. Fixes bug 5198.
+-		 */
+-		fullname = talloc_strndup(
+-			talloc_tos(), pwd->pw_gecos,
+-			strchr(pwd->pw_gecos, ',') - pwd->pw_gecos);
+-		if (fullname == NULL) {
+-			return NT_STATUS_NO_MEMORY;
+-		}
+-	}
+-
+ 	if (fullname != NULL) {
+ 		ok = pdb_set_fullname(user, fullname, PDB_SET);
+ 	} else {
+-		ok = pdb_set_fullname(user, pwd->pw_gecos, PDB_SET);
++		ok = pdb_set_fullname(user, pwd->pw_name, PDB_SET);
+ 	}
+ 	TALLOC_FREE(fullname);
+ 
+--- a/source3/winbindd/wb_getpwsid.c
++++ b/source3/winbindd/wb_getpwsid.c
+@@ -144,9 +144,6 @@
+ 
+ 	strlcpy(pw->pw_name, output_username, sizeof(pw->pw_name));
+ 
+-	strlcpy(pw->pw_gecos, info->full_name ? info->full_name : "",
+-		sizeof(pw->pw_gecos));
+-
+ 	tmp = talloc_sub_specified(state,
+ 				   info->homedir,
+ 				   info->acct_name,

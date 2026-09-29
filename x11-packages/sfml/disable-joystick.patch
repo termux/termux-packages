@@ -1,0 +1,122 @@
+Reverts https://github.com/SFML/SFML/commit/4a454047d4102b0393c0fc2a2bf48854e57253ea
+
+--- a/src/SFML/Window/Unix/JoystickImpl.cpp
++++ b/src/SFML/Window/Unix/JoystickImpl.cpp
+@@ -25,9 +25,12 @@
+ ////////////////////////////////////////////////////////////
+ // Headers
+ ////////////////////////////////////////////////////////////
++#ifndef __TERMUX__
+ #include <SFML/Window/Android/JniHelper.hpp>
++#endif
+ #include <SFML/Window/JoystickImpl.hpp>
+ 
++#ifndef __TERMUX__
+ #include <SFML/System/Android/Activity.hpp>
+ #include <SFML/System/Err.hpp>
+ 
+@@ -84,6 +87,7 @@ namespace
+     return capabilities;
+ }
+ } // namespace
++#endif
+ 
+ namespace sf::priv
+ {
+@@ -102,15 +106,20 @@ void JoystickImpl::cleanup()
+ ////////////////////////////////////////////////////////////
+ bool JoystickImpl::isConnected(unsigned int index)
+ {
++#ifndef __TERMUX__
+     // This is called as a prefilter before open, but it
+     // would just duplicate the logic of open.
+     return index < Joystick::Count;
++#else
++    return false;
++#endif
+ }
+ 
+ 
+ ////////////////////////////////////////////////////////////
+ bool JoystickImpl::open(unsigned int index)
+ {
++#ifndef __TERMUX__
+     if (index >= Joystick::Count)
+         return false;
+ 
+@@ -172,6 +181,7 @@ bool JoystickImpl::open(unsigned int index)
+ 
+         return true;
+     }
++#endif
+ 
+     return false;
+ }
+@@ -180,19 +190,25 @@ bool JoystickImpl::open(unsigned int index)
+ ////////////////////////////////////////////////////////////
+ void JoystickImpl::close()
+ {
++#ifndef __TERMUX__
+     ActivityStates&       states = getActivity();
+     const std::lock_guard lock(states.mutex);
+ 
+     if (m_currentDeviceIdx)
+         states.joystickStates.erase(*m_currentDeviceIdx);
+     m_currentDeviceIdx.reset();
++#endif
+ }
+ 
+ 
+ ////////////////////////////////////////////////////////////
+ JoystickCaps JoystickImpl::getCapabilities() const
+ {
++#ifndef __TERMUX__
+     return m_capabilities;
++#else
++    return {};
++#endif
+ }
+ 
+ 
+@@ -206,6 +222,7 @@ Joystick::Identification JoystickImpl::getIdentification() const
+ ////////////////////////////////////////////////////////////
+ JoystickState JoystickImpl::update() const
+ {
++#ifndef __TERMUX__
+     // Retrieve activity states
+     ActivityStates&       states = getActivity();
+     const std::lock_guard lock(states.mutex);
+@@ -239,9 +256,13 @@ JoystickState JoystickImpl::update() const
+     }
+ 
+     return {isConnected, states.joystickStates[*m_currentDeviceIdx].axes, states.joystickStates[*m_currentDeviceIdx].buttons};
++#else
++    return {};
++#endif
+ }
+ 
+ 
++#ifndef __TERMUX__
+ ////////////////////////////////////////////////////////////
+ int JoystickImpl::sfAxisToAndroid(Joystick::Axis axis)
+ {
+@@ -267,5 +288,6 @@ int JoystickImpl::sfAxisToAndroid(Joystick::Axis axis)
+ 
+     return -1;
+ }
++#endif
+ 
+ } // namespace sf::priv
+--- a/src/SFML/Window/Unix/JoystickImpl.hpp
++++ b/src/SFML/Window/Unix/JoystickImpl.hpp
+@@ -62,8 +62,10 @@ public:
+     ////////////////////////////////////////////////////////////
+     [[nodiscard]] JoystickState update() const;
+ 
++#ifndef __TERMUX__
+     ////////////////////////////////////////////////////////////
+     [[nodiscard]] static int sfAxisToAndroid(Joystick::Axis axis);
++#endif
+ 
+ private:
+     ////////////////////////////////////////////////////////////

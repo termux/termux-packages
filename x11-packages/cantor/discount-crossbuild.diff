@@ -1,0 +1,22 @@
+diff --git a/thirdparty/discount-2.2.6-patched/cmake/CMakeLists.txt b/thirdparty/discount-2.2.6-patched/cmake/CMakeLists.txt
+index a29eb48..2764d79 100644
+--- a/thirdparty/discount-2.2.6-patched/cmake/CMakeLists.txt
++++ b/thirdparty/discount-2.2.6-patched/cmake/CMakeLists.txt
+@@ -113,12 +113,10 @@ configure_file("${_ROOT}/mkdio.h.in"
+ 
+ include_directories("${_ROOT}")
+ 
+-add_executable(mktags
+-    "${_ROOT}/mktags.c")
+-
+-add_custom_command(OUTPUT "${_ROOT}/blocktags"
+-    COMMAND mktags > blocktags
+-    WORKING_DIRECTORY "${_ROOT}")
++if(NOT EXISTS "${_ROOT}/blocktags")
++    message(FATAL_ERROR
++        "Pre-generated blocktags is required for cross-compiling")
++endif()
+ 
+ add_library(libmarkdown
+     "${_ROOT}/mkdio.c"
+

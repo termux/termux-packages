@@ -1,0 +1,11 @@
+--- ./src/eventhandler.c~	2025-03-26 14:52:29.000000000 +0000
++++ ./src/eventhandler.c	2025-03-28 15:40:41.361582453 +0000
+@@ -182,7 +182,7 @@
+ 	if ((IFD_SUCCESS == rv) && (1 == dwGetSize) && ucGetData[0])
+ 	{
+ 		Log1(PCSC_LOG_INFO, "Killing polling thread");
+-		(void)pthread_cancel(rContext->pthThread);
++		(void)pthread_kill(rContext->pthThread, SIGUSR2);
+ 	}
+ 	else
+ 	{

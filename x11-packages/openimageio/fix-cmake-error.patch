@@ -1,0 +1,15 @@
+--- a/src/cmake/compiler.cmake
++++ b/src/cmake/compiler.cmake
+@@ -207,12 +207,6 @@
+     add_compile_definitions (_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
+ endif (MSVC)
+ 
+-if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD"
+-    AND ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "i386")
+-    # For FreeBSD, minimum arch of i586 is needed for atomic cpu instructions
+-    add_compile_options (-march=i586)
+-endif ()
+-
+ # Fast-math mode may go faster, but it breaks IEEE and also makes inconsistent
+ # results on different compilers/platforms, so we don't use it by default.
+ option (ENABLE_FAST_MATH "Use fast math (may break IEEE fp rules)" OFF)

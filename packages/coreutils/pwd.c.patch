@@ -1,0 +1,12 @@
+diff -u -r ../coreutils-8.23/src/pwd.c ./src/pwd.c
+--- ../coreutils-8.23/src/pwd.c	2014-07-13 18:09:52.000000000 -0400
++++ ./src/pwd.c	2015-05-17 19:58:20.692454980 -0400
+@@ -366,7 +366,7 @@
+   if (optind < argc)
+     error (0, 0, _("ignoring non-option arguments"));
+ 
+-  if (logical)
++  if (true) /* Termux: Always try logical, to avoid permission denied on /data/data */
+     {
+       wd = logical_getcwd ();
+       if (wd)

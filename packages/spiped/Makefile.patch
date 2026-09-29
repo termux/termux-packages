@@ -1,0 +1,31 @@
+--- a/spipe/Makefile	2021-12-24 19:27:38.000000000 +0000
++++ b/spipe/Makefile	2022-04-15 16:22:46.461946207 +0000
+@@ -21,7 +21,6 @@
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+--- a/spiped/Makefile	2021-12-24 19:27:38.000000000 +0000
++++ b/spiped/Makefile	2022-04-15 17:39:31.740187413 +0000
+@@ -21,7 +21,6 @@
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+--- a/Makefile	2021-12-24 19:27:38.000000000 +0000
++++ b/Makefile	2022-04-15 17:24:16.643530079 +0000
+@@ -24,7 +24,7 @@
+ 	. ./cpusupport-config.h;			\
+ 	. ./cflags-filter.sh;				\
+ 	export HAVE_BUILD_FLAGS=1;			\
+-	for D in ${PROGS} ${TESTS}; do			\
++	for D in ${PROGS}; do			\
+ 		( cd $${D} && ${MAKE} all ) || exit 2;	\
+ 	done
+ 

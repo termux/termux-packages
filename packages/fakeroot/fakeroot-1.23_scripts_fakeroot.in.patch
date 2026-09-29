@@ -1,0 +1,25 @@
+diff -uNr fakeroot-1.23/scripts/fakeroot.in fakeroot-1.23.mod/scripts/fakeroot.in
+--- fakeroot-1.23/scripts/fakeroot.in	2018-07-01 22:01:34.000000000 +0300
++++ fakeroot-1.23.mod/scripts/fakeroot.in	2018-10-01 17:32:47.566222406 +0300
+@@ -145,8 +145,8 @@
+ if [ "$WAITINTRAP" -eq 0 ]; then
+   trap "kill -s @signal@ $PID" EXIT INT
+ else
+-  @MACOSX_FALSE@trap 'FAKEROOTKEY=$FAKEROOTKEY @LDLIBPATHVAR@="$PATHS" @LDPRELOADVAR@="$FAKEROOT_LIB" /bin/ls -l / >/dev/null 2>&1; while kill -s @signal@ $PID 2>/dev/null; do sleep 0.1; done' EXIT INT
+-  @MACOSX_TRUE@trap 'FAKEROOTKEY=$FAKEROOTKEY @LDPRELOADVAR@="$FAKEROOT_LIB" /bin/ls -l / >/dev/null 2>&1; while kill -s @signal@ $PID 2>/dev/null; do sleep 0.1; done' EXIT INT
++  @MACOSX_FALSE@trap 'FAKEROOTKEY=$FAKEROOTKEY @LDLIBPATHVAR@="$PATHS" @LDPRELOADVAR@="$FAKEROOT_LIB" ls -l / >/dev/null 2>&1; while kill -s @signal@ $PID 2>/dev/null; do sleep 0.1; done' EXIT INT
++  @MACOSX_TRUE@trap 'FAKEROOTKEY=$FAKEROOTKEY @LDPRELOADVAR@="$FAKEROOT_LIB" ls -l / >/dev/null 2>&1; while kill -s @signal@ $PID 2>/dev/null; do sleep 0.1; done' EXIT INT
+ fi
+ 
+ if test -z "$FAKEROOTKEY" || test -z "$PID"; then
+@@ -168,8 +168,8 @@
+ export FAKEROOT_FD_BASE
+ 
+ if test -z "$*"; then
+-  @MACOSX_FALSE@FAKEROOTKEY=$FAKEROOTKEY @LDLIBPATHVAR@="$PATHS" @LDEXTRAVAR@ @LDPRELOADVAR@="$FAKEROOT_LIB" ${SHELL:-/bin/sh}
+-  @MACOSX_TRUE@FAKEROOTKEY=$FAKEROOTKEY @LDEXTRAVAR@ @LDPRELOADVAR@="$FAKEROOT_LIB" ${SHELL:-/bin/sh}
++  @MACOSX_FALSE@FAKEROOTKEY=$FAKEROOTKEY @LDLIBPATHVAR@="$PATHS" @LDEXTRAVAR@ @LDPRELOADVAR@="$FAKEROOT_LIB" ${SHELL:-@TERMUX_PREFIX@/bin/sh}
++  @MACOSX_TRUE@FAKEROOTKEY=$FAKEROOTKEY @LDEXTRAVAR@ @LDPRELOADVAR@="$FAKEROOT_LIB" ${SHELL:-@TERMUX_PREFIX@/bin/sh}
+   RESULT=$?
+ else
+   @MACOSX_FALSE@FAKEROOTKEY=$FAKEROOTKEY @LDLIBPATHVAR@="$PATHS" @LDEXTRAVAR@ @LDPRELOADVAR@="$LIB" "$@"

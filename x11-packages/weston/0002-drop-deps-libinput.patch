@@ -1,0 +1,130 @@
+diff --git a/frontend/main.c b/frontend/main.c
+index 6f552a3..aa7b89f 100644
+--- a/frontend/main.c
++++ b/frontend/main.c
+@@ -41,7 +41,9 @@
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <sys/socket.h>
++#ifndef __ANDROID__
+ #include <libinput.h>
++#endif
+ #include <libevdev/libevdev.h>
+ #include <linux/input.h>
+ #include <sys/time.h>
+@@ -1101,6 +1103,7 @@ load_additional_modules(struct wet_compositor wet)
+ 	}
+ }
+ 
++#ifndef __ANDROID__
+ static int
+ save_touch_device_calibration(struct weston_compositor *compositor,
+ 			      struct weston_touch_device *device,
+@@ -1158,6 +1161,7 @@ out:
+ 
+ 	return ret;
+ }
++#endif
+ 
+ static const struct weston_enum_map require_outputs_modes [] = {
+ 	{ "all-found",	REQUIRE_OUTPUTS_ALL_FOUND },
+@@ -1240,12 +1244,14 @@ weston_compositor_init_config(struct weston_compositor *ec,
+ 			compositor->use_color_manager = true;
+ 	}
+ 
++#ifndef __ANDROID__
+ 	/* weston.ini [libinput] */
+ 	s = weston_config_get_section(config, "libinput", NULL, NULL);
+ 	weston_config_section_get_bool(s, "touchscreen_calibrator", &cal, 0);
+ 	if (cal)
+ 		weston_compositor_enable_touch_calibrator(ec,
+ 						save_touch_device_calibration);
++#endif
+ 	weston_config_section_get_bool(s, "disable-input", &disable_input, false);
+ 	compositor->compositor->disable_input = disable_input;
+ 
+@@ -2812,6 +2818,7 @@ simple_heads_changed(struct wl_listener *listener, void *arg)
+ 	}
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ configure_input_device_accel(struct weston_config_section *s,
+ 		struct libinput_device *device)
+@@ -3015,6 +3022,7 @@ configure_input_device(struct weston_compositor *compositor,
+ 
+ 	configure_input_device_scroll(s, device);
+ }
++#endif
+ 
+ static int
+ drm_backend_output_configure(struct weston_output *output,
+@@ -4099,6 +4107,7 @@ static int
+ load_drm_backend(struct weston_compositor *c, int *argc, char **argv,
+ 		 struct weston_config *wc, enum weston_renderer_type renderer)
+ {
++#ifndef __ANDROID__
+ 	struct weston_drm_backend_config config = {{ 0, }};
+ 	struct weston_config_section *section;
+ 	struct wet_compositor *wet = to_wet_compositor(c);
+@@ -4182,6 +4191,10 @@ load_drm_backend(struct weston_compositor *c, int *argc, char **argv,
+ 	wet->drm_backend_loaded = true;
+ 
+ 	return 0;
++#else
++	weston_log("error: drm_backend is not available on Android.\n");
++	return -1;
++#endif
+ }
+ 
+ static int
+
+diff --git a/frontend/meson.build b/frontend/meson.build
+index 908e36e..c46e2e0 100644
+--- a/frontend/meson.build
++++ b/frontend/meson.build
+@@ -12,7 +12,6 @@ srcs_weston = [
+ deps_weston = [
+ 	dep_libshared,
+ 	dep_libweston_public,
+-	dep_libinput,
+ 	dep_libevdev,
+ 	dep_libdl,
+ 	dep_threads,
+diff --git a/libweston/meson.build b/libweston/meson.build
+index 2a61711..c81152d 100644
+--- a/libweston/meson.build
++++ b/libweston/meson.build
+@@ -217,6 +217,7 @@ libdrm_version = dep_libdrm.version()
+ libdrm_supports_color_pipeline = libdrm_version.version_compare('>=2.4.130')
+ config_h.set10('CAN_OFFLOAD_COLOR_PIPELINE', libdrm_supports_color_pipeline)
+ 
++if host_machine.system() != 'android'
+ lib_libinput_backend = static_library(
+ 	'libinput-backend',
+ 	[
+@@ -236,6 +237,7 @@ dep_libinput_backend = declare_dependency(
+ 	link_with: lib_libinput_backend,
+ 	include_directories: include_directories('.')
+ )
++endif
+ 
+ dep_vertex_clipping = declare_dependency(
+ 	sources: 'vertex-clipping.c',
+diff --git a/meson.build b/meson.build
+index e629dfe..e48184a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -158,12 +158,6 @@ dep_wayland_server = dependency('wayland-server', version: '>= 1.22.0')
+ dep_wayland_client = dependency('wayland-client', version: '>= 1.22.0')
+ dep_pixman = dependency('pixman-1', version: '>= 0.25.2')
+ dep_xkbcommon = dependency('xkbcommon', version: '>= 0.5.0')
+-dep_libinput = dependency('libinput', version: '>= 1.2.0')
+-if dep_xkbcommon.version().version_compare('>= 1.8.0')
+-	if dep_libinput.version().version_compare('>= 1.26.0')
+-		config_h.set('HAVE_COMPOSE_AND_KANA', '1')
+-	endif
+-endif
+ 
+ dep_libevdev = dependency('libevdev')
+ dep_libm = cc.find_library('m')

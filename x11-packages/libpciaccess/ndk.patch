@@ -1,0 +1,20 @@
+diff -uNr libpciaccess-0.19/src/linux_sysfs.c libpciaccess-0.19.mod/src/linux_sysfs.c
+--- libpciaccess-0.19/src/linux_sysfs.c	2019-07-17 19:25:27.000000000 +0300
++++ libpciaccess-0.19.mod/src/linux_sysfs.c	2019-07-23 01:36:18.607882465 +0300
+@@ -50,7 +50,7 @@
+ #include <dirent.h>
+ #include <errno.h>
+
+-#if defined(__i386__) || defined(__x86_64__)
++#if (defined(__i386__) || defined(__x86_64__)) && !defined(__ANDROID__)
+ #include <sys/io.h>
+ #else
+ #define inb(x) -1
+@@ -890,7 +890,7 @@
+     } else {
+ 	ret = inl(port + handle->base);
+     }
+-
++
+     return ret;
+ }

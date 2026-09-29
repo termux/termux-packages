@@ -1,0 +1,96 @@
+diff -uNr squid-4.12/src/ipc/mem/Segment.cc squid-4.12.mod/src/ipc/mem/Segment.cc
+--- squid-4.12/src/ipc/mem/Segment.cc	2020-06-07 18:42:16.000000000 +0300
++++ squid-4.12.mod/src/ipc/mem/Segment.cc	2020-08-07 22:10:14.210431881 +0300
+@@ -31,6 +31,65 @@
+ #include <unistd.h>
+ #endif
+ 
++static int termux_shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int termux_shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++
+ // test cases change this
+ const char *Ipc::Mem::Segment::BasePath = DEFAULT_STATEDIR;
+ 
+@@ -134,7 +193,7 @@
+ {
+     assert(theFD < 0);
+ 
+-    theFD = shm_open(theName.termedBuf(), O_RDWR, 0);
++    theFD = termux_shm_open(theName.termedBuf(), O_RDWR, 0);
+     if (theFD < 0) {
+         int xerrno = errno;
+         debugs(54, 5, "shm_open " << theName << ": " << xstrerr(xerrno));
+@@ -154,7 +213,7 @@
+ bool
+ Ipc::Mem::Segment::createFresh(int &xerrno)
+ {
+-    theFD = shm_open(theName.termedBuf(),
++    theFD = termux_shm_open(theName.termedBuf(),
+                      O_EXCL | O_CREAT | O_RDWR,
+                      S_IRUSR | S_IWUSR);
+     xerrno = errno;
+@@ -237,7 +296,7 @@
+ void
+ Ipc::Mem::Segment::unlink()
+ {
+-    if (shm_unlink(theName.termedBuf()) != 0) {
++    if (termux_shm_unlink(theName.termedBuf()) != 0) {
+         int xerrno = errno;
+         debugs(54, 5, "shm_unlink(" << theName << "): " << xstrerr(xerrno));
+     } else

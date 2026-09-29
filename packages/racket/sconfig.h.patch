@@ -1,0 +1,31 @@
+--- a/src/bc/sconfig.h
++++ b/src/bc/sconfig.h
+@@ -132,7 +132,9 @@
+ #  define SCHEME_ARCH "x86_64"
+ #  define REGISTER_POOR_MACHINE
+ #  define ASM_DBLPREC_CONTROL_87
++#ifndef __ANDROID__
+ #  define MZ_TRY_EXTFLONUMS
++#endif
+ # endif
+ # ifndef SCHEME_ARCH
+ #  define SCHEME_ARCH "unknown"
+@@ -154,14 +156,18 @@
+ # define MZ_USE_JIT_I386
+ # define MZ_JIT_USE_MPROTECT
+ # ifndef MZ_NO_UNWIND_SUPPORT
++#ifndef __ANDROID__
+ #  define MZ_USE_DWARF_LIBUNWIND
++#endif
+ # endif
+ #endif
+ #if defined(__x86_64__)
+ # define MZ_USE_JIT_X86_64
+ # define MZ_JIT_USE_MPROTECT
+ # ifndef MZ_NO_UNWIND_SUPPORT
++#ifndef __ANDROID__
+ #  define MZ_USE_DWARF_LIBUNWIND
++#endif
+ # endif
+ #endif
+ #if defined(__powerpc__) && !defined(__powerpc64__)

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X Keyboard description compiler"
+TERMUX_PKG_LICENSE="HPND, MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.5.0"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xkbcomp-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=2ac31f26600776db6d9cd79b3fcd272263faebac7eb85fb2f33c7141b8486060
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxkbfile"

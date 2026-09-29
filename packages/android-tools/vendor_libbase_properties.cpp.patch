@@ -1,0 +1,29 @@
+--- a/vendor/libbase/properties.cpp	2026-08-01 08:20:11.000000000 +0300
++++ b/vendor/libbase/properties.cpp	2026-09-18 12:07:45.487294017 +0300
+@@ -16,7 +16,7 @@
+ 
+ #include "android-base/properties.h"
+ 
+-#if defined(__BIONIC__)
++#if 0
+ #include <sys/system_properties.h>
+ #endif
+ 
+@@ -31,7 +31,7 @@
+ #include <android-base/strings.h>
+ #include <android-base/thread_annotations.h>
+ 
+-#if !defined(__BIONIC__)
++#if 1
+ 
+ // Here lies a rudimentary implementation of system properties for non-Bionic
+ // platforms. We are using weak symbols here because we want to allow
+@@ -204,7 +204,7 @@
+   return (__system_property_set(key.c_str(), value.c_str()) == 0);
+ }
+ 
+-#if defined(__BIONIC__)
++#if 0
+ 
+ struct WaitForPropertyData {
+   bool done;

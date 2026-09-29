@@ -1,0 +1,25 @@
+diff -ur orig/dox/format.c mod/dox/format.c
+--- orig/dox/format.c	2024-03-10 21:40:43.000000000 +0100
++++ mod/dox/format.c	2024-10-28 16:36:14.288078788 +0100
+@@ -30,6 +30,12 @@
+ #define DEFAULT_LINKCOLOR_G 50
+ #define DEFAULT_LINKCOLOR_B 160
+ 
++static int android_mblen(const char *s, size_t n)
++{
++    return mbtowc(0, s, n);
++}
++
++
+ typedef enum _type {
+     IMG,
+     BR,
+@@ -877,7 +883,7 @@
+ 
+                         while (txt_disp[(point + cnt)])
+                         {
+-                            len = mblen(txt_disp + point + cnt, MB_CUR_MAX);
++                            len = android_mblen(txt_disp + point + cnt, MB_CUR_MAX);
+                             if (len < 0)
+                             {
+                                 cnt++;

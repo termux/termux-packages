@@ -1,0 +1,11 @@
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -350,6 +350,8 @@
+         || target.contains("aix")
+     {
+         "c++"
++    } else if target.contains("android") {
++        "c++_shared"
+     } else if target.contains("netbsd") && llvm_static_stdcpp.is_some() {
+         // NetBSD uses a separate library when relocation is required
+         "stdc++_p"

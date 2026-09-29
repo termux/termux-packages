@@ -1,0 +1,46 @@
+--- a/src/lib_ccx/CMakeLists.txt
++++ b/src/lib_ccx/CMakeLists.txt
+@@ -12,9 +12,24 @@
+ 
+ find_package(PkgConfig)
+ pkg_check_modules (GPAC REQUIRED gpac)
++pkg_check_modules (LIBMD REQUIRED libmd)
++pkg_check_modules (LIBPNG REQUIRED libpng)
++pkg_check_modules (ZLIB REQUIRED zlib)
++pkg_check_modules (FREETYPE REQUIRED freetype2)
++pkg_check_modules (UTF8PROC REQUIRED libutf8proc)
+ 
+ set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${GPAC_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBMD_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBPNG_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${ZLIB_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${FREETYPE_INCLUDE_DIRS})
++set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${UTF8PROC_INCLUDE_DIRS})
+ set (EXTRA_LIBS ${EXTRA_LIBS} ${GPAC_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBMD_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBPNG_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${FREETYPE_LIBRARIES})
++set (EXTRA_LIBS ${EXTRA_LIBS} ${UTF8PROC_LIBRARIES})
+ 
+ if (WITH_FFMPEG)
+     find_package(PkgConfig)
+@@ -87,18 +102,3 @@
+     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_HARDSUBX")
+ endif (WITH_HARDSUBX)
+ 
+-file (GLOB HeaderFiles *.h)
+-file (WRITE ccx.pc "prefix=${CMAKE_INSTALL_PREFIX}\n"
+-                  "includedir=\${prefix}/include\n"
+-                  "libdir=\${prefix}/lib\n\n"
+-                  "Name: ccx\n"
+-                  "Description: Closed Caption Extraction library\n"
+-                  "Version: 0.75\n"
+-                  "Cflags: -I\${includedir}/\n"
+-                  "Libs: -L\${libdir} -lccx -lpng\n"
+-                  "Libs.private: -lpng\n"
+-                  )
+-
+-install (TARGETS ccx DESTINATION lib)
+-install (FILES ${HeaderFiles} DESTINATION include)
+-install (FILES ccx.pc DESTINATION lib/pkgconfig)

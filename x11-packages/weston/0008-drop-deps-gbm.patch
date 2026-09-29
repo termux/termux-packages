@@ -1,0 +1,53 @@
+diff --git a/libweston/renderer-gl/gl-renderer.c b/libweston/renderer-gl/gl-renderer.c
+index 81bb5e5..f55cf75 100644
+--- a/libweston/renderer-gl/gl-renderer.c
++++ b/libweston/renderer-gl/gl-renderer.c
+@@ -5177,6 +5177,7 @@ gl_renderer_create_fence_fd(struct weston_output *output)
+ 	return fd;
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ gl_renderer_allocator_destroy(struct dmabuf_allocator *allocator)
+ {
+@@ -5223,6 +5224,7 @@ gl_renderer_allocator_create(struct gl_renderer *gr,
+ 
+ 	return allocator;
+ }
++#endif
+ 
+ static void
+ gl_renderer_destroy(struct weston_compositor *ec)
+@@ -5257,7 +5259,9 @@ gl_renderer_destroy(struct weston_compositor *ec)
+ 	weston_drm_format_array_fini(&gr->supported_dmabuf_formats);
+ 	free(gr->supported_rendering_formats);
+ 
++#ifndef __ANDROID__
+ 	gl_renderer_allocator_destroy(gr->allocator);
++#endif
+ 
+ 	eglTerminate(gr->egl_display);
+ 	eglReleaseThread();
+@@ -5351,9 +5355,11 @@ gl_renderer_display_create(struct weston_compositor *ec,
+ 	if (gl_renderer_setup_egl_display(gr, options->egl_native_display) < 0)
+ 		goto fail;
+ 
++#ifndef __ANDROID__
+ 	gr->allocator = gl_renderer_allocator_create(gr, options);
+ 	if (!gr->allocator)
+ 		weston_log("failed to initialize allocator\n");
++#endif
+ 
+ 	weston_drm_format_array_init(&gr->supported_dmabuf_formats);
+ 
+@@ -5390,8 +5396,10 @@ gl_renderer_display_create(struct weston_compositor *ec,
+ 	if (gl_renderer_setup(ec) < 0)
+ 		goto fail_terminate;
+ 
++#ifndef __ANDROID__
+ 	if (gr->allocator)
+ 		gr->base.dmabuf_alloc = gl_renderer_dmabuf_alloc;
++#endif
+ 
+ 	if (gr->platform == EGL_PLATFORM_GBM_KHR) {
+ 		gr->supported_rendering_formats =

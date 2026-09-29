@@ -1,0 +1,511 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="GladeXmlNode" get-type="glade_xml_node_get_type"/>
+  <boxed name="GladeXmlDoc" get-type="glade_xml_doc_get_type"/>
+  <boxed name="GladeXmlContext" get-type="glade_xml_context_get_type"/>
+  <boxed name="GladePropertyDef" get-type="glade_property_def_get_type"/>
+  <class name="GladeEditorProperty" get-type="glade_editor_property_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+    <property name="property-def" type="gpointer" flags="11"/>
+    <property name="use-command" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="disable-check" type="gboolean" flags="7" default-value="FALSE"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
+    <signal name="value-changed" return="void" when="last">
+      <param type="GladeProperty"/>
+    </signal>
+    <signal name="commit" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GladeEPropNumeric" get-type="glade_eprop_numeric_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropEnum" get-type="glade_eprop_enum_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropFlags" get-type="glade_eprop_flags_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropColor" get-type="glade_eprop_color_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropNamedIcon" get-type="glade_eprop_named_icon_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropText" get-type="glade_eprop_text_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropBool" get-type="glade_eprop_bool_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropCheck" get-type="glade_eprop_check_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropUnichar" get-type="glade_eprop_unichar_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropObject" get-type="glade_eprop_object_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeEPropObjects" get-type="glade_eprop_objects_get_type" parents="GladeEditorProperty,GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <boxed name="GladeSignalDef" get-type="glade_signal_def_get_type"/>
+  <interface name="GladeEditable" get-type="glade_editable_get_type">
+    <prerequisite name="GtkWidget"/>
+  </interface>
+  <class name="GladeWidgetAdaptor" get-type="glade_widget_adaptor_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="type" type="GType" flags="11"/>
+    <property name="title" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="generic-name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="icon-name" type="gchararray" flags="11" default-value="widget-gtk-frame"/>
+    <property name="catalog" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="book" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="special-child-type" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="cursor" type="gpointer" flags="1"/>
+    <property name="query" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GladeWidgetAction" get-type="glade_widget_action_get_type" parents="GObject">
+    <property name="definition" type="gpointer" flags="10"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="visible" type="gboolean" flags="3" default-value="TRUE"/>
+  </class>
+  <boxed name="GladeWidgetActionDef" get-type="glade_widget_action_def_get_type"/>
+  <class name="GladeSignal" get-type="glade_signal_get_type" parents="GObject">
+    <property name="class" type="gpointer" flags="11"/>
+    <property name="detail" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="handler" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="userdata" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="support-warning" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="after" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="swapped" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GladeProperty" get-type="glade_property_get_type" parents="GObject">
+    <property name="class" type="gpointer" flags="11"/>
+    <property name="enabled" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="i18n-translatable" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="i18n-context" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="i18n-comment" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="state" type="gint" flags="1" default-value="0"/>
+    <property name="precision" type="gint" flags="3" default-value="2"/>
+    <signal name="value-changed" return="void" when="last">
+      <param type="gpointer"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="tooltip-changed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GladeWidget" get-type="glade_widget_get_type" parents="GInitiallyUnowned,GObject">
+    <implements name="_GladeDrag"/>
+    <property name="name" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="internal" type="gchararray" flags="7" default-value="NULL"/>
+    <property name="anarchist" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="adaptor" type="GladeWidgetAdaptor" flags="11"/>
+    <property name="object" type="GObject" flags="7"/>
+    <property name="project" type="GladeProject" flags="7"/>
+    <property name="properties" type="gpointer" flags="11"/>
+    <property name="parent" type="GladeWidget" flags="7"/>
+    <property name="internal-name" type="gchararray" flags="10" default-value="NULL"/>
+    <property name="template" type="GladeWidget" flags="10"/>
+    <property name="template-exact" type="gboolean" flags="10" default-value="FALSE"/>
+    <property name="reason" type="gint" flags="11" default-value="0"/>
+    <property name="toplevel-width" type="gint" flags="3" default-value="-1"/>
+    <property name="toplevel-height" type="gint" flags="3" default-value="-1"/>
+    <property name="support-warning" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="visible" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="composite" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="button-press-event" return="gboolean" when="last">
+      <param type="GdkEvent"/>
+    </signal>
+    <signal name="button-release-event" return="gboolean" when="last">
+      <param type="GdkEvent"/>
+    </signal>
+    <signal name="motion-notify-event" return="gboolean" when="last">
+      <param type="GdkEvent"/>
+    </signal>
+    <signal name="add-signal-handler" return="void" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="remove-signal-handler" return="void" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="change-signal-handler" return="void" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="support-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GladePropertyShell" get-type="glade_property_shell_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+    <property name="property-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="packing" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="use-command" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="editor-type" type="gchararray" flags="10" default-value="NULL"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="disable-check" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="pre-commit" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="post-commit" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GladeSignalModel" get-type="glade_signal_model_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <property name="widget" type="GladeWidget" flags="10"/>
+    <property name="signals" type="gpointer" flags="10"/>
+  </class>
+  <class name="GladePlaceholder" get-type="glade_placeholder_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkScrollable"/>
+    <implements name="_GladeDrag"/>
+  </class>
+  <class name="GladeCommand" get-type="glade_command_get_type" parents="GObject">
+  </class>
+  <class name="GladeProject" get-type="glade_project_get_type" parents="GObject">
+    <implements name="GtkTreeModel"/>
+    <implements name="GtkTreeDragSource"/>
+    <property name="modified" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="has-selection" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="path" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="read-only" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="add-item" type="GladeWidgetAdaptor" flags="1"/>
+    <property name="pointer-mode" type="GladePointerMode" flags="1" default-value="GLADE_POINTER_SELECT"/>
+    <property name="translation-domain" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="template" type="GladeWidget" flags="3"/>
+    <property name="resource-path" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="license" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="css-provider-path" type="gchararray" flags="3" default-value="NULL"/>
+    <signal name="add-signal-handler" return="void" when="last">
+      <param type="GladeWidget"/>
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="remove-signal-handler" return="void" when="last">
+      <param type="GladeWidget"/>
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="change-signal-handler" return="void" when="last">
+      <param type="GladeWidget"/>
+      <param type="GladeSignal"/>
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="add-widget" return="void" when="last">
+      <param type="GladeWidget"/>
+    </signal>
+    <signal name="remove-widget" return="void" when="last">
+      <param type="GladeWidget"/>
+    </signal>
+    <signal name="widget-name-changed" return="void" when="last">
+      <param type="GladeWidget"/>
+    </signal>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="close" return="void" when="last">
+    </signal>
+    <signal name="changed" return="void" when="first">
+      <param type="GladeCommand"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="parse-began" return="void" when="first">
+    </signal>
+    <signal name="parse-finished" return="void" when="first">
+    </signal>
+    <signal name="targets-changed" return="void" when="first">
+    </signal>
+    <signal name="load-progress" return="void" when="first">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="widget-visibility-changed" return="void" when="first">
+      <param type="GladeWidget"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="activate-signal-handler" return="void" when="last">
+      <param type="GladeWidget"/>
+      <param type="GladeSignal"/>
+    </signal>
+  </class>
+  <class name="GladeSignalEditor" get-type="glade_signal_editor_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="glade-widget" type="GtkTreeModel" flags="3"/>
+    <signal name="signal-activated" return="void" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="callback-suggestions" return="GStrv" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+    <signal name="detail-suggestions" return="GStrv" when="last">
+      <param type="GladeSignal"/>
+    </signal>
+  </class>
+  <class name="GladeEditor" get-type="glade_editor_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="show-info" type="gboolean" flags="-2147483647" default-value="FALSE"/>
+    <property name="widget" type="GladeWidget" flags="3"/>
+    <property name="show-class-field" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="class-field" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="show-boder" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="signal-editor" type="GladeSignalEditor" flags="1"/>
+  </class>
+  <class name="GladePalette" get-type="glade_palette_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="item-appearance" type="GladeItemAppearance" flags="3" default-value="GLADE_ITEM_ICON_ONLY"/>
+    <property name="use-small-item-icons" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="show-selector-button" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="project" type="GladeProject" flags="3"/>
+    <signal name="refresh" return="void" when="last">
+    </signal>
+  </class>
+  <class name="GladeClipboard" get-type="glade_clipboard_get_type" parents="GObject">
+    <property name="has-selection" type="gboolean" flags="1" default-value="FALSE"/>
+  </class>
+  <class name="GladeApp" get-type="glade_app_get_type" parents="GObject">
+    <signal name="doc-search" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="signal-editor-created" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="widget-adaptor-registered" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GladeBaseEditor" get-type="glade_base_editor_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="container" type="GObject" flags="3"/>
+    <signal name="child-selected" return="void" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="change-type" return="gboolean" when="last">
+      <param type="GObject"/>
+      <param type="GType"/>
+    </signal>
+    <signal name="get-display-name" return="gchararray" when="last">
+      <param type="GObject"/>
+    </signal>
+    <signal name="build-child" return="GObject" when="last">
+      <param type="GObject"/>
+      <param type="GType"/>
+    </signal>
+    <signal name="delete-child" return="gboolean" when="last">
+      <param type="GObject"/>
+      <param type="GObject"/>
+    </signal>
+    <signal name="move-child" return="gboolean" when="last">
+      <param type="GObject"/>
+      <param type="GObject"/>
+    </signal>
+  </class>
+  <class name="GladeDesignView" get-type="glade_design_view_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="_GladeDrag"/>
+    <property name="project" type="GladeProject" flags="11"/>
+  </class>
+  <class name="GladeEditorSkeleton" get-type="glade_editor_skeleton_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+  </class>
+  <class name="GladeInspector" get-type="glade_inspector_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="project" type="GladeProject" flags="3"/>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="item-activated" return="void" when="last">
+    </signal>
+  </class>
+  <enum name="GladeStock" get-type="glade_standard_stock_get_type">
+    <member name="dummy" nick="Dummy" value="0"/>
+  </enum>  <enum name="GladeStockImage" get-type="glade_standard_stock_image_get_type">
+    <member name="dummy" nick="Dummy" value="0"/>
+  </enum>  <boxed name="GladeGList" get-type="glade_glist_get_type"/>
+  <fundamental name="GladeParamObjects" get-type="glade_param_objects_get_type" instantiatable="1" parents="GParam">
+  </fundamental>
+  <class name="GladeCellRendererIcon" get-type="glade_cell_renderer_icon_get_type" parents="GtkCellRendererPixbuf,GtkCellRenderer,GInitiallyUnowned,GObject">
+    <property name="activatable" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="active" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="activate" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <enum name="GladeCursorType" get-type="glade_cursor_type_get_type">
+    <member name="GLADE_CURSOR_SELECTOR" nick="selector" value="0"/>
+    <member name="GLADE_CURSOR_ADD_WIDGET" nick="add-widget" value="1"/>
+    <member name="GLADE_CURSOR_RESIZE_TOP_LEFT" nick="resize-top-left" value="2"/>
+    <member name="GLADE_CURSOR_RESIZE_TOP_RIGHT" nick="resize-top-right" value="3"/>
+    <member name="GLADE_CURSOR_RESIZE_BOTTOM_LEFT" nick="resize-bottom-left" value="4"/>
+    <member name="GLADE_CURSOR_RESIZE_BOTTOM_RIGHT" nick="resize-bottom-right" value="5"/>
+    <member name="GLADE_CURSOR_RESIZE_LEFT" nick="resize-left" value="6"/>
+    <member name="GLADE_CURSOR_RESIZE_RIGHT" nick="resize-right" value="7"/>
+    <member name="GLADE_CURSOR_RESIZE_TOP" nick="resize-top" value="8"/>
+    <member name="GLADE_CURSOR_RESIZE_BOTTOM" nick="resize-bottom" value="9"/>
+    <member name="GLADE_CURSOR_DRAG" nick="drag" value="10"/>
+  </enum>  <flags name="GladeDebugFlag" get-type="glade_debug_flag_get_type">
+    <member name="GLADE_DEBUG_REF_COUNTS" nick="ref-counts" value="1"/>
+    <member name="GLADE_DEBUG_WIDGET_EVENTS" nick="widget-events" value="2"/>
+    <member name="GLADE_DEBUG_COMMANDS" nick="commands" value="4"/>
+    <member name="GLADE_DEBUG_PROPERTIES" nick="properties" value="8"/>
+    <member name="GLADE_DEBUG_VERIFY" nick="verify" value="16"/>
+  </flags>
+  <enum name="GladeEditorPageType" get-type="glade_editor_page_type_get_type">
+    <member name="GLADE_PAGE_GENERAL" nick="general" value="0"/>
+    <member name="GLADE_PAGE_COMMON" nick="common" value="1"/>
+    <member name="GLADE_PAGE_PACKING" nick="packing" value="2"/>
+    <member name="GLADE_PAGE_ATK" nick="atk" value="3"/>
+    <member name="GLADE_PAGE_QUERY" nick="query" value="4"/>
+    <member name="GLADE_PAGE_SIGNAL" nick="signal" value="5"/>
+  </enum>  <enum name="GladeItemAppearance" get-type="glade_item_appearance_get_type">
+    <member name="GLADE_ITEM_ICON_AND_LABEL" nick="icon-and-label" value="0"/>
+    <member name="GLADE_ITEM_ICON_ONLY" nick="icon-only" value="1"/>
+    <member name="GLADE_ITEM_LABEL_ONLY" nick="label-only" value="2"/>
+  </enum>  <enum name="GladePointerMode" get-type="glade_pointer_mode_get_type">
+    <member name="GLADE_POINTER_SELECT" nick="select" value="0"/>
+    <member name="GLADE_POINTER_ADD_WIDGET" nick="add-widget" value="1"/>
+    <member name="GLADE_POINTER_DRAG_RESIZE" nick="drag-resize" value="2"/>
+    <member name="GLADE_POINTER_MARGIN_EDIT" nick="margin-edit" value="3"/>
+    <member name="GLADE_POINTER_ALIGN_EDIT" nick="align-edit" value="4"/>
+  </enum>  <flags name="GladeSupportMask" get-type="glade_support_mask_get_type">
+    <member name="GLADE_SUPPORT_OK" nick="ok" value="0"/>
+    <member name="GLADE_SUPPORT_DEPRECATED" nick="deprecated" value="1"/>
+    <member name="GLADE_SUPPORT_MISMATCH" nick="mismatch" value="2"/>
+  </flags>
+  <enum name="GladeProjectModelColumns" get-type="glade_project_model_columns_get_type">
+    <member name="GLADE_PROJECT_MODEL_COLUMN_ICON_NAME" nick="column-icon-name" value="0"/>
+    <member name="GLADE_PROJECT_MODEL_COLUMN_NAME" nick="column-name" value="1"/>
+    <member name="GLADE_PROJECT_MODEL_COLUMN_TYPE_NAME" nick="column-type-name" value="2"/>
+    <member name="GLADE_PROJECT_MODEL_COLUMN_OBJECT" nick="column-object" value="3"/>
+    <member name="GLADE_PROJECT_MODEL_COLUMN_MISC" nick="column-misc" value="4"/>
+    <member name="GLADE_PROJECT_MODEL_COLUMN_WARNING" nick="column-warning" value="5"/>
+    <member name="GLADE_PROJECT_MODEL_N_COLUMNS" nick="n-columns" value="6"/>
+  </enum>  <flags name="GladeVerifyFlags" get-type="glade_verify_flags_get_type">
+    <member name="GLADE_VERIFY_NONE" nick="none" value="0"/>
+    <member name="GLADE_VERIFY_VERSIONS" nick="versions" value="1"/>
+    <member name="GLADE_VERIFY_DEPRECATIONS" nick="deprecations" value="2"/>
+    <member name="GLADE_VERIFY_UNRECOGNIZED" nick="unrecognized" value="4"/>
+  </flags>
+  <flags name="GladePropertyState" get-type="glade_property_state_get_type">
+    <member name="GLADE_STATE_NORMAL" nick="normal" value="0"/>
+    <member name="GLADE_STATE_CHANGED" nick="changed" value="1"/>
+    <member name="GLADE_STATE_UNSUPPORTED" nick="unsupported" value="2"/>
+    <member name="GLADE_STATE_SUPPORT_DISABLED" nick="support-disabled" value="4"/>
+  </flags>
+  <enum name="GladeSignalModelColumns" get-type="glade_signal_model_columns_get_type">
+    <member name="GLADE_SIGNAL_COLUMN_NAME" nick="column-name" value="0"/>
+    <member name="GLADE_SIGNAL_COLUMN_SHOW_NAME" nick="column-show-name" value="1"/>
+    <member name="GLADE_SIGNAL_COLUMN_HANDLER" nick="column-handler" value="2"/>
+    <member name="GLADE_SIGNAL_COLUMN_OBJECT" nick="column-object" value="3"/>
+    <member name="GLADE_SIGNAL_COLUMN_SWAP" nick="column-swap" value="4"/>
+    <member name="GLADE_SIGNAL_COLUMN_AFTER" nick="column-after" value="5"/>
+    <member name="GLADE_SIGNAL_COLUMN_TOOLTIP" nick="column-tooltip" value="6"/>
+    <member name="GLADE_SIGNAL_COLUMN_SIGNAL" nick="column-signal" value="7"/>
+    <member name="GLADE_SIGNAL_COLUMN_DETAIL" nick="column-detail" value="8"/>
+    <member name="GLADE_SIGNAL_N_COLUMNS" nick="n-columns" value="9"/>
+  </enum>  <enum name="GladeUtilFileDialogType" get-type="glade_util_file_dialog_type_get_type">
+    <member name="GLADE_FILE_DIALOG_ACTION_OPEN" nick="open" value="0"/>
+    <member name="GLADE_FILE_DIALOG_ACTION_SAVE" nick="save" value="1"/>
+  </enum>  <enum name="GladeUIMessageType" get-type="glade_ui_message_type_get_type">
+    <member name="GLADE_UI_INFO" nick="info" value="0"/>
+    <member name="GLADE_UI_WARN" nick="warn" value="1"/>
+    <member name="GLADE_UI_ERROR" nick="error" value="2"/>
+    <member name="GLADE_UI_ARE_YOU_SURE" nick="are-you-sure" value="3"/>
+    <member name="GLADE_UI_YES_OR_NO" nick="yes-or-no" value="4"/>
+  </enum>  <enum name="GladeCreateReason" get-type="glade_create_reason_get_type">
+    <member name="GLADE_CREATE_USER" nick="user" value="0"/>
+    <member name="GLADE_CREATE_COPY" nick="copy" value="1"/>
+    <member name="GLADE_CREATE_LOAD" nick="load" value="2"/>
+    <member name="GLADE_CREATE_REBUILD" nick="rebuild" value="3"/>
+    <member name="GLADE_CREATE_REASONS" nick="reasons" value="4"/>
+  </enum>  <class name="GladeAdaptorChooser" get-type="glade_adaptor_chooser_get_type" parents="GtkBox,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <property name="project" type="GladeProject" flags="3"/>
+  </class>
+  <class name="GladeEditorTable" get-type="glade_editor_table_get_type" parents="GtkGrid,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkOrientable"/>
+    <implements name="GladeEditable"/>
+    <property name="page-type" type="GladeEditorPageType" flags="10" default-value="GLADE_PAGE_GENERAL"/>
+  </class>
+  <class name="GladePropertyLabel" get-type="glade_property_label_get_type" parents="GtkEventBox,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GladeEditable"/>
+    <property name="property" type="GladeProperty" flags="3"/>
+    <property name="property-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="append-colon" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="packing" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="custom-text" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="custom-tooltip" type="gchararray" flags="3" default-value="NULL"/>
+  </class>
+  <class name="GladeNamedIconChooserDialog" get-type="glade_named_icon_chooser_dialog_get_type" parents="GtkDialog,GtkWindow,GtkBin,GtkContainer,GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="AtkImplementorIface"/>
+    <implements name="GtkBuildable"/>
+    <signal name="selection-changed" return="void" when="last">
+    </signal>
+    <signal name="icon-activated" return="void" when="last">
+    </signal>
+  </class>
+</dump>

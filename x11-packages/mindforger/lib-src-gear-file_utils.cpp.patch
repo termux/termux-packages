@@ -1,0 +1,11 @@
+--- a/lib/src/gear/file_utils.cpp
++++ b/lib/src/gear/file_utils.cpp
+@@ -120,7 +120,7 @@
+     char* cwd_c = _getcwd(nullptr, 0);
+     std::string cwd{cwd_c};
+     std::free(cwd_c) ;
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+     char* cwd_c = getcwd(NULL, 0);
+     std::string cwd{cwd_c};
+     free(cwd_c);

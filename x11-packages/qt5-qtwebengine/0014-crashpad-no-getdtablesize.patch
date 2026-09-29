@@ -1,0 +1,11 @@
+--- a/src/3rdparty/chromium/third_party/crashpad/crashpad/util/posix/close_multiple.cc
++++ b/src/3rdparty/chromium/third_party/crashpad/crashpad/util/posix/close_multiple.cc
+@@ -128,7 +128,7 @@
+   // bionic/libc/bionic/ndk_cruft.cpp getdtablesize().
+   int max_fd = implicit_cast<int>(sysconf(_SC_OPEN_MAX));
+ 
+-#if !defined(OS_ANDROID)
++#if !defined(OS_ANDROID) && !defined(__TERMUX__)
+   // getdtablesize() was removed effective Android 5.0.0 (API 21). Since it
+   // returns the same thing as the sysconf() above, just skip it. See
+   // https://android.googlesource.com/platform/bionic/+/462abab12b074c62c0999859e65d5a32ebb41951.

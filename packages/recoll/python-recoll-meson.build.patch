@@ -1,0 +1,30 @@
+Install native module for cross python
+--- a/python/recoll/meson.build.orig	2026-03-04 14:52:43.479785651 +0530
++++ b/python/recoll/meson.build	2026-03-04 14:53:11.180800481 +0530
+@@ -9,24 +9,10 @@
+     '../../utils',
+ )
+ 
+-py3versions_cmd = find_program('py3versions',
+-    native: true,
+-    required: false,
+-)
+-if py3versions_cmd.found()
+-    py3vs = run_command(py3versions_cmd, ['-iv',],
+-        check: true,
+-        capture: true,
+-        )
+-    py3versions = py3vs.stdout().split()
+-else
+-    py3versions = ['3',]
+-endif
+-
+ py_mod = import('python')
+ extensions = []
+-foreach v : py3versions
+-    py3_name = 'python' + v
++foreach v : [ '3' ]
++    py3_name = 'cross-python' + v
+     python_installation = py_mod.find_installation(py3_name)
+     extensions += python_installation.extension_module(
+         '_recoll',

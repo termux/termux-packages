@@ -1,0 +1,31 @@
+Copied from here https://salsa.debian.org/multimedia-team/handbrake/-/tree/abf6561af02cff11bce1f28900165716e57fa41a
+
+From: Sebastian Ramacher <sramacher@debian.org>
+Date: Fri, 1 Dec 2023 23:22:16 +0100
+Subject: Do not use contribs
+
+---
+ gtk/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gtk/meson.build b/gtk/meson.build
+index 96ba523..6b82ced 100644
+--- a/gtk/meson.build
++++ b/gtk/meson.build
+@@ -20,7 +20,7 @@ if hb_dir == ''
+   hb_dir = meson.current_build_dir() / '..'
+ endif
+ 
+-hb_incdirs = include_directories(hb_dir / 'libhb', hb_dir / 'contrib/include')
++hb_incdirs = include_directories(hb_dir / 'libhb')
+ 
+ # External dependencies (required)
+ ghb_deps = [
+@@ -51,6 +51,7 @@ ghb_deps = [
+   dependency('vorbis'),
+   dependency('vorbisenc'),
+   dependency('x264'),
++  dependency('zlib'),
+ ]
+ 
+ if get_option('libdovi').enabled()

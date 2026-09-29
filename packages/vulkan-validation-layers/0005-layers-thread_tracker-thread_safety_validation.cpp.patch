@@ -1,0 +1,14 @@
+--- a/layers/thread_tracker/thread_safety_validation.cpp
++++ b/layers/thread_tracker/thread_safety_validation.cpp
+@@ -57,9 +57,11 @@
+ #include <pthread.h>
+ static std::string GetPThreadName() {
+     char name[64] = {};  // on linux only 16 bytes are used, on Mac it can be more
++#if defined(__ANDROID__) && __ANDROID_API__ >= 26
+     if (pthread_getname_np(pthread_self(), name, sizeof(name)) != 0) {
+         return {};
+     }
++#endif
+     // On Linux unnamed thread goes with default name (executable).
+     // On Mac default thread name is empty (similar to Windows)
+     return name;

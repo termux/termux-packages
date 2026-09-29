@@ -1,0 +1,21 @@
+diff -u -r ../meson-1.10.0/mesonbuild/build.py ./mesonbuild/build.py
+--- ../meson-1.10.0/mesonbuild/build.py	2025-12-08 16:48:52.000000000 +0000
++++ ./mesonbuild/build.py	2026-01-05 10:39:09.113448398 +0000
+@@ -2553,7 +2553,7 @@
+             else:
+                 # libfoo.dylib
+                 filename_tpl = '{0.prefix}{0.name}.{0.suffix}'
+-        elif self.environment.machines[self.for_machine].is_android():
++        elif self.environment.machines[self.for_machine].is_android() and not os.environ.get('TERMUX_MESON_ENABLE_SOVERSION'):
+             prefix = prefix if prefix is not None else 'lib'
+             suffix = suffix if suffix is not None else 'so'
+             # Android doesn't support shared_library versioning
+@@ -2626,7 +2626,7 @@
+     def process_kwargs(self, kwargs: SharedLibraryKeywordArguments) -> None:
+         super().process_kwargs(kwargs)
+ 
+-        if not self.environment.machines[self.for_machine].is_android():
++        if not self.environment.machines[self.for_machine].is_android() or os.environ.get('TERMUX_MESON_ENABLE_SOVERSION'):
+             # Shared library version
+             self.ltversion = kwargs.get('version')
+             self.soversion = kwargs.get('soversion')

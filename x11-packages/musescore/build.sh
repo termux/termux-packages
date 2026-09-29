@@ -1,0 +1,22 @@
+TERMUX_PKG_HOMEPAGE=https://musescore.org/
+TERMUX_PKG_DESCRIPTION="A music score editor/player"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="4.7.5"
+TERMUX_PKG_SRCURL="https://github.com/musescore/MuseScore/archive/refs/tags/v${TERMUX_PKG_VERSION//\~/-}.tar.gz"
+TERMUX_PKG_SHA256=b9db52e139e925adfc56e3ab59244f44da4db7e5e133d5084c5da5dfc3dfb9d1
+TERMUX_PKG_DEPENDS="freetype, harfbuzz, libc++, libflac, qt6-qtbase, qt6-qtnetworkauth, qt6-qt5compat, qt6-qtscxml, qt6-qtsvg, libopus, libopusenc, libsndfile, alsa-lib"
+TERMUX_PKG_BUILD_DEPENDS="qt6-qttools"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+-DCMAKE_PROGRAM_PATH=${TERMUX_PREFIX}/opt/qt6/cross/bin/;${TERMUX_PREFIX}/opt/qt6/cross/lib/qt6/bin/
+-DMUE_RUN_LRELEASE=OFF
+-DMUE_COMPILE_USE_SYSTEM_FLAC=ON
+-DMUE_COMPILE_USE_SYSTEM_FREETYPE=ON
+-DMUE_COMPILE_USE_SYSTEM_HARFBUZZ=ON
+-DMUE_COMPILE_USE_SYSTEM_OPUS=ON
+-DMUE_COMPILE_USE_SYSTEM_OPUSENC=ON
+-DMUSE_ENABLE_UNIT_TESTS=FALSE
+"

@@ -1,0 +1,21 @@
+From: Antonio Larrosa <larrosa@kde.org>
+Date: Thu, 9 Mar 2017 10:21:18 +0100
+Subject: Check for division by zero in BlockCodec::runPull
+
+---
+ libaudiofile/modules/BlockCodec.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libaudiofile/modules/BlockCodec.cpp b/libaudiofile/modules/BlockCodec.cpp
+index 4731be1..eb2fb4d 100644
+--- a/libaudiofile/modules/BlockCodec.cpp
++++ b/libaudiofile/modules/BlockCodec.cpp
+@@ -47,7 +47,7 @@ void BlockCodec::runPull()
+ 
+ 	// Read the compressed data.
+ 	ssize_t bytesRead = read(m_inChunk->buffer, m_bytesPerPacket * blockCount);
+-	int blocksRead = bytesRead >= 0 ? bytesRead / m_bytesPerPacket : 0;
++	int blocksRead = (bytesRead >= 0 && m_bytesPerPacket > 0) ? bytesRead / m_bytesPerPacket : 0;
+ 
+ 	// Decompress into m_outChunk.
+ 	for (int i=0; i<blocksRead; i++)

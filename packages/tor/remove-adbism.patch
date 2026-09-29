@@ -1,0 +1,37 @@
+/data/local/tmp is an ADBism that only works in ADB; the folder
+is inaccessible to the permissions of normal apps like Termux,
+so @TERMUX_PREFIX@/tmp should be used instead in Termux.
+
+--- a/src/app/config/config.c
++++ b/src/app/config/config.c
+@@ -491,8 +491,8 @@ static const config_var_t option_vars_[] = {
+    * /data/local/tmp is guaranteed to exist, but will only be
+    * usable by the 'shell' and 'root' users, so this fallback is
+    * for debugging only. */
+-  V(GeoIPFile,                   FILENAME, "/data/local/tmp/geoip"),
+-  V(GeoIPv6File,                 FILENAME, "/data/local/tmp/geoip6"),
++  V(GeoIPFile,                   FILENAME, "@TERMUX_PREFIX@/tmp/geoip"),
++  V(GeoIPv6File,                 FILENAME, "@TERMUX_PREFIX@/tmp/geoip6"),
+ #else
+   V(GeoIPFile,                   FILENAME,
+     SHARE_DATADIR PATH_SEPARATOR "tor" PATH_SEPARATOR "geoip"),
+@@ -6927,7 +6927,7 @@ get_data_directory(const char *val)
+   if (val) {
+     return tor_strdup(val);
+   } else {
+-    return tor_strdup("/data/local/tmp");
++    return tor_strdup("@TERMUX_PREFIX@/tmp");
+   }
+ #else /* !defined(_WIN32) */
+   const char *d = val;
+--- a/src/test/testing_common.c
++++ b/src/test/testing_common.c
+@@ -93,7 +93,7 @@ setup_directory(void)
+ #elif defined(__ANDROID__)
+   /* tor might not like the default perms, so create a subdir */
+   tor_snprintf(temp_dir, sizeof(temp_dir),
+-               "/data/local/tmp/tor_%d_%d_%s",
++               "@TERMUX_PREFIX@/tmp/tor_%d_%d_%s",
+                (int) getuid(), (int) getpid(), rnd32);
+   r = mkdir(temp_dir, 0700);
+   if (r) {

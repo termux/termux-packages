@@ -1,0 +1,12 @@
+--- a/Makefile
++++ b/Makefile
+@@ -987,6 +987,9 @@
+ 
+ # Rust flags
+ CARGO_ARGS =
++ifdef CARGO_BUILD_TARGET
++CARGO_ARGS += --target ${CARGO_BUILD_TARGET}
++endif
+ ifndef V
+ CARGO_ARGS += --quiet
+ endif

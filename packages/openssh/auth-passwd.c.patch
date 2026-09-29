@@ -1,0 +1,31 @@
+--- a/auth-passwd.c
++++ b/auth-passwd.c
+@@ -56,6 +56,10 @@
+ #include "auth.h"
+ #include "auth-options.h"
+ 
++#ifdef __TERMUX__
++#include <termux-auth.h>
++#endif
++
+ extern struct sshbuf *loginmsg;
+ extern ServerOptions options;
+ 
+@@ -187,6 +191,17 @@
+ 		return (auth_close(as));
+ 	}
+ }
++#elif defined(__TERMUX__)
++int
++sys_auth_passwd(struct ssh *ssh, const char *password)
++{
++	Authctxt *authctxt = ssh->authctxt;
++	/* If sshd is starting as root, only allow root login */
++	if (authctxt->pw->pw_uid == 0 && strcmp(authctxt->user, "root") != 0) {
++		return 0;
++	}
++	return termux_auth(authctxt->user, password);	
++}
+ #elif !defined(CUSTOM_SYS_AUTH_PASSWD)
+ int
+ sys_auth_passwd(struct ssh *ssh, const char *password)

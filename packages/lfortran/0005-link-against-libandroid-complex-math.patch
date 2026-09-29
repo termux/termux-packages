@@ -1,0 +1,16 @@
+--- a/src/libasr/runtime/lfortran_intrinsics.h
++++ b/src/libasr/runtime/lfortran_intrinsics.h
+@@ -6,6 +6,13 @@
+ #include <inttypes.h>
+ #include <stdbool.h>
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++double complex clog(double complex);
++float complex clogf(float complex);
++double complex cpow(double complex, double complex);
++float complex cpowf(float complex, float complex);
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif

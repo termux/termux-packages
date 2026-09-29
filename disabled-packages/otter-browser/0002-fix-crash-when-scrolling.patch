@@ -1,0 +1,32 @@
+https://github.com/OtterBrowser/otter-browser/commit/4de69f164a77630e5a589b819521e151c797c08c
+
+--- a/src/modules/backends/web/qtwebengine/QtWebEngineWebWidget.cpp
++++ b/src/modules/backends/web/qtwebengine/QtWebEngineWebWidget.cpp
+@@ -1965,16 +1965,21 @@
+ 		case QEvent::MouseButtonPress:
+ 		case QEvent::Wheel:
+ 			{
+-				const QMouseEvent *mouseEvent(static_cast<QMouseEvent*>(event));
++				QMouseEvent *mouseEvent(nullptr);
+ 
+-				if (mouseEvent)
++				if (event->type() != QEvent::Wheel)
+ 				{
+-					setClickPosition(mouseEvent->pos());
+-					updateHitTestResult(mouseEvent->pos());
++					mouseEvent = static_cast<QMouseEvent*>(event);
+ 
+-					if (mouseEvent->button() == Qt::LeftButton && !getCurrentHitTestResult().linkUrl.isEmpty())
++					if (mouseEvent)
+ 					{
+-						m_lastUrlClickTime = QDateTime::currentDateTime();
++						setClickPosition(mouseEvent->pos());
++						updateHitTestResult(mouseEvent->pos());
++
++						if (mouseEvent->button() == Qt::LeftButton && !getCurrentHitTestResult().linkUrl.isEmpty())
++						{
++							m_lastUrlClickTime = QDateTime::currentDateTime();
++						}
+ 					}
+ 				}
+ 

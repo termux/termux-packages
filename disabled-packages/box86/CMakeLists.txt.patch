@@ -1,0 +1,37 @@
+diff -uNr box86/CMakeLists.txt box86.mod/CMakeLists.txt
+--- box86/CMakeLists.txt	2022-10-31 00:09:49.879470723 +0800
++++ box86.mod/CMakeLists.txt	2022-10-31 00:08:16.691470789 +0800
+@@ -622,7 +622,7 @@
+ add_dependencies(${BOX86} WRAPPERS)
+ add_dependencies(${BOX86} PRINTER)
+ if(ANDROID)
+-    target_link_libraries(${BOX86} c m dl)
++    target_link_libraries(${BOX86} c m dl android-complex-math android-glob android-spawn android-sysv-semaphore)
+ else()
+     #target_link_libraries(${BOX86} c m dl rt pthread resolv)
+     set_target_properties(${BOX86} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed -lc -lm -ldl -lrt -lpthread -lresolv -Wl,--as-needed -pthread")
+@@ -633,14 +633,22 @@
+ 
+ if(${CMAKE_VERSION} VERSION_LESS "3.13")
+     if(NOT NOLOADADDR)
+-        set_target_properties(${BOX86} PROPERTIES LINK_FLAGS "-rdynamic -Wl,-Ttext-segment,${BOX86_ELF_ADDRESS}")
++        if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
++            set_target_properties(${BOX86} PROPERTIES LINK_FLAGS "-Wl,--image-base=${BOX86_ELF_ADDRESS}")
++        else()
++            set_target_properties(${BOX86} PROPERTIES LINK_FLAGS "-rdynamic -Wl,-Ttext-segment,${BOX86_ELF_ADDRESS}")
++        endif()
+     else()
+         set_target_properties(${BOX86} PROPERTIES LINK_FLAGS -rdynamic)
+     endif()
+ else()
+     target_link_options(${BOX86} PUBLIC -rdynamic)
+     if(NOT NOLOADADDR)
+-        target_link_options(${BOX86} PUBLIC -Wl,-Ttext-segment,${BOX86_ELF_ADDRESS})
++        if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
++            target_link_options(${BOX86} PUBLIC LINKER:--image-base=${BOX86_ELF_ADDRESS})
++        else()
++            target_link_options(${BOX86} PUBLIC -Wl,-Ttext-segment,${BOX86_ELF_ADDRESS})
++        endif()
+     endif()
+ endif()
+ 

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="GCabFileAttribute" get-type="gcab_file_attribute_get_type">
+    <member name="GCAB_FILE_ATTRIBUTE_RDONLY" nick="rdonly" value="1"/>
+    <member name="GCAB_FILE_ATTRIBUTE_HIDDEN" nick="hidden" value="2"/>
+    <member name="GCAB_FILE_ATTRIBUTE_SYSTEM" nick="system" value="4"/>
+    <member name="GCAB_FILE_ATTRIBUTE_ARCH" nick="arch" value="32"/>
+    <member name="GCAB_FILE_ATTRIBUTE_EXEC" nick="exec" value="64"/>
+    <member name="GCAB_FILE_ATTRIBUTE_NAME_IS_UTF" nick="name-is-utf" value="128"/>
+  </enum>  <enum name="GCabCompression" get-type="gcab_compression_get_type">
+    <member name="GCAB_COMPRESSION_NONE" nick="none" value="0"/>
+    <member name="GCAB_COMPRESSION_MSZIP" nick="mszip" value="1"/>
+    <member name="GCAB_COMPRESSION_QUANTUM" nick="quantum" value="2"/>
+    <member name="GCAB_COMPRESSION_LZX" nick="lzx" value="3"/>
+    <member name="GCAB_COMPRESSION_MASK" nick="mask" value="15"/>
+  </enum>  <class name="GCabFile" get-type="gcab_file_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="file" type="GFile" flags="227"/>
+    <property name="bytes" type="GBytes" flags="227"/>
+  </class>
+  <class name="GCabFolder" get-type="gcab_folder_get_type" parents="GObject">
+    <property name="compression" type="GCabCompression" flags="225" default-value="GCAB_COMPRESSION_NONE"/>
+    <property name="comptype" type="gint" flags="235" default-value="0"/>
+    <property name="reserved" type="GByteArray" flags="227"/>
+  </class>
+  <class name="GCabCabinet" get-type="gcab_cabinet_get_type" parents="GObject">
+    <property name="reserved" type="GByteArray" flags="227"/>
+    <property name="signature" type="GByteArray" flags="227"/>
+  </class>
+  <error-quark function="gcab_error_quark" domain="gcab-error-quark"/>
+</dump>

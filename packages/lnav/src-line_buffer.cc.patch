@@ -1,0 +1,14 @@
+--- a/src/line_buffer.cc
++++ b/src/line_buffer.cc
+@@ -104,9 +104,9 @@
+ 
+     lock_hack()
+     {
+-        char lockname[64];
++        char lockname[] = "@TERMUX_PREFIX@/tmp/lnav.XXXXXXXXXXXXXXXXXXXX.lck";
+ 
+-        snprintf(lockname, sizeof(lockname), "/tmp/lnav.%d.lck", getpid());
++        snprintf(lockname, sizeof(lockname), "@TERMUX_PREFIX@/tmp/lnav.%d.lck", getpid());
+         this->lh_fd = open(lockname, O_CREAT | O_RDWR, 0600);
+         log_perror(fcntl(this->lh_fd, F_SETFD, FD_CLOEXEC));
+         unlink(lockname);

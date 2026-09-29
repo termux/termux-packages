@@ -1,0 +1,17 @@
+diff -ur orig/udocker/engine/base.py mod/udocker/engine/base.py
+--- orig/udocker/engine/base.py	2024-08-28 16:01:10.000000000 +0200
++++ mod/udocker/engine/base.py	2025-05-13 20:06:50.803621502 +0200
+@@ -197,9 +197,13 @@
+             self.opt["vol"].extend(self.hostauth_list)
+         if self.opt["dri"]:
+             self.opt["vol"].extend(Config.conf['dri_list'])
++
++        self.opt["vol"].append("@TERMUX_PREFIX@/etc/resolv.conf:/etc/resolv.conf")
++        
+         home = self._get_bindhome()
+         if home:
+             self.opt["vol"].append(home)
++
+         # remove directory bindings specified with --novol
+         for novolume in list(self.opt["novol"]):
+             found = False

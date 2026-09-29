@@ -1,0 +1,11 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -83,7 +83,7 @@
+ 	$(INSTALL) src.util/t3keyc/t3keyc $(_bindir)
+ 	$(INSTALL) -d $(_datadir)/libt3key1
+ 	find src/database -type f | while read FILE ; do install -m0644 "$$FILE" $(_datadir)/libt3key1 ; \
+-		$(_bindir)/t3keyc -l  $(_datadir)/libt3key1/"$${FILE##*/}" ; done
++		t3keyc -l  $(_datadir)/libt3key1/"$${FILE##*/}" ; done
+ 	$(INSTALL) -d $(_mandir)/man1
+ 	$(INSTALL) -m0644 man/t3keyc.1 $(_mandir)/man1
+ 	if [ -f src.util/t3learnkeys/t3learnkeys ] ; then $(INSTALL) src.util/t3learnkeys/t3learnkeys $(_bindir) ; \

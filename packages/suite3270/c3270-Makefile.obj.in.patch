@@ -1,0 +1,17 @@
+--- a/c3270/Makefile.obj.in
++++ b/c3270/Makefile.obj.in
+@@ -69,12 +69,12 @@
+ 	./mkfb -c -o $@ $(filter-out mkfb,$^)
+ 
+ mkfb: mkfb.c
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.c,$^)
++	$(CC_FOR_BUILD) $(XCPPFLAGS) -o $@ $(filter %.c,$^)
+ 
+ keypad.o: compiled_keypad.h
+ 
+ compiled_keypad.h: keypad.full keypad.labels keypad.map keypad.outline keypad.callbacks mkkeypad
+-	./mkkeypad -I$(TOP)/Common/c3270 >$@
++	mkkeypad -I$(TOP)/Common/c3270 >$@
+ 
+ c3270: $(OBJS1) $(DEP3270) $(DEP3270I) $(DEP32XX) $(DEP3270STUBS) $(DEP32XX)
+ 	$(CC) -o $@ $(OBJS1) $(LDFLAGS) $(LD3270) $(LD3270I) $(LD32XX) $(LD3270STUBS) $(LIBS)

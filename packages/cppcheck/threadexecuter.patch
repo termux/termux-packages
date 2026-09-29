@@ -1,0 +1,11 @@
+--- a/cli/processexecutor.cpp
++++ b/cli/processexecutor.cpp
+@@ -276,7 +276,7 @@
+ 
+ bool ProcessExecutor::checkLoadAverage(size_t nchildren)
+ {
+-#if defined(__QNX__) || defined(__HAIKU__) || defined(_AIX) // getloadavg() is unsupported on Qnx, Haiku, AIX.
++#if defined(__QNX__) || defined(__HAIKU__) || defined(_AIX) || defined(__ANDROID__) // getloadavg() is unsupported on Qnx, Haiku, AIX, Android.
+     (void)nchildren;
+     return true;
+ #else

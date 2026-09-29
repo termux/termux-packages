@@ -1,0 +1,16 @@
+--- ./src/terminal/TerminalServerMain.cpp~	2022-05-05 06:28:11.000000000 +0200
++++ ./src/terminal/TerminalServerMain.cpp	2022-05-05 08:56:50.241909706 +0200
+@@ -40,11 +40,11 @@
+         ("logtostdout", "log to stdout")                    //
+         ("pidfile", "Location of the pid file",
+          cxxopts::value<std::string>()->default_value(
+-             "/var/run/etserver.pid"))  //
++             "@TERMUX_PREFIX@/var/run/etserver.pid"))  //
+         ("v,verbose", "Enable verbose logging",
+          cxxopts::value<int>()->default_value("0"), "LEVEL")  //
+         ("serverfifo",
+-         "If set, listens on the matching fifo name",       //
++         "If set, listens on the matching server fifo name",       //
+          cxxopts::value<std::string>()->default_value(""))  //
+         ("telemetry",
+          "Allow et to anonymously send errors to guide future improvements",

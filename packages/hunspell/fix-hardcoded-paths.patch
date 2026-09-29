@@ -1,0 +1,20 @@
+--- a/src/tools/hunspell.cxx
++++ b/src/tools/hunspell.cxx
+@@ -685,7 +685,7 @@
+ 
+   const char* extension = (filename) ? basename(filename, '.') : nullptr;
+   TextParser* parser = get_parser(format, extension, pMS[0]);
+-  char tmpdirtemplate[] = "/tmp/hunspellXXXXXX";
++  char tmpdirtemplate[] = "@TERMUX_PREFIX@/tmp/hunspellXXXXXX";
+ 
+   bool bZippedOdf = is_zipped_odf(parser, extension);
+   // access content.xml of ODF
+@@ -1617,7 +1617,7 @@
+ 
+   const char* extension = basename(filename, '.');
+   TextParser* parser = get_parser(format, extension, pMS[0]);
+-  char tmpdirtemplate[] = "/tmp/hunspellXXXXXX";
++  char tmpdirtemplate[] = "@TERMUX_PREFIX@/tmp/hunspellXXXXXX";
+ 
+   bool bZippedOdf = is_zipped_odf(parser, extension);
+   // access content.xml of ODF

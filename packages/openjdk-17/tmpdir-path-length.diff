@@ -1,0 +1,21 @@
+--- a/src/hotspot/os/posix/perfMemory_posix.cpp
++++ b/src/hotspot/os/posix/perfMemory_posix.cpp
+@@ -130,15 +130,15 @@ static void save_memory_to_file(char* addr, size_t size) {
+ // return the user specific temporary directory name.
+ // the caller is expected to free the allocated memory.
+ //
+-#define TMP_BUFFER_LEN (4+22)
++#define TMP_BUFFER_LEN (@TERMUX_TMPDIR_PATH_LENGTH@+22)
+ static char* get_user_tmp_dir(const char* user, int vmid, int nspid) {
+-  char* tmpdir = (char *)os::get_temp_directory();
++  char* tmpdir = "@TERMUX_PREFIX@/tmp";
+ #if defined(LINUX)
+   // On linux, if containerized process, get dirname of
+   // /proc/{vmid}/root/tmp/{PERFDATA_NAME_user}
+   // otherwise /tmp/{PERFDATA_NAME_user}
+   char buffer[TMP_BUFFER_LEN];
+-  assert(strlen(tmpdir) == 4, "No longer using /tmp - update buffer size");
++  assert(strlen(tmpdir) == @TERMUX_TMPDIR_PATH_LENGTH@, "No longer using @TERMUX_PREFIX@/tmp - update buffer size");
+ 
+   if (nspid != -1) {
+     jio_snprintf(buffer, TMP_BUFFER_LEN, "/proc/%d/root%s", vmid, tmpdir);

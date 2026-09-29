@@ -1,0 +1,88 @@
+--- a/capture/ws80211_utils.c
++++ b/capture/ws80211_utils.c
+@@ -914,7 +914,7 @@
+ 	return -1;
+ }
+ 
+-const char *network_manager_path = "/usr/sbin/NetworkManager"; /* Is this correct? */
++const char *network_manager_path = "@TERMUX_PREFIX@/bin/NetworkManager"; /* Is this correct? */
+ const char *ws80211_get_helper_path(void) {
+ 	if (g_file_test(network_manager_path, G_FILE_TEST_IS_EXECUTABLE)) {
+ 		return network_manager_path;
+--- a/epan/dissectors/packet-snort.c
++++ b/epan/dissectors/packet-snort.c
+@@ -116,8 +116,8 @@
+ 
+ /* Snort binary and config file */
+ #ifndef _WIN32
+-static const char *pref_snort_binary_filename = "/usr/sbin/snort";
+-static const char *pref_snort_config_filename = "/etc/snort/snort.conf";
++static const char *pref_snort_binary_filename = "@TERMUX_PREFIX@/bin/snort";
++static const char *pref_snort_config_filename = "@TERMUX_PREFIX@/etc/snort/snort.conf";
+ #else
+ /* Default locations from Snort Windows installer */
+ static const char *pref_snort_binary_filename = "C:\\Snort\\bin\\snort.exe";
+--- a/epan/maxmind_db.c
++++ b/epan/maxmind_db.c
+@@ -89,8 +89,8 @@
+     { "C:\\ProgramData\\GeoIP" },
+     { "C:\\GeoIP" },
+ #else
+-    { "/usr/share/GeoIP" },
+-    { "/var/lib/GeoIP" },
++    { "@TERMUX_PREFIX@/share/GeoIP" },
++    { "@TERMUX_PREFIX@/var/lib/GeoIP" },
+ #endif
+     { NULL }
+ };
+--- a/epan/oids.c
++++ b/epan/oids.c
+@@ -1293,7 +1293,7 @@
+ 	g_string_append_printf(path_str, "%s", path);
+ 	g_free (path);
+ #else
+-	g_string_append(path_str, "/usr/share/snmp/mibs");
++	g_string_append(path_str, "@TERMUX_PREFIX@/share/snmp/mibs");
+ 	if (!smi_init_done)
+ 		smiInit(NULL);
+ 	path = smiGetPath();
+--- a/wiretap/nettl.c
++++ b/wiretap/nettl.c
+@@ -657,7 +657,7 @@
+     /* Write the file header. */
+     memset(&file_hdr,0,sizeof(file_hdr));
+     memcpy(file_hdr.magic,nettl_magic_hpux10,sizeof(file_hdr.magic));
+-    (void) g_strlcpy(file_hdr.file_name,"/tmp/wireshark.TRC000",NETTL_FILENAME_SIZE);
++    (void) g_strlcpy(file_hdr.file_name,"@TERMUX_PREFIX@/tmp/wireshark.TRC000",NETTL_FILENAME_SIZE);
+     (void) g_strlcpy(file_hdr.tz,"UTC",20);
+     (void) g_strlcpy(file_hdr.host_name,"",9);
+     (void) g_strlcpy(file_hdr.os_vers,"B.11.11",9);
+--- a/wsutil/filesystem.c
++++ b/wsutil/filesystem.c
+@@ -1209,7 +1209,7 @@
+ #ifdef _WIN32
+     return get_datafile_dir();
+ #else
+-    return "/etc";
++    return "@TERMUX_PREFIX@/etc";
+ #endif
+ }
+ 
+@@ -1392,6 +1392,9 @@
+      */
+     homedir = g_getenv("HOME");
+     if (homedir == NULL) {
++#ifdef __ANDROID__
++        homedir = "@TERMUX_HOME@";
++#else
+         /*
+          * It's not set.
+          *
+@@ -1405,6 +1408,7 @@
+         } else {
+             homedir = "/tmp";
+         }
++#endif /* __ANDROID__ */
+     }
+     path = g_build_filename(homedir,
+                             configuration_namespace == CONFIGURATION_NAMESPACE_WIRESHARK ? ".wireshark" : ".logray",

@@ -1,0 +1,13 @@
+--- a/include/notcurses/ncport.h
++++ b/include/notcurses/ncport.h
+@@ -16,6 +16,10 @@
+ 
+ #if defined(__linux__)                            // Linux
+ #include <byteswap.h>
++#ifdef __ANDROID__
++#undef __bswap_32
++#define __bswap_32 bswap_32
++#endif
+ #define htole(x) (__bswap_32(htonl(x)))
+ #elif defined(__APPLE__)                          // macOS
+ #include <libkern/OSByteOrder.h>

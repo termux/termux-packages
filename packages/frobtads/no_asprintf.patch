@@ -1,0 +1,14 @@
+diff -u -r ../frobtads-1.2.3/src/osfrobtads.h ./src/osfrobtads.h
+--- ../frobtads-1.2.3/src/osfrobtads.h	2013-05-17 21:46:51.000000000 +0200
++++ ./src/osfrobtads.h	2014-02-24 17:38:59.000000000 +0100
+@@ -428,8 +428,10 @@
+  * that aren't available on all Unix variants.  Eventually these will
+  * need to be replaced with more thorough versions that encompass
+  * other Unix variants. */
++#ifndef __ANDROID__
+ int asprintf(char **strp, const char *fmt, ...);
+ int vasprintf(char **strp, const char *fmt, va_list ap);
++#endif
+ #define os_asprintf asprintf
+ #define os_vasprintf vasprintf
+ 

@@ -1,0 +1,20 @@
+--- a/vendor/fs_mgr/liblp/utility.cpp	2026-08-01 08:20:11.000000000 +0300
++++ b/vendor/fs_mgr/liblp/utility.cpp	2026-09-18 12:03:08.835436645 +0300
+@@ -34,7 +34,7 @@
+ #include <ext4_utils/ext4_utils.h>
+ #include <openssl/sha.h>
+ 
+-#ifdef __ANDROID__
++#if 0
+ #include <cutils/android_get_control_file.h>
+ #endif
+ 
+@@ -195,7 +195,7 @@
+ }
+ 
+ base::unique_fd GetControlFileOrOpen(std::string_view path, int flags) {
+-#if defined(__ANDROID__)
++#if 0
+     int fd = android_get_control_file(path.data());
+     if (fd >= 0) {
+         int newfd = TEMP_FAILURE_RETRY(dup(fd));

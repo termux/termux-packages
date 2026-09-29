@@ -1,0 +1,20 @@
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,7 @@
+ BINDIR=${PREFIX}/bin
+ DOCDIR=${PREFIX}/share/doc/ytfzf
+ MANDIR=${PREFIX}/share/man
+-LICENSEDIR=${PREFIX}/share/licenses/ytfzf
++LICENSEDIR=${DOCDIR}
+ 
+ YTFZF_SYSTEM_ADDON_DIR=${PREFIX}/share/ytfzf/addons
+ 
+@@ -18,7 +18,7 @@
+ 	cp docs/conf.sh ${DESTDIR}${DOCDIR}
+ 	cp LICENSE ${DESTDIR}${LICENSEDIR}
+ 
+-install:
++install: doc
+ 	chmod 755 ${PROG}
+ 	cp ${PROG} ${PROG}.bak
+ 	mkdir -p ${DESTDIR}${BINDIR}

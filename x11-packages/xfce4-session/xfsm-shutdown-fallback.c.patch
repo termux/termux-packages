@@ -1,0 +1,20 @@
+--- a/xfce4-session/xfsm-shutdown-fallback.c
++++ b/xfce4-session/xfsm-shutdown-fallback.c
+@@ -172,6 +172,7 @@
+ static gboolean
+ linux_supports_sleep_state (const gchar *state)
+ {
++#ifndef __ANDROID__
+   gboolean ret = FALSE;
+   gchar *command;
+   GError *error = NULL;
+@@ -193,6 +194,9 @@ out:
+   g_free (command);
+ 
+   return ret;
++#else
++  return FALSE;
++#endif
+ }
+ #endif /* BACKEND_TYPE_LINUX */
+ 

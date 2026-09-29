@@ -1,0 +1,1469 @@
+Restore missing angelscript source files for 32-bit ARM
+copied and pasted from
+https://github.com/anjo76/angelscript/blob/ec94f25441e8ccbba1d8968c0418ed5c195e4b81/sdk/angelscript/source/as_callfunc_arm_gcc.S
+https://github.com/anjo76/angelscript/blob/ec94f25441e8ccbba1d8968c0418ed5c195e4b81/sdk/angelscript/source/as_callfunc_arm.cpp
+
+--- a/SimulIDE.pri
++++ b/SimulIDE.pri
+@@ -117,6 +117,10 @@ macx {
+     QMAKE_LINK = /usr/local/Cellar/gcc@7/7.5.0_4/bin/g++-7
+ }
+ 
++contains( QMAKE_HOST.arch, arm.* ) | contains( QMAKE_CC, .*arm.* ){
++    SOURCES += $$PWD/src/angel/src/as_callfunc_arm_gcc.S
++}
++
+ contains( QMAKE_HOST.arch, arm64|aarch64 ) | contains( QMAKE_CC, .*aarch64.* ){
+     SOURCES += $$PWD/src/angel/src/as_callfunc_arm64_gcc.S
+ }
+diff --git a/src/angel/src/as_callfunc_arm_gcc.S b/src/angel/src/as_callfunc_arm_gcc.S
+new file mode 100644
+index 00000000..69423f95
+--- /dev/null
++++ b/src/angel/src/as_callfunc_arm_gcc.S
+@@ -0,0 +1,742 @@
++/*
++  AngelCode Scripting Library
++  Copyright (c) 2003-2025 Andreas Jonsson
++
++  This software is provided 'as-is', without any express or implied
++  warranty. In no event will the authors be held liable for any
++  damages arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any
++  purpose, including commercial applications, and to alter it and
++  redistribute it freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you
++     must not claim that you wrote the original software. If you use
++     this software in a product, an acknowledgment in the product
++     documentation would be appreciated but is not required.
++
++  2. Altered source versions must be plainly marked as such, and
++     must not be misrepresented as being the original software.
++
++  3. This notice may not be removed or altered from any source
++     distribution.
++
++  The original version of this library can be located at:
++  http://www.angelcode.com/angelscript/
++
++  Andreas Jonsson
++  andreas@angelcode.com
++*/
++
++/*
++   Assembly routines for the ARM call convention
++   Written by Fredrik Ehnbom in June 2009
++
++   Adapted to GNUC by darktemplar216 in September 2009
++
++   Modified by Lasse Oorni for 8-byte stack alignment in May 2012
++
++   The assembler routines for Linux were written by Carlos Luna in December 2012
++*/
++
++#if !defined(AS_MAX_PORTABILITY)
++
++#if defined(__arm__) || defined(__ARM__) || defined(I3D_ARCH_ARM)
++
++#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__) || defined(__ARM_PCS)
++
++/* iOS, Android, Marmalade, and Linux with soft-float ABI goes here */
++
++.global armFunc
++.global armFuncR0
++.global armFuncR0R1
++.global armFuncObjLast
++.global armFuncR0ObjLast
++
++.type armFunc, %function
++.type armFuncR0, %function
++.type armFuncR0R1, %function
++.type armFuncObjLast, %function
++.type armFuncR0ObjLast, %function
++
++/* --------------------------------------------------------------------------------------------*/
++armFunc:
++    stmdb   sp!, {r4-r8, lr}
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r8, #0
++
++    beq     nomoreargs
++
++    /* Load the first 4 arguments into r0-r3 */
++    cmp     r7, #4
++    ldrge   r0, [r6],#4
++    cmp     r7, #2*4
++    ldrge   r1, [r6],#4
++    cmp     r7, #3*4
++    ldrge   r2, [r6],#4
++    cmp     r7, #4*4
++    ldrge   r3, [r6],#4
++    ble     nomoreargs
++
++    /* Load the rest of the arguments onto the stack */
++    sub     r7, r7, #4*4      /* skip the 4 registers already loaded into r0-r3 */
++    add     r8, r7, #4        /* ensure 8-byte stack alignment */
++    bic     r8, r8, #4
++    sub     sp, sp, r8
++    mov     r12, sp           /* copy size != frame size, so store frame start sp */
++stackargsloop:
++    ldr     r5, [r6], #4
++    str     r5, [sp], #4
++    subs    r7, r7, #4
++    bne     stackargsloop
++    mov     sp, r12
++nomoreargs:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    ldmia   sp!, {r4-r8, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++armFuncObjLast:
++    stmdb   sp!, {r4-r8, lr}
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r8, #0
++
++    mov     r0, r3          /* objlast. might get overwritten */
++    mov     r5, r3          /* objlast to temp reg */
++
++    beq     nomoreargsarmFuncObjLast
++
++    /* Load the first 4 arguments into r0-r3 */
++    cmp     r7, #4
++    ldrge   r0, [r6],#4
++    cmp     r7, #2*4
++    ldrge   r1, [r6],#4
++    movlt   r1, r5
++    cmp     r7, #3*4
++    ldrge   r2, [r6],#4
++    movlt   r2, r5
++    cmp     r7, #4*4
++    ldrge   r3, [r6],#4
++    movlt   r3, r5
++    blt     nomoreargsarmFuncObjLast
++
++    /* Load the rest of the arguments onto the stack */
++    sub     r7, r7, #4*4    /* skip the 4 registers already loaded into r0-r3 */
++    add     r8, r7, #8      /* account for the objlast pointer, ensure 8-byte stack alignment */
++    bic     r8, r8, #4
++    str     r5, [sp,#-4]    /* store the objlast on stack, twice in case we adjusted alignment */
++    str     r5, [sp,#-8]
++    sub     sp, sp, r8      /* adjust frame */
++    cmp     r7, #0          /* we may also have come here with no extra params */
++    beq     nomoreargsarmFuncObjLast
++    mov     r12, sp         /* copy size != frame size, so store frame start sp */
++stackargslooparmFuncObjLast:
++    ldr     r5, [r6], #4
++    str     r5, [sp], #4
++    subs    r7, r7, #4
++    bne     stackargslooparmFuncObjLast
++    mov     sp, r12
++nomoreargsarmFuncObjLast:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    ldmia   sp!, {r4-r8, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++armFuncR0ObjLast:
++    stmdb   sp!, {r4-r8, lr}
++    ldr     r5, [sp,#6*4]   /* objlast to temp reg */
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r8, #0
++
++    mov     r0, r3      /* r0 explicitly set */
++    mov     r1, r5      /* objlast.  might get overwritten */
++
++    beq     nomoreargsarmFuncR0ObjLast
++
++    /* Load the first 3 arguments into r1-r3 */
++    cmp     r7, #1*4
++    ldrge   r1, [r6],#4
++    cmp     r7, #2*4
++    ldrge   r2, [r6],#4
++    movlt   r2, r5
++    cmp     r7, #3*4
++    ldrge   r3, [r6],#4
++    movlt   r3, r5
++    blt     nomoreargsarmFuncR0ObjLast
++
++    /* Load the rest of the arguments onto the stack */
++    sub     r7, r7, #3*4    /* skip the 3 registers already loaded into r1-r3 */
++    add     r8, r7, #8      /* account for the objlast pointer, ensure 8-byte stack alignment */
++    bic     r8, r8, #4
++    str     r5, [sp,#-4]    /* store the objlast on stack, twice in case we adjusted alignment */
++    str     r5, [sp,#-8]
++    sub     sp, sp, r8      /* adjust frame */
++    cmp     r7, #0          /* we may also have come here with no extra params */
++    beq     nomoreargsarmFuncR0ObjLast
++    mov     r12, sp         /* copy size != frame size, so store frame start sp */
++stackargslooparmFuncR0ObjLast:
++    ldr     r5, [r6], #4
++    str     r5, [sp], #4
++    subs    r7, r7, #4
++    bne     stackargslooparmFuncR0ObjLast
++    mov     sp, r12
++nomoreargsarmFuncR0ObjLast:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    ldmia   sp!, {r4-r8, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++armFuncR0:
++    stmdb   sp!, {r4-r8, lr}
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r8, #0
++
++    mov     r0, r3  /* r0 explicitly set */
++
++    beq     nomoreargsarmFuncR0
++
++    /* Load the first 3 arguments into r1-r3 */
++    cmp     r7, #1*4
++    ldrge   r1, [r6],#4
++    cmp     r7, #2*4
++    ldrge   r2, [r6],#4
++    cmp     r7, #3*4
++    ldrge   r3, [r6],#4
++    ble     nomoreargsarmFuncR0
++
++    /* Load the rest of the arguments onto the stack */
++    sub     r7, r7, #3*4    /* skip the 3 registers already loaded into r1-r3 */
++    add     r8, r7, #4      /* ensure 8-byte stack alignment */
++    bic     r8, r8, #4
++    sub     sp, sp, r8
++    mov     r12, sp         /* copy size != frame size, so store frame start sp */
++stackargslooparmFuncR0:
++    ldr     r5, [r6], #4
++    str     r5, [sp], #4
++    subs    r7, r7, #4
++    bne     stackargslooparmFuncR0
++    mov     sp, r12
++nomoreargsarmFuncR0:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    ldmia   sp!, {r4-r8, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++armFuncR0R1:
++    stmdb   sp!, {r4-r8, lr}
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r8, #0
++
++    mov     r0, r3          /* r0 explicitly set */
++    ldr     r1, [sp, #6*4]  /* r1 explicitly set too */
++
++    beq     nomoreargsarmFuncR0R1
++
++    /* Load the first 2 arguments into r2-r3 */
++    cmp     r7, #1*4
++    ldrge   r2, [r6],#4
++    cmp     r7, #2*4
++    ldrge   r3, [r6],#4
++    ble     nomoreargsarmFuncR0R1
++
++    /* Load the rest of the arguments onto the stack */
++    sub     r7, r7, #2*4    /* skip the 2 registers already loaded into r2-r3 */
++    add     r8, r7, #4      /* ensure 8-byte stack alignment */
++    bic     r8, r8, #4
++    sub     sp, sp, r8
++    mov     r12, sp         /* copy size != frame size, so store frame start sp */
++stackargslooparmFuncR0R1:
++    ldr     r5, [r6], #4
++    str     r5, [sp], #4
++    subs    r7, r7, #4
++    bne     stackargslooparmFuncR0R1
++    mov     sp, r12
++nomoreargsarmFuncR0R1:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    ldmia   sp!, {r4-r8, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++#elif defined(__linux__) && !defined(__SOFTFP__) && !defined(__ARM_PCS)
++
++/* The Linux with hard-float ABI code goes here */
++
++
++/* These codes are suitable for armeabi + vfp  / armeabihf */
++/* when using armeabi + vfp, please set C_FLAGS -mfloat-abi=softfp -mfpu=vfp */
++/* using armeabihf, please set C_FLAGS -mfloat-abi=hard -mfpu=vfpv3-d16 */
++
++/* if you prefer to run in ARM mode, please add -marm to C_FLAGS */
++/* while using thumb mode, please add -mthumb -Wa,-mimplicit-it=thumb */
++
++
++/* SP is a multiple of 8 when control first enters a program.*/
++/* This places an obligation on authors of low level OS, RTOS, and runtime library code to align SP at all points */
++/* at which control first enters a body of (AAPCS-conforming) code. (please read "ARM IHI 0046B" document)*/
++
++
++.section .text
++
++    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
++#if defined(__thumb__) || defined(__thumb2__)
++    .thumb
++    .syntax unified
++#else
++    .arm            /* Use ARM instructions instead of Thumb.*/
++#endif
++    .globl armFunc  /* Make the function globally accessible.*/
++    .type armFunc, %function
++armFunc:
++    push    {r4-r8, r10, r11, lr}   /* sp must be 8-byte alignment for ABI compliance, so the pushed registers must be even */
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++
++    /* Load float and double args into d0-d7 and s0-s15 */
++    add       r10, r6, #272 /* r10 (r6 + 272) points to the first value for the VFP registers */
++    mov       r8, #0
++    vldmia.64 r10, {d0-d7}  /* Load contents starting at r10 into registers d0-d7 */
++
++    /* If there are no arguments to set into r0-r3 */
++    /* go check if there are arguments for the stack */
++    beq     stackargs
++
++    /* Load the first 4 arguments into r0-r3 */
++    cmp     r7, #4
++    ldrge   r0, [r6]
++    cmp     r7, #8
++    ldrge   r1, [r6, #4]
++    cmp     r7, #12
++    ldrge   r2, [r6, #8]
++    cmp     r7, #16
++    ldrge   r3, [r6, #12]
++
++stackargs:
++    ldr     r5, [r6, #268]  /* Load stack size into r5 */
++    movs    r7, r5          /* Load stack size into r7, checking for 0 args */
++
++    /* If there are no args for the stack, branch */
++    beq     nomoreargs
++
++    /* Load the rest of the arguments onto the stack */
++    /* Ensure 8-byte stack alignment */
++    mov     r8, sp
++    sub     sp, sp, r7
++    add     r6, r6, #16     /* Set r6 to point to the first arg to be placed on the stack */
++
++    sub     r12, sp, #8
++    bic     r12, r12, #7    /* thumb mode couldn't support "bic  sp, sp, #7" instruction */
++    sub     r8, r8, r12
++    mov     sp, r12         /* copy size != frame size, so store frame start sp, r12(ip) is not callee saved register */
++
++stackargsloop:
++    ldr     r5, [r6], #4
++    subs    r7, r7, #4
++    str     r5, [sp], #4
++    bne     stackargsloop
++    mov     sp, r12
++
++nomoreargs:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    vstmia.64 r10, {d0-d7}   /* Copy contents of registers d0-d7 to the address stored in r10 */
++
++    pop {r4-r8, r10, r11, pc}
++
++/* --------------------------------------------------------------------------------------------*/
++    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
++#if defined(__thumb__) || defined(__thumb2__)
++    .thumb
++    .syntax unified
++#else
++    .arm            /* Use ARM instructions instead of Thumb.*/
++#endif
++    .globl armFuncObjLast       /* Make the function globally accessible.*/
++    .type armFuncObjLast, %function
++armFuncObjLast:
++    push {r4-r8, r10, r11, lr}  /* We're storing r11 just to keep the stack aligned to an 8 byte boundary */
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++
++    mov     r0, r3          /* objlast. might get overwritten */
++    mov     r5, #0          /* This will hold an offset of #4 only if objlast couldn't be placed into an "r" register */
++
++    /* Load float and double args into d0-d7 and s0-s15 (r10 holds pointer to first float value) */
++    add     r10, r6, #272   /* r10 (r6 + 272) points to the first value for the VFP registers */
++    mov     r8, #0
++    vldmia.64 r10, {d0-d7}  /* Load contents starting at r10 into registers d0-d7 */
++
++    /* If there are no arguments to set into r0-r3 */
++    /* go check if there are arguments for the stack */
++    beq     stackargsFuncObjLast
++
++    mov     r5, r3          /* store objlast in r5 temporarily */
++
++    /* Load the first 4 arguments into r0-r3 */
++    cmp     r7, #4
++    ldrge   r0, [r6]
++    cmp     r7, #8
++    ldrge   r1, [r6,#4]
++    movlt   r1, r5
++    cmp     r7, #12
++    ldrge   r2, [r6,#8]
++    movlt   r2, r5
++    cmp     r7, #16
++    ldrge   r3, [r6,#12]
++    movlt   r3, r5
++    movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
++    blt     stackargsFuncObjLast    /* If objlast got placed into a register, go to stackargsFuncObjLast */
++
++    str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
++    mov     r5, #4                  /* Set r5 with an offset of #4, so objlast can be loaded into the stack */
++
++stackargsFuncObjLast:
++    ldr     r7, [r6, #268]  /* Load stack size into r7 */
++    add     r7, r7, r5      /* Add the offset placed in r5 (could be #0 or #4) */
++    cmp     r7, #0          /* Check for 0 args */
++
++    /* If there are no args for the stack, branch */
++    beq     nomoreargsarmFuncObjLast
++
++    /* Load the rest of the arguments onto the stack */
++    /* Ensure 8-byte stack alignment */
++    mov     r8, sp
++    sub     sp, sp, r7
++    add     r6, r6, #16     /* Set r6 to point to the first arg to be placed on the stack */
++
++    sub     r12, sp, #8
++    sub     r6, r6, r5      /* r6 = r6 - r5 (r5 can be #0 or #4) */
++    bic     r12, r12, #7    /* thumb mode couldn't support "bic  sp, sp, #7" instruction */
++    sub     r8, r8, r12
++    mov     sp, r12         /* copy size != frame size, so store frame start sp, r12(ip) is not callee saved register */
++
++stackargslooparmFuncObjLast:
++    ldr     r5, [r6], #4
++    subs    r7, r7, #4
++    str     r5, [sp], #4
++    bne     stackargslooparmFuncObjLast
++    mov     sp, r12
++
++nomoreargsarmFuncObjLast:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
++
++    pop   {r4-r8, r10,r11, pc}
++
++/* ------------------------------------------------------------------------------------------- */
++    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
++#if defined(__thumb__) || defined(__thumb2__)
++    .thumb
++    .syntax unified
++#else
++    .arm            /* Use ARM instructions instead of Thumb.*/
++#endif
++    .globl armFuncR0ObjLast     /* Make the function globally accessible.*/
++    .type armFuncR0ObjLast, %function
++armFuncR0ObjLast:
++    push    {r4-r8, r10, r11, lr}
++
++    ldr     r5, [sp,#32]   /* objlast to temp reg */
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++
++    mov     r0, r3      /* r0 explicitly set */
++    mov     r1, r5      /* objlast.  might get overwritten */
++    mov     r5, #0      /* This will hold an offset of #4 or #8 if objlast or one arg couldn't be placed into an "r" register */
++
++    /* Load float and double args into d0-d7 and s0-s15 (r10 holds pointer to first float value) */
++    add     r10, r6, #272   /* r10 (r6 + 272) points to the first value for the VFP registers */
++    mov     r8, #0
++    vldmia.64 r10, {d0-d7}  /* Load contents starting at r10 into registers d0-d7 */
++
++    /* If there are no arguments to set into r0-r3 */
++    /* go check if there are arguments for the stack */
++    beq     stackargsFuncR0ObjLast
++
++    mov     r5, r1          /* store objlast in r5 temporarily */
++
++    /* Load the first 3 arguments into r1-r3 */
++    cmp     r7, #4
++    ldrge   r1, [r6]
++    cmp     r7, #8
++    ldrge   r2, [r6,#4]
++    movlt   r2, r5
++    cmp     r7, #12
++    ldrge   r3, [r6,#8]
++    movlt   r3, r5
++    movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
++    blt     stackargsFuncR0ObjLast  /* If objlast got placed into a register, go to stackargsFuncR0ObjLast */
++
++    cmp     r7, #16                 /* Else if we have one last arg set the offset accordingly and store the arg in the array */
++    ldrge   r7, [r6, #12]
++    strge   r7, [r6, #8]
++
++    str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
++    mov     r5, #0
++
++    movge   r5, #4                  /* Set r5 with an offset of #4 if there's one last arg that couldn't be placed in r registers */
++    add     r5, r5, #4              /* Set r5 with an offset of + #4, so objlast can be loaded into the stack */
++
++stackargsFuncR0ObjLast:
++    ldr     r7, [r6, #268]  /* Load stack size into r7 */
++    add     r7, r7, r5      /* Add the offset placed in r5 (could be #0 or #4) */
++    cmp     r7, #0          /* Check for 0 args */
++
++    /* If there are no args for the stack, branch */
++    beq     nomoreargsarmFuncR0ObjLast
++
++    /* Load the rest of the arguments onto the stack */
++    /* Ensure 8-byte stack alignment */
++    mov     r8, sp
++    sub     sp, sp, r7
++    add     r6, r6, #16     /* Set r6 to point to the first arg to be placed on the stack */
++
++    sub     r12, sp, #8
++    sub     r6, r6, r5      /* r6 = r6 - r5 (r5 can be #0 or #4) */
++    bic     r12, r12, #7    /* thumb mode couldn't support "bic  sp, sp, #7" instruction */
++    sub     r8, r8, r12
++    mov     sp, r12         /* copy size != frame size, so store frame start sp, r12(ip) is not callee saved register */
++
++stackargslooparmFuncR0ObjLast:
++    ldr     r5, [r6], #4
++    subs    r7, r7, #4
++    str     r5, [sp], #4
++    bne     stackargslooparmFuncR0ObjLast
++    mov     sp, r12
++
++nomoreargsarmFuncR0ObjLast:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
++
++    pop {r4-r8, r10, r11, pc}
++
++/* ------------------------------------------------------------------------------------------- */
++    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
++#if defined(__thumb__) || defined(__thumb2__)
++    .thumb
++    .syntax unified
++#else
++    .arm            /* Use ARM instructions instead of Thumb.*/
++#endif
++    .globl armFuncR0        /* Make the function globally accessible.*/
++    .type armFuncR0, %function
++armFuncR0:
++    push {r4-r8, r10, r11, lr}
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r11, #0 /* This will hold an offset of #4 only if the last arg that should have been placed into an "r" reg needs to go to the stack */
++    mov     r0, r3  /* r0 explicitly set */
++
++    /* Load float and double args into d0-d7 and s0-s15 (r10 holds pointer to first float value) */
++    add     r10, r6, #272   /* r10 (r6 + 272) points to the first value for the VFP registers */
++    mov     r8, #0
++    vldmia.64 r10, {d0-d7}  /* Load contents starting at r10 into registers d0-d7 */
++
++    /* If there are no arguments to set into r0-r3 */
++    /* go check if there are arguments for the stack */
++    beq     stackargsarmFuncR0
++
++    /* Load the first 3 arguments into r1-r3 */
++    cmp     r7, #4
++    ldrge   r1, [r6]
++    cmp     r7, #8
++    ldrge   r2, [r6, #4]
++    cmp     r7, #12
++    ldrge   r3, [r6, #8]
++    cmp     r7, #16
++    movge   r11, #4         /* If there is still one arg to be placed, set the offset in r11 to #4 */
++
++stackargsarmFuncR0:
++    ldr     r5, [r6, #268]  /* Load stack size into r5 */
++    add     r5, r11         /* Add the offset placed in r11 (could be #0 or #4) */
++    movs    r7, r5          /* Load stack size into r7, checking for 0 args */
++
++    /* If there are no args for the stack, branch */
++    beq     nomoreargsarmFuncR0
++
++    /* Load the rest of the arguments onto the stack */
++    /* Ensure 8-byte stack alignment */
++    mov     r8, sp
++    sub     sp, sp, r7
++    add     r6, r6, #16     /* Set r6 to point to the first arg to be placed on the stack */
++
++    sub     r12, sp, #8
++    sub     r6, r6, r11     /* r6 = r6 - r11 (r11 can be #0 or #4) */
++    bic     r12, r12, #7    /* thumb mode couldn't support "bic  sp, sp, #7" instruction */
++    sub     r8, r8, r12
++    mov     sp, r12         /* copy size != frame size, so store frame start sp, r12(ip) is not callee saved register */
++
++stackargslooparmFuncR0:
++    ldr     r5, [r6], #4
++    subs    r7, r7, #4
++    str     r5, [sp], #4
++    bne     stackargslooparmFuncR0
++    mov     sp, r12
++
++nomoreargsarmFuncR0:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
++
++    pop {r4-r8, r10, r11, pc}
++
++/* ------------------------------------------------------------------------------------------- */
++    .align 2        /* Align the function code to a 4-byte (2^n) word boundary. */
++#if defined(__thumb__) || defined(__thumb2__)
++    .thumb
++    .syntax unified
++#else
++    .arm            /* Use ARM instructions instead of Thumb.*/
++#endif
++    .globl armFuncR0R1      /* Make the function globally accessible.*/
++    .type armFuncR0R1, %function
++armFuncR0R1:
++    push {r4-r8, r10, r11, lr}
++
++    mov     r6, r0  /* arg table */
++    movs    r7, r1  /* arg size (also set the condition code flags so that we detect if there are no arguments) */
++    mov     r4, r2  /* function address */
++    mov     r11, #0 /* This will hold an offset of #4 or #8 only if the last arg (or last 2 args) that should have been placed into "r" regs need to go to the stack */
++
++    mov     r0, r3          /* r0 explicitly set */
++    ldr     r1, [sp, #32]   /* r1 explicitly set too */
++
++    /* Load float and double args into d0-d7 and s0-s15 (r10 holds pointer to first float value) */
++    add     r10, r6, #272   /* r10 (r6 + 272) points to the first value for the VFP registers */
++    mov     r8, #0
++    vldmia.64 r10, {d0-d7}  /* Load contents starting at r10 into registers d0-d7 */
++
++    /* If there are no arguments to set into r2-r3 */
++    /* go check if there are arguments for the stack */
++    beq     stackargsarmFuncR0R1
++
++    /* Load the first 2 arguments into r2-r3 */
++    cmp     r7, #4
++    ldrge   r2, [r6]
++    cmp     r7, #8
++    ldrge   r3, [r6, #4]
++    cmp     r7, #12
++    movge   r11, #4         /* If there is a third arg to be placed, set the offset in r11 to #4 */
++    cmp     r7, #16
++    movge   r11, #8         /* If there is a fourth arg to be placed, set the offset in r11 to #8 */
++    ldrlt   r7, [r6, #8]    /* Else copy the third arg to the correct place in the array */
++    strlt   r7, [r6, #12]
++
++stackargsarmFuncR0R1:
++    ldr     r5, [r6, #268]  /* Load stack size into r5 */
++    add     r5, r11         /* Add the offset placed in r11 (could be #0 or #4 or #8) */
++    movs    r7, r5          /* Load stack size into r7, checking for 0 args */
++
++    /* If there are no args for the stack, branch */
++    beq     nomoreargsarmFuncR0R1
++
++    /* Load the rest of the arguments onto the stack */
++    /* Ensure 8-byte stack alignment */
++    mov     r8, sp
++    sub     sp, sp, r7
++    add     r6, r6, #16     /* Set r6 to point to the first arg to be placed on the stack */
++
++    sub     r12, sp, #8
++    sub     r6, r6, r11     /* r6 = r6 - r11 (r11 can be #0 or #4 or #8) */
++    bic     r12, r12, #7    /* thumb mode couldn't support "bic  sp, sp, #7" instruction */
++    sub     r8, r8, r12
++    mov     sp, r12         /* copy size != frame size, so store frame start sp, r12(ip) is not callee saved register */
++
++stackargslooparmFuncR0R1:
++    ldr     r5, [r6], #4
++    subs    r7, r7, #4
++    str     r5, [sp], #4
++    bne     stackargslooparmFuncR0R1
++    mov     sp, r12
++
++nomoreargsarmFuncR0R1:
++#if defined (__ARM_ARCH_4T__) || defined (__ARM_ARCH_4__)
++    mov    lr, pc   /* older ARM didn't support blx */
++    mov    pc, r4
++#else
++    blx     r4
++#endif
++    add     sp, sp, r8
++    vstmia.64   r10, {d0-d7}    /* Copy contents of registers d0-d10 to the address stored in r10 */
++
++    pop {r4-r8, r10, r11, pc}
++
++#endif /* hard float abi */
++
++#endif /* arm */
++
++#if defined(__linux__) && defined(__ELF__)
++/* ref: http://hardened.gentoo.org/gnu-stack.xml 
++   ref: https://wiki.gentoo.org/wiki/Hardened/GNU_stack_quickstart */
++.section .note.GNU-stack,"",%progbits
++#endif
++
++#endif /* !AS_MAX_PORTABILITY */
++
++
++
+diff --git a/src/angel/src/as_callfunc_arm.cpp b/src/angel/src/as_callfunc_arm.cpp
+new file mode 100644
+index 00000000..c30db60b
+--- /dev/null
++++ b/src/angel/src/as_callfunc_arm.cpp
+@@ -0,0 +1,697 @@
++/*
++   AngelCode Scripting Library
++   Copyright (c) 2003-2025 Andreas Jonsson
++
++   This software is provided 'as-is', without any express or implied
++   warranty. In no event will the authors be held liable for any
++   damages arising from the use of this software.
++
++   Permission is granted to anyone to use this software for any
++   purpose, including commercial applications, and to alter it and
++   redistribute it freely, subject to the following restrictions:
++
++   1. The origin of this software must not be misrepresented; you
++      must not claim that you wrote the original software. If you use
++      this software in a product, an acknowledgment in the product
++      documentation would be appreciated but is not required.
++
++   2. Altered source versions must be plainly marked as such, and
++      must not be misrepresented as being the original software.
++
++   3. This notice may not be removed or altered from any source
++      distribution.
++
++   The original version of this library can be located at:
++   http://www.angelcode.com/angelscript/
++
++   Andreas Jonsson
++   andreas@angelcode.com
++*/
++
++
++//
++// as_callfunc_arm.cpp
++//
++// These functions handle the actual calling of system functions on the arm platform
++//
++// Written by Fredrik Ehnbom in June 2009, based on as_callfunc_x86.cpp
++//
++// The code was complemented to support Linux with ARM by Carlos Luna in December, 2012.
++//
++// Added support for functor methods by Jordi Oliveras Rovira in April, 2014.
++
++
++// This code has to conform to both AAPCS and the modified ABI for iOS
++//
++// Reference:
++//
++// AAPCS: http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042d/IHI0042D_aapcs.pdf
++// iOS: http://developer.apple.com/library/ios/documentation/Xcode/Conceptual/iPhoneOSABIReference/iPhoneOSABIReference.pdf
++
++#include "as_config.h"
++
++#ifndef AS_MAX_PORTABILITY
++#ifdef AS_ARM
++
++#include "as_callfunc.h"
++#include "as_scriptengine.h"
++#include "as_texts.h"
++#include "as_tokendef.h"
++#include "as_context.h"
++
++#if defined(AS_SOFTFP)
++
++// This code supports the soft-float ABI, i.e. g++ -mfloat-abi=softfp
++//
++// The code for iOS, Android, Marmalade and Windows Phone goes here
++
++BEGIN_AS_NAMESPACE
++
++extern "C" asQWORD armFunc          (const asDWORD *, int, asFUNCTION_t);
++extern "C" asQWORD armFuncR0        (const asDWORD *, int, asFUNCTION_t, asDWORD r0);
++extern "C" asQWORD armFuncR0R1      (const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD r1);
++extern "C" asQWORD armFuncObjLast   (const asDWORD *, int, asFUNCTION_t, asDWORD obj);
++extern "C" asQWORD armFuncR0ObjLast (const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD obj);
++
++asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
++{
++	asCScriptEngine *engine = context->m_engine;
++	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
++	int callConv = sysFunc->callConv;
++
++	asQWORD       retQW     = 0;
++	asFUNCTION_t  func      = sysFunc->func;
++	int           paramSize = sysFunc->paramSize;
++	asFUNCTION_t *vftable;
++
++	if( sysFunc->hostReturnInMemory )
++	{
++		// The return is made in memory
++		callConv++;
++	}
++	bool isThisCallMethod = callConv >= ICC_THISCALL_OBJLAST;
++
++
++	asDWORD paramBuffer[64+2];
++	// Android & Linux needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
++	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
++	//                         doesn't have to be done for functions that don't have any 64bit types
++#if !defined(AS_ANDROID) && !defined(AS_LINUX)
++	// In cases of thiscall methods, the callstack is configured as a standard thiscall
++	// adding the secondObject as first or last element in callstack
++	if( sysFunc->takesObjByVal || isThisCallMethod )
++#endif
++	{
++#if defined(AS_ANDROID) || defined(AS_LINUX)
++		// mask is used as a toggler to skip uneven registers.
++		int mask = 1;
++
++		if( isThisCallMethod )
++		{
++			mask = 0;
++		}
++		else
++		{
++			// Check for object pointer as first argument
++			switch( callConv )
++			{
++				case ICC_THISCALL:
++				case ICC_CDECL_OBJFIRST:
++				case ICC_VIRTUAL_THISCALL:
++				case ICC_THISCALL_RETURNINMEM:
++				case ICC_CDECL_OBJFIRST_RETURNINMEM:
++				case ICC_VIRTUAL_THISCALL_RETURNINMEM:
++					mask = 0;
++					break;
++				default:
++					break;
++			}
++		}
++
++		// Check for hidden address in case of return by value
++		if( sysFunc->hostReturnInMemory )
++			mask = !mask;
++#endif
++		paramSize = 0;
++		int spos = 0;
++		int dpos = 2;
++
++		if( isThisCallMethod && (callConv >= ICC_THISCALL_OBJFIRST &&
++			callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
++		{
++			// Add the object pointer as the first parameter
++			paramBuffer[dpos++] = (asDWORD)secondObject;
++			paramSize++;
++		}
++
++		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
++		{
++			// TODO: runtime optimize: Declare a reference to descr->parameterTypes[n] so the array doesn't have to be access all the time
++			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
++			{
++#ifdef COMPLEX_OBJS_PASSED_BY_REF
++				if( descr->parameterTypes[n].GetTypeInfo()->flags & COMPLEX_MASK )
++				{
++					paramBuffer[dpos++] = args[spos++];
++					paramSize++;
++				}
++				else
++#endif
++				{
++#if defined(AS_ANDROID) || defined(AS_LINUX)
++					if( (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALIGN8) &&
++						((dpos & 1) == mask) )
++					{
++						// 64 bit value align
++						dpos++;
++						paramSize++;
++					}
++#endif
++					// Copy the object's memory to the buffer
++					memcpy(&paramBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
++
++					// Delete the original memory
++					engine->CallFree(*(char**)(args+spos));
++					spos++;
++					dpos += descr->parameterTypes[n].GetSizeInMemoryDWords();
++					paramSize += descr->parameterTypes[n].GetSizeInMemoryDWords();
++				}
++			}
++			else
++			{
++#if defined(AS_ANDROID) || defined(AS_LINUX)
++				// Should an alignment be performed?
++				if( !descr->parameterTypes[n].IsObjectHandle() && 
++					!descr->parameterTypes[n].IsReference() && 
++					descr->parameterTypes[n].GetSizeOnStackDWords() == 2 && 
++					((dpos & 1) == mask) )
++				{
++					// 64 bit value align
++					dpos++;
++					paramSize++;
++				}
++#endif
++
++				// Copy the value directly
++				paramBuffer[dpos++] = args[spos++];
++				if( descr->parameterTypes[n].GetSizeOnStackDWords() > 1 )
++					paramBuffer[dpos++] = args[spos++];
++				paramSize += descr->parameterTypes[n].GetSizeOnStackDWords();
++			}
++		}
++
++		if( isThisCallMethod && (callConv >= ICC_THISCALL_OBJLAST &&
++			callConv <= ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM) )
++		{
++			// Add the object pointer as the last parameter
++			paramBuffer[dpos++] = (asDWORD)secondObject;
++			paramSize++;
++		}
++
++		// Keep a free location at the beginning
++		args = &paramBuffer[2];
++	}
++
++	switch( callConv )
++	{
++	case ICC_CDECL_RETURNINMEM:     // fall through
++	case ICC_STDCALL_RETURNINMEM:
++		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)retPointer);
++		break;
++	case ICC_CDECL:     // fall through
++	case ICC_STDCALL:
++		retQW = armFunc(args, paramSize<<2, func);
++		break;
++	case ICC_THISCALL:  // fall through
++	case ICC_CDECL_OBJFIRST:
++	case ICC_THISCALL_OBJFIRST:
++	case ICC_THISCALL_OBJLAST:
++		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)obj);
++		break;
++	case ICC_THISCALL_RETURNINMEM:
++	case ICC_THISCALL_OBJFIRST_RETURNINMEM:
++	case ICC_THISCALL_OBJLAST_RETURNINMEM:
++#ifdef __GNUC__
++		// On GNUC the address where the return value will be placed should be put in R0
++		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++#else
++		// On Windows the R0 should always hold the object pointer, and the address for the return value comes after
++		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)obj, (asDWORD)retPointer);
++#endif
++		break;
++	case ICC_CDECL_OBJFIRST_RETURNINMEM:
++		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	case ICC_VIRTUAL_THISCALL:
++	case ICC_VIRTUAL_THISCALL_OBJFIRST:
++	case ICC_VIRTUAL_THISCALL_OBJLAST:
++		// Get virtual function table from the object pointer
++		vftable = *(asFUNCTION_t**)obj;
++		retQW = armFuncR0(args, paramSize<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj);
++		break;
++	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
++	case ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM:
++	case ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM:
++		// Get virtual function table from the object pointer
++		vftable = *(asFUNCTION_t**)obj;
++#ifdef __GNUC__
++		// On GNUC the address where the return value will be placed should be put in R0
++		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)retPointer, (asDWORD)obj);
++#else
++		// On Windows the R0 should always hold the object pointer, and the address for the return value comes after
++		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj, (asDWORD)retPointer);
++#endif
++		break;
++	case ICC_CDECL_OBJLAST:
++		retQW = armFuncObjLast(args, paramSize<<2, func, (asDWORD)obj);
++		break;
++	case ICC_CDECL_OBJLAST_RETURNINMEM:
++		retQW = armFuncR0ObjLast(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	default:
++		context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
++	}
++
++	return retQW;
++}
++
++END_AS_NAMESPACE
++
++#elif !defined(AS_SOFTFP)
++
++// This code supports the hard-float ABI, i.e. g++ -mfloat-abi=hard
++// The main difference is that the floating point values are passed in the fpu registers
++
++#define VFP_OFFSET 70
++#define STACK_OFFSET 6
++#define PARAM_BUFFER_SIZE 104
++
++BEGIN_AS_NAMESPACE
++
++extern "C" asQWORD armFunc          (const asDWORD *, int, asFUNCTION_t);
++extern "C" asQWORD armFuncR0        (const asDWORD *, int, asFUNCTION_t, asDWORD r0);
++extern "C" asQWORD armFuncR0R1      (const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD r1);
++extern "C" asQWORD armFuncObjLast   (const asDWORD *, int, asFUNCTION_t, asDWORD obj);
++extern "C" asQWORD armFuncR0ObjLast (const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD obj);
++
++asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObject)
++{
++	asCScriptEngine *engine = context->m_engine;
++	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
++	int callConv = sysFunc->callConv;
++
++	asQWORD       retQW     = 0;
++	asFUNCTION_t  func      = sysFunc->func;
++	int           paramSize = sysFunc->paramSize;
++	asFUNCTION_t *vftable;
++
++	//---------------------------------------------------------------------------- RPi
++	int freeFloatSlot	= VFP_OFFSET;
++	int freeDoubleSlot	= VFP_OFFSET;
++	int stackPos		= STACK_OFFSET;
++	int stackSize		= 0;
++	//----------------------------------------------------------------------------
++
++	//---------------------------------------------------------------------------- RPi
++	// We�ll divide paramBuffer into several segments:
++	//
++	// 0-1							Unused
++	// 2-5		(+8   / +0   asm)	values that should be placed in R0 - R3
++	// 6-67		(+24  / +16  asm)	values that should be placed on the stack
++	// 68		(+272 / +264 asm)	number of values stored in r registers (R0 - R3)
++	// 69		(+276 / +268 asm)	number of args stored on the stack
++	// 70-85	(+280 / +272 asm)	values that should be placed in VFP registers (16)
++	// 86-87	(+344 / +336 asm)	sp original value - sp final value - for debugging
++	// 88-103	(+352 / +344 asm)	Check area for free-used VFP registers
++	//
++	// Total number of elements: 104
++	//
++	// When passing the paramBuffer to the asm routines via the args pointer we are
++	// offsetting the start of the array to being at element # 2. That�s why in asm
++	// all addresses must have an offset of -2 words (-8 bytes).
++	//---------------------------------------------------------------------------- RPi
++
++	asDWORD paramBuffer[PARAM_BUFFER_SIZE];
++	memset(paramBuffer, 0, sizeof(asDWORD) * PARAM_BUFFER_SIZE);
++
++	if( sysFunc->hostReturnInMemory )
++	{
++		// TODO: runtime optimize: This check should be done in PrepareSystemFunction
++		if ( !( descr->returnType.GetTypeInfo()->flags & COMPLEX_RETURN_MASK )		&&
++			  ( descr->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS )	&&
++			    descr->returnType.GetSizeInMemoryBytes() <= 16 )
++			callConv--;
++		
++		// The return is made in memory
++		callConv++;
++	}
++
++	bool isThisCallMethod = callConv >= ICC_THISCALL_OBJLAST;
++
++	// Linux needs to align 64bit types on even registers, but this isn't done on iOS or Windows Phone
++	// TODO: optimize runtime: There should be a check for this in PrepareSystemFunction() so this 
++	//                         doesn't have to be done for functions that don't have any 64bit types
++	{
++		// mask is used as a toggler to skip uneven registers.
++		int mask = 1;
++
++		if( isThisCallMethod )
++		{
++			mask = 0;
++		}
++		else
++		{
++			// Check for object pointer as first argument
++			switch( callConv )
++			{
++				case ICC_THISCALL:
++				case ICC_CDECL_OBJFIRST:
++				case ICC_VIRTUAL_THISCALL:
++				case ICC_THISCALL_RETURNINMEM:
++				case ICC_CDECL_OBJFIRST_RETURNINMEM:
++				case ICC_VIRTUAL_THISCALL_RETURNINMEM:
++					mask = 0;
++					break;
++				default:
++					break;
++			}
++		}
++		// Check for hidden address in case of return by value
++		if( sysFunc->hostReturnInMemory )
++			mask = !mask;
++
++		paramSize = 0;
++		int spos = 0;
++		int dpos = 2;
++
++		if( isThisCallMethod && (callConv >= ICC_THISCALL_OBJFIRST &&
++			callConv <= ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM) )
++		{
++			// Add the object pointer as the first parameter
++			paramBuffer[dpos++] = (asDWORD)secondObject;
++			paramSize++;
++		}
++
++		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
++		{
++			// TODO: runtime optimize: Declare a reference to descr->parameterTypes[n] so the array doesn't have to be access all the time
++			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() &&
++				!(descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_ARRAY) )
++			{
++#ifdef COMPLEX_OBJS_PASSED_BY_REF
++				if( descr->parameterTypes[n].GetTypeInfo()->flags & COMPLEX_MASK )
++				{
++					paramBuffer[dpos++] = args[spos++];
++					paramSize++;
++				}
++				else
++#endif
++				{
++					if( (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALIGN8) )
++					{
++						if ( (dpos & 1) == mask )
++						{
++							// 64 bit value align
++							dpos++;
++							paramSize++;
++						}
++
++						if ( (stackPos & 1) == mask )
++						{
++							// 64 bit value align
++							stackPos++;
++							stackSize++;
++						}
++					}
++
++					// Copy the object's memory to the buffer
++					if (descr->parameterTypes[n].GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS)
++					{
++						int target = (freeFloatSlot > freeDoubleSlot) ? freeFloatSlot : freeDoubleSlot;
++
++						if ( descr->parameterTypes[n].GetSizeInMemoryDWords() <= ( (VFP_OFFSET + 16) - target) )
++						{
++							memcpy(&paramBuffer[target], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
++							memset(&paramBuffer[target + 18], (asDWORD)1, descr->parameterTypes[n].GetSizeInMemoryDWords());
++							target += descr->parameterTypes[n].GetSizeInMemoryDWords();
++							freeFloatSlot = freeDoubleSlot = target;
++						}
++						else
++						{
++							memcpy(&paramBuffer[stackPos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
++							stackPos += descr->parameterTypes[n].GetSizeInMemoryDWords();
++							stackSize += descr->parameterTypes[n].GetSizeOnStackDWords();
++						}
++					}
++					else
++					{
++						memcpy(&paramBuffer[dpos], *(void**)(args+spos), descr->parameterTypes[n].GetSizeInMemoryBytes());
++						dpos += descr->parameterTypes[n].GetSizeInMemoryDWords();
++						paramSize += descr->parameterTypes[n].GetSizeInMemoryDWords();
++					}
++
++					// Delete the original memory
++					engine->CallFree(*(char**)(args+spos));
++					spos++;					
++				}
++
++				continue;
++			}
++			else if( descr->parameterTypes[n].IsFloatType() && !descr->parameterTypes[n].IsReference() )
++			{
++				// Are there any "s" registers available?
++				if ( freeFloatSlot < (VFP_OFFSET + 16) )
++				{
++					if (freeFloatSlot == freeDoubleSlot)
++						freeDoubleSlot += 2;
++
++					paramBuffer[freeFloatSlot + 18] = (asDWORD)1;
++					paramBuffer[freeFloatSlot++] = args[spos++];
++
++					while(freeFloatSlot < (VFP_OFFSET + 16) && paramBuffer[freeFloatSlot + 18] != 0)
++						freeFloatSlot++;
++				}
++				// If not, then store the float arg in the stack area
++				else
++				{
++					paramBuffer[stackPos++] = args[spos++];
++					stackSize++;
++				}
++
++				continue;
++			}
++			else if( descr->parameterTypes[n].IsDoubleType() && !descr->parameterTypes[n].IsReference() )
++			{
++				// Are there any "d" registers available?
++				if ( freeDoubleSlot < (VFP_OFFSET + 15) )
++				{
++					if (freeFloatSlot == freeDoubleSlot)
++						freeFloatSlot += 2;
++
++					// Copy two dwords for the double
++					paramBuffer[freeDoubleSlot + 18] = (asDWORD)1;
++					paramBuffer[freeDoubleSlot + 19] = (asDWORD)1;
++					paramBuffer[freeDoubleSlot++] = args[spos++];
++					paramBuffer[freeDoubleSlot++] = args[spos++];
++
++					while(freeDoubleSlot < (VFP_OFFSET + 15) && paramBuffer[freeDoubleSlot + 18] != 0)
++						freeDoubleSlot += 2;
++				}
++				// If not, then store the double arg in the stack area
++				else
++				{
++					if ( (stackPos & 1) == mask )
++					{
++						// 64 bit value align
++						stackPos++;
++						stackSize++;
++					}
++
++					paramBuffer[stackPos++] = args[spos++];
++					paramBuffer[stackPos++] = args[spos++];
++					stackSize += 2;
++				}
++				
++				continue;
++			}
++			else if (descr->parameterTypes[n].GetTokenType() == ttQuestion)
++			{
++				// Copy the reference and the type id as two separate arguments
++				// Copy the value directly to "r" registers or the stack, checking for alignment
++				
++				// First the reference...
++				if (paramSize < 4)
++				{
++					paramBuffer[dpos++] = args[spos++];
++					paramSize += 1;
++				}
++				else
++				{
++					paramBuffer[stackPos++] = args[spos++];
++					stackSize += 1;
++				}
++
++				// ...then the type id
++				if (paramSize < 4)
++				{
++					paramBuffer[dpos++] = args[spos++];
++					paramSize += 1;
++				}
++				else
++				{
++					paramBuffer[stackPos++] = args[spos++];
++					stackSize += 1;
++				}
++			}
++			else
++			{
++				// Copy the value directly to "r" registers or the stack, checking for alignment
++				if (paramSize < 4)
++				{
++					// Should an alignment be performed?
++					if( (dpos & 1) == mask && descr->parameterTypes[n].GetSizeOnStackDWords() == 2 && 
++						!descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() &&
++						!descr->parameterTypes[n].IsAnyType() )
++					{
++						// 64 bit value align
++						dpos++;
++						paramSize++;
++					}
++
++					paramBuffer[dpos++] = args[spos++];
++					paramSize += descr->parameterTypes[n].GetSizeOnStackDWords();
++				}
++				else
++				{
++					// Should an alignment be performed?
++					if( (stackPos & 1) == mask && descr->parameterTypes[n].GetSizeOnStackDWords() == 2 &&
++						!descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() &&
++						!descr->parameterTypes[n].IsAnyType() )
++					{
++						// 64 bit value align
++						stackPos++;
++						stackSize++;
++					}
++
++					paramBuffer[stackPos++] = args[spos++];
++					stackSize += descr->parameterTypes[n].GetSizeOnStackDWords();
++				}
++
++				if( descr->parameterTypes[n].GetSizeOnStackDWords() > 1 )
++				{
++					if (paramSize < 5)
++						paramBuffer[dpos++] = args[spos++];
++					else
++						paramBuffer[stackPos++] = args[spos++];
++				}
++			}// else...
++		}// Loop
++
++		if( isThisCallMethod && (callConv >= ICC_THISCALL_OBJLAST &&
++			callConv <= ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM) )
++		{
++			if (paramSize < 4)
++			{
++				paramBuffer[dpos++] = (asDWORD)secondObject;
++				paramSize++;
++			}
++			else
++			{
++				paramBuffer[stackPos++] = (asDWORD)secondObject;
++				stackSize++;
++			}
++		}
++
++		// Keep a free location at the beginning
++		args = &paramBuffer[2];
++	}
++
++	paramBuffer[69] = static_cast<asDWORD>(stackSize<<2);
++
++	switch( callConv )
++	{
++	case ICC_CDECL_RETURNINMEM:     // fall through
++	case ICC_STDCALL_RETURNINMEM:
++		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)retPointer);
++		break;
++	case ICC_CDECL:     // fall through
++	case ICC_STDCALL:
++		retQW = armFunc(args, paramSize<<2, func);
++		break;
++	case ICC_THISCALL:  // fall through
++	case ICC_CDECL_OBJFIRST:
++	case ICC_THISCALL_OBJFIRST:
++	case ICC_THISCALL_OBJLAST:
++		retQW = armFuncR0(args, paramSize<<2, func, (asDWORD)obj);
++		break;
++	case ICC_THISCALL_RETURNINMEM:
++	case ICC_THISCALL_OBJFIRST_RETURNINMEM:
++	case ICC_THISCALL_OBJLAST_RETURNINMEM:
++		// On GNUC the address where the return value will be placed should be put in R0
++		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	case ICC_CDECL_OBJFIRST_RETURNINMEM:
++		retQW = armFuncR0R1(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	case ICC_VIRTUAL_THISCALL:
++	case ICC_VIRTUAL_THISCALL_OBJFIRST:
++	case ICC_VIRTUAL_THISCALL_OBJLAST:
++		// Get virtual function table from the object pointer
++		vftable = *(asFUNCTION_t**)obj;
++		retQW = armFuncR0(args, paramSize<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)obj);
++		break;
++	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
++	case ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM:
++	case ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM:
++		// Get virtual function table from the object pointer
++		vftable = *(asFUNCTION_t**)obj;
++		// On GNUC the address where the return value will be placed should be put in R0
++		retQW = armFuncR0R1(args, (paramSize+1)<<2, vftable[FuncPtrToUInt(func)>>2], (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	case ICC_CDECL_OBJLAST:
++		retQW = armFuncObjLast(args, paramSize<<2, func, (asDWORD)obj);
++		break;
++	case ICC_CDECL_OBJLAST_RETURNINMEM:
++		retQW = armFuncR0ObjLast(args, paramSize<<2, func, (asDWORD)retPointer, (asDWORD)obj);
++		break;
++	default:
++		context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
++	}
++
++	// On Linux with arm the float and double values are returns in the 
++	// floating point registers, s0 and s1. Objects that contain only 
++	// float types and are not considered complex are also returned in the
++	// floating point registers.
++	if( sysFunc->hostReturnFloat )
++	{
++		retQW = paramBuffer[VFP_OFFSET];
++
++		if ( sysFunc->hostReturnSize > 1 )
++			retQW = *( (asQWORD*)&paramBuffer[VFP_OFFSET] );
++		if (sysFunc->hostReturnSize > 2)
++			retQW2 = *((asQWORD*)&paramBuffer[VFP_OFFSET + 2]);
++	}
++	else if ( descr->returnType.IsObject() )
++	{
++		// TODO: runtime optimize: This should be identified with a flag determined in PrepareSystemFunction
++		if ( !descr->returnType.IsObjectHandle()									&&
++			 !descr->returnType.IsReference()										&&
++			 !(descr->returnType.GetTypeInfo()->flags & COMPLEX_RETURN_MASK)		&&
++			 (descr->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS) )
++			memcpy( retPointer, &paramBuffer[VFP_OFFSET], descr->returnType.GetSizeInMemoryBytes() );
++	}
++
++	return retQW;
++}
++
++END_AS_NAMESPACE
++
++#endif // AS_LINUX
++
++#endif // AS_ARM
++#endif // AS_MAX_PORTABILITY
++
++
++
++
++

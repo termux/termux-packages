@@ -1,0 +1,15 @@
+diff -uNr openssh-portable-V_9_9_P1/readconf.c openssh-portable-V_9_9_P1.mod/readconf.c
+--- openssh-portable-V_9_9_P1/readconf.c	2024-09-20 01:20:48.000000000 +0300
++++ openssh-portable-V_9_9_P1.mod/readconf.c	2024-09-26 13:31:03.612060161 +0300
+@@ -2495,9 +2495,8 @@
+ 
+ 		if (fstat(fileno(f), &sb) == -1)
+ 			fatal("fstat %s: %s", filename, strerror(errno));
+-		if (((sb.st_uid != 0 && sb.st_uid != getuid()) ||
+-		    (sb.st_mode & 022) != 0))
+-			fatal("Bad owner or permissions on %s", filename);
++		if ((sb.st_mode & 022) != 0)
++			fatal("Bad permissions on %s (file is writeable by group and others)", filename);
+ 	}
+ 
+ 	debug("Reading configuration data %.200s", filename);

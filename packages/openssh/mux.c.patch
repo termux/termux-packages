@@ -1,0 +1,34 @@
+diff -uNr openssh-portable-V_9_5_P1/mux.c openssh-portable-V_9_5_P1.mod/mux.c
+--- openssh-portable-V_9_5_P1/mux.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/mux.c	2023-11-23 16:29:34.264542664 +0200
+@@ -1325,6 +1325,22 @@
+ 	}
+ 
+ 	/* Now atomically "move" the mux socket into position */
++#ifdef __ANDROID__
++	/* Android does not support hard links, so use a non-atomic
++	   check-then-rename for now. */
++	if (access(orig_control_path, F_OK) == 0) {
++		error("ControlSocket %s already exists, disabling multiplexing",
++		    orig_control_path);
++		unlink(options.control_path);
++		goto disable_mux_master;
++	} else {
++		if (rename(options.control_path, orig_control_path) == -1) {
++			fatal("%s: link mux listener %s => %s: %s", __func__, 
++			    options.control_path, orig_control_path,
++			    strerror(errno));
++		}
++	}
++#else
+ 	if (link(options.control_path, orig_control_path) != 0) {
+ 		if (errno != EEXIST) {
+ 			fatal_f("link mux listener %s => %s: %s",
+@@ -1337,6 +1353,7 @@
+ 		goto disable_mux_master;
+ 	}
+ 	unlink(options.control_path);
++#endif
+ 	free(options.control_path);
+ 	options.control_path = orig_control_path;
+ 

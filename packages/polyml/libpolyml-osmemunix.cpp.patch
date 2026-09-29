@@ -1,0 +1,14 @@
+--- a/libpolyml/osmemunix.cpp
++++ b/libpolyml/osmemunix.cpp
+@@ -134,9 +134,9 @@
+     fd = openTmpFile(P_tmpdir);
+     if (fd != -1) return fd;
+ #endif
+-    fd = openTmpFile("/tmp");
++    fd = openTmpFile("@TERMUX_PREFIX@/tmp");
+     if (fd != -1) return fd;
+-    fd = openTmpFile("/var/tmp");
++    fd = openTmpFile("@TERMUX_PREFIX@/var/tmp");
+     if (fd != -1) return fd;
+ 
+     return -1;

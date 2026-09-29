@@ -1,0 +1,13 @@
+--- a/src/runtime/src/coreclr/vm/threadstatics.cpp
++++ b/src/runtime/src/coreclr/vm/threadstatics.cpp
+@@ -913,6 +913,10 @@ bool CanJITOptimizeTLSAccess()
+     // Optimization is disabled for linux/x86
+ #elif defined(TARGET_LINUX_MUSL) && defined(TARGET_ARM64)
+     // Optimization is disabled for linux musl arm64
++#elif defined(TARGET_LINUX_BIONIC) && defined(TARGET_ARM64)
++    // Optimization is disabled for linux bionic arm64
++#elif defined(TARGET_ANDROID) && defined(TARGET_ARM64)
++    // Optimization is disabled for Android arm64
+ #elif defined(TARGET_FREEBSD) && defined(TARGET_ARM64)
+     // Optimization is disabled for FreeBSD/arm64
+ #elif defined(FEATURE_INTERPRETER)

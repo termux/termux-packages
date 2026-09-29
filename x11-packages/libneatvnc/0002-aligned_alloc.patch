@@ -1,0 +1,18 @@
+--- a/src/buffer.c
++++ b/src/buffer.c
+@@ -32,6 +32,15 @@
+ #define UDIV_UP(a, b) (((a) + (b) - 1) / (b))
+ #define ALIGN_UP(n, a) (UDIV_UP(n, a) * a)
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++void *aligned_alloc(size_t align, size_t size)
++{
++	void *result = NULL;
++	posix_memalign(&result, align, size);
++	return result;
++}
++#endif
++
+ EXPORT
+ struct nvnc_buffer* nvnc_buffer_new(size_t size)
+ {

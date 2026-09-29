@@ -1,0 +1,23 @@
+diff -uNr psmisc/src/fuser.c psmisc.mod/src/fuser.c
+--- psmisc/src/fuser.c	2022-05-09 17:59:29.207722650 +0800
++++ psmisc.mod/src/fuser.c	2022-08-04 00:10:23.437688524 +0800
+@@ -60,6 +60,10 @@
+ #include <locale.h>
+ #endif
+ 
++#ifdef __ANDROID__
++# include <sys/sysmacros.h> /* makedev() macro */
++#endif
++
+ #include "fuser.h"
+ #include "signals.h"
+ #include "i18n.h"
+@@ -2346,7 +2350,7 @@
+                 return (char *)0;
+             }
+ 
+-            dest = mempcpy(dest, start, end - start);
++            dest = ((char*) memcpy(dest, start, end - start)) + (end - start);
+             *dest = '\0';
+ 
+             if (deep-- < 0)

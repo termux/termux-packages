@@ -1,0 +1,36 @@
+--- a/Makefile
++++ b/Makefile
+@@ -427,7 +429,7 @@
+ 	install -m 644 docs/*.html docs/*.css docs/*.png $(DESTDIR)$(docdir)
+ 	install -m 644 docs/examples/* $(DESTDIR)$(docdir)/examples
+ 
+-install: install-libs install-apps install-docs
++install: install-libs install-tools install-docs install-shared-c install-shared-c++
+ 
+ tarball:
+ 	bash scripts/archive.sh
+@@ -635,18 +635,17 @@ endif
+ 
+ install-shared-c: install-shared-check install-libs install-headers
+ 
+-install-shared-c++: install-shared-c c++
+-	install -m 644 platform/c++/include/mupdf/*.h $(DESTDIR)$(incdir)/mupdf
+-	install -m $(SO_INSTALL_MODE) $(OUT)/libmupdfcpp.$(SO)$(SO_VERSION) $(DESTDIR)$(libdir)/
++install-shared-c++: install-shared-check
++	install -vDm 644 platform/c++/include/mupdf/*.h -t $(DESTDIR)$(incdir)/mupdf
++	install -vDm $(SO_INSTALL_MODE) $(OUT)/libmupdfcpp.$(SO)$(SO_VERSION) -t $(DESTDIR)$(libdir)/
+ ifneq ($(OS),OpenBSD)
+ 	ln -sf libmupdfcpp.$(SO)$(SO_VERSION) $(DESTDIR)$(libdir)/libmupdfcpp.$(SO)
+ 	ln -sf libmupdfcpp.$(SO)$(SO_VERSION) $(DESTDIR)$(libdir)/libmupdfcpp.$(SO)$(SO_VERSION_MAJOR)
+ endif
+ 
+-install-shared-python: install-shared-c++ python
+-	install -d $(DESTDIR)$(pydir)/mupdf
+-	install -m $(SO_INSTALL_MODE) $(OUT)/_mupdf.$(SO) $(DESTDIR)$(pydir)/mupdf
+-	install -m 644 $(OUT)/mupdf.py $(DESTDIR)$(pydir)/mupdf/__init__.py
++install-shared-python:
++	install -vDm $(SO_INSTALL_MODE) $(OUT)/_mupdf.$(SO) -t $(DESTDIR)$(pydir)/mupdf
++	install -vDm 644 $(OUT)/mupdf.py $(DESTDIR)$(pydir)/mupdf/__init__.py
+ 
+ else
+ 

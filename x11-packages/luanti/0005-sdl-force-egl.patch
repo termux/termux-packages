@@ -1,0 +1,19 @@
+Without this, SDL mode of Luanti would:
+- have significantly reduced performance and driver compatibility
+- have strangely washed-out colors
+https://github.com/luanti-org/luanti/issues/16859
+
+--- a/irr/src/CIrrDeviceSDL.cpp
++++ b/irr/src/CIrrDeviceSDL.cpp
+@@ -442,6 +442,11 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters &param) :
+ #if defined(SDL_HINT_IME_SHOW_UI)
+ 		SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+ #endif
++#ifdef _IRR_USE_SDL3_
++		SDL_SetHint(SDL_HINT_VIDEO_FORCE_EGL, "1");
++#else
++		SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
++#endif
+ 
+ 		// Initialize SDL
+ 

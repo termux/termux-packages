@@ -1,0 +1,51 @@
+diff -uNr apg-2.3.0b/Makefile apg-2.3.0b.mod/Makefile
+--- apg-2.3.0b/Makefile	2003-08-07 18:40:39.000000000 +0300
++++ apg-2.3.0b.mod/Makefile	2019-05-20 02:04:28.641201031 +0300
+@@ -1,19 +1,19 @@
+ ##################################################################
+ # Directories
+ # Install dirs
+-INSTALL_PREFIX = /usr/local
++INSTALL_PREFIX = @TERMUX_PREFIX@
+ 
+ # Full default path is /usr/local/bin
+ APG_BIN_DIR = /bin
+ 
+ # Full default path is /usr/local/man/man1
+-APG_MAN_DIR = /man/man1
++APG_MAN_DIR = /share/man/man1
+ 
+ # Full default path is /usr/local/sbin
+-APGD_BIN_DIR = /sbin
++APGD_BIN_DIR = $(APG_BIN_DIR)
+ 
+ # Full default path is /usr/local/man/man8
+-APGD_MAN_DIR = /man/man8
++APGD_MAN_DIR = /share/man/man8
+ 
+ # You should not edit 2 lines below
+ APGBFM_CLIBS = -lm
+@@ -35,7 +35,7 @@
+ #         This works on MacOS X
+ #
+ STANDALONE_OPTIONS += -DAPG_USE_CRYPT
+-APG_CLIBS += -lcrypt
++APG_CLIBS += -L@TERMUX_PREFIX@/lib -lcrypt
+ 
+ ##################################################################
+ # Support for cracklib
+@@ -60,12 +60,12 @@
+ ##################################################################
+ # You can modify CC variable if you have compiler other than GCC
+ # But the code was designed and tested with GCC
+-CC = gcc
++CC ?= gcc
+ 
+ ##################################################################
+ # Compilation flags
+ # You should comment the line below for AIX+native cc
+-CFLAGS = -Wall
++CFLAGS = -Wall -I@TERMUX_PREFIX@/include -Wl,-rpath=@TERMUX_PREFIX@/lib -Wl,--enable-new-dtags
+ 
+ ####################################################################
+ # If you plan to install APG daemon you should look at lines below #

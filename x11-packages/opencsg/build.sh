@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.opencsg.org
+TERMUX_PKG_DESCRIPTION="Library for image-based CSG rendering using OpenGL"
+TERMUX_PKG_LICENSE="GPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.8.2"
+TERMUX_PKG_SRCURL="https://github.com/floriankirsch/OpenCSG/archive/refs/tags/opencsg-${TERMUX_PKG_VERSION//./-}-release.tar.gz"
+TERMUX_PKG_SHA256=63c74513f8197ceaef68bd90502c096b64146997d67e0979a82e0e8db2928527
+TERMUX_PKG_DEPENDS="freeglut, libc++"
+TERMUX_PKG_AUTO_UPDATE=true

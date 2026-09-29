@@ -1,0 +1,43 @@
+--- ./Makefile.in	2004-04-09 23:38:56.000000000 +0000
++++ ../Makefile.in	2018-03-11 08:07:34.518323429 +0000
+@@ -6,7 +6,7 @@
+ # $date: Sun Jul 25 17:56:15 MET DST 1999$ 
+ # $rev: 3$ 
+ 
+-CC= gcc
++CC ?= gcc
+ AR=/usr/bin/ar
+ RANLIB=/usr/bin/ranlib
+ CCOPT= -O2 -Wall @PCAP_INCLUDE@ @TCL_INC@ @USE_TCL@
+@@ -50,14 +50,13 @@
+ 	$(RANLIB) $@
+ 
+ hping3: byteorder.h $(OBJ)
+-	$(CC) -o hping3 $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@
++	$(CC) -o hping3 $(CCOPT) $(CPPFLAGS) $(LDFLAGS) $(DEBUG) $(OBJ) $(PCAP) @SOLARISLIB@ @TCL_LIB@
+ 	@echo
+-	./hping3 -v
+ 	@echo "use \`make strip' to strip hping3 binary"
+ 	@echo "use \`make install' to install hping3"
+ 
+ hping3-static: byteorder.h $(OBJ)
+-	$(CC) -static -o hping3-static $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@ -ldl
++	$(CC) -static -o hping3-static $(CCOPT) $(CPPFLAGS) $(LDFLAGS) $(DEBUG) $(OBJ) $(PCAP) @SOLARISLIB@ @TCL_LIB@ -ldl
+ 
+ byteorder.h:
+ 	./configure
+@@ -72,10 +71,10 @@
+ 	rm -rf hping3 *.o byteorder byteorder.h systype.h Makefile libars.a .depend
+ 
+ install: hping3
+-	cp -f hping3 /usr/sbin/
+-	chmod 755 /usr/sbin/hping3
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping2
++	cp -f hping3 $(PREFIX)/bin/
++	chmod 755 $(PREFIX)/bin/hping3
++	ln -sf $(PREFIX)/bin/hping3 $(PREFIX)/bin/hping
++	ln -sf $(PREFIX)/bin/hping3 $(PREFIX)/bin/hping2
+ 	@if [ -d ${INSTALL_MANPATH}/man8 ]; then \
+ 		cp ./docs/hping3.8 ${INSTALL_MANPATH}/man8; \
+ 		chmod 644 ${INSTALL_MANPATH}/man8/hping3.8; \

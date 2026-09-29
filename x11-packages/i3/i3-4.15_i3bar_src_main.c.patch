@@ -1,0 +1,12 @@
+diff -uNr i3-4.18/i3bar/src/main.c i3-4.18.mod/i3bar/src/main.c
+--- i3-4.18/i3bar/src/main.c	2020-02-17 19:27:38.000000000 +0200
++++ i3-4.18.mod/i3bar/src/main.c	2020-03-08 20:28:48.821977158 +0200
+@@ -160,7 +160,7 @@
+     }
+ 
+     if (socket_path == NULL) {
+-        char *i3_default_sock_path = "/tmp/i3-ipc.sock";
++        char *i3_default_sock_path = "@TERMUX_PREFIX@/tmp/i3-ipc.sock";
+         ELOG("No socket path specified, default to %s\n", i3_default_sock_path);
+         socket_path = sstrdup(i3_default_sock_path);
+     }

@@ -1,0 +1,31 @@
+--- a/src/components/user.c
++++ b/src/components/user.c
+@@ -9,7 +9,7 @@
+ static inline int user_ncmp(struct user_*, struct user_*, void *arg, size_t);
+ static inline void user_free(struct user_*);
+ 
+-AVL_GENERATE(user_list, user, ul, user_cmp, user_ncmp)
++AVL_GENERATE(user_list, user_, ul, user_cmp, user_ncmp)
+ 
+ static inline int
+ user_cmp(struct user_ *u1, struct user_ *u2, void *arg)
+--- a/src/components/user.h
++++ b/src/components/user.h
+@@ -14,7 +14,7 @@
+ 
+ struct user_
+ {
+-	TREE_NODE(user) ul;
++	TREE_NODE(user_) ul;
+ 	const char *nick;
+ 	size_t nick_len;
+ 	struct mode prfxmodes;
+@@ -23,7 +23,7 @@
+ 
+ struct user_list
+ {
+-	TREE_HEAD(user);
++	TREE_HEAD(user_);
+ 	unsigned count;
+ };
+ 

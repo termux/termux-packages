@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 03_fixloop.dpatch by Nico Golde <nion@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+--- a/tsocks.c
++++ b/tsocks.c
+@@ -990,6 +990,10 @@ static int recv_buffer(struct connreq *c
+       if (rc > 0) {
+          conn->datadone += rc;
+          rc = 0;
++      } else if (rc == 0) {
++         show_msg(MSGDEBUG, "Peer has shutdown but we only read %d of %d bytes.\n",
++            conn->datadone, conn->datalen);
++         rc = ENOTCONN; /* ENOTCONN seems like the most fitting error message */
+       } else {
+          if (errno != EWOULDBLOCK)
+             show_msg(MSGDEBUG, "Read failed, %s\n", strerror(errno));

@@ -1,0 +1,36 @@
+From 91b446d5218b3c9a3161b86aeb48e28fe058e22c Mon Sep 17 00:00:00 2001
+From: Termux <contact@termux.dev>
+Date: Mon, 8 Sep 2025 02:07:14 +0600
+Subject: [PATCH 2/3] replace osc 52 paste with termux-clipboard-get
+
+---
+ crates/nu-std/std/clip/mod.nu | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/crates/nu-std/std/clip/mod.nu b/crates/nu-std/std/clip/mod.nu
+index 94528e4d..8638dbb4 100644
+--- a/crates/nu-std/std/clip/mod.nu
++++ b/crates/nu-std/std/clip/mod.nu
+@@ -30,16 +30,13 @@ export def copy52 [
+ } --result "Hello"
+ export def paste52 []: [nothing -> string] {
+   try {
+-    term query $'(ansi osc)52;c;?(ansi st)' -p $'(ansi osc)52;c;' -t (ansi st)
++    ^@TERMUX_PREFIX@/bin/termux-clipboard-get
+   } catch {
+     error make -u {
+-      msg: "Terminal did not responds to OSC 52 paste request."
+-      help: $"Check if your terminal supports OSC 52."
++      msg: "termux-clipboard-get failed to paste."
++      help: $"Make sure you have Termux:API app and termux-api package installed."
+     }
+   }
+-  | decode
+-  | decode base64
+-  | decode
+ }
+ 
+ # Add a prefix to each line of the content to be copied
+-- 
+2.55.0
+

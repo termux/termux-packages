@@ -1,0 +1,158 @@
+--- a/gtk2_ardour/ardour_http.cc
++++ b/gtk2_ardour/ardour_http.cc
+@@ -84,6 +84,7 @@
+ 	 */
+ 	assert (!ca_path && !ca_info); // call once
+ 
++#ifndef __ANDROID__
+ 	if (Glib::file_test ("/etc/pki/tls/certs/ca-bundle.crt", Glib::FILE_TEST_IS_REGULAR)) {
+ 		// Fedora / RHEL, Arch
+ 		ca_info = "/etc/pki/tls/certs/ca-bundle.crt";
+@@ -96,6 +97,11 @@
+ 		// GNU/TLS can keep extra stuff here
+ 		ca_info = "/etc/pki/tls/cert.pem";
+ 	}
++#else // __ANDROID__
++	if (Glib::file_test ("@TERMUX_PREFIX@/etc/tls/cert.pem", Glib::FILE_TEST_IS_REGULAR)) {
++		ca_info = "@TERMUX_PREFIX@/etc/tls/cert.pem";
++	}
++#endif
+ 	// else NULL: use default (currently) "/etc/ssl/certs/ca-certificates.crt" if it exists
+ 
+ 	/* If we don't set anything defaults are used. at the time of writing we compile bundled curl on debian
+--- a/gtk2_ardour/bundle_env_linux.cc
++++ b/gtk2_ardour/bundle_env_linux.cc
+@@ -104,9 +104,9 @@
+ 	   if it exists, otherwise use the stuff we included in the bundle
+ 	*/
+ 
+-	if (Glib::file_test ("/etc/fonts/fonts.conf", Glib::FILE_TEST_EXISTS)) {
+-		g_setenv ("FONTCONFIG_FILE", "/etc/fonts/fonts.conf", 1);
+-		g_setenv ("FONTCONFIG_PATH", "/etc/fonts", 1);
++	if (Glib::file_test ("@TERMUX_PREFIX@/etc/fonts/fonts.conf", Glib::FILE_TEST_EXISTS)) {
++		g_setenv ("FONTCONFIG_FILE", "@TERMUX_PREFIX@/etc/fonts/fonts.conf", 1);
++		g_setenv ("FONTCONFIG_PATH", "@TERMUX_PREFIX@/etc/fonts", 1);
+ 	} else {
+ 		error << _("No fontconfig file found on your system. Things may looked very odd or ugly") << endmsg;
+ 	}
+--- a/gtk2_ardour/luainstance.cc
++++ b/gtk2_ardour/luainstance.cc
+@@ -451,11 +451,11 @@
+ {
+ 	// args are free()ed in ~SystemExec
+ 	char** args = (char**) malloc (4 * sizeof(char*));
+-	args[0] = strdup ("/bin/sh");
++	args[0] = strdup ("@TERMUX_PREFIX@/bin/sh");
+ 	args[1] = strdup ("-c");
+ 	args[2] = strdup (cmd.c_str());
+ 	args[3] = 0;
+-	ARDOUR::SystemExec x ("/bin/sh", args, true);
++	ARDOUR::SystemExec x ("@TERMUX_PREFIX@/bin/sh", args, true);
+ 	if (x.start()) {
+ 		return -1;
+ 	}
+--- a/gtk2_ardour/video_server_dialog.cc
++++ b/gtk2_ardour/video_server_dialog.cc
+@@ -83,7 +83,7 @@
+ 	HBox* docroot_hbox = manage (new HBox);
+ 
+ 	path_entry.set_width_chars(38);
+-	path_entry.set_text("/usr/bin/harvid");
++	path_entry.set_text("@TERMUX_PREFIX@/bin/harvid");
+ 	docroot_entry.set_width_chars(38);
+ 	docroot_entry.set_text(video_get_docroot (Config));
+ 
+--- a/libs/ardour/plugin_manager.cc
++++ b/libs/ardour/plugin_manager.cc
+@@ -296,9 +296,9 @@
+ 	}
+ 
+ 	if (lxvst_path.length() == 0) {
+-		lxvst_path = "/usr/local/lib64/lxvst:/usr/local/lib/lxvst:/usr/lib64/lxvst:/usr/lib/lxvst:"
+-			"/usr/local/lib64/linux_vst:/usr/local/lib/linux_vst:/usr/lib64/linux_vst:/usr/lib/linux_vst:"
+-			"/usr/lib/vst:/usr/local/lib/vst";
++		lxvst_path = "@TERMUX_PREFIX@/local/lib/lxvst:@TERMUX_PREFIX@/lib/lxvst:"
++			"@TERMUX_PREFIX@/local/lib/linux_vst:@TERMUX_PREFIX@/lib/linux_vst:"
++			"@TERMUX_PREFIX@/lib/vst:@TERMUX_PREFIX@/local/lib/vst";
+ 	}
+ 
+ 	/* first time setup, use 'default' path */
+@@ -2023,7 +2023,7 @@
+ 	std::string prog = PBD::get_win_special_folder_path (CSIDL_PROGRAM_FILES);
+ 	vst3_discover_from_path (Glib::build_filename (prog, "Common Files", "VST3"), cache_only);
+ #else
+-	vst3_discover_from_path ("~/.vst3:/usr/local/lib/vst3:/usr/lib/vst3", cache_only);
++	vst3_discover_from_path ("~/.vst3:@TERMUX_PREFIX@/local/lib/vst3:@TERMUX_PREFIX@/lib/vst3", cache_only);
+ #endif
+ }
+ 
+--- a/libs/ardour/search_paths.cc
++++ b/libs/ardour/search_paths.cc
+@@ -108,10 +108,8 @@
+ 	spath.add_subdirectory_to_paths (ladspa_dir_name);
+ 
+ #ifndef PLATFORM_WINDOWS
+-	spath.push_back ("/usr/local/lib64/ladspa");
+-	spath.push_back ("/usr/local/lib/ladspa");
+-	spath.push_back ("/usr/lib64/ladspa");
+-	spath.push_back ("/usr/lib/ladspa");
++	spath.push_back ("@TERMUX_PREFIX@/local/lib/ladspa");
++	spath.push_back ("@TERMUX_PREFIX@/lib/ladspa");
+ #endif
+ 
+ #ifdef __APPLE__
+@@ -293,7 +291,7 @@
+ const char *
+ vst_search_path ()
+ {
+-	return "/usr/local/lib/vst:/usr/lib/vst";
++	return "@TERMUX_PREFIX@/local/lib/vst:@TERMUX_PREFIX@/lib/vst";
+ }
+ 
+ #endif // PLATFORM_WINDOWS
+--- a/libs/ardour/vst3_plugin.cc
++++ b/libs/ardour/vst3_plugin.cc
+@@ -1038,8 +1038,8 @@
+ 	}
+ #else
+ 	preset_path += Glib::build_filename (Glib::get_home_dir (), ".vst3", "presets", vendor, pname);
+-	preset_path += Glib::build_filename ("/usr/share/vst3/presets", vendor, pname);
+-	preset_path += Glib::build_filename ("/usr/local/share/vst3/presets", vendor, pname);
++	preset_path += Glib::build_filename ("@TERMUX_PREFIX@/share/vst3/presets", vendor, pname);
++	preset_path += Glib::build_filename ("@TERMUX_PREFIX@/local/share/vst3/presets", vendor, pname);
+ #endif
+ 
+ 	return preset_path;
+--- a/libs/lua/lua-5.3.5/loslib.c
++++ b/libs/lua/lua-5.3.5/loslib.c
+@@ -115,7 +115,7 @@
+ #define LUA_TMPNAMBUFSIZE	32
+ 
+ #if !defined(LUA_TMPNAMTEMPLATE)
+-#define LUA_TMPNAMTEMPLATE	"/tmp/lua_XXXXXX"
++#define LUA_TMPNAMTEMPLATE	"@TERMUX_PREFIX@/tmp/lua_XXXXXX"
+ #endif
+ 
+ #define lua_tmpnam(b,e) { \
+--- a/libs/lua/lua-5.3.5/luaconf.h
++++ b/libs/lua/lua-5.3.5/luaconf.h
+@@ -200,7 +200,7 @@
+ 
+ #else			/* }{ */
+ 
+-#define LUA_ROOT	"/usr/local/"
++#define LUA_ROOT	"@TERMUX_PREFIX@/"
+ #define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR "/"
+ #define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR "/"
+ #define LUA_PATH_DEFAULT  \
+--- a/libs/pbd/mountpoint.cc
++++ b/libs/pbd/mountpoint.cc
+@@ -52,7 +52,7 @@
+ 	const char *cpath = path.c_str();
+ 	char best[PATH_MAX+1];
+ 
+-	if ((mntf = setmntent ("/etc/mtab", "r")) == 0) {
++	if ((mntf = setmntent ("@TERMUX_PREFIX@/etc/mtab", "r")) == 0) {
+ 		return "";
+ 	}
+ 

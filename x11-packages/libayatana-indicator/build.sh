@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/AyatanaIndicators/libayatana-indicator
+TERMUX_PKG_DESCRIPTION="Ayatana Indicators Shared Library"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.9.5"
+TERMUX_PKG_SRCURL=https://github.com/AyatanaIndicators/libayatana-indicator/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=73d71c908b803f12e4a5ecd8392511b58afbdd0c82ad7909611a17bb7847c5c8
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="ayatana-ido, gdk-pixbuf, glib, gtk3"

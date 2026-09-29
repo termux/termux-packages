@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/pull/28373#issuecomment-3867446441
+
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -656,7 +656,7 @@
+     for (idx = 0; idx < ARRAY_SIZE(ldt_bitmap); idx++)
+     {
+         if (ldt_bitmap[idx] == ~0u) continue;
+-        idx = idx * 32 + ffs( ~ldt_bitmap[idx] ) - 1;
++        idx = idx * 32 + __builtin_ffs( ~ldt_bitmap[idx] ) - 1;
+         return ldt_update_entry( (idx << 3) | 7, entry );
+     }
+     return 0;

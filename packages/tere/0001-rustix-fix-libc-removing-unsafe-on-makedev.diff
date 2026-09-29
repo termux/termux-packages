@@ -1,0 +1,30 @@
+diff --git a/src/backend/libc/fs/makedev.rs b/src/backend/libc/fs/makedev.rs
+index d9089e7f..08ecd872 100644
+--- a/src/backend/libc/fs/makedev.rs
++++ b/src/backend/libc/fs/makedev.rs
+@@ -5,14 +5,14 @@ use crate::fs::Dev;
+ #[cfg(not(any(target_os = "android", target_os = "emscripten")))]
+ #[inline]
+ pub(crate) fn makedev(maj: u32, min: u32) -> Dev {
+-    unsafe { c::makedev(maj, min) }
++    c::makedev(maj, min)
+ }
+ 
+ #[cfg(all(target_os = "android", not(target_pointer_width = "32")))]
+ #[inline]
+ pub(crate) fn makedev(maj: u32, min: u32) -> Dev {
+     // Android's `makedev` oddly has signed argument types.
+-    unsafe { c::makedev(maj as i32, min as i32) }
++    c::makedev(maj, min)
+ }
+ 
+ #[cfg(all(target_os = "android", target_pointer_width = "32"))]
+@@ -30,7 +30,7 @@ pub(crate) fn makedev(maj: u32, min: u32) -> Dev {
+ #[inline]
+ pub(crate) fn makedev(maj: u32, min: u32) -> Dev {
+     // Emscripten's `makedev` has a 32-bit return value.
+-    Dev::from(unsafe { c::makedev(maj, min) })
++    Dev::from(c::makedev(maj, min))
+ }
+ 
+ #[cfg(not(any(target_os = "android", target_os = "emscripten")))]

@@ -1,0 +1,20 @@
+--- ../cache/bastet-0.43.2/BastetBlockChooser.hpp	2015-08-30 07:04:24.000000000 +0000
++++ ./BastetBlockChooser.hpp	2017-09-25 03:10:40.601198625 +0000
+@@ -23,7 +23,7 @@
+ 
+ #include "Well.hpp"
+ 
+-#include <boost/tr1/tr1/unordered_set>
++#include <boost/unordered/unordered_set.hpp>
+ #include <set>
+ #include <boost/functional/hash.hpp>
+ 
+@@ -75,7 +75,7 @@
+   public:
+     Searcher(BlockType b, const Well *well, Vertex v, WellVisitor *visitor);
+   private:
+-    std::tr1::unordered_set<Vertex> _visited;
++    boost::unordered::unordered_set<Vertex> _visited;
+     //std::set<Vertex> _visited; ^^ the above is more efficient, we need to do many inserts
+     BlockType _block;
+     const Well *_well;

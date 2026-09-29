@@ -1,0 +1,14 @@
+--- a/src/aclocal.m4
++++ b/src/aclocal.m4
+@@ -525,7 +525,10 @@
+ 	alpha*)
+ 		CFLAGS="${CFLAGS} -mieee";;
+ esac
+-ECL_CFLAGS="-D${thehost}"
++case "${thehost}" in
++	android) ECL_CFLAGS= ;;
++	*) ECL_CFLAGS="-D${thehost}" ;;
++esac
+ AC_MSG_CHECKING(for ld flags when building shared libraries)
+ if test "${enable_shared}" = "yes"; then
+ AC_MSG_RESULT([${SHARED_LDFLAGS}])

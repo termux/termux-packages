@@ -1,0 +1,14 @@
+--- a/ext/dbm/Makefile.in
++++ b/ext/dbm/Makefile.in
+@@ -46,9 +46,8 @@
+ 
+ 
+ # auxiliary stuff to find out the extension of ndbm file(s).
+-ndbm-makedb : ndbm-makedb.c
+-	$(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -o ndbm-makedb \
+-	  $(srcdir)/ndbm-makedb.c $(LOCAL_LFLAGS) $(XLDFLAGS) @NDBMLIB@ $(LIBS)
++ndbm-makedb : fake-ndbm-makedb.c
++	$(CC_FOR_BUILD) -o ndbm-makedb $(srcdir)/fake-ndbm-makedb.c
+ 
+ ndbm-suffixes.h : ndbm-makedb ndbm-suffixes.scm
+ 	$(GOSH) $(srcdir)/ndbm-suffixes.scm ndbm-suffixes.h

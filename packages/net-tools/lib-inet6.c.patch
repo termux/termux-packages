@@ -1,0 +1,11 @@
+--- ./lib/inet6.c	2017-02-21 23:54:32.000000000 +0530
++++ ../inet6.c	2017-04-09 14:01:12.215538103 +0530
+@@ -46,7 +46,7 @@
+ 
+ static char *fix_v4_address(char *buf, const struct in6_addr *in6)
+ {
+-	if (IN6_IS_ADDR_V4MAPPED(in6->s6_addr)) {
++	if (IN6_IS_ADDR_V4MAPPED(in6)) {
+ 			char *s =strchr(buf, '.');
+ 			if (s) {
+ 				while (s > buf && *s != ':')

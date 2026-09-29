@@ -1,0 +1,30 @@
+--- a/src/lib/stdlib.c
++++ b/src/lib/stdlib.c
+@@ -142,6 +142,7 @@
+     return NULL;
+ }
+ 
++#ifndef __ANDROID__
+ // FIXME: add autoconf check that confstr(_CS_PATH) returns sane values
+ static char*
+ _lfp_default_path(void)
+@@ -151,6 +152,7 @@
+     confstr(_CS_PATH, default_path, default_path_size);
+     return default_path;
+ }
++#endif
+ 
+ DSO_PUBLIC char*
+ lfp_getpath(char *const envp[])
+@@ -160,7 +162,11 @@
+     if (envpath != NULL) {
+         return strdup(envpath);
+     } else {
++#ifndef __ANDROID__
+         return _lfp_default_path();
++#else
++        return "@TERMUX_PREFIX@/bin";
++#endif
+     }
+ }
+ 

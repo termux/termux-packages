@@ -1,0 +1,48 @@
+--- a/vendor/adb/client/usb_libusb_hotplug.cpp
++++ b/vendor/adb/client/usb_libusb_hotplug.cpp
+@@ -55,8 +55,8 @@
+ static std::unordered_map<libusb_device*, std::weak_ptr<LibUsbConnection>> GUARDED_BY(
+         connections_mutex_) connections_ [[clang::no_destroy]];
+ 
+-static void process_device(libusb_device* raw_device) {
+-    auto device = std::make_unique<LibUsbDevice>(raw_device);
++static void process_device(libusb_device* raw_device, libusb_device_handle* handle = nullptr) {
++    auto device = std::make_unique<LibUsbDevice>(raw_device, handle);
+     if (!device) {
+         LOG(FATAL) << "Failed to construct LibusbConnection";
+     }
+@@ -258,6 +258,9 @@
+ 
+ void usb_init() {
+     VLOG(USB) << "initializing libusb...";
++#ifdef __ANDROID__
++    libusb_set_option(nullptr, LIBUSB_OPTION_WEAK_AUTHORITY);
++#endif
+     int rc = libusb_init(nullptr);
+     if (rc != 0) {
+         LOG(WARNING) << "failed to initialize libusb: " << libusb_error_name(rc);
+@@ -269,5 +272,23 @@
+     } else {
+         usb_init_inhouse_hotplug();
+     }
++
++#ifdef __ANDROID__
++    char* termux_usb_env = getenv("TERMUX_USB_FD");
++    if (termux_usb_env != nullptr) {
++        char* endp;
++        long int termux_usb_fd = strtol(termux_usb_env, &endp, 10);
++        if (endp != termux_usb_env) {
++            libusb_device_handle* handle = nullptr;
++            int wrap_rc = libusb_wrap_sys_device(nullptr, termux_usb_fd, &handle);
++            if (wrap_rc == 0 && handle != nullptr) {
++                process_device(libusb_get_device(handle), handle);
++            } else {
++                LOG(WARNING) << "Failed to wrap TERMUX_USB_FD as libusb device: "
++                             << libusb_error_name(wrap_rc);
++            }
++        }
++    }
++#endif
+ }
+ }  // namespace libusb
+\ No newline at end of file

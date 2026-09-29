@@ -1,0 +1,23 @@
+Description: Set the static const intergrity_identifier variable as volatile
+ instead of building the file with -O0 to avoid the compiler optimizing it
+ away, so that we can use standard flags everywhere.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2013-05-10
+
+---
+ integr.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/integr.c
++++ b/integr.c
+@@ -5,7 +5,7 @@
+  *
+  */
+ 
+-static const char intergrity_identifier[] = {
++static volatile const char intergrity_identifier[] = {
+ 	0xB0, 0x03, 0xB0, 0x02, 0xB0, 0x03,
+ 	0xB0, 0x04, 0xB0, 0x05,
+ 	0x90, 0x90, 0x90, 0x90,

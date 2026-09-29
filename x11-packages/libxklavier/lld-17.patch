@@ -1,0 +1,29 @@
+From https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=274356
+
+commit 6d93f70026f3428663c2e948678cbda969602c8a
+Author: Dimitry Andric <dim@FreeBSD.org>
+Date:   2023-10-08T17:23:44+02:00
+
+x11/libxklavier: fix build with lld 17
+
+Building x11/libxklavier with lld 17 results in the following link
+error:
+
+  libtool: link: cc -shared  -fPIC -DPIC  .libs/xkl-enum-types.o .libs/xklavier.o .libs/xklavier_evt.o .libs/xklavier_config.o .libs/xklavier_config_iso.o .libs/xklavier_xkb.o .libs/xklavier_evt_xkb.o .libs/xklavier_config_xkb.o .libs/xklavier_toplevel.o .libs/xklavier_xmm.o .libs/xklavier_xmm_opts.o .libs/xklavier_evt_xmm.o .libs/xklavier_config_xmm.o .libs/xklavier_util.o .libs/xklavier_props.o .libs/xklavier_dump.o .libs/xkl_engine_marshal.o   -L/usr/local/lib -lxml2 -lgobject-2.0 -lglib-2.0 -lintl -lXi -lxkbfile -lX11  -O2 -fstack-protector-strong -fstack-protector-strong -Wl,-rpath -Wl,/usr/local/lib   -Wl,-soname -Wl,libxklavier.so.16 -Wl,-version-script -Wl,.libs/libxklavier.so.16.3.0-ver -o .libs/libxklavier.so.16.3.0
+  ld: error: version script assignment of 'global' to symbol 'xkl_engine_VOID__FLAGS_INT_BOOLEAN' failed: symbol not defined
+  cc: error: linker command failed with exit code 1 (use -v to see invocation)
+
+The mentioned symbol has been removed from libxklavier at some point,
+and can be deleted from the linker version script.
+
+diff -u -r ../libxklavier-libxklavier-5.4/libxklavier/libxklavier.public ./libxklavier/libxklavier.public
+--- ../libxklavier-libxklavier-5.4/libxklavier/libxklavier.public	2013-04-23 23:06:51.000000000 +0000
++++ ./libxklavier/libxklavier.public	2024-06-24 19:51:25.543575810 +0000
+@@ -83,7 +83,6 @@
+ xkl_engine_state_change_get_type
+ xkl_engine_stop_listen
+ xkl_engine_ungrab_key
+-xkl_engine_VOID__FLAGS_INT_BOOLEAN
+ xkl_engine_VOID__ENUM_INT_BOOLEAN
+ xkl_get_country_name
+ xkl_get_language_name

@@ -1,0 +1,17 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,4 @@
+-CFLAGS=-g -O2 -Wall -Wextra -Isrc -DNDEBUG -lncurses -linih
++CFLAGS+= -Wall -Wextra -Isrc -DNDEBUG $(CPPFLAGS) $(LDFLAGS) -lncurses -linih
+ 
+ SOURCES=$(wildcard src/**/*.c src/*.c)
+ OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
+@@ -21,7 +21,7 @@
+ .PHONY: all tests clean check install uninstall
+ 
+ # The target build
+-all: tests $(TARGET)
++all: $(TARGET)
+ 
+ dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra -lncurses -linih
+ dev: all

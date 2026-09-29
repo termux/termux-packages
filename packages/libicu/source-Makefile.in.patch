@@ -1,0 +1,43 @@
+Lots of libraries don't use libicu libs properly. For example, in `samba`, it uses `u_strToUTF8` which
+is declared in `icu-uc`, but it searches `icu-i18n` through pkg-config.
+
+Equivalent to revert commit https://github.com/unicode-org/icu/commit/199bc827021ffdb43b6579d68e5eecf54c7f6f56
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -275,7 +275,7 @@
+ 	@cat config/icu.pc > $@
+ 	@echo "Description: $(PACKAGE_ICU_DESCRIPTION): Common and Data libraries" >> $@
+ 	@echo "Name: $(PACKAGE)-uc" >> $@
+-ifeq ($(ENABLE_SHARED),)
++ifeq (,)
+ 	@echo "Libs:" '-L$${libdir}' "${ICULIBS_UC}" "${ICULIBS_DT}" '$${baselibs}' >> $@
+ else
+ 	@echo "Libs:" '-L$${libdir}' "${ICULIBS_UC}" >> $@
+@@ -287,7 +287,7 @@
+ 	@cat config/icu.pc > $@
+ 	@echo "Description: $(PACKAGE_ICU_DESCRIPTION): Internationalization library" >> $@
+ 	@echo "Name: $(PACKAGE)-i18n" >> $@
+-ifeq ($(ENABLE_SHARED),)
++ifeq (,)
+ 	@echo "Requires: icu-uc" >> $@
+ else
+ 	@echo "Requires.private: icu-uc" >> $@
+@@ -299,7 +299,7 @@
+ 	@cat config/icu.pc > $@
+ 	@echo "Description: $(PACKAGE_ICU_DESCRIPTION): Stream and I/O Library" >> $@
+ 	@echo "Name: $(PACKAGE)-io" >> $@
+-ifeq ($(ENABLE_SHARED),)
++ifeq (,)
+ 	@echo "Requires: icu-i18n" >> $@
+ else
+ 	@echo "Requires.private: icu-i18n" >> $@
+@@ -318,7 +318,7 @@
+ 	@cat config/icu.pc > $@
+ 	@echo "Description: $(PACKAGE_ICU_DESCRIPTION): Paragraph Layout library $(USING_HB)" >> $@
+ 	@echo "Name: $(PACKAGE)-lx" >> $@
+-ifeq ($(ENABLE_SHARED),)
++ifeq (,)
+ ifneq ($(ICULEHB_LIBS),)
+ 	@echo "Requires: icu-le-hb icu-uc" >> $@
+ else

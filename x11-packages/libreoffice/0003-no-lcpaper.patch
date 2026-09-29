@@ -1,0 +1,13 @@
+diff --git a/i18nutil/source/utility/paper.cxx b/i18nutil/source/utility/paper.cxx
+index f774b1998..35e052bf7 100644
+--- a/i18nutil/source/utility/paper.cxx
++++ b/i18nutil/source/utility/paper.cxx
+@@ -306,7 +306,7 @@ PaperInfo PaperInfo::getSystemDefaultPaper()
+ #endif
+ 
+ // _NL_PAPER_WIDTH / HEIGHT not available with android unified headers
+-#if defined(LC_PAPER) && defined(_GNU_SOURCE) && !defined(ANDROID)
++#if defined(LC_PAPER) && defined(_GNU_SOURCE) && !defined(__ANDROID__)
+         // try LC_PAPER
+         locale_t loc = newlocale(LC_PAPER_MASK, "", static_cast<locale_t>(0));
+         if (loc != static_cast<locale_t>(0))

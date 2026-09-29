@@ -1,0 +1,21 @@
+diff -u -r ../php-7.1.0RC3/pear/Makefile.frag ./pear/Makefile.frag
+--- ../php-7.1.0RC3/pear/Makefile.frag	2016-09-28 22:15:47.000000000 -0400
++++ ./pear/Makefile.frag	2016-10-03 05:53:02.793555471 -0400
+@@ -12,7 +12,7 @@
+ PEAR_INSTALLER_URL = https://pear.php.net/install-pear-nozlib.phar
+ 
+ install-pear-installer: $(SAPI_CLI_PATH)
+-	@$(top_builddir)/sapi/cli/php $(PEAR_INSTALL_FLAGS) pear/install-pear-nozlib.phar -d "$(peardir)" -b "$(bindir)" ${PEAR_PREFIX} ${PEAR_SUFFIX}
++	php $(PEAR_INSTALL_FLAGS) pear/install-pear-nozlib.phar -d "$(peardir)" -b "$(bindir)" ${PEAR_PREFIX} ${PEAR_SUFFIX}
+ 
+ install-pear:
+ 	@echo "Installing PEAR environment:      $(INSTALL_ROOT)$(peardir)/"
+@@ -25,7 +25,7 @@
+ 			elif test ! -z "$(FETCH)" && test -x "$(FETCH)"; then \
+ 				"$(FETCH)" -o $(builddir)/ "${PEAR_INSTALLER_URL}"; \
+ 			else \
+-				$(top_builddir)/sapi/cli/php -n $(srcdir)/fetch.php "${PEAR_INSTALLER_URL}" $(builddir)/install-pear-nozlib.phar; \
++				php -n $(srcdir)/fetch.php "${PEAR_INSTALLER_URL}" $(builddir)/install-pear-nozlib.phar; \
+ 			fi \
+ 		fi \
+ 	fi

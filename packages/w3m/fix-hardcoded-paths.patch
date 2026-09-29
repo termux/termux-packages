@@ -1,0 +1,51 @@
+--- a/etc.c
++++ b/etc.c
+@@ -1431,7 +1431,7 @@ void
+ myExec(char *command)
+ {
+     mySignal(SIGINT, SIG_DFL);
+-    execl("/bin/sh", "sh", "-c", command, NULL);
++    execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+     exit(127);
+ }
+ 
+--- a/rc.c
++++ b/rc.c
+@@ -1368,7 +1368,7 @@ init_rc(void)
+     if (((tmp_dir = getenv("TMPDIR")) == NULL || *tmp_dir == '\0') &&
+ 	((tmp_dir = getenv("TMP")) == NULL || *tmp_dir == '\0') &&
+ 	((tmp_dir = getenv("TEMP")) == NULL || *tmp_dir == '\0'))
+-	tmp_dir = "/tmp";
++	tmp_dir = "@TERMUX_PREFIX@/tmp";
+ #ifdef HAVE_MKDTEMP
+     tmp_dir = mkdtemp(Strnew_m_charp(tmp_dir, "/w3m-XXXXXX", NULL)->ptr);
+     if (tmp_dir == NULL)
+--- a/scripts/w3mman/w3mman.in
++++ b/scripts/w3mman/w3mman.in
+@@ -1,7 +1,7 @@
+ #!@PERL@
+ 
+ @W3M = split(' ', $ENV{'W3MMAN_W3M'} || '@W3M@');
+-$ENV{'W3MMAN_MAN'} ||= '@MAN@';
++$ENV{'W3MMAN_MAN'} ||= '@TERMUX_PREFIX@/bin/man';
+ $SCRIPT = 'file:///$LIB/w3mman2html.cgi';
+ 
+ sub usage {
+--- a/scripts/w3mman/w3mman2html.cgi.in
++++ b/scripts/w3mman/w3mman2html.cgi.in
+@@ -255,12 +255,9 @@ sub include_ref {
+   local($d);
+ 
+   for $d (
+-	"/usr/include",
+-	"/usr/local/include",
+-	"/usr/X11R6/include",
+-	"/usr/X11/include",
+-	"/usr/X/include",
+-	"/usr/include/X11"
++	"@TERMUX_PREFIX@/include",
++	"@TERMUX_PREFIX@/local/include",
++	"@TERMUX_PREFIX@/include/X11"
+   ) {
+     -f "$d/$_" && return "<a href=\"$CGI2$d/$_\">$_</a>";
+   }

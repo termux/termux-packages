@@ -1,0 +1,111 @@
+TERMUX_PKG_HOMEPAGE=https://librewolf.net/
+TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
+TERMUX_PKG_LICENSE="MPL-2.0"
+TERMUX_PKG_MAINTAINER="@3ls-it"
+TERMUX_PKG_VERSION="157.0-1"
+TERMUX_PKG_SRCURL="https://librewolf.dev/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
+TERMUX_PKG_SHA256=bea3cc7c57f3fb8928d583a0603b0f40130b02f662e032746345a51e0f55ffb3
+# ffmpeg and pulseaudio are dependencies through dlopen(3):
+TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
+TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/_/-/g"
+
+termux_step_post_get_source() {
+	local f="media/ffvpx/config_unix_aarch64.h"
+	echo "Applying sed substitution to ${f}"
+	sed -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' -i ${f}
+}
+
+termux_step_pre_configure() {
+	termux_setup_nodejs
+	termux_setup_rust
+
+	# https://github.com/rust-lang/rust/issues/49853
+	# https://github.com/rust-lang/rust/issues/45854
+	# Out of memory when building gkrust
+	# CI shows (signal: 9, SIGKILL: kill)
+	if [ "$TERMUX_DEBUG_BUILD" = false ]; then
+		local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
+		export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C debuginfo=1"
+	fi
+
+	cargo install cbindgen --locked
+
+	export HOST_CC=$(command -v clang)
+	export HOST_CXX=$(command -v clang++)
+
+	export BINDGEN_CFLAGS="--target=$CCTERMUX_HOST_PLATFORM --sysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot"
+	local env_name=BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME@U}
+	env_name=${env_name//-/_}
+	export $env_name="$BINDGEN_CFLAGS"
+
+	# https://reviews.llvm.org/D141184
+	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
+	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog"
+
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		# For symbol android_getCpuFeatures
+		LDFLAGS+=" -l:libndk_compat.a"
+	fi
+}
+
+termux_step_configure() {
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		termux_step_pre_configure
+		cd $TERMUX_PKG_SRCDIR
+	fi
+
+	# There can be only one!
+	rm -f .mozconfig mozconfig
+	sed \
+		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|" \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
+		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|" \
+		"$TERMUX_PKG_BUILDER_DIR/mozconfig.cfg" > .mozconfig
+
+	if [ "$TERMUX_DEBUG_BUILD" = true ]; then
+		cat >>.mozconfig - <<END
+ac_add_options --enable-debug-symbols
+ac_add_options --disable-install-strip
+END
+	fi
+
+	./mach configure
+}
+
+termux_step_make() {
+	./mach build -j "$TERMUX_PKG_MAKE_PROCESSES"
+	./mach buildsymbols
+}
+
+termux_step_make_install() {
+	./mach install
+
+	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/librewolf.desktop"
+
+	# Install icons for LibreWolf branding
+	local i theme=librewolf
+	# LibreWolf icon sizes: 16, 31, 48, 64, 128
+	for i in 16 32 48 64 128; do
+		install -Dvm644 "browser/branding/$theme/default$i.png" \
+			"$TERMUX_PREFIX/share/icons/hicolor/${i}x${i}/apps/$TERMUX_PKG_NAME.png"
+	done
+	install -Dvm644 "browser/branding/$theme/content/about-logo.png" \
+		"$TERMUX_PREFIX/share/icons/hicolor/192x192/apps/$TERMUX_PKG_NAME.png"
+	install -Dvm644 "browser/branding/$theme/content/about-logo@2x.png" \
+		"$TERMUX_PREFIX/share/icons/hicolor/384x384/apps/$TERMUX_PKG_NAME.png"
+	install -Dvm644 "browser/branding/$theme/content/about-logo.svg" \
+		"$TERMUX_PREFIX/share/icons/hicolor/scalable/apps/$TERMUX_PKG_NAME.svg"
+}
+
+termux_step_post_make_install() {
+	# https://github.com/termux/termux-packages/issues/18429
+	# https://phabricator.services.mozilla.com/D181687
+	# Android 8.x and older not support "-z pack-relative-relocs" / DT_RELR
+	local r=$("${READELF}" -d "${TERMUX_PREFIX}/bin/librewolf")
+	if [[ -n "$(echo "${r}" | grep "(RELR)")" ]]; then
+		termux_error_exit "DT_RELR is unsupported on Android 8.x and older\n${r}"
+	fi
+}

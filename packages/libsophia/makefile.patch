@@ -1,0 +1,12 @@
+--- a/makefile
++++ b/makefile
+@@ -45,9 +45,6 @@
+ 	@$(CC) sophia.o $(SOPHIA_LDFLAGS) -o libsophia.so.2.2.0
+ 	@ln -sf libsophia.so.2.2.0 libsophia.so.2.2
+ 	@ln -sf libsophia.so.2.2.0 libsophia.so
+-ifeq ($(shell uname), Linux)
+-	@strip --strip-unneeded libsophia.so.2.2.0
+-endif
+ ifeq ($(shell uname), Darwin)
+ 	@strip -u -r -x libsophia.so.2.2.0
+ endif

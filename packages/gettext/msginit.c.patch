@@ -1,0 +1,20 @@
+diff -uNr gettext-0.20.1/gettext-tools/src/msginit.c gettext-0.20.1.mod/gettext-tools/src/msginit.c
+--- gettext-0.20.1/gettext-tools/src/msginit.c	2019-05-12 00:11:31.000000000 +0300
++++ gettext-0.20.1.mod/gettext-tools/src/msginit.c	2019-05-21 15:05:49.363213216 +0300
+@@ -1136,6 +1136,7 @@
+ static const char *
+ get_user_fullname ()
+ {
++#ifndef __ANDROID__
+ #if HAVE_PWD_H
+   struct passwd *pwd;
+ 
+@@ -1159,7 +1160,7 @@
+       return result;
+     }
+ #endif
+-
++#endif
+   return NULL;
+ }
+ 

@@ -1,0 +1,26 @@
+diff --git a/runtime/v1/linux/bundle.go b/runtime/v1/linux/bundle.go
+index b1830d004..b391676a2 100644
+--- a/runtime/v1/linux/bundle.go
++++ b/runtime/v1/linux/bundle.go
+@@ -195,7 +195,7 @@ const socketRoot = "/run/containerd"
+ 
+ func (b *bundle) shimAddress(namespace, socketPath string) string {
+ 	d := sha256.Sum256([]byte(filepath.Join(socketPath, namespace, b.id)))
+-	return fmt.Sprintf("unix://%s/%x", filepath.Join(socketRoot, "s"), d)
++	return fmt.Sprintf("unix://%s/%x", filepath.Join(socketRoot, "s"), d)[:108]
+ }
+ 
+ func (b *bundle) loadAddress() (string, error) {
+diff --git a/runtime/v2/shim/util_unix.go b/runtime/v2/shim/util_unix.go
+index 4e2309a80..159698518 100644
+--- a/runtime/v2/shim/util_unix.go
++++ b/runtime/v2/shim/util_unix.go
+@@ -71,7 +71,7 @@ func SocketAddress(ctx context.Context, socketPath, id string) (string, error) {
+ 		return "", err
+ 	}
+ 	d := sha256.Sum256([]byte(filepath.Join(socketPath, ns, id)))
+-	return fmt.Sprintf("unix://%s/%x", filepath.Join(socketRoot, "s"), d), nil
++	return fmt.Sprintf("unix://%s/%x", filepath.Join(socketRoot, "s"), d)[:108], nil
+ }
+ 
+ // AnonDialer returns a dialer for a socket

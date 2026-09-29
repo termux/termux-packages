@@ -1,0 +1,12 @@
+diff -uNr libsndfile/src/common.c libsndfile.mod/src/common.c
+--- libsndfile/src/common.c	2017-10-31 10:30:54.000000000 +0200
++++ libsndfile.mod/src/common.c	2018-06-19 17:08:45.344367164 +0300
+@@ -1730,7 +1730,7 @@
+ 		tmpdir = getenv ("TEMP") ;
+ 	else
+ 	{	tmpdir = getenv ("TMPDIR") ;
+-		tmpdir = tmpdir == NULL ? "/tmp" : tmpdir ;
++		tmpdir = tmpdir == NULL ? "@TERMUX_PREFIX@/tmp" : tmpdir ;
+ 		} ;
+ 
+ 	if (tmpdir && access (tmpdir, R_OK | W_OK | X_OK) == 0)

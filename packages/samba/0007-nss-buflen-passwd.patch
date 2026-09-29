@@ -1,0 +1,13 @@
+--- a/lib/util/util_paths.c
++++ b/lib/util/util_paths.c
+@@ -65,6 +65,10 @@
+ 	return get_dyn_SHLIBEXT();
+ }
+ 
++#ifndef NSS_BUFLEN_PASSWD
++#define NSS_BUFLEN_PASSWD 1024
++#endif
++
+ static char *get_user_home_dir(TALLOC_CTX *mem_ctx)
+ {
+ 	struct passwd pwd = {0};

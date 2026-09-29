@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,7 @@
+ endif
+ 
+ default: 3d.c CAM-curses-ascii-matcher/CAM.c menu.c
+-	cc 3d.c CAM-curses-ascii-matcher/CAM.c menu.c -Wall -O3 -ffast-math -lm -lncurses -o rubiks_cube
++	$(CC) $(CFLAGS) $(CPPFLAGS) 3d.c CAM-curses-ascii-matcher/CAM.c menu.c -Wall -O3 -ffast-math -lm -lncurses -o rubiks_cube $(LDFLAGS)
+ 
+ install: rubiks_cube
+ 	install -d $(DESTDIR)$(PREFIX)/bin

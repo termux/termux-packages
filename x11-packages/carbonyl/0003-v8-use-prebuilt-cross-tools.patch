@@ -1,0 +1,98 @@
+--- a/chromium/src/v8/BUILD.gn
++++ b/chromium/src/v8/BUILD.gn
+@@ -2127,7 +2127,9 @@
+       "tools/gcmole/:*",
+     ]
+ 
++if (false) {
+     deps = [ ":torque($toolchain)" ]
++}
+ 
+     script = "tools/run.py"
+ 
+@@ -2169,8 +2171,14 @@
+       ]
+     }
+ 
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/carbonyl-host-tools/"
++}
++
+     args = [
+-      "./" + rebase_path(
++      arg0_prefix + rebase_path(
+               get_label_info(":torque($toolchain)", "root_out_dir") + "/torque",
+               root_build_dir),
+       "-o",
+@@ -2325,9 +2334,18 @@
+ action("generate_bytecode_builtins_list") {
+   script = "tools/run.py"
+   outputs = [ "$target_gen_dir/builtins-generated/bytecodes-builtins-list.h" ]
++if (false) {
+   deps = [ ":bytecode_builtins_list_generator($v8_generator_toolchain)" ]
++}
++
++if (false) {
++  arg0_prefix = "./"
++} else {
++  arg0_prefix = "@TERMUX_PREFIX@/opt/carbonyl-host-tools/"
++}
++
+   args = [
+-    "./" + rebase_path(
++    arg0_prefix + rebase_path(
+             get_label_info(
+                     ":bytecode_builtins_list_generator($v8_generator_toolchain)",
+                     "root_out_dir") + "/bytecode_builtins_list_generator",
+@@ -2355,7 +2373,9 @@
+     suffix = "_$name"
+   }
+   action("run_mksnapshot_" + name) {
++if (false) {
+     deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
++}
+ 
+     script = "tools/run.py"
+ 
+@@ -2365,8 +2385,14 @@
+ 
+     data = []
+ 
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/carbonyl-host-tools/"
++}
++
+     args = [
+-      "./" + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
++      arg0_prefix + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
+                                         "root_out_dir") + "/mksnapshot",
+                          root_build_dir),
+       "--turbo_instruction_scheduling",
+@@ -7187,14 +7213,22 @@
+ 
+     script = "tools/run.py"
+ 
++if (false) {
+     deps = [ ":gen-regexp-special-case($v8_generator_toolchain)" ]
++}
+ 
+     output_file = "$target_gen_dir/src/regexp/special-case.cc"
+ 
+     outputs = [ output_file ]
+ 
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/carbonyl-host-tools/"
++}
++
+     args = [
+-      "./" + rebase_path(
++      arg0_prefix + rebase_path(
+               get_label_info(
+                       ":gen-regexp-special-case($v8_generator_toolchain)",
+                       "root_out_dir") + "/gen-regexp-special-case",

@@ -1,0 +1,21 @@
+diff --git a/meson.build b/meson.build
+index 111d639..eaaf308 100644
+--- a/meson.build
++++ b/meson.build
+@@ -166,8 +166,14 @@ configure_file(
+ )
+ 
+ install_subdir(
+-    'files',
+-    install_dir: '/',
++    'files/usr',
++    install_dir: prefix,
++    strip_directory: true,
++)
++
++install_subdir(
++    'files/etc',
++    install_dir: join_paths(prefix, 'etc'),
+     strip_directory: true,
+ )
+ 

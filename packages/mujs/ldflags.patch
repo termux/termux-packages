@@ -1,0 +1,25 @@
+--- a/Makefile
++++ b/Makefile
+@@ -4,11 +4,11 @@
+ 
+ default: build/debug/mujs build/debug/mujs-pp
+ 
+-CFLAGS = -std=c99 -pedantic -Wall -Wextra -Wno-unused-parameter
++CFLAGS ?= -std=c99 -pedantic -Wall -Wextra -Wno-unused-parameter
+ 
+ OPTIM = -O3
+ 
+-prefix = /usr/local
++prefix ?= /usr/local
+ bindir = $(prefix)/bin
+ incdir = $(prefix)/include
+ libdir = $(prefix)/lib
+@@ -33,7 +33,7 @@ HDRS = mujs.h jsi.h regexp.h utf.h astnames.h opnames.h utfdata.h
+ 
+ ifneq ($(HAVE_READLINE),no)
+   READLINE_CFLAGS = -DHAVE_READLINE
+-  READLINE_LIBS = -lreadline
++  READLINE_LIBS = $(LDFLAGS) -lreadline
+ endif
+ 
+ SRCS = \

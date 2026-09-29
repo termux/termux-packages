@@ -1,0 +1,17 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/wfeldt/libx86emu
+TERMUX_PKG_DESCRIPTION="x86 emulation library"
+TERMUX_PKG_LICENSE="HPND"
+TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE_INFO"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=3.7
+TERMUX_PKG_SRCURL=https://github.com/wfeldt/libx86emu/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=03754aede79530baa0e862e1aad5527e9c1bd3371736b1ab5a2bc769e4a3d680
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_BREAKS="libx86emu-dev"
+TERMUX_PKG_REPLACES="libx86emu-dev"
+TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_configure() {
+	echo 'touch changelog' > git2log
+}

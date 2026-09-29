@@ -1,0 +1,14 @@
+diff --git a/src/utmp.c b/src/utmp.c
+index 5377864..a1eb013 100644
+--- a/utmp.c
++++ b/utmp.c
+@@ -41,6 +41,9 @@
+ #ifdef HAVE_UTEMPTER
+ #include <utempter.h>
+ #endif
++#ifdef __ANDROID__
++#define DEAD_PROCESS 8
++#endif
+ 
+ #include "misc.h"
+ #include "tty.h"

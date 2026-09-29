@@ -1,0 +1,58 @@
+diff -ur orig/bin/CMakeLists.txt mod/bin/CMakeLists.txt
+--- orig/bin/CMakeLists.txt	2025-03-31 15:04:05.000000000 +0200
++++ mod/bin/CMakeLists.txt	2025-08-12 17:10:06.387231016 +0200
+@@ -55,7 +55,7 @@
+   )
+   ")
+ else()
+-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/xmoto.bin" DESTINATION share/xmoto)
+-  install(DIRECTORY Textures/Musics DESTINATION share/xmoto/Textures)
+-  install(DIRECTORY Textures/Fonts DESTINATION share/xmoto/Textures)
++  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/xmoto.bin" DESTINATION share/games/xmoto)
++  install(DIRECTORY Textures/Musics DESTINATION share/games/xmoto/Textures)
++  install(DIRECTORY Textures/Fonts DESTINATION share/games/xmoto/Textures)
+ endif()
+diff -ur orig/extra/CMakeLists.txt mod/extra/CMakeLists.txt
+--- orig/extra/CMakeLists.txt	2025-03-31 15:04:05.000000000 +0200
++++ mod/extra/CMakeLists.txt	2025-08-12 17:10:06.390564349 +0200
+@@ -13,6 +13,6 @@
+     FILES
+       xmoto.bmp
+       xmoto.ico
+-    DESTINATION share/xmoto
++    DESTINATION share/games/xmoto
+   )
+ endif()
+diff -ur orig/src/CMakeLists.txt mod/src/CMakeLists.txt
+--- orig/src/CMakeLists.txt	2025-03-31 15:04:05.000000000 +0200
++++ mod/src/CMakeLists.txt	2025-08-12 17:10:06.390564349 +0200
+@@ -599,7 +599,7 @@
+         MACOSX_PACKAGE_LOCATION "Resources/locale/${lang}/LC_MESSAGES"
+       )
+     else()
+-      install(FILES "${mo}" DESTINATION share/locale/${lang}/LC_MESSAGES)
++      install(FILES "${mo}" DESTINATION share/games/locale/${lang}/LC_MESSAGES)
+     endif()
+ 
+     add_custom_command(OUTPUT "${mo}"
+diff -ur orig/src/common/VFileIO.cpp mod/src/common/VFileIO.cpp
+--- orig/src/common/VFileIO.cpp	2025-03-31 15:04:05.000000000 +0200
++++ mod/src/common/VFileIO.cpp	2025-08-12 17:11:42.413907249 +0200
+@@ -1350,7 +1350,7 @@
+   /* Try some default fallbacks */
+   if (!m_bGotSystemDataDir) {
+     const std::vector<std::string> dataDirs = {
+-      "/usr/share", "/usr/local/share",
++      "@TERMUX_PREFIX@/share/games"
+     };
+ 
+     for (auto &dir : dataDirs) {
+@@ -1364,7 +1364,7 @@
+ 
+   /* Default to /usr/share */
+   if (!m_bGotSystemDataDir) {
+-    m_SystemDataDir = "/usr/share";
++    m_SystemDataDir = "@TERMUX_PREFIX@/share/games";
+   }
+ 
+   m_SystemLocaleDir = m_SystemDataDir + "/locale";

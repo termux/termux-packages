@@ -1,0 +1,56 @@
+--- a/src/util/dzl-counter.c
++++ b/src/util/dzl-counter.c
+@@ -150,7 +150,7 @@
+   DZL_MEMORY_BARRIER;
+ }
+ 
+-#ifndef G_OS_WIN32
++#if !defined G_OS_WIN32 && !defined __ANDROID__
+ static void
+ _dzl_counter_arena_atexit (void)
+ {
+@@ -201,6 +201,7 @@
+   arena->ref_count = 1;
+   arena->is_local_arena = TRUE;
+ 
++#if !defined __ANDROID__
+   if (getenv ("DZL_COUNTER_DISABLE_SHM"))
+     {
+       needs_warning = FALSE;
+@@ -251,6 +252,7 @@
+ failure:
+   shm_unlink (name);
+   close (fd);
++#endif /* __ANDROID__ */
+ #endif
+ 
+ use_malloc:
+@@ -318,8 +320,10 @@
+ 
+   g_snprintf (name, sizeof name, NAME_FORMAT, (int)pid);
+ 
++#ifndef __ANDROID__
+   fd = shm_open (name, O_RDONLY, 0);
+   if (fd < 0)
++#endif
+     return FALSE;
+ 
+   count = pread (fd, &header, sizeof header, 0);
+@@ -566,7 +570,7 @@
+   G_UNLOCK (reglock);
+ }
+ 
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ static void *
+ _dzl_counter_find_getcpu_in_vdso (void)
+ {
+@@ -645,7 +649,7 @@
+   _dzl_counter_getcpu_helper = _dzl_counter_getcpu_rdtscp;
+ #endif
+ 
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+   _dzl_counter_getcpu_vdso_raw = _dzl_counter_find_getcpu_in_vdso ();
+ 
+   if (_dzl_counter_getcpu_vdso_raw)

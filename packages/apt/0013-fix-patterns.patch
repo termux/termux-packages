@@ -1,0 +1,45 @@
+https://github.com/Debian/apt/pull/136
+diff --git a/apt-pkg/cachefilter-patterns.cc b/apt-pkg/cachefilter-patterns.cc
+index 12d8ae748..7a3255f41 100644
+--- a/apt-pkg/cachefilter-patterns.cc
++++ b/apt-pkg/cachefilter-patterns.cc
+@@ -30,7 +30,7 @@ static const constexpr struct
+    {"c"_sv, "?config-files"_sv, false},
+    // FIXME: The words after ~D should be case-insensitive
+    {"DDepends:"_sv, "?depends"_sv, true},
+-   {"DPre-Depends:"_sv, "?pre-depends"_sv, true},
++   {"DPreDepends:"_sv, "?predepends"_sv, true},
+    {"DSuggests:"_sv, "?suggests"_sv, true},
+    {"DRecommends:"_sv, "?recommends"_sv, true},
+    {"DConflicts:"_sv, "?conflicts"_sv, true},
+@@ -40,7 +40,7 @@ static const constexpr struct
+    {"DEnhances:"_sv, "?enhances"_sv, true},
+    {"D"_sv, "?depends"_sv, true},
+    {"RDepends:"_sv, "?reverse-depends"_sv, true},
+-   {"RPre-Depends:"_sv, "?reverse-pre-depends"_sv, true},
++   {"RPreDepends:"_sv, "?reverse-predepends"_sv, true},
+    {"RSuggests:"_sv, "?reverse-suggests"_sv, true},
+    {"RRecommends:"_sv, "?reverse-recommends"_sv, true},
+    {"RConflicts:"_sv, "?reverse-conflicts"_sv, true},
+diff --git a/doc/apt-patterns.7.xml b/doc/apt-patterns.7.xml
+index 6b1c0f20b..bbcf01138 100644
+--- a/doc/apt-patterns.7.xml
++++ b/doc/apt-patterns.7.xml
+@@ -161,14 +161,15 @@
+    <variablelist>
+      <varlistentry>
+      <term><code>?depends(PATTERN)</code></term><term><code>~DPATTERN</code></term>
+-     <term><code>?pre-depends(PATTERN)</code></term><term><code>~DPre-Depends:PATTERN</code></term>
++     <term><code>?predepends(PATTERN)</code></term><term><code>~DPreDepends:PATTERN</code></term>
+      <term><code>?suggests(PATTERN)</code></term><term><code>~DSuggests:PATTERN</code></term>
++     <term><code>?recommends(PATTERN)</code></term><term><code>~DRecommends:PATTERN</code></term>
+      <term><code>?conflicts(PATTERN)</code></term><term><code>~DConflicts:PATTERN</code></term>
+      <term><code>?replaces(PATTERN)</code></term><term><code>~DReplaces:PATTERN</code></term>
+      <term><code>?obsoletes(PATTERN)</code></term><term><code>~DObsoletes:PATTERN</code></term>
+      <term><code>?breaks(PATTERN)</code></term><term><code>~DBreaks:PATTERN</code></term>
+      <term><code>?enhances(PATTERN)</code></term><term><code>~DEnhances:PATTERN</code></term>
+-     <listitem><para>Selects versions depending/pre-depending/suggesting/conflicting/etc on/with/ packages matching PATTERN.</para></listitem>
++     <listitem><para>Selects versions depending/pre-depending/suggesting/recommending/conflicting/etc on/with/ packages matching PATTERN.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>?reverse-<replaceable>depType</replaceable>(PATTERN)</code></term>

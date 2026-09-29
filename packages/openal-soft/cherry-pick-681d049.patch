@@ -1,0 +1,24 @@
+From 681d049c06c65a346f8c77c9f4deecee64cda352 Mon Sep 17 00:00:00 2001
+From: Chris Robinson <chris.kcat@gmail.com>
+Date: Tue, 12 May 2026 18:53:03 -0700
+Subject: [PATCH] Don't set -Werror=function-effects by default
+
+It's too prone to error in various circumstances
+---
+ CMakeLists.txt | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c925aa8703..8670d60891 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -407,9 +407,6 @@ else()
+         list(APPEND C_FLAGS -Werror=undef -Werror=format-security
+             $<$<COMPILE_LANGUAGE:C>:-Werror=implicit -Werror=incompatible-pointer-types
+                 -Werror=int-conversion>)
+-        if(HAVE_WFUNCTION_EFFECTS)
+-            list(APPEND C_FLAGS $<$<COMPILE_LANGUAGE:CXX>:-Werror=function-effects>)
+-        endif()
+     endif()
+ 
+     # NOTE: This essentially provides the equivalent of the C++26 feature to

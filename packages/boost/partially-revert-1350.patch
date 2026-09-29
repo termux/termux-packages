@@ -1,0 +1,20 @@
+Partially reverts broken PR https://github.com/boostorg/math/pull/1350
+
+Prevents this message:
+./boost/math/special_functions/detail/fp_traits.hpp:314:15:
+error: static assertion failed due to requirement '113 == 64':
+Oops, assumption that long double is an 80-bit quantity is incorrect!!
+
+when building for 64-bit x86 Android
+
+
+--- a/boost/math/special_functions/detail/fp_traits.hpp
++++ b/boost/math/special_functions/detail/fp_traits.hpp
+@@ -311,7 +311,6 @@ private:
+ 
+ // Intel extended double precision format (80 bits)
+ 
+-static_assert(LDBL_MANT_DIG == 64, "Oops, assumption that long double is an 80-bit quantity is incorrect!!");
+ 
+ template<>
+ struct fp_traits_non_native<long double, extended_double_precision>

@@ -1,0 +1,11 @@
+--- a/src/boomerang/core/Project.cpp
++++ b/src/boomerang/core/Project.cpp
+@@ -303,7 +303,7 @@
+ void Project::loadSymbols()
+ {
+     // Add symbols from -s switch(es)
+-    for (const std::pair<Address, QString> &elem : getSettings()->m_symbolMap) {
++    for (const std::pair<const Address, QString> &elem : getSettings()->m_symbolMap) {
+         m_loadedBinary->getSymbols()->createSymbol(elem.first, elem.second);
+     }
+ 

@@ -1,0 +1,62 @@
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -610,13 +610,13 @@
+ libprog_a_CXXFLAGS = $(common_CFLAGS)
+ colmincdir = $(includedir)/colm
+ colminc_HEADERS = $(RUNTIME_HDR)
+-@EXTERNAL_COLM_FALSE@BUILD_PARSE_3_WITH = $(builddir)/bootstrap2$(EXEEXT)
++@EXTERNAL_COLM_FALSE@BUILD_PARSE_3_WITH = bootstrap2$(EXEEXT)
+ 
+ #
+ # Generate the parser using a single run with an external colm program.
+ #
+ @EXTERNAL_COLM_TRUE@BUILD_PARSE_3_WITH = $(EXTERNAL_COLM)/bin/colm$(EXEEXT)
+-@EXTERNAL_COLM_FALSE@WRAP_PARSE_3_WITH = $(builddir)/colm-wrap
++@EXTERNAL_COLM_FALSE@WRAP_PARSE_3_WITH = colm-wrap
+ @EXTERNAL_COLM_TRUE@WRAP_PARSE_3_WITH = $(EXTERNAL_COLM)/bin/colm-wrap
+ @EXTERNAL_COLM_FALSE@AM_LDFLAGS = -L.
+ @EXTERNAL_COLM_TRUE@AM_LDFLAGS = $(EXTERNAL_LIBS)
+@@ -2037,17 +2037,17 @@
+ 
+ @EXTERNAL_COLM_FALSE@gen/bootstrap1.pack: $(builddir)/colm-wrap bootstrap0$(EXEEXT)
+ @EXTERNAL_COLM_FALSE@	mkdir -p gen
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -w bootstrap0 -o $@ \
++@EXTERNAL_COLM_FALSE@	colm-wrap -w bootstrap0 -o $@ \
+ @EXTERNAL_COLM_FALSE@		-c -p gen/parse1.c -e gen/if1.h -x gen/if1.cc no-input
+ 
+ @EXTERNAL_COLM_FALSE@gen/parse1.c: gen/bootstrap1.pack
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ @EXTERNAL_COLM_FALSE@gen/if1.h: gen/bootstrap1.pack
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ @EXTERNAL_COLM_FALSE@gen/if1.cc: gen/bootstrap1.pack gen/if1.h
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ #
+ # bootstrap2: The input program is specified using the colm grammar used in
+@@ -2058,17 +2058,17 @@
+ 
+ @EXTERNAL_COLM_FALSE@gen/bootstrap2.pack: $(builddir)/colm-wrap bootstrap1$(EXEEXT) colm.lm
+ @EXTERNAL_COLM_FALSE@	mkdir -p gen
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -w bootstrap1 -o $@ \
++@EXTERNAL_COLM_FALSE@	colm-wrap -w bootstrap1 -o $@ \
+ @EXTERNAL_COLM_FALSE@		-c -p gen/parse2.c -e gen/if2.h -x gen/if2.cc colm.lm
+ 
+ @EXTERNAL_COLM_FALSE@gen/parse2.c: gen/bootstrap2.pack
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ @EXTERNAL_COLM_FALSE@gen/if2.h: gen/bootstrap2.pack
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ @EXTERNAL_COLM_FALSE@gen/if2.cc: gen/bootstrap2.pack gen/if2.h
+-@EXTERNAL_COLM_FALSE@	$(builddir)/colm-wrap -o $@ $<
++@EXTERNAL_COLM_FALSE@	colm-wrap -o $@ $<
+ 
+ gen/bootstrap3.pack: $(WRAP_PARSE_3_WITH) $(BUILD_PARSE_3_WITH) prog.lm colm.lm 
+ 	mkdir -p gen

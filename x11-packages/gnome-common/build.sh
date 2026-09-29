@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnome.org
+TERMUX_PKG_DESCRIPTION="Common development macros for GNOME"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=3.18.0
+TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gnome-common/${TERMUX_PKG_VERSION%.*}/gnome-common-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=22569e370ae755e04527b76328befc4c73b62bfd4a572499fde116b8318af8cf
+TERMUX_PKG_DEPENDS="autoconf-archive, intltool, gtk-doc"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-autoconf-archive"

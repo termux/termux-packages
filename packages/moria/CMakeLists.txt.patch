@@ -1,0 +1,35 @@
+diff -uNr umoria-5.7.11/CMakeLists.txt umoria-5.7.11.mod/CMakeLists.txt
+--- umoria-5.7.11/CMakeLists.txt	2020-02-26 22:59:33.000000000 +0200
++++ umoria-5.7.11.mod/CMakeLists.txt	2020-03-20 15:49:55.823149195 +0200
+@@ -161,11 +161,10 @@
+ #
+ # Set up the install paths and files
+ #
+-set(build_dir "umoria")
++option(build_dir "Directory for build files" "umoria")
+ set(data_dir "${build_dir}/data")
+ 
+ 
+-set(EXECUTABLE_OUTPUT_PATH ${build_dir})
+ 
+ # Core game data files
+ set(
+@@ -237,7 +236,7 @@
+ set(resources ${data_files} ${support_files})
+ 
+ # Also add resources to the target so they are visible in the IDE
+-add_executable(umoria ${source_files} ${resources})
++add_executable(moria ${source_files} ${resources})
+ 
+ 
+ # This is horrible, but needed bacause `find_package()` doesn't use the
+@@ -262,4 +261,8 @@
+ endif ()
+ 
+ include_directories(${CURSES_INCLUDE_DIR})
+-target_link_libraries(umoria ${CURSES_LIBRARIES})
++target_link_libraries(moria ${CURSES_LIBRARIES})
++
++install(TARGETS moria DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
++install(FILES historical/manual.md historical/faq.md LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/moria/)
++INSTALL(DIRECTORY ${build_dir}/data DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/games/moria/ FILES_MATCHING PATTERN "*.txt")

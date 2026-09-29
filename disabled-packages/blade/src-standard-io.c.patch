@@ -1,0 +1,24 @@
+--- a/src/standard/io.c
++++ b/src/standard/io.c
+@@ -121,8 +121,10 @@
+   dict_add_entry(vm, dict, NUMBER_VAL(3), NUMBER_VAL(raw_attr.c_lflag));
+ 
+ #if !defined(__MUSL__)
++#ifndef __ANDROID__
+   dict_add_entry(vm, dict, NUMBER_VAL(4), NUMBER_VAL(raw_attr.c_ispeed));
+   dict_add_entry(vm, dict, NUMBER_VAL(5), NUMBER_VAL(raw_attr.c_ospeed));
++#endif
+ #else
+   dict_add_entry(vm, dict, NUMBER_VAL(4), NUMBER_VAL(raw_attr.__c_ispeed));
+   dict_add_entry(vm, dict, NUMBER_VAL(5), NUMBER_VAL(raw_attr.__c_ospeed));
+@@ -181,8 +183,10 @@
+         case 2: raw.c_cflag = (unsigned long) AS_NUMBER(value); break;
+         case 3: raw.c_lflag = (unsigned long) AS_NUMBER(value); break;
+ #if !defined(__MUSL__)
++#ifndef __ANDROID__
+         case 4: raw.c_ispeed = (unsigned long) AS_NUMBER(value); break;
+         case 5: raw.c_ospeed = (unsigned long) AS_NUMBER(value); break;
++#endif
+ #else
+         case 4: raw.__c_ispeed = (unsigned long) AS_NUMBER(value); break;
+         case 5: raw.__c_ospeed = (unsigned long) AS_NUMBER(value); break;

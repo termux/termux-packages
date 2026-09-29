@@ -1,0 +1,11 @@
+--- ./ncat/ncat_posix.c.orig	2022-01-26 14:14:21.327352404 +0530
++++ ./ncat/ncat_posix.c	2022-01-26 14:14:24.577352403 +0530
+@@ -171,7 +171,7 @@
+         char **cmdargs;
+ 
+         case EXEC_SHELL:
+-            execl("/bin/sh", "sh", "-c", cmdexec, (void *) NULL);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmdexec, (void *) NULL);
+             break;
+ #ifdef HAVE_LUA
+         case EXEC_LUA:

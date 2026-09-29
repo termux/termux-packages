@@ -1,0 +1,32 @@
+From d5ef1bde4b2e76a5f59498da5850332b2c54fb21 Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Fri, 11 Jul 2025 15:50:21 +0800
+Subject: [PATCH 40/40] android: Prevent build of libsaproc
+
+This is originally Grimler's but to allow jsound to build, this patch
+needed to be changed.
+
+saproc still cannot be built though, this is a bionic limitation, it
+requires prstatus_t, something missing from the ndk. It's just used for
+debugging purposes though, not important
+
+Co-authored-by: Henrik Grimler <grimler@termux.dev>
+Co-authored-by: Robert Kirkman <31490854+robertkirkman@users.noreply.github.com>
+---
+ make/modules/jdk.hotspot.agent/Lib.gmk | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/make/modules/jdk.hotspot.agent/Lib.gmk b/make/modules/jdk.hotspot.agent/Lib.gmk
+index d21c969c188..ca7a8988a2b 100644
+--- a/make/modules/jdk.hotspot.agent/Lib.gmk
++++ b/make/modules/jdk.hotspot.agent/Lib.gmk
+@@ -77,6 +77,4 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBSA, \
+     LIBS_windows := dbgeng.lib $(WIN_JAVA_LIB), \
+ ))
+ 
+-TARGETS += $(BUILD_LIBSA)
+-
+ ################################################################################
+-- 
+2.50.1
+

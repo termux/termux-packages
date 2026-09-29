@@ -1,0 +1,71 @@
+Index: libao2/ao_sdl.c
+===================================================================
+--- a/libao2/ao_sdl.c	(revision 38453)
++++ b/libao2/ao_sdl.c	(revision 38454)
+@@ -51,9 +51,6 @@
+ 
+ LIBAO_EXTERN(sdl)
+ 
+-// turn this on if you want to use the slower SDL_MixAudio
+-#undef USE_SDL_INTERNAL_MIXER
+-
+ // Samplesize used by the SDLlib AudioSpec struct
+ #if defined(__MINGW32__) || defined(__CYGWIN__) || defined(__AMIGAOS4__)
+ #define SAMPLESIZE 2048
+@@ -67,10 +64,6 @@
+ 
+ static AVFifoBuffer *buffer;
+ 
+-#ifdef USE_SDL_INTERNAL_MIXER
+-static unsigned char volume=SDL_MIX_MAXVOLUME;
+-#endif
+-
+ static int write_buffer(unsigned char* data,int len){
+   int free = av_fifo_space(buffer);
+   if (len > free) len = free;
+@@ -77,20 +70,10 @@
+   return av_fifo_generic_write(buffer, data, len, NULL);
+ }
+ 
+-#ifdef USE_SDL_INTERNAL_MIXER
+-static void mix_audio(void *dst, void *src, int len) {
+-  SDL_MixAudio(dst, src, len, volume);
+-}
+-#endif
+-
+ static int read_buffer(unsigned char* data,int len){
+   int buffered = av_fifo_size(buffer);
+   if (len > buffered) len = buffered;
+-#ifdef USE_SDL_INTERNAL_MIXER
+-  av_fifo_generic_read(buffer, data, len, mix_audio);
+-#else
+   av_fifo_generic_read(buffer, data, len, NULL);
+-#endif
+   return len;
+ }
+ 
+@@ -99,24 +82,6 @@
+ 
+ // to set/get/query special features/parameters
+ static int control(int cmd,void *arg){
+-#ifdef USE_SDL_INTERNAL_MIXER
+-	switch (cmd) {
+-		case AOCONTROL_GET_VOLUME:
+-		{
+-			ao_control_vol_t* vol = (ao_control_vol_t*)arg;
+-			vol->left = vol->right = volume * 100 / SDL_MIX_MAXVOLUME;
+-			return CONTROL_OK;
+-		}
+-		case AOCONTROL_SET_VOLUME:
+-		{
+-			int diff;
+-			ao_control_vol_t* vol = (ao_control_vol_t*)arg;
+-			diff = (vol->left+vol->right) / 2;
+-			volume = diff * SDL_MIX_MAXVOLUME / 100;
+-			return CONTROL_OK;
+-		}
+-	}
+-#endif
+ 	return CONTROL_UNKNOWN;
+ }
+ 

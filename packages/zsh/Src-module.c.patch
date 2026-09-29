@@ -1,0 +1,16 @@
+diff -u -r ../zsh-5.1.1/Src/module.c ./Src/module.c
+--- ../zsh-5.1.1/Src/module.c	2015-02-19 14:47:41.000000000 -0500
++++ ./Src/module.c	2015-11-24 18:38:12.383460402 -0500
+@@ -1496,8 +1496,10 @@
+ #else
+ # ifdef HAVE_DL_H
+ #  include <dl.h>
+-#  define RTLD_LAZY BIND_DEFERRED
+-#  define RTLD_GLOBAL DYNAMIC_PATH
++#  ifndef __ANDROID__
++#   define RTLD_LAZY BIND_DEFERRED
++#   define RTLD_GLOBAL DYNAMIC_PATH
++#  endif
+ # else
+ #  include <sys/types.h>
+ #  include <nlist.h>

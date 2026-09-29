@@ -1,0 +1,96 @@
+--- ../Makefile.orig	2020-05-09 11:22:42.148997286 +0200
++++ ./Makefile	2020-05-09 21:15:52.803520582 +0200
+@@ -1682,7 +1682,7 @@
+ endif
+ else
+ ifeq ($(subst default,undefined,$(origin HOSTCC)),undefined)
+-HOSTCC = ${hostprefix}gcc
++HOSTCC = ${hostprefix}clang
+ endif
+ endif
+ 
+@@ -1748,11 +1748,11 @@
+ ifneq (,$(findstring bcc32,${CC}))
+ LINK = ${CC} ${CFLAGS} ${EXTRACFLAGS} -e$(call q,$@) $(call q,$<)
+ else
+-LINK = ${CC} ${CFLAGS} ${EXTRACFLAGS} -o $(call q,$@) $(call q,$<)
++LINK = ${CC} ${CFLAGS} $(LDFLAGS) ${EXTRACFLAGS} -o $(call q,$@) $(call q,$<)
+ endif
+ endif
+ else
+-LINK = ${LD} ${LDFLAGS} ${EXTRALDFLAGS} -o $(call q,$@) $(call q,$<)
++LINK = ${CC} ${LDFLAGS} $(LDFLAGS) ${EXTRALDFLAGS} -o $(call q,$@) $(call q,$<)
+ endif
+ endif
+ ifeq ($(subst default,undefined,$(origin HOSTLINK)),undefined)
+@@ -1763,11 +1763,11 @@
+ ifneq (,$(findstring bcc32,${HOSTCC}))
+ HOSTLINK = ${HOSTCC} ${HOSTCFLAGS} -e$(call q,$@) $(call q,$<)
+ else
+-HOSTLINK = ${HOSTCC} ${HOSTCFLAGS} -o $(call q,$@) $(call q,$<)
++HOSTLINK = ${HOSTCC} $(LDFLAGS) ${HOSTCFLAGS} -o $(call q,$@) $(call q,$<)
+ endif
+ endif
+ else
+-HOSTLINK = ${HOSTLD} ${HOSTLDFLAGS} ${EXTRAHOSTLDFLAGS} -o $(call q,$@) $(call q,$<)
++HOSTLINK = ${HOSTLD} $(LDFLAGS) ${HOSTLDFLAGS} ${EXTRAHOSTLDFLAGS} -o $(call q,$@) $(call q,$<)
+ endif
+ endif
+ 
+@@ -3127,7 +3127,7 @@
+ 
+ all install uninstall clean bindist:: gnumake.ok configure.ok
+ 
+-all install:: $(call mw,${obj}compiler.ok)
++all install::
+ 
+ all uninstall:: coreutils.ok sed.ok
+ 
+@@ -3246,39 +3246,6 @@
+             exit 1; \
+         fi)
+ 
+-# this rule is depended upon by the principal targets to perform a
+-# sanity check of the compiler and linker for the build machine
+-${obj}compiler.ok: $(call mw,${MAKEFILE})
+-	@${MAKE} ${MAKELOOP} \
+-            sanity_return=0 \
+-            _sanity0$X
+-	@ ./_sanity0
+-	@${REMOVE} $(call q,${obj}_sanity0.c) _sanity0 $(call q,${obj}_sanity0$O)
+-	@${MAKE} ${MAKELOOP} \
+-            sanity_return=1 \
+-            _sanity1$X
+-	@( ./_sanity1 && exit 1 || : )
+-	@${REMOVE} $(call q,${obj}_sanity1.c) _sanity1 $(call q,${obj}_sanity1$O)
+-	@${ECHOLINEX} your compiler appears to work, so creating $(call q,$@)
+-	@${ECHOLINEX} You may safely remove this file with \`$(call q,${REMOVE} $@)\'. > $(call q,$@)
+-
+-ifneq (,${sanity_return})
+-
+-${obj}_sanity${sanity_return}.c: $(call mw,${MAKEFILE})
+-	@${MKPARENTDIR}
+-	@(${ECHOLINEX} '/* '$(call q,$(call ccq,$@))': compiler sanity check */'; \
+-        echo '/* you may safely delete this file */'; \
+-        echo 'int main(int argc, char **argv) { return '$(call q,${sanity_return})'; }') > $(call q,$@)
+-
+-${obj}_sanity${sanity_return}$O: $(call mw,${obj}_sanity${sanity_return}.c)
+-	@${MKPARENTDIR}
+-	@${COMPILE}
+-
+-_sanity${sanity_return}$X: $(call mw,${obj}_sanity${sanity_return}$O)
+-	@${LINK} ${LIBS}
+-
+-endif
+-
+ .PHONY: all clean install uninstall
+ .PHONY: installdirs uninstalldirs
+ .PHONY: install-files uninstall-files
+@@ -3292,7 +3259,6 @@
+ .PHONY: distclean mostlyclean maintainer-clean
+ 
+ distclean::
+-	-${REMOVE} $(call q,${obj}compiler.ok)
+ 	@${MAKE} ${MAKELOOP} \
+             uninstall-optional-dir-xq-$(call qxq,${objdir})
+ 

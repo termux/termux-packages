@@ -1,0 +1,16 @@
+--- a/xio-gopen.c
++++ b/xio-gopen.c
+@@ -46,12 +46,7 @@
+ 
+    retropt_bool(opts, OPT_O_APPEND, &opt_append);
+ 
+-   if (exists) {
+-      /* file (or at least named entry) exists */
+-      if ((xioflags&XIO_ACCMODE) != XIO_RDONLY && opt_append) {
+-	 openflags |= O_APPEND;
+-      }
+-   } else {
++   if (!exists) {
+       openflags |= O_CREAT;
+    }
+ 

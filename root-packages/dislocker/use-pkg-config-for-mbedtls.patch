@@ -1,0 +1,21 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index b8dfdd7..15810c3 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -217,12 +217,13 @@ add_library(dislocker_crypto_backend INTERFACE)
+ 
+ message(STATUS "Crypto backend: ${CRYPTO_BACKEND}")
+ if(CRYPTO_BACKEND STREQUAL "mbedtls")
+-  find_package (MbedTLS 3 REQUIRED)
++  find_package(PkgConfig REQUIRED)
++  pkg_check_modules(MBEDCRYPTO REQUIRED IMPORTED_TARGET mbedcrypto)
+   target_link_libraries(${PROJECT_NAME}
+     PRIVATE
+-      MbedTLS::mbedcrypto
++      PkgConfig::MBEDCRYPTO
+   )
+-  target_link_libraries(dislocker_crypto_backend INTERFACE MbedTLS::mbedcrypto)
++  target_link_libraries(dislocker_crypto_backend INTERFACE PkgConfig::MBEDCRYPTO)
+   target_include_directories(${PROJECT_NAME}
+     PUBLIC
+     ${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/encryption/mbedtls

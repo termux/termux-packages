@@ -1,0 +1,21 @@
+diff -u -r ../abook-0.6.0pre2/filter.c ./filter.c
+--- ../abook-0.6.0pre2/filter.c	2006-09-06 01:26:10.000000000 -0400
++++ ./filter.c	2016-08-09 15:02:24.050415314 -0400
+@@ -146,6 +146,9 @@
+ get_real_name()
+ {
+ 	char *username = getenv("USER");
++#ifdef __ANDROID__
++	return xstrdup(username);
++#else
+ 	struct passwd *pwent;
+ 	int rtn;
+ 	char *tmp;
+@@ -161,6 +164,7 @@
+ 		return xstrdup(username);
+ 	} else
+ 		return tmp;
++#endif
+ }
+ 
+ /*

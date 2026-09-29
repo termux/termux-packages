@@ -1,0 +1,16 @@
+diff -uNr proxychains-ng-4.13/src/hostsreader.c proxychains-ng-4.13.mod/src/hostsreader.c
+--- proxychains-ng-4.13/src/hostsreader.c	2018-06-25 02:26:05.000000000 +0300
++++ proxychains-ng-4.13.mod/src/hostsreader.c	2019-03-05 19:34:06.360468021 +0200
+@@ -16,7 +16,11 @@
+ };
+ 
+ int hostsreader_open(struct hostsreader *ctx) {
+-	if(!(ctx->f = fopen("/etc/hosts", "r"))) return 0;
++	if(!(ctx->f = fopen("@TERMUX_PREFIX@/etc/hosts", "r"))) {
++		if(!(ctx->f = fopen("/etc/hosts", "r"))) {
++			return 0;
++		}
++	}
+ 	return 1;
+ }
+ 

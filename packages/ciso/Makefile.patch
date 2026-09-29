@@ -1,0 +1,21 @@
+--- ./Makefile	2015-07-07 22:35:38.000000000 +0430
++++ ./Makefile	2022-06-10 11:50:04.240052084 +0430
+@@ -2,16 +2,14 @@
+ prefix      = /usr
+ USRBINDIR   = $(DESTDIR)$(prefix)/bin
+ 
+-CC = $(CROSS_COMPILE)gcc
+-LD = $(CROSS_COMPILE)gcc
+ INSTALL = install
+ 
+ all : ciso
+ ciso : ciso.o
+-	gcc -o ciso ciso.o -lz
++	$(CC) $(LDFLAGS) -o ciso ciso.o -lz
+ 
+ ciso.o : ciso.c
+-	gcc -o ciso.o -c ciso.c
++	$(CC) $(CFLAGS) $(CPPFLAGS) -o ciso.o -c ciso.c
+ 
+ install :
+ 	$(INSTALL) -m 755 ciso $(USRBINDIR)/ciso

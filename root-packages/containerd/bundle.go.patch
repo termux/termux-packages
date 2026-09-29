@@ -1,0 +1,13 @@
+diff --git a/data/data/com.termux/files/home/test/containerd-1.4.3/runtime/v1/linux/bundle.go b/runtime/v1/linux/bundle.go
+index 9d0a6c4..a2063b2 100644
+--- a/data/data/com.termux/files/home/test/containerd-1.4.3/runtime/v1/linux/bundle.go
++++ b/runtime/v1/linux/bundle.go
+@@ -138,7 +138,7 @@ func (b *bundle) legacyShimAddress(namespace string) string {
+ 	return filepath.Join(string(filepath.Separator), "containerd-shim", namespace, b.id, "shim.sock")
+ }
+ 
+-const socketRoot = "/run/containerd"
++const socketRoot = "@TERMUX_PREFIX@/var/run/containerd"
+ 
+ func (b *bundle) shimAddress(namespace, socketPath string) string {
+ 	d := sha256.Sum256([]byte(filepath.Join(socketPath, namespace, b.id)))

@@ -1,0 +1,44 @@
+diff -uNr shellinabox-2.20/shellinabox/service.c shellinabox-2.20.mod/shellinabox/service.c
+--- shellinabox-2.20/shellinabox/service.c	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/shellinabox/service.c	2020-08-11 22:05:54.096833987 +0300
+@@ -94,9 +94,11 @@
+   // The next part of the argument is either the word 'LOGIN' or the
+   // application definition.
+   if (!strcmp(arg, "LOGIN")) {
++#ifndef __ANDROID__
+     if (geteuid()) {
+       fatal("[config] Must be \"root\" to invoke LOGIN service!");
+     }
++#endif
+     service->useLogin                       = 1;
+     service->useHomeDir                     = 0;
+     service->authUser                       = 0;
+@@ -106,8 +108,7 @@
+     check(service->user                     = strdup("root"));
+     check(service->group                    = strdup("root"));
+     check(service->cwd                      = strdup("/"));
+-    check(service->cmdline                  = strdup(
+-                                                  "/bin/login -p -h ${peer}"));
++    check(service->cmdline                  = strdup("@TERMUX_PREFIX@/bin/pwlogin"));
+   } else
+ #endif
+   if (!strcmp(arg, "SSH") || !strncmp(arg, "SSH:", 4)) {
+@@ -123,7 +124,7 @@
+     char *host;
+     char *sshPort;
+     check(host                              = strdup("localhost"));
+-    check(sshPort                           = strdup("22"));
++    check(sshPort                           = strdup("8022"));
+ 
+     if ((ptr                                = strchr(arg, ':')) != NULL) {
+       ptr                                   = ptr + 1;
+@@ -175,8 +176,7 @@
+           "-oHostbasedAuthentication=no -oIdentitiesOnly=yes "
+           "-oKbdInteractiveAuthentication=yes -oPasswordAuthentication=yes "
+           "-oPreferredAuthentications=keyboard-interactive,password "
+-          "-oPubkeyAuthentication=no -oRhostsRSAAuthentication=no "
+-          "-oRSAAuthentication=no -oStrictHostKeyChecking=no -oTunnel=no "
++          "-oPubkeyAuthentication=no -oStrictHostKeyChecking=no -oTunnel=no "
+           "-oUserKnownHostsFile=/dev/null -oVerifyHostKeyDNS=no "
+ // beewoolie-2012.03.30: while it would be nice to disable this
+ //          feature, we cannot be sure that it is available on the

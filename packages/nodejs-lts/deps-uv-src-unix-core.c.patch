@@ -1,0 +1,12 @@
+diff '--color=auto' -uNr node-v18.0.0.orig/deps/uv/src/unix/core.c node-v18.0.0/deps/uv/src/unix/core.c
+--- node-v18.0.0.orig/deps/uv/src/unix/core.c	2022-04-21 15:15:32.621869790 +0530
++++ node-v18.0.0/deps/uv/src/unix/core.c	2022-04-21 15:29:22.728123998 +0530
+@@ -1125,7 +1125,7 @@
+ 
+   /* No temp environment variables defined */
+   #if defined(__ANDROID__)
+-    buf = "/data/local/tmp";
++    buf = "@TERMUX_PREFIX@/tmp";
+   #else
+     buf = "/tmp";
+   #endif

@@ -1,0 +1,13 @@
+Fixes ld.lld: error: undefined symbol: cmCPackAppImageGenerator::cmCPackAppImageGenerator()
+
+--- a/Source/CMakeLists.txt
++++ b/Source/CMakeLists.txt
+@@ -1265,7 +1265,7 @@ if(UNIX)
+   endif()
+ endif()
+ 
+-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   target_sources(
+     CPackLib
+     PRIVATE

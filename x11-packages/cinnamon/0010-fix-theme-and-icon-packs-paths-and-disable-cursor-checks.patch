@@ -1,0 +1,51 @@
+diff --git a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
+index 8d640cb..43951b4 100755
+--- a/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
++++ b/files/usr/share/cinnamon/cinnamon-settings/modules/cs_themes.py
+@@ -22,14 +22,14 @@ ICON_SIZE = 48
+ # but it's helpful to be aware of it.
+ 
+ ICON_FOLDERS = [
+-    os.path.join(GLib.get_home_dir(), ".icons"),
+-    os.path.join(GLib.get_user_data_dir(), "icons")
+-] + [os.path.join(datadir, "icons") for datadir in GLib.get_system_data_dirs()]
++   os.path.join(GLib.get_home_dir(), ".icons"),
++   os.path.join(GLib.get_user_data_dir(), "icons")
++] + [os.path.join(datadir, "icons") for datadir in GLib.get_system_data_dirs()] + ["@TERMUX_PREFIX@/share/icons"]
+ 
+ THEME_FOLDERS = [
+-    os.path.join(GLib.get_home_dir(), ".themes"),
+-    os.path.join(GLib.get_user_data_dir(), "themes")
+-] + [os.path.join(datadir, "themes") for datadir in GLib.get_system_data_dirs()]
++   os.path.join(GLib.get_home_dir(), ".themes"),
++   os.path.join(GLib.get_user_data_dir(), "themes")
++] + [os.path.join(datadir, "themes") for datadir in GLib.get_system_data_dirs()] + ["@TERMUX_PREFIX@/share/themes"]
+ 
+ THEMES_BLACKLIST = [
+     "gnome", # not meant to be used as a theme. Provides icons to inheriting themes.
+@@ -371,9 +371,9 @@ class Module:
+         if variant.cinnamon_theme is None:
+             print("No Cinnamon theme defined")
+             return False
+-        if variant.cursor_theme is None:
+-            print("No cursor theme defined")
+-            return False
++        # if variant.cursor_theme is None:
++        #     print("No cursor theme defined")
++        #     return False
+         if variant.gtk_theme not in self.gtk_theme_names:
+             print("Gtk theme not found:", variant.gtk_theme)
+             return False
+@@ -383,9 +383,9 @@ class Module:
+         if variant.cinnamon_theme not in self.cinnamon_theme_names and variant.cinnamon_theme != "cinnamon":
+             print("Cinnamon theme not found:", variant.cinnamon_theme)
+             return False
+-        if variant.cursor_theme not in self.cursor_theme_names:
+-            print("Cursor theme not found:", variant.cursor_theme)
+-            return False
++        # if variant.cursor_theme not in self.cursor_theme_names:
++        #     print("Cursor theme not found:", variant.cursor_theme)
++        #     return False
+         return True
+ 
+     def cleanup_ui(self):

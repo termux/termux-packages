@@ -1,0 +1,11 @@
+--- a/trysendfile.c
++++ b/trysendfile.c
+@@ -63,7 +63,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+-#if defined(__GLIBC__) || defined(__dietlibc__)
++#if defined(__GLIBC__) || defined(__dietlibc__) || defined(__ANDROID__)
+ #include <sys/sendfile.h>
+ #else
+ #include <linux/unistd.h>

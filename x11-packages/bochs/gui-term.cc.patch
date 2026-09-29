@@ -1,0 +1,47 @@
+diff -uNr bochs-2.6.9/gui/term.cc bochs-2.6.9.mod/gui/term.cc
+--- bochs-2.6.9/gui/term.cc     2017-01-15 19:44:43.000000000 +0800
++++ bochs-2.6.9.mod/gui/term.cc 2019-08-26 01:42:56.996929000 +0800
+@@ -33,7 +33,11 @@
+ #include <signal.h>
+ };
+
+-#define BX_DEBUGGER_TERM (BX_DEBUGGER && !defined(__OpenBSD__))
++#if BX_DEBUGGER && !defined(__OpenBSD__)
++#define BX_DEBUGGER_TERM 1
++#else
++#define BX_DEBUGGER_TERM 0
++#endif
+
+ class bx_term_gui_c : public bx_gui_c {
+ public:
+@@ -180,20 +184,25 @@
+   if (!strcmp(SIM->get_param_string(BXPN_LOG_FILENAME)->getptr(), "-"))
+     BX_PANIC(("cannot log to stderr in term mode"));
+ #else
+-  FILE *old_stdin = stdin;
+-  FILE *old_stdout = stdout;
++  int old_stdin = dup(STDIN_FILENO);
++  int old_stdout = dup(STDOUT_FILENO);
+   scr_fd = open("/dev/ptmx",O_RDWR);
+   if(scr_fd > 0){
+-    stdin = stdout = fdopen(scr_fd,"wr");
+     grantpt(scr_fd);
+     unlockpt(scr_fd);
++    FILE * pty = fdopen(scr_fd,"wr");
++    int pts = fileno(pty);
++    dup2(pts,STDIN_FILENO);
++    dup2(pts,STDOUT_FILENO);
+     fprintf(stderr, "\nBochs connected to screen \"%s\"\n",ptsname(scr_fd));
+   }
+ #endif
+   initscr();
+ #if BX_DEBUGGER_TERM
+-  stdin = old_stdin;
+-  stdout = old_stdout;
++  dup2(old_stdin,STDIN_FILENO);
++  dup2(old_stdout,STDOUT_FILENO);
++  close(old_stdin);
++  close(old_stdout);
+ #endif
+   start_color();
+   cbreak();

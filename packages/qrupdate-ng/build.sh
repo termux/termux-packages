@@ -1,0 +1,34 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/mpimd-csc/qrupdate-ng
+TERMUX_PKG_DESCRIPTION="A Library for Fast Updating of QR and Cholesky Decompositions."
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2:1.3.0"
+TERMUX_PKG_SRCURL=https://github.com/mpimd-csc/qrupdate-ng/archive/refs/tags/v${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_SHA256=92bf83b66da1b54efa857006f07ccddb2db7a656be3234a494bfaf9cea14690f
+TERMUX_PKG_DEPENDS="libopenblas"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_POLICY_VERSION_MINIMUM=3.5
+-DCMAKE_SYSTEM_NAME=Linux
+-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-Bsymbolic
+-DLAPACK_LIBRARIES=$TERMUX_PREFIX/lib/libopenblas.so
+"
+TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
+
+termux_step_pre_configure() {
+	termux_setup_flang
+}
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION_GUARD_FILES="
+lib/libqrupdate.so.1
+"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+}

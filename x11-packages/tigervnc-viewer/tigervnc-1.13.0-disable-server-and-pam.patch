@@ -1,0 +1,59 @@
+Borrowed from https://github.com/gentoo/gentoo/blob/12dbbe21e6bc8b67510f80b376860e6352c3a7ea/net-misc/tigervnc/files/tigervnc-1.12.0-disable-server-and-pam.patch
+
+See https://bugs.gentoo.org/852830
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -260,6 +260,7 @@ if(BUILD_JAVA)
+   add_subdirectory(java)
+ endif()
+ 
++option(BUILD_SERVER "Build TigerVNC server" ON)
+ trioption(BUILD_VIEWER "Build TigerVNC viewer")
+ if(BUILD_VIEWER)
+   # Check for FLTK
+@@ -341,7 +341,7 @@ if (ENABLE_NETTLE)
+ endif()
+ 
+ # Check for PAM library
+-if(UNIX AND NOT APPLE)
++if(FALSE)
+   find_package(PAM REQUIRED)
+ endif()
+ 
+@@ -315,9 +316,6 @@
+   add_subdirectory(media)
+ endif()
+ 
+-add_subdirectory(tests)
+-
+-
+ if(BUILD_VIEWER)
+   add_subdirectory(release)
+ endif()
+--- a/common/rfb/CMakeLists.txt
++++ b/common/rfb/CMakeLists.txt
+@@ -76,7 +76,7 @@ if(WIN32)
+   target_sources(rfb PRIVATE WinPasswdValidator.cxx)
+ endif(WIN32)
+ 
+-if(UNIX AND NOT APPLE)
++if(FALSE)
+   target_sources(rfb PRIVATE UnixPasswordValidator.cxx)
+   target_include_directories(rfb SYSTEM PRIVATE ${PAM_INCLUDE_DIRS})
+   target_link_libraries(rfb ${PAM_LIBRARIES})
+--- a/unix/CMakeLists.txt
++++ b/unix/CMakeLists.txt
+@@ -1,6 +1,8 @@
+ add_subdirectory(tx)
+ add_subdirectory(common)
+-add_subdirectory(vncconfig)
+-add_subdirectory(vncpasswd)
+-add_subdirectory(vncserver)
+-add_subdirectory(x0vncserver)
++if(BUILD_SERVER)
++	add_subdirectory(vncconfig)
++	add_subdirectory(vncpasswd)
++	add_subdirectory(vncserver)
++	add_subdirectory(x0vncserver)
++endif()

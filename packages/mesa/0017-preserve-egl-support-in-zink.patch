@@ -1,0 +1,40 @@
+mesa upstream code 'thinks' that if 'x11_dri3_open()'
+has a negative retval, then DRI3 EGL acceleration in Zink with the current settings
+is impossible in all cases and it disables Zink and falls back to software rendering.
+
+However, Termux:X11 is a 3rd party edge case where, in actual testing,
+for a very long time throughout the past year of mesa releases,
+even if 'x11_dri3_open()' has a negative retval,
+for some reason Zink+Tunip GPU acceleration still works if force-enabled
+anytime that software rendering is not the initial default.
+
+This 'Termux-unaware' upstream mesa codepath that fails to 'understand' the true
+capabilities of Zink+Turnip+Termux:X11 has gradually been building up in the background
+for the last several months, but in this commit:
+https://gitlab.freedesktop.org/mesa/mesa/-/commit/3294cad34159bd5317e3dfb0cb4e0ba5caca9f77
+the 'switch was flipped' to the new codepath, so to speak, locking vanilla mesa's EGL
+support away from the Zink+Turnip+Termux:X11 codepath unless some kind of intervention
+is performed, such as this patch.
+
+--- a/src/egl/drivers/dri2/platform_x11_dri3.c
++++ b/src/egl/drivers/dri2/platform_x11_dri3.c
+@@ -535,7 +535,7 @@ dri3_x11_connect(struct dri2_egl_display *dri2_dpy, bool swrast)
+             _eglLog(_EGL_WARNING, "DRI3: Failed to initialize");
+       }
+ 
+-      return false;
++      return true;
+    }
+ 
+    loader_get_user_preferred_fd(&dri2_dpy->fd_render_gpu,
+--- a/src/egl/main/eglapi.c
++++ b/src/egl/main/eglapi.c
+@@ -683,7 +683,7 @@ eglInitialize(EGLDisplay dpy, EGLint *major, EGLint *minor)
+                  "Found 'LIBGL_ALWAYS_SOFTWARE' set, will use a CPU renderer");
+ 
+       const char *env = os_get_option("MESA_LOADER_DRIVER_OVERRIDE");
+-      disp->Options.Zink = env && !strcmp(env, "zink");
++      disp->Options.Zink = !env || !strcmp(env, "zink");
+ 
+       const char *gallium_hud_env = os_get_option("GALLIUM_HUD");
+       disp->Options.GalliumHudWarn =

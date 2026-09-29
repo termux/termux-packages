@@ -1,0 +1,22 @@
++++ ./CMakeLists.txt
+@@ -64,10 +64,6 @@
+ if (NOT FOUND_FLEX)
+     message(FATAL_ERROR "Missing dependency: did not find flex, please install flex or equivalent. More details in INSTALL.md")
+ endif()
+-find_program(FOUND_BYACC HINTS /usr/include/ NAMES byacc dev-util/byacc)
+-if (NOT FOUND_BYACC)
+-    message(FATAL_ERROR "Missing dependency: did not find byacc, please install byacc or equivalent. More details in INSTALL.md")
+-endif()
+ find_library(FOUND_JSON HINTS /usr/include/ NAMES json libjson-c-dev json-c-devel json-c dev-libs/json-c)
+ if (NOT FOUND_JSON)
+     message(FATAL_ERROR "Missing dependency: did not find libjson-c, please install libjson-c or equivalent. More details in INSTALL.md")
++++ ./src/CMakeLists.txt
+@@ -187,7 +187,7 @@ add_custom_command(OUTPUT parser.c
+ )
+ else()
+ add_custom_command(OUTPUT parser.c
+-    COMMAND byacc -d -o "${CMAKE_CURRENT_BINARY_DIR}/parser.c" "${CMAKE_CURRENT_SOURCE_DIR}/parser.y"
++    COMMAND yacc -d -o "${CMAKE_CURRENT_BINARY_DIR}/parser.c" "${CMAKE_CURRENT_SOURCE_DIR}/parser.y"
+     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/parser.y"
+ )
+ endif()

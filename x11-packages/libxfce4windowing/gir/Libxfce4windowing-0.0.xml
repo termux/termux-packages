@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="XfwMonitor" get-type="xfw_monitor_get_type" parents="GObject" abstract="1">
+    <property name="identifier" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="connector" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="make" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="serial" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="refresh" type="guint" flags="225" default-value="60000"/>
+    <property name="fractional-scale" type="gdouble" flags="225" default-value="1.000000"/>
+    <property name="scale" type="guint" flags="225" default-value="1"/>
+    <property name="physical-geometry" type="GdkRectangle" flags="225"/>
+    <property name="logical-geometry" type="GdkRectangle" flags="225"/>
+    <property name="workarea" type="GdkRectangle" flags="225"/>
+    <property name="width-mm" type="guint" flags="225" default-value="0"/>
+    <property name="height-mm" type="guint" flags="225" default-value="0"/>
+    <property name="subpixel" type="XfwMonitorSubpixel" flags="225" default-value="XFW_MONITOR_SUBPIXEL_UNKNOWN"/>
+    <property name="transform" type="XfwMonitorTransform" flags="225" default-value="XFW_MONITOR_TRANSFORM_NORMAL"/>
+    <property name="is-primary" type="gboolean" flags="225" default-value="FALSE"/>
+    <property name="gdk-monitor" type="GdkMonitor" flags="225"/>
+  </class>
+  <enum name="XfwMonitorTransform" get-type="xfw_monitor_transform_get_type">
+    <member name="XFW_MONITOR_TRANSFORM_NORMAL" nick="normal" value="0"/>
+    <member name="XFW_MONITOR_TRANSFORM_90" nick="90" value="1"/>
+    <member name="XFW_MONITOR_TRANSFORM_180" nick="180" value="2"/>
+    <member name="XFW_MONITOR_TRANSFORM_270" nick="270" value="3"/>
+    <member name="XFW_MONITOR_TRANSFORM_FLIPPED" nick="flipped" value="4"/>
+    <member name="XFW_MONITOR_TRANSFORM_FLIPPED_90" nick="flipped-90" value="5"/>
+    <member name="XFW_MONITOR_TRANSFORM_FLIPPED_180" nick="flipped-180" value="6"/>
+    <member name="XFW_MONITOR_TRANSFORM_FLIPPED_270" nick="flipped-270" value="7"/>
+  </enum>  <enum name="XfwMonitorSubpixel" get-type="xfw_monitor_subpixel_get_type">
+    <member name="XFW_MONITOR_SUBPIXEL_UNKNOWN" nick="unknown" value="0"/>
+    <member name="XFW_MONITOR_SUBPIXEL_NONE" nick="none" value="1"/>
+    <member name="XFW_MONITOR_SUBPIXEL_HRGB" nick="hrgb" value="2"/>
+    <member name="XFW_MONITOR_SUBPIXEL_HBGR" nick="hbgr" value="3"/>
+    <member name="XFW_MONITOR_SUBPIXEL_VRGB" nick="vrgb" value="4"/>
+    <member name="XFW_MONITOR_SUBPIXEL_VBGR" nick="vbgr" value="5"/>
+  </enum>  <class name="XfwApplication" get-type="xfw_application_get_type" parents="GObject" abstract="1">
+    <property name="class-id" type="gchararray" flags="225" default-value=""/>
+    <property name="name" type="gchararray" flags="225" default-value="NULL"/>
+    <property name="windows" type="gpointer" flags="225"/>
+    <property name="instances" type="gpointer" flags="225"/>
+    <property name="gicon" type="GIcon" flags="225"/>
+    <signal name="icon-changed" return="void" when="last">
+    </signal>
+  </class>
+  <class name="XfwSeat" get-type="xfw_seat_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <enum name="XfwDirection" get-type="xfw_direction_get_type">
+    <member name="XFW_DIRECTION_UP" nick="up" value="0"/>
+    <member name="XFW_DIRECTION_DOWN" nick="down" value="1"/>
+    <member name="XFW_DIRECTION_LEFT" nick="left" value="2"/>
+    <member name="XFW_DIRECTION_RIGHT" nick="right" value="3"/>
+  </enum>  <interface name="XfwWorkspace" get-type="xfw_workspace_get_type">
+    <property name="capabilities" type="XfwWorkspaceCapabilities" flags="7" default-value="XFW_WORKSPACE_CAPABILITIES_NONE"/>
+    <property name="group" type="XfwWorkspaceGroup" flags="1"/>
+    <property name="id" type="gchararray" flags="1" default-value=""/>
+    <property name="layout-column" type="gint" flags="1" default-value="-1"/>
+    <property name="layout-row" type="gint" flags="1" default-value="-1"/>
+    <property name="name" type="gchararray" flags="7" default-value=""/>
+    <property name="number" type="guint" flags="11" default-value="0"/>
+    <property name="state" type="XfwWorkspaceState" flags="7" default-value="XFW_WORKSPACE_STATE_NONE"/>
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="capabilities-changed" return="void" when="last">
+      <param type="XfwWorkspaceCapabilities"/>
+      <param type="XfwWorkspaceCapabilities"/>
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+      <param type="XfwWorkspaceState"/>
+      <param type="XfwWorkspaceState"/>
+    </signal>
+    <signal name="group-changed" return="void" when="last">
+      <param type="XfwWorkspaceGroup"/>
+    </signal>
+  </interface>
+  <flags name="XfwWorkspaceCapabilities" get-type="xfw_workspace_capabilities_get_type">
+    <member name="XFW_WORKSPACE_CAPABILITIES_NONE" nick="none" value="0"/>
+    <member name="XFW_WORKSPACE_CAPABILITIES_ACTIVATE" nick="activate" value="1"/>
+    <member name="XFW_WORKSPACE_CAPABILITIES_REMOVE" nick="remove" value="4"/>
+  </flags>
+  <flags name="XfwWorkspaceState" get-type="xfw_workspace_state_get_type">
+    <member name="XFW_WORKSPACE_STATE_NONE" nick="none" value="0"/>
+    <member name="XFW_WORKSPACE_STATE_ACTIVE" nick="active" value="1"/>
+    <member name="XFW_WORKSPACE_STATE_URGENT" nick="urgent" value="2"/>
+    <member name="XFW_WORKSPACE_STATE_HIDDEN" nick="hidden" value="4"/>
+    <member name="XFW_WORKSPACE_STATE_VIRTUAL" nick="virtual" value="8"/>
+  </flags>
+  <class name="XfwWindow" get-type="xfw_window_get_type" parents="GObject" abstract="1">
+    <property name="screen" type="XfwScreen" flags="235"/>
+    <property name="class-ids" type="GStrv" flags="225"/>
+    <property name="name" type="gchararray" flags="225" default-value=""/>
+    <property name="type" type="XfwWindowType" flags="225" default-value="XFW_WINDOW_TYPE_NORMAL"/>
+    <property name="state" type="XfwWindowState" flags="225" default-value="XFW_WINDOW_STATE_NONE"/>
+    <property name="capabilities" type="XfwWindowCapabilities" flags="225" default-value="XFW_WINDOW_CAPABILITIES_NONE"/>
+    <property name="workspace" type="XfwWorkspace" flags="225"/>
+    <property name="monitors" type="gpointer" flags="225"/>
+    <property name="application" type="XfwApplication" flags="225"/>
+    <property name="gicon" type="GIcon" flags="225"/>
+    <signal name="icon-changed" return="void" when="last">
+    </signal>
+    <signal name="name-changed" return="void" when="last">
+    </signal>
+    <signal name="capabilities-changed" return="void" when="last">
+      <param type="XfwWindowCapabilities"/>
+      <param type="XfwWindowCapabilities"/>
+    </signal>
+    <signal name="state-changed" return="void" when="last">
+      <param type="XfwWindowState"/>
+      <param type="XfwWindowState"/>
+    </signal>
+    <signal name="class-changed" return="void" when="last">
+    </signal>
+    <signal name="type-changed" return="void" when="last">
+      <param type="XfwWindowType"/>
+    </signal>
+    <signal name="geometry-changed" return="void" when="last">
+    </signal>
+    <signal name="workspace-changed" return="void" when="last">
+    </signal>
+    <signal name="closed" return="void" when="last">
+    </signal>
+  </class>
+  <enum name="XfwWindowType" get-type="xfw_window_type_get_type">
+    <member name="XFW_WINDOW_TYPE_NORMAL" nick="normal" value="0"/>
+    <member name="XFW_WINDOW_TYPE_DESKTOP" nick="desktop" value="1"/>
+    <member name="XFW_WINDOW_TYPE_DOCK" nick="dock" value="2"/>
+    <member name="XFW_WINDOW_TYPE_DIALOG" nick="dialog" value="3"/>
+    <member name="XFW_WINDOW_TYPE_TOOLBAR" nick="toolbar" value="4"/>
+    <member name="XFW_WINDOW_TYPE_MENU" nick="menu" value="5"/>
+    <member name="XFW_WINDOW_TYPE_UTILITY" nick="utility" value="6"/>
+    <member name="XFW_WINDOW_TYPE_SPLASHSCREEN" nick="splashscreen" value="7"/>
+  </enum>  <flags name="XfwWindowState" get-type="xfw_window_state_get_type">
+    <member name="XFW_WINDOW_STATE_NONE" nick="none" value="0"/>
+    <member name="XFW_WINDOW_STATE_ACTIVE" nick="active" value="1"/>
+    <member name="XFW_WINDOW_STATE_MINIMIZED" nick="minimized" value="2"/>
+    <member name="XFW_WINDOW_STATE_MAXIMIZED" nick="maximized" value="4"/>
+    <member name="XFW_WINDOW_STATE_FULLSCREEN" nick="fullscreen" value="8"/>
+    <member name="XFW_WINDOW_STATE_SKIP_PAGER" nick="skip-pager" value="16"/>
+    <member name="XFW_WINDOW_STATE_SKIP_TASKLIST" nick="skip-tasklist" value="32"/>
+    <member name="XFW_WINDOW_STATE_PINNED" nick="pinned" value="64"/>
+    <member name="XFW_WINDOW_STATE_SHADED" nick="shaded" value="128"/>
+    <member name="XFW_WINDOW_STATE_ABOVE" nick="above" value="256"/>
+    <member name="XFW_WINDOW_STATE_BELOW" nick="below" value="512"/>
+    <member name="XFW_WINDOW_STATE_URGENT" nick="urgent" value="1024"/>
+  </flags>
+  <flags name="XfwWindowCapabilities" get-type="xfw_window_capabilities_get_type">
+    <member name="XFW_WINDOW_CAPABILITIES_NONE" nick="none" value="0"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_MINIMIZE" nick="can-minimize" value="1"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNMINIMIZE" nick="can-unminimize" value="2"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_MAXIMIZE" nick="can-maximize" value="4"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNMAXIMIZE" nick="can-unmaximize" value="8"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_FULLSCREEN" nick="can-fullscreen" value="16"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNFULLSCREEN" nick="can-unfullscreen" value="32"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_SHADE" nick="can-shade" value="64"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNSHADE" nick="can-unshade" value="128"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_MOVE" nick="can-move" value="256"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_RESIZE" nick="can-resize" value="512"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_PLACE_ABOVE" nick="can-place-above" value="1024"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNPLACE_ABOVE" nick="can-unplace-above" value="2048"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_PLACE_BELOW" nick="can-place-below" value="4096"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_UNPLACE_BELOW" nick="can-unplace-below" value="8192"/>
+    <member name="XFW_WINDOW_CAPABILITIES_CAN_CHANGE_WORKSPACE" nick="can-change-workspace" value="16384"/>
+  </flags>
+  <interface name="XfwWorkspaceGroup" get-type="xfw_workspace_group_get_type">
+    <property name="active-workspace" type="XfwWorkspace" flags="1"/>
+    <property name="monitors" type="gpointer" flags="1"/>
+    <property name="screen" type="XfwScreen" flags="11"/>
+    <property name="workspace-manager" type="XfwWorkspaceManager" flags="11"/>
+    <property name="workspaces" type="gpointer" flags="1"/>
+    <signal name="capabilities-changed" return="void" when="last">
+      <param type="XfwWorkspaceGroupCapabilities"/>
+      <param type="XfwWorkspaceGroupCapabilities"/>
+    </signal>
+    <signal name="active-workspace-changed" return="void" when="last">
+      <param type="XfwWorkspace"/>
+    </signal>
+    <signal name="monitor-added" return="void" when="last">
+      <param type="XfwMonitor"/>
+    </signal>
+    <signal name="monitor-removed" return="void" when="last">
+      <param type="XfwMonitor"/>
+    </signal>
+    <signal name="monitors-changed" return="void" when="last">
+    </signal>
+    <signal name="workspace-added" return="void" when="last">
+      <param type="XfwWorkspace"/>
+    </signal>
+    <signal name="workspace-removed" return="void" when="last">
+      <param type="XfwWorkspace"/>
+    </signal>
+    <signal name="viewports-changed" return="void" when="last">
+    </signal>
+  </interface>
+  <flags name="XfwWorkspaceGroupCapabilities" get-type="xfw_workspace_group_capabilities_get_type">
+    <member name="XFW_WORKSPACE_GROUP_CAPABILITIES_NONE" nick="none" value="0"/>
+    <member name="XFW_WORKSPACE_GROUP_CAPABILITIES_CREATE_WORKSPACE" nick="create-workspace" value="1"/>
+    <member name="XFW_WORKSPACE_GROUP_CAPABILITIES_MOVE_VIEWPORT" nick="move-viewport" value="2"/>
+    <member name="XFW_WORKSPACE_GROUP_CAPABILITIES_SET_LAYOUT" nick="set-layout" value="4"/>
+  </flags>
+  <interface name="XfwWorkspaceManager" get-type="xfw_workspace_manager_get_type">
+    <property name="screen" type="XfwScreen" flags="11"/>
+    <signal name="workspace-group-created" return="void" when="last">
+      <param type="XfwWorkspaceGroup"/>
+    </signal>
+    <signal name="workspace-group-destroyed" return="void" when="last">
+      <param type="XfwWorkspaceGroup"/>
+    </signal>
+    <signal name="workspace-created" return="void" when="last">
+      <param type="XfwWorkspace"/>
+    </signal>
+    <signal name="workspace-destroyed" return="void" when="last">
+      <param type="XfwWorkspace"/>
+    </signal>
+  </interface>
+  <class name="XfwScreen" get-type="xfw_screen_get_type" parents="GObject" abstract="1">
+    <property name="gdk-screen" type="GdkScreen" flags="11"/>
+    <property name="workspace-manager" type="XfwWorkspaceManager" flags="1"/>
+    <property name="active-window" type="XfwWindow" flags="1"/>
+    <property name="show-desktop" type="gboolean" flags="1073741827" default-value="FALSE"/>
+    <signal name="monitor-added" return="void" when="last">
+      <param type="XfwMonitor"/>
+    </signal>
+    <signal name="monitor-removed" return="void" when="last">
+      <param type="XfwMonitor"/>
+    </signal>
+    <signal name="monitors-changed" return="void" when="last">
+    </signal>
+    <signal name="seat-added" return="void" when="last">
+      <param type="XfwSeat"/>
+    </signal>
+    <signal name="seat-removed" return="void" when="last">
+      <param type="XfwSeat"/>
+    </signal>
+    <signal name="window-opened" return="void" when="last">
+      <param type="XfwWindow"/>
+    </signal>
+    <signal name="active-window-changed" return="void" when="last">
+      <param type="XfwWindow"/>
+    </signal>
+    <signal name="window-stacking-changed" return="void" when="last">
+    </signal>
+    <signal name="window-closed" return="void" when="last">
+      <param type="XfwWindow"/>
+    </signal>
+    <signal name="window-manager-changed" return="void" when="last">
+    </signal>
+  </class>
+  <error-quark function="xfw_error_quark" domain="xfw-error-quark"/>
+</dump>

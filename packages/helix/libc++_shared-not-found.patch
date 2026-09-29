@@ -1,0 +1,12 @@
+--- a/helix-loader/src/grammar.rs
++++ b/helix-loader/src/grammar.rs
+@@ -492,6 +492,9 @@ fn build_tree_sitter_library(
+ 
+         command
+             .arg("-shared")
++            .arg("-L@TERMUX_PREFIX@/lib")
++            .arg("-Wl,-rpath=@TERMUX_PREFIX@/lib")
++            .arg("-Wno-error=implicit-int")
+             .arg("-fno-exceptions")
+             .arg("-I")
+             .arg(header_path)

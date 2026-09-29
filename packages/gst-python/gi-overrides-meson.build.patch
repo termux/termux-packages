@@ -1,0 +1,15 @@
+Link with libgstreamer-1.0.so directly, otherwise
+ImportError: dlopen failed: cannot locate symbol "_gst_fraction_type" referenced by
+"/data/data/com.termux/files/usr/lib/python3.12/site-packages/gi/overrides/_gi_gst.cpython-312.so"
+
+--- a/gi/overrides/meson.build
++++ b/gi/overrides/meson.build
+@@ -5,7 +5,7 @@
+ )
+ 
+ host_system = host_machine.system()
+-if host_system == 'windows'
++if host_system == 'android' or host_system == 'windows'
+   gst_dep_for_gi = gst_dep
+ else
+   gst_dep_for_gi = gst_dep.partial_dependency(compile_args: true, includes: true, sources: true)

@@ -1,0 +1,22 @@
+--- a/opal/mca/memory/patcher/memory_patcher_component.c
++++ b/opal/mca/memory/patcher/memory_patcher_component.c
+@@ -493,8 +493,8 @@
+         uintptr_t attach_addr = (uintptr_t) shmaddr;
+ 
+         if (shmflg & SHM_RND) {
+-            attach_addr -= ((uintptr_t) shmaddr) % SHMLBA;
+-            size += ((uintptr_t) shmaddr) % SHMLBA;
++            attach_addr -= ((uintptr_t) shmaddr) % sysconf(_SC_PAGESIZE);
++            size += ((uintptr_t) shmaddr) % sysconf(_SC_PAGESIZE);
+         }
+         opal_mem_hooks_release_hook((void *) attach_addr, size, false);
+     }
+@@ -505,7 +505,7 @@
+ #        else // IPCOP_shmat
+         unsigned long ret;
+         ret = memory_patcher_syscall(SYS_ipc, IPCOP_shmat, shmid, shmflg, &shmaddr, shmaddr);
+-        result = (ret > -(unsigned long) SHMLBA) ? (void *) ret : (void *) shmaddr;
++        result = (ret > -(unsigned long) sysconf(_SC_PAGESIZE)) ? (void *) ret : (void *) shmaddr;
+ #        endif
+     } else {
+         result = original_shmat(shmid, shmaddr, shmflg);

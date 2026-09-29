@@ -1,0 +1,38 @@
+diff --git a/configure.ac b/configure.ac
+index 2ffcedc..0903e0c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -145,6 +145,17 @@ AM_CONDITIONAL([HAVE_GCOVR], [test "x$ac_cv_check_gcovr" = xyes])
+ AC_SUBST(COVERAGE_CFLAGS)
+ AC_SUBST(COVERAGE_LDFLAGS)
+ 
++#
++# systemd user unit directory
++#
++AC_ARG_WITH([systemduserunitdir],
++            AS_HELP_STRING([--with-systemduserunitdir=DIR], [Directory for systemd user unit files]),
++            [],
++            [with_systemduserunitdir=/usr/lib/systemd/user])
++
++AM_CONDITIONAL(HAVE_SYSTEMD, [test "x$with_systemduserunitdir" != "xno"])
++AC_SUBST(systemduserunitdir, $with_systemduserunitdir)
++
+ #
+ # Gnome/GTK checks
+ #
+diff --git a/data/Makefile.am b/data/Makefile.am
+index 6d615ef..fed6f02 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -4,8 +4,10 @@ service_DATA = org.ayatana.bamf.service
+ upstartdir = @datarootdir@/upstart/sessions
+ upstart_DATA = bamfdaemon.conf
+ 
+-systemddir = /usr/lib/systemd/user
++if HAVE_SYSTEMD
++systemddir = @systemduserunitdir@
+ systemd_DATA = bamfdaemon.service
++endif
+ 
+ bamfdaemondbusrunnerdir = $(pkglibexecdir)
+ bamfdaemondbusrunner_SCRIPTS = bamfdaemon-dbus-runner

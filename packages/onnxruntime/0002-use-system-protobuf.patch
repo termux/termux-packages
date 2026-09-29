@@ -1,0 +1,27 @@
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -201,15 +201,7 @@
+  set(ONNXRUNTIME_PROTOBUF_PATCH_COMMAND "")
+ endif()
+ 
+-#Protobuf depends on absl and utf8_range
+-onnxruntime_fetchcontent_declare(
+-  Protobuf
+-  URL ${DEP_URL_protobuf}
+-  URL_HASH SHA1=${DEP_SHA1_protobuf}
+-  PATCH_COMMAND ${ONNXRUNTIME_PROTOBUF_PATCH_COMMAND}
+-  EXCLUDE_FROM_ALL
+-  FIND_PACKAGE_ARGS NAMES Protobuf protobuf
+-)
++find_package(Protobuf REQUIRED)
+ 
+ set(protobuf_BUILD_TESTS OFF CACHE BOOL "Build protobuf tests" FORCE)
+ #TODO: we'd better to turn the following option off. However, it will cause
+@@ -230,7 +222,6 @@
+ include(protobuf_function)
+ #protobuf end
+ 
+-onnxruntime_fetchcontent_makeavailable(Protobuf)
+ if(Protobuf_FOUND)
+   message(STATUS "Using protobuf from find_package(or vcpkg). Protobuf version: ${Protobuf_VERSION}")
+ else()

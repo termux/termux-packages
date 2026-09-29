@@ -1,0 +1,72 @@
+TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
+TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
+TERMUX_PKG_LICENSE="GPL-3.0-or-later, GPL-2.0-or-later, LGPL-2.1-or-later, BSD 3-Clause, BSD, ISC"
+TERMUX_PKG_LICENSE_FILE="
+	Documentation/licenses/COPYING.GPL-3.0-or-later
+	Documentation/licenses/COPYING.GPL-2.0-or-later
+	Documentation/licenses/COPYING.LGPL-2.1-or-later
+	Documentation/licenses/COPYING.BSD-3-Clause
+	Documentation/licenses/COPYING.BSD-4-Clause-UC
+	Documentation/licenses/COPYING.ISC
+"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.42.4"
+TERMUX_PKG_SRCURL="https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=fbd62a100ab7bb8746ba0661255c3c48185b1e9021507c624da01fbc696330ec
+# <dependency>: <binaries linking to that dependency>
+# libandroid-glob: lsclocks
+# libandroid-posix-semaphore: lsipc, lsns and the lib{blkid,smartcols,uuid} subpackages
+# libcap-ng: setpriv
+# libsmartcols: cal, column, fincore, irqtop, losetup, lsclocks, lscpu, lsfd, lsipc, lsirq, lsns, prlimit, wdctl, zramctl
+# ncurses: cal, dmesg, hexdump, irqtop, setterm, ul
+# zlib: fsck.cramfs
+#
+# libcrypt would be required for newgrp and sulogin, which we are not building
+TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-posix-semaphore, libcap-ng, libsmartcols, ncurses, zlib"
+TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_BREAKS="util-linux-dev"
+TERMUX_PKG_REPLACES="util-linux-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_func_setns=yes
+ac_cv_func_statx=no
+ac_cv_func_unshare=yes
+ac_cv_func_uselocale=no
+ac_cv_type_struct_statx=no
+ac_cv_type_struct_fanotify_event_info_header=no
+--enable-setpriv
+--disable-agetty
+--disable-chmem
+--disable-copyfilerange
+--disable-eject
+--disable-fdformat
+--disable-hwclock-cmos
+--disable-ipcmk
+--disable-ipcrm
+--disable-ipcs
+--disable-kill
+--disable-last
+--disable-liblastlog2
+--disable-logger
+--disable-lsmem
+--disable-makeinstall-chown
+--disable-mesg
+--disable-mountpoint
+--disable-nologin
+--disable-pivot_root
+--disable-poman
+--disable-raw
+--disable-rfkill
+--disable-switch_root
+--disable-wall
+"
+
+termux_step_pre_configure() {
+	case "$TERMUX_ARCH_BITS" in
+		#prlimit() is only available in 64-bit bionic.
+		64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_prlimit=yes";;
+		32) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-year2038";;
+	esac
+
+	LDFLAGS+=" -landroid-posix-semaphore"
+	autoreconf -fi
+}

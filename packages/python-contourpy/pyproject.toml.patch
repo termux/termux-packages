@@ -1,0 +1,16 @@
+Fix the below error with newer meson versions:
+	../src/meson.build:1:0: ERROR: Tried modify read only option 'vsenv'
+
+diff -u -r ../cache/tmp-checkout/pyproject.toml ./pyproject.toml
+--- ../cache/tmp-checkout/pyproject.toml	2024-10-02 12:20:23.171351029 +0000
++++ ./pyproject.toml	2024-10-02 12:21:00.516125872 +0000
+@@ -83,9 +83,6 @@
+ ]
+ dist = []
+ install = []
+-setup = [
+-    "--vsenv",  # Force use of MSVC on Windows, ignored on other platforms
+-]
+ 
+ 
+ [tool.cibuildwheel]

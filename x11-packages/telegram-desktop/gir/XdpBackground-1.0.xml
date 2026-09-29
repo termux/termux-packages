@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="XdpBackgroundBackground" get-type="xdp_background_background_get_type">
+    <property name="version" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-request-background" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-set-status" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="XdpBackgroundBackgroundProxy" get-type="xdp_background_background_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="XdpBackgroundBackground"/>
+  </class>
+  <class name="XdpBackgroundBackgroundSkeleton" get-type="xdp_background_background_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="XdpBackgroundBackground"/>
+  </class>
+  <interface name="XdpBackgroundObject" get-type="xdp_background_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="background" type="XdpBackgroundBackground" flags="227"/>
+  </interface>
+  <class name="XdpBackgroundObjectProxy" get-type="xdp_background_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpBackgroundObject"/>
+  </class>
+  <class name="XdpBackgroundObjectSkeleton" get-type="xdp_background_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="XdpBackgroundObject"/>
+  </class>
+  <class name="XdpBackgroundObjectManagerClient" get-type="xdp_background_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

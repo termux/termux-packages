@@ -1,0 +1,26 @@
+--- a/src/bin/lfortran.cpp
++++ b/src/bin/lfortran.cpp
+@@ -1086,7 +1099,11 @@
+             out << src;
+         }
+
++#ifdef __ANDROID__
++        std::string CXX = "clang++";
++#else
+         std::string CXX = "g++";
++#endif
+         std::string options;
+         if (compiler_options.openmp) {
+             options += "-fopenmp ";
+@@ -1240,7 +1257,11 @@
+         }
+         return 0;
+     } else if (backend == Backend::cpp) {
++#ifdef __ANDROID__
++        std::string CXX = "clang++";
++#else
+         std::string CXX = "g++";
++#endif
+         std::string options, post_options;
+         if (static_executable) {
+             options += " -static ";

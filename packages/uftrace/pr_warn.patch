@@ -1,0 +1,76 @@
+--- a/cmds/info.c	2022-04-15 17:55:05.276817917 +0000
++++ b/cmds/info.c	2022-04-15 20:29:53.138225790 +0000
+@@ -1226,7 +1226,7 @@
+ 
+ 	ret = open_info_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %m\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
+--- a/cmds/report.c	2022-04-15 17:55:05.277817916 +0000
++++ b/cmds/report.c	2022-04-15 20:31:47.514057989 +0000
+@@ -1,5 +1,6 @@
+ #include <inttypes.h>
+ #include <stdio.h>
++#include <errno.h>
+ 
+ #include "uftrace.h"
+ #include "utils/field.h"
+@@ -441,7 +442,7 @@
+ 	report_calc_avg(&base_tree);
+ 
+ 	if (open_data_file(&dummy_opts, &data.handle) < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->diff);
++		pr_warn("cannot open record data: %s: %m\n", opts->diff, strerror(errno));
+ 		goto out;
+ 	}
+ 
+@@ -547,7 +548,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %m\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
+--- a/cmds/dump.c	2022-04-15 17:55:05.276817917 +0000
++++ b/cmds/dump.c	2022-04-15 20:33:03.603946364 +0000
+@@ -4,6 +4,7 @@
+ #include <stdio.h>
+ #include <sys/stat.h>
+ #include <time.h>
++#include <errno.h>
+ 
+ #include "libtraceevent/event-parse.h"
+ #include "libtraceevent/kbuffer.h"
+@@ -1644,7 +1645,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %m\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
+--- a/cmds/replay.c	2022-04-15 17:55:05.277817916 +0000
++++ b/cmds/replay.c	2022-04-15 20:33:53.498873171 +0000
+@@ -3,6 +3,7 @@
+ #include <stdio.h>
+ #include <stdio_ext.h>
+ #include <stdlib.h>
++#include <errno.h>
+ 
+ #include "uftrace.h"
+ #include "utils/event.h"
+@@ -1221,7 +1222,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %m\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 

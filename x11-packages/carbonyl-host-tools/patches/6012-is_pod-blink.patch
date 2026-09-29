@@ -1,0 +1,57 @@
+From 900a85c1c1361624756aeb56b0e17659e6476399 Mon Sep 17 00:00:00 2001
+From: Stephan Hartmann <stha09@googlemail.com>
+Date: Fri, 13 Oct 2023 08:57:49 +0000
+Subject: [PATCH] libstdc++: replace deprecated std::is_pod<T> in blink
+
+std::is_pod is deprecated since C++20. Replace with std::trivial and
+std::is_standard_layout. Avoids a lot of warnings.
+
+Bug: 957519
+Change-Id: Ia5ffac10b68420eb68eb34b2eeb8afb574c039a6
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/4936811
+Reviewed-by: Michael Lippautz <mlippautz@chromium.org>
+Commit-Queue: Stephan Hartmann <stha09@googlemail.com>
+Cr-Commit-Position: refs/heads/main@{#1209300}
+---
+ third_party/blink/renderer/platform/wtf/hash_traits.h       | 3 ++-
+ .../blink/renderer/platform/wtf/text/string_hasher.h        | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/third_party/blink/renderer/platform/wtf/hash_traits.h b/third_party/blink/renderer/platform/wtf/hash_traits.h
+index fe7a96a5a5b9b6..de5d2e085a55fc 100644
+--- a/third_party/blink/renderer/platform/wtf/hash_traits.h
++++ b/third_party/blink/renderer/platform/wtf/hash_traits.h
+@@ -194,7 +194,8 @@ struct GenericHashTraitsBase {
+   struct NeedsToForbidGCOnMove {
+     // TODO(yutak): Consider using of std:::is_trivially_move_constructible
+     // when it is accessible.
+-    static constexpr bool value = !std::is_pod<T>::value;
++    static constexpr bool value =
++        !std::is_trivial_v<U> || !std::is_standard_layout_v<U>;
+   };
+ 
+   // The kCanTraceConcurrently value is used by Oilpan concurrent marking. Only
+diff --git a/third_party/blink/renderer/platform/wtf/text/string_hasher.h b/third_party/blink/renderer/platform/wtf/text/string_hasher.h
+index c74ff61975a6f3..70993eaeb83653 100644
+--- a/third_party/blink/renderer/platform/wtf/text/string_hasher.h
++++ b/third_party/blink/renderer/platform/wtf/text/string_hasher.h
+@@ -191,7 +191,8 @@ class StringHasher {
+   void AddCharactersAssumingAligned_internal(const unsigned char* data, unsigned length) {
+     DCHECK(!has_pending_character_);
+ 
+-    static_assert(std::is_pod<T>::value, "we only support hashing POD types");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>,
++                  "we only support hashing POD types");
+     bool remainder = length & 1;
+     length >>= 1;
+ 
+@@ -216,7 +217,8 @@ class StringHasher {
+ 
+   template <typename T, UChar Converter(T)>
+   void AddCharacters_internal(const unsigned char* data, unsigned length) {
+-    static_assert(std::is_pod<T>::value, "we only support hashing POD types");
++    static_assert(std::is_trivial_v<T> && std::is_standard_layout_v<T>,
++                  "we only support hashing POD types");
+ 
+     if (has_pending_character_ && length) {
+       has_pending_character_ = false;

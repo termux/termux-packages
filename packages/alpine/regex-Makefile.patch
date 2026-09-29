@@ -1,0 +1,26 @@
+--- ./regex/Makefile.orig	2021-09-18 20:32:36.394783616 +0530
++++ ./regex/Makefile	2022-02-26 18:09:38.333824110 +0530
+@@ -106,11 +106,11 @@
+ CFLAGS = -g -O2 -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L
+ CP = /usr/bin/cp
+ CPP = gcc-10 -E
+-CPPFLAGS = -I/usr/include  -I/regex
++CPPFLAGS = -I@TERMUX_PREFIX@/include  -I/regex
+ CYGPATH_W = echo
+-C_CLIENT_CFLAGS = EXTRACFLAGS=" -I/usr/include  -I/regex -g -O2 -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L"
++C_CLIENT_CFLAGS = EXTRACFLAGS=" -I@TERMUX_PREFIX@/include  -I/regex -g -O2 -DOPENSSL_1_1_0 -DOPENSSL_API_COMPAT=0x10100000L"
+ C_CLIENT_GCCOPTLEVEL = 
+-C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib  -L/regex -lgssapi_krb5 -lcrypt -lssl -lcrypto -ldl  -ltinfo -lkrb5"
++C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L@TERMUX_PREFIX@/lib  -L/regex -lgssapi_krb5 -lcrypt -lssl -lcrypto -ldl  -ltinfo -lkrb5"
+ C_CLIENT_SPECIALS = SSLDIR=/usr SSLCERTS=/etc/ssl/certs 
+ C_CLIENT_TARGET = slx
+ C_CLIENT_WITH_IPV6 = touch imap/ip6
+@@ -137,7 +137,7 @@
+ ISPELLPROG = hunspell
+ Includedir = @Includedir@
+ LD = /usr/x86_64-suse-linux/bin/ld -m elf_x86_64
+-LDFLAGS = -L/usr/lib  -L/regex
++LDFLAGS = -L@TERMUX_PREFIX@/lib  -L/regex
+ LIBICONV = -liconv
+ LIBINTL = 
+ LIBOBJS = 

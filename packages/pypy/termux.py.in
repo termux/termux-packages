@@ -1,0 +1,115 @@
+from rpython.translator.platform.linux import Linux
+from rpython.translator.platform.posix import _run_subprocess, GnuMakefile
+from rpython.translator.platform import ExecutionResult, log
+import os
+
+PROOT_TARGET = os.getenv("PROOT_TARGET")
+if PROOT_TARGET == None:
+    log.Error("PROOT_TARGET: Must provide PROOT_TARGET.")
+    assert 0
+
+PROOT_TARGET_ARGS = PROOT_TARGET.split()
+
+def _update_cflags_for_termux(cflags):
+    assert isinstance(cflags, tuple)
+    cflags += tuple(os.getenv("TARGET_CFLAGS").split())
+    return cflags
+
+def _update_link_flags_for_termux(ldflags):
+    assert isinstance(ldflags, tuple)
+    ldflags += tuple(os.getenv("TARGET_LDFLAGS").split())
+    return ldflags
+
+def _update_rpath_flags(rpath_flags):
+    assert isinstance(rpath_flags, list)
+    return ["-Wl,-rpath=@TERMUX_PREFIX@/lib"] + rpath_flags
+
+class BaseTermux(Linux):
+    cflags = _update_cflags_for_termux(Linux.cflags)
+    extra_libs = ()
+    link_flags = _update_link_flags_for_termux(Linux.link_flags)
+    rpath_flags = _update_rpath_flags(Linux.rpath_flags)
+    available_includedirs = []
+    available_librarydirs = []
+
+    @property
+    def cc(self):
+        return self._get_cross_compiler()
+
+    @cc.setter
+    def cc(self, *args):
+        pass
+
+    def _execute_c_compiler(self, cc, args, outname, cwd=None):
+        # 'cc' can also contain some options for the C compiler;
+        # e.g. it can be "gcc -m32".  We handle it by splitting on ' '.
+        cclist = cc.split()
+        cc = cclist[0]
+        args = cclist[1:] + args
+        log.execute('Compiler Exec: ' + cc + ' ' + ' '.join(args))
+        returncode, stdout, stderr = _run_subprocess(
+            cc, args, self.c_environ, cwd)
+        self._handle_error(returncode, bytes(stdout), bytes(stderr), outname)
+
+    def execute(self, executable, args=[], env=None, compilation_info=None):
+        if isinstance(args, str):
+            args = ' ' + str(executable) + ' ' + args
+            log.execute('Cross Exec (' + self.name + '): ' + args)
+        else:
+            args = [str(executable)] + args
+            log.execute('Cross Exec (' + self.name + '): ' + ' '.join(args))
+        proot_exec = PROOT_TARGET_ARGS[0]
+        args = PROOT_TARGET_ARGS[1:] + args
+        returncode, stdout, stderr = _run_subprocess(proot_exec, args, env)
+        stdout = "" if stdout == None else stdout
+        stderr = "" if stderr == None else stderr
+        return ExecutionResult(returncode, stdout, stderr)
+
+    def include_dirs_for_libffi(self):
+        return self.available_includedirs
+
+    def library_dirs_for_libffi(self):
+        return self.available_librarydirs
+
+    def _preprocess_include_dirs(self, include_dirs):
+        return list(include_dirs) + self.available_includedirs
+
+    def _preprocess_library_dirs(self, library_dirs):
+        return list(library_dirs) + self.available_librarydirs
+
+    def execute_makefile(self, path_to_makefile, extra_opts=[]):
+        raise NotImplementedError()
+
+    def get_multiarch(self):
+        raise NotImplementedError("Needs to be overwritten")
+
+    def _get_cross_compiler(self):
+        return os.getenv("TARGET_CC")
+
+
+class Termux_AArch64(BaseTermux):
+    name = "termux-aarch64"
+
+    def get_multiarch(self):
+        return "aarch64-linux-android"
+
+
+class Termux_ARM(BaseTermux):
+    name = "termux-arm"
+
+    def get_multiarch(self):
+        return "arm-linux-androideabi"
+
+
+class Termux_AMD64(BaseTermux):
+    name = "termux-x86_64"
+
+    def get_multiarch(self):
+        return "x86_64-linux-android"
+
+
+class Termux_IA32(BaseTermux):
+    name = "termux-i686"
+
+    def get_multiarch(self):
+        return "i686-linux-android"

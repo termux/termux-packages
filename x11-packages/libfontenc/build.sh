@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X11 font encoding library"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.9"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libfontenc-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=9d8392705cb10803d5fe1d27d236cbab3f664e26841ce01916bbbe430cf273e2
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_BUILD_DEPENDS="xorgproto"

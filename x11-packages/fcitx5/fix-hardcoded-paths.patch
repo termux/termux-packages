@@ -1,0 +1,72 @@
+--- a/src/lib/fcitx-utils/standardpath.cpp
++++ b/src/lib/fcitx-utils/standardpath.cpp
+@@ -113,7 +113,7 @@
+         pkgconfigHome_ =
+             defaultPath((isFcitx ? "FCITX_CONFIG_HOME" : nullptr),
+                         constructPath(configHome_, packageName).c_str());
+-        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "/etc/xdg",
++        configDirs_ = defaultPaths("XDG_CONFIG_DIRS", "@TERMUX_PREFIX@/etc/xdg",
+                                    builtInPathMap, nullptr);
+         auto pkgconfigDirFallback = configDirs_;
+         for (auto &path : pkgconfigDirFallback) {
+@@ -128,7 +128,7 @@
+         pkgdataHome_ =
+             defaultPath((isFcitx ? "FCITX_DATA_HOME" : nullptr),
+                         constructPath(dataHome_, packageName).c_str());
+-        dataDirs_ = defaultPaths("XDG_DATA_DIRS", "/usr/local/share:/usr/share",
++        dataDirs_ = defaultPaths("XDG_DATA_DIRS", "@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share",
+                                  builtInPathMap,
+                                  skipBuiltInPath_ ? nullptr : "datadir");
+         auto pkgdataDirFallback = dataDirs_;
+@@ -143,7 +143,7 @@
+         auto tmpdir = getEnvironment("TMPDIR");
+         runtimeDir_ =
+             defaultPath("XDG_RUNTIME_DIR",
+-                        (!tmpdir || tmpdir->empty()) ? "/tmp" : tmpdir->data());
++                        (!tmpdir || tmpdir->empty()) ? "@TERMUX_PREFIX@/tmp" : tmpdir->data());
+         // Though theoratically, this is also fcitxPath, we just simply don't
+         // use it here.
+         addonDirs_ = defaultPaths("FCITX_ADDON_DIRS", FCITX_INSTALL_ADDONDIR,
+--- a/src/lib/fcitx/icontheme.cpp
++++ b/src/lib/fcitx/icontheme.cpp
+@@ -887,7 +887,7 @@
+             std::vector<std::filesystem::path> files = {
+                 std::filesystem::path(*home) / ".kde4/share/config/kdeglobals",
+                 std::filesystem::path(*home) / ".kde/share/config/kdeglobals",
+-                "/etc/kde4/kdeglobals"};
++                "@TERMUX_PREFIX@/etc/kde4/kdeglobals"};
+             for (auto &file : files) {
+                 auto fd = StandardPaths::openPath(file);
+                 auto theme = getKdeTheme(fd.fd());
+@@ -907,7 +907,7 @@
+                 return theme;
+             }
+         }
+-        auto theme = getGtkTheme("/etc/gtk-3.0/settings.ini");
++        auto theme = getGtkTheme("@TERMUX_PREFIX@/etc/gtk-3.0/settings.ini");
+         if (!theme.empty()) {
+             return theme;
+         }
+@@ -915,7 +915,7 @@
+         if (home && !home->empty()) {
+             std::vector<std::filesystem::path> files = {
+                 std::filesystem::path(*home) / ".gtkrc-2.0",
+-                "/etc/gtk-2.0/gtkrc"};
++                "@TERMUX_PREFIX@/etc/gtk-2.0/gtkrc"};
+             for (auto &file : files) {
+                 auto theme = getGtkTheme(file);
+                 if (!theme.empty()) {
+--- a/src/lib/fcitx/misc_p.h
++++ b/src/lib/fcitx/misc_p.h
+@@ -101,9 +101,9 @@
+ }
+ 
+ static inline std::string getLocalMachineId(const std::string &fallback = {}) {
+-    auto content = readFileContent("/var/lib/dbus/machine-id");
++    auto content = readFileContent("@TERMUX_PREFIX@/var/lib/dbus/machine-id");
+     if (content.empty()) {
+-        content = readFileContent("/etc/machine-id");
++        content = readFileContent("@TERMUX_PREFIX@/etc/machine-id");
+     }
+ 
+     return content.empty() ? fallback : content;

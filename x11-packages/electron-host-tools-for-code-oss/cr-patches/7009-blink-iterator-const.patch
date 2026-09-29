@@ -1,0 +1,26 @@
+diff --git a/third_party/blink/renderer/core/dom/traversal_range.h b/third_party/blink/renderer/core/dom/traversal_range.h
+index 09861e6b16..26299fd62c 100644
+--- a/third_party/blink/renderer/core/dom/traversal_range.h
++++ b/third_party/blink/renderer/core/dom/traversal_range.h
+@@ -18,8 +18,8 @@ class TraversalRange {
+  public:
+   using StartNodeType = typename Iterator::StartNodeType;
+   explicit TraversalRange(const StartNodeType* start) : start_(start) {}
+-  Iterator begin() { return Iterator(start_); }
+-  Iterator end() { return Iterator::End(); }
++  Iterator begin() const { return Iterator(start_); }
++  Iterator end() const { return Iterator::End(); }
+ 
+  private:
+   const StartNodeType* start_;
+@@ -34,8 +34,8 @@ class TraversalRangeWithFilter {
+   explicit TraversalRangeWithFilter(const StartNodeType* start,
+                                     TinyBloomFilter filter)
+       : start_(start), filter_(filter) {}
+-  Iterator begin() { return Iterator(start_, filter_); }
+-  Iterator end() { return Iterator::End(); }
++  Iterator begin() const { return Iterator(start_, filter_); }
++  Iterator end() const { return Iterator::End(); }
+ 
+  private:
+   const StartNodeType* start_;

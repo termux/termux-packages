@@ -1,0 +1,45 @@
+From 197c3e93b91e0f0ee6ba34a7887feafd2fa1651e Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Mon, 26 Jan 2026 10:14:14 -0500
+Subject: [PATCH] configure: Only use girepository-2.0 if libpeas uses it too
+
+Fixes header conflicts on systems where glib has girepository-2.0 but
+libpeas still uses the old gobject-introspection-1.0 headers.
+
+Fixes https://github.com/mate-desktop/pluma/issues/729
+---
+ configure.ac | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b35b55e3..5f9a8486 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -197,9 +197,16 @@ if test "$found_introspection" = "yes"; then
+ 	AC_DEFINE([HAVE_INTROSPECTION], [1], [Define to enable GObject Introspection])
+ 
+ 	# Check for girepository-2.0 API (moved to glib in version 1.80+)
+-	PKG_CHECK_EXISTS([girepository-2.0],
+-		[AC_DEFINE([HAVE_GIREPOSITORY_2], [1], [Using girepository-2.0 API])],
+-		[])
++	# We can only use girepository-2.0 if libpeas also uses it, otherwise we get conflicts
++	PKG_CHECK_EXISTS([girepository-2.0], [
++		# Check if libpeas requires girepository-2.0
++		if pkg-config --print-requires libpeas-1.0 | grep -q "girepository-2.0"; then
++			AC_DEFINE([HAVE_GIREPOSITORY_2], [1], [Using girepository-2.0 API])
++			have_girepository_2=yes
++		else
++			have_girepository_2=no
++		fi
++	], [have_girepository_2=no])
+ else
+ 	have_introspection=no
+ fi
+@@ -308,6 +315,7 @@ Configure summary:
+ 	Spell Plugin enabled:	$enable_enchant
+ 	Gvfs metadata enabled:	$enable_gvfs_metadata
+ 	GObject Introspection:	${have_introspection}
++	GIRepository 2.0:	${have_girepository_2:-no}
+ 	Tests enabled:		$enable_tests
+ "
+ 

@@ -1,0 +1,15 @@
+diff --git a/lldb/source/Host/posix/ProcessLauncherPosixFork.cpp b/lldb/source/Host/posix/ProcessLauncherPosixFork.cpp
+index 35482341d3e6..90daaf9ef16d 100644
+--- a/lldb/source/Host/posix/ProcessLauncherPosixFork.cpp
++++ b/lldb/source/Host/posix/ProcessLauncherPosixFork.cpp
+@@ -136,8 +136,10 @@ static void LLVM_ATTRIBUTE_NORETURN ChildFunc(int error_fd,
+ 
+   if (info.GetFlags().Test(eLaunchFlagDebug)) {
+     // Do not inherit setgid powers.
++#if !defined(__ANDROID__)
+     if (setgid(getgid()) != 0)
+       ExitWithError(error_fd, "setgid");
++#endif
+ 
+     // HACK:
+     // Close everything besides stdin, stdout, and stderr that has no file

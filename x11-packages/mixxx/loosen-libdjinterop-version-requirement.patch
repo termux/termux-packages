@@ -1,0 +1,13 @@
+This should be OK to do as long as mixxx is always recompiled anytime libdjinterop is bumped.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2435,7 +2435,7 @@ if(ENGINEPRIME)
+   # statically.  This situation should be reviewed once libdjinterop hits version 1.x.
+   set(LIBDJINTEROP_VERSION 0.24.3)
+   # Look whether an existing installation of libdjinterop matches the required version.
+-  find_package(DjInterop  ${LIBDJINTEROP_VERSION} EXACT CONFIG)
++  find_package(DjInterop  ${LIBDJINTEROP_VERSION} CONFIG)
+   if(NOT DjInterop_FOUND)
+     find_package(DjInterop  ${LIBDJINTEROP_VERSION} EXACT MODULE)
+   endif()

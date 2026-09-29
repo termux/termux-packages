@@ -1,0 +1,19 @@
+this was adding this to LD_LIBRARY_PATH,
+/data/data/com.termux/files/usr/lib/python3.13/site-packages/cv2/../../../../lib
+which resolves to /data/data/com.termux/files/usr/lib, which is already in run path
+globally set in termux_step_setup_toolchain_29, so it is not necessary,
+and should not be set in Termux because setting LD_LIBRARY_PATH breaks running
+ffmpeg
+
+--- a/modules/python/package/cv2/__init__.py
++++ b/modules/python/package/cv2/__init__.py
+@@ -143,8 +143,7 @@ def bootstrap():
+         os.environ['PATH'] = ';'.join(l_vars['BINARIES_PATHS']) + ';' + os.environ.get('PATH', '')
+         if DEBUG: print('OpenCV loader: PATH={}'.format(str(os.environ['PATH'])))
+     else:
+-        # amending of LD_LIBRARY_PATH works for sub-processes only
+-        os.environ['LD_LIBRARY_PATH'] = ':'.join(l_vars['BINARIES_PATHS']) + ':' + os.environ.get('LD_LIBRARY_PATH', '')
++        pass
+ 
+     if DEBUG: print("Relink everything from native cv2 module to cv2 package")
+ 

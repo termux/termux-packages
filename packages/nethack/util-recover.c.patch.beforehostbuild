@@ -1,0 +1,12 @@
+--- a/util/recover.c
++++ b/util/recover.c
+@@ -22,7 +22,8 @@
+ #include "dungeon.h"
+ #include "hack.h"
+ 
+-#if !defined(O_WRONLY) && !defined(LSC) && !defined(AZTEC_C)
++#if (!defined(O_WRONLY) && !defined(LSC) && !defined(AZTEC_C)) \
++    || defined(USE_FCNTL)
+ #include <fcntl.h>
+ #endif
+ 

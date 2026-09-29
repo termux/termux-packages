@@ -1,0 +1,33 @@
+--- a/src/libs/store/KoNetAccess.cpp
++++ b/src/libs/store/KoNetAccess.cpp
+@@ -385,7 +385,7 @@ QString NetAccess::fish_executeInternal(const QUrl &url, const QString &command,
+         remoteTempFileName = tmpFile.fileName();
+         // We only need the filename. The directory might not exist on the remote side.
+         int pos = remoteTempFileName.lastIndexOf(QLatin1Char('/'));
+-        remoteTempFileName = QStringLiteral("/tmp/fishexec_") + remoteTempFileName.mid(pos + 1);
++        remoteTempFileName = QStringLiteral("@TERMUX_PREFIX@/tmp/fishexec_") + remoteTempFileName.mid(pos + 1);
+         tempPathUrl.setPath(remoteTempFileName);
+         d->bJobOK = true; // success unless further error occurs
+         QByteArray packedArgs;
+--- a/src/libs/store/KoTarStore.cpp
++++ b/src/libs/store/KoTarStore.cpp
+@@ -61,7 +61,7 @@ KoTarStore::KoTarStore(QWidget* window, const QUrl &_url, const QString & _filen
+ 
+     } else {
+         d->fileMode = KoStorePrivate::RemoteWrite;
+-        d->localFileName = QStringLiteral("/tmp/kozip"); // ### FIXME with KTempFile
++        d->localFileName = QStringLiteral("@TERMUX_PREFIX@/tmp/kozip"); // ### FIXME with KTempFile
+     }
+ 
+     m_pTar = new KTar(d->localFileName, QStringLiteral("application/x-gzip"));
+--- a/src/libs/store/KoZipStore.cpp
++++ b/src/libs/store/KoZipStore.cpp
+@@ -53,7 +53,7 @@ KoZipStore::KoZipStore(QWidget *window, const QUrl &_url, const QString &_filena
+ 
+     } else {
+         d->fileMode = KoStorePrivate::RemoteWrite;
+-        d->localFileName = QStringLiteral("/tmp/kozip"); // ### FIXME with KTempFile
++        d->localFileName = QStringLiteral("@TERMUX_PREFIX@/tmp/kozip"); // ### FIXME with KTempFile
+     }
+ 
+     m_pZip = new KZip(d->localFileName);

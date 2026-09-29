@@ -1,0 +1,103 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 06_fallback.dpatch by Tamas SZERB <toma@rulez.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Establish direct connection instead of sockified if
+## DP: there is no default server specified and the
+## DP: fallback = yes.
+
+--- a/parser.h
++++ b/parser.h
+@@ -33,6 +33,7 @@ struct parsedfile {
+    struct netent *localnets;
+    struct serverent defaultserver;
+    struct serverent *paths;
++   int fallback;
+ };
+ 
+ /* Functions provided by parser module */
+--- a/parser.c
++++ b/parser.c
+@@ -35,6 +35,7 @@ static int handle_local(struct parsedfil
+ static int handle_defuser(struct parsedfile *, int, char *);
+ static int handle_defpass(struct parsedfile *, int, char *);
+ static int make_netent(char *value, struct netent **ent);
++static int handle_fallback(struct parsedfile *, int, char *);
+ 
+ char __attribute__ ((visibility ("hidden")))
+ *find_config(char *line) {
+@@ -181,6 +182,8 @@ static int handle_line(struct parsedfile
+ 				handle_defpass(config, lineno, words[2]);
+ 			} else if (!strcmp(words[0], "local")) {
+ 				handle_local(config, lineno, words[2]);
++			} else if (!strcmp(words[0], "fallback")) {
++				handle_fallback(config, lineno, words[2]);
+ 			} else {
+ 				show_msg(MSGERR, "Invalid pair type (%s) specified "
+ 					   "on line %d in configuration file, "
+@@ -512,6 +515,19 @@ static int handle_local(struct parsedfil
+ 	return(0);
+ }
+ 
++static int handle_fallback(struct parsedfile *config, int lineno, char *value) {
++	char *v = strsplit(NULL, &value, " ");
++	if (config->fallback !=0) {
++		show_msg(MSGERR, "Fallback may only be specified "
++				"once in configuration file.\n",
++				lineno, currentcontext->lineno);
++	} else {
++		if(!strcmp(v, "yes")) config->fallback = 1;
++		if(!strcmp(v, "no")) config->fallback = 0;
++	}
++	return(0);
++}
++
+ /* Construct a netent given a string like                             */
+ /* "198.126.0.1[:portno[-portno]]/255.255.255.0"                      */
+ int make_netent(char *value, struct netent **ent) {
+--- a/tsocks.c
++++ b/tsocks.c
+@@ -294,11 +294,20 @@ int connect(CONNECT_SIGNATURE) {
+             (path->address ? path->address : "(Not Provided)"));
+    if (path->address == NULL) {
+       if (path == &(config->defaultserver)) {
+-         show_msg(MSGERR, "Connection needs to be made "
+-                          "via default server but "
+-                          "the default server has not "
+-                          "been specified. Falling back to direct connection.\n");
+-                          return(realconnect(__fd, __addr, __len));
++         if (config->fallback) {
++            show_msg(MSGERR, "Connection needs to be made "
++                             "via default server but "
++                             "the default server has not "
++                             "been specified. Fallback is 'yes' so "
++                             "Falling back to direct connection.\n");
++            return(realconnect(__fd, __addr, __len));
++         } else {
++           show_msg(MSGERR, "Connection needs to be made "
++                            "via default server but "
++                            "the default server has not "
++                            "been specified. Fallback is 'no' so "
++                            "coudln't establish the connection.\n");
++         }
+    }
+       else 
+          show_msg(MSGERR, "Connection needs to be made "
+--- a/tsocks.conf.5
++++ b/tsocks.conf.5
+@@ -135,6 +135,15 @@ tsocks gives an error message and aborts
+ This parameter protects the user against accidentally establishing
+ unwanted unsockified (ie. direct) connection.
+ 
++.TP
++.I fallback
++This directive allows to fall back to direct connection if no default
++server present in the configuration and fallback = yes.
++If fallback = no or not specified and there is no default server, the 
++tsocks gives an error message and aborts.
++This parameter protects the user against accidentally establishing
++unwanted unsockified (ie. direct) connection.
++
+ .SH UTILITIES
+ tsocks comes with two utilities that can be useful in creating and verifying
+ the tsocks configuration file. 

@@ -1,0 +1,32 @@
+--- ../texworks-release-0.6.7/CMakeLists.txt	2022-02-26 11:03:43.000000000 +0000
++++ ./CMakeLists.txt	2022-10-17 19:14:54.852737094 +0000
+@@ -207,13 +207,13 @@
+ ENDIF ()
+ 
+ IF (UNIX AND NOT APPLE)
+-  SET(TeXworks_HELP_DIR share/doc/texworks-help CACHE PATH "Path where TeXworks looks for help files")
+-  SET(TeXworks_DIC_DIR /usr/share/hunspell:/usr/share/myspell/dicts CACHE PATH "Path where TeXworks looks for spellchecking dictionaries")
+-  SET(TeXworks_DOCS_DIR share/doc/texworks CACHE PATH "Path in which documentation files are installed")
+-  SET(TeXworks_ICON_DIR share/icons/hicolor CACHE PATH "Path in which icons are installed")
+-  SET(TeXworks_MAN_DIR share/man/man1 CACHE PATH "Path in which manpages are installed")
+-  SET(TeXworks_DESKTOP_DIR share/applications CACHE PATH "Path in which .desktop files are installed")
+-  SET(TeXworks_APPDATA_DIR share/metainfo CACHE PATH "Path in which .appdata.xml files are installed")
++  SET(TeXworks_HELP_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/texworks-help CACHE PATH "Path where TeXworks looks for help files")
++  SET(TeXworks_DIC_DIR ${CMAKE_INSTALL_PREFIX}/share/hunspell:${CMAKE_INSTALL_PREFIX}/share/myspell/dicts CACHE PATH "Path where TeXworks looks for spellchecking dictionaries")
++  SET(TeXworks_DOCS_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/texworks CACHE PATH "Path in which documentation files are installed")
++  SET(TeXworks_ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor CACHE PATH "Path in which icons are installed")
++  SET(TeXworks_MAN_DIR ${CMAKE_INSTALL_PREFIX}/share/man/man1 CACHE PATH "Path in which manpages are installed")
++  SET(TeXworks_DESKTOP_DIR ${CMAKE_INSTALL_PREFIX}/share/applications CACHE PATH "Path in which .desktop files are installed")
++  SET(TeXworks_APPDATA_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo CACHE PATH "Path in which .appdata.xml files are installed") 
+   MARK_AS_ADVANCED(TeXworks_HELP_DIR)
+   MARK_AS_ADVANCED(TeXworks_DIC_DIR)
+   MARK_AS_ADVANCED(TeXworks_DOCS_DIR)
+@@ -222,7 +222,7 @@
+   MARK_AS_ADVANCED(TeXworks_DESKTOP_DIR)
+   MARK_AS_ADVANCED(TeXworks_APPDATA_DIR)
+   IF (EXISTS ${TeXworks_SOURCE_DIR}/manual/)
+-    INSTALL(DIRECTORY ${TeXworks_SOURCE_DIR}/manual/ DESTINATION ${CMAKE_INSTALL_PREFIX}/${TeXworks_HELP_DIR}/ OPTIONAL)
++    INSTALL(DIRECTORY ${TeXworks_SOURCE_DIR}/manual/ DESTINATION ${TeXworks_HELP_DIR}/ OPTIONAL)
+   ENDIF()
+ ENDIF()
+ 

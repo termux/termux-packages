@@ -1,0 +1,14 @@
+--- a/third_party/dawn/src/dawn/native/XlibXcbFunctions.cpp	
++++ b/third_party/dawn/src/dawn/native/XlibXcbFunctions.cpp
+@@ -17,7 +17,11 @@
+ namespace dawn::native {
+ 
+ XlibXcbFunctions::XlibXcbFunctions() {
++#ifdef __TERMUX__
++    if (!mLib.Open("libX11-xcb.so") || !mLib.GetProc(&xGetXCBConnection, "XGetXCBConnection")) {
++#else
+     if (!mLib.Open("libX11-xcb.so.1") || !mLib.GetProc(&xGetXCBConnection, "XGetXCBConnection")) {
++#endif
+         mLib.Close();
+     }
+ }

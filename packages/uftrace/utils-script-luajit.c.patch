@@ -1,0 +1,14 @@
+--- a/utils/script-luajit.c
++++ b/utils/script-luajit.c
+@@ -150,9 +150,11 @@
+ 			case 8:
+ 				dval = val.d;
+ 				break;
++#if !(defined __ANDROID__ && defined __x86_64__)
+ 			case 10:
+ 				dval = (double)val.D;
+ 				break;
++#endif
+ 			default:
+ 				pr_dbg("invalid floating-point type size %d\n",
+ 				       spec->size);

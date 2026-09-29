@@ -1,0 +1,48 @@
+--- v1/makefile	2023-06-27 00:30:55.000000000 +0800
++++ v2/makefile	2024-06-09 20:05:00.118926980 +0800
+@@ -1,7 +1,7 @@
+ LIBNAME = lpeg
+ LUADIR = ./lua/
+ 
+-COPT = -O2 -DNDEBUG
++#COPT = -O2 -DNDEBUG
+ # COPT = -O0 -DLPEG_DEBUG -g
+ 
+ CWARNS = -Wall -Wextra -pedantic \
+@@ -25,29 +25,29 @@
+ # -Wunreachable-code \
+ 
+ 
+-CFLAGS = $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
++CFLAGS += $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
+ CC = gcc
+ 
+ FILES = lpvm.o lpcap.o lptree.o lpcode.o lpprint.o lpcset.o
+ 
+ # For Linux
+ linux:
+-	$(MAKE) lpeg.so "DLLFLAGS = -shared -fPIC"
++	$(MAKE) liblpeg.so "DLLFLAGS = -shared -fPIC"
+ 
+ # For Mac OS
+ macosx:
+-	$(MAKE) lpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
++	$(MAKE) liblpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
+ 
+-lpeg.so: $(FILES)
+-	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
++liblpeg.so: $(FILES)
++	env $(CC) $(DLLFLAGS) -Wl,-soname,liblpeg-$(LUAVER).so $(FILES) -o liblpeg.so
+ 
+ $(FILES): makefile
+ 
+-test: test.lua re.lua lpeg.so
++test: test.lua re.lua liblpeg.so
+ 	./test.lua
+ 
+ clean:
+-	rm -f $(FILES) lpeg.so
++	rm -f $(FILES) liblpeg.so
+ 
+ 
+ lpcap.o: lpcap.c lpcap.h lptypes.h

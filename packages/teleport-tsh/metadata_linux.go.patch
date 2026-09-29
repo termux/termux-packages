@@ -1,0 +1,56 @@
+--- teleport-15.0.0/lib/inventory/metadata/metadata_linux.go
++++ teleport-15.0.0 .mod/lib/inventory/metadata/metadata_linux.go
+@@ -21,45 +21,19 @@
+ 
+ package metadata
+ 
+-// #include <gnu/libc-version.h>
+-import "C"
+-
+ import (
+-	"fmt"
+-	"strings"
++	"runtime"
++	log "github.com/sirupsen/logrus"
+ )
+ 
+-// fetchOSVersion combines the content of '/etc/os-release' to be e.g.
+-// "ubuntu 22.04".
++// fetchOSVersion returns "" if not on linux and not on darwin.
+ func (c *fetchConfig) fetchOSVersion() string {
+-	// TODO(codingllama): Leverage lib/linux.ParseOSRelease here?
+-	filename := "/etc/os-release"
+-	out, err := c.read(filename)
+-	if err != nil {
+-		return ""
+-	}
+-
+-	id := "linux"
+-	versionID := "(unknown)"
+-	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+-		key, value, found := strings.Cut(line, "=")
+-		if !found {
+-			continue
+-		}
+-
+-		switch key {
+-		case "ID":
+-			id = strings.Trim(value, `"`)
+-		case "VERSION_ID":
+-			versionID = strings.Trim(value, `"`)
+-		}
+-	}
+-
+-	return fmt.Sprintf("%s %s", id, versionID)
++	log.Warningf("fetchOSVersion is not implemented for %s", runtime.GOOS)
++	return ""
+ }
+ 
+-// fetchGlibcVersion returns the glibc version string as returned by
+-// gnu_get_libc_version.
++// fetchGlibcVersion returns "" if not on linux and not on darwin.
+ func (c *fetchConfig) fetchGlibcVersion() string {
+-	return C.GoString(C.gnu_get_libc_version())
++	log.Warningf("fetchGlibcVersion is not implemented for %s", runtime.GOOS)
++	return ""
+ }

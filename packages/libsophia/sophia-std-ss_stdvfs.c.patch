@@ -1,0 +1,11 @@
+--- a/sophia/std/ss_stdvfs.c
++++ b/sophia/std/ss_stdvfs.c
+@@ -89,7 +89,7 @@
+ ss_stdvfs_sync_file_range(ssvfs *f ssunused, int fd, uint64_t off, uint64_t size)
+ {
+ 	int rc;
+-#ifdef __linux__
++#if defined __linux__ && (!defined __ANDROID__ || __ANDROID_API__ >= 26)
+ 	rc = sync_file_range(fd, off, size,
+ 	                     SYNC_FILE_RANGE_WRITE|
+ 	                     SYNC_FILE_RANGE_WAIT_AFTER);

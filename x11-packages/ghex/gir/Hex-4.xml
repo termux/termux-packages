@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="HexBuffer" get-type="hex_buffer_get_type">
+    <property name="file" type="GFile" flags="1073742051"/>
+  </interface>
+  <class name="HexDocument" get-type="hex_document_get_type" parents="GObject">
+    <property name="file" type="GFile" flags="1073742051"/>
+    <property name="buffer" type="HexBuffer" flags="1073742051"/>
+    <signal name="document-changed" return="void" when="first">
+      <param type="gpointer"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="undo" return="void" when="first">
+    </signal>
+    <signal name="redo" return="void" when="first">
+    </signal>
+    <signal name="undo-stack-forget" return="void" when="first">
+    </signal>
+    <signal name="file-name-changed" return="void" when="first">
+    </signal>
+    <signal name="file-save-started" return="void" when="first">
+    </signal>
+    <signal name="file-saved" return="void" when="first">
+    </signal>
+    <signal name="file-read-started" return="void" when="first">
+    </signal>
+    <signal name="file-loaded" return="void" when="first">
+    </signal>
+  </class>
+  <boxed name="HexDocumentFindData" get-type="hex_document_find_data_get_type"/>
+  <boxed name="HexChangeData" get-type="hex_change_data_get_type"/>
+  <class name="HexWidget" get-type="hex_widget_get_type" parents="GtkWidget,GInitiallyUnowned,GObject">
+    <implements name="GtkAccessible"/>
+    <implements name="GtkBuildable"/>
+    <implements name="GtkConstraintTarget"/>
+    <property name="document" type="HexDocument" flags="1073742059"/>
+    <property name="fade-zeroes" type="gboolean" flags="1073742055" default-value="FALSE"/>
+    <signal name="cursor-moved" return="void" when="first">
+    </signal>
+    <signal name="data-changed" return="void" when="first">
+    </signal>
+    <signal name="cut-clipboard" return="void" when="first">
+    </signal>
+    <signal name="copy-clipboard" return="void" when="first">
+    </signal>
+    <signal name="paste-clipboard" return="void" when="first">
+    </signal>
+    <signal name="draw-complete" return="void" when="first">
+    </signal>
+  </class>
+  <boxed name="HexWidgetAutoHighlight" get-type="hex_widget_autohighlight_get_type"/>
+  <class name="HexWidgetMark" get-type="hex_widget_mark_get_type" parents="GObject">
+    <property name="have-custom-color" type="gboolean" flags="1073742049" default-value="FALSE"/>
+    <property name="custom-color" type="GdkRGBA" flags="1073742051"/>
+  </class>
+</dump>

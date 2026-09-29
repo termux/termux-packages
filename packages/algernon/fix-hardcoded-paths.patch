@@ -1,0 +1,74 @@
+--- a/engine/config.go
++++ b/engine/config.go
+@@ -188,7 +188,7 @@
+ 
+ // New creates a new server configuration based using the default values
+ func New(versionString, description string) (*Config, error) {
+-	tmpdir := env.Str("TMPDIR", "/tmp")
++	tmpdir := env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp")
+ 	ac := &Config{
+ 		curlSupport: true,
+ 
+@@ -222,7 +222,7 @@
+ 		defaultLogFile: filepath.Join(tmpdir, "algernon.log"),
+ 
+ 		// List of configuration filenames to check
+-		serverConfigurationFilenames: []string{"/etc/algernon/serverconf.lua", "/etc/algernon/server.lua"},
++		serverConfigurationFilenames: []string{"@TERMUX_PREFIX@/etc/algernon/serverconf.lua", "@TERMUX_PREFIX@/etc/algernon/server.lua"},
+ 
+ 		// Compression speed over compactness
+ 		cacheCompressionSpeed: true,
+@@ -254,7 +254,7 @@
+ 		return nil, err
+ 	}
+ 	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
+-	ac.mimereader = mime.New("/etc/mime.types", true)
++	ac.mimereader = mime.New("@TERMUX_PREFIX@/etc/mime.types", true)
+ 	ac.setupLogging()
+ 
+ 	// File stat cache
+--- a/engine/flags.go
++++ b/engine/flags.go
+@@ -230,9 +230,9 @@
+ 	switch {
+ 	case ac.productionMode:
+ 		// Use system directories
+-		ac.serverDirOrFilename = "/srv/algernon"
+-		ac.serve.serverCert = "/etc/algernon/cert.pem"
+-		ac.serve.serverKey = "/etc/algernon/key.pem"
++		ac.serverDirOrFilename = "@TERMUX_PREFIX@/var/lib/algernon"
++		ac.serve.serverCert = "@TERMUX_PREFIX@/etc/algernon/cert.pem"
++		ac.serve.serverKey = "@TERMUX_PREFIX@/etc/algernon/key.pem"
+ 		ac.cacheMode = cachemode.Production
+ 		ac.serverMode = true
+ 	case ac.devMode:
+--- a/engine/serve.go
++++ b/engine/serve.go
+@@ -132,7 +132,7 @@
+ // configureCertMagic sets CertMagic package-level defaults from ac.
+ // If $XDG_CONFIG_DIR is not set, uses $HOME, then $TMPDIR, then /tmp for cert storage.
+ func (ac *Config) configureCertMagic() {
+-	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "/tmp"))
++	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp"))
+ 	defaultEmail := env.StrAlt("LOGNAME", "USER", "root") + "@localhost"
+ 	if len(ac.serve.certMagicDomains) > 0 {
+ 		defaultEmail = "webmaster@" + ac.serve.certMagicDomains[0]
+--- a/vendor/github.com/caddyserver/certmagic/dnsutil.go
++++ b/vendor/github.com/caddyserver/certmagic/dnsutil.go
+@@ -376,4 +376,4 @@
+ 	fqdnSOACacheMu sync.Mutex
+ )
+ 
+-const defaultResolvConf = "/etc/resolv.conf"
++const defaultResolvConf = "@TERMUX_PREFIX@/etc/resolv.conf"
+--- a/vendor/github.com/xyproto/gopher-lua/utils.go
++++ b/vendor/github.com/xyproto/gopher-lua/utils.go
+@@ -156,7 +156,7 @@
+ }
+ 
+ func popenArgs(arg string) (string, []string) {
+-	cmd := "/bin/sh"
++	cmd := "@TERMUX_PREFIX@/bin/sh"
+ 	args := []string{"-c"}
+ 	if LuaOS == "windows" {
+ 		cmd = "C:\\Windows\\system32\\cmd.exe"

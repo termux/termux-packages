@@ -1,0 +1,11 @@
+--- a/client/snapclient.cpp	2022-04-15 02:22:36.712384329 +0530
++++ b/client/snapclient.cpp	2022-04-15 02:23:43.542384304 +0530
+@@ -308,7 +308,7 @@
+         std::unique_ptr<Daemon> daemon;
+         if (daemonOption->is_set())
+         {
+-            string pidFile = "/var/run/snapclient/pid";
++            string pidFile = "@TERMUX_PREFIX@/var/run/snapclient/pid";
+             if (settings.instance != 1)
+                 pidFile += "." + cpt::to_string(settings.instance);
+             string user;

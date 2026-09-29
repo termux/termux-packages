@@ -1,0 +1,81 @@
+--- a/desktop/libresprite-thumbnailer
++++ b/desktop/libresprite-thumbnailer
+@@ -6,14 +6,14 @@
+ # Licensed under the the MIT License (https://opensource.org/licenses/MIT).
+ 
+ if [ $# -ge 2 -a $# -lt 4 ]; then
+-  mkdir -p /tmp/LibreSprite
++  mkdir -p @TERMUX_PREFIX@/tmp/LibreSprite
+   filename=${1//\//.}$RANDOM
+   if [ $# -eq 2 ]; then
+-    libresprite -b --frame-range "0,0" $1 --sheet /tmp/LibreSprite/$filename.png
++    libresprite -b --frame-range "0,0" $1 --sheet @TERMUX_PREFIX@/tmp/LibreSprite/$filename.png
+   elif [ $# -eq 3 ]; then
+-    libresprite -b --frame-range "0,0" $1 --shrink-to "$3,$3" --sheet /tmp/LibreSprite/$filename.png
++    libresprite -b --frame-range "0,0" $1 --shrink-to "$3,$3" --sheet @TERMUX_PREFIX@/tmp/LibreSprite/$filename.png
+   fi
+-  mkdir -p $(dirname "$2"); mv /tmp/LibreSprite/$filename.png $2;
++  mkdir -p $(dirname "$2"); mv @TERMUX_PREFIX@/tmp/LibreSprite/$filename.png $2;
+ else
+   echo "Parameters for libresprite thumbnailer are: inputfile outputfile [size]"
+ fi
+--- a/src/base/fs_unix.h
++++ b/src/base/fs_unix.h
+@@ -156,7 +156,7 @@ std::string get_temp_path()
+   if (tmpdir)
+     return tmpdir;
+   else
+-    return "/tmp";
++    return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ std::string get_user_docs_folder()
+@@ -216,23 +216,23 @@ std::vector<std::string> get_font_paths()
+     if (home.empty())
+         home = "~";
+     return {
+-        "/usr/share/fonts",
+-        "/usr/local/share/fonts",
++        "@TERMUX_PREFIX@/share/fonts",
++        "@TERMUX_PREFIX@/local/share/fonts",
+         home + "/.local/share/fonts",
+         home + "/.fonts",
+-        "/usr/share/fonts/OTF",
+-        "/usr/local/share/fonts/OTF",
++        "@TERMUX_PREFIX@/share/fonts/OTF",
++        "@TERMUX_PREFIX@/local/share/fonts/OTF",
+         home + "/.local/share/fonts/OTF",
+-        "/usr/share/fonts/OTF",
+-        "/usr/local/share/fonts/OTF",
++        "@TERMUX_PREFIX@/share/fonts/OTF",
++        "@TERMUX_PREFIX@/local/share/fonts/OTF",
+         home + "/.local/share/fonts/OTF",
+         home + "/.font/OTF",
+-        "/usr/share/fonts/TTF",
+-        "/usr/local/share/fonts/TTF",
++        "@TERMUX_PREFIX@/share/fonts/TTF",
++        "@TERMUX_PREFIX@/local/share/fonts/TTF",
+         home + "/.local/share/fonts/TTF",
+         home + "/.font/TTF",
+-        "/usr/share/fonts/ttf",
+-        "/usr/local/share/fonts/ttf",
++        "@TERMUX_PREFIX@/share/fonts/ttf",
++        "@TERMUX_PREFIX@/local/share/fonts/ttf",
+         home + "/.local/share/fonts/ttf",
+         home + "/.font/ttf"
+     };
+--- a/src/she/sdl2/she.cpp
++++ b/src/she/sdl2/she.cpp
+@@ -731,9 +731,9 @@ namespace she {
+ 	    for (let i = 0; i < files.length; ++i) {
+ 	      let fr = new FileReader();
+ 	      fr.onload = ((fr, name)=>{
+-		  try{ FS.mkdir('/tmp'); }catch(ex){}
+-		  FS.writeFile('/tmp/' + name, new Uint8Array(fr.result));
+-		  canvas.dispatchEvent(new CustomEvent("readFile", {detail:{path:'/tmp/' + name}}));
++		  try{ FS.mkdir('@TERMUX_PREFIX@/tmp'); }catch(ex){}
++		  FS.writeFile('@TERMUX_PREFIX@/tmp/' + name, new Uint8Array(fr.result));
++		  canvas.dispatchEvent(new CustomEvent("readFile", {detail:{path:'@TERMUX_PREFIX@/tmp/' + name}}));
+ 		}).bind(null, fr, files[i].name);
+ 	      fr.readAsArrayBuffer(files[i]);
+ 	    }

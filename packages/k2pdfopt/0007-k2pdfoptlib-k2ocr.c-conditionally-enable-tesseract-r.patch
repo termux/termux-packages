@@ -1,0 +1,66 @@
+From c804e2ff8bdfbdb1be602218329596ff27b055b0 Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Sun, 14 Jun 2020 12:33:43 +0800
+Subject: [PATCH 07/10] k2pdfoptlib/k2ocr.c: conditionally enable
+ tesseract-related functions
+
+---
+ k2pdfoptlib/k2ocr.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/k2pdfoptlib/k2ocr.c b/k2pdfoptlib/k2ocr.c
+index e4be8f3..2e28d5e 100644
+--- a/k2pdfoptlib/k2ocr.c
++++ b/k2pdfoptlib/k2ocr.c
+@@ -41,16 +41,16 @@ typedef struct
+     int ni;
+     char initstr[256];
+     } OCRTESSINITINFO;
+-#endif
+ static void k2ocr_show_envvar(char *buf,char *color,char *var);
+ static void k2ocr_status_line(char *buf,char *color,char *label,char *string);
+ static void k2ocr_tesslang_init(char *lang,int assume_yes);
++#endif
+ static void k2ocr_ocrwords_add_subregion_to_queue(MASTERINFO *masterinfo,OCRWORDS *words,
+                                         BMPREGION *region,K2PDFOPT_SETTINGS *k2settings);
+ #endif /* HAVE_OCR_LIB */
+ 
+ /* Functions to support extracting text from PDF using MuPDF lib */
+-#ifdef HAVE_MUPDF_LIB
++#if (defined(HAVE_MUPDF_LIB) || defined(HAVE_DJVU_LIB))
+ static void k2ocr_ocrwords_get_from_ocrlayer(MASTERINFO *masterinfo,OCRWORDS *words,
+                                              BMPREGION *region,K2PDFOPT_SETTINGS *k2settings);
+ static int ocrword_map_to_bitmap(OCRWORD *word,MASTERINFO *masterinfo,BMPREGION *region,
+@@ -425,6 +425,7 @@ static void *otinit(void *data)
+ void k2ocr_showlog(void)
+ 
+     {
++#ifdef HAVE_TESSERACT_LIB
+     static char *funcname="k2ocr_showlog";
+ 
+     if (k2ocr_tess_status<0 && k2ocr_logfile!=NULL && wfile_status(k2ocr_logfile)==1
+@@ -468,6 +469,7 @@ void k2ocr_showlog(void)
+         k2printf(header,divider,"End","\n");
+         willus_mem_free((double **)&bigbuf,funcname);
+         }
++#endif
+     }
+             
+ 
+@@ -724,9 +726,13 @@ printf("Done k2ocr_ocrwords_add_subregion_to_queue()\n");
+ void k2ocr_multithreaded_ocr(OCRWORDS *words,K2PDFOPT_SETTINGS *k2settings)
+ 
+     {
++#ifdef HAVE_TESSERACT_LIB
+     ocr_cpu_time_secs += ocrwords_multithreaded_ocr(words,ocrtess_api,maxthreads,
+                                                     k2settings->dst_ocr,
+                                                     k2settings->ocr_dpi);
++#else
++    printf("k2ocr_multithreaded_ocr(): tesseract unsupported\n");
++#endif
+     }
+ 
+ 
+-- 
+2.28.0
+

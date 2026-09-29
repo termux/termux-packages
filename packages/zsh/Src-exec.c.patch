@@ -1,0 +1,13 @@
+diff --git a/Src/exec.c b/Src/exec.c
+index 8cdd86a..08115be 100644
+--- a/Src/exec.c
++++ b/Src/exec.c
+@@ -585,7 +585,7 @@ zexecve(char *pth, char **argv, char **newenvp)
+ 			}
+ 			*--args = "sh";
+ 			winch_unblock();
+-			execve("/bin/sh", args, newenvp);
++			execve("@TERMUX_PREFIX@/bin/sh", args, newenvp);
+ 		    }
+ 		}
+ 	    } else

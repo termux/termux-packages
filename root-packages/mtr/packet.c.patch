@@ -1,0 +1,18 @@
+--- a/packet/packet.c
++++ b/packet/packet.c
+@@ -121,15 +121,6 @@
+ int drop_elevated_permissions(
+     void)
+ {
+-    /*  Drop any suid permissions granted  */
+-    if (setgid(getgid()) || setuid(getuid())) {
+-        return -1;
+-    }
+-
+-    if (geteuid() != getuid() || getegid() != getgid()) {
+-        return -1;
+-    }
+-
+     /*
+        Drop all process capabilities.
+      */

@@ -1,0 +1,23 @@
+--- a/src/plugins/projectexplorer/runcontrol.h	2026-05-11 19:32:22.000000000 +1000
++++ b/src/plugins/projectexplorer/runcontrol.h	2026-06-19 16:03:04.303584321 +1000
+@@ -180,7 +180,18 @@
+     const Utils::BaseAspect::Data *aspectData(Utils::Id instanceId) const;
+     const Utils::BaseAspect::Data *aspectData(Utils::BaseAspect::Data::ClassId classId) const;
+     template <typename T> const typename T::Data *aspectData() const {
+-        return dynamic_cast<const typename T::Data *>(aspectData(&T::staticMetaObject));
++	
++        const auto *baseData = aspectData(&T::staticMetaObject);
++
++        if (const auto *result = dynamic_cast<const typename T::Data *>(baseData)) {
++            return result;
++        }
++
++        if (baseData) {
++            return static_cast<const typename T::Data *>(baseData);
++        }
++
++        return nullptr;
+     }
+ 
+     QString buildKey() const;
+     

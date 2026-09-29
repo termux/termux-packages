@@ -1,0 +1,30 @@
+diff --git a/exe/pyinstaller/aws.spec b/exe/pyinstaller/aws.spec
+index eb35333ec..8afba7734 100644
+--- a/exe/pyinstaller/aws.spec
++++ b/exe/pyinstaller/aws.spec
+@@ -43,6 +43,10 @@ if platform.system() == "Darwin":
+         updated_datas.append((dest, src, typecode))
+     aws_a.datas = updated_datas
+
++AOSP="@TERMUX_PREFIX@/opt/aosp"
++excl = {l for d in (f"{AOSP}/lib", f"{AOSP}/lib64") if os.path.isdir(d) for l in os.listdir(d)}
++aws_a.binaries = [l for l in aws_a.binaries if os.path.basename(l[0]) not in excl]
++
+ aws_pyz = PYZ(aws_a.pure, aws_a.zipped_data, cipher=block_cipher)
+ aws_exe = EXE(aws_pyz,
+           aws_a.scripts,
+diff --git a/exe/pyinstaller/aws_completer.spec b/exe/pyinstaller/aws_completer.spec
+index 5d114e39b..ea9f64056 100644
+--- a/exe/pyinstaller/aws_completer.spec
++++ b/exe/pyinstaller/aws_completer.spec
+@@ -44,6 +44,10 @@ if platform.system() == "Darwin":
+         updated_datas.append((dest, src, typecode))
+     completer_a.datas = updated_datas
+
++AOSP="@TERMUX_PREFIX@/opt/aosp"
++excl = {l for d in (f"{AOSP}/lib", f"{AOSP}/lib64") if os.path.isdir(d) for l in os.listdir(d)}
++completer_a.binaries = [l for l in completer_a.binaries if os.path.basename(l[0]) not in excl]
++
+ completer_pyz = PYZ(completer_a.pure, completer_a.zipped_data, cipher=block_cipher)
+ completer_exe = EXE(completer_pyz,
+           completer_a.scripts,

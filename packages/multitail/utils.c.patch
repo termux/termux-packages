@@ -1,0 +1,21 @@
+diff -u -r ../multitail-6.2.1/utils.c ./utils.c
+--- ../multitail-6.2.1/utils.c	2014-02-16 15:06:54.000000000 +0100
++++ ./utils.c	2014-06-30 16:50:19.000000000 +0200
+@@ -95,7 +95,7 @@
+ 
+ void get_load_values(double *v1, double *v2, double *v3)
+ {
+-#if !defined(__UCLIBC__) && (defined(__FreeBSD__) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__GNU__) || defined(__sun) || defined(sun))
++#if !defined(__ANDROID__) && !defined(__UCLIBC__) && (defined(__FreeBSD__) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__GNU__) || defined(__sun) || defined(sun))
+ #if defined(__GLIBC__) && ( __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 2))
+ 	/* Older glibc doesn't have getloadavg() - use sysinfo() */
+ 	/* thanks to Ville Herva for this code! */
+@@ -367,7 +367,7 @@
+ 
+ 	for(;;)
+ 	{
+-		fd = open64(path, mode);
++		fd = open(path, mode);
+ 		if (fd == -1)
+ 		{
+ 			if (errno == EINTR || errno == EAGAIN) /* for AIX */

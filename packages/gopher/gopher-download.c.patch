@@ -1,0 +1,13 @@
+--- a/gopher/download.c
++++ b/gopher/download.c
+@@ -271,8 +271,8 @@
+ 	  return;
+      }
+ #else
+-     if (chdir("/tmp")!=0) {
+-	  CursesErrorMsg(Gtxt("Can't write to the /tmp directory!",70));
++     if (chdir("@TERMUX_PREFIX@/tmp")!=0) {
++	  CursesErrorMsg(Gtxt("Can't write to the @TERMUX_PREFIX@/tmp directory!",70));
+ 	  return;
+      }
+ #endif

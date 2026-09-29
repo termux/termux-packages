@@ -1,0 +1,88 @@
+--- a/configure	2026-09-30 23:53:36.903910196 +0300
++++ b/configure	2026-09-30 23:53:36.908678261 +0300
+@@ -4071,8 +4071,8 @@
+ 	    #
+ 	    ac_lbl_cc_force_warning_errors=-Werror
+     else
+-	    V_INCLS="$V_INCLS -I/usr/local/include"
+-	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
++	    V_INCLS="$V_INCLS -I@TERMUX_PREFIX@/local/include"
++	    LDFLAGS="$LDFLAGS -L@TERMUX_PREFIX@/local/lib"
+ 
+ 	    case "$host_os" in
+ 
+@@ -5785,7 +5785,7 @@
+ then :
+   ipv6type=$i;
+ 				ipv6lib=inet6;
+-				ipv6libdir=/usr/local/v6/lib;
++				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib;
+ 				ipv6trylibc=yes
+ fi
+ rm -rf conftest*
+@@ -5808,7 +5808,7 @@
+ 
+ 			;;
+ 		linux-libinet6)
+-																		if test -d /usr/inet6 -o -f /usr/include/netinet/ip6.h; then
++																		if test -d /usr/inet6 -o -f @TERMUX_PREFIX@/include/netinet/ip6.h; then
+ 				ipv6type=$i
+ 				ipv6lib=inet6
+ 				ipv6libdir=/usr/inet6/lib
+@@ -5829,7 +5829,7 @@
+ then :
+   ipv6type=$i;
+ 				ipv6lib=inet6;
+-				ipv6libdir=/usr/local/v6/lib
++				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib
+ fi
+ rm -rf conftest*
+ 
+@@ -5837,7 +5837,7 @@
+ 		v6d)
+ 			cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-#include </usr/local/v6/include/sys/v6config.h>
++#include <@TERMUX_PREFIX@/local/v6/include/sys/v6config.h>
+ #ifdef __V6D__
+ yes
+ #endif
+@@ -5847,8 +5847,8 @@
+ then :
+   ipv6type=$i;
+ 				ipv6lib=v6;
+-				ipv6libdir=/usr/local/v6/lib;
+-				CFLAGS="-I/usr/local/v6/include $CFLAGS"
++				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib;
++				CFLAGS="-I@TERMUX_PREFIX@/local/v6/include $CFLAGS"
+ fi
+ rm -rf conftest*
+ 
+@@ -5866,7 +5866,7 @@
+ then :
+   ipv6type=$i;
+ 				ipv6lib=inet6;
+-				ipv6libdir=/usr/local/v6/lib
++				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib
+ fi
+ rm -rf conftest*
+ 
+@@ -6846,12 +6846,12 @@
+                 fi
+                                                                                                                                                                                                                                                                                                                                 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
+ printf %s "checking for extraneous pcap header directories... " >&6; }
+-                if test \( ! -r /usr/local/include/pcap.h \) -a \
+-                        \( ! -r /usr/include/pcap.h \); then
+-                    if test -r /usr/local/include/pcap/pcap.h; then
+-                        d="/usr/local/include/pcap"
+-                    elif test -r /usr/include/pcap/pcap.h; then
+-                        d="/usr/include/pcap"
++                if test \( ! -r @TERMUX_PREFIX@/local/include/pcap.h \) -a \
++                        \( ! -r @TERMUX_PREFIX@/include/pcap.h \); then
++                    if test -r @TERMUX_PREFIX@/local/include/pcap/pcap.h; then
++                        d="@TERMUX_PREFIX@/local/include/pcap"
++                    elif test -r @TERMUX_PREFIX@/include/pcap/pcap.h; then
++                        d="@TERMUX_PREFIX@/include/pcap"
+                     fi
+                 fi
+                 if test -z "$d" ; then

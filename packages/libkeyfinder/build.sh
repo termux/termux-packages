@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://mixxxdj.github.io/libkeyfinder
+TERMUX_PKG_DESCRIPTION="Musical key detection for digital audio"
+TERMUX_PKG_LICENSE="GPL-3.0-only"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.2.8"
+TERMUX_PKG_SRCURL="https://github.com/mixxxdj/libkeyfinder/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=a54fc6c5ff435bb4b447f175bc97f9081fb5abf0edd5d125e6f5215c8fff4d11
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="fftw, libc++"

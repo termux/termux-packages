@@ -1,0 +1,20 @@
+Description: fix build with ld --as-needed
+ when building with ld --as-needed libraries must be placed
+ after object files needing them on the command line so the symbols
+ of the libraries are registered as needed.
+Author: Julian Taylor <jtaylor.debian@googlemail.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/xbill/+bug/803215
+Bug-Debian: https://bugs.debian.org/632528
+Bug-Debian: https://bugs.debian.org/925861
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -2,7 +2,7 @@
+ CFLAGS = @CFLAGS@
+ CPPFLAGS = @CPPFLAGS@
+ LDFLAGS = @LDFLAGS@
+-LIBS = @LIBS@ @X_LIBS@ @WIDGET_LIBS@ @X_PRE_LIBS@
++LIBS = @LIBS@ @X_LIBS@ @WIDGET_LIBS@ @X_PRE_LIBS@ -lXpm
+ INSTALL=@INSTALL@
+ INSTALL_DATA=@INSTALL_DATA@
+ MKINSTALLDIRS = $(SHELL) $(top_srcdir)/mkinstalldirs

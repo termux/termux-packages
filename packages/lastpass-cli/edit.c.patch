@@ -1,0 +1,27 @@
+--- a/edit.c
++++ b/edit.c
+@@ -47,7 +47,7 @@
+ 
+ #define MAX_NOTE_LEN (unsigned long) 45000
+ 
+-#if defined(__linux__) || defined(__CYGWIN__)
++#if defined(__linux__) && !defined(__ANDROID__) || defined(__CYGWIN__)
+ static char *shared_memory_dir(void)
+ {
+ 	return xstrdup("/dev/shm");
+@@ -108,14 +108,7 @@
+ 	char *tmpdir = getenv("SECURE_TMPDIR");
+ 	if (!tmpdir) {
+ 		if (!(tmpdir = getenv("TMPDIR")))
+-			tmpdir = "/tmp";
+-
+-		fprintf(stderr,
+-			"Warning: Using %s as secure temporary directory.\n"
+-			"Recommend using tmpfs and encrypted swap.\n"
+-			"Set SECURE_TMPDIR environment variable to override.\n",
+-			tmpdir);
+-		sleep(5);
++			tmpdir = "@TERMUX_PREFIX@/tmp";
+ 	}
+ 	return xstrdup(tmpdir);
+ }

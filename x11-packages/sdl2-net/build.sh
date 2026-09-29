@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_net/
+TERMUX_PKG_DESCRIPTION="A small sample cross-platform networking library (version 2)"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.4.0"
+TERMUX_PKG_SRCURL="https://www.libsdl.org/projects/SDL_net/release/SDL2_net-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=9cbca2527feb3f1a622d48ba65cc7dee9b1e3f2c55ceafb7d7720bb058aafb30
+TERMUX_PKG_DEPENDS="sdl2 | sdl2-compat"
+TERMUX_PKG_BUILD_DEPENDS="sdl2-static"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"

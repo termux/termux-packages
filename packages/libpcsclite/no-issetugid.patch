@@ -1,0 +1,26 @@
+--- a/meson.build
++++ b/meson.build
+@@ -113,8 +113,6 @@
+     if compiler.has_function('issetugid', dependencies: libbsd)
+       pcscd_dep += libbsd
+       libpcsclite_dep += libbsd
+-    else
+-      error('Could not find right library for issetugid()')
+     endif
+   endif
+ endif
+--- a/src/sys_unix.c
++++ b/src/sys_unix.c
+@@ -170,10 +170,12 @@
+ #ifdef HAVE_SECURE_GETENV
+ 	return secure_getenv(name);
+ #else
++#ifndef __ANDROID__
+ 	/* Otherwise, make sure current process is not tainted by uid or gid
+ 	 * changes */
+ 	if (issetugid())
+ 		return NULL;
++#endif
+ 	return getenv(name);
+ #endif
+ }

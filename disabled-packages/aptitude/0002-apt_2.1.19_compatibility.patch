@@ -1,0 +1,19 @@
+Description: Fix FTBFS regression from StrToNum fixes in APT 2.1.19
+Author: David Kalnischkies <david@kalnischkies.de>
+Author: Axel Beckert <abe@debian.org>
+Bug-Debian: https://bugs.debian.org/982716
+
+--- a/src/generic/apt/aptitude_resolver.cc
++++ b/src/generic/apt/aptitude_resolver.cc
+@@ -673,7 +673,10 @@
+   else
+     {
+       unsigned long score_tweak = 0;
+-      if(!StrToNum(action.c_str(), score_tweak, action.size()))
++      char * endptr;
++      errno = 0;
++      score_tweak = strtol(action.c_str(), &endptr, 10);
++      if (errno != 0 || *endptr != '\0')
+ 	{
+ 	  // TRANSLATORS: actions ("approve", etc.) are keywords and should
+ 	  // not be translated

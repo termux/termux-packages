@@ -1,0 +1,20 @@
+--- a/src/corelib/thread/qthread_unix.cpp
++++ b/src/corelib/thread/qthread_unix.cpp
+@@ -52,7 +52,7 @@
+ # define SCHED_IDLE    5
+ #endif
+ 
+-#if defined(Q_OS_DARWIN) || !defined(Q_OS_ANDROID) && !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0)
++#if !defined(__ANDROID__) && (defined(Q_OS_DARWIN) || !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0))
+ #define QT_HAS_THREAD_PRIORITY_SCHEDULING
+ #endif
+ 
+@@ -924,7 +924,7 @@
+ 
+ void QThread::terminate()
+ {
+-#if !defined(Q_OS_ANDROID) && !defined(Q_OS_HARMONY)
++#if !defined(__ANDROID__) && !defined(Q_OS_HARMONY)
+     Q_D(QThread);
+     QMutexLocker locker(&d->mutex);
+ 

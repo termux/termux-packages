@@ -1,0 +1,44 @@
+Description: Fix upstream build system to honour CPPFLAGS and LDFLAGS.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2013-05-09
+
+---
+ gnu/makefile.in |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+--- a/gnu/makefile.in
++++ b/gnu/makefile.in
+@@ -56,7 +56,7 @@ DEBUG_SM = r
+ ADD_LDFLAGS = -s @LD_STRIP@
+ endif
+ 
+-ALL_CFLAGS += $(CFLAGS)
++ALL_CFLAGS += @CPPFLAGS@ $(CPPFLAGS) @CFLAGS@ $(CFLAGS)
+ 
+ # Build Installation paths
+ 
+@@ -80,11 +80,11 @@ SFXSTUB_DIR = $(BASEDIR)/sfxstub
+ # Definitions for compiling submodules
+ 
+ LDFLAGS = @LDFLAGS@ $(ADD_LDFLAGS)
+-DLL_FLAGS = @DLL_FLAGS@ $(ADD_LDFLAGS)
++DLL_FLAGS = @DLL_FLAGS@ $(LDFLAGS)
+ DLL_CFLAGS = @DLL_CFLAGS@
+ REQUIRES_DEF = @REQUIRES_DEF@
+ 
+-COPT = -c -I@OUT_DIR@ -I$(BASEDIR) -I$(SRC_DIR) @CFLAGS@ $(ALL_CFLAGS)
++COPT = -c -I@OUT_DIR@ -I$(BASEDIR) -I$(SRC_DIR) $(ALL_CFLAGS)
+ STD_COPT = -DARJUTIL $(COPT)
+ ARJ_COPT = -DSFL=4 $(COPT)
+ ARJSFXV_COPT = -DSFL=3 $(COPT)
+@@ -189,7 +190,7 @@ msg-headers: $(MSG_HEADERS)
+ 	mkdir -p $@
+ 
+ .deps/%.d: %.c .deps
+-	$(CC) $(CPPFLAGS) $(COPT) $< -MM > $@
++	$(CC) $(COPT) $< -MM > $@
+ 
+ SOURCES = $(wildcard *.c)
+ DEPS = $(addprefix .deps/,$(SOURCES:.c=.d))

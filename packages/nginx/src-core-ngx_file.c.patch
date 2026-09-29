@@ -1,0 +1,12 @@
+diff -u -r ../nginx-1.15.3/src/core/ngx_file.c ./src/core/ngx_file.c
+--- ../nginx-1.15.3/src/core/ngx_file.c	2018-08-28 15:36:00.000000000 +0000
++++ ./src/core/ngx_file.c	2018-09-19 22:12:25.665430137 +0000
+@@ -618,7 +618,7 @@
+             continue;
+         }
+ 
+-#if !(NGX_WIN32)
++#if !(NGX_WIN32) && !defined(__ANDROID__)
+         {
+         ngx_file_info_t   fi;
+ 

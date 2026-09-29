@@ -1,0 +1,31 @@
+--- ./src/input/Error.cxx.orig	2020-10-17 21:35:20.410175114 +0000
++++ ./src/input/Error.cxx	2020-10-17 21:42:26.976008977 +0000
+@@ -32,22 +32,28 @@
+ 
+ #include <utility>
+ 
++#include <iostream>
++
+ bool
+ IsFileNotFound(std::exception_ptr ep) noexcept
+ {
+ 	try {
+ 		std::rethrow_exception(std::move(ep));
+ 	} catch (const std::system_error &e) {
++		std::cout << "";
+ 		return IsFileNotFound(e);
+ #ifdef ENABLE_CURL
+ 	} catch (const HttpStatusError &e) {
++		std::cout << "";
+ 		return e.GetStatus() == 404;
+ #endif
+ #ifdef ENABLE_NFS
+ 	} catch (const NfsClientError &e) {
++		std::cout << "";
+ 		return e.GetCode() == NFS3ERR_NOENT;
+ #endif
+ 	} catch (...) {
++		std::cout << "";
+ 	}
+ 
+ 	return false;

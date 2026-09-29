@@ -1,0 +1,16 @@
+--- fcitx5-gtk-5.0.23/fcitx-gclient/CMakeLists.txt.orig	2023-03-17 12:41:05
++++ fcitx5-gtk-5.0.23/fcitx-gclient/CMakeLists.txt	2023-04-26 19:00:06
+@@ -25,11 +25,11 @@
+ find_program(GLIB_GENMARSHAL ${GLIB2_GLIB_GENMARSHAL})
+ 
+ add_custom_command(OUTPUT marshall.c
+-  COMMAND ${GLIB_GENMARSHAL} --body --prefix=fcitx_marshall --internal --include-header=marshall.h
++  COMMAND /usr/bin/glib-genmarshal --body --prefix=fcitx_marshall --internal --include-header=marshall.h
+   ${PROJECT_SOURCE_DIR}/gtk-common/marshall.list > marshall.c
+   DEPENDS ${PROJECT_SOURCE_DIR}/gtk-common/marshall.list)
+ add_custom_command(OUTPUT marshall.h
+-  COMMAND ${GLIB_GENMARSHAL} --header --prefix=fcitx_marshall --internal
++  COMMAND /usr/bin/glib-genmarshal --header --prefix=fcitx_marshall --internal
+   ${PROJECT_SOURCE_DIR}/gtk-common/marshall.list > marshall.h
+   DEPENDS ${PROJECT_SOURCE_DIR}/gtk-common/marshall.list)
+ 

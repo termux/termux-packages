@@ -1,0 +1,21 @@
+diff --git a/Makefile b/Makefile
+index 5028ee4..f3ce14f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -9,16 +9,8 @@ PREFIX ?= /usr/local
+ INSTALLPATH = ${DESTDIR}${PREFIX}/bin
+ MANPATH = ${DESTDIR}${PREFIX}/share/man/man1
+ 
+-ifeq ($(shell sh -c 'which ncurses5-config>/dev/null 2>/dev/null && echo y'), y)
+-	CFLAGS += -Wall -g $$(ncurses5-config --cflags)
+-	LDFLAGS += $$(ncurses5-config --libs)
+-else ifeq ($(shell sh -c 'which ncursesw5-config>/dev/null 2>/dev/null && echo y'), y)
+-		CFLAGS += -Wall -g $$(ncursesw5-config --cflags)
+-		LDFLAGS += $$(ncursesw5-config --libs)
+-else
+ 	CFLAGS += -Wall -g $$(pkg-config --cflags ncurses)
+ 	LDFLAGS += $$(pkg-config --libs ncurses)
+-endif
+ 
+ tty-clock : ${SRC}
+ 

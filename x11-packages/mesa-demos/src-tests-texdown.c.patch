@@ -1,0 +1,11 @@
+--- a/src/tests/texdown.c
++++ b/src/tests/texdown.c
+@@ -175,7 +175,7 @@
+ #ifdef _WIN32
+    texImage = (GLubyte *) _aligned_malloc(bytes, ALIGN);
+ #else
+-   texImage = (GLubyte *) aligned_alloc(ALIGN, bytes);
++   texImage = (GLubyte *) memalign(ALIGN, bytes);
+ #endif
+    if (!texImage) {
+       DownloadRate = 0.0;

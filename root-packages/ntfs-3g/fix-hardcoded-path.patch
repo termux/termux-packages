@@ -1,0 +1,72 @@
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/mkntfs.c ntfs-3g-2022.10.3.mod/ntfsprogs/mkntfs.c
+--- ntfs-3g-2022.10.3/ntfsprogs/mkntfs.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/mkntfs.c	2022-11-26 16:50:17.724557260 +0800
+@@ -3537,7 +3537,7 @@
+ 			ntfs_log_error("Refusing to make a filesystem here!\n");
+ 			goto done;
+ 		}
+-		ntfs_log_warning("mkntfs forced anyway. Hope /etc/mtab is incorrect.\n");
++		ntfs_log_warning("mkntfs forced anyway. Hope @TERMUX_PREFIX@/etc/mtab is incorrect.\n");
+ 	}
+ 	result = TRUE;
+ done:
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/ntfscmp.c ntfs-3g-2022.10.3.mod/ntfsprogs/ntfscmp.c
+--- ntfs-3g-2022.10.3/ntfsprogs/ntfscmp.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/ntfscmp.c	2022-11-26 16:49:36.494557276 +0800
+@@ -959,7 +959,7 @@
+ 
+ 	if (ntfs_check_if_mounted(volume, &mntflag)) {
+ 		perr_println("Failed to check '%s' mount state", volume);
+-		printf("Probably /etc/mtab is missing. It's too risky to "
++		printf("Probably @TERMUX_PREFIX@/etc/mtab is missing. It's too risky to "
+ 		       "continue. You might try\nan another Linux distro.\n");
+ 		exit(1);
+ 	}
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/ntfsfallocate.c ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsfallocate.c
+--- ntfs-3g-2022.10.3/ntfsprogs/ntfsfallocate.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsfallocate.c	2022-11-26 16:50:49.324557248 +0800
+@@ -841,7 +841,7 @@
+ 		ntfs_log_error("%s is mounted.\n", dev_name);
+ 		if (!opts.force)
+ 			err_exit((ntfs_volume*)NULL, "Refusing to run!\n");
+-		fprintf(stderr, "ntfsfallocate forced anyway. Hope /etc/mtab "
++		fprintf(stderr, "ntfsfallocate forced anyway. Hope @TERMUX_PREFIX@/etc/mtab "
+ 				"is incorrect.\n");
+ 	}
+ 
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/ntfsmftalloc.c ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsmftalloc.c
+--- ntfs-3g-2022.10.3/ntfsprogs/ntfsmftalloc.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsmftalloc.c	2022-11-26 16:49:15.324557284 +0800
+@@ -306,7 +306,7 @@
+ 		ntfs_log_error("%s is mounted.\n", dev_name);
+ 		if (!opts.force)
+ 			err_exit("Refusing to run!\n");
+-		ntfs_log_error("ntfsmftalloc forced anyway. Hope /etc/mtab "
++		ntfs_log_error("ntfsmftalloc forced anyway. Hope @TERMUX_PREFIX@/etc/mtab "
+ 				"is incorrect.\n");
+ 	}
+ 	/* Mount the device. */
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/ntfsresize.c ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsresize.c
+--- ntfs-3g-2022.10.3/ntfsprogs/ntfsresize.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/ntfsresize.c	2022-11-26 16:51:11.854557239 +0800
+@@ -2929,7 +2929,7 @@
+ 
+ 	if (ntfs_check_if_mounted(opt.volume, &mntflag)) {
+ 		perr_printf("Failed to check '%s' mount state", opt.volume);
+-		printf("Probably /etc/mtab is missing. It's too risky to "
++		printf("Probably @TERMUX_PREFIX@/etc/mtab is missing. It's too risky to "
+ 		       "continue. You might try\nan another Linux distro.\n");
+ 		exit(1);
+ 	}
+diff -uNr ntfs-3g-2022.10.3/ntfsprogs/ntfstruncate.c ntfs-3g-2022.10.3.mod/ntfsprogs/ntfstruncate.c
+--- ntfs-3g-2022.10.3/ntfsprogs/ntfstruncate.c	2022-10-03 17:10:36.000000000 +0800
++++ ntfs-3g-2022.10.3.mod/ntfsprogs/ntfstruncate.c	2022-11-26 16:51:28.654557233 +0800
+@@ -733,7 +733,7 @@
+ 		ntfs_log_error("%s is mounted.\n", dev_name);
+ 		if (!opts.force)
+ 			err_exit("Refusing to run!\n");
+-		fprintf(stderr, "ntfstruncate forced anyway. Hope /etc/mtab "
++		fprintf(stderr, "ntfstruncate forced anyway. Hope @TERMUX_PREFIX@/etc/mtab "
+ 				"is incorrect.\n");
+ 	}
+ 

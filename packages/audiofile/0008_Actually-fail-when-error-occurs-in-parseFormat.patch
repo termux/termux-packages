@@ -1,0 +1,36 @@
+From: Antonio Larrosa <larrosa@kde.org>
+Date: Mon, 6 Mar 2017 18:59:26 +0100
+Subject: Actually fail when error occurs in parseFormat
+
+When there's an unsupported number of bits per sample or an invalid
+number of samples per block, don't only print an error message using
+the error handler, but actually stop parsing the file.
+
+This fixes #35 (also reported at
+https://bugzilla.opensuse.org/show_bug.cgi?id=1026983 and
+https://blogs.gentoo.org/ago/2017/02/20/audiofile-heap-based-buffer-overflow-in-imadecodeblockwave-ima-cpp/
+)
+---
+ libaudiofile/WAVE.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libaudiofile/WAVE.cpp b/libaudiofile/WAVE.cpp
+index 0fc48e8..d04b796 100644
+--- a/libaudiofile/WAVE.cpp
++++ b/libaudiofile/WAVE.cpp
+@@ -332,6 +332,7 @@ status WAVEFile::parseFormat(const Tag &id, uint32_t size)
+ 			{
+ 				_af_error(AF_BAD_NOT_IMPLEMENTED,
+ 					"IMA ADPCM compression supports only 4 bits per sample");
++				return AF_FAIL;
+ 			}
+ 
+ 			int bytesPerBlock = (samplesPerBlock + 14) / 8 * 4 * channelCount;
+@@ -339,6 +340,7 @@ status WAVEFile::parseFormat(const Tag &id, uint32_t size)
+ 			{
+ 				_af_error(AF_BAD_CODEC_CONFIG,
+ 					"Invalid samples per block for IMA ADPCM compression");
++				return AF_FAIL;
+ 			}
+ 
+ 			track->f.sampleWidth = 16;

@@ -1,0 +1,27 @@
+diff -uNr chicken-6.0.0/runtime.c chicken-6.0.0.mod/runtime.c
+--- chicken-6.0.0/runtime.c	2026-08-10 14:08:38.135000504 +0530
++++ chicken-6.0.0.mod/runtime.c	2026-08-12 12:45:37.986259134 +0530
+@@ -37,9 +37,6 @@
+ # include <sysexits.h>
+ #endif
+
+-#ifdef __ANDROID__
+-# include <android/log.h>
+-#endif
+
+ #if !defined(PIC)
+ # define NO_DLOAD2
+@@ -591,14 +588,10 @@
+   va_list va;
+
+   va_start(va, fstr);
+-#ifdef __ANDROID__
+-  __android_log_vprint(ANDROID_LOG_DEBUG, prefix, fstr, va);
+-#else
+   C_fflush(C_stdout);
+   C_fprintf(C_stderr, "[%s] ", prefix);
+   C_vfprintf(C_stderr, fstr, va);
+   C_fflush(C_stderr);
+-#endif
+   va_end(va);
+ }

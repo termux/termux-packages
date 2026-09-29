@@ -1,0 +1,58 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 91d0e2c..6e6ac0c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -62,11 +62,11 @@ include(LXQtConfigVars)
+ 
+ # startlxqt script
+ set(PREDEF_XDG_DATA_DIRS "$XDG_DATA_HOME")
+-if(NOT("${LXQT_DATA_DIR}" MATCHES "^/usr(/local)?/share$"))
++if(NOT("${LXQT_DATA_DIR}" MATCHES "^@TERMUX_PREFIX@(/local)?/share$"))
+     set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:${LXQT_DATA_DIR}")
+ endif()
+-set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:/usr/local/share:/usr/share")
+-set(PREDEF_XDG_CONFIG_DIRS "/etc:${LXQT_ETC_XDG_DIR}:/usr/share")
++set(PREDEF_XDG_DATA_DIRS "${PREDEF_XDG_DATA_DIRS}:@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share")
++set(PREDEF_XDG_CONFIG_DIRS "@TERMUX_PREFIX@/etc:${LXQT_ETC_XDG_DIR}:@TERMUX_PREFIX@/share")
+ configure_file(startlxqt.in startlxqt @ONLY)
+ install(PROGRAMS
+     "${CMAKE_CURRENT_BINARY_DIR}/startlxqt"
+diff --git a/lxqt-config-session/autostartedit.cpp b/lxqt-config-session/autostartedit.cpp
+index 58078f9..a54f256 100644
+--- a/lxqt-config-session/autostartedit.cpp
++++ b/lxqt-config-session/autostartedit.cpp
+@@ -58,7 +58,7 @@ bool AutoStartEdit::needTray()
+ 
+ void AutoStartEdit::browse()
+ {
+-    QString filePath = QFileDialog::getOpenFileName(this, tr("Select Application"), QSL("/usr/bin/"));
++    QString filePath = QFileDialog::getOpenFileName(this, tr("Select Application"), QSL("@TERMUX_PREFIX@/bin/"));
+     if (!filePath.isEmpty())
+         ui->commandEdit->setText(filePath);
+ }
+diff --git a/lxqt-config-session/sessionconfigwindow.cpp b/lxqt-config-session/sessionconfigwindow.cpp
+index 2079a12..704ccde 100644
+--- a/lxqt-config-session/sessionconfigwindow.cpp
++++ b/lxqt-config-session/sessionconfigwindow.cpp
+@@ -119,7 +119,7 @@ void SessionConfigWindow::updateCfgComboBox(QComboBox * cb,
+                                             const QString &prompt
+                                            )
+ {
+-    QString fname = QFileDialog::getOpenFileName(cb, prompt, QSL("/usr/bin/"));
++    QString fname = QFileDialog::getOpenFileName(cb, prompt, QSL("@TERMUX_PREFIX@/bin/"));
+     if (fname.isEmpty())
+         return;
+ 
+diff --git a/lxqt-session/src/wmselectdialog.cpp b/lxqt-session/src/wmselectdialog.cpp
+index 921ba0e..5e2320b 100644
+--- a/lxqt-session/src/wmselectdialog.cpp
++++ b/lxqt-session/src/wmselectdialog.cpp
+@@ -117,7 +117,7 @@ void WmSelectDialog::selectFileDialog(const QModelIndex &/*index*/)
+     if (item->data(1, TYPE_ROLE) != SELECT_DLG_TYPE)
+         return;
+ 
+-    QString fname = QFileDialog::getOpenFileName(this, QString(), QSL("/usr/bin/"));
++    QString fname = QFileDialog::getOpenFileName(this, QString(), QSL("@TERMUX_PREFIX@/bin/"));
+     if (fname.isEmpty())
+         return;
+ 

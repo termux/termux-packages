@@ -1,0 +1,93 @@
+diff --git a/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h b/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
+index 83f40a9..9804b76 100644
+--- a/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
++++ b/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
+@@ -53,7 +53,7 @@ typedef struct PairingAuthCtx PairingAuthCtx;
+  * @return a new PairingAuthCtx server instance. Caller is responsible for
+  *         destroying the context via #pairing_auth_destroy.
+  */
+-PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(30);
++PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Creates a new PairingAuthCtx instance as the client.
+@@ -64,14 +64,14 @@ PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRO
+  * @return a new PairingAuthCtx client instance. Caller is responsible for
+  *         destroying the context via #pairing_auth_destroy.
+  */
+-PairingAuthCtx* pairing_auth_client_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(30);
++PairingAuthCtx* pairing_auth_client_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Destroys the PairingAuthCtx.
+  *
+  * @param ctx the PairingAuthCtx instance to destroy. Will abort if null.
+  */
+-void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
++void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns the exact size of the SPAKE2 msg.
+@@ -82,7 +82,7 @@ void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
+  * @param ctx the PairingAuthCtx instance. Will abort if null.
+  * @return the size of the SPAKE2 message in bytes. This is guaranteed to be > 0.
+  */
+-size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
++size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(24);
+ 
+ /**
+  * Writes the SPAKE2 message to exchange with the other party to |out_buf|.
+@@ -96,7 +96,7 @@ size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
+  *                be have at least #pairing_auth_msg_size size. Will abort if
+  *                out_buf is null.
+  */
+-void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTRODUCED_IN(30);
++void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTRODUCED_IN(24);
+ 
+ /**
+  * Processes the peer's |their_msg| and attempts to initialize the cipher for
+@@ -117,7 +117,7 @@ void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTROD
+  *         for more details on the SPAKE2 protocol.
+  */
+ bool pairing_auth_init_cipher(PairingAuthCtx* ctx, const uint8_t* their_msg, size_t msg_len)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns a safe buffer size for encrypting data of a certain size.
+@@ -130,7 +130,7 @@ bool pairing_auth_init_cipher(PairingAuthCtx* ctx, const uint8_t* their_msg, siz
+  * @return the minimum buffer size, in bytes, to hold an encrypted message of size len. See
+  * #pairing_auth_encrypt for usage.
+  */
+-size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRODUCED_IN(30);
++size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Encrypts input data and writes the encrypted data into a user-provided buffer.
+@@ -147,7 +147,7 @@ size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRO
+  *         otherwise.
+  */
+ bool pairing_auth_encrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inlen, uint8_t* outbuf,
+-                          size_t* outlen) __INTRODUCED_IN(30);
++                          size_t* outlen) __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns a safe buffer size for decrypting data of a certain size.
+@@ -162,7 +162,7 @@ bool pairing_auth_encrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inle
+  *         #pairing_auth_decrypt for usage.
+  */
+ size_t pairing_auth_safe_decrypted_size(PairingAuthCtx* ctx, const uint8_t* buf, size_t len)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ /**
+  * Decrypts input data and writes the decrypted data into a user-provided buffer.
+@@ -180,7 +180,7 @@ size_t pairing_auth_safe_decrypted_size(PairingAuthCtx* ctx, const uint8_t* buf,
+  *         otherwise.
+  */
+ bool pairing_auth_decrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inlen, uint8_t* outbuf,
+-                          size_t* outlen) __INTRODUCED_IN(30);
++                          size_t* outlen) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }

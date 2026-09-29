@@ -1,0 +1,14 @@
+--- a/common/core/time.h
++++ b/common/core/time.h
+@@ -26,7 +26,11 @@
+ 
+ #include <limits.h>
+ 
++#ifdef __ANDROID__
++#include <sys/time.h>
++#else
+ struct timeval;
++#endif
+ 
+ namespace core {
+ 

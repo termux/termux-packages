@@ -1,0 +1,12 @@
+diff -uNr slang-2.3.2/src/slsignal.c slang-2.3.2.mod/src/slsignal.c
+--- slang-2.3.2/src/slsignal.c	2018-03-05 01:16:36.000000000 +0200
++++ slang-2.3.2.mod/src/slsignal.c	2020-01-01 20:19:02.140129034 +0200
+@@ -272,7 +272,7 @@
+ 	(void) sigprocmask (SIG_SETMASK, &save_mask, NULL);
+ # endif
+ 
+-	execl ("/bin/sh", "sh", "-c", cmd, (char *)NULL);
++	execl ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, (char *)NULL);
+ 	_exit (127);
+      }
+    else

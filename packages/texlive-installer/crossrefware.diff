@@ -1,0 +1,108 @@
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bbl2bib.pl ./texmf-dist/scripts/crossrefware/bbl2bib.pl
+--- ./texmf-dist/scripts/crossrefware.orig/bbl2bib.pl	2025-03-09 17:33:49.974620795 +0100
++++ ./texmf-dist/scripts/crossrefware/bbl2bib.pl	2025-03-09 17:41:54.107865745 +0100
+@@ -98,7 +98,7 @@
+ use strict;
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bibdoiadd.pl ./texmf-dist/scripts/crossrefware/bibdoiadd.pl
+--- ./texmf-dist/scripts/crossrefware.orig/bibdoiadd.pl	2025-03-09 17:33:49.974620795 +0100
++++ ./texmf-dist/scripts/crossrefware/bibdoiadd.pl	2025-03-09 17:41:54.107865745 +0100
+@@ -106,7 +106,7 @@
+ use strict;
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bibdoiadd.pl.orig ./texmf-dist/scripts/crossrefware/bibdoiadd.pl.orig
+--- ./texmf-dist/scripts/crossrefware.orig/bibdoiadd.pl.orig	2024-09-07 22:23:41.000000000 +0200
++++ ./texmf-dist/scripts/crossrefware/bibdoiadd.pl.orig	2025-03-09 17:33:49.974620795 +0100
+@@ -106,7 +106,7 @@
+ use strict;
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bibmradd.pl ./texmf-dist/scripts/crossrefware/bibmradd.pl
+--- ./texmf-dist/scripts/crossrefware.orig/bibmradd.pl	2025-03-09 17:33:49.978620795 +0100
++++ ./texmf-dist/scripts/crossrefware/bibmradd.pl	2025-03-09 17:41:54.107865745 +0100
+@@ -69,7 +69,7 @@
+ 
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bibmradd.pl.orig ./texmf-dist/scripts/crossrefware/bibmradd.pl.orig
+--- ./texmf-dist/scripts/crossrefware.orig/bibmradd.pl.orig	2024-09-07 22:23:41.000000000 +0200
++++ ./texmf-dist/scripts/crossrefware/bibmradd.pl.orig	2025-03-09 17:33:49.978620795 +0100
+@@ -69,7 +69,7 @@
+ 
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/biburl2doi.pl ./texmf-dist/scripts/crossrefware/biburl2doi.pl
+--- ./texmf-dist/scripts/crossrefware.orig/biburl2doi.pl	2025-03-09 17:33:49.978620795 +0100
++++ ./texmf-dist/scripts/crossrefware/biburl2doi.pl	2025-03-09 17:41:54.111865745 +0100
+@@ -51,7 +51,7 @@
+ use strict;
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/bibzbladd.pl ./texmf-dist/scripts/crossrefware/bibzbladd.pl
+--- ./texmf-dist/scripts/crossrefware.orig/bibzbladd.pl	2025-03-09 17:33:49.982620795 +0100
++++ ./texmf-dist/scripts/crossrefware/bibzbladd.pl	2025-03-09 17:41:54.111865745 +0100
+@@ -64,7 +64,7 @@
+ use strict;
+ BEGIN {
+     # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++    chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+     if (length($TLMaster)) {
+ 	unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+     }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/ltx2crossrefxml.pl ./texmf-dist/scripts/crossrefware/ltx2crossrefxml.pl
+--- ./texmf-dist/scripts/crossrefware.orig/ltx2crossrefxml.pl	2025-03-09 17:33:49.986620795 +0100
++++ ./texmf-dist/scripts/crossrefware/ltx2crossrefxml.pl	2025-03-09 17:41:54.111865745 +0100
+@@ -286,7 +286,7 @@
+ 
+  BEGIN {
+      # find files relative to our installed location within TeX Live
+-     chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
++     chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
+      if (length($TLMaster)) {
+          unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+      }
+diff -ur ./texmf-dist/scripts/crossrefware.orig/ltx2crossrefxml.pl.orig ./texmf-dist/scripts/crossrefware/ltx2crossrefxml.pl.orig
+--- ./texmf-dist/scripts/crossrefware.orig/ltx2crossrefxml.pl.orig	2024-09-07 22:23:41.000000000 +0200
++++ ./texmf-dist/scripts/crossrefware/ltx2crossrefxml.pl.orig	2025-03-09 17:33:49.986620795 +0100
+@@ -286,7 +286,7 @@
+ 
+  BEGIN {
+      # find files relative to our installed location within TeX Live
+-     chomp(my $TLMaster = `kpsewhich -var-value=TEXMFROOT`); # TL root
++     chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
+      if (length($TLMaster)) {
+          unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+      }

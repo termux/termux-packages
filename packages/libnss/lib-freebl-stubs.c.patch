@@ -1,0 +1,11 @@
+--- a/nss/lib/freebl/stubs.c
++++ b/nss/lib/freebl/stubs.c
+@@ -574,7 +574,7 @@
+ PR_GetEnvSecure_stub(const char *var)
+ {
+     STUB_SAFE_CALL1(PR_GetEnvSecure, var);
+-#ifdef __USE_GNU
++#if defined __USE_GNU && !defined __ANDROID__
+     return secure_getenv(var);
+ #else
+     return getenv(var);

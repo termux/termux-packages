@@ -1,0 +1,42 @@
+--- a/build/config/rust.gni
++++ b/build/config/rust.gni
+@@ -7,6 +7,8 @@
+ import("//build/config/sanitizers/sanitizers.gni")
+ import("//build/toolchain/toolchain.gni")
+ 
++import("//v8/gni/snapshot_toolchain.gni")
++
+ if (is_android) {
+   import("//build/config/android/config.gni")
+ }
+@@ -109,6 +111,8 @@
+   # but nothing depends on tham and therefore Clippy will only be invoked
+   # in a full build (i.e. when building all targets).
+   enable_rust_clippy_eager = true
++
++  custom_target_rust_abi_target = ""
+ }
+ 
+ declare_args() {
+@@ -174,7 +178,7 @@
+ # TODO(crbug.com/40809974): To build unit tests for Android we need to build
+ # them as a dylib and put them into an APK. We should reuse all the same logic
+ # for gtests from the `//testing/test:test` template.
+-can_build_rust_unit_tests = toolchain_has_rust && !is_android
++can_build_rust_unit_tests = toolchain_has_rust && !is_android && false
+ 
+ # We want to store rust_sysroot as a source-relative variable for ninja
+ # portability. In practice if an external toolchain was specified, it might
+@@ -343,6 +347,12 @@
+   }
+ }
+ 
++if (!toolchain_for_rust_host_build_tools && current_toolchain != v8_snapshot_toolchain && current_toolchain != host_toolchain) {
++  if (custom_target_rust_abi_target != "") {
++    rust_abi_target = custom_target_rust_abi_target
++  }
++}
++
+ if (toolchain_has_rust) {
+   assert(rust_abi_target != "")
+ 

@@ -1,0 +1,471 @@
+There are a lot of dependencies hardcoded in CMake
+specifically for a tightly vendored GNU/Linux or Mac build;
+I just changed things until it works for Android
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,15 +67,15 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+      set(CMAKE_CXX_FLAGS "-pthread -Wl,--no-as-needed -ldl")
+    endif()
+    add_definitions(-DOS_LINUX)
+-else()
+-   message(FATAL_ERROR "only support linux or macOs")
+ endif()
+ 
++if (NOT ANDROID)
+ if(HOST_ARCH MATCHES "x86_64" OR HOST_ARCH MATCHES "i386")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse4.2")
+ elseif(HOST_ARCH MATCHES "arm")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -moutline-atomics")
+ endif()
++endif()
+ 
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
+ 
+@@ -82,7 +80,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
+ set(EP_BASE_SUFFIX "buildtrees")
+ set_property(DIRECTORY PROPERTY EP_BASE ${CMAKE_CURRENT_SOURCE_DIR}/${EP_BASE_SUFFIX})
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/")
+-set(STAGED_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/deps)
++set(STAGED_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+ set(CMAKE_UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils)
+ set(INSTALL_INCLUDEDIR ${STAGED_INSTALL_PREFIX}/include)
+ set(INSTALL_LIBDIR ${STAGED_INSTALL_PREFIX}/lib)
+@@ -134,6 +134,7 @@ endif()
+ include(protogen.cmake)
+ include(ExternalProject)
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(gtest
+   URL
+   https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
+@@ -159,6 +160,7 @@ ExternalProject_Add(gtest
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(GTEST_LIBRARY ${INSTALL_LIBDIR_64}/libgtest.a)
+@@ -165,9 +163,9 @@ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(GTEST_MAIN_LIBRARY ${INSTALL_LIBDIR_64}/libgtest_main.a)
+   set(GMOCK_LIBRARY ${INSTALL_LIBDIR_64}/libgmock.a)
+ else()
+-  set(GTEST_LIBRARY ${INSTALL_LIBDIR}/libgtest.a)
+-  set(GTEST_MAIN_LIBRARY ${INSTALL_LIBDIR}/libgtest_main.a)
+-  set(GMOCK_LIBRARY ${INSTALL_LIBDIR}/libgmock.a)
++  set(GTEST_LIBRARY ${INSTALL_LIBDIR}/libgtest.so)
++  set(GTEST_MAIN_LIBRARY ${INSTALL_LIBDIR}/libgtest_main.so)
++  set(GMOCK_LIBRARY ${INSTALL_LIBDIR}/libgmock.so)
+ endif()
+ 
+ set(GTEST_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+@@ -175,6 +173,7 @@ set(GTEST_MAIN_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ set(GMOCK_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(gflags
+   URL
+   https://github.com/gflags/gflags/archive/refs/tags/v2.2.2.tar.gz
+@@ -203,11 +202,12 @@ ExternalProject_Add(gflags
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+   set(LIB_GFLAGS libgflags_debug.a)
+ else()
+-  set(LIB_GFLAGS libgflags.a)
++  set(LIB_GFLAGS libgflags.so)
+ endif()
+ 
+ set(GFLAGS_LIBRARY ${INSTALL_LIBDIR}/${LIB_GFLAGS})
+@@ -247,6 +247,7 @@ else()
+   set(LIBUNWIND_ON OFF)
+ endif()
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(glog
+   DEPENDS
+   gflags
+@@ -281,11 +282,12 @@ ExternalProject_Add(glog
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+   set(LIB_GLOG libglogd.a)
+ else()
+-  set(LIB_GLOG libglog.a)
++  set(LIB_GLOG libglog.so)
+ endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+@@ -295,6 +297,7 @@ else()
+ endif()
+ set(GLOG_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(snappy
+   DEPENDS
+   URL
+@@ -324,15 +327,17 @@ ExternalProject_Add(snappy
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(SNAPPY_LIBRARY ${INSTALL_LIBDIR_64}/libsnappy.a)
+ else()
+-  set(SNAPPY_LIBRARY ${INSTALL_LIBDIR}/libsnappy.a)
++  set(SNAPPY_LIBRARY ${INSTALL_LIBDIR}/libsnappy.so)
+ endif()
+ 
+ set(SNAPPY_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(zstd
+   DEPENDS
+   URL
+@@ -364,15 +369,17 @@ ExternalProject_Add(zstd
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(ZSTD_LIBRARY ${INSTALL_LIBDIR_64}/libzstd.a)
+ else()
+-  set(ZSTD_LIBRARY ${INSTALL_LIBDIR}/libzstd.a)
++  set(ZSTD_LIBRARY ${INSTALL_LIBDIR}/libzstd.so)
+ endif()
+ 
+ set(ZSTD_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(fmt
+   DEPENDS
+   URL
+@@ -399,11 +406,12 @@ ExternalProject_Add(fmt
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+   set(LIB_FMT libfmtd.a)
+ else()
+-  set(LIB_FMT libfmt.a)
++  set(LIB_FMT libfmt.so)
+ endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+@@ -414,6 +422,7 @@ endif()
+ 
+ set(FMT_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(lz4
+   DEPENDS
+   URL
+@@ -445,15 +454,17 @@ ExternalProject_Add(lz4
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(LZ4_LIBRARY ${INSTALL_LIBDIR_64}/liblz4.a)
+ else()
+-  set(LZ4_LIBRARY ${INSTALL_LIBDIR}/liblz4.a)
++  set(LZ4_LIBRARY ${INSTALL_LIBDIR}/liblz4.so)
+ endif()
+ 
+ set(LZ4_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(zlib
+   DEPENDS
+   URL
+@@ -481,8 +492,9 @@ ExternalProject_Add(zlib
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+-set(ZLIB_LIBRARY ${INSTALL_LIBDIR}/libz.a)
++set(ZLIB_LIBRARY ${INSTALL_LIBDIR}/libz.so)
+ set(ZLIB_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ 
+ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+@@ -554,6 +566,7 @@ else()
+   set(JEMALLOC_ON OFF)
+ endif()
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(protobuf
+   DEPENDS
+   zlib
+@@ -587,17 +600,19 @@ ExternalProject_Add(protobuf
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ 
+ if(${LIB_BUILD_TYPE} STREQUAL DEBUG)
+   set(LIB_PROTOBUF libprotobufd.a)
+ else()
+-  set(LIB_PROTOBUF libprotobuf.a)
++  set(LIB_PROTOBUF libprotobuf.so)
+ endif()
+ 
+ set(PROTOBUF_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ set(PROTOBUF_LIBRARY ${INSTALL_LIBDIR}/${LIB_PROTOBUF})
+-set(PROTOBUF_PROTOC ${STAGED_INSTALL_PREFIX}/bin/protoc)
++find_program(PROTOBUF_PROTOC protoc PATHS ENV PROTOC_PATH NO_DEFAULT_PATH)
+ 
++if (NOT ANDROID)
+ ExternalProject_Add(rocksdb
+   DEPENDS
+   gflags
+@@ -679,6 +694,7 @@ ExternalProject_Add(rediscache
+   BUILD_COMMAND
+   make -j${CPU_CORE}
+ )
++endif()
+ set(REDISCACHE_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+ set(REDISCACHE_LIBRARY ${INSTALL_LIBDIR}/librediscache.a)
+ 
+@@ -744,7 +760,7 @@ endif()
+ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
+   set(ROCKSDB_LIBRARY ${INSTALL_LIBDIR_64}/librocksdb.a)
+ else()
+-  set(ROCKSDB_LIBRARY ${INSTALL_LIBDIR}/librocksdb.a)
++  set(ROCKSDB_LIBRARY ${INSTALL_LIBDIR}/librocksdb.so)
+ endif()
+ 
+ set(ROCKSDB_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+@@ -825,6 +825,7 @@ target_link_directories(${PROJECT_NAME}
+   PUBLIC ${INSTALL_LIBDIR_64}
+   PUBLIC ${INSTALL_LIBDIR})
+ 
++if (NOT ANDROID)
+ add_dependencies(${PROJECT_NAME}
+   gflags
+   gtest
+@@ -845,6 +846,7 @@ add_dependencies(${PROJECT_NAME}
+   storage
+   cache
+ )
++endif()
+ 
+ target_include_directories(${PROJECT_NAME}
+   PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+@@ -842,14 +858,14 @@ target_link_libraries(${PROJECT_NAME}
+   net
+   pstd
+   ${GLOG_LIBRARY}
+-  librocksdb.a
++  librocksdb.so
+   ${LIB_PROTOBUF}
+   ${LIB_GFLAGS}
+   ${LIB_FMT}
+-  libsnappy.a
+-  libzstd.a
+-  liblz4.a
+-  libz.a
++  libsnappy.so
++  libzstd.so
++  liblz4.so
++  libz.so
+   librediscache.a
+   ${LIBUNWIND_LIBRARY}
+   ${JEMALLOC_LIBRARY})
+--- a/src/pstd/CMakeLists.txt
++++ b/src/pstd/CMakeLists.txt
+@@ -7,10 +7,12 @@ project (pstd)
+ add_compile_options("-fno-builtin-memcmp -pipe")
+ 
+ 
++if (NOT ANDROID)
+ set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
+ if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+   add_compile_options(-msse)
+ endif()
++endif()
+ 
+ add_compile_options(-W -Wextra -Wall -Wsign-compare)
+ add_compile_options(-Wno-unused-parameter -Wno-redundant-decls -Wwrite-strings)
+@@ -30,12 +30,14 @@ aux_source_directory(./src  DIR_SRCS)
+ 
+ add_library(pstd STATIC ${DIR_SRCS})
+ 
++if (NOT ANDROID)
+ add_dependencies(pstd
+   rocksdb
+   glog
+   gflags
+   fmt
+ )
++endif()
+ 
+ target_include_directories(pstd
+     PUBLIC ${PROJECT_SOURCE_DIR}/..
+--- a/src/pstd/tests/CMakeLists.txt
++++ b/src/pstd/tests/CMakeLists.txt
+@@ -20,7 +20,9 @@ foreach(pstd_test_source ${PSTD_TEST_SOURCE})
+     ${ROCKSDB_SOURCE_DIR}
+   )
+ 
++  if (NOT ANDROID)
+   add_dependencies(${pstd_test_name} pstd gtest glog gflags ${LIBUNWIND_NAME})
++  endif()
+   target_link_libraries(${pstd_test_name}
+     PUBLIC pstd
+     PUBLIC ${GTEST_LIBRARY}
+--- a/src/pstd/examples/CMakeLists.txt
++++ b/src/pstd/examples/CMakeLists.txt
+@@ -17,7 +17,9 @@ get_filename_component(pstd_example_filename ${pstd_example_source} NAME)
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${pstd_example_name} pstd glog gflags ${LIBUNWIND_NAME})
++  endif()
+ 
+   target_link_libraries(${pstd_example_name}
+     PUBLIC storage
+--- a/src/net/CMakeLists.txt
++++ b/src/net/CMakeLists.txt
+@@ -13,7 +13,7 @@ endif()
+ add_subdirectory(test)
+ add_subdirectory(examples)
+ 
+-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
++if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ANDROID)
+   list(FILTER DIR_SRCS EXCLUDE REGEX ".net_kqueue.*")
+ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   list(FILTER DIR_SRCS EXCLUDE REGEX ".net_epoll.*")
+@@ -21,7 +21,9 @@ endif()
+ 
+ add_library(net STATIC ${DIR_SRCS} )
+ 
++if (NOT ANDROID)
+ add_dependencies(net protobuf glog gflags ${LIBUNWIND_NAME})
++endif()
+ 
+ 
+ target_include_directories(net
+--- a/src/net/test/CMakeLists.txt
++++ b/src/net/test/CMakeLists.txt
+@@ -19,7 +19,9 @@ foreach(net_test_source ${NET_TEST_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${net_test_name} net gtest glog gflags ${LIBUNWIND_NAME} pstd)
++  endif()
+   target_link_libraries(${net_test_name}
+     PUBLIC net
+     PUBLIC ${GTEST_LIBRARY}
+--- a/src/net/examples/CMakeLists.txt
++++ b/src/net/examples/CMakeLists.txt
+@@ -23,7 +23,9 @@ foreach(net_example_source ${NET_EXAMPLES_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${net_example_name} net pstd storage glog gflags ${LIBUNWIND_NAME} protobuf)
++  endif()
+ 
+   target_link_libraries(${net_example_name}
+     PUBLIC net
+--- a/src/net/examples/performance/CMakeLists.txt
++++ b/src/net/examples/performance/CMakeLists.txt
+@@ -31,7 +31,9 @@ foreach(net_example_performance_source ${NET_EXAMPLES_PERFORMANCE_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${net_example_performance_name} net pstd glog gflags ${LIBUNWIND_NAME} protobuf)
++  endif()
+ 
+   target_link_libraries(${net_example_performance_name}
+     PUBLIC net
+--- a/src/storage/CMakeLists.txt
++++ b/src/storage/CMakeLists.txt
+@@ -11,10 +11,12 @@ add_subdirectory(benchmark)
+ add_definitions(-DROCKSDB_PLATFORM_POSIX -DROCKSDB_LIB_IO_POSIX)
+ add_compile_options("-fno-builtin-memcmp")
+ 
++if (NOT ANDROID)
+ set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_HOST_SYSTEM_PROCESSOR})
+ if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+   add_compile_options(-msse)
+ endif()
++endif()
+ 
+ aux_source_directory(./src  DIR_SRCS)
+ 
+@@ -20,7 +20,9 @@ aux_source_directory(./src  DIR_SRCS)
+ 
+ add_library(storage STATIC ${DIR_SRCS} )
+ 
++if (NOT ANDROID)
+ add_dependencies(storage rocksdb gtest glog gflags fmt ${LIBUNWIND_NAME} pstd)
++endif()
+ # TODO fix rocksdb include path
+ target_include_directories(storage
+     PUBLIC ${PROJECT_SOURCE_DIR}
+--- a/src/storage/tests/CMakeLists.txt
++++ b/src/storage/tests/CMakeLists.txt
+@@ -20,7 +20,9 @@ foreach(blackwindow_test_source ${BLACKWINDOW_TEST_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${blackwindow_test_name} gtest glog gflags ${LIBUNWIND_NAME})
++  endif()
+   target_link_libraries(${blackwindow_test_name}
+     PUBLIC ${GTEST_LIBRARY}
+     PUBLIC pstd
+--- a/src/storage/examples/CMakeLists.txt
++++ b/src/storage/examples/CMakeLists.txt
+@@ -17,7 +17,9 @@ foreach(storage_example_source ${STORAGE_EXAMPLES_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${storage_example_name} storage pstd glog gflags ${LIBUNWIND_NAME})
++  endif()
+ 
+   target_link_libraries(${storage_example_name}
+     PUBLIC storage
+--- a/src/storage/benchmark/CMakeLists.txt
++++ b/src/storage/benchmark/CMakeLists.txt
+@@ -17,7 +17,9 @@ foreach(storage_benchmark_source ${STORAGE_BENCHMARK_SOURCE})
+     ${ROCKSDB_INCLUDE_DIR}
+     ${ROCKSDB_SOURCE_DIR}
+   )
++  if (NOT ANDROID)
+   add_dependencies(${storage_benchmark_name} storage pstd glog gflags ${LIBUNWIND_NAME})
++  endif()
+ 
+   target_link_libraries(${storage_benchmark_name}
+     PUBLIC storage
+--- a/src/cache/CMakeLists.txt
++++ b/src/cache/CMakeLists.txt
+@@ -6,7 +6,9 @@ project (cache)
+ aux_source_directory(./src  DIR_SRCS)
+ include_directories(include)
+ add_library(cache STATIC ${DIR_SRCS})
++if (NOT ANDROID)
+ add_dependencies(cache net protobuf glog gflags rediscache ${LIBUNWIND_NAME})
++endif()
+ 
+ target_link_libraries(cache
+         PUBLIC ${GTEST_LIBRARY}

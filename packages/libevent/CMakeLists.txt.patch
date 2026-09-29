@@ -1,0 +1,12 @@
+--- ./CMakeLists.txt.orig	2022-08-30 11:05:57.580636738 +0200
++++ ./CMakeLists.txt	2022-08-30 11:06:47.268305387 +0200
+@@ -859,7 +859,8 @@
+     if (WIN32)
+         list(APPEND SRC_CORE evthread_win32.c)
+     else()
+-        find_package(Threads REQUIRED)
++        set(CMAKE_THREAD_LIBS_INIT "")
++        set(CMAKE_USE_PTHREADS_INIT 1) 
+         if (NOT CMAKE_USE_PTHREADS_INIT)
+             message(FATAL_ERROR
+                     "Failed to find Pthreads, set EVENT__DISABLE_THREAD_SUPPORT to disable")

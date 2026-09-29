@@ -1,0 +1,12 @@
+diff -u -r ../screenFetch-3.9.0/screenfetch-dev ./screenfetch-dev
+--- ../screenFetch-3.9.0/screenfetch-dev	2019-09-28 09:52:10.000000000 +0000
++++ ./screenfetch-dev	2019-10-06 08:11:06.979812728 +0000
+@@ -1566,7 +1566,7 @@
+ 			hwmonfile=""
+ 			[ -e "$dir/name" ] && hwmonfile=$dir/name
+ 			[ -e "$dir/device/name" ] && hwmonfile=$dir/device/name
+-			[ -n "$hwmonfile" ] && if grep -q 'coretemp' "$hwmonfile"; then
++			[ -n "$hwmonfile" ] && [ -r "$hwmonfile" ] && if grep -q 'coretemp' "$hwmonfile"; then
+ 				thermal="$dir/temp1_input"
+ 				break
+ 			fi

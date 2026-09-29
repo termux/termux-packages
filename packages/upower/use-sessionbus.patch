@@ -1,0 +1,33 @@
+--- a/libupower-glib/up-client.c
++++ b/libupower-glib/up-client.c
+@@ -541,7 +541,7 @@
+ 	client->priv = up_client_get_instance_private (client);
+ 
+ 	/* connect to main interface */
+-	client->priv->proxy = up_exported_daemon_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++	client->priv->proxy = up_exported_daemon_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 									 G_DBUS_PROXY_FLAGS_NONE,
+ 									 "org.freedesktop.UPower",
+ 									 "/org/freedesktop/UPower",
+--- a/libupower-glib/up-device.c
++++ b/libupower-glib/up-device.c
+@@ -157,7 +157,7 @@
+ 	g_clear_pointer (&device->priv->offline_props, g_hash_table_unref);
+ 
+ 	/* connect to the correct path for all the other methods */
+-	proxy_device = up_exported_device_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
++	proxy_device = up_exported_device_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+ 								  G_DBUS_PROXY_FLAGS_NONE,
+ 								  "org.freedesktop.UPower",
+ 								  object_path,
+--- a/src/up-main.c
++++ b/src/up-main.c
+@@ -269,7 +269,7 @@
+ 	bus_flags = G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT;
+ 	if (replace)
+ 		bus_flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
+-	g_bus_own_name (G_BUS_TYPE_SYSTEM,
++	g_bus_own_name (G_BUS_TYPE_SESSION,
+ 			DEVKIT_POWER_SERVICE_NAME,
+ 			bus_flags,
+ 			up_main_bus_acquired,

@@ -1,0 +1,14 @@
+--- a/Common/codepage.c
++++ b/Common/codepage.c
+@@ -105,7 +105,11 @@
+     setlocale(LC_ALL, "");
+ 
+     /* Figure out the locale code set (character set encoding). */
++#ifdef __ANDROID__
++    codeset_name = "UTF-8";
++#else
+     codeset_name = nl_langinfo(CODESET);
++#endif
+ # if defined(__CYGWIN__) /*[*/
+     /*
+      * Cygwin's locale support is quite limited.  If the locale

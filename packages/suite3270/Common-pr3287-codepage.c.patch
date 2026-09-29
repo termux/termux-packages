@@ -1,0 +1,14 @@
+--- a/Common/pr3287/codepage.c
++++ b/Common/pr3287/codepage.c
+@@ -78,7 +78,11 @@
+ 
+ #if !defined(_WIN32) /*[*/
+     setlocale(LC_ALL, "");
++#ifdef __ANDROID__
++    codeset_name = "UTF-8";
++#else
+     codeset_name = nl_langinfo(CODESET);
++#endif
+ # if defined(__CYGWIN__) /*[*/
+     /*
+      * Cygwin's locale support is quite limited.  If the locale

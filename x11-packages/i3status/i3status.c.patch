@@ -1,0 +1,131 @@
+--- a/i3status.c
++++ b/i3status.c
+@@ -294,6 +294,7 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
++#if 0
+     cfg_opt_t ethernet_opts[] = {
+         CFG_STR("format_up", "E: %ip (%speed)", CFGF_NONE),
+         CFG_STR("format_down", "E: down", CFGF_NONE),
+@@ -303,6 +304,7 @@
+         CFG_CUSTOM_SEPARATOR_OPT,
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
++#endif
+ 
+     cfg_opt_t ipv6_opts[] = {
+         CFG_STR("format_up", "%ip", CFGF_NONE),
+@@ -314,6 +316,7 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
++#if 0
+     cfg_opt_t battery_opts[] = {
+         CFG_STR("format", "%status %percentage %remaining", CFGF_NONE),
+         CFG_STR("format_down", "No battery", CFGF_NONE),
+@@ -334,6 +337,7 @@
+         CFG_CUSTOM_SEPARATOR_OPT,
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
++#endif
+ 
+     cfg_opt_t time_opts[] = {
+         CFG_STR("format", "%Y-%m-%d %H:%M:%S", CFGF_NONE),
+@@ -363,6 +367,7 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
++#if 0
+     cfg_opt_t load_opts[] = {
+         CFG_STR("format", "%1min %5min %15min", CFGF_NONE),
+         CFG_STR("format_above_threshold", NULL, CFGF_NONE),
+@@ -373,6 +378,7 @@
+         CFG_CUSTOM_SEPARATOR_OPT,
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
++#endif
+ 
+     cfg_opt_t memory_opts[] = {
+         CFG_STR("format", "%used %free %available", CFGF_NONE),
+@@ -429,6 +435,7 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
++#if 0
+     cfg_opt_t volume_opts[] = {
+         CFG_STR("format", "♪: %volume", CFGF_NONE),
+         CFG_STR("format_muted", "♪: 0%%", CFGF_NONE),
+@@ -441,6 +448,7 @@
+         CFG_CUSTOM_SEPARATOR_OPT,
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
++#endif
+ 
+     cfg_opt_t read_opts[] = {
+         CFG_STR("format", "%content", CFGF_NONE),
+@@ -460,16 +468,12 @@
+         CFG_SEC("run_watch", run_watch_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("path_exists", path_exists_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("wireless", wireless_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("ethernet", ethernet_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("battery", battery_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("cpu_temperature", temp_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("disk", disk_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("volume", volume_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("ipv6", ipv6_opts, CFGF_NONE),
+         CFG_SEC("time", time_opts, CFGF_NONE),
+         CFG_SEC("tztime", tztime_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("ddate", ddate_opts, CFGF_NONE),
+-        CFG_SEC("load", load_opts, CFGF_NONE),
+         CFG_SEC("memory", memory_opts, CFGF_NONE),
+         CFG_SEC("cpu_usage", usage_opts, CFGF_NONE),
+         CFG_SEC("read_file", read_opts, CFGF_TITLE | CFGF_MULTI),
+@@ -709,6 +713,7 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
++#if 0
+             CASE_SEC_TITLE("ethernet") {
+                 SEC_OPEN_MAP("ethernet");
+                 const char *interface = NULL;
+@@ -751,6 +756,7 @@
+                 print_battery_info(&ctx);
+                 SEC_CLOSE_MAP;
+             }
++#endif
+ 
+             CASE_SEC_TITLE("run_watch") {
+                 SEC_OPEN_MAP("run_watch");
+@@ -800,6 +806,7 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
++#if 0
+             CASE_SEC("load") {
+                 SEC_OPEN_MAP("load");
+                 load_ctx_t ctx = {
+@@ -813,6 +820,7 @@
+                 print_load(&ctx);
+                 SEC_CLOSE_MAP;
+             }
++#endif
+ 
+             CASE_SEC("memory") {
+                 SEC_OPEN_MAP("memory");
+@@ -881,6 +889,7 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
++#if 0
+             CASE_SEC_TITLE("volume") {
+                 SEC_OPEN_MAP("volume");
+                 volume_ctx_t ctx = {
+@@ -896,6 +905,7 @@
+                 print_volume(&ctx);
+                 SEC_CLOSE_MAP;
+             }
++#endif
+ 
+             CASE_SEC_TITLE("cpu_temperature") {
+                 SEC_OPEN_MAP("cpu_temperature");

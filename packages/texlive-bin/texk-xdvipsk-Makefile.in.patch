@@ -1,0 +1,27 @@
+--- a/texk/xdvipsk/Makefile.in
++++ b/texk/xdvipsk/Makefile.in
+@@ -93,8 +93,6 @@ POST_UNINSTALL = :
+ build_triplet = @build@
+ host_triplet = @host@
+ bin_PROGRAMS = xdvipsk$(EXEEXT)
+-@cross_TRUE@am__append_1 = mingw/include/wingdi.h
+-@cross_TRUE@am__append_2 = -lgdi32
+ subdir = .
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ am__aclocal_m4_deps = $(top_srcdir)/../../m4/kpse-common.m4 \
+@@ -1002,7 +1000,6 @@ LUA_LIBS = $(LUA53_LIBS)
+ LUA_DEPEND = $(LUA53_DEPEND)
+ AM_CPPFLAGS = $(KPATHSEA_INCLUDES) -DUNIX -DKPATHSEA -DSHIFTLOWCHARS
+ AM_CFLAGS = $(WARNING_CFLAGS)
+-@cross_TRUE@MINGW_INCLUDES = -I$(abs_top_srcdir)/mingw/include
+ 
+ # Force Automake to use CXXLD for linking
+ nodist_EXTRA_xdvipsk_SOURCES = dummy.cxx
+@@ -1137,7 +1134,6 @@ LIBTIFF_LIBS = libtiff.a
+ xdvipsk_LDADD = libdvipsgraph.a $(KPATHSEA_LIBS) $(LUA_LIBS) \
+ 	$(LIBTIFF_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIBJPEG_LIBS) \
+ 	$(FREETYPE2_LIBS) -lstdc++ $(am__append_2)
+-@cross_TRUE@xdvipsk_LDFLAGS = -fno-lto -fno-use-linker-plugin -static -static-libgcc -static-libstdc++ --disable-shared
+ noinst_LIBRARIES = libdvipsgraph.a $(LIBTIFF_LIBS) $(LIBJPEG_LIBS)
+ libdvipsgraph_a_dependencies = $(ZLIB_DEPEND) $(LIBPNG_DEPEND) $(LIBJPEG_DEPEND) $(LIBTIFF_DEPEND)
+ libdvipsgraph_a_SOURCES = \

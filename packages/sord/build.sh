@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://drobilla.net/software/sord.html
+TERMUX_PKG_DESCRIPTION="A lightweight C library for storing RDF data in memory"
+TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.16.22"
+TERMUX_PKG_SRCURL=https://download.drobilla.net/sord-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=bb23b34b216579136795d518cffa73d91cf205594ce9accebfd408afb839173f
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="pcre2, serd, libzix"

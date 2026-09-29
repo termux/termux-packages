@@ -1,0 +1,72 @@
+--- a/src/install/bin.rs
++++ b/src/install/bin.rs
+@@ -1357,7 +1357,7 @@
+         buf[off] = 0;
+         let package_dir = ZStr::from_buf(&buf[..], off);
+ 
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(target_os = "linux")]
+         {
+             if let Some(escapes) = Self::target_escapes_beneath_package_dir(package_dir, abs_target)
+             {
+@@ -1389,7 +1389,7 @@
+         )
+     }
+ 
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(target_os = "linux")]
+     fn target_escapes_beneath_package_dir(package_dir: &ZStr, abs_target: &ZStr) -> Option<bool> {
+         let package_dir_bytes = package_dir.as_bytes();
+         let abs_target_bytes = abs_target.as_bytes();
+--- a/src/sys/lib.rs
++++ b/src/sys/lib.rs
+@@ -1934,7 +1934,7 @@
+             Ok(Fd::from_native(rc))
+         }
+     }
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(target_os = "linux")]
+     pub fn openat2_beneath(dir: impl AsFd, path: &ZStr, flags: i32, mode: Mode) -> Maybe<Fd> {
+         let dir = dir.as_fd();
+         super::linux_syscall::openat2_beneath(dir, path, flags, mode)
+@@ -1943,7 +1943,7 @@
+     /// `openat2(RESOLVE_IN_ROOT | RESOLVE_NO_MAGICLINKS)`: resolves `path` as
+     /// if `dir` were `/`. Falls back to plain `openat` on kernels without
+     /// `openat2` (or when seccomp blocks it), caching the unavailability.
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(target_os = "linux")]
+     pub fn openat2_in_root(dir: impl AsFd, path: &ZStr, flags: i32, mode: Mode) -> Maybe<Fd> {
+         use core::sync::atomic::{AtomicBool, Ordering};
+         static UNAVAILABLE: AtomicBool = AtomicBool::new(false);
+--- a/src/sys/linux_syscall.rs
++++ b/src/sys/linux_syscall.rs
+@@ -90,6 +90,7 @@
+ }
+ 
+ #[inline]
++#[cfg(not(target_os = "android"))]
+ pub(crate) fn openat2_beneath(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+@@ -107,6 +108,7 @@
+ }
+ 
+ #[inline]
++#[cfg(not(target_os = "android"))]
+ pub(crate) fn openat2_in_root(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd, i32> {
+     let oflags = rustix::fs::OFlags::from_bits_retain(flags as u32);
+     let mode = rustix::fs::Mode::from_raw_mode(mode);
+--- a/src/runtime/server/DirectoryRoute.rs
++++ b/src/runtime/server/DirectoryRoute.rs
+@@ -324,9 +324,9 @@
+         let flags = bun_sys::O::RDONLY | bun_sys::O::CLOEXEC | bun_sys::O::NONBLOCK;
+         #[cfg(windows)]
+         let flags = bun_sys::O::RDONLY | bun_sys::O::CLOEXEC;
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(target_os = "linux")]
+         let fd = bun_sys::openat2_in_root(self.root_fd.get(), zrel, flags, 0).ok()?;
+-        #[cfg(not(any(target_os = "linux", target_os = "android")))]
++        #[cfg(not(target_os = "linux"))]
+         let fd = bun_sys::openat(self.root_fd.get(), zrel, flags, 0).ok()?;
+         // Windows `openat` returns a HANDLE; `FileResponseStream` needs a
+         // libuv fd. `make_lib_uv_owned` is a no-op on POSIX.

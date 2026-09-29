@@ -1,0 +1,12 @@
+diff -uNr recordmydesktop-0.3.8.1/src/rmd_initialize_data.c recordmydesktop-0.3.8.1.mod/src/rmd_initialize_data.c
+--- recordmydesktop-0.3.8.1/src/rmd_initialize_data.c	2008-12-13 17:49:09.000000000 +0200
++++ recordmydesktop-0.3.8.1.mod/src/rmd_initialize_data.c	2020-02-11 15:45:12.372308546 +0200
+@@ -239,7 +239,7 @@
+ 
+     char *tmpdir = getenv("TMPDIR");
+     if (tmpdir == NULL) {
+-        tmpdir = "/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+     }
+     args->workdir = strdup(tmpdir);
+ 

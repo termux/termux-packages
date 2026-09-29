@@ -1,0 +1,38 @@
+--- a/gtk3-nocsd.in
++++ b/gtk3-nocsd.in
+@@ -20,17 +20,14 @@
+ 
+ # Determine if this script are installed in the system path
+ GTK3_NOCSD_BINARY="$(readlink -fe "$(which "$0")")"
+-case "${GTK3_NOCSD_BINARY%/*}" in
+-    /sbin|/bin|/usr/bin|/usr/sbin|/usr/local/bin|/usr/local/sbin)  IN_SYSTEM_PATH=1  ;;
+-    *)                                                             IN_SYSTEM_PATH=0  ;;
+-esac
++IN_SYSTEM_PATH=1
+ 
+ # Determine if the library is in the system path. If that's the case,
+ # just use the plain library name, because that way loading the library
+ # on all architectures it's installed is supported (because the linker
+ # will automatically pick out the right one).
+ if [ $IN_SYSTEM_PATH -eq 1 ] ; then
+-    if LC_ALL=C LD_PRELOAD="${GTK3_NOCSD_NAME}" /bin/true 2>&1  | grep LD_PRELOAD | grep -qF "${GTK3_NOCSD_NAME}" ; then
++    if LC_ALL=C LD_PRELOAD="${GTK3_NOCSD_NAME}" @TERMUX_PREFIX@/bin/true 2>&1  | grep LD_PRELOAD | grep -qF "${GTK3_NOCSD_NAME}" ; then
+         IN_SYSTEM_PATH=0
+     else
+         GTK3_NOCSD="${GTK3_NOCSD_NAME}"
+@@ -72,13 +69,13 @@
+ 
+ # Find the real program (the first one that's not symlinked to get3-nocsd)
+ APPNAME="$(basename "$0")"
+-for APPPATH in $(which -a "$APPNAME") /bin/false; do
++for APPPATH in $(which -a "$APPNAME") @TERMUX_PREFIX@/bin/false; do
+     APPPATH_LINK="$(readlink -fe "$APPPATH")"
+     [ x"${APPPATH_LINK##*/}"x = x"gtk3-nocsd"x ] || break
+ done
+ 
+ # Provide error message at all
+-if [ x"$APPNAME"x != x"false"x ] && [ x"${APPPATH}"x = x"/bin/false"x ] ; then
++if [ x"$APPNAME"x != x"false"x ] && [ x"${APPPATH}"x = x"@TERMUX_PREFIX@/bin/false"x ] ; then
+     APPPATH=/.gtk3-nocsd./"$APPNAME"
+ fi
+ 

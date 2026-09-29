@@ -1,0 +1,56 @@
+diff -ur ../frida-core.orig/src/meson.build ./subprojects/frida-core/src/meson.build
+--- ../frida-core.orig/src/meson.build	2025-07-11 09:37:59.248502740 +0000
++++ ./subprojects/frida-core/src/meson.build	2025-07-11 09:38:44.647504986 +0000
+@@ -38,7 +38,7 @@
+     host_os,
+     host_arch,
+     host_toolchain,
+-    resource_compiler,
++    'frida-resource-compiler',
+     '>>>', lipo, '<<<',
+     meson.current_build_dir(),
+     '@PRIVATE_DIR@',
+@@ -483,7 +483,7 @@
+         host_os,
+         host_arch,
+         host_toolchain,
+-        resource_compiler,
++        'frida-resource-compiler',
+         '>>>', lipo, '<<<',
+         meson.current_build_dir(),
+         '@PRIVATE_DIR@',
+--- ../frida-core.orig/tools/meson.build	2025-07-11 09:34:31.349139847 +0000
++++ ./subprojects/frida-core/tools/meson.build	2025-07-11 17:59:29.935571400 +0000
+@@ -10,20 +10,8 @@
+   extra_link_depends += [symscript]
+ endif
+ 
+-resource_compiler = executable('frida-resource-compiler', 'resource-compiler.vala',
+-  vala_args: [
+-    '--pkg=gio-2.0',
+-    '--pkg=libbrotlienc',
+-    '--enable-deprecated',
+-  ],
+-  link_args: extra_link_args,
+-  link_depends: extra_link_depends,
+-  dependencies: [native_glib_dep, native_gio_dep, native_gee_dep, native_brotlienc_dep],
+-  native: true,
+-)
+-
+ resource_compiler_cmd_array = [
+-  resource_compiler,
++  'frida-resource-compiler',
+   f'--toolchain=@host_toolchain@',
+   f'--machine=@host_arch@'
+ ]
+--- ../frida-core.orig/src/embed-agent.py	2025-07-11 09:34:31.326023263 +0000
++++ ./subprojects/frida-core/src/embed-agent.py	2025-07-12 10:40:28.052316897 +0000
+@@ -89,7 +89,7 @@
+         sys.exit(1)
+ 
+     subprocess.run([
+-        resource_compiler,
++        'frida-resource-compiler',
+         f"--toolchain={host_toolchain}",
+         f"--machine={host_arch}",
+         "--config-filename", resource_config,

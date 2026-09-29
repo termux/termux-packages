@@ -1,0 +1,328 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="EvDocumentInfo" get-type="ev_document_info_get_type"/>
+  <boxed name="EvDocumentLicense" get-type="ev_document_license_get_type"/>
+  <class name="EvPage" get-type="ev_page_get_type" parents="GObject">
+  </class>
+  <class name="EvRenderContext" get-type="ev_render_context_get_type" parents="GObject">
+  </class>
+  <class name="EvDocument" get-type="ev_document_get_type" parents="GObject" abstract="1">
+    <property name="modified" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <boxed name="EvRectangle" get-type="ev_rectangle_get_type"/>
+  <boxed name="EvSourceLink" get-type="ev_source_link_get_type"/>
+  <class name="EvAttachment" get-type="ev_attachment_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="234" default-value="NULL"/>
+    <property name="mtime" type="gulong" flags="234" default-value="0"/>
+    <property name="ctime" type="gulong" flags="234" default-value="0"/>
+    <property name="size" type="guint" flags="234" default-value="0"/>
+    <property name="data" type="gpointer" flags="234"/>
+  </class>
+  <class name="EvAnnotation" get-type="ev_annotation_get_type" parents="GObject" abstract="1">
+    <property name="page" type="EvPage" flags="234"/>
+    <property name="contents" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="modified" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="color" type="gpointer" flags="227"/>
+    <property name="rgba" type="GdkRGBA" flags="227"/>
+    <property name="area" type="EvRectangle" flags="227"/>
+  </class>
+  <interface name="EvAnnotationMarkup" get-type="ev_annotation_markup_get_type">
+    <prerequisite name="EvAnnotation"/>
+    <property name="can-have-popup" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="has-popup" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="label" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="opacity" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="popup-is-open" type="gboolean" flags="227" default-value="FALSE"/>
+    <property name="rectangle" type="EvRectangle" flags="227"/>
+  </interface>
+  <class name="EvAnnotationText" get-type="ev_annotation_text_get_type" parents="EvAnnotation,GObject">
+    <implements name="EvAnnotationMarkup"/>
+    <property name="icon" type="EvAnnotationTextIcon" flags="227" default-value="EV_ANNOTATION_TEXT_ICON_NOTE"/>
+    <property name="is-open" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <class name="EvAnnotationAttachment" get-type="ev_annotation_attachment_get_type" parents="EvAnnotation,GObject">
+    <implements name="EvAnnotationMarkup"/>
+    <property name="attachment" type="EvAttachment" flags="231"/>
+  </class>
+  <class name="EvAnnotationTextMarkup" get-type="ev_annotation_text_markup_get_type" parents="EvAnnotation,GObject">
+    <implements name="EvAnnotationMarkup"/>
+    <property name="type" type="EvAnnotationTextMarkupType" flags="231" default-value="EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT"/>
+  </class>
+  <interface name="EvAsyncRenderer" get-type="ev_async_renderer_get_type">
+    <signal name="render-finished" return="void" when="last">
+      <param type="GdkPixbuf"/>
+    </signal>
+  </interface>
+  <boxed name="EvMappingList" get-type="ev_mapping_list_get_type"/>
+  <interface name="EvDocumentAnnotations" get-type="ev_document_annotations_get_type">
+  </interface>
+  <interface name="EvDocumentAttachments" get-type="ev_document_attachments_get_type">
+  </interface>
+  <boxed name="EvFindRectangle" get-type="ev_find_rectangle_get_type"/>
+  <interface name="EvDocumentFind" get-type="ev_document_find_get_type">
+  </interface>
+  <class name="EvLinkDest" get-type="ev_link_dest_get_type" parents="GObject">
+    <property name="type" type="EvLinkDestType" flags="235" default-value="EV_LINK_DEST_TYPE_UNKNOWN"/>
+    <property name="page" type="gint" flags="235" default-value="0"/>
+    <property name="left" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="top" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="bottom" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="right" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="zoom" type="gdouble" flags="235" default-value="0.000000"/>
+    <property name="change" type="guint" flags="235" default-value="0"/>
+    <property name="named" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="page-label" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="EvLinkAction" get-type="ev_link_action_get_type" parents="GObject">
+    <property name="type" type="EvLinkActionType" flags="235" default-value="EV_LINK_ACTION_TYPE_GOTO_DEST"/>
+    <property name="dest" type="EvLinkDest" flags="235"/>
+    <property name="uri" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="filename" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="params" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="show-list" type="gpointer" flags="235"/>
+    <property name="hide-list" type="gpointer" flags="235"/>
+    <property name="toggle-list" type="gpointer" flags="235"/>
+    <property name="reset-fields" type="gpointer" flags="235"/>
+    <property name="exclude-reset-fields" type="gboolean" flags="235" default-value="FALSE"/>
+  </class>
+  <class name="EvLink" get-type="ev_link_get_type" parents="GObject">
+    <property name="title" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="action" type="EvLinkAction" flags="235"/>
+  </class>
+  <interface name="EvDocumentFonts" get-type="ev_document_fonts_get_type">
+  </interface>
+  <class name="EvFormField" get-type="ev_form_field_get_type" parents="GObject" abstract="1">
+  </class>
+  <class name="EvFormFieldText" get-type="ev_form_field_text_get_type" parents="EvFormField,GObject">
+  </class>
+  <class name="EvFormFieldButton" get-type="ev_form_field_button_get_type" parents="EvFormField,GObject">
+  </class>
+  <class name="EvFormFieldChoice" get-type="ev_form_field_choice_get_type" parents="EvFormField,GObject">
+  </class>
+  <class name="EvFormFieldSignature" get-type="ev_form_field_signature_get_type" parents="EvFormField,GObject">
+  </class>
+  <interface name="EvDocumentForms" get-type="ev_document_forms_get_type">
+  </interface>
+  <class name="EvImage" get-type="ev_image_get_type" parents="GObject">
+  </class>
+  <interface name="EvDocumentImages" get-type="ev_document_images_get_type">
+  </interface>
+  <class name="EvLayer" get-type="ev_layer_get_type" parents="GObject">
+  </class>
+  <interface name="EvDocumentLayers" get-type="ev_document_layers_get_type">
+  </interface>
+  <interface name="EvDocumentLinks" get-type="ev_document_links_get_type">
+  </interface>
+  <class name="EvMedia" get-type="ev_media_get_type" parents="GObject">
+  </class>
+  <interface name="EvDocumentMedia" get-type="ev_document_media_get_type">
+  </interface>
+  <interface name="EvDocumentPrint" get-type="ev_document_print_get_type">
+  </interface>
+  <interface name="EvDocumentSecurity" get-type="ev_document_security_get_type">
+  </interface>
+  <interface name="EvDocumentText" get-type="ev_document_text_get_type">
+  </interface>
+  <class name="EvTransitionEffect" get-type="ev_transition_effect_get_type" parents="GObject">
+    <property name="type" type="EvTransitionEffectType" flags="227" default-value="EV_TRANSITION_EFFECT_REPLACE"/>
+    <property name="alignment" type="EvTransitionEffectAlignment" flags="227" default-value="EV_TRANSITION_ALIGNMENT_HORIZONTAL"/>
+    <property name="direction" type="EvTransitionEffectDirection" flags="227" default-value="EV_TRANSITION_DIRECTION_INWARD"/>
+    <property name="duration" type="gint" flags="-2147483421" default-value="0"/>
+    <property name="duration-real" type="gdouble" flags="227" default-value="0.000000"/>
+    <property name="angle" type="gint" flags="227" default-value="0"/>
+    <property name="scale" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="rectangular" type="gboolean" flags="227" default-value="FALSE"/>
+  </class>
+  <interface name="EvDocumentTransition" get-type="ev_document_transition_get_type">
+  </interface>
+  <interface name="EvFileExporter" get-type="ev_file_exporter_get_type">
+  </interface>
+  <interface name="EvSelection" get-type="ev_selection_get_type">
+  </interface>
+  <enum name="EvAnnotationType" get-type="ev_annotation_type_get_type">
+    <member name="EV_ANNOTATION_TYPE_UNKNOWN" nick="unknown" value="0"/>
+    <member name="EV_ANNOTATION_TYPE_TEXT" nick="text" value="1"/>
+    <member name="EV_ANNOTATION_TYPE_ATTACHMENT" nick="attachment" value="2"/>
+    <member name="EV_ANNOTATION_TYPE_TEXT_MARKUP" nick="text-markup" value="3"/>
+  </enum>  <enum name="EvAnnotationTextIcon" get-type="ev_annotation_text_icon_get_type">
+    <member name="EV_ANNOTATION_TEXT_ICON_NOTE" nick="note" value="0"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_COMMENT" nick="comment" value="1"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_KEY" nick="key" value="2"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_HELP" nick="help" value="3"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_NEW_PARAGRAPH" nick="new-paragraph" value="4"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_PARAGRAPH" nick="paragraph" value="5"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_INSERT" nick="insert" value="6"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_CROSS" nick="cross" value="7"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_CIRCLE" nick="circle" value="8"/>
+    <member name="EV_ANNOTATION_TEXT_ICON_UNKNOWN" nick="unknown" value="9"/>
+  </enum>  <enum name="EvAnnotationTextMarkupType" get-type="ev_annotation_text_markup_type_get_type">
+    <member name="EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT" nick="highlight" value="0"/>
+    <member name="EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT" nick="strike-out" value="1"/>
+    <member name="EV_ANNOTATION_TEXT_MARKUP_UNDERLINE" nick="underline" value="2"/>
+    <member name="EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY" nick="squiggly" value="3"/>
+  </enum>  <flags name="EvAnnotationsSaveMask" get-type="ev_annotations_save_mask_get_type">
+    <member name="EV_ANNOTATIONS_SAVE_NONE" nick="none" value="0"/>
+    <member name="EV_ANNOTATIONS_SAVE_CONTENTS" nick="contents" value="1"/>
+    <member name="EV_ANNOTATIONS_SAVE_COLOR" nick="color" value="2"/>
+    <member name="EV_ANNOTATIONS_SAVE_AREA" nick="area" value="4"/>
+    <member name="EV_ANNOTATIONS_SAVE_LABEL" nick="label" value="8"/>
+    <member name="EV_ANNOTATIONS_SAVE_OPACITY" nick="opacity" value="16"/>
+    <member name="EV_ANNOTATIONS_SAVE_POPUP_RECT" nick="popup-rect" value="32"/>
+    <member name="EV_ANNOTATIONS_SAVE_POPUP_IS_OPEN" nick="popup-is-open" value="64"/>
+    <member name="EV_ANNOTATIONS_SAVE_TEXT_IS_OPEN" nick="text-is-open" value="128"/>
+    <member name="EV_ANNOTATIONS_SAVE_TEXT_ICON" nick="text-icon" value="256"/>
+    <member name="EV_ANNOTATIONS_SAVE_ATTACHMENT" nick="attachment" value="512"/>
+    <member name="EV_ANNOTATIONS_SAVE_TEXT_MARKUP_TYPE" nick="text-markup-type" value="1024"/>
+    <member name="EV_ANNOTATIONS_SAVE_ALL" nick="all" value="2047"/>
+  </flags>
+  <enum name="EvAnnotationsOverMarkup" get-type="ev_annotations_over_markup_get_type">
+    <member name="EV_ANNOTATION_OVER_MARKUP_NOT_IMPLEMENTED" nick="not-implemented" value="0"/>
+    <member name="EV_ANNOTATION_OVER_MARKUP_UNKNOWN" nick="unknown" value="1"/>
+    <member name="EV_ANNOTATION_OVER_MARKUP_YES" nick="yes" value="2"/>
+    <member name="EV_ANNOTATION_OVER_MARKUP_NOT" nick="not" value="3"/>
+  </enum>  <flags name="EvFindOptions" get-type="ev_find_options_get_type">
+    <member name="EV_FIND_DEFAULT" nick="default" value="0"/>
+    <member name="EV_FIND_CASE_SENSITIVE" nick="case-sensitive" value="1"/>
+    <member name="EV_FIND_WHOLE_WORDS_ONLY" nick="whole-words-only" value="2"/>
+  </flags>
+  <enum name="EvDocumentLayout" get-type="ev_document_layout_get_type">
+    <member name="EV_DOCUMENT_LAYOUT_SINGLE_PAGE" nick="single-page" value="0"/>
+    <member name="EV_DOCUMENT_LAYOUT_ONE_COLUMN" nick="one-column" value="1"/>
+    <member name="EV_DOCUMENT_LAYOUT_TWO_COLUMN_LEFT" nick="two-column-left" value="2"/>
+    <member name="EV_DOCUMENT_LAYOUT_TWO_COLUMN_RIGHT" nick="two-column-right" value="3"/>
+    <member name="EV_DOCUMENT_LAYOUT_TWO_PAGE_LEFT" nick="two-page-left" value="4"/>
+    <member name="EV_DOCUMENT_LAYOUT_TWO_PAGE_RIGHT" nick="two-page-right" value="5"/>
+  </enum>  <enum name="EvDocumentMode" get-type="ev_document_mode_get_type">
+    <member name="EV_DOCUMENT_MODE_NONE" nick="none" value="0"/>
+    <member name="EV_DOCUMENT_MODE_USE_OC" nick="use-oc" value="1"/>
+    <member name="EV_DOCUMENT_MODE_USE_THUMBS" nick="use-thumbs" value="2"/>
+    <member name="EV_DOCUMENT_MODE_FULL_SCREEN" nick="full-screen" value="3"/>
+    <member name="EV_DOCUMENT_MODE_USE_ATTACHMENTS" nick="use-attachments" value="4"/>
+    <member name="EV_DOCUMENT_MODE_PRESENTATION" nick="presentation" value="3"/>
+  </enum>  <enum name="EvDocumentContainsJS" get-type="ev_document_contains_js_get_type">
+    <member name="EV_DOCUMENT_CONTAINS_JS_UNKNOWN" nick="unknown" value="0"/>
+    <member name="EV_DOCUMENT_CONTAINS_JS_NO" nick="no" value="1"/>
+    <member name="EV_DOCUMENT_CONTAINS_JS_YES" nick="yes" value="2"/>
+  </enum>  <flags name="EvDocumentUIHints" get-type="ev_document_ui_hints_get_type">
+    <member name="EV_DOCUMENT_UI_HINT_HIDE_TOOLBAR" nick="hide-toolbar" value="1"/>
+    <member name="EV_DOCUMENT_UI_HINT_HIDE_MENUBAR" nick="hide-menubar" value="2"/>
+    <member name="EV_DOCUMENT_UI_HINT_HIDE_WINDOWUI" nick="hide-windowui" value="4"/>
+    <member name="EV_DOCUMENT_UI_HINT_FIT_WINDOW" nick="fit-window" value="8"/>
+    <member name="EV_DOCUMENT_UI_HINT_CENTER_WINDOW" nick="center-window" value="16"/>
+    <member name="EV_DOCUMENT_UI_HINT_DISPLAY_DOC_TITLE" nick="display-doc-title" value="32"/>
+    <member name="EV_DOCUMENT_UI_HINT_DIRECTION_RTL" nick="direction-rtl" value="64"/>
+  </flags>
+  <flags name="EvDocumentPermissions" get-type="ev_document_permissions_get_type">
+    <member name="EV_DOCUMENT_PERMISSIONS_OK_TO_PRINT" nick="ok-to-print" value="1"/>
+    <member name="EV_DOCUMENT_PERMISSIONS_OK_TO_MODIFY" nick="ok-to-modify" value="2"/>
+    <member name="EV_DOCUMENT_PERMISSIONS_OK_TO_COPY" nick="ok-to-copy" value="4"/>
+    <member name="EV_DOCUMENT_PERMISSIONS_OK_TO_ADD_NOTES" nick="ok-to-add-notes" value="8"/>
+    <member name="EV_DOCUMENT_PERMISSIONS_FULL" nick="full" value="15"/>
+  </flags>
+  <flags name="EvDocumentInfoFields" get-type="ev_document_info_fields_get_type">
+    <member name="EV_DOCUMENT_INFO_TITLE" nick="title" value="1"/>
+    <member name="EV_DOCUMENT_INFO_FORMAT" nick="format" value="2"/>
+    <member name="EV_DOCUMENT_INFO_AUTHOR" nick="author" value="4"/>
+    <member name="EV_DOCUMENT_INFO_SUBJECT" nick="subject" value="8"/>
+    <member name="EV_DOCUMENT_INFO_KEYWORDS" nick="keywords" value="16"/>
+    <member name="EV_DOCUMENT_INFO_LAYOUT" nick="layout" value="32"/>
+    <member name="EV_DOCUMENT_INFO_CREATOR" nick="creator" value="64"/>
+    <member name="EV_DOCUMENT_INFO_PRODUCER" nick="producer" value="128"/>
+    <member name="EV_DOCUMENT_INFO_CREATION_DATE" nick="creation-date" value="256"/>
+    <member name="EV_DOCUMENT_INFO_MOD_DATE" nick="mod-date" value="512"/>
+    <member name="EV_DOCUMENT_INFO_LINEARIZED" nick="linearized" value="1024"/>
+    <member name="EV_DOCUMENT_INFO_START_MODE" nick="start-mode" value="2048"/>
+    <member name="EV_DOCUMENT_INFO_UI_HINTS" nick="ui-hints" value="4096"/>
+    <member name="EV_DOCUMENT_INFO_PERMISSIONS" nick="permissions" value="8192"/>
+    <member name="EV_DOCUMENT_INFO_N_PAGES" nick="n-pages" value="16384"/>
+    <member name="EV_DOCUMENT_INFO_SECURITY" nick="security" value="32768"/>
+    <member name="EV_DOCUMENT_INFO_PAPER_SIZE" nick="paper-size" value="65536"/>
+    <member name="EV_DOCUMENT_INFO_LICENSE" nick="license" value="131072"/>
+    <member name="EV_DOCUMENT_INFO_CONTAINS_JS" nick="contains-js" value="262144"/>
+  </flags>
+  <flags name="EvDocumentLoadFlags" get-type="ev_document_load_flags_get_type">
+    <member name="EV_DOCUMENT_LOAD_FLAG_NONE" nick="none" value="0"/>
+    <member name="EV_DOCUMENT_LOAD_FLAG_NO_CACHE" nick="no-cache" value="1"/>
+  </flags>
+  <enum name="EvDocumentError" get-type="ev_document_error_get_type">
+    <member name="EV_DOCUMENT_ERROR_INVALID" nick="invalid" value="0"/>
+    <member name="EV_DOCUMENT_ERROR_UNSUPPORTED_CONTENT" nick="unsupported-content" value="1"/>
+    <member name="EV_DOCUMENT_ERROR_ENCRYPTED" nick="encrypted" value="2"/>
+  </enum>  <enum name="EvFileExporterFormat" get-type="ev_file_exporter_format_get_type">
+    <member name="EV_FILE_FORMAT_UNKNOWN" nick="unknown" value="0"/>
+    <member name="EV_FILE_FORMAT_PS" nick="ps" value="1"/>
+    <member name="EV_FILE_FORMAT_PDF" nick="pdf" value="2"/>
+  </enum>  <flags name="EvFileExporterCapabilities" get-type="ev_file_exporter_capabilities_get_type">
+    <member name="EV_FILE_EXPORTER_CAN_PAGE_SET" nick="page-set" value="1"/>
+    <member name="EV_FILE_EXPORTER_CAN_COPIES" nick="copies" value="2"/>
+    <member name="EV_FILE_EXPORTER_CAN_COLLATE" nick="collate" value="4"/>
+    <member name="EV_FILE_EXPORTER_CAN_REVERSE" nick="reverse" value="8"/>
+    <member name="EV_FILE_EXPORTER_CAN_SCALE" nick="scale" value="16"/>
+    <member name="EV_FILE_EXPORTER_CAN_GENERATE_PDF" nick="generate-pdf" value="32"/>
+    <member name="EV_FILE_EXPORTER_CAN_GENERATE_PS" nick="generate-ps" value="64"/>
+    <member name="EV_FILE_EXPORTER_CAN_PREVIEW" nick="preview" value="128"/>
+    <member name="EV_FILE_EXPORTER_CAN_NUMBER_UP" nick="number-up" value="256"/>
+  </flags>
+  <enum name="EvCompressionType" get-type="ev_compression_type_get_type">
+    <member name="EV_COMPRESSION_NONE" nick="none" value="0"/>
+    <member name="EV_COMPRESSION_BZIP2" nick="bzip2" value="1"/>
+    <member name="EV_COMPRESSION_GZIP" nick="gzip" value="2"/>
+    <member name="EV_COMPRESSION_LZMA" nick="lzma" value="3"/>
+  </enum>  <enum name="EvFormFieldTextType" get-type="ev_form_field_text_type_get_type">
+    <member name="EV_FORM_FIELD_TEXT_NORMAL" nick="normal" value="0"/>
+    <member name="EV_FORM_FIELD_TEXT_MULTILINE" nick="multiline" value="1"/>
+    <member name="EV_FORM_FIELD_TEXT_FILE_SELECT" nick="file-select" value="2"/>
+  </enum>  <enum name="EvFormFieldButtonType" get-type="ev_form_field_button_type_get_type">
+    <member name="EV_FORM_FIELD_BUTTON_PUSH" nick="push" value="0"/>
+    <member name="EV_FORM_FIELD_BUTTON_CHECK" nick="check" value="1"/>
+    <member name="EV_FORM_FIELD_BUTTON_RADIO" nick="radio" value="2"/>
+  </enum>  <enum name="EvFormFieldChoiceType" get-type="ev_form_field_choice_type_get_type">
+    <member name="EV_FORM_FIELD_CHOICE_COMBO" nick="combo" value="0"/>
+    <member name="EV_FORM_FIELD_CHOICE_LIST" nick="list" value="1"/>
+  </enum>  <enum name="EvLinkActionType" get-type="ev_link_action_type_get_type">
+    <member name="EV_LINK_ACTION_TYPE_GOTO_DEST" nick="goto-dest" value="0"/>
+    <member name="EV_LINK_ACTION_TYPE_GOTO_REMOTE" nick="goto-remote" value="1"/>
+    <member name="EV_LINK_ACTION_TYPE_EXTERNAL_URI" nick="external-uri" value="2"/>
+    <member name="EV_LINK_ACTION_TYPE_LAUNCH" nick="launch" value="3"/>
+    <member name="EV_LINK_ACTION_TYPE_NAMED" nick="named" value="4"/>
+    <member name="EV_LINK_ACTION_TYPE_LAYERS_STATE" nick="layers-state" value="5"/>
+    <member name="EV_LINK_ACTION_TYPE_RESET_FORM" nick="reset-form" value="6"/>
+  </enum>  <enum name="EvLinkDestType" get-type="ev_link_dest_type_get_type">
+    <member name="EV_LINK_DEST_TYPE_PAGE" nick="page" value="0"/>
+    <member name="EV_LINK_DEST_TYPE_XYZ" nick="xyz" value="1"/>
+    <member name="EV_LINK_DEST_TYPE_FIT" nick="fit" value="2"/>
+    <member name="EV_LINK_DEST_TYPE_FITH" nick="fith" value="3"/>
+    <member name="EV_LINK_DEST_TYPE_FITV" nick="fitv" value="4"/>
+    <member name="EV_LINK_DEST_TYPE_FITR" nick="fitr" value="5"/>
+    <member name="EV_LINK_DEST_TYPE_NAMED" nick="named" value="6"/>
+    <member name="EV_LINK_DEST_TYPE_PAGE_LABEL" nick="page-label" value="7"/>
+    <member name="EV_LINK_DEST_TYPE_UNKNOWN" nick="unknown" value="8"/>
+  </enum>  <enum name="EvSelectionStyle" get-type="ev_selection_style_get_type">
+    <member name="EV_SELECTION_STYLE_GLYPH" nick="glyph" value="0"/>
+    <member name="EV_SELECTION_STYLE_WORD" nick="word" value="1"/>
+    <member name="EV_SELECTION_STYLE_LINE" nick="line" value="2"/>
+  </enum>  <enum name="EvTransitionEffectType" get-type="ev_transition_effect_type_get_type">
+    <member name="EV_TRANSITION_EFFECT_REPLACE" nick="replace" value="0"/>
+    <member name="EV_TRANSITION_EFFECT_SPLIT" nick="split" value="1"/>
+    <member name="EV_TRANSITION_EFFECT_BLINDS" nick="blinds" value="2"/>
+    <member name="EV_TRANSITION_EFFECT_BOX" nick="box" value="3"/>
+    <member name="EV_TRANSITION_EFFECT_WIPE" nick="wipe" value="4"/>
+    <member name="EV_TRANSITION_EFFECT_DISSOLVE" nick="dissolve" value="5"/>
+    <member name="EV_TRANSITION_EFFECT_GLITTER" nick="glitter" value="6"/>
+    <member name="EV_TRANSITION_EFFECT_FLY" nick="fly" value="7"/>
+    <member name="EV_TRANSITION_EFFECT_PUSH" nick="push" value="8"/>
+    <member name="EV_TRANSITION_EFFECT_COVER" nick="cover" value="9"/>
+    <member name="EV_TRANSITION_EFFECT_UNCOVER" nick="uncover" value="10"/>
+    <member name="EV_TRANSITION_EFFECT_FADE" nick="fade" value="11"/>
+  </enum>  <enum name="EvTransitionEffectAlignment" get-type="ev_transition_effect_alignment_get_type">
+    <member name="EV_TRANSITION_ALIGNMENT_HORIZONTAL" nick="horizontal" value="0"/>
+    <member name="EV_TRANSITION_ALIGNMENT_VERTICAL" nick="vertical" value="1"/>
+  </enum>  <enum name="EvTransitionEffectDirection" get-type="ev_transition_effect_direction_get_type">
+    <member name="EV_TRANSITION_DIRECTION_INWARD" nick="inward" value="0"/>
+    <member name="EV_TRANSITION_DIRECTION_OUTWARD" nick="outward" value="1"/>
+  </enum>  <error-quark function="ev_document_error_quark" domain="ev-document-error-quark"/>
+  <error-quark function="ev_attachment_error_quark" domain="ev-attachment-error-quark"/>
+</dump>

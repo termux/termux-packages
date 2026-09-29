@@ -1,0 +1,30 @@
+--- a/libbb/yescrypt/alg-yescrypt-common.c
++++ b/libbb/yescrypt/alg-yescrypt-common.c
+@@ -35,6 +35,12 @@
+ 
+ #define FULL_PARAMS(...) __VA_ARGS__
+ 
++#ifdef __ANDROID__
++static void *(*volatile explicit_memset)(void *, int, size_t) = memset;
++#undef explicit_bzero
++#define explicit_bzero(s, n) explicit_memset(s, 0, n)
++#endif
++
+ /* Not inlining:
+  * de/encode64 functions are only used to read
+  * yescrypt_params_t field, and convert salt to binary -
+--- a/libbb/yescrypt/alg-yescrypt-kdf.c
++++ b/libbb/yescrypt/alg-yescrypt-kdf.c
+@@ -42,6 +42,12 @@
+ #define unlikely(exp) (exp)
+ #endif
+ 
++#ifdef __ANDROID__
++static void *(*volatile explicit_memset)(void *, int, size_t) = memset;
++#undef explicit_bzero
++#define explicit_bzero(s, n) explicit_memset(s, 0, n)
++#endif
++
+ typedef union {
+ 	uint32_t w[16];
+ 	uint64_t d[8];

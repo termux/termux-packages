@@ -1,0 +1,15 @@
+--- a/finger/util.c
++++ b/finger/util.c
+@@ -53,6 +53,12 @@
+ #include <stdlib.h>
+ #include "finger.h"
+ 
++#ifdef __ANDROID__
++#define bcopy(src,dest,n) memmove(dest,src,n)
++#define L_SET SEEK_SET
++#define _PATH_MAILDIR "@TERMUX_PREFIX@/var/spool/mail"
++#endif
++
+ #define	HBITS	8			/* number of bits in hash code */
+ #define	HSIZE	(1 << 8)		/* hash table size */
+ #define	HMASK	(HSIZE - 1)		/* hash code mask */

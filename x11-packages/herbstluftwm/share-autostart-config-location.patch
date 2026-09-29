@@ -1,0 +1,13 @@
+diff --git a/share/autostart b/share/autostart
+index b40109e8..f0919156 100755
+--- a/share/autostart
++++ b/share/autostart
+@@ -185,7 +185,7 @@ hc unlock
+ 
+ # find the panel
+ panel=~/.config/herbstluftwm/panel.sh
+-[ -x "$panel" ] || panel=/etc/xdg/herbstluftwm/panel.sh
++[ -x "$panel" ] || panel="@TERMUX_PREFIX@/etc/xdg/herbstluftwm/panel.sh"
+ for monitor in $(hc list_monitors | cut -d: -f1) ; do
+     # start it on each monitor
+     "$panel" "$monitor" &

@@ -1,0 +1,29 @@
+--- a/llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
++++ b/llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
+@@ -286,7 +286,7 @@
+   uintptr_t SlabSize = 0;
+   uintptr_t CurrentSlabOffset = 0;
+   SectionIDMap *SecIDMap = nullptr;
+-#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
+   unsigned UsedTLSStorage = 0;
+ #endif
+ };
+@@ -350,7 +350,7 @@
+ 
+ // In case the execution needs TLS storage, we define a very small TLS memory
+ // area here that will be used in allocateTLSSection().
+-#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
+ extern "C" {
+ alignas(16) __attribute__((visibility("hidden"), tls_model("initial-exec"),
+                            used)) thread_local char LLVMRTDyldTLSSpace[16];
+@@ -361,7 +361,7 @@
+ TrivialMemoryManager::allocateTLSSection(uintptr_t Size, unsigned Alignment,
+                                          unsigned SectionID,
+                                          StringRef SectionName) {
+-#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__)
++#if defined(__x86_64__) && defined(__ELF__) && defined(__linux__) && !defined(__ANDROID__)
+   if (Size + UsedTLSStorage > sizeof(LLVMRTDyldTLSSpace)) {
+     return {};
+   }

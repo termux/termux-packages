@@ -1,0 +1,27 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+# Run `sv-enable ssh-agent` and add the following to your bashrc (or
+# equivalent) to use ssh-agent:
+#   export SSH_AUTH_SOCK="$PREFIX"/var/run/ssh-agent.socket
+# After that you can add your key to the agent with `ssh-add`, and
+# then make use of the credentials across all terminal sessions
+
+service_agent() {
+	# If agent is not turned off before device is rebooted or
+	# termux force-stopped, then it fails to start with:
+	#   unix_listener: cannot bind to path /data/data/com.termux/files/usr/var/run/ssh-agent.socket: Address already in use
+	# Therefore unlink socket file before trying to use it
+	if [ -S "$1" ]; then
+		unlink "$1"
+	fi
+	exec ssh-agent -D -a "$1" 2>&1
+}
+
+# Allow overriding the service_agent function easily.
+if [ -r "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh ]; then
+	. "${TERMUX__PREFIX:-"${PREFIX}"}"/etc/ssh/start_agent.sh
+fi
+
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-"${TERMUX__PREFIX:-"${PREFIX}"}/var/run"}"/ssh-agent.socket
+
+service_agent "${SSH_AUTH_SOCK}"

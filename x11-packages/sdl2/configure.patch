@@ -1,0 +1,28 @@
+diff --color -uNr SDL2-2.24.0/configure SDL2-2.24.0.mod/configure
+--- SDL2-2.24.0/configure	2022-08-19 23:46:21.000000000 +0800
++++ SDL2-2.24.0.mod/configure	2022-08-21 09:11:23.955790764 +0800
+@@ -28248,24 +28248,6 @@
+ case "$host" in
+     *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
+         case "$host" in
+-            *-*-android*)
+-                # Android
+-                ARCH=android
+-                ANDROID_CFLAGS="-DGL_GLEXT_PROTOTYPES"
+-                CFLAGS="$CFLAGS $ANDROID_CFLAGS"
+-                SDL_CFLAGS="$SDL_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_CFLAGS="$EXTRA_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldl -lGLESv1_CM -lGLESv2 -llog -landroid"
+-                SDLMAIN_SOURCES="$srcdir/src/main/android/*.c"
+-                if test x$enable_video = xyes; then
+-                    SOURCES="$SOURCES $srcdir/src/core/android/*.c $srcdir/src/video/android/*.c"
+-
+-printf "%s\n" "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
+-
+-                    SUMMARY_video="${SUMMARY_video} android"
+-                    have_video=yes
+-                fi
+-                ;;
+             *-*-linux*)         ARCH=linux ;;
+             *-*-uclinux*)       ARCH=linux ;;
+             *-*-kfreebsd*-gnu)  ARCH=kfreebsd-gnu ;;

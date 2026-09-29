@@ -1,0 +1,11 @@
+--- a/src/libproxychains.c
++++ b/src/libproxychains.c
+@@ -587,7 +587,7 @@
+ 	return !memcmp(a->s6_addr, "\0\0\0\0\0\0\0\0\0\0\xff\xff", 12);
+ }
+ 
+-HOOKFUNC(int, connect, int sock, const struct sockaddr *addr, unsigned int len) {
++HOOKFUNC(int, connect, int sock, const struct sockaddr *addr, socklen_t len) {
+ 	INIT();
+ 	PFUNC();
+ 

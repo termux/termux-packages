@@ -1,0 +1,88 @@
+diff --git a/config_host.mk.in b/config_host.mk.in
+index 67440ae00..127ed1bff 100644
+--- a/config_host.mk.in
++++ b/config_host.mk.in
+@@ -67,6 +67,7 @@ export CCACHE_DEPEND_MODE=@CCACHE_DEPEND_MODE@
+ export CDR_CFLAGS=$(gb_SPACE)@CDR_CFLAGS@
+ export CDR_LIBS=$(gb_SPACE)@CDR_LIBS@
+ @x_CFLAGS@ export CFLAGS=@CFLAGS@
++@x_CPPFLAGS@ export CPPFLAGS=@CPPFLAGS@
+ export CLANG_USE_LD=@CLANG_USE_LD@
+ export CLANGDIR=@CLANGDIR@
+ export CLANGLIBDIR=@CLANGLIBDIR@
+diff --git a/configure.ac b/configure.ac
+index bdb216524..cf74134ba 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1400,7 +1400,7 @@ AC_SUBST(SDKDIRNAME)
+ AC_SUBST(PTHREAD_CFLAGS)
+ AC_SUBST(PTHREAD_LIBS)
+ 
+-# Check for explicit A/C/CXX/OBJC/OBJCXX/LDFLAGS.
++# Check for explicit A/C/CPP/CXX/OBJC/OBJCXX/LDFLAGS.
+ # By default use the ones specified by our build system,
+ # but explicit override is possible.
+ AC_MSG_CHECKING(for explicit AFLAGS)
+@@ -1419,6 +1419,14 @@ else
+     AC_MSG_RESULT(no)
+     x_CFLAGS=[\#]
+ fi
++AC_MSG_CHECKING(for explicit CPPFLAGS)
++if test -n "$CPPFLAGS"; then
++    AC_MSG_RESULT([$CPPFLAGS])
++    x_CPPFLAGS=
++else
++    AC_MSG_RESULT(no)
++    x_CPPFLAGS=[\#]
++fi
+ AC_MSG_CHECKING(for explicit CXXFLAGS)
+ if test -n "$CXXFLAGS"; then
+     AC_MSG_RESULT([$CXXFLAGS])
+@@ -1453,12 +1461,14 @@ else
+ fi
+ AC_SUBST(AFLAGS)
+ AC_SUBST(CFLAGS)
++AC_SUBST(CPPFLAGS)
+ AC_SUBST(CXXFLAGS)
+ AC_SUBST(OBJCFLAGS)
+ AC_SUBST(OBJCXXFLAGS)
+ AC_SUBST(LDFLAGS)
+ AC_SUBST(x_AFLAGS)
+ AC_SUBST(x_CFLAGS)
++AC_SUBST(x_CPPFLAGS)
+ AC_SUBST(x_CXXFLAGS)
+ AC_SUBST(x_OBJCFLAGS)
+ AC_SUBST(x_OBJCXXFLAGS)
+@@ -6260,11 +6270,12 @@ if test "$cross_compiling" = "yes"; then
+     test -d config_build && cp -p config_build/*.h CONF-FOR-BUILD/config_host 2>/dev/null
+     (
+     unset COM USING_X11 OS CPUNAME
+-    unset CC CXX SYSBASE CFLAGS
++    unset CC CXX CPP SYSBASE CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+     unset AR LD NM OBJDUMP PKG_CONFIG RANLIB READELF STRIP
+     unset CPPUNIT_CFLAGS CPPUNIT_LIBS
+     unset LIBXML_CFLAGS LIBXML_LIBS LIBXSLT_CFLAGS LIBXSLT_LIBS XSLTPROC
+     unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH
++    unset CPLUS_INCLUDE_PATH C_INCLUDE_PATH LIBRARY_PATH
+     if test -n "$CC_FOR_BUILD"; then
+         export CC="$CC_FOR_BUILD"
+         CC_BASE=`first_arg_basename "$CC"`
+@@ -6274,6 +6285,10 @@ if test "$cross_compiling" = "yes"; then
+         CXX_BASE=`first_arg_basename "$CXX"`
+     fi
+     test -n "$PKG_CONFIG_FOR_BUILD" && export PKG_CONFIG="$PKG_CONFIG_FOR_BUILD"
++    test -n "$CFLAGS_FOR_BUILD" && export CFLAGS="$CFLAGS_FOR_BUILD"
++    test -n "$CPPFLAGS_FOR_BUILD" && export CPPFLAGS="$CPPFLAGS_FOR_BUILD"
++    test -n "$CXXFLAGS_FOR_BUILD" && export CXXFLAGS="$CXXFLAGS_FOR_BUILD"
++    test -n "$LDFLAGS_FOR_BUILD" && export LDFLAGS="$LDFLAGS_FOR_BUILD"
+     cd CONF-FOR-BUILD
+ 
+     # Handle host configuration, which affects the cross-toolset too
+@@ -6347,6 +6362,7 @@ if test "$cross_compiling" = "yes"; then
+         --without-tls \
+         --without-webdav \
+         --without-x \
++        --with-system-curl \
+ "
+     # single quotes added for better readability in case of spaces
+     echo "    Running CONF-FOR-BUILD/configure" \

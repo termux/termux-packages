@@ -1,0 +1,44 @@
+--- a/src/xspice/verilog/coroutine_shim.h
++++ b/src/xspice/verilog/coroutine_shim.h
+@@ -82,6 +82,13 @@ static void cr_yield_to_sim(struct cr_ctx *ctx) {
+         fail("pthread_cond_wait (spice)", err);
+ }
+ 
++#ifdef __ANDROID__
++static void cr_thread_signal_handler(int signum)
++{
++     pthread_exit(0);
++}
++#endif
++
+ static void cr_init(struct cr_ctx *ctx, void *(*fn)(void *), void *data) {
+     int err;
+ 
+@@ -105,6 +112,15 @@ static void cr_init(struct cr_ctx *ctx, void *(*fn)(void *), void *data) {
+     err = pthread_cond_wait(&ctx->spice_cond, &ctx->mutex);
+     if (err)
+         fail("pthread_cond_wait", err);
++
++#ifdef __ANDROID__
++    struct sigaction actions;
++    memset(&actions, 0, sizeof(actions));
++    sigemptyset(&actions.sa_mask);
++    actions.sa_flags = 0;
++    actions.sa_handler = cr_thread_signal_handler;
++    sigaction(SIGUSR2, &actions, NULL);
++#endif
+ }
+ 
+ static void cr_safety(void) {
+@@ -129,7 +145,11 @@ static void cr_cleanup(struct cr_ctx *ctx) {
+      * It should be in pthread_cond_wait() and will go quickly.
+      */
+ 
++#ifndef __ANDROID__
+     pthread_cancel(ctx->thread);
++#else
++    pthread_kill(ctx->thread, SIGUSR2);
++#endif
+     pthread_mutex_unlock(&ctx->mutex);
+     pthread_cond_signal(&ctx->cosim_cond); // Make it run
+     pthread_join(ctx->thread, NULL);       // Wait for it.

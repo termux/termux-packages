@@ -1,0 +1,32 @@
+Origin: https://gitlab.com/kalilinux/packages/code-oss/-/raw/440bc47403c82affa67b13e421cbe2afc0e4eeda/debian/patches/Set-enableTelemetry-to-false-by-default.patch
+From: Sophie Brun <sophie@offensive-security.com>
+Date: Fri, 11 Apr 2025 09:34:57 +0200
+Subject: Disable Telemetry to false by default
+
+Forwarded: not-needed
+---
+ src/vs/platform/telemetry/common/telemetryService.ts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/vs/platform/telemetry/common/telemetryService.ts b/src/vs/platform/telemetry/common/telemetryService.ts
+index 4c72d65..ced284b 100644
+--- a/src/vs/platform/telemetry/common/telemetryService.ts
++++ b/src/vs/platform/telemetry/common/telemetryService.ts
+@@ -209,7 +209,7 @@ configurationRegistry.registerConfiguration({
+ 	'properties': {
+ 		[TELEMETRY_SETTING_ID]: {
+ 			'type': 'string',
+-			'enum': [TelemetryConfiguration.ON, TelemetryConfiguration.ERROR, TelemetryConfiguration.CRASH, TelemetryConfiguration.OFF],
++			'enum': [TelemetryConfiguration.OFF, TelemetryConfiguration.ERROR, TelemetryConfiguration.CRASH, TelemetryConfiguration.OFF],
+ 			'enumDescriptions': [
+ 				localize('telemetry.telemetryLevel.default', "Sends usage data, errors, and crash reports."),
+ 				localize('telemetry.telemetryLevel.error', "Sends general error telemetry and crash reports."),
+@@ -229,7 +229,7 @@ configurationRegistry.registerConfiguration({
+ 		},
+ 		'telemetry.feedback.enabled': {
+ 			type: 'boolean',
+-			default: true,
++			default: false,
+ 			description: localize('telemetry.feedback.enabled', "Enable feedback mechanisms such as the issue reporter, surveys, and other feedback options."),
+ 			policy: {
+ 				name: 'EnableFeedback',

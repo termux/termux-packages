@@ -1,0 +1,39 @@
+diff -uNr st-0.8.2/st.c st-0.8.2.mod/st.c
+--- st-0.8.2/st.c	2019-02-09 13:50:41.000000000 +0200
++++ st-0.8.2.mod/st.c	2019-07-09 20:07:26.109439488 +0300
+@@ -762,6 +762,35 @@
+ 		perror("Couldn't call stty");
+ }
+ 
++#ifdef __ANDROID__
++#if __ANDROID_API__ < 24
++int openpty(int* amaster, int* aslave, char* name, const struct termios* termp, const struct winsize* winp)
++{
++        char buf[512];
++
++        int master = open("/dev/ptmx", O_RDWR);
++        if (master == -1) return -1;
++        if (grantpt(master) || unlockpt(master) || ptsname_r(master, buf, sizeof buf)) goto fail;
++
++        int slave = open(buf, O_RDWR | O_NOCTTY);
++        if (slave == -1) goto fail;
++
++        /* XXX Should we ignore errors here?  */
++        if (termp) tcsetattr(slave, TCSANOW, termp);
++        if (winp) ioctl(slave, TIOCSWINSZ, winp);
++
++        *amaster = master;
++        *aslave = slave;
++        if (name != NULL) strcpy(name, buf);
++        return 0;
++
++fail:
++        close(master);
++        return -1;
++}
++#endif
++#endif
++
+ int
+ ttynew(char *line, char *cmd, char *out, char **args)
+ {

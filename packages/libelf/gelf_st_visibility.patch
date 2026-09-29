@@ -1,0 +1,16 @@
+diff --git a/libelf/gelf.h b/libelf/gelf.h
+index 0619880..a3286ef 100644
+--- a/libelf/gelf.h
++++ b/libelf/gelf.h
+@@ -133,7 +133,11 @@ typedef Elf64_Lib GElf_Lib;
+
+ /* How to extract information held in the st_other field.  */
+
++#ifdef ELF64_ST_VISIBILITY
+ #define GELF_ST_VISIBILITY(val)		ELF64_ST_VISIBILITY (val)
++#else
++#define GELF_ST_VISIBILITY(val)		((val) & 0x3)
++#endif
+
+
+ /* How to extract and insert information held in the r_info field.  */

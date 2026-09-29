@@ -1,0 +1,19 @@
+--- a/src/io.c
++++ b/src/io.c
+@@ -160,12 +160,16 @@
+ static int io_tls_x509_vrfy(struct connection*);
+ 
+ const char *default_ca_certs[] = {
++#ifndef __ANDROID__
+ 	"/etc/ssl/ca-bundle.pem",
+ 	"/etc/ssl/cert.pem",
+ 	"/etc/ssl/certs/ca-certificates.crt",
+ 	"/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+ 	"/etc/pki/tls/cacert.pem",
+ 	"/etc/pki/tls/certs/ca-bundle.crt",
++#else
++	"@TERMUX_PREFIX@/etc/tls/cert.pem",
++#endif
+ };
+ 
+ struct connection*

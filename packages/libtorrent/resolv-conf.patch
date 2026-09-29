@@ -1,0 +1,11 @@
+--- a/src/net/udns/udns_init.c
++++ b/src/net/udns/udns_init.c
+@@ -147,7 +147,7 @@ static int dns_init_resolvconf(struct dns_ctx *ctx) {
+   int has_srch = 0;
+ 
+   /* read resolv.conf... */
+-  { int fd = open("/etc/resolv.conf", O_RDONLY);
++  { int fd = open("@TERMUX_PREFIX@/etc/resolv.conf", O_RDONLY);
+     if (fd >= 0) {
+       int l = read(fd, buf, sizeof(buf) - 1);
+       close(fd);

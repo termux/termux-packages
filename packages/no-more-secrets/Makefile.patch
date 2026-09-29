@@ -1,0 +1,32 @@
+--- a/Makefile
++++ b/Makefile
+@@ -15,23 +15,25 @@
+ CC ?= gcc
+ CFLAGS ?= -Wextra -Wall -O2
+ 
++NCURSES_LIBS ?= -lncursesw
++
+ .PHONY: all install uninstall clean
+ 
+ nms: $(OBJ)/input.o $(OBJ)/error.o $(OBJ)/nmscharset.o $(OBJ)/nmstermio.o $(OBJ)/nmseffect.o $(OBJ)/nms.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^
++	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ $(LDFLAGS)
+ 
+ sneakers: $(OBJ)/nmscharset.o $(OBJ)/nmstermio.o $(OBJ)/nmseffect.o $(OBJ)/sneakers.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^
++	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ $(LDFLAGS)
+ 
+ all: nms sneakers
+ 
+ all-ncurses: nms-ncurses sneakers-ncurses
+ 
+ nms-ncurses: $(OBJ)/input.o $(OBJ)/error.o $(OBJ)/nmscharset.o $(OBJ)/nmstermio_ncurses.o $(OBJ)/nmseffect.o $(OBJ)/nms.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/nms $^ -lncursesw
++	$(CC) $(CFLAGS) $(NCURSES_CFLAGS) -o $(BIN)/nms-ncurses $^ $(LDFLAGS) $(NCURSES_LIBS)
+ 
+ sneakers-ncurses: $(OBJ)/nmscharset.o $(OBJ)/nmstermio_ncurses.o $(OBJ)/nmseffect.o $(OBJ)/sneakers.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/sneakers $^ -lncursesw
++	$(CC) $(CFLAGS) $(NCURSES_CFLAGS) -o $(BIN)/sneakers-ncurses $^ $(LDFLAGS) $(NCURSES_LIBS)
+ 
+ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
+ 	$(CC) $(CFLAGS) -o $@ -c $<

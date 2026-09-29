@@ -1,0 +1,43 @@
+SOVERSION suffix is needed for SONAME of `liblzma.so` to avoid conflict
+with a system one (in /system/lib64 or /system/lib)
+
+diff -u -r ../xz-5.6.2/configure ./configure
+--- ../xz-5.6.2/configure	2024-05-29 15:16:38.000000000 +0000
++++ ./configure	2024-05-31 10:56:38.683582292 +0000
+@@ -15666,27 +15666,6 @@
+   dynamic_linker=no
+   ;;
+ 
+-linux*android*)
+-  version_type=none # Android doesn't support versioned libraries.
+-  need_lib_prefix=no
+-  need_version=no
+-  library_names_spec='$libname$release$shared_ext $libname$shared_ext'
+-  soname_spec='$libname$release$shared_ext'
+-  finish_cmds=
+-  shlibpath_var=LD_LIBRARY_PATH
+-  shlibpath_overrides_runpath=yes
+-
+-  # This implies no fast_install, which is unacceptable.
+-  # Some rework will be needed to allow for fast_install
+-  # before this can be enabled.
+-  hardcode_into_libs=yes
+-
+-  dynamic_linker='Android linker'
+-  # -rpath works at least for libraries that are not overridden by
+-  # libraries installed in system locations.
+-  hardcode_libdir_flag_spec='$wl-rpath $wl$libdir'
+-  ;;
+-
+ # This must be glibc/ELF.
+ linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
+   version_type=linux # correct to gnu/linux during the next big refactor
+@@ -15694,7 +15673,7 @@
+   need_version=no
+   library_names_spec='$libname$release$shared_ext$versuffix $libname$release$shared_ext$major $libname$shared_ext'
+   soname_spec='$libname$release$shared_ext$major'
+-  finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
++  finish_cmds=
+   shlibpath_var=LD_LIBRARY_PATH
+   shlibpath_overrides_runpath=no
+ 

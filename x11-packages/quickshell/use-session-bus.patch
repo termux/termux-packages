@@ -1,0 +1,39 @@
+diff --git a/src/services/upower/core.cpp b/src/services/upower/core.cpp
+index 0f9d9da..f7bf8d0 100644
+--- a/src/services/upower/core.cpp
++++ b/src/services/upower/core.cpp
+@@ -28,7 +28,7 @@ QS_LOGGING_CATEGORY(logUPower, "quickshell.service.upower", QtWarningMsg);
+ UPower::UPower() {
+ 	qCDebug(logUPower) << "Starting UPower Service";
+ 
+-	auto bus = QDBusConnection::systemBus();
++	auto bus = QDBusConnection::sessionBus();
+ 
+ 	if (!bus.isConnected()) {
+ 		qCWarning(logUPower) << "Could not connect to DBus. UPower service will not work.";
+diff --git a/src/services/upower/device.cpp b/src/services/upower/device.cpp
+index adf5923..9113361 100644
+--- a/src/services/upower/device.cpp
++++ b/src/services/upower/device.cpp
+@@ -78,7 +78,7 @@ UPowerDevice::UPowerDevice(QObject* parent): QObject(parent) {
+ 
+ void UPowerDevice::init(const QString& path) {
+ 	this->device =
+-	    new DBusUPowerDevice("org.freedesktop.UPower", path, QDBusConnection::systemBus(), this);
++	    new DBusUPowerDevice("org.freedesktop.UPower", path, QDBusConnection::sessionBus(), this);
+ 
+ 	if (!this->device->isValid()) {
+ 		qCWarning(logUPowerDevice) << "Cannot create UPowerDevice for" << path;
+diff --git a/src/services/upower/powerprofiles.cpp b/src/services/upower/powerprofiles.cpp
+index 43615ae..cd0b40b 100644
+--- a/src/services/upower/powerprofiles.cpp
++++ b/src/services/upower/powerprofiles.cpp
+@@ -63,7 +63,7 @@ PowerProfiles::PowerProfiles() {
+ 
+ 	qCDebug(logPowerProfiles) << "Starting PowerProfiles Service.";
+ 
+-	auto bus = QDBusConnection::systemBus();
++	auto bus = QDBusConnection::sessionBus();
+ 
+ 	if (!bus.isConnected()) {
+ 		qCWarning(logPowerProfiles

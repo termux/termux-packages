@@ -1,0 +1,31 @@
+--- ./networking/interface.c.orig	2024-11-30 18:15:36.609159072 +0800
++++ ./networking/interface.c	2024-11-30 18:18:04.293159016 +0800
+@@ -53,18 +53,19 @@
+ #define _PATH_PROCNET_DEV               "/proc/net/dev"
+ #define _PATH_PROCNET_IFINET6           "/proc/net/if_inet6"
+ 
+-#ifdef HAVE_AFINET6
+-# ifndef _LINUX_IN6_H
++// disabled because of conflict with Android NDK.
++//#ifdef HAVE_AFINET6
++//# ifndef _LINUX_IN6_H
+ /*
+  * This is from linux/include/net/ipv6.h
+  */
+-struct in6_ifreq {
+-	struct in6_addr ifr6_addr;
+-	uint32_t ifr6_prefixlen;
+-	unsigned int ifr6_ifindex;
+-};
+-# endif
+-#endif /* HAVE_AFINET6 */
++//struct in6_ifreq {
++//	struct in6_addr ifr6_addr;
++//	uint32_t ifr6_prefixlen;
++//	unsigned int ifr6_ifindex;
++//};
++//# endif
++//#endif /* HAVE_AFINET6 */
+ 
+ /* Defines for glibc2.0 users. */
+ #ifndef SIOCSIFTXQLEN

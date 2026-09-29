@@ -1,0 +1,20 @@
+--- a/lib/gvc/gvconfig.c
++++ b/lib/gvc/gvconfig.c
+@@ -398,7 +398,7 @@
+   }
+   len -= strlen(SUFFIX);
+ 
+-#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) || defined(__ANDROID__)
+   // Windows libraries do not have a version in the filename
+ 
+ #elif defined(GVPLUGIN_VERSION)
+@@ -441,7 +441,7 @@
+     return false;
+   }
+ #else
+-  static const char SO[] = ".so.";
++  static const char SO[] = ".so";
+   if (len < strlen(SO) || !startswith(filepath + len - strlen(SO), SO)) {
+     return false;
+   }

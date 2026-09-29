@@ -1,0 +1,14 @@
+Fixes:
+error: identifier '_sv' preceded by whitespace in a literal operator declaration is deprecated
+
+--- a/src/wiz/utility/string_view.h
++++ b/src/wiz/utility/string_view.h
+@@ -209,7 +209,7 @@ namespace wiz {
+     };    
+ }
+ 
+-constexpr wiz::StringView operator "" _sv(const char* text, std::size_t length) {
++constexpr wiz::StringView operator ""_sv(const char* text, std::size_t length) {
+     return wiz::StringView(text, length);
+ }
+ 

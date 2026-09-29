@@ -1,0 +1,32 @@
+--- a/local/procio.c
++++ b/local/procio.c
+@@ -46,6 +46,7 @@
+ static ssize_t proc_write(void *, const char *, size_t);
+ static int proc_close(void *);
+ 
++#ifndef __ANDROID__
+ __extension__
+ static cookie_io_functions_t procio = {
+     .read  = proc_read,
+@@ -53,9 +54,13 @@
+     .seek  = NULL,
+     .close = proc_close,
+ };
++#endif
+ 
+ FILE *fprocopen(const char *path, const char *mode)
+ {
++#ifdef __ANDROID__
++	return fopen(path, mode);
++#else
+ 	pcookie_t *cookie = NULL;
+ 	FILE *handle = NULL;
+ 	mode_t flags = 0;
+@@ -144,6 +149,7 @@
+ 	}
+ out:
+ 	return handle;
++#endif
+ }
+ 
+ static

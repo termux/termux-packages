@@ -1,0 +1,131 @@
+--- a/functions
++++ b/functions
+@@ -236,6 +236,9 @@
+ }
+ 
+ detect_container () {
++	#termux
++	return
++
+ 	if [ "${container-}" = lxc ]; then
+ 		CONTAINER="lxc"
+ 	elif [ "$container" = mmdebstrap-unshare ]; then
+@@ -1026,7 +1029,7 @@
+ extract_dpkg_deb_data () {
+ 	local pkg="$1"
+ 
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but tar failed. Exit..."
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but tar failed. Exit..."
+ }
+ 
+ # Raw .deb extractors
+@@ -1068,7 +1071,7 @@
+ 	esac
+ 
+ 	if in_path "$cat_cmd"; then
+-		ar -p "$pkg" "$tarball" | "$cat_cmd" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
++		ar -p "$pkg" "$tarball" | "$cat_cmd" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+ 	else
+ 		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
+ 	fi
+@@ -1125,7 +1128,7 @@
+ ); }
+ 
+ in_target_nofail () {
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\"" 2>/dev/null; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@" 2>/dev/null; then
+ 		true
+ 	fi
+ 	return 0
+@@ -1137,7 +1140,7 @@
+ 	msg="$2"
+ 	arg="$3"
+ 	shift; shift; shift
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\""; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@"; then
+ 		warning "$code" "$msg" "$arg"
+ 		# Try to point user at actual failing package.
+ 		msg="See %s for details"
+@@ -1163,11 +1166,14 @@
+ ###################################################### standard setup stuff
+ 
+ conditional_cp () {
+-	if [ ! -e "$2/$1" ]; then
++	local dst
++	dst="${2}/$(echo "$1" | sed 's|^@TERMUX_PREFIX@||g')"
++
++	if [ ! -e "$dst" ]; then
+ 		if [ -L "$1" ] && [ -e "$1" ]; then
+-			cat "$1" >"$2/$1"
++			cat "$1" >"$dst"
+ 		elif [ -e "$1" ]; then
+-			cp "$1" "$2/$1"
++			cp "$1" "$dst"
+ 		fi
+ 	fi
+ }
+@@ -1193,13 +1199,15 @@
+ setup_etc () {
+ 	mkdir -p "$TARGET/etc"
+ 
+-	conditional_cp /etc/resolv.conf "$TARGET"
+-	conditional_cp /etc/hostname "$TARGET"
++	conditional_cp @TERMUX_PREFIX@/etc/resolv.conf "$TARGET"
++	conditional_cp @TERMUX_PREFIX@/etc/hostname "$TARGET"
+ }
+ 
+ UMOUNT_DIRS=
+ 
+ umount_exit_function () {
++	return
++
+ 	local realdir dir
+ 	for dir in $UMOUNT_DIRS; do
+ 		realdir="$(in_target_nofail readlink -f "$dir")"
+@@ -1232,6 +1240,8 @@
+ }
+ 
+ setup_proc () {
++	return
++
+ 	case "$HOST_OS" in
+ 	    *freebsd*)
+ 		umount_on_exit /dev
+@@ -1306,10 +1316,6 @@
+ 		touch "$TARGET/dev/console"
+ 		;;
+ 	    *)
+-		if ! setup_devices_simple ||
+-		   !  sh -c ': >"$1"' -- "$TARGET/dev/null" 2>/dev/null; then
+-			setup_devices_bind
+-		fi
+ 		;;
+ 	esac
+ }
+@@ -1339,6 +1346,8 @@
+ 
+ # Create a device node if it does not exist. By default, the mode is 666.
+ mknod_if_needed () {
++	return
++
+ 	local device type major minor mode
+ 	device="$1"
+ 	type="$2"
+@@ -1353,6 +1362,8 @@
+ 
+ 
+ setup_devices_simple () {
++	return
++
+ 	# The list of devices that can be created in a container comes from
+ 	# src/core/cgroup.c in the systemd source tree.
+ 	mknod_if_needed "$TARGET/dev/null"        c 1 3
+@@ -1384,6 +1395,8 @@
+ }
+ 
+ setup_devices_bind () {
++	return
++
+ 	local device
+ 	mount -t tmpfs nodev "$TARGET/dev"
+ 	umount_on_exit /dev

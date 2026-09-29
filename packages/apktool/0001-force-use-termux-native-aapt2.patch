@@ -1,0 +1,59 @@
+From c5f648c94846ec157b2273c6905c9b2089db43d5 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Fri, 3 Jul 2026 21:54:46 +0800
+Subject: [PATCH 1/2] feat: force use termux native aapt2 binary
+
+---
+ .../java/brut/androlib/res/AaptManager.java   | 31 ++-----------------
+ 1 file changed, 2 insertions(+), 29 deletions(-)
+
+diff --git a/brut.apktool/apktool-lib/src/main/java/brut/androlib/res/AaptManager.java b/brut.apktool/apktool-lib/src/main/java/brut/androlib/res/AaptManager.java
+index 326e3ce7..cb95efe0 100644
+--- a/brut.apktool/apktool-lib/src/main/java/brut/androlib/res/AaptManager.java
++++ b/brut.apktool/apktool-lib/src/main/java/brut/androlib/res/AaptManager.java
+@@ -35,34 +35,7 @@ public final class AaptManager {
+     }
+ 
+     public static File getBinaryFile() throws AndrolibException {
+-        String binName = getBinaryName();
+-
+-        if (!OSDetection.is64Bit()) {
+-            throw new AndrolibException(binName + " binaries are not available for 32-bit platforms.");
+-        }
+-
+-        StringBuilder binPath = new StringBuilder("/prebuilt/");
+-        if (OSDetection.isUnix()) {
+-            binPath.append("linux"); // ELF 64-bit LSB executable, x86-64
+-        } else if (OSDetection.isMacOSX()) {
+-            binPath.append("macosx"); // fat binary x86_64 + arm64
+-        } else if (OSDetection.isWindows()) {
+-            binPath.append("windows"); // x86_64
+-        } else {
+-            throw new AndrolibException("Could not identify platform: " + OSDetection.returnOS());
+-        }
+-        binPath.append('/');
+-        binPath.append(binName);
+-        if (OSDetection.isWindows()) {
+-            binPath.append(".exe");
+-        }
+-
+-        File binFile;
+-        try {
+-            binFile = Jar.getResourceAsFile(AaptManager.class, binPath.toString(), binName + "_");
+-        } catch (BrutException ex) {
+-            throw new AndrolibException(ex);
+-        }
++        File binFile = new File("/data/data/com.termux/files/usr/bin/aapt2");
+         setBinaryExecutable(binFile);
+         return binFile;
+     }
+@@ -99,4 +72,4 @@ public final class AaptManager {
+         }
+         throw new AndrolibException("Could not identify aapt binary version: " + versionStr);
+     }
+-}
++}
+\ No newline at end of file
+-- 
+2.54.0
+

@@ -1,0 +1,11 @@
+--- a/src/jsmods/core.c
++++ b/src/jsmods/core.c
+@@ -1403,7 +1403,7 @@
+ 		if (!res) res = (char *) gf_opts_get_key("core", "docs-dir");
+ #else
+ 		if (!res) res = getenv("HOME");
+-		if (!res) res = "/home/";
++		if (!res) res = "@TERMUX_HOME@/";
+ #endif
+ 		return JS_NewString(ctx, res);
+ 

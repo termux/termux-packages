@@ -1,0 +1,24 @@
+--- a/realname.c	2024-12-03 16:19:37.000000000 +0700
++++ b/realname.c	2026-05-27 10:04:15.653068531 +0700
+@@ -35,18 +35,9 @@
+   char *tmp;
+ 
+   if (buffer[0] == '\0') {
+-    uid_t me = geteuid ();
+-    struct passwd *my_passwd = getpwuid (me);
+-    if (my_passwd) {
+-      int  i;
+-      strncpy (buffer, my_passwd->pw_gecos, size);
+-      for (i=0; i<size; ++i) {
+-        if (buffer[i] == ',') {
+-          buffer[i] = '\0';
+-          break;
+-        }
+-      }
+-    }
++    char* name_default = getenv("USER");
++    if (name_default == NULL) name_default = "Droid";
++    strncpy(buffer, name_default, size);
+   }
+ 
+   werase (message);

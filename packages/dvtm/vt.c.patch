@@ -1,0 +1,28 @@
+diff -u -r ../dvtm-0.15/vt.c ./vt.c
+--- ../dvtm-0.15/vt.c	2016-01-09 06:40:56.000000000 -0500
++++ ./vt.c	2016-01-21 08:09:47.457953606 -0500
+@@ -21,7 +21,9 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ #include <limits.h>
+ #include <signal.h>
+ #include <stdio.h>
+@@ -1309,10 +1311,14 @@
+ 
+ static void is_utf8_locale(void)
+ {
++#ifdef __ANDROID__
++	is_utf8 = true;
++#else
+ 	const char *cset = nl_langinfo(CODESET);
+ 	if (!cset)
+ 		cset = "ANSI_X3.4-1968";
+ 	is_utf8 = !strcmp(cset, "UTF-8");
++#endif
+ }
+ 
+ static wchar_t get_vt100_graphic(char c)

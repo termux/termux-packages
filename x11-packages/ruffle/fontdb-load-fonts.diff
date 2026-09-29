@@ -1,0 +1,71 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -77,7 +77,7 @@
+ ]
+ std = ["ttf-parser/std"]
+ 
+-[target."cfg(all(unix, not(any(target_os = \"macos\", target_os = \"android\"))))".dependencies.fontconfig-parser]
++[target."cfg(all(unix, not(any(target_os = \"macos\"))))".dependencies.fontconfig-parser]
+ version = "0.5"
+ optional = true
+ default-features = false
+--- a/Cargo.toml.orig
++++ b/Cargo.toml.orig
+@@ -23,7 +23,7 @@
+ default-features = false
+ features = ["opentype-layout", "apple-layout", "variable-fonts", "glyph-names", "no-std-float"]
+ 
+-[target.'cfg(all(unix, not(any(target_os = "macos", target_os = "android"))))'.dependencies]
++[target.'cfg(all(unix, not(any(target_os = "macos"))))'.dependencies]
+ fontconfig-parser = { version = "0.5", optional = true, default-features = false }
+ 
+ [dev-dependencies]
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -458,7 +458,7 @@
+         }
+ 
+         // Linux.
+-        #[cfg(all(unix, not(any(target_os = "macos", target_os = "android"))))]
++        #[cfg(all(unix, not(any(target_os = "macos"))))]
+         {
+             #[cfg(feature = "fontconfig")]
+             {
+@@ -480,12 +480,13 @@
+     #[cfg(all(
+         unix,
+         feature = "fs",
+-        not(any(target_os = "macos", target_os = "android"))
++        not(any(target_os = "macos"))
+     ))]
+     fn load_no_fontconfig(&mut self) {
+         let mut seen = Default::default();
+-        self.load_fonts_dir_impl("/usr/share/fonts/".as_ref(), &mut seen);
+-        self.load_fonts_dir_impl("/usr/local/share/fonts/".as_ref(), &mut seen);
++        self.load_fonts_dir_impl("@TERMUX_PREFIX@/share/fonts/".as_ref(), &mut seen);
++        self.load_fonts_dir_impl("@TERMUX_PREFIX@/local/share/fonts/".as_ref(), &mut seen);
++        self.load_fonts_dir_impl("/system/fonts/".as_ref(), &mut seen);
+ 
+         if let Ok(ref home) = std::env::var("HOME") {
+             let home_path = std::path::Path::new(home);
+@@ -498,7 +499,7 @@
+     #[cfg(all(
+         unix,
+         feature = "fontconfig",
+-        not(any(target_os = "macos", target_os = "android"))
++        not(any(target_os = "macos"))
+     ))]
+     fn load_fontconfig(&mut self) -> bool {
+         use std::path::Path;
+@@ -527,9 +528,9 @@
+             };
+ 
+             if read_global {
+-                let _ = fontconfig.merge_config(Path::new("/etc/fonts/local.conf"));
++                let _ = fontconfig.merge_config(Path::new("@TERMUX_PREFIX@/etc/fonts/local.conf"));
+             }
+-            let _ = fontconfig.merge_config(Path::new("/etc/fonts/fonts.conf"));
++            let _ = fontconfig.merge_config(Path::new("@TERMUX_PREFIX@/etc/fonts/fonts.conf"));
+         }
+ 
+         for fontconfig_parser::Alias {

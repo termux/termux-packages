@@ -1,0 +1,27 @@
+diff -uNr hollywood-1.20/lib/hollywood/logs hollywood-1.20.mod/lib/hollywood/logs
+--- hollywood-1.20/lib/hollywood/logs	2019-06-12 07:07:54.000000000 +0300
++++ hollywood-1.20.mod/lib/hollywood/logs	2020-01-02 15:03:57.646716697 +0200
+@@ -14,13 +14,20 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
+-command -v ccze >/dev/null 2>&1 || exit 1
++_HAS_CCZE=false
++if command -v ccze >/dev/null 2>&1; then
++	_HAS_CCZE=true
++fi
+ 
+ trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ while true; do
+-	LOGS=$(find /var/log -type f -name "*.log" 2>/dev/null | head -n 4096 | sort -R)
++	LOGS=$(find @TERMUX_PREFIX@/var/log -type f -name "*.log" 2>/dev/null | head -n 4096 | sort -R)
+ 	for log in $LOGS; do
+-		cat "$log" 2>/dev/null | ccze -A
++		if ${_HAS_CCZE}; then
++			cat "$log" 2>/dev/null | ccze -A
++		else
++			cat "$log" 2>/dev/null
++		fi
+ 		sleep 0.5
+ 	done
+ done

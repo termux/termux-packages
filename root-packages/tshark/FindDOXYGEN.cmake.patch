@@ -1,0 +1,18 @@
+--- ../FindDOXYGEN.cmake.orig	2019-05-22 15:34:43.639814214 +0200
++++ ./cmake/modules/FindDOXYGEN.cmake	2019-05-22 15:55:29.567993099 +0200
+@@ -13,15 +13,6 @@
+     /sbin
+ )
+ 
+-# We set various paths in doxygen.cfg via configure_file(). These are
+-# native system paths which aren't compatible with Cygwin's Doxygen.
+-string(TOLOWER ${DOXYGEN_EXECUTABLE} _de_lower)
+-if(${_de_lower} MATCHES "cyg")
+-	set(_ignore_reason "Cygwin Doxygen found at ${DOXYGEN_EXECUTABLE}. Ignoring.")
+-	message(STATUS ${_ignore_reason})
+-	set(DOXYGEN_EXECUTABLE DOXYGEN_EXECUTABLE-NOTFOUND CACHE FILEPATH ${_ignore_reason} FORCE)
+-endif()
+-
+ include( FindPackageHandleStandardArgs )
+ find_package_handle_standard_args( DOXYGEN DEFAULT_MSG DOXYGEN_EXECUTABLE )
+ 

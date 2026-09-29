@@ -1,0 +1,22 @@
+diff -uNr busybox-1.31.1/miscutils/crond.c busybox-1.31.1.mod/miscutils/crond.c
+--- busybox-1.31.1/miscutils/crond.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/miscutils/crond.c	2019-11-11 22:04:10.820622087 +0200
+@@ -435,7 +435,7 @@
+ 
+ 	maxLines = (strcmp(fileName, "root") == 0) ? 65535 : MAXLINES;
+ 
+-	if (fstat(fileno(parser->fp), &sbuf) == 0 && sbuf.st_uid == DAEMON_UID) {
++	if (fstat(fileno(parser->fp), &sbuf) == 0) {
+ 		CronFile *file = xzalloc(sizeof(CronFile));
+ 		CronLine **pline;
+ 		int n;
+@@ -655,6 +655,9 @@
+ 
+ static void set_env_vars(struct passwd *pas, const char *shell)
+ {
++#ifdef __ANDROID__
++	return;
++#endif
+ 	/* POSIX requires crond to set up at least HOME, LOGNAME, PATH, SHELL.
+ 	 * We assume crond inherited suitable PATH.
+ 	 */

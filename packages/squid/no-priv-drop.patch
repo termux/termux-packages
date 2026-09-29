@@ -1,0 +1,50 @@
+diff -uNr squid-4.12/src/tools.cc squid-4.12.mod/src/tools.cc
+--- squid-4.12/src/tools.cc	2020-06-07 18:42:16.000000000 +0300
++++ squid-4.12.mod/src/tools.cc	2020-08-07 22:20:30.241392700 +0300
+@@ -558,6 +558,9 @@
+ void
+ leave_suid(void)
+ {
++#ifdef __ANDROID__
++    return;
++#endif
+     debugs(21, 3, "leave_suid: PID " << getpid() << " called");
+ 
+     if (Config.effectiveGroup) {
+@@ -594,6 +597,7 @@
+         }
+     }
+ 
++#ifndef __ANDROID__
+ #if HAVE_SETRESUID
+     if (setresuid(Config2.effectiveUserID, Config2.effectiveUserID, 0) < 0) {
+         const auto xerrno = errno;
+@@ -615,6 +619,7 @@
+ #endif
+ 
+     restoreCapabilities(true);
++#endif
+     setTraceability();
+ }
+ 
+@@ -622,6 +627,10 @@
+ void
+ enter_suid(void)
+ {
++#ifdef __ANDROID__
++    return;
++#endif
++
+     debugs(21, 3, "enter_suid: PID " << getpid() << " taking root privileges");
+ #if HAVE_SETRESUID
+     if (setresuid((uid_t)-1, 0, (uid_t)-1) < 0) {
+@@ -645,6 +654,9 @@
+ void
+ no_suid(void)
+ {
++#ifdef __ANDROID__
++    return;
++#endif
+     uid_t uid;
+     leave_suid();
+     uid = geteuid();

@@ -1,0 +1,17 @@
+Prevents error in `oxfmt file.ts`:
+External services must be set when `napi` feature is enabled
+It seems like the 'napi' feature depends on things like yuku-codegen, yuku-parser and vite-plus,
+which I don't know how to build for Android
+https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=oxc&id=4ea0988dacbc909527283056d99d41da77ba29f6#n36
+
+--- a/apps/oxfmt/Cargo.toml
++++ b/apps/oxfmt/Cargo.toml
+@@ -87,7 +87,7 @@ mimalloc-safe = { workspace = true, optional = true, features = [
+ ] }
+ 
+ [features]
+-default = ["napi"]
++default = []
+ napi = ["dep:napi", "dep:napi-derive"]
+ allocator = ["dep:mimalloc-safe"]
+ detect_code_removal = ["oxc_formatter/detect_code_removal"]

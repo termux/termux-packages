@@ -1,0 +1,12 @@
+diff -u -r ../lftp-4.8.0/src/Filter.cc ./src/Filter.cc
+--- ../lftp-4.8.0/src/Filter.cc	2017-04-24 08:20:52.000000000 +0200
++++ ./src/Filter.cc	2017-08-20 22:06:59.423505183 +0200
+@@ -209,7 +209,7 @@
+       }
+       else
+       {
+-	 execl("/bin/sh","sh","-c",name.get(),NULL);
++	 execl("@TERMUX_PREFIX@/bin/sh","sh","-c",name.get(),NULL);
+ 	 fprintf(stderr,_("execl(/bin/sh) failed: %s\n"),strerror(errno));
+       }
+       fflush(stderr);

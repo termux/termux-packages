@@ -1,0 +1,28 @@
+--- ./wmake/scripts/sysFunctions.orig	2021-09-12 20:35:59.681678592 +0000
++++ ./wmake/scripts/sysFunctions	2021-09-12 20:37:13.058308118 +0000
+@@ -142,11 +142,11 @@
+     sysPrefix()
+     {
+         case "$1" in
+-        /usr/local/*)
+-            echo "/usr/local"
++        @TERMUX_PREFIX@/local/*)
++            echo "@TERMUX_PREFIX@/local"
+             ;;
+         *)
+-            echo "/usr"
++            echo "@TERMUX_PREFIX@"
+             ;;
+         esac
+     }
+@@ -191,8 +191,8 @@
+         fi
+ 
+         findFirstFile \
+-            "/usr/local/include/$searchName" \
+-            "/usr/include/$searchName" \
++            "@TERMUX_PREFIX@/local/include/$searchName" \
++            "@TERMUX_PREFIX@/include/$searchName" \
+             ;
+     }
+ 

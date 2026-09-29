@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GdkPixbuf" get-type="gdk_pixbuf_get_type" parents="GObject">
+    <implements name="GIcon"/>
+    <implements name="GLoadableIcon"/>
+    <property name="colorspace" type="GdkColorspace" flags="1073742059" default-value="GDK_COLORSPACE_RGB"/>
+    <property name="n-channels" type="gint" flags="1073742059" default-value="3"/>
+    <property name="has-alpha" type="gboolean" flags="1073742059" default-value="FALSE"/>
+    <property name="bits-per-sample" type="gint" flags="1073742059" default-value="8"/>
+    <property name="width" type="gint" flags="1073742059" default-value="1"/>
+    <property name="height" type="gint" flags="1073742059" default-value="1"/>
+    <property name="rowstride" type="gint" flags="1073742059" default-value="1"/>
+    <property name="pixels" type="gpointer" flags="1073742059"/>
+    <property name="pixel-bytes" type="GBytes" flags="1073742059"/>
+  </class>
+  <class name="GdkPixbufAnimation" get-type="gdk_pixbuf_animation_get_type" parents="GObject">
+  </class>
+  <class name="GdkPixbufAnimationIter" get-type="gdk_pixbuf_animation_iter_get_type" parents="GObject">
+  </class>
+  <class name="GdkPixbufNonAnim" get-type="gdk_pixbuf_non_anim_get_type" parents="GdkPixbufAnimation,GObject">
+  </class>
+  <class name="GdkPixbufSimpleAnim" get-type="gdk_pixbuf_simple_anim_get_type" parents="GdkPixbufAnimation,GObject">
+    <property name="loop" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="GdkPixbufSimpleAnimIter" get-type="gdk_pixbuf_simple_anim_iter_get_type" parents="GdkPixbufAnimationIter,GObject">
+  </class>
+  <boxed name="GdkPixbufFormat" get-type="gdk_pixbuf_format_get_type"/>
+  <class name="GdkPixbufLoader" get-type="gdk_pixbuf_loader_get_type" parents="GObject">
+    <signal name="size-prepared" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="area-prepared" return="void" when="last">
+    </signal>
+    <signal name="area-updated" return="void" when="last">
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+      <param type="gint"/>
+    </signal>
+    <signal name="closed" return="void" when="last">
+    </signal>
+  </class>
+  <enum name="GdkPixbufAlphaMode" get-type="gdk_pixbuf_alpha_mode_get_type">
+    <member name="GDK_PIXBUF_ALPHA_BILEVEL" nick="bilevel" value="0"/>
+    <member name="GDK_PIXBUF_ALPHA_FULL" nick="full" value="1"/>
+  </enum>  <enum name="GdkColorspace" get-type="gdk_colorspace_get_type">
+    <member name="GDK_COLORSPACE_RGB" nick="rgb" value="0"/>
+  </enum>  <enum name="GdkPixbufError" get-type="gdk_pixbuf_error_get_type">
+    <member name="GDK_PIXBUF_ERROR_CORRUPT_IMAGE" nick="corrupt-image" value="0"/>
+    <member name="GDK_PIXBUF_ERROR_INSUFFICIENT_MEMORY" nick="insufficient-memory" value="1"/>
+    <member name="GDK_PIXBUF_ERROR_BAD_OPTION" nick="bad-option" value="2"/>
+    <member name="GDK_PIXBUF_ERROR_UNKNOWN_TYPE" nick="unknown-type" value="3"/>
+    <member name="GDK_PIXBUF_ERROR_UNSUPPORTED_OPERATION" nick="unsupported-operation" value="4"/>
+    <member name="GDK_PIXBUF_ERROR_FAILED" nick="failed" value="5"/>
+    <member name="GDK_PIXBUF_ERROR_INCOMPLETE_ANIMATION" nick="incomplete-animation" value="6"/>
+  </enum>  <enum name="GdkInterpType" get-type="gdk_interp_type_get_type">
+    <member name="GDK_INTERP_NEAREST" nick="nearest" value="0"/>
+    <member name="GDK_INTERP_TILES" nick="tiles" value="1"/>
+    <member name="GDK_INTERP_BILINEAR" nick="bilinear" value="2"/>
+    <member name="GDK_INTERP_HYPER" nick="hyper" value="3"/>
+  </enum>  <enum name="GdkPixbufRotation" get-type="gdk_pixbuf_rotation_get_type">
+    <member name="GDK_PIXBUF_ROTATE_NONE" nick="none" value="0"/>
+    <member name="GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE" nick="counterclockwise" value="90"/>
+    <member name="GDK_PIXBUF_ROTATE_UPSIDEDOWN" nick="upsidedown" value="180"/>
+    <member name="GDK_PIXBUF_ROTATE_CLOCKWISE" nick="clockwise" value="270"/>
+  </enum>  <error-quark function="gdk_pixbuf_error_quark" domain="gdk-pixbuf-error-quark"/>
+</dump>

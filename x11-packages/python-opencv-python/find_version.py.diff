@@ -1,0 +1,46 @@
+--- a/setup.py
++++ b/setup.py
+@@ -497,7 +497,7 @@ def get_and_set_info(contrib, headless, rolling, ci_build):
+ 
+     # generate a fresh version.py always when Git repository exists
+     # (in sdists the version.py file already exists)
+-    if os.path.exists(".git"):
++    if True:
+         old_args = sys.argv.copy()
+         sys.argv = ["", str(contrib), str(headless), str(rolling), str(ci_build)]
+         runpy.run_path("find_version.py", run_name="__main__")
+--- a/find_version.py
++++ b/find_version.py
+@@ -10,7 +10,7 @@ if __name__ == "__main__":
+ 
+     opencv_version = ""
+     # dig out the version from OpenCV sources
+-    version_file_path = "opencv/modules/core/include/opencv2/core/version.hpp"
++    version_file_path = "@TERMUX_PREFIX@/include/opencv4/opencv2/core/version.hpp"
+ 
+     with open(version_file_path, "r") as f:
+         for line in f:
+@@ -29,21 +29,10 @@ if __name__ == "__main__":
+                 break
+ 
+     # used in local dev releases
+-    git_hash = (
+-        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+-        .splitlines()[0]
+-        .decode()
+-    )
++    git_hash = "N/A"
+     # this outputs the annotated tag if we are exactly on a tag, otherwise <tag>-<n>-g<shortened sha-1>
+     try:
+-        tag = (
+-            subprocess.check_output(
+-                ["git", "describe", "--tags"], stderr=subprocess.STDOUT
+-            )
+-            .splitlines()[0]
+-            .decode()
+-            .split("-")
+-        )
++        tag = ["@TERMUX_PKG_VERSION@"]
+     except subprocess.CalledProcessError as e:
+         # no tags reachable (e.g. on a topic branch in a fork), see
+         # https://stackoverflow.com/questions/4916492/git-describe-fails-with-fatal-no-names-found-cannot-describe-anything

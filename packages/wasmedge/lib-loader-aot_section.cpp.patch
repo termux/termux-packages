@@ -1,0 +1,18 @@
+diff --git a/lib/loader/aot_section.cpp b/lib/loader/aot_section.cpp
+index bc09eb4..ac1339d 100644
+--- a/lib/loader/aot_section.cpp
++++ b/lib/loader/aot_section.cpp
+@@ -7,8 +7,13 @@
+ 
+ #if WASMEDGE_OS_LINUX || WASMEDGE_OS_MACOS
+ extern "C" {
++#ifdef __arm__
++void __register_frame(void *) {}
++void __deregister_frame(void *) {}
++#else
+ extern void __register_frame(void *);
+ extern void __deregister_frame(void *);
++#endif
+ }
+ #endif
+ 

@@ -1,0 +1,45 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -424,7 +424,9 @@
+            /sw/lib"
+ 
+   for LIBDIR in $LIBDIRS ; do
+-    AC_CHECK_FILE([$LIBDIR], [LDFLAGS="$LDFLAGS -L$LIBDIR"], [continue])
++    if test -d "$LIBDIR"; then
++      LDFLAGS="$LDFLAGS -L$LIBDIR"; break;
++    fi
+   done
+ 
+   # Generic include directories.
+@@ -440,9 +442,12 @@
+   if test "x$with_cfitsio" != xno ; then
+     # Search for CFITSIO.
+     for INCDIR in $CFITSIO_INCDIRS $INCDIRS ; do
+-      AC_CHECK_FILE([$INCDIR/cfitsio/fitsio.h],
+-                    [CFITSIOINC="-I$INCDIR/cfitsio"; break])
+-      AC_CHECK_FILE([$INCDIR/fitsio.h], [CFITSIOINC="-I$INCDIR"; break])
++      if test -f "$INCDIR/cfitsio/fitsio.h"; then
++        CFITSIOINC="-I$INCDIR/cfitsio"; break;
++      fi
++      if test -f "$INCDIR/fitsio.h"; then
++        CFITSIOINC="-I$INCDIR"; break;
++      fi
+     done
+ 
+     AC_CHECK_LIB([socket],  [recv],   [CFITSIOLIB="-lsocket"], [], [$LIBS])
+@@ -469,9 +474,12 @@
+   if test "x$F77" != x -a "x$with_pgplot" != xno ; then
+     # Search for PGPLOT.
+     for INCDIR in $PGPLOT_INCDIRS $INCDIRS ; do
+-      AC_CHECK_FILE([$INCDIR/pgplot/cpgplot.h],
+-                    [PGPLOTINC="-I$INCDIR/pgplot"; break])
+-      AC_CHECK_FILE([$INCDIR/cpgplot.h], [PGPLOTINC="-I$INCDIR"; break])
++      if test -f "$INCDIR/pgplot/cpgplot.h"; then
++        PGPLOTINC="-I$INCDIR/pgplot"; break;
++      fi
++      if test -f "$INCDIR/cpgplot.h"; then
++        PGPLOTINC="-I$INCDIR"; break;
++      fi
+     done
+ 
+     # FLIBS (found above via AC_F77_LIBRARY_LDFLAGS) only helps if PGPLOT was

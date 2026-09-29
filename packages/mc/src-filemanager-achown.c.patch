@@ -1,0 +1,30 @@
+diff -u -r ../mc-4.8.21/src/filemanager/achown.c ./src/filemanager/achown.c
+--- ../mc-4.8.21/src/filemanager/achown.c	2018-05-27 19:56:21.000000000 +0000
++++ ./src/filemanager/achown.c	2018-06-03 22:53:50.499299792 +0000
+@@ -564,22 +564,26 @@
+         listbox_add_item (chl_list, LISTBOX_APPEND_AT_END, 0, "<Unknown>", NULL, FALSE);
+         if (is_owner)
+         {
++#ifndef __ANDROID__
+             /* get and put user names in the listbox */
+             setpwent ();
+             while ((chl_pass = getpwent ()) != NULL)
+                 listbox_add_item (chl_list, LISTBOX_APPEND_SORTED, 0, chl_pass->pw_name, NULL,
+                                   FALSE);
+             endpwent ();
++#endif
+             fe = listbox_search_text (chl_list, get_owner (sf_stat.st_uid));
+         }
+         else
+         {
++#ifndef __ANDROID__
+             /* get and put group names in the listbox */
+             setgrent ();
+             while ((chl_grp = getgrent ()) != NULL)
+                 listbox_add_item (chl_list, LISTBOX_APPEND_SORTED, 0, chl_grp->gr_name, NULL,
+                                   FALSE);
+             endgrent ();
++#endif
+             fe = listbox_search_text (chl_list, get_group (sf_stat.st_gid));
+         }
+ 

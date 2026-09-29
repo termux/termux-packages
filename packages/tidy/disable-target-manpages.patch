@@ -1,0 +1,66 @@
+diff -uNr tidy-html5/CMakeLists.txt tidy-html5.mod/CMakeLists.txt
+--- tidy-html5/CMakeLists.txt	2018-04-27 16:33:51.000000000 +0300
++++ tidy-html5.mod/CMakeLists.txt	2019-01-20 18:53:15.625486585 +0200
+@@ -472,62 +472,6 @@
+ 
+ 
+ #################################################
+-# Create man pages
+-#################################################
+-
+-if (UNIX AND SUPPORT_CONSOLE_APP)
+-    find_program( XSLTPROC_FOUND xsltproc )
+-    if (XSLTPROC_FOUND)
+-        ## NOTE: man name must match exe ie currently `${LIB_NAME}.1` not `tidy.1`
+-        ## also could use `manpath` command output to determine target install path
+-        set(TIDY_MANFILE ${LIB_NAME}.1)
+-        message(STATUS "*** Generating man ${TIDY_MANFILE} custom commands...")
+-        set(TIDY1XSL ${CMAKE_CURRENT_BINARY_DIR}/tidy1.xsl)
+-        set(TIDYHELP ${CMAKE_CURRENT_BINARY_DIR}/tidy-help.xml)
+-        set(TIDYCONFIG ${CMAKE_CURRENT_BINARY_DIR}/tidy-config.xml)
+-        add_custom_target(man ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME}")
+-        
+-        ## Populate the @VARIABLES@ in the input file.
+-        configure_file(
+-            ${CMAKE_CURRENT_SOURCE_DIR}/man/tidy1.xsl.in
+-            ${TIDY1XSL}
+-        )
+- 
+-        # Run the built EXE to generate xml output .
+-        add_custom_command(
+-            TARGET man
+-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME} -xml-help > ${TIDYHELP}
+-            COMMENT "Generate ${TIDYHELP}"
+-            VERBATIM
+-        )
+-
+-        # Run the built EXE to generate more xml output.
+-        add_custom_command(
+-            TARGET man
+-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${LIB_NAME} -xml-config > ${TIDYCONFIG}
+-            COMMENT "Generate ${TIDYCONFIG}"
+-            VERBATIM
+-        )
+-
+-        # Run xsltproc to generate the install files.
+-        add_custom_command(
+-            TARGET man
+-            DEPENDS ${TIDYHELP}
+-            COMMAND xsltproc ARGS ${TIDY1XSL} ${TIDYHELP} > ${CMAKE_CURRENT_BINARY_DIR}/${TIDY_MANFILE}
+-            COMMENT "Generate ${TIDY_MANFILE}"
+-            VERBATIM
+-        )
+-
+-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TIDY_MANFILE} DESTINATION ${MAN_INSTALL_DIR})
+-
+-    else ()
+-        message(STATUS "*** NOTE: xsltproc NOT FOUND! Can NOT generate man page.")
+-        message(STATUS "*** You need to install xsltproc in your system.")
+-    endif ()
+-endif ()
+-
+-
+-#################################################
+ # Create MSI,EXE, DMG, DEB/RPM
+ #   TODO: Check each of these builds
+ #################################################

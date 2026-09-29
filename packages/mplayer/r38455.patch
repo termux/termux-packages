@@ -1,0 +1,93 @@
+Index: libao2/ao_sdl.c
+===================================================================
+--- a/libao2/ao_sdl.c	(revision 38454)
++++ b/libao2/ao_sdl.c	(revision 38455)
+@@ -62,18 +62,19 @@
+ #define NUM_CHUNKS 8
+ #define BUFFSIZE (NUM_CHUNKS * CHUNK_SIZE)
+ 
+-static AVFifoBuffer *buffer;
++static AVFifo *buffer;
+ 
+ static int write_buffer(unsigned char* data,int len){
+-  int free = av_fifo_space(buffer);
++  int free = av_fifo_can_write(buffer);
+   if (len > free) len = free;
+-  return av_fifo_generic_write(buffer, data, len, NULL);
++  av_fifo_write(buffer, data, len);
++  return len;
+ }
+ 
+ static int read_buffer(unsigned char* data,int len){
+-  int buffered = av_fifo_size(buffer);
++  int buffered = av_fifo_can_read(buffer);
+   if (len > buffered) len = buffered;
+-  av_fifo_generic_read(buffer, data, len, NULL);
++  av_fifo_read(buffer, data, len);
+   return len;
+ }
+ 
+@@ -103,7 +104,7 @@
+ 	SDL_AudioSpec aspec, obtained;
+ 
+ 	/* Allocate ring-buffer memory */
+-	buffer = av_fifo_alloc(BUFFSIZE);
++	buffer = av_fifo_alloc2(BUFFSIZE, 1, 0);
+ 
+ 	mp_msg(MSGT_AO,MSGL_INFO,MSGTR_AO_SDL_INFO, rate, (channels > 1) ? "Stereo" : "Mono", af_fmt2str_short(format));
+ 
+@@ -219,7 +220,7 @@
+ 	  usec_sleep(get_delay() * 1000 * 1000);
+ 	SDL_CloseAudio();
+ 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+-	av_fifo_free(buffer);
++	av_fifo_freep2(&buffer);
+ }
+ 
+ // stop playing and empty buffers (for seeking/pause)
+@@ -229,7 +230,7 @@
+ 
+ 	SDL_PauseAudio(1);
+ 	/* Reset ring-buffer state */
+-	av_fifo_reset(buffer);
++	av_fifo_reset2(buffer);
+ 	SDL_PauseAudio(0);
+ }
+ 
+@@ -252,7 +253,7 @@
+ 
+ // return: how many bytes can be played without blocking
+ static int get_space(void){
+-    return av_fifo_space(buffer);
++    return av_fifo_can_write(buffer);
+ }
+ 
+ // plays 'len' bytes of 'data'
+@@ -259,11 +260,10 @@
+ // it should round it down to outburst*n
+ // return: number of bytes played
+ static int play(void* data,int len,int flags){
++	int ret;
+ 
+ 	if (!(flags & AOPLAY_FINAL_CHUNK))
+ 	len = (len/ao_data.outburst)*ao_data.outburst;
+-#if 0
+-	int ret;
+ 
+ 	/* Audio locking prohibits call of outputaudio */
+ 	SDL_LockAudio();
+@@ -272,13 +272,10 @@
+ 	SDL_UnlockAudio();
+ 
+     	return ret;
+-#else
+-	return write_buffer(data, len);
+-#endif
+ }
+ 
+ // return: delay in seconds between first and last sample in buffer
+ static float get_delay(void){
+-    int buffered = av_fifo_size(buffer); // could be less
++    int buffered = av_fifo_can_read(buffer); // could be less
+     return (float)(buffered + ao_data.buffersize)/(float)ao_data.bps;
+ }

@@ -1,0 +1,11 @@
+--- a/src/cli.c
++++ b/src/cli.c
+@@ -426,7 +426,7 @@
+ 		int fd;
+ 
+ 		snprintf(fname, sizeof(fname), "%s/XXXXXX.png",
+-			 getenv("TMPDIR") ? : "/tmp");
++			 getenv("TMPDIR") ? : "@TERMUX_PREFIX@/tmp");
+ 		fd = mkstemps(fname, 4);
+ 		if (fd < 0)
+ 			die("can't create temp file '%s'\n", fname);

@@ -1,0 +1,17 @@
+Fix SIGBUS Firefox error on Arm. Also apply to other arches just in case.
+
+https://github.com/termux/termux-packages/issues/15901
+https://github.com/mozilla/gecko-dev/commit/d7ba2cef0e9b74addedda4bc7f57daf10599a5dc
+https://github.com/google/cityhash/blob/master/src/city.cc
+
+--- a/other-licenses/nsis/Contrib/CityHash/cityhash/city.cpp
++++ b/other-licenses/nsis/Contrib/CityHash/cityhash/city.cpp
+@@ -33,7 +33,7 @@
+ 
+ using namespace std;
+ 
+-#if __sparc__
++#if __sparc__ || __TERMUX__
+ #include <string.h>
+ static inline uint64 UNALIGNED_LOAD64(const char *p) {
+   uint64 val;

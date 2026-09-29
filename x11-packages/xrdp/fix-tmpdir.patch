@@ -1,0 +1,45 @@
+diff --git a/common/xrdp_sockets.h b/common/xrdp_sockets.h
+index c39f6db..20f6286 100644
+--- a/common/xrdp_sockets.h
++++ b/common/xrdp_sockets.h
+@@ -62,6 +62,6 @@
+ #define XRDP_DISCONNECT_STR   XRDP_SOCKET_PATH "/" XRDP_DISCONNECT_BASE_STR
+ 
+ /* Where X11 stores its Unix Domain Sockets (unlikely to change) */
+-#define X11_UNIX_SOCKET_DIRECTORY "/tmp/.X11-unix"
++#define X11_UNIX_SOCKET_DIRECTORY "@TERMUX_PREFIX@/tmp/.X11-unix"
+ 
+ #endif
+diff --git a/sesman/session_list.c b/sesman/session_list.c
+index c4fd9d3..20771a7 100644
+--- a/sesman/session_list.c
++++ b/sesman/session_list.c
+@@ -155,13 +155,13 @@ x_server_running_check_ports(int display)
+     int x_running;
+     int sck;
+ 
+-    g_sprintf(text, "/tmp/.X11-unix/X%d", display);
++    g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", display);
+     x_running = g_file_exist(text);
+ 
+     if (!x_running)
+     {
+         LOG(LOG_LEVEL_DEBUG, "Did not find a running X server at %s", text);
+-        g_sprintf(text, "/tmp/.X%d-lock", display);
++        g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X%d-lock", display);
+         x_running = g_file_exist(text);
+     }
+ 
+diff --git a/xrdp/xrdp_mm.c b/xrdp/xrdp_mm.c
+index 61e097e..3965308 100644
+--- a/xrdp/xrdp_mm.c
++++ b/xrdp/xrdp_mm.c
+@@ -3383,7 +3383,7 @@ xrdp_mm_dump_jpeg(struct xrdp_mm *self, XRDP_ENC_DATA_DONE *enc_done)
+     header.bytes_follow = enc_done->comp_bytes - (2 + pheader_bytes[0]);
+     if (ii == 0)
+     {
+-        ii = g_file_open_rw("/tmp/jpeg.beef.bin");
++        ii = g_file_open_rw("@TERMUX_PREFIX@/tmp/jpeg.beef.bin");
+         if (ii == -1)
+         {
+             ii = 0;

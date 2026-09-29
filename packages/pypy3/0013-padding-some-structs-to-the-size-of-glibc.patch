@@ -1,0 +1,24 @@
+Pad `struct RPyOpaque_ThreadLock` so its bionic (target) size is >= the host
+glibc size, ensuring the ll2ctypes buffer can hold the host's writes. The
+padding is harmless on the final Android binary.
+
+--- a/rpython/translator/c/src/thread_pthread.h
++++ b/rpython/translator/c/src/thread_pthread.h
+@@ -40,6 +40,8 @@
+ struct RPyOpaque_ThreadLock {
+ 	sem_t sem;
+ 	int initialized;
++
++	char __padding[128];
+ };
+ 
+ #else /* !USE_SEMAPHORE */
+@@ -53,6 +55,8 @@
+ 	pthread_cond_t   lock_released;
+ 	pthread_mutex_t  mut;
+ 	struct RPyOpaque_ThreadLock *prev, *next;
++
++	char             __padding[128];
+ };
+ 
+ #endif /* USE_SEMAPHORE */

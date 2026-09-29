@@ -1,0 +1,46 @@
+diff '--color=auto' -uNr a/process.c b/process.c
+--- a/process.c	2024-12-25 15:43:20.000000000 +0800
++++ b/process.c	2025-03-06 02:18:48.124897314 +0800
+@@ -4221,6 +4221,20 @@
+     return result;
+ }
+ 
++#ifdef __ANDROID__
++void __rb_atfork_prepare() {
++    rb_thread_release_fork_lock();
++}
++
++void __rb_atfork_parent() {
++    // NOOP
++}
++
++void __rb_atfork_child() {
++    // NOOP
++}
++#endif
++
+ rb_pid_t
+ rb_fork_ruby(int *status)
+ {
+@@ -4229,6 +4243,12 @@
+     int try_gc = 1, err;
+     struct child_handler_disabler_state old;
+ 
++#ifdef __ANDROID__
++    if ((err = pthread_atfork(__rb_atfork_prepare, __rb_atfork_parent, __rb_atfork_child))) {
++        rb_bug_errno("pthread_atfork", err);
++    }
++#endif
++
+     do {
+         prefork();
+ 
+@@ -4243,6 +4263,8 @@
+         if (
+ #if defined(__FreeBSD__)
+             pid != 0 &&
++#elif defined(__ANDROID__)
++            false && /* the lock was released in the prepare hook registered at pthread_atfork */
+ #endif
+             true) {
+             rb_thread_release_fork_lock();

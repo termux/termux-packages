@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/AMDmi3/cavezofphear
+TERMUX_PKG_DESCRIPTION="A Boulder Dash like game for consoles/terminals"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.6.2"
+TERMUX_PKG_SRCURL=https://github.com/AMDmi3/cavezofphear/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=32f8d535b3bbd6d037371ff80127f02dfb7ef4eca066c753efff1e09c28030af
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DSYSTEMWIDE=ON -DWITH_MANPAGE=OFF"
+TERMUX_PKG_GROUPS="games"

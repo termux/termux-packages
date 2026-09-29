@@ -1,0 +1,56 @@
+--- a/vendor/logging/liblog/logger_write.cpp
++++ b/vendor/logging/liblog/logger_write.cpp
+@@ -41,7 +41,7 @@
+ #include "logger.h"
+ #include "uio.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "logd_writer.h"
+ #include "pmsg_writer.h"
+ #endif
+@@ -66,7 +66,7 @@
+ 
+ #define LOG_BUF_SIZE 1024
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static int check_log_uid_permissions() {
+   uid_t uid = getuid();
+ 
+@@ -113,7 +113,7 @@
+  * Release any logger resources. A new log write will immediately re-acquire.
+  */
+ void __android_log_close() {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   LogdClose();
+   PmsgClose();
+ #endif
+@@ -166,7 +166,7 @@
+   return minimum_log_priority;
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static __android_logger_function logger_function = __android_log_logd_logger;
+ #else
+ static __android_logger_function logger_function = __android_log_stderr_logger;
+@@ -195,7 +195,7 @@
+   aborter_function(abort_message);
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ static int write_to_log(log_id_t log_id, struct iovec* vec, size_t nr,
+                         const struct timespec* timestamp = nullptr) {
+   if (log_id == LOG_ID_KERNEL) {
+@@ -285,7 +285,7 @@
+ }
+ 
+ static const char* get_file_logger_path() {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   static const char* file_logger_path = []() {
+     static char path[PROP_VALUE_MAX] = {};
+     if (__system_property_get("ro.log.file_logger.path", path) > 0) {

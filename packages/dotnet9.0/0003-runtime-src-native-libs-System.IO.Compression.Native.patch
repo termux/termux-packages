@@ -1,0 +1,31 @@
+--- a/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
+@@ -60,7 +60,7 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
+             ${NATIVE_LIBS_EXTRA}
+         )
+ 
+-        if (NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_USE_SYSTEM_BROTLI)
++        if (NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT CLR_CMAKE_USE_SYSTEM_BROTLI)
+             set(DEF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/System.IO.Compression.Native_unixexports.src)
+             set(EXPORTS_FILE ${CMAKE_CURRENT_BINARY_DIR}/System.IO.Compression.Native.exports)
+             generate_exports_file(${DEF_SOURCES} ${EXPORTS_FILE})
+@@ -114,7 +114,7 @@ else ()
+         endif()
+     endif ()
+ 
+-    if (NOT GEN_SHARED_LIB AND NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_TARGET_BROWSER AND NOT CLR_CMAKE_TARGET_WASI)
++    if (NOT GEN_SHARED_LIB AND NOT CLR_CMAKE_TARGET_MACCATALYST AND NOT CLR_CMAKE_TARGET_IOS AND NOT CLR_CMAKE_TARGET_TVOS AND NOT CLR_CMAKE_TARGET_BROWSER AND NOT CLR_CMAKE_TARGET_WASI)
+         set(NATIVECOMPRESSION_SOURCES ${NATIVECOMPRESSION_SOURCES} entrypoints.c)
+     endif ()
+ 
+--- a/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake
++++ b/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake
+@@ -16,7 +16,7 @@ macro(append_extra_compression_libs NativeLibsExtra)
+     # 'zlib' represents our in-tree zlib, and is used in all other platforms
+     # that don't meet any of the previous special requirements, like most
+     # regular Unix and Windows builds.
+-    list(APPEND ZLIB_LIBRARIES $<IF:$<BOOL:${CLR_CMAKE_USE_SYSTEM_ZLIB}>,z,zlib>)
++    list(APPEND ZLIB_LIBRARIES $<IF:$<BOOL:${CLR_CMAKE_USE_SYSTEM_ZLIB}>,z,zlib> m)
+   endif ()
+   list(APPEND ${NativeLibsExtra} ${ZLIB_LIBRARIES})
+ 

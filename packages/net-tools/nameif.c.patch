@@ -1,0 +1,21 @@
+diff -uNr net-tools-2.10/nameif.c net-tools-2.10.mod/nameif.c
+--- net-tools-2.10/nameif.c	2021-01-07 01:22:35.000000000 +0200
++++ net-tools-2.10.mod/nameif.c	2021-01-07 15:52:58.378961050 +0200
+@@ -10,7 +10,7 @@
+ #endif
+ #include <stdio.h>
+ #include <getopt.h>
+-#include <sys/syslog.h>
++#include <syslog.h>
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <ctype.h>
+@@ -28,7 +28,7 @@
+ /* Current limitation of Linux network device ioctl(2) interface */
+ #define MAC_ADDRESS_MAX_LENGTH (sizeof(((struct ifreq *)0)->ifr_hwaddr.sa_data))
+ 
+-static const char default_conf[] = "/etc/mactab";
++static const char default_conf[] = "@TERMUX_PREFIX@/etc/mactab";
+ static const char *fname = default_conf;
+ static int use_syslog;
+ static int ctl_sk = -1;

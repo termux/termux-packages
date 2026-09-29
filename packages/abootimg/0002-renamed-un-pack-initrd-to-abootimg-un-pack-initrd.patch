@@ -1,0 +1,39 @@
+From ff8e759ed3c61dd1726f149452ec147b3ac77f1d Mon Sep 17 00:00:00 2001
+From: Gilles Grandou <gilles@grandou.net>
+Date: Thu, 21 Jul 2011 01:26:28 +0200
+Subject: [PATCH 2/3] renamed (un)pack-initrd to abootimg-(un)pack-initrd
+
+---
+ pack-initrd => abootimg-pack-initrd     | 0
+ unpack-initrd => abootimg-unpack-initrd | 0
+ debian/rules                            | 4 ++--
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ rename pack-initrd => abootimg-pack-initrd (100%)
+ rename unpack-initrd => abootimg-unpack-initrd (100%)
+
+diff --git a/pack-initrd b/abootimg-pack-initrd
+similarity index 100%
+rename from pack-initrd
+rename to abootimg-pack-initrd
+diff --git a/unpack-initrd b/abootimg-unpack-initrd
+similarity index 100%
+rename from unpack-initrd
+rename to abootimg-unpack-initrd
+diff --git a/debian/rules b/debian/rules
+index 98d8cd89eaa0..0196471adbb9 100755
+--- a/debian/rules
++++ b/debian/rules
+@@ -12,8 +12,8 @@ configure/abootimg::
+ binary-install/abootimg::
+ 	dh_installman $(CURDIR)/debian/abootimg.1
+ 	install $(CURDIR)/abootimg $(CURDIR)/debian/abootimg/usr/bin
+-	install -T $(CURDIR)/pack-initrd $(CURDIR)/debian/abootimg/usr/bin/abootimg-pack-initrd
+-	install -T $(CURDIR)/unpack-initrd $(CURDIR)/debian/abootimg/usr/bin/abootimg-unpack-initrd
++	install -T $(CURDIR)/abootimg-pack-initrd $(CURDIR)/debian/abootimg/usr/bin
++	install -T $(CURDIR)/abootimg-unpack-initrd $(CURDIR)/debian/abootimg/usr/bin
+ 
+ clean::
+ 	rm -rf files/agtl.egg-info
+-- 
+2.38.1
+

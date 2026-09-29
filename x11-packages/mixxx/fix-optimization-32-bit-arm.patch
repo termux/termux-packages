@@ -1,0 +1,24 @@
+Prevents
+clang++: error: unsupported option '-mfloat-abi=hard' for target 'thumbv7-unknown-linux-android24'
+Matches termux_setup_toolchain_29()
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -532,7 +532,7 @@ elseif(GNU_GCC OR LLVM_CLANG)
+         # https://stackoverflow.com/questions/45917280/mac-osx-minumum-support-sse-version
+       elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|armv7.*)$") # but not armv8
+         add_compile_options(
+-          -mfloat-abi=hard
++          -mfloat-abi=softfp
+           -mfpu=neon
+         )
+       endif()
+@@ -555,7 +555,7 @@ elseif(GNU_GCC OR LLVM_CLANG)
+       # are set automatically
+       if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|armv7.*)$") # but not armv8
+         add_compile_options(
+-          -mfloat-abi=hard
++          -mfloat-abi=softfp
+           -mfpu=neon
+         )
+       endif()

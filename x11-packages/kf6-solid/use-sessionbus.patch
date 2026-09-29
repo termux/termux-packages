@@ -1,0 +1,63 @@
+--- a/src/solid/devices/backends/upower/upowerdevice.cpp
++++ b/src/solid/devices/backends/upower/upowerdevice.cpp
+@@ -24,7 +24,7 @@
+     : Solid::Ifaces::Device()
+     , m_udi(udi)
+ {
+-    QDBusConnection::systemBus().connect(QStringLiteral(UP_DBUS_SERVICE),
++    QDBusConnection::sessionBus().connect(QStringLiteral(UP_DBUS_SERVICE),
+                                          m_udi,
+                                          QStringLiteral("org.freedesktop.DBus.Properties"),
+                                          QStringLiteral("PropertiesChanged"),
+@@ -33,7 +33,7 @@
+ 
+     // TODO port this to Solid::Power, we can't link against kdelibs4support for this signal
+     // older upower versions not affected
+-    QDBusConnection::systemBus().connect(QStringLiteral("org.freedesktop.login1"), //
++    QDBusConnection::sessionBus().connect(QStringLiteral("org.freedesktop.login1"), //
+                                          QStringLiteral("/org/freedesktop/login1"),
+                                          QStringLiteral("org.freedesktop.login1.Manager"),
+                                          QStringLiteral("PrepareForSleep"),
+@@ -201,7 +201,7 @@
+     QDBusMessage call =
+         QDBusMessage::createMethodCall(QStringLiteral(UP_DBUS_SERVICE), m_udi, QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("Get"));
+     call.setArguments({QStringLiteral(UP_DBUS_INTERFACE_DEVICE), key});
+-    QDBusReply<QVariant> reply = QDBusConnection::systemBus().call(call);
++    QDBusReply<QVariant> reply = QDBusConnection::sessionBus().call(call);
+ 
+     if (reply.isValid()) {
+         m_cache[key] = reply.value();
+@@ -227,7 +227,7 @@
+     QDBusMessage call =
+         QDBusMessage::createMethodCall(QStringLiteral(UP_DBUS_SERVICE), m_udi, QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("GetAll"));
+     call.setArguments({QStringLiteral(UP_DBUS_INTERFACE_DEVICE)});
+-    QDBusReply<QVariantMap> reply = QDBusConnection::systemBus().call(call);
++    QDBusReply<QVariantMap> reply = QDBusConnection::sessionBus().call(call);
+ 
+     if (reply.isValid()) {
+         m_cache = reply.value();
+
+--- a/src/solid/devices/backends/upower/upowermanager.cpp
++++ b/src/solid/devices/backends/upower/upowermanager.cpp
+@@ -22,7 +22,7 @@
+ UPowerManager::UPowerManager(QObject *parent)
+     : Solid::Ifaces::DeviceManager(parent)
+     , m_supportedInterfaces({Solid::DeviceInterface::GenericInterface, Solid::DeviceInterface::Battery})
+-    , m_manager(QDBusConnection::systemBus())
++    , m_manager(QDBusConnection::sessionBus())
+     , m_knownDevices(udiPrefix())
+ {
+     qDBusRegisterMetaType<QList<QDBusObjectPath>>();
+@@ -36,9 +36,9 @@
+                                                               QStringLiteral("org.freedesktop.DBus"),
+                                                               QStringLiteral("ListActivatableNames"));
+ 
+-        QDBusReply<QStringList> reply = QDBusConnection::systemBus().call(message);
++        QDBusReply<QStringList> reply = QDBusConnection::sessionBus().call(message);
+         if (reply.isValid() && reply.value().contains(QStringLiteral(UP_DBUS_SERVICE))) {
+-            QDBusConnection::systemBus().interface()->startService(QStringLiteral(UP_DBUS_SERVICE));
++            QDBusConnection::sessionBus().interface()->startService(QStringLiteral(UP_DBUS_SERVICE));
+             serviceFound = true;
+         }
+     }
+     

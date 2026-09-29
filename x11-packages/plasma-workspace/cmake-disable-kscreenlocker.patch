@@ -1,0 +1,102 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -76,7 +76,7 @@
+ find_package(KSysGuard ${PROJECT_DEP_VERSION} CONFIG)
+ set_package_properties(KSysGuard PROPERTIES
+     DESCRIPTION "Components to monitor the system"
+-    TYPE REQUIRED
++    TYPE OPTIONAL
+ )
+ find_package(KF6Screen ${PROJECT_DEP_VERSION} CONFIG REQUIRED)
+ find_package(LayerShellQt ${PROJECT_DEP_VERSION} CONFIG REQUIRED)
+@@ -127,8 +127,7 @@
+    TYPE REQUIRED)
+ pkg_check_modules(DBus dbus-1 REQUIRED IMPORTED_TARGET)
+ 
+-find_package(KWinDBusInterface CONFIG REQUIRED)
+-find_package(ScreenSaverDBusInterface CONFIG REQUIRED)
++find_package(KWinX11DBusInterface CONFIG REQUIRED)
+ 
+ find_package(KF6Holidays)
+ set_package_properties(KF6Holidays PROPERTIES DESCRIPTION "Holidays provider for Plasma calendar"
+@@ -207,8 +206,6 @@
+ 
+     find_package(XCB MODULE REQUIRED COMPONENTS AUX XCB CURSOR RANDR IMAGE)
+     set_package_properties(XCB PROPERTIES TYPE REQUIRED)
+-
+-    find_package(KScreenLocker ${PROJECT_DEP_VERSION} REQUIRED)
+ else()
+     set(HAVE_X11 0)
+     set(HAVE_XCURSOR 0)
+@@ -324,7 +324,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+     add_feature_info(GLIBC_LOCALE_GEN GLIBC_LOCALE_GEN "Generate glibc locales")
+     add_feature_info(GLIBC_LOCALE_PREGENERATED GLIBC_LOCALE_PREGENERATED "glibc locales are pregenerated")
+     ################## Find libraries ###################
+-    if(REGION_LANG_GENERATE_LOCALE_HELPER)
++    if(FALSE)
+         find_package(PolkitQt6-1)
+         set_package_properties(PolkitQt6-1
+                 PROPERTIES DESCRIPTION "DBus interface wrapper for Polkit"
+--- a/components/sessionsprivate/CMakeLists.txt	2025-08-05 05:54:42.000000000 -0500
++++ b/components/sessionsprivate/CMakeLists.txt	2025-09-18 15:21:43.560069634 -0500
+@@ -3,7 +3,6 @@
+     types.h
+ )
+ 
+-qt_add_dbus_interface(sessionsprivateplugin_SRCS ${SCREENSAVER_DBUS_INTERFACE} screensaver_interface)
+ 
+ kconfig_add_kcfg_files(sessionsprivateplugin_SRCS kscreensaversettings.kcfgc)
+ 
+--- a/containmentactions/contextmenu/CMakeLists.txt	2025-08-05 05:54:42.000000000 -0500
++++ b/containmentactions/contextmenu/CMakeLists.txt	2025-09-18 15:21:43.640069634 -0500
+@@ -10,7 +10,6 @@
+ set(krunner_xml ${plasma-workspace_SOURCE_DIR}/krunner/dbus/org.kde.krunner.App.xml)
+ qt_add_dbus_interface(contextmenu_SRCS ${krunner_xml} krunner_interface)
+ 
+-qt_add_dbus_interface(contextmenu_SRCS ${SCREENSAVER_DBUS_INTERFACE} screensaver_interface)
+ 
+ kcoreaddons_add_plugin(plasma_containmentactions_contextmenu SOURCES ${contextmenu_SRCS} INSTALL_NAMESPACE "plasma/containmentactions")
+ 
+--- a/ksmserver/CMakeLists.txt	2025-08-05 05:54:42.000000000 -0500
++++ b/ksmserver/CMakeLists.txt	2025-09-18 15:21:44.330069634 -0500
+@@ -37,7 +36,6 @@
+     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+ 
+ target_link_libraries(ksmserver
+-    PW::KScreenLocker
+     PW::KWorkspace
+     KF6::XmlGui
+     KF6::I18n
+--- a/libkworkspace/CMakeLists.txt	2025-08-05 05:54:42.000000000 -0500
++++ b/libkworkspace/CMakeLists.txt	2025-09-18 15:21:43.660069634 -0500
+@@ -22,7 +22,6 @@
+ 
+ add_definitions(-DTRANSLATION_DOMAIN=\"libkworkspace\")
+ 
+-qt_add_dbus_interface(kworkspace_LIB_SRCS ${SCREENSAVER_DBUS_INTERFACE} screenlocker_interface )
+ qt_add_dbus_interface(kworkspace_LIB_SRCS ${plasma-workspace_SOURCE_DIR}/ksmserver/org.kde.LogoutPrompt.xml logoutprompt_interface)
+ qt_add_dbus_interface(kworkspace_LIB_SRCS ${plasma-workspace_SOURCE_DIR}/startkde/plasma-session/org.kde.Startup.xml startup_interface)
+ qt_add_dbus_interface(kworkspace_LIB_SRCS ${plasma-workspace_SOURCE_DIR}/startkde/plasma-shutdown/org.kde.Shutdown.xml shutdown_interface)
+--- a/runners/sessions/CMakeLists.txt	2025-08-05 05:54:42.000000000 -0500
++++ b/runners/sessions/CMakeLists.txt	2025-09-18 15:21:43.660069634 -0500
+@@ -6,7 +6,6 @@
+     sessionrunner.cpp sessionrunner.h
+ )
+ 
+-qt_add_dbus_interface(krunner_sessions_SRCS ${SCREENSAVER_DBUS_INTERFACE} screensaver_interface)
+ 
+ kcoreaddons_add_plugin(krunner_sessions SOURCES ${krunner_sessions_SRCS} INSTALL_NAMESPACE "kf6/krunner")
+ target_link_libraries(krunner_sessions Qt::DBus KF6::Runner KF6::I18n PW::KWorkspace)
+
+diff --git a/kcms/region_language/localegenhelper/CMakeLists.txt b/kcms/region_language/localegenhelper/CMakeLists.txt
+index 21389d1..5858de8 100644
+--- a/kcms/region_language/localegenhelper/CMakeLists.txt
++++ b/kcms/region_language/localegenhelper/CMakeLists.txt
+@@ -17,7 +17,6 @@ qt_add_dbus_adaptor(localegen_Helper_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.lo
+ add_executable(plasma-localegen-helper ${localegen_Helper_SRCS})
+ target_link_libraries(plasma-localegen-helper
+     Qt::DBus
+-    PolkitQt6-1::Core
+     KF6::I18n
+ )
+ ecm_install_configured_files(INPUT org.kde.localegenhelper.service.in DESTINATION ${KDE_INSTALL_DBUSSYSTEMSERVICEDIR} @ONLY)

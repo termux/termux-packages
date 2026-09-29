@@ -1,0 +1,261 @@
+From ce3d7e2654bf5bc456a8b2bc89993393cffa9560 Mon Sep 17 00:00:00 2001
+From: Slava Aseev <ptrnine@altlinux.org>
+Date: Wed, 9 Jan 2019 18:26:57 +0300
+Subject: [PATCH] Updated to 3.6.4 DCMTK API
+
+---
+ config/cmake/Modules/FindDCMTK.cmake       |  2 +-
+ core/vil/file_formats/vil_dicom.cxx        | 66 ++++++++++++----------
+ core/vil/file_formats/vil_dicom_stream.cxx | 26 ++++-----
+ core/vil/file_formats/vil_dicom_stream.h   | 18 ++++--
+ 4 files changed, 63 insertions(+), 49 deletions(-)
+
+diff -uNr a/core/vil/file_formats/vil_dicom.cxx b/core/vil/file_formats/vil_dicom.cxx
+--- a/core/vil/file_formats/vil_dicom.cxx       2021-08-02 23:21:08.000000000 +0800
++++ b/core/vil/file_formats/vil_dicom.cxx       2022-09-29 21:27:12.960447500 +0800
+@@ -27,13 +27,13 @@
+ #  include "vil/vil_pixel_format.h"
+ #  include "vil/vil_exception.h"
+
+-#  include <dcfilefo.h>
+-#  include <dcmetinf.h>
+-#  include <dcdatset.h>
+-#  include <dctagkey.h>
+-#  include <dcdeftag.h>
+-#  include <dcstack.h>
+-#  include <diinpxt.h>
++#  include <dcmtk/dcmdata/dcfilefo.h>
++#  include <dcmtk/dcmdata/dcmetinf.h>
++#  include <dcmtk/dcmdata/dcdatset.h>
++#  include <dcmtk/dcmdata/dctagkey.h>
++#  include <dcmtk/dcmdata/dcdeftag.h>
++#  include <dcmtk/dcmdata/dcstack.h>
++#  include <dcmtk/dcmimgle/diinpxt.h>
+
+ #  include "vil_dicom_stream.h"
+ //
+@@ -108,8 +108,9 @@
+ read_header(DcmObject * dataset, vil_dicom_header_info & i);
+
+ static void
+-read_pixels_into_buffer(DcmPixelData * pixels,
++read_pixels_into_buffer(DiDocument* doc,
+                         unsigned num_samples,
++                        unsigned nplanes,
+                         Uint16 alloc,
+                         Uint16 stored,
+                         Uint16 high,
+@@ -209,12 +210,15 @@
+       else
+       {
+         assert(stack.top()->ident() == EVR_PixelData);
+-        pixels = static_cast<DcmPixelData *>(stack.top());
+       }
+     }
++
++    DiDocument doc(&dset, EXS_Unknown);
++    pixels = doc.getPixelData();
++
+     unsigned num_samples = ni() * nj() * nplanes();
+     read_pixels_into_buffer(
+-      pixels, num_samples, bits_alloc, bits_stored, high_bit, pixel_rep, slope, intercept, pixel_buf, pixel_format);
++      &doc, num_samples, nplanes(), bits_alloc, bits_stored, high_bit, pixel_rep, slope, intercept, pixel_buf, pixel_format);
+   }
+
+   // Create an image resource to manage the pixel buffer
+@@ -1035,8 +1039,9 @@
+ template <class InT>
+ void
+ convert_src_type(InT const *,
+-                 DcmPixelData * pixels,
++                 DiDocument *document,
+                  unsigned num_samples,
++                 unsigned nplanes,
+                  Uint16 alloc,
+                  Uint16 stored,
+                  Uint16 high,
+@@ -1044,25 +1049,26 @@
+                  DiInputPixel *& pixel_data,
+                  vil_pixel_format & act_format)
+ {
++  Uint32 firstFragment = 0;
+   if (rep == 0 && stored <= 8)
+   {
+     act_format = VIL_PIXEL_FORMAT_BYTE;
+-    pixel_data = new DiInputPixelTemplate<InT, Uint8>(pixels, alloc, stored, high, 0, num_samples);
++    pixel_data = new DiInputPixelTemplate<InT,Uint8>(document, alloc, stored, high, 0, num_samples, nplanes, nullptr, firstFragment);
+   }
+   else if (rep == 0 && stored <= 16)
+   {
+     act_format = VIL_PIXEL_FORMAT_UINT_16;
+-    pixel_data = new DiInputPixelTemplate<InT, Uint16>(pixels, alloc, stored, high, 0, num_samples);
++    pixel_data = new DiInputPixelTemplate<InT,Uint16>(document, alloc, stored, high, 0, num_samples, nplanes, nullptr, firstFragment);
+   }
+   else if (rep == 1 && stored <= 8)
+   {
+     act_format = VIL_PIXEL_FORMAT_SBYTE;
+-    pixel_data = new DiInputPixelTemplate<InT, Sint8>(pixels, alloc, stored, high, 0, num_samples);
++    pixel_data = new DiInputPixelTemplate<InT,Sint8>(document, alloc, stored, high, 0, num_samples, nplanes, nullptr, firstFragment);
+   }
+   else if (rep == 1 && stored <= 16)
+   {
+     act_format = VIL_PIXEL_FORMAT_INT_16;
+-    pixel_data = new DiInputPixelTemplate<InT, Sint16>(pixels, alloc, stored, high, 0, num_samples);
++    pixel_data = new DiInputPixelTemplate<InT,Sint16>(document, alloc, stored, high, 0, num_samples, nplanes, nullptr, firstFragment);
+   }
+ }
+
+@@ -1095,8 +1101,9 @@
+ }
+ #  endif // MIXED_ENDIAN
+ static void
+-read_pixels_into_buffer(DcmPixelData * pixels,
++read_pixels_into_buffer(DiDocument* doc,
+                         unsigned num_samples,
++                        unsigned nplanes,
+                         Uint16 alloc,
+                         Uint16 stored,
+                         Uint16 high,
+@@ -1117,13 +1124,13 @@
+   // Make sure pixel_data is deleted before this function exits!
+   //
+   DiInputPixel * pixel_data = 0;
+-  if (pixels->getVR() == EVR_OW)
++  if (doc->getPixelData()->getVR() == EVR_OW)
+   {
+-    convert_src_type((Uint16 *)0, pixels, num_samples, alloc, stored, high, rep, pixel_data, act_format);
++    convert_src_type((Uint16 *)0 , doc, num_samples, nplanes, alloc, stored, high, rep, pixel_data, act_format);
+   }
+   else
+   {
+-    convert_src_type((Uint8 *)0, pixels, num_samples, alloc, stored, high, rep, pixel_data, act_format);
++    convert_src_type((Uint8 *)0, doc, num_samples, nplanes, alloc, stored, high, rep, pixel_data, act_format);
+   }
+ #  ifdef MIXED_ENDIAN
+ #    ifdef NO_OFFSET
+@@ -1147,7 +1154,7 @@
+   }
+
+   // The data has been copied and converted. Release the source.
+-  pixels->clear();
++  doc->getPixelData()->clear();
+
+   // Now, the actual buffer is good, or else we need to rescale
+   //
+diff -uNr a/core/vil/file_formats/vil_dicom_stream.cxx b/core/vil/file_formats/vil_dicom_stream.cxx
+--- a/core/vil/file_formats/vil_dicom_stream.cxx        2021-08-02 23:21:08.000000000 +0800
++++ b/core/vil/file_formats/vil_dicom_stream.cxx        2022-09-29 21:26:54.001356700 +0800
+@@ -4,7 +4,7 @@
+
+ #  include "vil_dicom_stream.h"
+ #  include "vil/vil_stream.h"
+-#  include <dcerror.h>
++#  include <dcmtk/dcmdata/dcerror.h>
+
+ #  include <cassert>
+ #  ifdef _MSC_VER
+@@ -42,14 +42,14 @@
+
+
+ OFBool
+-vil_dicom_stream_producer::eos() const
++vil_dicom_stream_producer::eos()
+ {
+   return vs_->tell() >= vs_->file_size();
+ }
+
+
+-Uint32
+-vil_dicom_stream_producer::avail() const
++offile_off_t
++vil_dicom_stream_producer::avail()
+ {
+   vil_streampos n = vs_->file_size() - vs_->tell();
+   assert(n >= 0);
+@@ -57,13 +57,13 @@
+   // apparently dicom streams only support 32 bit positions
+   // whereas vil_streams now support 64 bit positions (when
+   // available)
+-  assert(n <= (vil_streampos)std::numeric_limits<Uint32>::max());
+-  return (Uint32)n;
++  assert(n <= (vil_streampos)std::numeric_limits<offile_off_t>::max());
++  return (offile_off_t)n;
+ }
+
+
+-Uint32
+-vil_dicom_stream_producer::read(void * buf, Uint32 buflen)
++offile_off_t
++vil_dicom_stream_producer::read(void * buf, offile_off_t buflen)
+ {
+   vil_streampos n = vs_->read(buf, buflen);
+   assert(n >= 0);
+@@ -71,13 +71,13 @@
+   // apparently dicom streams only support 32 bit positions
+   // whereas vil_streams now support 64 bit positions (when
+   // available)
+-  assert(n <= (vil_streampos)std::numeric_limits<Uint32>::max());
+-  return (Uint32)n;
++  assert(n <= (vil_streampos)std::numeric_limits<offile_off_t>::max());
++  return (offile_off_t)n;
+ }
+
+
+-Uint32
+-vil_dicom_stream_producer::skip(Uint32 skiplen)
++offile_off_t
++vil_dicom_stream_producer::skip(offile_off_t skiplen)
+ {
+   vs_->seek(vs_->tell() + skiplen);
+   return skiplen;
+@@ -85,7 +85,7 @@
+
+
+ void
+-vil_dicom_stream_producer::putback(Uint32 num)
++vil_dicom_stream_producer::putback(offile_off_t num)
+ {
+   vs_->seek(vs_->tell() - (long int)num);
+ }
+diff -uNr a/core/vil/file_formats/vil_dicom_stream.h b/core/vil/file_formats/vil_dicom_stream.h
+--- a/core/vil/file_formats/vil_dicom_stream.h  2021-08-02 23:21:08.000000000 +0800
++++ b/core/vil/file_formats/vil_dicom_stream.h  2022-09-29 21:20:34.157511200 +0800
+@@ -4,7 +4,8 @@
+ // \file
+ // \author Amitha Perera
+
+-#include <dcistrma.h>
++#include <dcmtk/dcmdata/dcistrma.h>
++#include <dcmtk/dcmimgle/didocu.h>
+
+ class vil_stream;
+
+@@ -18,11 +19,11 @@
+
+   virtual OFBool good() const;
+   virtual OFCondition status() const;
+-  virtual OFBool eos() const;
+-  virtual Uint32 avail() const;
+-  virtual Uint32 read(void *buf, Uint32 buflen);
+-  virtual Uint32 skip(Uint32 skiplen);
+-  virtual void putback(Uint32 num);
++  virtual OFBool eos();
++  virtual offile_off_t avail();
++  virtual offile_off_t read(void *buf, offile_off_t buflen);
++  virtual offile_off_t skip(offile_off_t skiplen);
++  virtual void putback(offile_off_t num);
+
+  private:
+   vil_stream* vs_;
+@@ -43,6 +44,11 @@
+   {
+     return new vil_dicom_stream_factory(*this);
+   }
++
++  virtual DcmInputStreamFactoryType ident() const
++  {
++    return DFT_DcmInputFileStreamFactory;
++  }
+
+  private:
+   vil_stream* vs_;

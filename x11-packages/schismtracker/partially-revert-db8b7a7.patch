@@ -1,0 +1,15 @@
+Partially reverts https://github.com/schismtracker/schismtracker/commit/db8b7a7fd41f951a1953f1f625bb1ad47fc89d6c,
+which introduces a change that doesn't work on Android.
+
+--- a/schism/loadso.c
++++ b/schism/loadso.c
+@@ -270,8 +270,7 @@
+ #elif defined(SCHISM_WIIU)
+ 	"%s.rpl",
+ #else
+-	/* NOTE: this is apparently required for Android; see issue #767
+-	 * "lib%s.so", */
++	"lib%s.so",
+ #endif
+ 	NULL,
+ };

@@ -1,0 +1,64 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,26 +1,26 @@
+-CPPFLAGS	:= -I.
+-CFLAGS		:= -g -Wall -Werror
+-CXXFLAGS	:= -g -Wall -Werror
++CPPFLAGS	+= -I.
++CFLAGS		?= -g -Wall -Werror
++CXXFLAGS	?= -g -Wall -Werror
+ INSTALL		:= install
+ DESTDIR		:=
+ SPECFILE	:= keyutils.spec
+ NO_GLIBC_KEYERR	:= 0
+ NO_ARLIB	:= 0
+ NO_SOLIB	:= 0
+-ETCDIR		:= /etc
+-BINDIR		:= /bin
+-SBINDIR		:= /sbin
+-SHAREDIR	:= /usr/share/keyutils
+-MANDIR		:= /usr/share/man
++ETCDIR		:= @TERMUX_PREFIX@/etc
++BINDIR		:= @TERMUX_PREFIX@/bin
++SBINDIR		:= @TERMUX_PREFIX@/bin
++SHAREDIR	:= @TERMUX_PREFIX@/share/keyutils
++MANDIR		:= @TERMUX_PREFIX@/share/man
+ MAN1		:= $(MANDIR)/man1
+ MAN3		:= $(MANDIR)/man3
+ MAN5		:= $(MANDIR)/man5
+ MAN7		:= $(MANDIR)/man7
+ MAN8		:= $(MANDIR)/man8
+-INCLUDEDIR	:= /usr/include
++INCLUDEDIR	:= @TERMUX_PREFIX@/include
+ LN		:= ln
+ LNS		:= $(LN) -sf
+-PREFIX 		:= /usr
++PREFIX 		:= @TERMUX_PREFIX@
+ 
+ ###############################################################################
+ #
+@@ -59,12 +59,12 @@
+ #
+ ###############################################################################
+ ifeq ($(origin LIBDIR),undefined)
+-LIBDIR		:= $(shell ldd /usr/bin/make | grep '\(/libc[.]\)' | sed -e 's!.*\(/.*\)/libc[.].*!\1!')
++LIBDIR		:= @TERMUX_PREFIX@/lib
+ endif
+ ifeq ($(origin USRLIBDIR),undefined)
+-USRLIBDIR	:= $(patsubst /lib/%,/usr/lib/%,$(LIBDIR))
++USRLIBDIR	:= @TERMUX_PREFIX@/lib
+ endif
+-BUILDFOR	:= $(shell file /usr/bin/make | sed -e 's!.*ELF \(32\|64\)-bit.*!\1!')-bit
++BUILDFOR	:=
+ 
+ ifeq ($(origin CFLAGS),undefined)
+ ifeq ($(BUILDFOR),32-bit)
+@@ -161,7 +161,7 @@
+ 
+ key.dns_resolver: key.dns_resolver.o dns.afsdb.o $(LIB_DEPENDENCY)
+ 	$(CC) -L. $(CFLAGS) $(LDFLAGS) $(RPATH) -o $@ \
+-		key.dns_resolver.o dns.afsdb.o -lkeyutils -lresolv
++		key.dns_resolver.o dns.afsdb.o -lkeyutils
+ 
+ key.dns_resolver.o: key.dns_resolver.c key.dns.h
+ dns.afsdb.o: dns.afsdb.c key.dns.h

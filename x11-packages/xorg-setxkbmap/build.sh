@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Set the keyboard using the X Keyboard Extension"
+TERMUX_PKG_LICENSE="HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.3.5"
+TERMUX_PKG_SRCURL="https://xorg.freedesktop.org/releases/individual/app/setxkbmap-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=360193cecc93f906d8383a8fb5c1f3a7eed35e6ced0e118a64ee56ae13c88cac
+TERMUX_PKG_DEPENDS="libx11, libxkbfile, libxrandr"
+TERMUX_PKG_AUTO_UPDATE=true

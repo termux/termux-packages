@@ -1,0 +1,16 @@
+diff -uNr minio-RELEASE.2022-12-02T19-19-22Z/cmd/net.go minio-RELEASE.2022-12-02T19-19-22Z.mod/cmd/net.go
+--- minio-RELEASE.2022-12-02T19-19-22Z/cmd/net.go	2022-12-02 21:19:22.000000000 +0200
++++ minio-RELEASE.2022-12-02T19-19-22Z.mod/cmd/net.go	2023-01-07 15:31:24.742376643 +0200
+@@ -47,6 +47,12 @@
+ // mustGetLocalIPs returns IPs of local interface
+ func mustGetLocalIPs() (ipList []net.IP) {
+ 	ifs, err := net.Interfaces()
++
++	if ifs == nil {
++		ipList = append(ipList, net.IPv4(127, 0, 0, 1))
++		return ipList
++	}
++
+ 	logger.FatalIf(err, "Unable to get IP addresses of this host")
+ 
+ 	for _, interf := range ifs {

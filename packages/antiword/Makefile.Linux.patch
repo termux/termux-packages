@@ -1,0 +1,40 @@
+diff -uNr antiword-0.37/Makefile.Linux antiword-0.37.mod/Makefile.Linux
+--- antiword-0.37/Makefile.Linux	2005-10-29 20:13:15.000000000 +0300
++++ antiword-0.37.mod/Makefile.Linux	2019-02-25 22:05:02.764208927 +0200
+@@ -2,8 +2,8 @@
+ # Makefile for antiword (Linux version)
+ #
+
+-CC	= gcc
+-LD	= gcc
++CC	?= gcc
++LD	= $(CC)
+
+ INSTALL		= cp -f
+ INSTALL_PROGRAM	= $(INSTALL)
+@@ -12,12 +12,11 @@
+ # must be equal to DEBUG or NDEBUG
+ DB	= NDEBUG
+ # Optimization: -O<n> or debugging: -g
+-OPT	= -O2
++OPT	=
+
+ LDLIBS	=
+
+-CFLAGS	= -Wall -pedantic $(OPT) -D$(DB)
+-LDFLAGS	=
++CFLAGS	+= -Wall -pedantic $(OPT) -D$(DB)
+
+ OBJS	=\
+ 	main_u.o asc85enc.o blocklist.o chartrans.o datalist.o depot.o\
+@@ -36,8 +36,8 @@
+ LOCAL_INSTALL_DIR = $(HOME)/bin
+ LOCAL_RESOURCES_DIR = $(HOME)/.antiword
+
+-GLOBAL_INSTALL_DIR = /usr/local/bin
+-GLOBAL_RESOURCES_DIR = /usr/share/antiword
++GLOBAL_INSTALL_DIR = @TERMUX_PREFIX@/bin
++GLOBAL_RESOURCES_DIR = @TERMUX_PREFIX@/share/antiword
+
+ all:		$(PROGS)
+

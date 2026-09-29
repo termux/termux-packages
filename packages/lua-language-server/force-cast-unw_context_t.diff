@@ -1,0 +1,11 @@
+--- a/unwind_linux.cpp
++++ b/unwind_linux.cpp
+@@ -6,7 +6,7 @@
+ namespace bee::crash {
+     void unwind(ucontext_t *ctx, uint16_t skip, unwind_callback func, void *ud) noexcept {
+         unw_cursor_t cursor;
+-#if defined(__aarch64__)
++#if 1
+         unw_context_t *unw_ctx = (unw_context_t *)ctx;
+         unw_init_local(&cursor, unw_ctx);
+ #else

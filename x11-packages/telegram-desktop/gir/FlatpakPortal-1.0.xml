@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="FlatpakPortalFlatpak" get-type="flatpak_portal_flatpak_get_type">
+    <property name="supports" type="guint" flags="227" default-value="0"/>
+    <property name="version" type="guint" flags="227" default-value="0"/>
+    <signal name="handle-spawn" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GUnixFDList"/>
+      <param type="gchararray"/>
+      <param type="GStrv"/>
+      <param type="GVariant"/>
+      <param type="GVariant"/>
+      <param type="guint"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="handle-spawn-signal" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gboolean"/>
+    </signal>
+    <signal name="handle-create-update-monitor" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="spawn-started" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="spawn-exited" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+  </interface>
+  <class name="FlatpakPortalFlatpakProxy" get-type="flatpak_portal_flatpak_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="FlatpakPortalFlatpak"/>
+  </class>
+  <class name="FlatpakPortalFlatpakSkeleton" get-type="flatpak_portal_flatpak_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="FlatpakPortalFlatpak"/>
+  </class>
+  <interface name="FlatpakPortalFlatpakUpdateMonitor" get-type="flatpak_portal_flatpak_update_monitor_get_type">
+    <signal name="handle-close" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+    </signal>
+    <signal name="handle-update" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+    <signal name="update-available" return="void" when="last">
+      <param type="GVariant"/>
+    </signal>
+    <signal name="progress" return="void" when="last">
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="FlatpakPortalFlatpakUpdateMonitorProxy" get-type="flatpak_portal_flatpak_update_monitor_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="FlatpakPortalFlatpakUpdateMonitor"/>
+  </class>
+  <class name="FlatpakPortalFlatpakUpdateMonitorSkeleton" get-type="flatpak_portal_flatpak_update_monitor_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="FlatpakPortalFlatpakUpdateMonitor"/>
+  </class>
+  <interface name="FlatpakPortalObject" get-type="flatpak_portal_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="flatpak" type="FlatpakPortalFlatpak" flags="227"/>
+    <property name="flatpak-update-monitor" type="FlatpakPortalFlatpakUpdateMonitor" flags="227"/>
+  </interface>
+  <class name="FlatpakPortalObjectProxy" get-type="flatpak_portal_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="FlatpakPortalObject"/>
+  </class>
+  <class name="FlatpakPortalObjectSkeleton" get-type="flatpak_portal_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="FlatpakPortalObject"/>
+  </class>
+  <class name="FlatpakPortalObjectManagerClient" get-type="flatpak_portal_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

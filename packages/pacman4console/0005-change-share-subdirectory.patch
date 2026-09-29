@@ -1,0 +1,41 @@
+--- a/Makefile
++++ b/Makefile
+@@ -9,19 +9,19 @@ all:
+ 
+ install:    all
+ 	mkdir -p $(DESTDIR)$(bindir)
+-	mkdir -p $(DESTDIR)$(datarootdir)/pacman
+-	cp -fR Levels/ $(DESTDIR)$(datarootdir)/pacman/
++	mkdir -p $(DESTDIR)$(datarootdir)/pacman4console
++	cp -fR Levels/ $(DESTDIR)$(datarootdir)/pacman4console/
+ 	install -Dm755 pacmanplay pacmanedit $(DESTDIR)$(bindir)/
+-	chmod 755 $(DESTDIR)$(datarootdir)/pacman/ -R
++	chmod 755 $(DESTDIR)$(datarootdir)/pacman4console/ -R
+ 
+ uninstall:
+ 	rm -f $(DESTDIR)$(bindir)/pacman
+ 	rm -f $(DESTDIR)$(bindir)/pacmanedit
+-	rm -f $(DESTDIR)$(datarootdir)/pacman/Levels/level0[1-9].dat
+-	rm -f $(DESTDIR)$(datarootdir)/pacman/Levels/README
+-	rm -f $(DESTDIR)$(datarootdir)/pacman/Levels/template.dat
+-	if [ -e $(DESTDIR)$(datarootdir)/pacman/Levels/ ] ; then rmdir $(DESTDIR)$(datarootdir)/pacman/Levels/ ; fi
+-	if [ -e $(DESTDIR)$(datarootdir)/pacman/ ] ; then rmdir $(DESTDIR)$(datarootdir)/pacman/ ; fi
++	rm -f $(DESTDIR)$(datarootdir)/pacman4console/Levels/level0[1-9].dat
++	rm -f $(DESTDIR)$(datarootdir)/pacman4console/Levels/README
++	rm -f $(DESTDIR)$(datarootdir)/pacman4console/Levels/template.dat
++	if [ -e $(DESTDIR)$(datarootdir)/pacman4console/Levels/ ] ; then rmdir $(DESTDIR)$(datarootdir)/pacman4console/Levels/ ; fi
++	if [ -e $(DESTDIR)$(datarootdir)/pacman4console/ ] ; then rmdir $(DESTDIR)$(datarootdir)/pacman4console/ ; fi
+ 
+ clean:	uninstall
+ 	rm -f pacman
+--- a/pacman.h
++++ b/pacman.h
+@@ -3,7 +3,7 @@
+ #ifndef DATAROOTDIR
+ #    define DATAROOTDIR "/usr/local/share"
+ #endif
+-#define LEVELS_FILE DATAROOTDIR "/pacman/Levels/level__.dat"
++#define LEVELS_FILE DATAROOTDIR "/pacman4console/Levels/level__.dat"
+ char LevelFile[] = LEVELS_FILE;     //Locations of default levels
+ int FreeLife = 1000;                //Starting points for free life
+ int Points = 0;                     //Initial points

@@ -1,0 +1,32 @@
+Prevents reverse dependency mate-system-monitor from crashing on launch
+
+--- a/sysdeps/linux/loadavg.c
++++ b/sysdeps/linux/loadavg.c
+@@ -52,7 +52,11 @@ glibtop_get_loadavg_s (glibtop *server, glibtop_loadavg *buf)
+ 
+ 	memset (buf, 0, sizeof (glibtop_loadavg));
+ 
+-	file_to_buffer(server, buffer, sizeof buffer, FILENAME);
++	if (try_file_to_buffer(buffer, sizeof buffer, "%s", FILENAME))
++	{
++		glibtop_warn_io_r(server, "Failed to open \"%s\"", FILENAME);
++		return;
++	}
+ 
+ 	buf->loadavg [0] = g_ascii_strtod (buffer, &p);
+ 	buf->loadavg [1] = g_ascii_strtod (p, &p);
+--- a/sysdeps/linux/swap.c
++++ b/sysdeps/linux/swap.c
+@@ -69,7 +69,11 @@ glibtop_get_swap_s (glibtop *server, glibtop_swap *buf)
+ 
+ 	if(server->os_version_code >= LINUX_VERSION_CODE(2, 6, 0))
+ 	{
+-		file_to_buffer (server, buffer, sizeof buffer, PROC_VMSTAT);
++		if (try_file_to_buffer(buffer, sizeof buffer, "%s", PROC_VMSTAT))
++		{
++			glibtop_warn_io_r(server, "Failed to open \"%s\"", PROC_VMSTAT);
++			return;
++		}
+ 
+ 		p = strstr (buffer, "\npswpin");
+ 

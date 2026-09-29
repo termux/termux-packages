@@ -1,0 +1,26 @@
+--- a/sdk/src/posix/fs.cpp
++++ b/sdk/src/posix/fs.cpp
+@@ -1787,10 +1787,10 @@
+     uuid_unparse(uuid, uuid_str);
+     id->append(uuid_str);
+ #else
+-    int fd = open("/etc/machine-id", O_RDONLY);
++    int fd = open("@TERMUX_PREFIX@/etc/machine-id", O_RDONLY);
+     if (fd < 0)
+     {
+-        fd = open("/var/lib/dbus/machine-id", O_RDONLY);
++        fd = open("@TERMUX_PREFIX@/var/lib/dbus/machine-id", O_RDONLY);
+         if (fd < 0)
+         {
+             return;
+--- a/src/megacmdcommonutils.cpp
++++ b/src/megacmdcommonutils.cpp
+@@ -1581,7 +1581,7 @@ std::string PosixDirectories::configDirPath()
+ 
+ string PosixDirectories::noHomeFallbackFolder()
+ {
+-    return std::string("/tmp/megacmd-").append(std::to_string(getuid()));
++    return std::string("@TERMUX_PREFIX@/tmp/megacmd-").append(std::to_string(getuid()));
+ }
+ 
+ #ifdef __APPLE__

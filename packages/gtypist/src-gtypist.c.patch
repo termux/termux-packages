@@ -1,0 +1,47 @@
+diff -u -r ../gtypist-2.9.5/src/gtypist.c ./src/gtypist.c
+--- ../gtypist-2.9.5/src/gtypist.c	2014-08-12 06:29:13.000000000 +0000
++++ ./src/gtypist.c	2017-07-07 08:34:41.950574988 +0000
+@@ -21,6 +21,7 @@
+  */
+ 
+ #include "config.h"
++#include "utf8.h"
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <stdio.h>
+@@ -42,7 +43,7 @@
+ #include <assert.h>
+ #include <locale.h>
+ #include <wctype.h>
+-#ifndef MINGW
++#if !defined(MINGW) && !defined(__ANDROID__)
+ #include <langinfo.h>
+ #endif
+ 
+@@ -62,6 +63,8 @@
+ char* locale_encoding; /* current locale's encoding */
+ int isUTF8Locale; /* does the current locale have a UTF-8 encoding? */
+ 
++void check_script_file_with_current_encoding( FILE *script );
++
+ /* character to be display to represent "enter key" */
+ /* TODO: this requires beginner mode!
+ #define RETURN_CHARACTER 0x000023CE */
+@@ -139,7 +142,7 @@
+ #define ADDCH_REV(X) wideaddch_rev(X)
+ 
+ 
+-#ifdef MINGW
++#if defined(MINGW) || defined(__ANDROID__)
+ #define MIN( a, b ) ( ( a ) < ( b )? ( a ) : ( b ) )
+ #define MAX( a, b ) ( ( a ) > ( b )? ( a ) : ( b ) )
+ #endif
+@@ -2010,7 +2013,7 @@
+   textdomain (PACKAGE);
+ #endif
+ 
+-#ifdef MINGW
++#if defined(MINGW) || defined(__ANDROID__)
+   locale_encoding = "UTF-8";
+ #else
+   locale_encoding = nl_langinfo(CODESET);

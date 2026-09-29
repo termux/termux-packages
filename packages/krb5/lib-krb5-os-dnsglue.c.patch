@@ -1,0 +1,62 @@
+--- a/lib/krb5/os/dnsglue.c
++++ b/lib/krb5/os/dnsglue.c
+@@ -100,6 +100,41 @@
+ 
+ #else
+ 
++#ifdef __ANDROID__
++#include <dlfcn.h>
++typedef int (*res_init_func_t)(void);
++typedef int (*res_search_func_t)(const char *, int, int, unsigned char *, int);
++static res_init_func_t res_init_func = res_init;
++static res_search_func_t res_search_func = res_search;
++#undef res_init
++#undef res_search
++static int res_funcs_initialized;
++
++int
++res_init(void)
++{
++    if (!res_funcs_initialized) {
++        void *wrapper_handle = dlopen("libresolv_wrapper.so", RTLD_NOW);
++        if (wrapper_handle != NULL) {
++            res_init_func_t res_init_wrapper = dlsym(wrapper_handle, "res_init");
++            res_search_func_t res_search_wrapper = dlsym(wrapper_handle, "res_search");
++            if (res_init_wrapper != NULL && res_search_wrapper != NULL) {
++                res_init_func = res_init_wrapper;
++                res_search_func = res_search_wrapper;
++            }
++        }
++        res_funcs_initialized = 1;
++    }
++    return res_init_func();
++}
++
++int
++res_search(const char *dname, int class, int type, unsigned char *answer, int anslen)
++{
++    return res_search_func(dname, class, type, answer, anslen);
++}
++#endif /* __ANDROID__ */
++
+ /* Use res_init and res_search. */
+ #define DECLARE_HANDLE(h)
+ #define INIT_HANDLE(h) (res_init() == 0)
+@@ -499,6 +534,9 @@
+ char *
+ k5_primary_domain()
+ {
++#ifdef __ANDROID__
++    return NULL;
++#else
+     char *domain;
+     DECLARE_HANDLE(h);
+ 
+@@ -507,6 +545,7 @@
+     domain = PRIMARY_DOMAIN(h);
+     DESTROY_HANDLE(h);
+     return domain;
++#endif
+ }
+ 
+ #endif /* not _WIN32 */

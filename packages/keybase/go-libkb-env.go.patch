@@ -1,0 +1,12 @@
+diff -u -r ../client-4.0.0/go/libkb/env.go ./go/libkb/env.go
+--- ../client-4.0.0/go/libkb/env.go	2019-05-07 19:35:07.000000000 +0000
++++ ./go/libkb/env.go	2019-05-11 22:36:35.015703478 +0000
+@@ -1784,7 +1784,7 @@
+ func (e *Env) ForceSecretStoreFile() bool {
+ 	// By default use system-provided secret store (like MacOS Keychain), but
+ 	// allow users to fall back to file-based store for testing and debugging.
+-	return e.GetBool(false,
++	return e.GetBool(true,
+ 		func() (bool, bool) { return e.getEnvBool("KEYBASE_SECRET_STORE_FILE") },
+ 		func() (bool, bool) { return e.GetConfig().GetForceSecretStoreFile() },
+ 	)

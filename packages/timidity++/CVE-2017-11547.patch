@@ -1,0 +1,67 @@
+From 34328d22cbb4ccf03f29223f54f1834c796d86a2 Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.de>
+Date: Tue, 26 Jun 2018 22:31:28 +0200
+Subject: resample: Fix out-of-bound access in resamplers
+
+References: CVE-2017-11547
+
+An adhoc fix for out-of-bound accesses in resamples.
+The offset might overflow the given data range.
+
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+bug-debian: https://bugs.debian.org/870338
+bug-suse: https://bugzilla.suse.com/show_bug.cgi?id=1081694
+origin: https://bugzilla.suse.com/attachment.cgi?id=760826
+---
+ timidity/resample.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/timidity/resample.c b/timidity/resample.c
+index cd6b8e6..4a3fadf 100644
+--- a/timidity/resample.c
++++ b/timidity/resample.c
+@@ -57,6 +57,8 @@ static resample_t resample_cspline(sample_t *src, splen_t ofs, resample_rec_t *r
+ {
+     int32 ofsi, ofsf, v0, v1, v2, v3, temp;
+ 
++    if (ofs + (1 << FRACTION_BITS) >= rec->data_length)
++      return src[ofs >> FRACTION_BITS];
+     ofsi = ofs >> FRACTION_BITS;
+     v1 = src[ofsi];
+     v2 = src[ofsi + 1];
+@@ -96,6 +98,8 @@ static resample_t resample_lagrange(sample_t *src, splen_t ofs, resample_rec_t *
+ {
+     int32 ofsi, ofsf, v0, v1, v2, v3;
+ 
++    if (ofs + (1 << FRACTION_BITS) >= rec->data_length)
++      return src[ofs >> FRACTION_BITS];
+     ofsi = ofs >> FRACTION_BITS;
+     v1 = (int32)src[ofsi];
+     v2 = (int32)src[ofsi + 1];
+@@ -154,6 +158,8 @@ static resample_t resample_gauss(sample_t *src, splen_t ofs, resample_rec_t *rec
+     sample_t *sptr;
+     int32 left, right, temp_n;
+ 
++    if (ofs + (1 << FRACTION_BITS) >= rec->data_length)
++      return src[ofs >> FRACTION_BITS];
+     left = (ofs>>FRACTION_BITS);
+     right = (rec->data_length>>FRACTION_BITS) - left - 1;
+     temp_n = (right<<1)-1;
+@@ -261,6 +267,8 @@ static resample_t resample_newton(sample_t *src, splen_t ofs, resample_rec_t *re
+     int32 left, right, temp_n;
+     int ii, jj;
+ 
++    if (ofs + (1 << FRACTION_BITS) >= rec->data_length)
++      return src[ofs >> FRACTION_BITS];
+     left = (ofs>>FRACTION_BITS);
+     right = (rec->data_length>>FRACTION_BITS)-(ofs>>FRACTION_BITS)-1;
+     temp_n = (right<<1)-1;
+@@ -330,6 +338,8 @@ static resample_t resample_linear(sample_t *src, splen_t ofs, resample_rec_t *re
+ {
+     int32 v1, v2, ofsi;
+ 
++    if (ofs + (1 << FRACTION_BITS) >= rec->data_length)
++      return src[ofs >> FRACTION_BITS];
+     ofsi = ofs >> FRACTION_BITS;
+     v1 = src[ofsi];
+     v2 = src[ofsi + 1];

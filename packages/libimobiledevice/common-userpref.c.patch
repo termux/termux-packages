@@ -1,0 +1,16 @@
+diff --git a/common/userpref.c b/common/userpref.c
+index 76945e1..4daffb3 100644
+--- a/common/userpref.c
++++ b/common/userpref.c
+@@ -172,9 +172,9 @@ const char *userpref_get_config_dir()
+ 	}
+ #else
+ #ifdef __APPLE__
+-	base_config_dir = strdup("/var/db");
++	base_config_dir = strdup("@TERMUX_PREFIX@/var/db");
+ #else
+-	base_config_dir = strdup("/var/lib");
++	base_config_dir = strdup("@TERMUX_PREFIX@/var/lib");
+ #endif
+ #endif
+ 	__config_dir = string_concat(base_config_dir, DIR_SEP_S, USERPREF_CONFIG_DIR, NULL);

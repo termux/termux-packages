@@ -1,0 +1,19 @@
+diff -uNr bash-5.0/shell.c bash-5.0.mod/shell.c
+--- bash-5.0/shell.c	2018-12-06 18:28:21.000000000 +0200
++++ bash-5.0.mod/shell.c	2019-02-20 14:19:29.808520144 +0200
+@@ -339,12 +339,12 @@
+ {
+   struct stat sb;
+ 
+-  if (stat ("/tmp", &sb) < 0)
+-    internal_warning (_("could not find /tmp, please create!"));
++  if (stat ("@TERMUX_PREFIX@/tmp", &sb) < 0)
++    internal_warning (_("could not find @TERMUX_PREFIX@/tmp, please create!"));
+   else
+     {
+       if (S_ISDIR (sb.st_mode) == 0)
+-	internal_warning (_("/tmp must be a valid directory name"));
++	internal_warning (_("@TERMUX_PREFIX@/tmp must be a valid directory name"));
+     }
+ }
+ #endif /* __CYGWIN__ */

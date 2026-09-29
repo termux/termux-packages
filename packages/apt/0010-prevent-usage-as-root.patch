@@ -1,0 +1,106 @@
+diff -uNr apt-2.1.11/cmdline/apt.cc apt-2.1.11.mod/cmdline/apt.cc
+--- apt-2.1.11/cmdline/apt.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt.cc	2020-11-05 16:56:10.361005861 +0200
+@@ -101,6 +101,11 @@
+ 									/*}}}*/
+ int main(int argc, const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
+diff -uNr apt-2.1.11/cmdline/apt-get.cc apt-2.1.11.mod/cmdline/apt-get.cc
+--- apt-2.1.11/cmdline/apt-get.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-get.cc	2020-11-05 16:56:49.205289051 +0200
+@@ -430,6 +430,11 @@
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    // Parse the command line and initialize the package library
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_GET, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+diff -uNr apt-2.1.11/cmdline/apt-key.in apt-2.1.11.mod/cmdline/apt-key.in
+--- apt-2.1.11/cmdline/apt-key.in	2020-11-05 16:50:45.426584174 +0200
++++ apt-2.1.11.mod/cmdline/apt-key.in	2020-11-05 16:59:59.422661972 +0200
+@@ -83,11 +83,11 @@
+     chmod 700 "$GPGHOMEDIR"
+ }
+ 
+-requires_root() {
+-	if [ ! -d "@TERMUX_PREFIX@" ] && [ "$(id -u)" -ne 0 ]; then
+-		apt_error "This command can only be used by root."
+-		exit 1
+-	fi
++assert_no_root() {
++    if [ "$(id -u)" = "0" ]; then
++        apt_error "Ability to run this command as root has been disabled for safety purposes."
++        exit 1
++    fi
+ }
+ 
+ command_available() {
+@@ -624,7 +624,6 @@
+ 	 create_new_keyring() { if [ ! -r "$FORCED_KEYRING" ]; then TRUSTEDFILE='/dev/null'; FORCED_KEYRING="$TRUSTEDFILE"; fi; }
+ 	 ;;
+       --fakeroot)
+-	 requires_root() { true; }
+ 	 ;;
+       --quiet)
+ 	 aptkey_echo() { true; }
+@@ -762,7 +761,7 @@
+ case "$command" in
+     add)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root
+ 	setup_merged_keyring
+ 	aptkey_execute "$GPG" --quiet --batch --import "$@"
+ 	merge_back_changes
+@@ -771,20 +770,20 @@
+     del|rm|remove)
+ 	# no script warning here as removing 'add' usage needs 'del' for cleanup
+ 	warn_outside_maintscript
+-	requires_root
++	assert_no_root
+ 	foreach_keyring_do 'remove_key_from_keyring' "$@"
+ 	aptkey_echo "OK"
+         ;;
+     update)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root
+ 	setup_merged_keyring
+ 	update
+ 	merge_back_changes
+ 	;;
+     net-update)
+ 	warn_on_script_usage
+-	requires_root
++	assert_no_root
+ 	setup_merged_keyring
+ 	net_update
+ 	merge_back_changes
+diff -uNr apt-2.1.11/cmdline/apt-mark.cc apt-2.1.11.mod/cmdline/apt-mark.cc
+--- apt-2.1.11/cmdline/apt-mark.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-mark.cc	2020-11-05 16:57:19.205507031 +0200
+@@ -449,6 +449,11 @@
+ 									/*}}}*/
+ int main(int argc,const char *argv[])					/*{{{*/
+ {
++   if (getuid() == 0) {
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
++      return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_MARK, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 

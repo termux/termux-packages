@@ -1,0 +1,19 @@
+Fixes:
+error: 'open' has superfluous mode bits; missing O_CREAT or O_TMPFILE?
+
+In bionic libc, open() does not need to and cannot be passed a non-zero value for its 3rd argument
+unless O_CREAT or O_TMPFILE was used as the 2nd argument.
+https://android.googlesource.com/platform/bionic/+/refs/heads/main/libc/bionic/open.cpp#71
+
+
+--- a/src/os/unix/file.cpp
++++ b/src/os/unix/file.cpp
+@@ -259,7 +259,7 @@ void pws_os::TryUnlockFile(const stringT &filename, HANDLE &lockFileHandle)
+   std::unique_ptr<char[]> mbsFilename(new char[mbsSize]);
+   wcstombs(mbsFilename.get(), lockFilename.c_str(), mbsSize);
+ 
+-  int fileHandle = open(mbsFilename.get(), O_RDONLY, (S_IREAD | S_IWRITE));
++  int fileHandle = open(mbsFilename.get(), O_RDONLY, 0);
+ 
+   // If not failed to open the file read locker data ("user@machine:nnnnnnnn") from it
+   if (fileHandle != -1) {

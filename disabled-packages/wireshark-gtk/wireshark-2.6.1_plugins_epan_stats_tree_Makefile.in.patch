@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/stats_tree/Makefile.in wireshark-2.6.1.mod/plugins/epan/stats_tree/Makefile.in
+--- wireshark-2.6.1/plugins/epan/stats_tree/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/stats_tree/Makefile.in	2018-06-26 18:53:04.038315925 +0300
+@@ -836,7 +836,7 @@
+ 	}
+ 
+ stats_tree.la: $(stats_tree_la_OBJECTS) $(stats_tree_la_DEPENDENCIES) $(EXTRA_stats_tree_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(stats_tree_la_LINK) -rpath $(epan_plugindir) $(stats_tree_la_OBJECTS) $(stats_tree_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(stats_tree_la_LINK) -rpath $(epan_plugindir) $(stats_tree_la_OBJECTS) $(stats_tree_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

@@ -1,0 +1,35 @@
+--- src/Makefile.in.old	2018-11-24 18:13:53.765023695 +0000
++++ src/Makefile.in	2018-11-24 18:15:02.875571529 +0000
+@@ -227,10 +227,7 @@
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(bindir)
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(includedir)
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(libdir)/pkgconfig
+-	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man3
+-	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
+ 	$(SHTOOL) install -c -m 755 uuid-config $(DESTDIR)$(bindir)/
+-	$(SHTOOL) install -c -m 644 $(S)/uuid-config.1 $(DESTDIR)$(mandir)/man1/
+ 	$(SHTOOL) install -c -m 644 $(S)/uuid.pc $(DESTDIR)$(libdir)/pkgconfig/ossp-uuid.pc
+ 	$(SHTOOL) install -c -m 644 uuid.h $(DESTDIR)$(includedir)/
+ 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
+@@ -241,11 +238,6 @@
+ 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid++.hh $(DESTDIR)$(includedir)/"; \
+ 	    $(SHTOOL) install -c -m 644 $(S)/uuid++.hh $(DESTDIR)$(includedir)/; \
+ 	fi
+-	$(SHTOOL) install -c -m 644 $(S)/uuid.3 $(DESTDIR)$(mandir)/man3/ossp-uuid.3
+-	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+-	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/"; \
+-	    $(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/; \
+-	fi
+ 	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(LIB_NAME) $(DESTDIR)$(libdir)/
+ 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
+ 	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(DCE_NAME) $(DESTDIR)$(libdir)/; \
+@@ -253,8 +245,7 @@
+ 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+ 	    $(LIBTOOL) --mode=install $(SHTOOL) install -c -m 644 $(CXX_NAME) $(DESTDIR)$(libdir)/; \
+ 	fi
+-	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -s -m 755 uuid $(DESTDIR)$(bindir)/
+-	$(SHTOOL) install -c -m 644 $(S)/uuid.1 $(DESTDIR)$(mandir)/man1/
++	@$(LIBTOOL) --mode=install $(SHTOOL) install -c -m 755 uuid $(DESTDIR)$(bindir)/
+ 	-@if [ ".$(WITH_PERL)" = .yes ]; then \
+ 	    (cd $(S)/perl && $(MAKE) $(MFLAGS) install DESTDIR=$(DESTDIR)); \
+ 	fi

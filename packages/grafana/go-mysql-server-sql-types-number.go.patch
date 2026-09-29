@@ -1,0 +1,53 @@
+--- a/vendor/github.com/dolthub/go-mysql-server/sql/types/number.go
++++ b/vendor/github.com/dolthub/go-mysql-server/sql/types/number.go
+@@ -1246,27 +1246,27 @@ func convertToUint64(t NumberTypeImpl_, v any, round Round) (uint64, sql.Convert
+ 		return uint64(v.UTC().Unix()), sql.InRange, nil
+ 	case int:
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(v), sql.InRange, nil
+ 	case int8:
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(v), sql.InRange, nil
+ 	case int16:
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(v), sql.InRange, nil
+ 	case int32:
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(v), sql.InRange, nil
+ 	case int64:
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(v), sql.InRange, nil
+ 	case uint:
+@@ -1284,7 +1284,7 @@ func convertToUint64(t NumberTypeImpl_, v any, round Round) (uint64, sql.Convert
+ 			return math.MaxUint64, sql.OutOfRange, nil
+ 		}
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		return uint64(math.Round(float64(v))), sql.InRange, nil
+ 	case float64:
+@@ -1292,7 +1292,7 @@ func convertToUint64(t NumberTypeImpl_, v any, round Round) (uint64, sql.Convert
+ 			return math.MaxUint64, sql.OutOfRange, nil
+ 		}
+ 		if v < 0 {
+-			return uint64(math.MaxUint64 - uint(-v-1)), sql.OutOfRange, nil
++			return uint64(math.MaxUint64 - uint64(-v-1)), sql.OutOfRange, nil
+ 		}
+ 		if !IsValidFloat(v) {
+ 			return 0, sql.OutOfRange, sql.ErrInvalidValue.New(v, t.String())

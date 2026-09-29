@@ -1,0 +1,20 @@
+--- a/common/raptoptions.cc
++++ b/common/raptoptions.cc
+@@ -177,7 +177,7 @@
+    }
+ 
+    // read dir
+-   const char infodir[] = "/var/lib/dpkg/info";
++   const char infodir[] = "@TERMUX_PREFIX@/var/lib/dpkg/info";
+    const char configext[] = ".config";
+ 
+    DIR *dir;
+@@ -213,7 +213,7 @@
+    //      TODO: make deborphan a library to make this cleaner
+    FILE *fp;
+    char buf[255];
+-   char cmd[] = "/usr/bin/deborphan";
++   char cmd[] = "@TERMUX_PREFIX@/bin/deborphan";
+    // FIXME: fail silently if deborphan is not installed - change this?
+    if (!FileExists(cmd))
+       return;

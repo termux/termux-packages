@@ -1,0 +1,40 @@
+diff -uNr gtkwave-3.3.103/contrib/rtlbrowse/Makefile.in gtkwave-3.3.103.mod/contrib/rtlbrowse/Makefile.in
+--- gtkwave-3.3.103/contrib/rtlbrowse/Makefile.in	2019-11-11 08:04:52.000000000 +0200
++++ gtkwave-3.3.103.mod/contrib/rtlbrowse/Makefile.in	2020-02-11 13:55:43.054194837 +0200
+@@ -97,7 +97,7 @@
+ 	vzt_read.$(OBJEXT) lxt2_read.$(OBJEXT) vlex.$(OBJEXT) \
+ 	LzmaLib.$(OBJEXT)
+ rtlbrowse_OBJECTS = $(am_rtlbrowse_OBJECTS)
+-rtlbrowse_LDADD = $(LDADD)
++rtlbrowse_LDADD = -landroid-shmem $(LDADD)
+ am__DEPENDENCIES_1 =
+ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+ rtlbrowse_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+diff -uNr gtkwave-3.3.103/src/helpers/Makefile.in gtkwave-3.3.103.mod/src/helpers/Makefile.in
+--- gtkwave-3.3.103/src/helpers/Makefile.in	2019-11-11 08:04:52.000000000 +0200
++++ gtkwave-3.3.103.mod/src/helpers/Makefile.in	2020-02-11 13:48:48.625657407 +0200
+@@ -118,7 +118,7 @@
+ lxt2vcd_DEPENDENCIES = $(am__DEPENDENCIES_1)
+ shmidcat_SOURCES = shmidcat.c
+ shmidcat_OBJECTS = shmidcat.$(OBJEXT)
+-shmidcat_LDADD = $(LDADD)
++shmidcat_LDADD = -landroid-shmem $(LDADD)
+ am_vcd2fst_OBJECTS = vcd2fst.$(OBJEXT) lz4.$(OBJEXT) fastlz.$(OBJEXT) \
+ 	fstapi.$(OBJEXT) jrb.$(OBJEXT)
+ vcd2fst_OBJECTS = $(am_vcd2fst_OBJECTS)
+diff -uNr gtkwave-3.3.103/src/Makefile.in gtkwave-3.3.103.mod/src/Makefile.in
+--- gtkwave-3.3.103/src/Makefile.in	2019-11-11 08:04:52.000000000 +0200
++++ gtkwave-3.3.103.mod/src/Makefile.in	2020-02-11 13:52:25.795447539 +0200
+@@ -448,10 +448,10 @@
+ 	vcd_partial.c vcd_recoder.c vcd_saver.c vcd_saver.h version.h vlist.c vlist.h vzt.c vzt.h wavealloca.h \
+ 	wavewindow.c zoombuttons.c
+ 
+-gtkwave_LDADD = $(LIBCOCOA_LDADD) $(GTK_LIBS) $(LIBLZMA_LDADD) $(LIBZ_LDADD) $(LIBBZ2_LDADD) $(LIBFST_LDADD) $(AET2_LDADD) $(TCL_LDADD) $(TK_LDADD) $(FSDB_LDADD) $(LIBJUDY_LDADD) $(GTK_MAC_LIBS) $(GCONF_LIBS) $(GTK_UNIX_PRINT_LIBS) $(MINGW_LDADD)
++gtkwave_LDADD = $(LIBCOCOA_LDADD) $(GTK_LIBS) $(LIBLZMA_LDADD) $(LIBZ_LDADD) $(LIBBZ2_LDADD) $(LIBFST_LDADD) $(AET2_LDADD) $(TCL_LDADD) $(TK_LDADD) $(FSDB_LDADD) $(LIBJUDY_LDADD) $(GTK_MAC_LIBS) -landroid-shmem $(GCONF_LIBS) $(GTK_UNIX_PRINT_LIBS) $(MINGW_LDADD)
+ gtkwave_LDFLAGS = $(COCOA_GTK_LDFLAGS)
+ twinwave_SOURCES = twinwave.c
+-twinwave_LDADD = $(GTK_LIBS) $(GTK_MAC_LIBS) $(GCONF_LIBS)
++twinwave_LDADD = $(GTK_LIBS) $(GTK_MAC_LIBS) -landroid-shmem $(GCONF_LIBS)
+ gsettings_SCHEMAS = com.geda.gtkwave.gschema.xml
+ BUILT_SOURCES = vcd_keywords.c
+ 

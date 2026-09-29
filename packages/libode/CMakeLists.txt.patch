@@ -1,0 +1,22 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -603,7 +603,7 @@
+ 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ode/src>
+ 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ode/src/joints>
+ 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ou/include>
+-	$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
++	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+ )
+ 
+ if(ODE_16BIT_INDICES)
+@@ -759,8 +759,8 @@
+ string(REGEX REPLACE "/$" "" PACKAGE_RELATIVE_PATH "${PACKAGE_RELATIVE_PATH}")
+ set(prefix "\${pcfiledir}/${PACKAGE_RELATIVE_PATH}")
+ set(exec_prefix "\${prefix}")
+-set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
+-set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
++set(libdir "\${exec_prefix}/lib")
++set(includedir "\${prefix}/include")
+ configure_file(ode.pc.in ode.pc @ONLY)
+ set(prefix "\$(cd \"\$(dirname \"\$0\")\"; pwd -P)/..")
+ configure_file(ode-config.in ode-config @ONLY)

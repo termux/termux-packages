@@ -1,0 +1,43 @@
+--- a/dmenu.c
++++ b/dmenu.c
+@@ -312,6 +312,11 @@
+ 	KeySym ksym;
+ 	Status status;
+ 
++#ifdef __ANDROID__
++	if (!XSupportsLocale()) {
++		len = XLookupString(ev, buf, sizeof buf, &ksym, NULL);
++	} else {
++#endif
+ 	len = XmbLookupString(xic, ev, buf, sizeof buf, &ksym, &status);
+ 	switch (status) {
+ 	default: /* XLookupNone, XBufferOverflow */
+@@ -322,6 +327,9 @@
+ 	case XLookupBoth:
+ 		break;
+ 	}
++#ifdef __ANDROID__
++	}
++#endif
+ 
+ 	if (ev->state & ControlMask) {
+ 		switch(ksym) {
+@@ -665,12 +673,18 @@
+ 	XSetClassHint(dpy, win, &ch);
+ 
+ 
++#ifdef __ANDROID__
++	if (XSupportsLocale()) {
++#endif
+ 	/* input methods */
+ 	if ((xim = XOpenIM(dpy, NULL, NULL, NULL)) == NULL)
+ 		die("XOpenIM failed: could not open input device");
+ 
+ 	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
+ 	                XNClientWindow, win, XNFocusWindow, win, NULL);
++#ifdef __ANDROID__
++	}
++#endif
+ 
+ 	XMapRaised(dpy, win);
+ 	if (embed) {

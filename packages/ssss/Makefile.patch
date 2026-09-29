@@ -1,0 +1,13 @@
+diff -uNr ssss-releases-v0.5.7/Makefile ssss-releases-v0.5.7.mod/Makefile
+--- ssss-releases-v0.5.7/Makefile	2020-12-07 22:12:51.000000000 +0000
++++ ssss-releases-v0.5.7.mod/Makefile	2020-12-07 23:06:39.473573387 +0000
+@@ -5,8 +5,7 @@
+ doc: ssss.1 ssss.1.html
+ 
+ ssss-split: ssss.c
+-	$(CC) -W -Wall -O2 -o ssss-split ssss.c -lgmp
+-	strip ssss-split
++	$(CC) -W -Wall -DNOMLOCK $(CPPFLAGS) $(CFLAGS) -o ssss-split ssss.c $(LDFLAGS) -lgmp
+ 
+ ssss-combine: ssss-split
+ 	ln -f ssss-split ssss-combine

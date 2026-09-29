@@ -1,0 +1,12 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/04_get_abs_path
+
+--- a/ntreg.c
++++ b/ntreg.c
+@@ -1511,6 +1511,7 @@ int get_abs_path(struct hive *hdesc, int nkofs, char *path, int maxlen)
+   }
+ 
+   strncpy(tmp,path,ABSPATHLEN-1);
++  tmp[ABSPATHLEN-1] = '\0';
+ 
+   if (key->type & 0x20)
+     keyname = mem_str(key->keyname, key->len_name);

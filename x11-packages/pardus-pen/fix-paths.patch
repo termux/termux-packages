@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index d63db0a..647f42c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -33,7 +33,7 @@ subdir('debian')
+ 
+ if get_option('resources')
+     # Build qrc
+-    run_command(['/bin/sh', './data/genresource.sh'], check:true)
++    run_command(['@TERMUX_PREFIX@/bin/sh', './data/genresource.sh'], check:true)
+     rcc_args = ['rcc', './data/resources.qrc', '-o', meson.current_build_dir()/'resources.cpp']
+     if not get_option('etap19')
+         rcc_args += ['-threshold=0' ,'--compress=9', '--compress-algo=zlib']

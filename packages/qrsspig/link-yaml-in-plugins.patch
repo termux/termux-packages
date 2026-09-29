@@ -1,0 +1,10 @@
+Plugins use yaml-cpp without linking it themselves.
+
+--- a/src/plugins/CMakeLists.txt
++++ b/src/plugins/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ message (STATUS "Checking plugin dependencies")
++link_libraries(${LibYaml_LIBRARIES})
+ add_subdirectory(input)
+ add_subdirectory(output)
+ add_subdirectory(upload)

@@ -1,0 +1,21 @@
+Running this during cross-compilation would require performing a host-build of the manual generator
+executable or running it with emulation using termux-proot-run.
+
+--- a/app/TrenchBroom/CMakeLists.txt
++++ b/app/TrenchBroom/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateManual.cmake)
+ 
+ set(APP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+ set(TB_RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+@@ -134,10 +133,6 @@ if(COMPILER_IS_MSVC)
+     target_link_options(TrenchBroom PRIVATE "/STACK:${TB_STACK_SIZE}")
+ endif()
+ 
+-# Xcode "new build system" does't allow custom commands to be depended on by two unrelated targets
+-# In this case, ${INDEX_OUTPUT_PATH} is depended on by TrenchBroom and GenerateManual
+-# so we must make TrenchBroom depend on GenerateManual (see #3608)
+-add_dependencies(TrenchBroom GenerateManual)
+ 
+ set_target_properties(TrenchBroom PROPERTIES AUTORCC TRUE)
+ 

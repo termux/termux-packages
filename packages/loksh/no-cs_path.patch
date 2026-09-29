@@ -1,0 +1,29 @@
+diff -uNr loksh-6.3/main.c loksh-6.3.mod/main.c
+--- loksh-6.3/main.c	2018-04-14 12:35:14.000000000 +0300
++++ loksh-6.3.mod/main.c	2019-01-29 15:29:47.035733470 +0200
+@@ -188,16 +188,6 @@
+ 	init_histvec();
+ 
+ 	def_path = _PATH_DEFPATH;
+-	{
+-		size_t len = confstr(_CS_PATH, NULL, 0);
+-		char *new;
+-
+-		if (len > 0) {
+-			confstr(_CS_PATH, new = alloc(len + 1, APERM), len + 1);
+-			def_path = new;
+-		}
+-	}
+-
+ 	/* Set PATH to def_path (will set the path global variable).
+ 	 * (import of environment below will probably change this setting).
+ 	 */
+@@ -389,7 +379,7 @@
+ 	}
+ 
+ 	if (Flag(FPRIVILEGED))
+-		include("/etc/suid_profile", 0, NULL, 1);
++		include("@TERMUX_PREFIX@/etc/suid_profile", 0, NULL, 1);
+ 	else if (Flag(FTALKING)) {
+ 		char *env_file;
+ 

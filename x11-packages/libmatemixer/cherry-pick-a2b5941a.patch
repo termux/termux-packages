@@ -1,0 +1,33 @@
+From a2b5941a6120c9aa0bfba03603147171e1cdec74 Mon Sep 17 00:00:00 2001
+From: Colomban Wendling <cwendling@hypra.fr>
+Date: Tue, 4 Feb 2025 17:59:19 +0100
+Subject: [PATCH] pulse: Don't crash on failure to retrieve server info
+
+Although the documentation isn't very verbose, pactl handles this case
+like this, so a NULL info is likely a valid result of this call upon
+failure.
+
+Most of the code is actually just copied over from pactl.c itself,
+there wasn't much more to it.
+
+Part-of: mate-desktop/mate-media#159
+---
+ backends/pulse/pulse-connection.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/backends/pulse/pulse-connection.c b/backends/pulse/pulse-connection.c
+index b8ca8c5..6a745f8 100644
+--- a/backends/pulse/pulse-connection.c
++++ b/backends/pulse/pulse-connection.c
+@@ -1467,6 +1467,11 @@ pulse_server_info_cb (pa_context           *c,
+ {
+     PulseConnection *connection;
+ 
++    if (! info) {
++        g_warning ("Failed to get PulseAudio server information: %s", pa_strerror (pa_context_errno (c)));
++        return;
++    }
++
+     connection = PULSE_CONNECTION (userdata);
+ 
+     g_signal_emit (G_OBJECT (connection),

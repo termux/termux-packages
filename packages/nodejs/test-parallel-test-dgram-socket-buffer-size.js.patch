@@ -1,0 +1,19 @@
+--- ./test/parallel/test-dgram-socket-buffer-size.js.orig	2022-06-05 10:48:41.037598101 +0530
++++ ./test/parallel/test-dgram-socket-buffer-size.js	2022-06-05 10:48:52.537598096 +0530
+@@ -6,6 +6,7 @@
+ const dgram = require('dgram');
+ const { inspect } = require('util');
+ const { internalBinding } = require('internal/test/binding');
++const { platform } = require('os');
+ const {
+   UV_EBADF,
+   UV_EINVAL,
+@@ -115,7 +116,7 @@
+     socket.setSendBufferSize(10000);
+ 
+     // note: linux will double the buffer size
+-    const expectedBufferSize = common.isLinux ? 20000 : 10000;
++    const expectedBufferSize = (common.isLinux || platform() === 'android') ? 20000 : 10000;
+     assert.strictEqual(socket.getRecvBufferSize(), expectedBufferSize);
+     assert.strictEqual(socket.getSendBufferSize(), expectedBufferSize);
+     socket.close();

@@ -1,0 +1,226 @@
+https://github.com/termux/termux-packages/issues/15852
+Borrowed from https://github.com/gentoo/gentoo/blob/8d4beeac7560e8fcd93eeede0a03ed0f8692d1db/dev-tcltk/expect/files/expect-5.45.4-configure-clang16.patch
+
+From 4c3a5051aa9706eea42dab31f9e121d975c08521 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Thu, 17 Nov 2022 20:20:45 +0000
+Subject: [PATCH] Fix configure with clang 16
+
+Bug: https://bugs.gentoo.org/881687
+Signed-off-by: Sam James <sam@gentoo.org>
+--- a/configure.in
++++ b/configure.in
+@@ -454,7 +454,7 @@ AC_CHECK_FUNC(siglongjmp, AC_DEFINE(HAVE_SIGLONGJMP))
+ # because Unixware 2.0 handles it specially and refuses to compile
+ # autoconf's automatic test that is a call with no arguments
+ AC_MSG_CHECKING([for memcpy])
+-AC_TRY_LINK(,[
++AC_TRY_LINK([#include <string.h>],[
+ char *s1, *s2;
+ memcpy(s1,s2,0);
+ ],
+@@ -471,7 +471,7 @@ memcpy(s1,s2,0);
+ AC_MSG_CHECKING([if WNOHANG requires _POSIX_SOURCE])
+ AC_TRY_RUN([
+ #include <sys/wait.h>
+-main() {
++int main(void) {
+ #ifndef WNOHANG
+ 	return 0;
+ #else
+@@ -491,7 +491,7 @@ rm -rf wnohang
+ AC_TRY_RUN([
+ #include <stdio.h>
+ #include <sys/wait.h>
+-main() {
++int main(void) {
+ #ifdef WNOHANG
+ 	FILE *fp = fopen("wnohang","w");
+ 	fprintf(fp,"%d",WNOHANG);
+@@ -540,24 +540,23 @@ dnl AC_HEADER_EGREP([(void|sighandler_t).*signal], signal.h, retsigtype=void,AC_
+ AC_MSG_CHECKING([if signals need to be re-armed])
+ AC_TRY_RUN([
+ #include <signal.h>
+-#define RETSIGTYPE $retsigtype
+-
++#include <stdlib.h>
++#include <sys/wait.h>
++#include <unistd.h>
+ int signal_rearms = 0;
+ 
+ RETSIGTYPE
+-child_sigint_handler(n)
+-int n;
++child_sigint_handler(int n)
+ {
+ }
+ 
+ RETSIGTYPE
+-parent_sigint_handler(n)
+-int n;
++parent_sigint_handler(int n)
+ {
+ signal_rearms++;
+ }
+ 
+-main()
++int main(void)
+ {
+ 	signal(SIGINT,parent_sigint_handler);
+ 
+@@ -719,7 +718,8 @@ fi
+ AC_MSG_CHECKING([for struct sgttyb])
+ AC_TRY_RUN([
+ #include <sgtty.h>
+-main()
++#include <stdlib.h>
++int main(void)
+ {
+   struct sgttyb tmp;
+   exit(0);
+@@ -745,7 +745,8 @@ if test $mach -eq 0 ; then
+   # pty_termios.c is set up to handle pty_termio.
+   AC_MSG_CHECKING([for struct termio])
+   AC_TRY_RUN([#include <termio.h>
+-  main()
++  #include <stdlib.h>
++  int main(void)
+   {
+     struct termio tmp;
+     exit(0);
+@@ -769,7 +770,8 @@ if test $mach -eq 0 ; then
+ #  include <inttypes.h>
+ #  endif
+ #  include <termios.h>
+-  main()
++#  include <stdlib.h>
++  int main(void)
+   {
+     struct termios tmp;
+     exit(0);
+@@ -793,7 +795,7 @@ AC_TRY_RUN([
+ #include <inttypes.h>
+ #endif
+ #include <termios.h>
+-main() {
++int main(void) {
+ #if defined(TCGETS) || defined(TCGETA)
+ 	return 0;
+ #else
+@@ -815,7 +817,7 @@ AC_TRY_RUN([
+ #include <inttypes.h>
+ #endif
+ #include <termios.h>
+-main() {
++int main(void) {
+ #ifdef TIOCGWINSZ
+ 	return 0;
+ #else
+@@ -834,7 +836,7 @@ main() {
+ AC_MSG_CHECKING([for Cray-style ptys])
+ SETUID=":"
+ AC_TRY_RUN([
+-main(){
++int main(void) {
+ #ifdef CRAY
+ 	return 0;
+ #else
+@@ -887,9 +889,10 @@ AC_FUNC_SETPGRP
+ #
+ AC_MSG_CHECKING([for SV-style timezone])
+ AC_TRY_RUN([
++#include <stdlib.h>
+ extern char *tzname[2];
+ extern int daylight;
+-main()
++int main(void)
+ {
+   int *x = &daylight;
+   char **y = tzname;
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -2029,7 +2029,7 @@ AC_DEFUN([TEA_SERIAL_PORT], [
+     AC_TRY_RUN([
+ #include <termios.h>
+ 
+-int main() {
++int main(void) {
+     struct termios t;
+     if (tcgetattr(0, &t) == 0) {
+ 	cfsetospeed(&t, 0);
+@@ -2042,7 +2042,7 @@ int main() {
+ 	AC_TRY_RUN([
+ #include <termio.h>
+ 
+-int main() {
++int main(void) {
+     struct termio t;
+     if (ioctl(0, TCGETA, &t) == 0) {
+ 	t.c_cflag |= CBAUD | PARENB | PARODD | CSIZE | CSTOPB;
+@@ -2055,7 +2055,7 @@ int main() {
+ 	AC_TRY_RUN([
+ #include <sgtty.h>
+ 
+-int main() {
++int main(void) {
+     struct sgttyb t;
+     if (ioctl(0, TIOCGETP, &t) == 0) {
+ 	t.sg_ospeed = 0;
+@@ -2070,7 +2070,7 @@ int main() {
+ #include <termios.h>
+ #include <errno.h>
+ 
+-int main() {
++int main(void) {
+     struct termios t;
+     if (tcgetattr(0, &t) == 0
+ 	|| errno == ENOTTY || errno == ENXIO || errno == EINVAL) {
+@@ -2086,7 +2086,7 @@ int main() {
+ #include <termio.h>
+ #include <errno.h>
+ 
+-int main() {
++int main(void) {
+     struct termio t;
+     if (ioctl(0, TCGETA, &t) == 0
+ 	|| errno == ENOTTY || errno == ENXIO || errno == EINVAL) {
+@@ -2101,7 +2101,7 @@ int main() {
+ #include <sgtty.h>
+ #include <errno.h>
+ 
+-int main() {
++int main(void) {
+     struct sgttyb t;
+     if (ioctl(0, TIOCGETP, &t) == 0
+ 	|| errno == ENOTTY || errno == ENXIO || errno == EINVAL) {
+@@ -2392,7 +2392,9 @@ AC_DEFUN([TEA_TIME_HANDLER], [
+     # (like convex) have timezone functions, etc.
+     #
+     AC_CACHE_CHECK([long timezone variable], tcl_cv_timezone_long, [
+-	AC_TRY_COMPILE([#include <time.h>],
++	AC_TRY_COMPILE([#include <time.h>
++             #include <stdlib.h>
++            ],
+ 	    [extern long timezone;
+ 	    timezone += 1;
+ 	    exit (0);],
+@@ -2404,7 +2406,9 @@ AC_DEFUN([TEA_TIME_HANDLER], [
+ 	# On some systems (eg IRIX 6.2), timezone is a time_t and not a long.
+ 	#
+ 	AC_CACHE_CHECK([time_t timezone variable], tcl_cv_timezone_time, [
+-	    AC_TRY_COMPILE([#include <time.h>],
++	    AC_TRY_COMPILE([#include <time.h>
++                 #include <stdlib.h>
++                ],
+ 		[extern time_t timezone;
+ 		timezone += 1;
+ 		exit (0);],
+@@ -2441,7 +2445,7 @@ AC_DEFUN([TEA_BUGGY_STRTOD], [
+ 	AC_CACHE_CHECK([for Solaris2.4/Tru64 strtod bugs], tcl_cv_strtod_buggy,[
+ 	    AC_TRY_RUN([
+ 		extern double strtod();
+-		int main() {
++		int main(void) {
+ 		    char *infString="Inf", *nanString="NaN", *spaceString=" ";
+ 		    char *term;
+ 		    double value;

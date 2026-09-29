@@ -1,0 +1,15 @@
+--- a/src/leveldb/util/env_posix.cc
++++ b/src/leveldb/util/env_posix.cc
+@@ -28,6 +28,12 @@
+ #include "util/posix_logger.h"
+ #include "util/env_posix_test_helper.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#define fread_unlocked fread
++#define fwrite_unlocked fwrite
++#define fflush_unlocked fflush
++#endif
++
+ namespace leveldb {
+ 
+ namespace {

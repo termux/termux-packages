@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=http://libharu.org/
+TERMUX_PKG_DESCRIPTION="Free, cross platform, open source library for generating PDF files"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.4.6"
+TERMUX_PKG_SRCURL="https://github.com/libharu/libharu/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=ec8f327520d1d354ce58b5d2af75b64f380cddc522437c169463b39760921348
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libpng, zlib"

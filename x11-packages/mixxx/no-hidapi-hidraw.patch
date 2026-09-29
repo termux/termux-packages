@@ -1,0 +1,25 @@
+Unlike GNU/Linux's hidapi,
+Termux's hidapi does not have a libhidapi-hidraw.so.
+
+--- a/cmake/modules/Findhidapi.cmake
++++ b/cmake/modules/Findhidapi.cmake
+@@ -59,7 +59,7 @@ find_library(hidapi_LIBRARY
+ )
+ mark_as_advanced(hidapi_LIBRARY)
+ 
+-if(CMAKE_SYSTEM_NAME STREQUAL Linux)
++if(FALSE)
+   find_library(hidapi-hidraw_LIBRARY
+     NAMES hidapi-hidraw
+     HINTS ${PC_hidapi_LIBRARY_DIRS}
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3867,7 +3867,7 @@ if(HID)
+     # hidapi has two backends on Linux, one using the kernel's hidraw API and one using libusb.
+     # libusb obviously does not support Bluetooth HID devices, so use the hidraw backend. The
+     # libusb backend is the default, so hidraw needs to be selected explicitly at link time.
+-    if(CMAKE_SYSTEM_NAME STREQUAL Linux)
++    if(FALSE)
+       target_link_libraries(mixxx-lib PRIVATE hidapi::hidraw)
+     else()
+       target_link_libraries(mixxx-lib PRIVATE hidapi::hidapi)

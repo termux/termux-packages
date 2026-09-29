@@ -1,0 +1,12 @@
+qt5-qtbase in Termux doesn't build accessibility
+--- src/src/qscintilla.pro	2021-05-09 12:23:05.233865021 +0000
++++ src.mod/src/qscintilla.pro	2021-05-09 12:22:58.033891538 +0000
+@@ -23,6 +23,8 @@
+ TEMPLATE = lib
+ CONFIG += qt warn_off thread exceptions hide_symbols
+ 
++DEFINES += QT_NO_ACCESSIBILITY
++
+ CONFIG(debug, debug|release) {
+     mac: {
+         TARGET = qscintilla2_qt$${QT_MAJOR_VERSION}_debug

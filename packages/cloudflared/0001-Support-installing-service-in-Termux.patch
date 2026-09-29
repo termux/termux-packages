@@ -1,0 +1,170 @@
+From 3ca729db490d6583629cbe76dcd8ac9ca7b40d29 Mon Sep 17 00:00:00 2001
+From: toidicakhia <108525966+toidicakhia@users.noreply.github.com>
+Date: Tue, 28 Jul 2026 02:56:40 +0000
+Subject: [PATCH] Support installing service in Termux
+
+---
+ cmd/cloudflared/android_service.go | 142 +++++++++++++++++++++++++++++
+ cmd/cloudflared/linux_service.go   |   2 +-
+ 2 files changed, 143 insertions(+), 1 deletion(-)
+ create mode 100644 cmd/cloudflared/android_service.go
+
+diff --git a/cmd/cloudflared/android_service.go b/cmd/cloudflared/android_service.go
+new file mode 100644
+index 00000000..3de16426
+--- /dev/null
++++ b/cmd/cloudflared/android_service.go
+@@ -0,0 +1,142 @@
++//go:build android
++
++package main
++
++import (
++	"fmt"
++	"os"
++	"os/exec"
++	"path/filepath"
++
++	homedir "github.com/mitchellh/go-homedir"
++	"github.com/urfave/cli/v2"
++
++	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
++	"github.com/cloudflare/cloudflared/logger"
++)
++
++const (
++	defaultTermuxPrefix = "@TERMUX_PREFIX@"
++	termuxServiceName   = "cloudflared"
++	termuxSvcRelDir     = "var/service"
++	termuxConfigDirName = ".cloudflared"
++)
++
++var createTokenFile = createTokenFileUnix
++
++func runApp(app *cli.App, _ chan struct{}) {
++	app.Commands = append(app.Commands, &cli.Command{
++		Name:  "service",
++		Usage: "Manages the cloudflared Termux runit service",
++		Subcommands: []*cli.Command{
++			{
++				Name:      "install",
++				Usage:     "Install cloudflared as a Termux runit service",
++				ArgsUsage: "[TOKEN]",
++				Description: `
++Installs cloudflared as a runit-managed service using termux-services.
++
++A token may optionally be provided. If a token is provided, it will be written
++to disk in the home directory and the cloudflared service configured to use
++it via the --token-file argument.`,
++				Action: cliutil.ConfiguredAction(installTermuxService),
++			},
++			{
++				Name:   "uninstall",
++				Usage:  "Uninstall the cloudflared Termux service",
++				Action: cliutil.ConfiguredAction(uninstallTermuxService),
++			},
++		},
++	})
++	_ = app.Run(os.Args)
++}
++
++func termuxPrefix() string {
++	if p := os.Getenv("PREFIX"); p != "" {
++		return p
++	}
++	return defaultTermuxPrefix
++}
++
++func svDir() string {
++	return filepath.Join(termuxPrefix(), termuxSvcRelDir)
++}
++
++func serviceDir() string {
++	return filepath.Join(svDir(), termuxServiceName)
++}
++
++func installTermuxService(c *cli.Context) error {
++	log := logger.CreateLoggerFromContext(c, logger.EnableTerminalLog)
++
++	if c.NArg() > 0 {
++		cd, err := homedir.Dir()
++		if err != nil {
++			return fmt.Errorf("error determining home directory: %w", err)
++		}
++		cfgDir := filepath.Join(cd, termuxConfigDirName)
++
++		if err := os.MkdirAll(cfgDir, 0o700); err != nil {
++			return fmt.Errorf("create config directory %s: %w", cfgDir, err)
++		}
++
++		tokenPath := filepath.Join(cfgDir, "token")
++		if err := os.WriteFile(tokenPath, []byte(c.Args().First()), 0o600); err != nil {
++			return fmt.Errorf("could not write token to %s: %w", tokenPath, err)
++		}
++	}
++
++	svcDir := serviceDir()
++
++	if _, err := exec.LookPath("sv"); err != nil {
++		log.Warn().Msg("sv command not found. Install termux-services: pkg install termux-services")
++		log.Info().Msgf("Service directory: %s", svcDir)
++		log.Info().Msgf("To enable and start: sv-enable %s", termuxServiceName)
++		log.Info().Msgf("To start manually: sv up %s", termuxServiceName)
++	} else {
++		if err := runCommand("sv-enable", termuxServiceName); err != nil {
++			log.Warn().Err(err).Msg("sv-enable failed, trying sv up directly")
++			downFile := filepath.Join(svcDir, "down")
++			_ = os.Remove(downFile)
++			if err := runCommand("sv", "up", termuxServiceName); err != nil {
++				log.Warn().Err(err).Msgf("Could not start %s service", termuxServiceName)
++			}
++		}
++	}
++
++	log.Info().Msg("Termux runit service for cloudflared installed successfully")
++	log.Info().Msgf("Service directory: %s", svcDir)
++	log.Info().Msg("")
++	log.Info().Msg("To ensure the service starts on device boot:")
++	log.Info().Msg("  1. Install Termux:Boot from F-Droid")
++	log.Info().Msg("  2. Create ~/.termux/boot/start-services with:")
++	log.Info().Msgf("     #!%s/bin/sh", termuxPrefix())
++	log.Info().Msg("     termux-wake-lock")
++	log.Info().Msgf("     exec runsvdir -P %s/var/service", termuxPrefix())
++	log.Info().Msg("  3. Make it executable: chmod +x ~/.termux/boot/start-services")
++	log.Info().Msg("  4. Disable battery optimization for Termux in Android settings")
++
++	return nil
++}
++
++func uninstallTermuxService(c *cli.Context) error {
++	log := logger.CreateLoggerFromContext(c, logger.EnableTerminalLog)
++
++	if _, err := exec.LookPath("sv"); err == nil {
++		_ = runCommand("sv-disable", termuxServiceName)
++		_ = runCommand("sv", "down", termuxServiceName)
++	} else {
++		log.Warn().Msg("sv command not found, skipping service stop")
++	}
++
++	cd, err := homedir.Dir()
++	if err == nil {
++		tokenPath := filepath.Join(cd, termuxConfigDirName, "token")
++		if err := os.Remove(tokenPath); err != nil && !os.IsNotExist(err) {
++			log.Warn().Err(err).Msgf("Could not remove %s", tokenPath)
++		}
++	}
++
++	log.Info().Msg("Termux runit service for cloudflared uninstalled successfully")
++	return nil
++}
+diff --git a/cmd/cloudflared/linux_service.go b/cmd/cloudflared/linux_service.go
+index 067d5b40..e74a7a75 100644
+--- a/cmd/cloudflared/linux_service.go
++++ b/cmd/cloudflared/linux_service.go
+@@ -1,4 +1,4 @@
+-//go:build linux
++//go:build linux && !android
+ 
+ 	package main
+ -- 
+2.55.0.windows.3

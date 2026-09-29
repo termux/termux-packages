@@ -1,0 +1,15 @@
+--- a/src/jsc/bindings/c-bindings.cpp
++++ b/src/jsc/bindings/c-bindings.cpp
+@@ -272,7 +272,12 @@
+ // close_range is glibc > 2.33, which is very new
+ extern "C" ssize_t bun_close_range(unsigned int start, unsigned int end, unsigned int flags)
+ {
++#if defined(__ANDROID__)
++    // API 28 (Android 9) has kernel version 4.14+, which often lacks `close_range`.
++    return -1;
++#else
+     return syscall(__NR_close_range, start, end, flags);
++#endif
+ }
+ #else // OS(FREEBSD)
+ // FreeBSD 12.2+ libc has close_range; 14.0+ supports CLOSE_RANGE_CLOEXEC

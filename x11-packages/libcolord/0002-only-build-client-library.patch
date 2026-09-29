@@ -1,0 +1,36 @@
+--- a/contrib/meson.build
++++ b/contrib/meson.build
+@@ -1,4 +1,6 @@
+-subdir('session-helper')
++if get_option('daemon')
++	subdir('session-helper')
++endif
+ 
+ if get_option('sane')
+ 	subdir('colord-sane')
+--- a/lib/meson.build
++++ b/lib/meson.build
+@@ -1,7 +1,9 @@
+ lib_incdir = include_directories('.')
+ 
+ subdir('colord')
+-subdir('colorhug')
++if get_option('daemon')
++  subdir('colorhug')
++endif
+ 
+ if get_option('libcolordcompat')
+   subdir('compat')
+--- a/meson.build
++++ b/meson.build
+@@ -271,7 +271,9 @@
+ endif
+ 
+ # this needs client/cd-create-profile
+-subdir('data')
++if meson.can_run_host_binaries()
++  subdir('data')
++endif
+ 
+ # this needs data/profiles/*.icc
+ if get_option('man')

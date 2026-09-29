@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://gnupg.org/related_software/libksba/
+TERMUX_PKG_DESCRIPTION="Library for using X.509 certificates and CMS (Cryptographic Message Syntax) easily accessible"
+TERMUX_PKG_LICENSE="LGPL-3.0, GPL-3.0, GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.8.1"
+TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libksba/libksba-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=c2f84393011827219ae117131dba8e7684c2bed0961eed11b0642c2acba440b5
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libgpg-error"
+TERMUX_PKG_BREAKS="libksba-dev"
+TERMUX_PKG_REPLACES="libksba-dev"

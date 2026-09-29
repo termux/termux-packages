@@ -1,0 +1,89 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -49,9 +49,6 @@
+ include_directories(${PROJECT_SOURCE_DIR})
+ include_directories(${PROJECT_SOURCE_DIR}/lib_ccx)
+ include_directories(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/libpng)
+ 
+ # Check if the operating system is macOS (Darwin)
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+@@ -65,58 +62,9 @@
+   endif()
+ endif()
+ 
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/zlib)
+-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/freetype/include)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/libpng/ SOURCEFILE)
+-aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/zlib/ SOURCEFILE)
+ aux_source_directory(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi/ SOURCEFILE)
+ 
+-set(UTF8PROC_SOURCE ${PROJECT_SOURCE_DIR}/thirdparty/utf8proc/utf8proc.c)
+ 
+-set(FREETYPE_SOURCE
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/autofit/autofit.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbase.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbbox.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbdf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbitmap.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftcid.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftfntfmt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftfstype.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftgasp.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftglyph.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftgxval.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftinit.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftlcdfil.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftmm.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftotval.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftpatent.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftpfr.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftstroke.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftsynth.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftsystem.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/fttype1.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftwinfnt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/bdf/bdf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/bzip2/ftbzip2.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cache/ftcache.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cff/cff.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/cid/type1cid.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/gzip/ftgzip.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/lzw/ftlzw.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pcf/pcf.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pfr/pfr.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/psaux/psaux.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/pshinter/pshinter.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/psnames/psnames.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/raster/raster.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/sfnt/sfnt.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/smooth/smooth.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/truetype/truetype.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/type1/type1.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/type42/type42.c
+-        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/winfonts/winfnt.c
+-        )
+ #Windows specific libraries and linker flags
+ if(WIN32)
+     if(NOT MINGW)
+@@ -159,7 +107,7 @@
+ 
+ set (EXTRA_LIBS ${EXTRA_LIBS} -lm -lpthread -ldl)
+ 
+-find_package (PkgConfig)
++find_package (PkgConfig REQUIRED)
+ 
+ ########################################################
+ # Build using FFmpeg libraries
+@@ -240,7 +188,7 @@
+   set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LEPTONICA_INCLUDE_DIRS})
+ endif (PKG_CONFIG_FOUND AND WITH_HARDSUBX)
+ 
+-add_executable (ccextractor ${SOURCEFILE} ${FREETYPE_SOURCE} ${UTF8PROC_SOURCE})
++add_executable (ccextractor ${SOURCEFILE})
+ 
+ ########################################################
+ # Build with Rust library

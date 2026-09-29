@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://zipios.sourceforge.io/
+TERMUX_PKG_DESCRIPTION="A small C++ library for reading and writing zip files"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.3.4"
+TERMUX_PKG_SRCURL=https://github.com/Zipios/Zipios/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=c3ad6be0f6fbd035f7d4942caab77da9bca027ba0c1c8ba0f0cd8621803abb8e
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libc++, zlib"

@@ -1,0 +1,12 @@
+diff -uNr a/tests/test_common.h b/tests/test_common.h
+--- a/tests/test_common.h
++++ b/tests/test_common.h
+@@ -68,7 +68,7 @@
+ #elif defined(_WIN32)
+   /* A (void *) cast needed for avoiding a warning with MINGW :-/ */
+   block = (void *)_aligned_malloc(size, alignment);
+-#elif _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600
++#elif (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) || defined(__ANDROID__)
+   /* Platform does have an implementation of posix_memalign */
+   res = posix_memalign(&block, alignment, size);
+ #elif defined(__APPLE__)

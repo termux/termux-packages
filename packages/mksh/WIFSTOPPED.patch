@@ -1,0 +1,13 @@
+https://github.com/termux/termux-packages/issues/16319
+
+--- a/jobs.c
++++ b/jobs.c
+@@ -1391,7 +1391,7 @@
+ 		ru0 = ru1;
+ 		p->status = status;
+ #ifndef MKSH_UNEMPLOYED
+-		if (WIFSTOPPED(status))
++		if (WIFSTOPPED(status) && !WIFCONTINUED(status))
+ 			p->state = PSTOPPED;
+ 		else
+ #if defined(WCONTINUED) && defined(WIFCONTINUED)

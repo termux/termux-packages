@@ -1,0 +1,13 @@
+--- a/bundled/linux/include/uapi/linux/in.h
++++ b/bundled/linux/include/uapi/linux/in.h
+@@ -84,7 +84,9 @@
+ };
+ #endif
+
+-#if __UAPI_DEF_IN_ADDR
++#ifdef __ANDROID__
++#include <bits/in_addr.h>
++#elif __UAPI_DEF_IN_ADDR
+ /* Internet address. */
+ struct in_addr {
+        __be32  s_addr;

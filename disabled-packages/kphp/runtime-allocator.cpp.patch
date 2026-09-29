@@ -1,0 +1,70 @@
+--- a/runtime/allocator.cpp
++++ b/runtime/allocator.cpp
+@@ -9,6 +9,36 @@
+ #include <dlfcn.h>
+ #include <unistd.h>
+ 
++static void *(* volatile malloc_hook_dummy)(size_t, const void *);
++static decltype(malloc_hook_dummy) *malloc_hook_ptr;
++static void *(* volatile realloc_hook_dummy)(void *, size_t, const void *);
++static decltype(realloc_hook_dummy) *realloc_hook_ptr;
++static void (* volatile free_hook_dummy)(void *, const void *);
++static decltype(free_hook_dummy) *free_hook_ptr;
++static void *(* volatile memalign_hook_dummy)(size_t, size_t, const void *);
++static decltype(memalign_hook_dummy) *memalign_hook_ptr;
++
++static void malloc_hook_init(void) {
++  static bool initialized = false;
++  if (initialized) return;
++  void *libc_handle = dlopen("libc.so", RTLD_NOW);
++  if (libc_handle != NULL) {
++    malloc_hook_ptr = (decltype(malloc_hook_ptr))dlsym(libc_handle, "__malloc_hook");
++    realloc_hook_ptr = (decltype(realloc_hook_ptr))dlsym(libc_handle, "__realloc_hook");
++    free_hook_ptr = (decltype(free_hook_ptr))dlsym(libc_handle, "__free_hook");
++    memalign_hook_ptr = (decltype(memalign_hook_ptr))dlsym(libc_handle, "__memalign_hook");
++  }
++  if (malloc_hook_ptr == NULL)
++    malloc_hook_ptr = &malloc_hook_dummy;
++  if (realloc_hook_ptr == NULL)
++    realloc_hook_ptr = &realloc_hook_dummy;
++  if (free_hook_ptr == NULL)
++    free_hook_ptr = &free_hook_dummy;
++  if (memalign_hook_ptr == NULL)
++    memalign_hook_ptr = &memalign_hook_dummy;
++  initialized = true;
++}
++
+ #include "common/algorithms/find.h"
+ #include "common/containers/final_action.h"
+ #include "common/macos-ports.h"
+@@ -246,10 +276,11 @@
+   void switch_hooks(bool malloc_hooks_are_replaced_before) noexcept {
+     php_assert(malloc_hooks_are_replaced_before == malloc_hooks_are_replaced_);
+     CriticalSectionGuard critical_section;
+-    std::swap(malloc_hook_, __malloc_hook);
+-    std::swap(realloc_hook_, __realloc_hook);
+-    std::swap(memalign_hook_, __memalign_hook);
+-    std::swap(free_hook_, __free_hook);
++    malloc_hook_init();
++    std::swap(malloc_hook_, *malloc_hook_ptr);
++    std::swap(realloc_hook_, *realloc_hook_ptr);
++    std::swap(memalign_hook_, *memalign_hook_ptr);
++    std::swap(free_hook_, *free_hook_ptr);
+     malloc_hooks_are_replaced_ = !malloc_hooks_are_replaced_;
+   }
+ 
+@@ -274,10 +305,10 @@
+       return script_allocator_free(ptr);
+     }} {}
+ 
+-  decltype(__malloc_hook) malloc_hook_{nullptr};
+-  decltype(__realloc_hook) realloc_hook_{nullptr};
+-  decltype(__memalign_hook) memalign_hook_{nullptr};
+-  decltype(__free_hook) free_hook_{nullptr};
++  decltype(malloc_hook_dummy) malloc_hook_{nullptr};
++  decltype(realloc_hook_dummy) realloc_hook_{nullptr};
++  decltype(memalign_hook_dummy) memalign_hook_{nullptr};
++  decltype(free_hook_dummy) free_hook_{nullptr};
+   bool malloc_hooks_are_replaced_{false};
+ };
+ 

@@ -1,0 +1,18 @@
+# It is already done by bionic.
+
+--- far2l-v_2.7.0/utils/src/LookupDebugSymbol.cpp.orig	2025-11-16 22:25:32.454458607 +0530
++++ far2l-v_2.7.0/utils/src/LookupDebugSymbol.cpp	2025-11-17 13:19:37.927697150 +0530
+@@ -13,13 +13,11 @@
+ 	typedef Elf64_Phdr Elf_Phdr;
+ 	typedef Elf64_Shdr Elf_Shdr;
+ 	typedef Elf64_Sym  Elf_Sym;
+-#  define ELF_ST_TYPE(INFO) ELF64_ST_TYPE(INFO)
+ # else
+ 	typedef Elf32_Ehdr Elf_Ehdr;
+ 	typedef Elf32_Phdr Elf_Phdr;
+ 	typedef Elf32_Shdr Elf_Shdr;
+ 	typedef Elf32_Sym  Elf_Sym;
+-#  define ELF_ST_TYPE(INFO) ELF32_ST_TYPE(INFO)
+ # endif
+ 
+ static FDScope s_initial_cwdfd(open(".", O_PATH));

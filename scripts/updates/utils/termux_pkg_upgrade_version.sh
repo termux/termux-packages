@@ -1,0 +1,204 @@
+# shellcheck shell=bash
+_termux_should_cleanup() {
+	local space_available big_package="$1"
+	[[ "${big_package}" == "true" ]] && return 0 # true
+
+	if [[ -d "/var/lib/docker" ]]; then
+		# Get available space in bytes
+		space_available="$(df "/var/lib/docker" | awk 'NR==2 { print $4 * 1024 }')"
+
+		if (( space_available <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )); then
+			return 0 # true
+		fi
+	fi
+
+	return 1 # false
+}
+
+_termux_check_new_debs_for_conflicts() {
+	# newer-than-marker, not by name: output/ has other packages' .debs too,
+	# and not every subpackage (e.g. *-static) has a .subpackage.sh to match.
+	local build_marker="$1" conflict_check_dir rc
+	conflict_check_dir="$(mktemp -d)"
+	find "${TERMUX_SCRIPTDIR}/output" -name '*.deb' -newer "${build_marker}" -exec cp -t "${conflict_check_dir}" {} +
+	"${TERMUX_SCRIPTDIR}/scripts/utils/termux_check_file_conflicts.sh" "${conflict_check_dir}"
+	rc=$?
+	rm -rf "${conflict_check_dir}"
+	return "${rc}"
+}
+
+termux_pkg_upgrade_version() {
+	if (( $# < 1 )); then
+		termux_error_exit <<-EndUsage
+			Usage: ${FUNCNAME[0]} LATEST_VERSION [--skip-version-check]
+			Also reports the fully parsed LATEST_VERSION on file descriptor 3
+		EndUsage
+	fi
+
+	local LATEST_VERSION SKIP_VERSION_CHECK EPOCH
+	LATEST_VERSION="$(sort -rV <<< "$1")" # Ensure its sorted in descending version order.
+	SKIP_VERSION_CHECK="${2:-}"
+	EPOCH="${TERMUX_PKG_VERSION%%:*}" # If there is no epoch, this will be the full version.
+	# Check if it isn't the full version and add ':'.
+	if [[ "${EPOCH}" != "${TERMUX_PKG_VERSION}" ]]; then
+		EPOCH="${EPOCH}:"
+	else
+		EPOCH=""
+	fi
+
+	# If needed, filter version numbers using grep regexp.
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}" ]]; then
+		# Extract version numbers.
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(grep --max-count=1 -oP "${TERMUX_PKG_UPDATE_VERSION_REGEXP}" <<< "${LATEST_VERSION}" || :)"
+		if [[ -z "${LATEST_VERSION:-}" ]]; then
+			termux_error_exit <<-EndOfError
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
+			EndOfError
+		fi
+		unset ORIGINAL_LATEST_VERSION
+	fi
+
+	# If needed, filter version numbers using sed regexp.
+	if [[ -n "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP:-}" ]]; then
+		# Extract version numbers.
+		local ORIGINAL_LATEST_VERSION="${LATEST_VERSION}"
+		LATEST_VERSION="$(sed -E "${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}" <<< "${LATEST_VERSION}" || :)"
+		if [[ -z "${LATEST_VERSION:-}" ]]; then
+			termux_error_exit <<-EndOfError
+				ERROR: Failed to filter version numbers for '${TERMUX_PKG_NAME}'.
+				Ensure that '${TERMUX_PKG_UPDATE_VERSION_SED_REGEXP}' works correctly to match '${ORIGINAL_LATEST_VERSION}'.
+			EndOfError
+		fi
+		unset ORIGINAL_LATEST_VERSION
+	fi
+
+	# Remove any leading non-digits as that would not be a valid version.
+	# shellcheck disable=SC2001 # This is something parameter expansion can't handle well, so we use sed.
+	LATEST_VERSION="$(sed -e "s/^[^0-9]*//" <<< "$LATEST_VERSION")"
+
+	# Translate "_" into ".": some packages use underscores to separate
+	# version numbers, but we require them to be separated by dots.
+	LATEST_VERSION="${LATEST_VERSION//_/.}"
+
+	# Translate "-suffix" into "~suffix": "X.Y.Z-suffix" is considered later
+	# than X.Y.Z. for it to be considered earlier use "X.Y.Z~suffix".
+	for suffix in "rc" "alpha" "beta"; do
+		LATEST_VERSION="$(sed -E "s/[-._]?(${suffix}[0-9]*)/~\1/ig" <<< "$LATEST_VERSION")"
+	done
+
+	# If FD 3 is open, use it for reporting the fully parsed $LATEST_VERSION
+	# If it's not open use the brace group to be able to
+	# discard the `3: Bad file descriptor` error silently.
+	{ echo "$LATEST_VERSION" >&3; } 2> /dev/null
+
+	if [[ "${SKIP_VERSION_CHECK}" != "--skip-version-check" ]]; then
+		if ! termux_pkg_is_update_needed \
+			"${TERMUX_PKG_VERSION#*:}" "${LATEST_VERSION}"; then
+			echo "INFO: No update needed. Already at version '${LATEST_VERSION}'."
+			return 0
+		fi
+	fi
+
+	if [[ -n "${TERMUX_PKG_UPGRADE_VERSION_DRY_RUN:-}" ]]; then
+		return 1
+	fi
+
+	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+		echo "INFO: package needs to be updated to ${LATEST_VERSION}."
+		return
+	fi
+
+	echo "INFO: package being updated to ${LATEST_VERSION}."
+
+	sed \
+		-e "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1\"${EPOCH}${LATEST_VERSION}\"/g" \
+		-e "/TERMUX_PKG_REVISION=/d" \
+		-i "${TERMUX_PKG_BUILDER_DIR}/build.sh"
+
+	# Update checksum
+	if [[ "${TERMUX_PKG_SHA256[*]}" != "SKIP_CHECKSUM" && "${TERMUX_PKG_SRCURL:0:4}" != "git+" ]]; then
+		echo n | "${TERMUX_SCRIPTDIR}/scripts/bin/update-checksum" "${TERMUX_PKG_NAME}" || {
+			git checkout -- "${TERMUX_SCRIPTDIR}"
+			git pull --rebase --autostash
+			termux_error_exit "failed to update checksum."
+		}
+	fi
+
+	echo "INFO: Trying to build package."
+
+	for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+		_buildsh_path="${TERMUX_SCRIPTDIR}/${repo_path}/${TERMUX_PKG_NAME}/build.sh"
+		repo="$(jq --raw-output ".\"${repo_path}\".name" "${TERMUX_SCRIPTDIR}/repo.json")"
+		repo="${repo#"termux-"}"
+
+		if [[ -f "${_buildsh_path}" ]]; then
+			echo "INFO: Package ${TERMUX_PKG_NAME} exists in ${repo} repo."
+			unset _buildsh_path repo_path
+			break
+		fi
+	done
+
+	# check cleanup conditions
+	local big_package=false
+	while IFS= read -r p; do
+		if [[ "${p}" == "${TERMUX_PKG_NAME}" ]]; then
+			big_package=true
+			break
+		fi
+	done < "${TERMUX_SCRIPTDIR}/scripts/big-pkgs.list"
+
+	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+
+	local _build_marker
+	_build_marker="$(mktemp)"
+
+	if ! "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" -d ./build-package.sh -C -a "${TERMUX_ARCH}" -i --reuse-built-packages "${TERMUX_PKG_NAME}" \
+			|| ! _termux_check_new_debs_for_conflicts "${_build_marker}"; then
+		rm -f "${_build_marker}"
+		_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+		git checkout -- "${TERMUX_SCRIPTDIR}"
+		termux_error_exit "failed to build."
+	fi
+	rm -f "${_build_marker}"
+
+	_termux_should_cleanup "${big_package}" && "${TERMUX_SCRIPTDIR}/scripts/run-docker.sh" ./clean.sh
+
+	if [[ "${GIT_COMMIT_PACKAGES}" == "true" ]]; then
+		echo "INFO: Committing package."
+		stderr="$(
+			git add \
+				"${TERMUX_PKG_BUILDER_DIR}" \
+				"${TERMUX_SCRIPTDIR}/scripts/build/setup/" \
+				2>&1 >/dev/null
+			git commit \
+				-m "bump(${repo}/${TERMUX_PKG_NAME}): ${LATEST_VERSION}" \
+				-m "This commit has been automatically submitted by Github Actions." \
+				2>&1 >/dev/null
+		)" || {
+			git reset HEAD --hard
+			termux_error_exit <<-EndOfError
+			ERROR: git commit failed. See below for details.
+			${stderr}
+			EndOfError
+		}
+	fi
+
+	if [[ "${GIT_PUSH_PACKAGES}" == "true" ]]; then
+		echo "INFO: Pushing package."
+		stderr="$(
+			# Fetch and pull before attempting to push to avoid a situation
+			# where a long running auto update fails because a later faster
+			# autoupdate got committed first and now the git history is out of date.
+			git fetch 2>&1 >/dev/null
+			git pull --rebase --autostash 2>&1 >/dev/null
+			git push 2>&1 >/dev/null
+		)" || {
+			termux_error_exit <<-EndOfError
+			ERROR: git push failed. See below for details.
+			${stderr}
+			EndOfError
+		}
+	fi
+}

@@ -1,0 +1,11 @@
+--- ./lisp/term.el.orig	2025-02-26 22:40:48.382660611 +0100
++++ ./lisp/term.el	2025-02-26 22:42:12.160211487 +0100
+@@ -1776,7 +1776,7 @@
+            ;; found as /system/bin/sh.
+ 	   (if (eq system-type 'android)
+                "/system/bin/sh"
+-             "/bin/sh")
++             "@TERMUX_PREFIX@/bin/sh")
+            "-c"
+ 	   (format "stty -nl echo rows %d columns %d sane 2>%s;\
+ if [ $1 = .. ]; then shift; fi; exec \"$@\""

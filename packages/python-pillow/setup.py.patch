@@ -1,0 +1,42 @@
+--- Pillow-12.0.0/setup.py.orig	2025-11-18 17:26:26.007519913 +0530
++++ Pillow-12.0.0/setup.py	2025-11-18 17:33:11.193581763 +0530
+@@ -575,8 +575,8 @@
+                 for d in os.environ[k].split(os.path.pathsep):
+                     _add_directory(library_dirs, d)
+ 
+-        _add_directory(library_dirs, os.path.join(sys.prefix, "lib"))
+-        _add_directory(include_dirs, os.path.join(sys.prefix, "include"))
++        _add_directory(library_dirs, os.path.join("@TERMUX_PREFIX@", "lib"))
++        _add_directory(include_dirs, os.path.join("@TERMUX_PREFIX@", "include"))
+ 
+         #
+         # add platform directories
+@@ -658,7 +658,7 @@
+                 extension.extra_compile_args = ["-Wno-nullability-completeness"]
+ 
+         elif sys.platform.startswith(("linux", "gnu", "freebsd")):
+-            for dirname in _find_library_dirs_ldconfig():
++            for dirname in []:
+                 _add_directory(library_dirs, dirname)
+             if sys.platform.startswith("linux") and os.environ.get("ANDROID_ROOT"):
+                 # termux support for android.
+@@ -684,7 +684,7 @@
+         # FIXME: check /opt/stuff directories here?
+ 
+         # standard locations
+-        if not self.disable_platform_guessing:
++        if False:
+             _add_directory(library_dirs, "/usr/local/lib")
+             _add_directory(include_dirs, "/usr/local/include")
+ 
+@@ -1083,8 +1083,8 @@ files.extend(
+     os.path.join("src/libImaging", src_file + ".c") for src_file in _LIB_IMAGING
+ )
+ ext_modules = [
+-    Extension("PIL._imaging", files),
+-    Extension("PIL._imagingft", ["src/_imagingft.c"]),
++    Extension("PIL._imaging", files, libraries=["m"]),
++    Extension("PIL._imagingft", ["src/_imagingft.c"], libraries=["m"]),
+     Extension("PIL._imagingcms", ["src/_imagingcms.c"]),
+     Extension("PIL._webp", ["src/_webp.c"]),
+     Extension("PIL._avif", ["src/_avif.c"]),

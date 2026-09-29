@@ -1,0 +1,16 @@
+https://github.com/termux/termux-packages/issues/15852
+
+--- a/snprintfv/snprintfv/format.c
++++ b/snprintfv/snprintfv/format.c
+@@ -40,6 +40,11 @@
+ #include <math.h>
+ #include <stddef.h>
+ 
++#ifdef __ANDROID__
++#define isinfl(x) __builtin_isinf(x)
++#define isnanl(x) __builtin_isnan(x)
++#endif
++
+ #ifdef HAVE_WCHAR_H
+ #  include <wchar.h>
+ #endif

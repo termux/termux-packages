@@ -1,0 +1,36 @@
+Fixes error:
+   --> /home/builder/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termios-0.2.2/src/lib.rs:116:15
+    |
+116 | pub use ::os::target::{cc_t,speed_t,tcflag_t}; // types
+    |               ^^^^^^ could not find `target` in `os`
+
+and another error:
+ld.lld: error: undefined symbol: __errno_location
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -14,5 +14,5 @@ categories = ["hardware-support", "os", "os::unix-apis"]
+ [dependencies]
+ serial-core = { version = "0.4", path = "../serial-core" }
+ libc = "0.2.1"
+-termios = "0.2.2"
++termios = "0.3.3"
+ ioctl-rs = "0.1.5"
+--- a/src/error.rs
++++ b/src/error.rs
+@@ -64,13 +64,13 @@ pub fn errno() -> i32 {
+         __dfly_error()
+     }
+ 
+-    #[cfg(target_os = "openbsd")]
++    #[cfg(any(target_os = "openbsd", target_os = "android"))]
+     unsafe fn errno_location() -> *const c_int {
+         extern { fn __errno() -> *const c_int; }
+         __errno()
+     }
+ 
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(target_os = "linux")]
+     unsafe fn errno_location() -> *const c_int {
+         extern { fn __errno_location() -> *const c_int; }
+         __errno_location()

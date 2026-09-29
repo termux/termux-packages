@@ -1,0 +1,11 @@
+--- a/comm/third_party/rnp/moz.build
++++ b/comm/third_party/rnp/moz.build
+@@ -69,7 +69,7 @@
+ }
+ crypto_backend = CONFIG["MZLA_LIBRNP_BACKEND"]
+ if crypto_backend == "botan":
+-    crypto_backend_version = CONFIG["BOTAN_VERSION"]
++    crypto_backend_version = "@TERMUX_BOTAN_VERSION@"
+     LOCAL_INCLUDES += ["!../botan/build/include/public"]
+     if CONFIG["MZLA_SYSTEM_BOTAN"]:
+         CXXFLAGS += CONFIG["MZLA_BOTAN_CFLAGS"]

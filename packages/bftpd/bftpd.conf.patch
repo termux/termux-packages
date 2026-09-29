@@ -1,0 +1,143 @@
+diff -uNr bftpd/bftpd.conf bftpd.mod/bftpd.conf
+--- bftpd/bftpd.conf	2019-07-28 20:07:32.000000000 +0300
++++ bftpd.mod/bftpd.conf	2020-07-24 17:49:21.832372999 +0300
+@@ -9,7 +9,7 @@
+   DENY_LOGIN="no" 
+ 
+   #The port number where the daemon should listen (only for daemon mode)
+-  PORT="21"
++  PORT="8021"
+ 
+   #You can force bftpd to use a specific port range in passive mode.
+   #Passive mode means that the client will open data connections
+@@ -34,26 +34,6 @@
+   #The password for the administration commands, encrypted (man mkpasswd).
+   ADMIN_PASS="x"
+ 
+-  #With this option, you can put your entire FTP environment into a chroot
+-  #jail. Apart from security, this offers you the possibility of having
+-  #virtual users that don't exist in the system.
+-  #Additionally, you can make some kind of 'file pool' by creating a directory
+-  #with files which you can symlink from the users' homes (this means setting
+-  #DO_CHROOT=no in order for the users to be able to access that dir.
+-  #Note that you need the following files in your initial chroot directory:
+-  #/etc/passwd, /etc/shadow, /etc/group
+-  #On GNU systems, you will also need the NSS libraries in /lib.
+-  #INITIAL_CHROOT="/ftp"
+-
+-  #The bftpdutmp file enables you to record user logins and logouts in
+-  #bftpd, which is useful for the administration interface (which is not
+-  #finished yet). You also need the file to be able to restrict the number
+-  #of users simultaneously logged on, and so on.
+-  #Note that the directory in which the file resides must already exist.
+-  #Set the option to "" if you do not want that. This is discouraged for normal
+-  #use, but can be helpful if you want to create a boot floppy or something.
+-  PATH_BFTPDUTMP="/var/run/bftpd/bftpdutmp"
+-
+   #This option controls the buffer size while transferring files.
+   #If you are on a very fast network (fast meaning 100 Mbit/s or more),
+   #you should set this to 64000 or something like that.
+@@ -66,7 +46,6 @@
+   # can slow transfer speeds.
+   XFER_BUFSIZE="2048"
+ 
+-
+   # This variable controls whether the transfer buffer (see above option)
+   # should change size as more (or less) clients connect to the server.
+   # Setting this option to "yes" will put more work on your CPU, but
+@@ -75,8 +54,6 @@
+   # your bandwidth to spike.
+   CHANGE_BUFSIZE="no"
+ 
+-
+-
+   # This option allows you to add a delay (in microseconds) to
+   # the time between when one piece of data was sent
+   # and when the next will be sent. This is to aid in
+@@ -130,7 +107,7 @@
+   # be saved.
+   # Each day gets its own log file, to make it easier to rotate logs.
+   # Please note, this directory must be created manually.
+-  # BANDWIDTH="/var/log/bftpd"
++  # BANDWIDTH="@TERMUX_PREFIX@/var/log/bftpd"
+ 
+   #ROOTDIR specifies the root directory of the client. It defaults to %h
+   #(user's home directory). %u is replaced by the user name.
+@@ -141,7 +118,7 @@
+ 
+   #Name of the log file. Say "syslog" to log into syslog.
+   #Say "" for no logging.
+-  LOGFILE="/var/log/bftpd.log"
++  LOGFILE="@TERMUX_PREFIX@/var/log/bftpd.log"
+ 
+   #Use %v for version, %h for the server FQDN and %i for the server IP address.
+   # Note: If you use the "%h" option and you do an inital CHROOT, then
+@@ -152,7 +129,8 @@
+   #The server automatically chdirs to the directory given here after login.
+   AUTO_CHDIR="/"
+ 
+-  #Authentication type, values: PAM, PASSWD
++  #Authentication type, values: PASSWD
++  # PAM is not supported in Termux.
+   AUTH="PASSWD"
+ 
+   # The FILE_AUTH varible over-rides the AUTH value. If the FILE_AUTH
+@@ -175,7 +153,7 @@
+   # where normal user accounts cannot be created.
+   # Under no circumstances should anyone except root be
+   # able to read the FILE_AUTH password file.
+-  #FILE_AUTH="/etc/ftpdpassword"
++  #FILE_AUTH="@TERMUX_PREFIX@/etc/ftpdpassword"
+ 
+ 
+   #Enable this if you want the client's IP address to be resolved to a host
+@@ -185,7 +163,7 @@
+   RESOLVE_CLIENT_IP="no"
+ 
+   #Path to the message of the day, seen by all users before login.
+-  MOTD_GLOBAL="/etc/ftpmotd"
++  MOTD_GLOBAL="@TERMUX_PREFIX@/etc/ftpmotd"
+ 
+   #Path to the message of the day, seen after login, relative to the root
+   #path of the user (see ROOTDIR).
+@@ -201,9 +179,6 @@
+   #want to have a security hole!
+   DO_CHROOT="yes"
+   
+-  #Enable this to log each login to wtmp.
+-  LOG_WTMP="yes"
+-
+   #If you want bftpd to bind itself to one specific network interface, enter
+   #its IP address here. Else enter 'any'. This option only works in standalone
+   #mode.
+@@ -221,11 +196,7 @@
+   #Path to the ftpusers file. It can contain user names that are denied.
+   #If it does not exist, every user can log in. If you don't want this,
+   #just put a nonexistent filename here.
+-  PATH_FTPUSERS="/etc/ftpusers"
+-
+-  #Enable this if you want to deny any user who has a shell which is not in
+-  #/etc/shells.
+-  AUTH_ETCSHELLS="no"
++  PATH_FTPUSERS="@TERMUX_PREFIX@/etc/ftpusers"
+ 
+   #With the option ALLOWCOMMAND_XXXX, you can disable the command XXXX.
+   #For example, if you don't want any user to delete files, you can do
+@@ -286,7 +257,7 @@
+   # NOTE: Be careful when using this option and the DO_CHROOT option.
+   # The location of the root directory can change when using DO_CHROOT.
+   # The current working directory (cwd) is passed to the script you run.
+-  # PRE_WRITE_SCRIPT="/bin/true"
++  # PRE_WRITE_SCRIPT="@TERMUX_PREFIX@/bin/true"
+ 
+   # This option is enabled when the server should run
+   # a script after writing to the file system. This should
+@@ -295,7 +266,7 @@
+   # NOTE: Be careful when using this option and the DO_CHROOT option.
+   # The location of the root directory can change when using DO_CHROOT.
+   # The current working directory (cwd) is passed to the script you run.
+-  # POST_WRITE_SCRIPT="/bin/false"
++  # POST_WRITE_SCRIPT="@TERMUX_PREFIX@/bin/false"
+ 
+   # The GNU C library makes some assumptions about the local time zone
+   # when run in a chroot environment. The Bftpd server tries to work

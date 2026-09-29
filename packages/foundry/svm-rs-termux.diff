@@ -1,0 +1,107 @@
+--- a/src/paths.rs
++++ b/src/paths.rs
+@@ -37,7 +37,8 @@
+ 
+ /// Returns the path to the default data directory.
+ ///
+-/// Returns `~/.svm` if it exists, otherwise uses `$XDG_DATA_HOME/svm`.
++/// Returns `<prefix>/libexec/foundry/svm` if the package bundles its compilers there (Termux),
++/// `~/.svm` if it exists, otherwise uses `$XDG_DATA_HOME/svm`.
+ pub fn data_dir() -> &'static Path {
+     static ONCE: OnceLock<PathBuf> = OnceLock::new();
+     ONCE.get_or_init(|| {
+@@ -53,8 +54,32 @@
+     })
+ }
+ 
++/// Returns the directory in which the Termux `foundry` package installs the Solidity compilers it
++/// bundles with the package: `<prefix>/libexec/foundry/svm`.
++///
++/// The prefix is derived from the location of the running executable (`<prefix>/bin/forge`)
++/// instead of being hardcoded, so the same binary works no matter where the prefix lives.
++fn packaged_data_dir() -> Option<PathBuf> {
++    // .../bin/<binary> -> .../<prefix>
++    let prefix = std::env::current_exe().ok()?.parent()?.parent()?.to_path_buf();
++    Some(prefix.join("libexec").join("foundry").join("svm"))
++}
++
+ #[allow(dead_code)]
+ fn resolve_data_dir() -> PathBuf {
++    // The system-wide compilers bundled with the package take precedence over anything the user
++    // installed themselves: they are the only solc binaries that can run on Android.
++    if let Some(dir) = packaged_data_dir()
++        && dir.is_dir()
++    {
++        return dir;
++    }
++
++    resolve_user_data_dir()
++}
++
++#[allow(dead_code)]
++fn resolve_user_data_dir() -> PathBuf {
+     let home_dir = dirs::home_dir()
+         .expect("could not detect user home directory")
+         .join(".svm");
+--- a/src/install.rs
++++ b/src/install.rs
+@@ -1,3 +1,7 @@
++// On Android the downloading code below is not part of the build (see `bundled_solc`), which leaves
++// the download helpers and their imports unused there.
++#![cfg_attr(target_os = "android", allow(dead_code, unused_imports))]
++
+ use crate::{
+     SvmError, all_releases, data_dir, platform, releases::artifact_url, setup_data_dir,
+     setup_version, version_binary,
+@@ -26,9 +30,35 @@
+ /// See <https://github.com/ethereum/solidity/releases/tag/v0.8.29>
+ const NIXOS_MAX_PATCH_VERSION: Version = Version::new(0, 8, 28);
+ 
++/// Returns the path of the Solidity compiler bundled with the Termux package for `version`.
++///
++/// Termux ships a fixed set of compilers under `<prefix>/libexec/foundry/svm`, which is what
++/// [`data_dir`] resolves to there. Nothing is ever downloaded: the prebuilt binaries published
++/// upstream are glibc/musl ELFs that cannot be executed on Android, so the compilers bundled with
++/// the package are the only ones available. A version that is not bundled fails with the error
++/// upstream itself uses for a version that has no artifact for the current platform.
++#[cfg(target_os = "android")]
++fn bundled_solc(version: &Version) -> Result<PathBuf, SvmError> {
++    let path = version_binary(&version.to_string());
++    if path.is_file() {
++        Ok(path)
++    } else {
++        Err(SvmError::UnknownVersion(version.clone()))
++    }
++}
++
+ /// Blocking version of [`install`]
+ #[cfg(feature = "blocking")]
+ pub fn blocking_install(version: &Version) -> Result<PathBuf, SvmError> {
++    #[cfg(target_os = "android")]
++    return bundled_solc(version);
++
++    #[cfg(not(target_os = "android"))]
++    return blocking_install_impl(version);
++}
++
++#[cfg(all(feature = "blocking", not(target_os = "android")))]
++fn blocking_install_impl(version: &Version) -> Result<PathBuf, SvmError> {
+     setup_data_dir()?;
+ 
+     let artifacts = crate::blocking_all_releases(platform::platform())?;
+@@ -73,6 +103,15 @@
+ ///
+ /// Returns the path to the solc file.
+ pub async fn install(version: &Version) -> Result<PathBuf, SvmError> {
++    #[cfg(target_os = "android")]
++    return bundled_solc(version);
++
++    #[cfg(not(target_os = "android"))]
++    return install_impl(version).await;
++}
++
++#[cfg(not(target_os = "android"))]
++async fn install_impl(version: &Version) -> Result<PathBuf, SvmError> {
+     setup_data_dir()?;
+ 
+     let artifacts = all_releases(platform::platform()).await?;

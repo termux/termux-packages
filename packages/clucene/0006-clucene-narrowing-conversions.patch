@@ -1,0 +1,36 @@
+--- a/src/core/CLucene/queryParser/QueryParser.cpp.sav	2011-03-17 01:21:07.000000000 +0100
++++ b/src/core/CLucene/queryParser/QueryParser.cpp	2012-03-09 18:20:58.000000000 +0100
+@@ -79,7 +79,7 @@
+     _T("<RANGEEX_GOOP>")
+ };
+ 
+-const int32_t QueryParser::jj_la1_0[] = {0x180,0x180,0xe00,0xe00,0x1f69f80,0x48000,0x10000,0x1f69000,0x1348000,0x80000,0x80000,0x10000,0x18000000,0x2000000,0x18000000,0x10000,0x80000000,0x20000000,0x80000000,0x10000,0x80000,0x10000,0x1f68000};
++const int32_t QueryParser::jj_la1_0[] = {0x180,0x180,0xe00,0xe00,0x1f69f80,0x48000,0x10000,0x1f69000,0x1348000,0x80000,0x80000,0x10000,0x18000000,0x2000000,0x18000000,0x10000,int32_t(0x80000000),0x20000000,int32_t(0x80000000),0x10000,0x80000,0x10000,0x1f68000};
+ const int32_t QueryParser::jj_la1_1[] = {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x1,0x0,0x0,0x0,0x0};
+ 
+ struct QueryParser::JJCalls {
+--- a/src/core/CLucene/queryParser/QueryParserTokenManager.cpp.sav	2011-03-17 01:21:07.000000000 +0100
++++ b/src/core/CLucene/queryParser/QueryParserTokenManager.cpp	2012-03-09 18:20:24.000000000 +0100
+@@ -15,9 +15,9 @@
+ 
+ CL_NS_DEF(queryParser)
+ 
+-const int64_t QueryParserTokenManager::jjbitVec2[]={0x0L, 0x0L, _ILONGLONG(0xffffffffffffffff), _ILONGLONG(0xffffffffffffffff)};
++const int64_t QueryParserTokenManager::jjbitVec2[]={0x0L, 0x0L, int64_t(_ILONGLONG(0xffffffffffffffff)), int64_t(_ILONGLONG(0xffffffffffffffff))};
+ const int64_t QueryParserTokenManager::jjbitVec0[] = {
+-	_ILONGLONG(0xfffffffffffffffe), _ILONGLONG(0xffffffffffffffff), _ILONGLONG(0xffffffffffffffff), _ILONGLONG(0xffffffffffffffff)
++	int64_t(_ILONGLONG(0xfffffffffffffffe)), int64_t(_ILONGLONG(0xffffffffffffffff)), int64_t(_ILONGLONG(0xffffffffffffffff)), int64_t(_ILONGLONG(0xffffffffffffffff))
+ };
+ const int32_t QueryParserTokenManager::jjnextStates[]={
+ 		15, 17, 18, 29, 32, 23, 33, 30, 20, 21, 32, 23, 33, 31, 34, 27,
+--- a/src/core/CLucene/queryParser/legacy/Lexer.cpp
++++ b/src/core/CLucene/queryParser/legacy/Lexer.cpp
+@@ -117,7 +117,7 @@
+       if( _istspace(ch)!=0 ) {
+          continue;
+       }
+-      TCHAR buf[2] = {ch,'\0'};
++      TCHAR buf[2] = {static_cast<TCHAR>(ch),'\0'};
+       switch(ch) {
+          case '+':
+             token->set(buf, QueryToken::PLUS);

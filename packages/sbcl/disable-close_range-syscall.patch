@@ -1,0 +1,14 @@
+Disables use of close_range() on Android, which does not have
+that function until API level 34 (Android 14)
+
+--- a/src/runtime/run-program.c
++++ b/src/runtime/run-program.c
+@@ -134,7 +134,7 @@ void closefds_range(unsigned int first, unsigned int last)
+ #if defined(LISP_FEATURE_OS_PROVIDES_CLOSE_RANGE_WRAPPER)
+     // Prefer the libc wrapper, if it exists at build time.
+     fds_closed = !close_range(first, last, 0);
+-#elif defined(LISP_FEATURE_LINUX) && defined(__NR_close_range)
++#elif defined(LISP_FEATURE_LINUX) && defined(__NR_close_range) && !defined(LISP_FEATURE_ANDROID)
+     // Use syscall(2) if we could detect the syscall number at build time.
+     fds_closed = !syscall(__NR_close_range, first, last, 0);
+ #endif

@@ -1,0 +1,63 @@
+From 7d9c63161041b1fb68fb65cf55a57fcba1ee50de Mon Sep 17 00:00:00 2001
+From: Stephan Hartmann <stha09@googlemail.com>
+Date: Fri, 17 Nov 2023 16:53:30 +0000
+Subject: [PATCH] libstdc++: replace deprecated std::is_pod<T> in //base
+
+std::is_pod is deprecated since C++20. Replace with std::trivial and
+std::is_standard_layout. Avoids a lot of warnings.
+
+Bug: 957519
+Change-Id: Idc06ac91a4363bb61b71f1e3b3646422856b25d5
+Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/4994566
+Reviewed-by: Benoit Lize <lizeb@chromium.org>
+Reviewed-by: Stephen Nusko <nuskos@chromium.org>
+Commit-Queue: Stephan Hartmann <stha09@googlemail.com>
+Cr-Commit-Position: refs/heads/main@{#1226170}
+---
+ .../src/partition_alloc/shim/malloc_zone_functions_apple.cc   | 3 ++-
+ base/trace_event/category_registry.cc                         | 4 +++-
+ base/trace_event/trace_arguments.cc                           | 2 +-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/base/allocator/partition_allocator/src/partition_alloc/shim/malloc_zone_functions_apple.cc b/base/allocator/partition_allocator/src/partition_alloc/shim/malloc_zone_functions_apple.cc
+index 5d42dbe42d86d3..c233df30fc86c1 100644
+--- a/base/allocator/partition_allocator/shim/malloc_zone_functions_mac.cc
++++ b/base/allocator/partition_allocator/shim/malloc_zone_functions_mac.cc
+@@ -12,7 +12,8 @@
+ namespace allocator_shim {
+ 
+ MallocZoneFunctions g_malloc_zones[kMaxZoneCount];
+-static_assert(std::is_pod<MallocZoneFunctions>::value,
++static_assert(std::is_trivial<MallocZoneFunctions>::value &&
++              std::is_standard_layout<MallocZoneFunctions>::value,
+               "MallocZoneFunctions must be POD");
+ 
+ void StoreZoneFunctions(const ChromeMallocZone* zone,
+diff --git a/base/trace_event/category_registry.cc b/base/trace_event/category_registry.cc
+index e9fc8903028adb..cc4770de3517b3 100644
+--- a/base/trace_event/category_registry.cc
++++ b/base/trace_event/category_registry.cc
+@@ -20,7 +20,9 @@
+ namespace {
+ 
+ // |categories_| might end up causing creating dynamic initializers if not POD.
+-static_assert(std::is_pod<TraceCategory>::value, "TraceCategory must be POD");
++static_assert(std::is_trivial<TraceCategory>::value &&
++              std::is_standard_layout<TraceCategory>::value,
++              "TraceCategory must be POD");
+ 
+ }  // namespace
+ 
+diff --git a/base/trace_event/trace_arguments.cc b/base/trace_event/trace_arguments.cc
+index e0081df7312f73..81c53061b4b5dd 100644
+--- a/base/trace_event/trace_arguments.cc
++++ b/base/trace_event/trace_arguments.cc
+@@ -164,7 +164,7 @@
+ }
+ 
+ static_assert(
+-    std::is_pod<TraceValue>::value,
++    std::is_trivial<TraceValue>::value && std::is_standard_layout<TraceValue>::value,
+     "TraceValue must be plain-old-data type for performance reasons!");
+ 
+ void TraceValue::AppendAsJSON(unsigned char type, std::string* out) const {

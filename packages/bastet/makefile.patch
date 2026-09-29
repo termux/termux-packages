@@ -1,0 +1,24 @@
+--- ../cache/bastet-0.43.2/Makefile	2015-08-30 07:04:24.000000000 +0000
++++ ./Makefile	2017-09-19 09:09:21.992227135 +0000
+@@ -17,11 +17,19 @@
+ depend: *.hpp $(SOURCES) $(MAIN) $(TESTS)
+ 	$(CXX) -MM $(SOURCES) $(MAIN) $(TESTS)> depend
+ 
+-include depend
++#include depend
+ 
+ $(PROGNAME): $(SOURCES:.cpp=.o) $(MAIN:.cpp=.o)
+ 	$(CXX) -ggdb -o $(PROGNAME) $(SOURCES:.cpp=.o) $(MAIN:.cpp=.o) $(LDFLAGS) 
+-
++install: 
++	cp bastet $(PREFIX)/bin
++	chmod +x $(PREFIX)/bin/bastet
++	mkdir -p $(PREFIX)/var/games
++	touch $(PREFIX)/var/games/bastet.scores2
++	chmod +w $(PREFIX)/var/games/bastet.scores2
++	mkdir -p $(PREFIX)/share/man/man6/
++	cp bastet.6 $(PREFIX)/share/man/man6/ 
++	
+ clean:
+ 	rm -f $(SOURCES:.cpp=.o) $(TESTS:.cpp=.o) $(MAIN:.cpp=.o) $(PROGNAME)
+ 

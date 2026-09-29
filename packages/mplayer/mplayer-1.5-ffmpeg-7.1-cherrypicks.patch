@@ -1,0 +1,304 @@
+This is cherry-picked from commits found
+inside the upstream mplayer repository
+which is an SVN repository that it's hard to find an active gitweb mirror of.
+it is possible to download using this command:
+svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer
+The fmt-conversion.c change could be found using this command:
+svn log fmt-conversion.c  | head -n50 
+Then, it is possible to obtain this commit in unified diff format by using this
+command.
+cd mplayer/
+svn diff -c r38450 .
+A similar process was used for the other files patched by this patch,
+by getting the SVN hashes r38453, r38644, r38636, r38451 and r38452.
+--- a/av_helpers.c
++++ b/av_helpers.c
+@@ -120,38 +120,39 @@ int lavc_encode_audio(AVCodecContext *ctx, void *src, int src_len, void *dst, in
+ {
+     void *orig_src = src;
+     int bps = av_get_bytes_per_sample(ctx->sample_fmt);
+-    int planar = ctx->channels > 1 && av_sample_fmt_is_planar(ctx->sample_fmt);
++    int channels = ctx->ch_layout.nb_channels;
++    int planar = channels > 1 && av_sample_fmt_is_planar(ctx->sample_fmt);
+     int isac3 = ctx->codec->id == AV_CODEC_ID_AC3;
+     int n;
+     int got;
+     AVPacket pkt;
+     AVFrame *frame = av_frame_alloc();
+-    if ((ctx->channels == 6 || ctx->channels == 5) &&
++    if ((channels == 6 || channels == 5) &&
+         (isac3 || !strcmp(ctx->codec->name,"libfaac"))) {
+         reorder_channel_nch(src, AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+                             isac3 ? AF_CHANNEL_LAYOUT_LAVC_DEFAULT : AF_CHANNEL_LAYOUT_AAC_DEFAULT,
+-                            ctx->channels,
++                            channels,
+                             src_len / bps, bps);
+     }
+-    frame->nb_samples = src_len / ctx->channels / bps;
++    frame->nb_samples = src_len / channels / bps;
+     if (planar) {
+         // TODO: this is horribly inefficient.
+         int ch;
+         src = av_mallocz(src_len);
+-        for (ch = 0; ch < ctx->channels; ch++) {
++        for (ch = 0; ch < channels; ch++) {
+             uint8_t *tmps = (uint8_t *)orig_src + ch*bps;
+-            uint8_t *tmpd = (uint8_t *)src + ch*src_len/ctx->channels;
++            uint8_t *tmpd = (uint8_t *)src + ch*src_len/channels;
+             int s;
+             for (s = 0; s < frame->nb_samples; s++) {
+                 memcpy(tmpd, tmps, bps);
+-                tmps += ctx->channels * bps;
++                tmps += channels * bps;
+                 tmpd += bps;
+             }
+         }
+     }
+     frame->format = ctx->sample_fmt;
+-    frame->channels = ctx->channels;
+-    n = avcodec_fill_audio_frame(frame, ctx->channels, ctx->sample_fmt, src, src_len, 1);
++    frame->ch_layout.nb_channels = channels;
++    n = avcodec_fill_audio_frame(frame, channels, ctx->sample_fmt, src, src_len, 1);
+     if (n < 0) return 0;
+     n = avcodec_send_frame(ctx, frame);
+     av_init_packet(&pkt);
+--- a/fmt-conversion.c
++++ b/fmt-conversion.c
+@@ -138,7 +138,6 @@ static const struct {
+     { IMGFMT_422P,       AV_PIX_FMT_YUVJ422P },
+     { IMGFMT_444P,       AV_PIX_FMT_YUVJ444P },
+     { IMGFMT_440P,       AV_PIX_FMT_YUVJ440P },
+-    { IMGFMT_XVMC_IDCT_MPEG2, AV_PIX_FMT_XVMC },
+     { 0,                      AV_PIX_FMT_NONE }
+ };
+ 
+--- a/libaf/af_lavcac3enc.c
++++ b/libaf/af_lavcac3enc.c
+@@ -96,7 +96,7 @@ static int control(struct af_instance_s *af, int cmd, void *arg)
+ 
+         bit_rate = s->bit_rate ? s->bit_rate : default_bit_rate[af->data->nch];
+ 
+-        if (s->lavc_actx->channels != af->data->nch ||
++        if (s->lavc_actx->ch_layout.nb_channels != af->data->nch ||
+                 s->lavc_actx->sample_rate != af->data->rate ||
+                 s->lavc_actx->bit_rate != bit_rate) {
+ 
+@@ -104,7 +104,7 @@ static int control(struct af_instance_s *af, int cmd, void *arg)
+                 avcodec_close(s->lavc_actx);
+ 
+             // Put sample parameters
+-            s->lavc_actx->channels = af->data->nch;
++            s->lavc_actx->ch_layout.nb_channels = af->data->nch;
+             s->lavc_actx->sample_rate = af->data->rate;
+             s->lavc_actx->sample_fmt  = AV_SAMPLE_FMT_S16P;
+             s->lavc_actx->bit_rate = bit_rate;
+--- a/libmpcodecs/ad_ffmpeg.c
++++ b/libmpcodecs/ad_ffmpeg.c
+@@ -79,10 +79,10 @@ static int setup_format(sh_audio_t *sh_audio, const AVCodecContext *lavc_context
+         } else if (sh_audio->wf->nSamplesPerSec && !c->srate_changed)
+             samplerate=sh_audio->wf->nSamplesPerSec;
+     }
+-    if (lavc_context->channels != sh_audio->channels ||
++    if (lavc_context->ch_layout.nb_channels != sh_audio->channels ||
+         samplerate != sh_audio->samplerate ||
+         sample_format != sh_audio->sample_format) {
+-        sh_audio->channels=lavc_context->channels;
++        sh_audio->channels=lavc_context->ch_layout.nb_channels;
+         sh_audio->samplerate=samplerate;
+         sh_audio->sample_format = sample_format;
+         sh_audio->samplesize=af_fmt2bits(sh_audio->sample_format)/ 8;
+@@ -121,14 +121,14 @@ static int init(sh_audio_t *sh_audio)
+     lavc_context->sample_rate = sh_audio->samplerate;
+     lavc_context->bit_rate = sh_audio->i_bps * 8;
+     if(sh_audio->wf){
+-	lavc_context->channels = sh_audio->wf->nChannels;
++	lavc_context->ch_layout.nb_channels = sh_audio->wf->nChannels;
+ 	lavc_context->sample_rate = sh_audio->wf->nSamplesPerSec;
+ 	lavc_context->bit_rate = sh_audio->wf->nAvgBytesPerSec * 8;
+ 	lavc_context->block_align = sh_audio->wf->nBlockAlign;
+ 	lavc_context->bits_per_coded_sample = sh_audio->wf->wBitsPerSample;
++    } else {
++        lavc_context->ch_layout.nb_channels = sh_audio->channels;
+     }
+-    lavc_context->channel_layout = sh_audio->channel_layout;
+-    lavc_context->request_channel_layout = av_get_default_channel_layout(audio_output_channels);
+     lavc_context->codec_tag = sh_audio->format; //FOURCC
+     lavc_context->codec_id = lavc_codec->id; // not sure if required, imho not --A'rpi
+ 
+@@ -274,7 +274,7 @@ static av_always_inline void copy_samples_planar(size_t bps,
+ static int copy_samples(AVCodecContext *avc, AVFrame *frame,
+                         unsigned char *buf, int max_size)
+ {
+-    int channels = avc->channels;
++    int channels = avc->ch_layout.nb_channels;
+     int sample_size = av_get_bytes_per_sample(avc->sample_fmt);
+     int size = channels * sample_size * frame->nb_samples;
+ 
+@@ -369,12 +369,12 @@ static int decode_audio(sh_audio_t *sh_audio,unsigned char *buf,int minlen,int m
+         if (len2 < 0)
+             return len2;
+ 	if(len2>0){
+-	  if (((AVCodecContext *)sh_audio->context)->channels >= 5) {
++	  if (((AVCodecContext *)sh_audio->context)->ch_layout.nb_channels >= 5) {
+             int samplesize = av_get_bytes_per_sample(((AVCodecContext *)
+                                     sh_audio->context)->sample_fmt);
+             reorder_channel_nch(buf, AF_CHANNEL_LAYOUT_LAVC_DEFAULT,
+                                 AF_CHANNEL_LAYOUT_MPLAYER_DEFAULT,
+-                                ((AVCodecContext *)sh_audio->context)->channels,
++                                ((AVCodecContext *)sh_audio->context)->ch_layout.nb_channels,
+                                 len2 / samplesize, samplesize);
+ 	  }
+ 	  //len=len2;break;
+--- a/libmpcodecs/ad_spdif.c
++++ b/libmpcodecs/ad_spdif.c
+@@ -55,7 +55,7 @@ static int read_packet(void *p, uint8_t *buf, int buf_size)
+     return 0;
+ }
+ 
+-static int write_packet(void *p, uint8_t *buf, int buf_size)
++static int write_packet(void *p, const uint8_t *buf, int buf_size)
+ {
+     int len;
+     struct spdifContext *ctx = p;
+--- a/libmpcodecs/ae_lavc.c
++++ b/libmpcodecs/ae_lavc.c
+@@ -50,7 +50,7 @@ static int bind_lavc(audio_encoder_t *encoder, muxer_stream_t *mux_a)
+ {
+ 	mux_a->wf = malloc(sizeof(WAVEFORMATEX)+lavc_actx->extradata_size+256);
+ 	mux_a->wf->wFormatTag = lavc_param_atag;
+-	mux_a->wf->nChannels = lavc_actx->channels;
++	mux_a->wf->nChannels = lavc_actx->ch_layout.nb_channels;
+ 	mux_a->wf->nSamplesPerSec = lavc_actx->sample_rate;
+ 	mux_a->wf->nAvgBytesPerSec = (lavc_actx->bit_rate / 8);
+         mux_a->avg_rate= lavc_actx->bit_rate;
+@@ -192,7 +192,7 @@ int mpae_init_lavc(audio_encoder_t *encoder)
+             mp_msg(MSGT_MENCODER,MSGL_ERR, "Audio encoder requires unknown or unsupported input format\n");
+             return 0;
+ 	}
+-	lavc_actx->channels = encoder->params.channels;
++	lavc_actx->ch_layout.nb_channels = encoder->params.channels;
+ 	lavc_actx->sample_rate = encoder->params.sample_rate;
+ 	lavc_actx->time_base.num = 1;
+ 	lavc_actx->time_base.den = encoder->params.sample_rate;
+@@ -219,7 +219,7 @@ int mpae_init_lavc(audio_encoder_t *encoder)
+ 	*/
+ 	if(lavc_param_atag == 0x11) {
+ 		int blkalign = 2048;
+-		int framesize = (blkalign - 4 * lavc_actx->channels) * 8 / (4 * lavc_actx->channels) + 1;
++		int framesize = (blkalign - 4 * lavc_actx->ch_layout.nb_channels) * 8 / (4 * lavc_actx->ch_layout.nb_channels) + 1;
+ 		lavc_actx->bit_rate = lavc_actx->sample_rate*8*blkalign/framesize;
+ 	}
+         if((lavc_param_audio_global_header&1)
+@@ -238,7 +238,7 @@ int mpae_init_lavc(audio_encoder_t *encoder)
+ 
+ 	if(lavc_param_atag == 0x11) {
+ 		lavc_actx->block_align = 2048;
+-		lavc_actx->frame_size = (lavc_actx->block_align - 4 * lavc_actx->channels) * 8 / (4 * lavc_actx->channels) + 1;
++		lavc_actx->frame_size = (lavc_actx->block_align - 4 * lavc_actx->ch_layout.nb_channels) * 8 / (4 * lavc_actx->ch_layout.nb_channels) + 1;
+ 	}
+ 
+ 	encoder->decode_buffer_size = lavc_actx->frame_size *
+--- a/libmpcodecs/vd_ffmpeg.c
++++ b/libmpcodecs/vd_ffmpeg.c
+@@ -515,8 +515,8 @@ static void uninit(sh_video_t *sh){
+             mp_msg(MSGT_DECVIDEO, MSGL_INFO, "QP: %d, count: %d\n", i, ctx->qp_stat[i]);
+         }
+         mp_msg(MSGT_DECVIDEO, MSGL_INFO, MSGTR_MPCODECS_ArithmeticMeanOfQP,
+-            ctx->qp_sum / avctx->frame_number,
+-            1.0/(ctx->inv_qp_sum / avctx->frame_number)
++            ctx->qp_sum / avctx->frame_num,
++            1.0/(ctx->inv_qp_sum / avctx->frame_num)
+             );
+     }
+ 
+@@ -526,7 +526,6 @@ static void uninit(sh_video_t *sh){
+ 
+         av_freep(&avctx->extradata);
+         av_freep(&avctx->hwaccel_context);
+-        av_freep(&avctx->slice_offset);
+     }
+ 
+     avcodec_free_context(&avctx);
+--- a/libmpcodecs/ve_lavc.c
++++ b/libmpcodecs/ve_lavc.c
+@@ -741,7 +741,7 @@ static int encode_frame(struct vf_instance *vf, AVFrame *pic, double pts){
+     int res;
+ 
+     if(pts == MP_NOPTS_VALUE)
+-        pts= lavc_venc_context->frame_number * av_q2d(lavc_venc_context->time_base);
++        pts= lavc_venc_context->frame_num * av_q2d(lavc_venc_context->time_base);
+ 
+     if(pic){
+ #if 0
+--- a/libmpdemux/demux_lavf.c
++++ b/libmpdemux/demux_lavf.c
+@@ -309,8 +309,8 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
+             wf= calloc(sizeof(*wf) + codec->extradata_size, 1);
+             codec->codec_tag = mp_codec_id2tag(codec->codec_id, codec->codec_tag, 1);
+             wf->wFormatTag= codec->codec_tag;
+-            wf->nChannels= codec->channels;
+-            sh_audio->channel_layout = codec->channel_layout;
++            wf->nChannels= codec->ch_layout.nb_channels;
++            sh_audio->channel_layout = codec->ch_layout.u.mask;
+             wf->nSamplesPerSec= codec->sample_rate;
+             wf->nAvgBytesPerSec= codec->bit_rate/8;
+             wf->nBlockAlign= codec->block_align ? codec->block_align : 1;
+@@ -332,7 +332,7 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
+             sh_audio->audio.dwRate  /= g;
+ //          printf("sca:%d rat:%d fs:%d sr:%d ba:%d\n", sh_audio->audio.dwScale, sh_audio->audio.dwRate, codec->frame_size, codec->sample_rate, codec->block_align);
+             sh_audio->format= codec->codec_tag;
+-            sh_audio->channels= codec->channels;
++            sh_audio->channels= codec->ch_layout.nb_channels;
+             sh_audio->samplerate= codec->sample_rate;
+             sh_audio->i_bps= codec->bit_rate/8;
+             switch (codec->codec_id) {
+--- a/libmpdemux/muxer_lavf.c
++++ b/libmpdemux/muxer_lavf.c
+@@ -77,7 +77,7 @@ const m_option_t lavfopts_conf[] = {
+ 	{NULL, NULL, 0, 0, 0, 0, NULL}
+ };
+ 
+-static int mp_write(void *opaque, uint8_t *buf, int size)
++static int mp_write(void *opaque, const uint8_t *buf, int size)
+ {
+ 	muxer_t *muxer = opaque;
+ 	return stream_write_buffer(muxer->stream, buf, size);
+@@ -192,7 +192,7 @@ static void fix_parameters(muxer_stream_t *stream)
+ 		mp_msg(MSGT_MUXER, MSGL_INFO, "AUDIO CODEC ID: %x, TAG: %x\n", ctx->codec_id, (uint32_t) ctx->codec_tag);
+ 		ctx->sample_rate = stream->wf->nSamplesPerSec;
+ //                mp_msg(MSGT_MUXER, MSGL_INFO, "stream->h.dwSampleSize: %d\n", stream->h.dwSampleSize);
+-		ctx->channels = stream->wf->nChannels;
++		ctx->ch_layout.nb_channels = stream->wf->nChannels;
+                 if(stream->h.dwRate && (stream->h.dwScale * (int64_t)ctx->sample_rate) % stream->h.dwRate == 0)
+                     ctx->frame_size= (stream->h.dwScale * (int64_t)ctx->sample_rate) / stream->h.dwRate;
+                 mp_msg(MSGT_MUXER, MSGL_V, "MUXER_LAVF(audio stream) frame_size: %d, scale: %u, sps: %u, rate: %u, ctx->block_align = stream->wf->nBlockAlign; %d=%d stream->wf->nAvgBytesPerSec:%d\n",
+--- a/libvo/osx_common.h
++++ b/libvo/osx_common.h
+@@ -19,6 +19,8 @@
+ #ifndef MPLAYER_OSX_COMMON_H
+ #define MPLAYER_OSX_COMMON_H
+ 
++struct MPGLContext;
++
+ int convert_key(unsigned key, unsigned charcode);
+ void change_movie_aspect(float new_aspect);
+ void config_movie_aspect(float config_aspect);
+@@ -32,6 +34,6 @@ void vo_osx_ontop(void);
+ void vo_osx_fullscreen(void);
+ int vo_osx_check_events(void);
+ void vo_osx_update_xinerama_info(void);
+-void vo_osx_swap_buffers(void);
++void vo_osx_swap_buffers(struct MPGLContext *);
+ 
+ #endif /* MPLAYER_OSX_COMMON_H */
+--- a/libvo/osx_objc_common.m
++++ b/libvo/osx_objc_common.m
+@@ -118,7 +118,7 @@ void vo_osx_update_xinerama_info(void)
+     [oglv update_screen_info];
+ }
+ 
+-void vo_osx_swap_buffers(void)
++void vo_osx_swap_buffers(struct MPGLContext *)
+ {
+     [oglv->glContext flushBuffer];
+ }

@@ -1,0 +1,15 @@
+--- a/common/rpackage.cc
++++ b/common/rpackage.cc
+@@ -238,10 +238,10 @@
+ string RPackage::installedFiles()
+ {
+    // Try the normal file name first:
+-   string f = "/var/lib/dpkg/info/" + string(name()) + ".list";
++   string f = "@TERMUX_PREFIX@/var/lib/dpkg/info/" + string(name()) + ".list";
+    if (!FileExists(f)) {
+       // Try the multiarch file name next:
+-      f = "/var/lib/dpkg/info/" + string(name()) + ":" + arch() + ".list";
++      f = "@TERMUX_PREFIX@/var/lib/dpkg/info/" + string(name()) + ":" + arch() + ".list";
+       if (!FileExists(f)) {
+          return "The list of installed files is only available for installed "
+                 "packages!";

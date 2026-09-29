@@ -1,0 +1,12 @@
+diff -u -r ../ranger-1.9.3/ranger/config/commands.py ./ranger/config/commands.py
+--- ../ranger-1.9.3/ranger/config/commands.py	2019-12-31 15:07:45.000000000 +0000
++++ ./ranger/config/commands.py	2020-01-02 20:34:53.030269000 +0000
+@@ -1184,7 +1184,7 @@
+             script_was_edited = (script_content != cmdfile.read())
+ 
+             # Do the renaming
+-            self.fm.run(['/bin/sh', cmdfile.name], flags='w')
++            self.fm.run(['@TERMUX_PREFIX@/bin/sh', cmdfile.name], flags='w')
+ 
+         # Retag the files, but only if the script wasn't changed during review,
+         # because only then we know which are the source and destination files.

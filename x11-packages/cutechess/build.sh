@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://cutechess.com/
+TERMUX_PKG_DESCRIPTION="Graphical user interface, command-line interface and library for playing chess"
+TERMUX_PKG_LICENSE="GPL-3.0-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.5.1"
+TERMUX_PKG_SRCURL="https://github.com/cutechess/cutechess/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_SHA256=063f94f8a421952487cc49acddd218962c3881bfdf0219ad8f159954678fb375
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="qt6-qt5compat, qt6-qtbase, qt6-qtsvg"
+TERMUX_PKG_RECOMMENDS="stockfish"

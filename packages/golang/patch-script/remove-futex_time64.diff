@@ -1,0 +1,20 @@
+--- a/src/runtime/os_linux32.go
++++ b/src/runtime/os_linux32.go
+@@ -24,7 +24,7 @@
+
+ //go:nosplit
+ func futex(addr unsafe.Pointer, op int32, val uint32, ts *timespec, addr2 unsafe.Pointer, val3 uint32) int32 {
+-	if use64bitsTimeOn32bits {
++	if GOOS != "android" && use64bitsTimeOn32bits {
+ 		return futex_time64(addr, op, val, ts, addr2, val3)
+ 	}
+ 	// Downgrade ts.
+@@ -45,7 +45,7 @@
+
+ //go:nosplit
+ func timer_settime(timerid int32, flags int32, new, old *itimerspec) int32 {
+-	if use64bitsTimeOn32bits {
++	if GOOS != "android" && use64bitsTimeOn32bits {
+ 		return timer_settime64(timerid, flags, new, old)
+ 	}
+

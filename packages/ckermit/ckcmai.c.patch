@@ -1,0 +1,12 @@
+--- a/ckcmai.c
++++ b/ckcmai.c
+@@ -3157,6 +3157,9 @@
+         /* try to make a random unsigned int to feed srand() */
+ #ifndef VMS
+ 	/* time.h and MultiNet do not get along */
++#ifdef __ANDROID__
++        time_t time(time_t *);
++#endif
+         c = time(NULL);
+ #endif /* VMS */
+         c *= getpid();

@@ -1,0 +1,21 @@
+--- a/paths
++++ b/paths
+@@ -64,13 +64,13 @@
+ # file <confpaths.h> (located in include/).
+ #
+ 
+-PATH_SENDMAIL	search:sendmail:/usr/sbin:/usr/lib:/etc /usr/sbin/sendmail
+-PATH_MAILDIR	d /var/mail /var/spool/mail
++PATH_SENDMAIL	search:sendmail:@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/lib:@TERMUX_PREFIX@/etc @TERMUX_PREFIX@/bin/sendmail
++PATH_MAILDIR	d @TERMUX_PREFIX@/var/mail @TERMUX_PREFIX@/var/spool/mail
+ PATH_DEV	d /dev/
+ # PATH_TTY_PFX is a prefix that's removed to get a tty device's name
+ PATH_TTY_PFX	<paths.h>:_PATH_DEV d /dev/
+ PATH_DEVNULL	c /dev/null
+-PATH_UTMP	<utmp.h> <utmp.h>:UTMP_FILE $(localstatedir)/run/utmp search:utmp:/var/run:/var/adm:/etc
+-PATH_UTMPX	<utmpx.h> <utmpx.h>:UTMPX_FILE $(localstatedir)/run/utmpx search:utmpx:/var/run:/var/adm:/etc
+-PATH_WTMP	<utmp.h> <utmp.h>:WTMP_FILE $(localstatedir)/log/wtmp search:wtmp:/var/log:/var/adm:/etc
++PATH_UTMP	<utmp.h> <utmp.h>:UTMP_FILE $(localstatedir)/run/utmp search:utmp:@TERMUX_PREFIX@/var/run:@TERMUX_PREFIX@/var/adm:@TERMUX_PREFIX@/etc
++PATH_UTMPX	<utmpx.h> <utmpx.h>:UTMPX_FILE $(localstatedir)/run/utmpx search:utmpx:@TERMUX_PREFIX@/var/run:@TERMUX_PREFIX@/var/adm:@TERMUX_PREFIX@/etc
++PATH_WTMP	<utmp.h> <utmp.h>:WTMP_FILE $(localstatedir)/log/wtmp search:wtmp:@TERMUX_PREFIX@/var/log:@TERMUX_PREFIX@/var/adm:@TERMUX_PREFIX@/etc
+ PATH_TTY	c /dev/tty

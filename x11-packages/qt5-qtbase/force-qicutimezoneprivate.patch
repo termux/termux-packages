@@ -1,0 +1,20 @@
+--- a/src/corelib/time/qtimezone.cpp
++++ b/src/corelib/time/qtimezone.cpp
+@@ -64,7 +64,7 @@ static QTimeZonePrivate *newBackendTimeZone()
+     return new QMacTimeZonePrivate();
+ #elif defined(Q_OS_ANDROID) && !defined(Q_OS_ANDROID_EMBEDDED)
+     return new QAndroidTimeZonePrivate();
+-#elif defined(Q_OS_UNIX) || defined(Q_OS_ANDROID_EMBEDDED)
++#elif (defined(Q_OS_UNIX) || defined(Q_OS_ANDROID_EMBEDDED)) && !defined(__ANDROID__)
+     return new QTzTimeZonePrivate();
+ #elif QT_CONFIG(icu)
+     return new QIcuTimeZonePrivate();
+@@ -91,7 +91,7 @@ static QTimeZonePrivate *newBackendTimeZone(const QByteArray &ianaId)
+     return new QMacTimeZonePrivate(ianaId);
+ #elif defined(Q_OS_ANDROID) && !defined(Q_OS_ANDROID_EMBEDDED)
+     return new QAndroidTimeZonePrivate(ianaId);
+-#elif defined(Q_OS_UNIX) || defined(Q_OS_ANDROID_EMBEDDED)
++#elif (defined(Q_OS_UNIX) || defined(Q_OS_ANDROID_EMBEDDED)) && !defined(__ANDROID__)
+     return new QTzTimeZonePrivate(ianaId);
+ #elif QT_CONFIG(icu)
+     return new QIcuTimeZonePrivate(ianaId);

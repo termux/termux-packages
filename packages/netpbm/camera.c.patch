@@ -1,0 +1,25 @@
+diff -u -r ../advanced/converter/other/cameratopam/camera.c ./converter/other/cameratopam/camera.c
+--- ../advanced/converter/other/cameratopam/camera.c	2014-12-29 02:10:41.516106336 -0500
++++ ./converter/other/cameratopam/camera.c	2014-12-29 02:32:47.236107253 -0500
+@@ -775,6 +775,21 @@
+ kodak_jpeg_load_raw(Image const Image) {}
+ #else
+ 
++static void
++swab (const void *bfrom, void *bto, ssize_t n)
++{
++	const char *from = (const char *) bfrom;
++	char *to = (char *) bto;
++
++	n &= ~((ssize_t) 1);
++	while (n > 1)
++	{
++		const char b0 = from[--n], b1 = from[--n];
++		to[n] = b0;
++		to[n + 1] = b1;
++	}
++}
++
+ static bool
+ fill_input_buffer (j_decompress_ptr cinfo)
+ {

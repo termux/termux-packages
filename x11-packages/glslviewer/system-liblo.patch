@@ -1,0 +1,31 @@
+Fixes ld.lld: error: undefined symbol: index
+
+--- a/deps/CMakeLists.txt
++++ b/deps/CMakeLists.txt
+@@ -1,6 +1,2 @@
+ ## VERA
+ add_subdirectory(vera)
+-
+-if (NOT EMSCRIPTEN) 
+-    add_subdirectory(liblo/cmake)
+-endif()
+\ No newline at end of file
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,7 +54,6 @@ add_executable(glslViewer
+ )
+ 
+ 
+-include_directories(deps/liblo)
+ target_include_directories(glslViewer PRIVATE deps)
+ target_link_libraries(glslViewer PRIVATE vera)
+ # target_compile_definitions(vera PUBLIC SUPPORT_PLY_BINARY)
+@@ -148,7 +147,7 @@ else()
+         set(CPACK_GENERATOR "ZIP")
+ 
+     else()
+-        target_link_libraries(glslViewer PRIVATE pthread dl lo_static)
++        target_link_libraries(glslViewer PRIVATE pthread dl lo)
+         install(TARGETS glslViewer DESTINATION ${CMAKE_INSTALL_BINDIR})
+         
+         if (NOT APPLE)

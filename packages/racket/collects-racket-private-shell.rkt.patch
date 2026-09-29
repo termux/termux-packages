@@ -1,0 +1,11 @@
+--- a/collects/racket/private/shell.rkt
++++ b/collects/racket/private/shell.rkt
+@@ -4,7 +4,7 @@
+ 
+ (define (shell-path/args who argstr)
+   (case (system-type)
+-    [(unix macosx) (append '("/bin/sh" "-c") (list argstr))]
++    [(unix macosx) (append '("@TERMUX_PREFIX@/bin/sh" "-c") (list argstr))]
+     [(windows) (let ([cmd
+                       (let ([d (find-system-path 'sys-dir)])
+                         (let ([cmd (build-path d "cmd.exe")])

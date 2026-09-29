@@ -1,0 +1,24 @@
+--- src/src/corelib/configure.json	2020-09-21 13:16:21.000000000 +0000
++++ src.mod/src/corelib/configure.json	2021-05-18 13:05:04.670547308 +0000
+@@ -44,7 +44,8 @@
+             },
+             "headers": "glib.h",
+             "sources": [
+-                { "type": "pkgConfig", "args": "glib-2.0 gthread-2.0" }
++                { "type": "pkgConfig", "args": "glib-2.0 gthread-2.0" },
++                { "libs": "-lgthread-2.0 -lglib-2.0" }
+             ]
+         },
+         "posix_iconv": {
+--- src/src/widgets/configure.json	2020-09-21 13:16:21.000000000 +0000
++++ src.mod/src/widgets/configure.json	2021-05-18 13:07:19.325327327 +0000
+@@ -21,7 +21,8 @@
+         "gtk3": {
+             "label": "GTK+ >= 3.6",
+             "sources": [
+-                { "type": "pkgConfig", "args": "gtk+-3.0 >= 3.6" }
++                { "type": "pkgConfig", "args": "gtk+-3.0 >= 3.6" },
++                { "libs": "-lgtk-3 -lgdk-3 -lpangocairo-1.0 -lpango-1.0 -lharfbuzz -latk-1.0 -lcairo-gobject -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0" }
+             ]
+         }
+     },

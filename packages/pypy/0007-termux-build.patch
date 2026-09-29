@@ -1,0 +1,64 @@
+--- a/rpython/config/translationoption.py
++++ b/rpython/config/translationoption.py
+@@ -40,6 +40,10 @@
+ PLATFORMS = [
+     'host',
+     'arm',
++    'termux-aarch64',
++    'termux-arm',
++    'termux-x86_64',
++    'termux-i686',
+ ]
+
+ translation_optiondescription = OptionDescription(
+@@ -285,8 +289,17 @@
+     ChoiceOption("platform",
+                  "target platform", ['host'] + PLATFORMS, default='host',
+                  cmdline='--platform',
+-                 suggests={"arm": [("translation.gcrootfinder", "shadowstack"),
+-                                   ("translation.jit_backend", "arm")]}),
++                 suggests={ "arm": [("translation.gcrootfinder", "shadowstack"),
++                                   ("translation.jit_backend", "arm")],
++                            "termux-aarch64": [("translation.gcrootfinder", "shadowstack"),
++                                               ("translation.jit_backend", "auto")],
++                            "termux-arm": [("translation.gcrootfinder", "shadowstack"),
++                                           ("translation.jit_backend", "arm")],
++                            "termux-x86_64": [("translation.gcrootfinder", "shadowstack"),
++                                              ("translation.jit_backend", "auto")],
++                            "termux-i686": [("translation.gcrootfinder", "shadowstack"),
++                                            ("translation.jit_backend", "auto")],
++                        }),
+
+     BoolOption("split_gc_address_space",
+                "Ensure full separation of GC and non-GC pointers", default=False),
+
+--- a/rpython/translator/platform/__init__.py
++++ b/rpython/translator/platform/__init__.py
+@@ -332,6 +332,8 @@
+ else:
+     raise ValueError('unknown sys.platform "%s"', sys.platform)
+
++# Android always requires compiling with -fPIC
++host_factory = Linux
+ platform = host = host_factory()
+
+ def pick_platform(new_platform, cc):
+@@ -340,6 +342,18 @@
+     elif new_platform == 'arm':
+         from rpython.translator.platform.arm import ARM
+         return ARM(cc)
++    elif new_platform == 'termux-aarch64':
++        from rpython.translator.platform.termux import Termux_AArch64
++        return Termux_AArch64(cc)
++    elif new_platform == 'termux-arm':
++        from rpython.translator.platform.termux import Termux_ARM
++        return Termux_ARM(cc)
++    elif new_platform == 'termux-x86_64':
++        from rpython.translator.platform.termux import Termux_AMD64
++        return Termux_AMD64(cc)
++    elif new_platform == 'termux-i686':
++        from rpython.translator.platform.termux import Termux_IA32
++        return Termux_IA32(cc)
+     else:
+         raise ValueError("platform = %s" % (new_platform,))
+

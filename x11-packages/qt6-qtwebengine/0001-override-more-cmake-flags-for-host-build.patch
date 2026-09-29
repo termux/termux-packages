@@ -1,0 +1,27 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -133,6 +133,10 @@
+                    -DGN_TARGET_CPU=${TEST_architecture_arch}
+                    -DCMAKE_C_FLAGS=
+                    -DCMAKE_CXX_FLAGS=
++                   -DCMAKE_EXE_LINKER_FLAGS=
++                   -DCMAKE_MODULE_LINKER_FLAGS=
++                   -DCMAKE_SHARED_LINKER_FLAGS=
++                   -DDUMMY_SYSROOT=
+                    -DQT_FEATURE_qtwebengine_build=${QT_FEATURE_qtwebengine_build}
+                    -DQT_FEATURE_qtpdf_build=${QT_FEATURE_qtpdf_build}
+                    -DGCC_LEGACY_SUPPORT=${QT_FEATURE_webengine_gcc_legacy_support}
+--- a/src/host/CMakeLists.txt
++++ b/src/host/CMakeLists.txt
+@@ -62,6 +62,11 @@
+         "${CMAKE_CURRENT_BINARY_DIR}/config.tests/hostcompiler"
+         "${CMAKE_CURRENT_SOURCE_DIR}/config.tests/hostcompiler"
+         hostcompiler
++        CMAKE_FLAGS -DCMAKE_C_FLAGS=
++                    -DCMAKE_CXX_FLAGS=
++                    -DCMAKE_EXE_LINKER_FLAGS=
++                    -DCMAKE_MODULE_LINKER_FLAGS=
++                    -DCMAKE_SHARED_LINKER_FLAGS=
+     )
+     if(NOT has32HostCompiler)
+         MESSAGE(FATAL_ERROR "Compiler does not support 32bit compilation")

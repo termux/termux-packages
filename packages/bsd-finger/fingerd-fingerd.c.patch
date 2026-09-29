@@ -1,0 +1,14 @@
+--- a/fingerd/fingerd.c
++++ b/fingerd/fingerd.c
+@@ -270,9 +270,11 @@
+ 
+ 		if (fingerpath) execv(fingerpath, avx);
+ 		execv(_PATH_FINGER, avx);
++#ifndef __ANDROID__
+ 		execv(_ALT_PATH_FINGER_1, avx);
+ 		execv(_ALT_PATH_FINGER_2, avx);
+ 		execv(_ALT_PATH_FINGER_3, avx);
++#endif
+ 		syslog(LOG_ERR, "Finger program not found\n");
+ 		exit(1);
+ #if 0

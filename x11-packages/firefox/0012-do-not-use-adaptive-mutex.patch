@@ -1,0 +1,20 @@
+--- a/memory/build/Mutex.h
++++ b/memory/build/Mutex.h
+@@ -50,7 +50,7 @@
+   mozilla::detail::MaybeStorageBase<CRITICAL_SECTION> mMutex;
+ #elif defined(XP_DARWIN)
+   os_unfair_lock mMutex = OS_UNFAIR_LOCK_INIT;
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(__TERMUX__)
+   pthread_mutex_t mMutex = PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP;
+ #else
+   pthread_mutex_t mMutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -80,7 +80,7 @@
+     }
+ #elif defined(XP_DARWIN)
+     mMutex = OS_UNFAIR_LOCK_INIT;
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(__TERMUX__)
+     pthread_mutexattr_t attr;
+     if (pthread_mutexattr_init(&attr) != 0) {
+       return false;

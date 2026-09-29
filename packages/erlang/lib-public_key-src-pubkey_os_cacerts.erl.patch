@@ -1,0 +1,13 @@
+diff -uNr otp-OTP-27.1/lib/public_key/src/pubkey_os_cacerts.erl otp-OTP-27.1.mod/lib/public_key/src/pubkey_os_cacerts.erl
+--- otp-OTP-27.1/lib/public_key/src/pubkey_os_cacerts.erl	2024-09-13 11:45:35.000000000 +0300
++++ otp-OTP-27.1.mod/lib/public_key/src/pubkey_os_cacerts.erl	2024-09-20 12:22:06.258145167 +0300
+@@ -187,7 +187,8 @@
+     persistent_term:put(?MODULE, CaCerts).
+ 
+ linux_paths() ->
+-    ["/etc/ssl/certs/ca-certificates.crt",                %% Debian, Ubuntu, Gentoo
++    ["@TERMUX_PREFIX@/etc/tls/cert.pem",                  %% Termux
++     "/etc/ssl/certs/ca-certificates.crt",                %% Debian, Ubuntu, Gentoo
+      "/etc/pki/tls/certs/ca-bundle.crt",                  %% Fedora, RHEL 6, Amazon Linux
+      "/etc/ssl/ca-bundle.pem",                            %% OpenSUSE
+      "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem", %% CentOS, RHEL 7

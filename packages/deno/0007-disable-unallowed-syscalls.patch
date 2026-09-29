@@ -1,0 +1,31 @@
+`setgroups` are only allowed when user is root, i.e. `getuid() == 0`
+
+https://github.com/denoland/deno/issues/19759#issuecomment-2914426954
+
+--- a/ext/process/lib.rs
++++ b/ext/process/lib.rs
+@@ -234,12 +234,23 @@
+   let result = unsafe {
+     match step {
+       UnixChildSetupStep::ClearSupplementaryGroups => {
++        if libc::getuid() != 0 {
++          return Ok(())
++        }
+         libc::setgroups(0, std::ptr::null())
+       }
+       UnixChildSetupStep::SetPrimaryGroupId(gid) => {
++        if libc::getuid() != 0 {
++          return Ok(())
++        }
+         libc::setgid(gid as libc::gid_t)
+       }
+-      UnixChildSetupStep::SetUserId(uid) => libc::setuid(uid as libc::uid_t),
++      UnixChildSetupStep::SetUserId(uid) => {
++        if libc::getuid() != 0 {
++          return Ok(())
++        }
++        libc::setuid(uid as libc::uid_t)
++      }
+       UnixChildSetupStep::ChangeCurrentDirectory(cwd) => {
+         libc::chdir(cwd.as_ptr())
+       }

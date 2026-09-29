@@ -1,0 +1,23 @@
+From e133ac6d049f5d56821cec6a3e5501cb20965c66 Mon Sep 17 00:00:00 2001
+From: levlam <levlam@telegram.org>
+Date: Tue, 10 Jun 2025 18:30:41 +0300
+Subject: [PATCH] Fix clang compilation error.
+
+---
+ td/telegram/ForumTopicManager.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/td/telegram/ForumTopicManager.cpp b/td/telegram/ForumTopicManager.cpp
+index 3cae93c2a810..6315dea60a99 100644
+--- a/td/telegram/ForumTopicManager.cpp
++++ b/td/telegram/ForumTopicManager.cpp
+@@ -1292,7 +1292,8 @@ void ForumTopicManager::repair_topic_unread_mention_count(DialogId dialog_id, Me
+     return;
+   }
+ 
+-  td_->create_handler<GetForumTopicQuery>(Auto())->send(dialog_id.get_channel_id(), top_thread_message_id);
++  td_->create_handler<GetForumTopicQuery>(Promise<td_api::object_ptr<td_api::forumTopic>>())
++      ->send(dialog_id.get_channel_id(), top_thread_message_id);
+ }
+ 
+ }  // namespace td

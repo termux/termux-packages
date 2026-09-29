@@ -1,0 +1,13 @@
+--- a/gui/mainwindow.cpp
++++ b/gui/mainwindow.cpp
+@@ -1098,8 +1098,8 @@
+         failback << "elementary";
+         failback << "gnome";
+ 
+-        QDir usrDir("/usr/share/icons/");
+-        QDir usrLocalDir("/usr/local/share/icons/");
++        QDir usrDir("@TERMUX_PREFIX@/share/icons/");
++        QDir usrLocalDir("@TERMUX_PREFIX@/local/share/icons/");
+         foreach (QString s, failback) {
+             if (usrDir.exists(s) || usrLocalDir.exists(s)) {
+                 QIcon::setThemeName(s);

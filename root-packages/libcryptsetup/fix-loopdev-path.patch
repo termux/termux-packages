@@ -1,0 +1,22 @@
+diff --git a/lib/utils_loop.c b/lib/utils_loop.c
+index ec85678..b6b1eee 100644
+--- a/lib/utils_loop.c
++++ b/lib/utils_loop.c
+@@ -59,7 +59,7 @@ static char *crypt_loop_get_device_old(void)
+ 	struct loop_info64 lo64 = {0};
+ 
+ 	for (i = 0; i < 256; i++) {
+-		sprintf(dev, "/dev/loop%d", i);
++		sprintf(dev, "/dev/block/loop%d", i);
+ 
+ 		loop_fd = open(dev, O_RDONLY);
+ 		if (loop_fd < 0)
+@@ -93,7 +93,7 @@ static char *crypt_loop_get_device(void)
+ 	}
+ 	close(loop_fd);
+ 
+-	if (sprintf(dev, "/dev/loop%d", i) < 0)
++	if (sprintf(dev, "/dev/block/loop%d", i) < 0)
+ 		return NULL;
+ 
+ 	if (stat(dev, &st) || !S_ISBLK(st.st_mode))

@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/xapp-project/xapp-symbolic-icons
+TERMUX_PKG_DESCRIPTION="A set of symbolic icons for Gtk applications and projects"
+TERMUX_PKG_LICENSE="GPL-3.0-only, LGPL-3.0-only"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.0"
+TERMUX_PKG_SRCURL="https://github.com/xapp-project/xapp-symbolic-icons/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=fa96ac6a1a85c0cb16dccab5c03ae1e651a3482cde4a93f792956977bc19108d
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="hicolor-icon-theme, python"

@@ -1,0 +1,43 @@
+Fixes error:
+vendored/src/misc.c:1966:8: error: incompatible pointer to integer conversion assigning to 'int' from 'char * _Nonnull' [-Wint-conversion]
+
+DanAlbert's explanation of strerror_r in Android helped me understand this error
+https://github.com/android/ndk/issues/324#issuecomment-286213656
+
+Also, prepends @TERMUX_PREFIX@ to some instances of absolute path /etc
+
+--- a/build.rs
++++ b/build.rs
+@@ -14,7 +14,7 @@ fn main() {
+ 
+     let mut cfg = cc::Build::new();
+     cfg.define("LIBSSH_STATIC", None);
+-    cfg.define("_GNU_SOURCE", None);
++    cfg.define("_GNU_SOURCE", Some("1"));
+     cfg.include("vendored/include");
+     cfg.flag_if_supported("-Wno-deprecated-declarations");
+ 
+@@ -29,10 +29,10 @@ fn main() {
+     let openssl_version = u64::from_str_radix(&openssl_version, 16).unwrap();
+ 
+     let target = std::env::var("TARGET").unwrap();
+-    cfg.define("GLOBAL_CLIENT_CONFIG", Some("\"/etc/ssh/ssh_config\""));
++    cfg.define("GLOBAL_CLIENT_CONFIG", Some("\"@TERMUX_PREFIX@/etc/ssh/ssh_config\""));
+     cfg.define(
+         "GLOBAL_BIND_CONFIG",
+-        Some("\"/etc/ssh/libssh_server_config\""),
++        Some("\"@TERMUX_PREFIX@/etc/ssh/libssh_server_config\""),
+     );
+     cfg.define("HAVE_GETADDRINFO", Some("1"));
+     cfg.define("HAVE_LIBCRYPTO", Some("1"));
+--- a/vendored/src/misc.c
++++ b/vendored/src/misc.c
+@@ -1953,7 +1953,7 @@ char *ssh_strreplace(const char *src, const char *pattern, const char *replace)
+  */
+ char *ssh_strerror(int err_num, char *buf, size_t buflen)
+ {
+-#if defined(__linux__) && defined(__GLIBC__) && defined(_GNU_SOURCE)
++#if defined(__linux__) && (defined(__GLIBC__) || (defined(__ANDROID__) && __ANDROID_API__ >= 23)) && defined(_GNU_SOURCE)
+     /* GNU extension on Linux */
+     return strerror_r(err_num, buf, buflen);
+ #else

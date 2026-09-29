@@ -1,0 +1,43 @@
+--- a/support/nfsidmap/libnfsidmap.c
++++ b/support/nfsidmap/libnfsidmap.c
+@@ -57,6 +57,40 @@
+ #include <arpa/nameser.h>
+ #include <arpa/nameser_compat.h>
+ 
++#ifdef __ANDROID__
++static int res_querydomain(const char *name, const char *domain, int klass, int type, unsigned char *answer, int anslen)
++{
++	static int initialized = 0;
++	static int (*libc_impl)(const char *, const char *, int, int, unsigned char *, int) = NULL;
++	if (!initialized) {
++		void *libc_handle = dlopen("libc.so", RTLD_NOW);
++		if (libc_handle != NULL)
++			libc_impl = dlsym(libc_handle, "__res_querydomain");
++		initialized = 1;
++	}
++	if (libc_impl != NULL)
++		return libc_impl(name, domain, klass, type, answer, anslen);
++	h_errno = NO_RECOVERY;
++	return -1;
++}
++
++static int dn_skipname(const unsigned char *ptr, const unsigned char *eom)
++{
++	static int initialized = 0;
++	static int (*libc_impl)(const unsigned char *, const unsigned char *) = NULL;
++	if (!initialized) {
++		void *libc_handle = dlopen("libc.so", RTLD_NOW);
++		if (libc_handle != NULL)
++			libc_impl = dlsym(libc_handle, "__dn_skipname");
++		initialized = 1;
++	}
++	if (libc_impl != NULL)
++		return libc_impl(ptr, eom);
++	errno = ENOSYS;
++	return -1;
++}
++#endif
++
+ #include "nfsidmap.h"
+ #include "nfsidmap_private.h"
+ #include "nfsidmap_plugin.h"

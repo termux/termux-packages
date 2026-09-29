@@ -1,0 +1,20 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ -include environ.inc
+ .PHONY: help deps dev build install image release test clean clean-all
+ 
+-export CGO_ENABLED=0
++export CGO_ENABLED=1
+ VERSION=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "$VERSION")
+ COMMIT=$(shell git rev-parse --short HEAD || echo "$COMMIT")
+ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+@@ -9,7 +9,7 @@ BUILD=$(shell git show -s --pretty=format:%cI)
+ GOCMD=go
+ GOCMD=go
+ 
+-DESTDIR=/usr/local/bin
++DESTDIR=@TERMUX_PREFIX@/bin
+ 
+ ifeq ($(BRANCH), master)
+ IMAGE := prologic/saltyim

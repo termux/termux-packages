@@ -1,0 +1,21 @@
+Partially reverts https://github.com/fish-shell/fish-shell/commit/d68f8bdd3b60a4a4cee0c938b5b3e2ff23c1ed86
+(https://github.com/fish-shell/fish-shell/commit/7228cb15bfacfc88f97a1733a8e55b0ae78ec53c)
+In order to work around "error: call to undeclared function 'UNUSED'"
+
+This topic is closely related to this other commit,
+https://github.com/fish-shell/fish-shell/commit/70bd49f61265c3a50c98d439fc77e13ef4409231
+which is not yet present in stable fish (4.0.6 at time of writing),
+but which will probably also break the build of fish for Android in the future and need to be
+reverted or partially reverted.
+
+--- a/src/libc.c
++++ b/src/libc.c
+@@ -9,6 +9,8 @@
+ #include <sys/statvfs.h>
+ #include <unistd.h>
+ 
++#define UNUSED(x) (void)(x)
++
+ uint64_t C_ST_LOCAL() {
+ #if defined(ST_LOCAL)
+     return ST_LOCAL;

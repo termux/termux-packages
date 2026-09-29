@@ -1,0 +1,62 @@
+--- ../cache/tmp-checkout/shell/tsu.sh	2024-06-17 17:38:19.114615657 +0000
++++ ./shell/tsu.sh	2024-06-17 17:40:57.729881388 +0000
+@@ -288,42 +288,24 @@
+ 
+ ### TODO: Implement this cleanly.
+ 
+-### ----- MAGISKSU
+-# shellcheck disable=SC2117
+-if [[ -z "$SKIP_SBIN" && "$(/sbin/su -v)" == *"MAGISKSU" ]]; then
+-	# We are on Magisk su
+-	su_args=("/sbin/su")
+-	[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
+-
+-	if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
+-		su_args+=("--preserve-environment")
+-		su_cmdline="PATH=$BB_MAGISK:$PATH $ENV_BUILT $STARTUP_SCRIPT"
+-	else
+-		su_cmdline="PATH=$BB_MAGISK env -i $ENV_BUILT $STARTUP_SCRIPT"
+-	fi
+-	su_args+=("-c")
+-	exec "${su_args[@]}" "${su_cmdline}"
+-	##### ----- END MAGISKSU
+-else
+-	##### ----- OTHERS SU
+-	for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
+-		if [[ -x "$SU_BINARY" ]]; then
+-
+-			su_args=("$SU_BINARY")
+-			[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
+-
+-			# Let's use the system toybox/toolbox for now
+-			if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
+-				su_args+=("--preserve-environment")
+-				su_cmdline="PATH=$ANDROID_SYSPATHS:$PATH $ENV_BUILT $STARTUP_SCRIPT "
+-			else
+-				su_cmdline="PATH=$ANDROID_SYSPATHS env -i $ENV_BUILT $STARTUP_SCRIPT"
+-			fi
+-			su_args+=("-c")
+-			exec "${su_args[@]}" "${su_cmdline}"
++##### ----- OTHERS SU
++for SU_BINARY in "${SU_BINARY_SEARCH[@]}"; do
++	if [[ -x "$SU_BINARY" ]]; then
++
++		su_args=("$SU_BINARY")
++		[[ -z "$SWITCH_USER" ]] || su_args+=("$SWITCH_USER")
++
++		# Let's use the system toybox/toolbox for now
++		if [[ -n "$ENVIRONMENT_PRESERVE" ]]; then
++			su_args+=("--preserve-environment")
++			su_cmdline="PATH=$ANDROID_SYSPATHS:$PATH $ENV_BUILT $STARTUP_SCRIPT "
++		else
++			su_cmdline="PATH=$ANDROID_SYSPATHS env -i $ENV_BUILT $STARTUP_SCRIPT"
+ 		fi
+-	done
+-fi
++		su_args+=("-c")
++		exec "${su_args[@]}" "${su_cmdline}"
++	fi
++done
+ ##### ----- END OTHERS SU
+ 
+ # We didnt find any su binary

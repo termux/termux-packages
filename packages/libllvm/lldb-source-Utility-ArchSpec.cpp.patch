@@ -1,0 +1,16 @@
+diff --git a/lldb/source/Utility/ArchSpec.cpp b/lldb/source/Utility/ArchSpec.cpp
+index c7b56a8385f7..01887e37eb38 100644
+--- a/lldb/source/Utility/ArchSpec.cpp
++++ b/lldb/source/Utility/ArchSpec.cpp
+@@ -198,7 +198,11 @@ static const CoreDefinition g_core_definitions[] = {
+      "i486"},
+     {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86,
+      ArchSpec::eCore_x86_32_i486sx, "i486sx"},
++#ifndef __ANDROID__
+     {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86, ArchSpec::eCore_x86_32_i686,
++#else
++    {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86, ArchSpec::eCore_x86_32_i386,
++#endif
+      "i686"},
+ 
+     {eByteOrderLittle, 8, 1, 15, llvm::Triple::x86_64,

@@ -1,0 +1,47 @@
+#---------------------------------------------------------------------
+# Example configuration.  See the full configuration manual online.
+#
+#   http://www.haproxy.org/download/1.7/doc/configuration.txt
+#
+#---------------------------------------------------------------------
+
+global
+    maxconn     20000
+    log         127.0.0.1 local0
+    pidfile     @TERMUX_PREFIX@/var/run/haproxy.pid
+    daemon
+
+frontend  main
+    bind :5000
+    mode                 http
+    log                  global
+    option               httplog
+    option               dontlognull
+    option               http_proxy
+    option forwardfor    except 127.0.0.0/8
+    maxconn              8000
+    timeout              client  30s
+
+    acl url_static       path_beg       -i /static /images /javascript /stylesheets
+    acl url_static       path_end       -i .jpg .gif .png .css .js
+
+    use_backend static          if url_static
+    default_backend             app
+
+backend static
+    mode        http
+    balance     roundrobin
+    timeout     connect 5s
+    timeout     server  5s
+    server      static 127.0.0.1:4331 check
+
+backend app
+    mode        http
+    balance     roundrobin
+    timeout     connect 5s
+    timeout     server  30s
+    timeout     queue   30s
+    server  app1 127.0.0.1:5001 check
+    server  app2 127.0.0.1:5002 check
+    server  app3 127.0.0.1:5003 check
+    server  app4 127.0.0.1:5004 check

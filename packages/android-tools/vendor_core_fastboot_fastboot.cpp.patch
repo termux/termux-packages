@@ -1,0 +1,16 @@
++++ ./vendor/core/fastboot/fastboot.cpp
+@@ -1547,6 +1547,14 @@
+ 
+ void reboot_to_userspace_fastboot() {
+     fb->RebootTo("fastboot");
++#ifdef __ANDROID__
++    // XXX: can't reconnect the device by ourselves in Termux-usb
++    if (fb->transport()->NotReusable()) {
++        fb->WaitForDisconnect();
++        return;
++    }
++#endif
++
+     if (fb->WaitForDisconnect() != fastboot::SUCCESS) {
+         die("Error waiting for USB disconnect.");
+     }

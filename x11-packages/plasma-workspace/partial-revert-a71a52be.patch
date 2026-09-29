@@ -1,0 +1,20 @@
+Partially revert https://invent.kde.org/plasma/plasma-workspace/-/commit/a71a52be44946cf06698819f32a09bbac8b0b086
+because it causes this error for 32-bit targets:
+
+/home/runner/.termux-build/plasma-workspace/src/xembed-sni-proxy/sniproxy.cpp:327:59:
+error: non-constant-expression cannot be narrowed from type 'uint32_t' (aka 'unsigned int')
+to 'qsizetype' (aka 'int') in initializer list [-Wc++11-narrowing]
+  327 |         return {image->data, image->width, image->height, image->stride, QImage::Format_ARGB32, sni_cleanup_xcb_image, image};
+      |                                                           ^~~~~~~~~~~~~
+
+--- a/xembed-sni-proxy/sniproxy.cpp
++++ b/xembed-sni-proxy/sniproxy.cpp
+@@ -324,7 +324,7 @@ QImage SNIProxy::getImageNonComposite() const
+             return elaborateConversion;
+     } else {
+         // Now we are sure we can eventually delete the xcb_image_t with this version
+-        return {image->data, image->width, image->height, image->stride, QImage::Format_ARGB32, sni_cleanup_xcb_image, image};
++        return QImage(image->data, image->width, image->height, image->stride, QImage::Format_ARGB32, sni_cleanup_xcb_image, image);
+     }
+ }
+ 

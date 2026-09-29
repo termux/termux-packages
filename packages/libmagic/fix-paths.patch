@@ -1,0 +1,24 @@
+diff -uNr file-5.42/src/compress.c file-5.42.mod/src/compress.c
+--- file-5.42/src/compress.c	2022-04-11 19:15:07.000000000 +0100
++++ file-5.42.mod/src/compress.c	2022-07-22 17:17:00.944240000 +0100
+@@ -465,7 +465,7 @@
+ 		(void)strlcat(buf, "/", sizeof(buf));
+ 	(void)strlcat(buf, "file.XXXXXX", sizeof(buf));
+ #else
+-	(void)strlcpy(buf, "/tmp/file.XXXXXX", sizeof(buf));
++	(void)strlcpy(buf, "@TERMUX_PREFIX@/tmp/file.XXXXXX", sizeof buf);
+ #endif
+ #ifndef HAVE_MKSTEMP
+ 	{
+diff -uNr file-5.42/src/file.h file-5.42.mod/src/file.h
+--- file-5.42/src/file.h	2022-05-28 21:24:09.000000000 +0100
++++ file-5.42.mod/src/file.h	2022-07-22 17:16:04.080017000 +0100
+@@ -96,7 +96,7 @@
+ #define ENABLE_CONDITIONALS
+ 
+ #ifndef MAGIC
+-#define MAGIC "/etc/magic"
++#define MAGIC "@TERMUX_PREFIX@/etc/magic"
+ #endif
+ 
+ #if defined(__EMX__) || defined (WIN32)

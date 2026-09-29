@@ -1,0 +1,20 @@
+--- ./networking/httpd.c.orig	2022-03-01 20:22:51.797986436 +0000
++++ ./networking/httpd.c	2022-03-01 20:25:18.869664006 +0000
+@@ -1043,7 +1043,7 @@
+ 	if (!errno && n && n <= 0xffff)
+ 		n = create_and_bind_stream_or_die(NULL, n);
+ 	else
+-		n = create_and_bind_stream_or_die(bind_addr_or_port, 80);
++		n = create_and_bind_stream_or_die(bind_addr_or_port, 8080);
+ 	xlisten(n, 9);
+ 	return n;
+ }
+@@ -2286,7 +2286,7 @@
+ 
+ 		if (verbose > 1)
+ 			bb_error_msg("proxy:%s", urlp);
+-		lsa = host2sockaddr(proxy_entry->host_port, 80);
++		lsa = host2sockaddr(proxy_entry->host_port, 8080);
+ 		if (!lsa)
+ 			send_headers_and_exit(HTTP_INTERNAL_SERVER_ERROR);
+ 		proxy_fd = socket(lsa->u.sa.sa_family, SOCK_STREAM, 0);

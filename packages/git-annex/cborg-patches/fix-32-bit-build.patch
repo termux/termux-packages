@@ -1,0 +1,202 @@
+# adapted from https://patch-diff.githubusercontent.com/raw/well-typed/cborg/pull/351.patch
+
+--- a/cborg/src/Codec/CBOR/Decoding.hs	2001-09-09 07:16:40.000000000 +0530
++++ b/cborg/src/Codec/CBOR/Decoding.hs	2026-08-06 20:20:57.762959556 +0530
+@@ -315,11 +315,16 @@
+ toInt8   :: Int# -> Int8
+ toInt16  :: Int# -> Int16
+ toInt32  :: Int# -> Int32
+-toInt64  :: Int# -> Int64
+ toWord8  :: Word# -> Word8
+ toWord16 :: Word# -> Word16
+ toWord32 :: Word# -> Word32
++#if defined(ARCH_64bit)
++toInt64  :: Int# -> Int64
+ toWord64 :: Word# -> Word64
++#else
++toInt64  :: Int64# -> Int64
++toWord64 :: Word64# -> Word64
++#endif
+ #if MIN_VERSION_ghc_prim(0,8,0)
+ toInt8   n = I8#  (intToInt8# n)
+ toInt16  n = I16# (intToInt16# n)
+@@ -327,8 +332,7 @@
+ toWord8  n = W8#  (wordToWord8# n)
+ toWord16 n = W16# (wordToWord16# n)
+ toWord32 n = W32# (wordToWord32# n)
+-#if WORD_SIZE_IN_BITS == 64
+-#if MIN_VERSION_base(4,17,0)
++#if MIN_VERSION_base(4,17,0) && defined(ARCH_64bit)
+ toInt64  n = I64# (intToInt64# n)
+ toWord64 n = W64# (wordToWord64# n)
+ #else
+@@ -336,10 +340,6 @@
+ toWord64 n = W64# n
+ #endif
+ #else
+-toInt64  n = I64# (intToInt64# n)
+-toWord64 n = W64# (wordToWord64# n)
+-#endif
+-#else
+ toInt8   n = I8#  n
+ toInt16  n = I16# n
+ toInt32  n = I32# n
+@@ -986,7 +986,7 @@
+ -- @since 0.2.2.0
+ peekByteOffset :: Decoder s ByteOffset
+ peekByteOffset = Decoder (\k -> return (PeekByteOffset (\off# -> k (I64#
+-#if MIN_VERSION_base(4,17,0)
++#if MIN_VERSION_base(4,17,0) && !defined(ARCH_32bit)
+         (intToInt64# off#)
+ #else
+         off#
+--- a/cborg/src/Codec/CBOR/Magic.hs
++++ b/cborg/src/Codec/CBOR/Magic.hs
+@@ -118,7 +118,7 @@ import qualified Numeric.Half as Half
+ import           Data.Bits ((.|.), unsafeShiftL)
+ #endif
+ 
+-#if defined(ARCH_32bit)
++#if defined(ARCH_32bit) && !MIN_VERSION_base(4,16,0)
+ import           GHC.IntWord64 (wordToWord64#, word64ToWord#,
+                                 intToInt64#, int64ToInt#,
+                                 leWord64#, ltWord64#, word64ToInt64#)
+@@ -170,7 +170,7 @@ grabWord64 (Ptr ip#) = W64# (wordToWord64# (byteSwap# (word64ToWord# (indexWord6
+ grabWord64 (Ptr ip#) = W64# (byteSwap# (indexWord64OffAddr# ip# 0#))
+ #endif
+ #else
+-grabWord64 (Ptr ip#) = W64# (byteSwap64# (word64ToWord# (indexWord64OffAddr# ip# 0#)))
++grabWord64 (Ptr ip#) = W64# (byteSwap64# (indexWord64OffAddr# ip# 0#))
+ #endif
+ 
+ #elif defined(MEM_UNALIGNED_OPS) && \
+@@ -445,7 +445,7 @@ word16ToInt (W16# w#) = I# (word2Int# (word16ToWord# w#))
+ word32ToInt (W32# w#) = I# (word2Int# (word32ToWord# w#))
+ #else
+ word32ToInt (W32# w#) =
+-  case isTrue# (w# `ltWord#` 0x80000000##) of
++  case isTrue# (word32ToWord# w# `ltWord#` 0x80000000##) of
+     True  -> Just (I# (word2Int# (word32ToWord# w#)))
+     False -> Nothing
+ #endif
+@@ -491,6 +491,19 @@ word64ToInt (W64# w#) =
+ {-# INLINE word64ToInt #-}
+ 
+ #if defined(ARCH_32bit)
++#if MIN_VERSION_base(4,16,0)
++word8ToInt64  (W8#  w#) = I64# (intToInt64# (word2Int# (word8ToWord# w#)))
++word16ToInt64 (W16# w#) = I64# (intToInt64# (word2Int# (word16ToWord# w#)))
++word32ToInt64 (W32# w#) = I64# (word64ToInt64# (wordToWord64# (word32ToWord# w#)))
++word64ToInt64 (W64# w#) =
++  case isTrue# (w# `ltWord64#` uncheckedShiftL64# (wordToWord64# 1##) 63#) of
++    True  -> Just (I64# (word64ToInt64# w#))
++    False -> Nothing
++
++word8ToWord64  (W8#  w#) = W64# (wordToWord64# (word8ToWord# w#))
++word16ToWord64 (W16# w#) = W64# (wordToWord64# (word16ToWord# w#))
++word32ToWord64 (W32# w#) = W64# (wordToWord64# (word32ToWord# w#))
++#else
+ word8ToInt64  (W8#  w#) = I64# (intToInt64# (word2Int# w#))
+ word16ToInt64 (W16# w#) = I64# (intToInt64# (word2Int# w#))
+ word32ToInt64 (W32# w#) = I64# (word64ToInt64# (wordToWord64# w#))
+@@ -502,6 +515,7 @@ word64ToInt64 (W64# w#) =
+ word8ToWord64  (W8#  w#) = W64# (wordToWord64# w#)
+ word16ToWord64 (W16# w#) = W64# (wordToWord64# w#)
+ word32ToWord64 (W32# w#) = W64# (wordToWord64# w#)
++#endif
+ 
+ {-# INLINE word8ToInt64  #-}
+ {-# INLINE word16ToInt64 #-}
+--- a/cborg/src/Codec/CBOR/Read.hs
++++ b/cborg/src/Codec/CBOR/Read.hs
+@@ -60,7 +60,7 @@ import qualified Data.Text          as T
+ import qualified Data.Text.Encoding as T
+ import           Data.Word
+ import           GHC.Word
+-#if defined(ARCH_32bit)
++#if defined(ARCH_32bit) && !MIN_VERSION_base(4,16,0)
+ import           GHC.IntWord64
+ #endif
+ import           GHC.Exts
+@@ -505,8 +505,8 @@ go_fast !bs da@(ConsumeNegWord64Canonical k) =
+ go_fast !bs da@(ConsumeInt64Canonical k) =
+   case tryConsumeInt64 (BS.unsafeHead bs) bs of
+     DecodeFailure             -> go_fast_end bs da
+-    DecodedToken sz i@(I64# i#)
+-      | isInt64Canonical sz i  -> k i# >>= go_fast (BS.unsafeDrop sz bs)
++    DecodedToken sz (I64# i#)
++      | isInt64Canonical sz i# -> k i# >>= go_fast (BS.unsafeDrop sz bs)
+       | otherwise              -> go_fast_end bs da
+ 
+ go_fast !bs da@(ConsumeListLen64Canonical k) =
+@@ -989,8 +989,8 @@ go_fast_end !bs (ConsumeNegWord64Canonical k) =
+ go_fast_end !bs (ConsumeInt64Canonical k) =
+   case tryConsumeInt64 (BS.unsafeHead bs) bs of
+     DecodeFailure             -> return $! SlowFail bs "expected int64"
+-    DecodedToken sz i@(I64# i#)
+-      | isInt64Canonical sz i  -> k i# >>= go_fast_end (BS.unsafeDrop sz bs)
++    DecodedToken sz (I64# i#)
++      | isInt64Canonical sz i# -> k i# >>= go_fast_end (BS.unsafeDrop sz bs)
+       | otherwise              -> return $! SlowFail bs "non-canonical int64"
+ 
+ go_fast_end !bs (ConsumeListLen64Canonical k) =
+@@ -1266,7 +1266,7 @@ go_slow da bs !offset = do
+ 
+     SlowPeekByteOffset bs' k ->
+       lift
+-#if MIN_VERSION_base(4,17,0)
++#if MIN_VERSION_base(4,17,0) && !defined(ARCH_32bit)
+         (k (int64ToInt# off#))
+ #else
+         (k off#)
+@@ -1376,7 +1376,7 @@ go_slow_overlapped da sz bs_cur bs_next !offset =
+       SlowPeekByteOffset bs_empty k ->
+         assert (BS.null bs_empty) $ do
+         lift
+-#if MIN_VERSION_base(4,17,0)
++#if MIN_VERSION_base(4,17,0) && !defined(ARCH_32bit)
+           (k (int64ToInt# off#))
+ #else
+           (k off#)
+@@ -1560,17 +1560,17 @@ isIntCanonical sz i
+ {-# INLINE isWord64Canonical #-}
+ isWord64Canonical :: Int -> Word64 -> Bool
+ isWord64Canonical sz w
+-  | sz == 2   = w > 0x17)
+-  | sz == 3   = w > 0xff)
+-  | sz == 5   = w > 0xffff)
+-  | sz == 9   = w > 0xffffffff)
++  | sz == 2   = w > 0x17
++  | sz == 3   = w > 0xff
++  | sz == 5   = w > 0xffff
++  | sz == 9   = w > 0xffffffff
+   | otherwise = True
+ 
+ {-# INLINE isInt64Canonical #-}
+ isInt64Canonical :: Int -> Int64# -> Bool
+ isInt64Canonical sz i#
+-  | isTrue# (i# `ltInt64#` intToInt64# 0#) = isWord64Canonical sz (not64# w#)
+-  | otherwise                              = isWord64Canonical sz         w#
++  | isTrue# (i# `ltInt64#` intToInt64# 0#) = isWord64Canonical sz (W64# (not64# w#))
++  | otherwise                              = isWord64Canonical sz (W64#         w#)
+   where
+     w# = int64ToWord64# i#
+ #endif
+@@ -1791,7 +1791,7 @@ tryConsumeInteger hdr !bs = case word8ToWord hdr of
+   0x1b -> let !w = eatTailWord64 bs
+               sz = 9
+ #if defined(ARCH_32bit)
+-          in DecodedToken sz (BigIntToken (isWord64Canonical sz (word64ToWord w)) $! toInteger w)
++          in DecodedToken sz (BigIntToken (isWord64Canonical sz w) $! toInteger w)
+ #else
+           in DecodedToken sz (BigIntToken (isWordCanonical sz (word64ToWord w))   $! toInteger w)
+ #endif
+@@ -1833,7 +1833,7 @@ tryConsumeInteger hdr !bs = case word8ToWord hdr of
+   0x3b -> let !w = eatTailWord64 bs
+               sz = 9
+ #if defined(ARCH_32bit)
+-          in DecodedToken sz (BigIntToken (isWord64Canonical sz (word64ToWord w)) $! (-1 - toInteger w))
++          in DecodedToken sz (BigIntToken (isWord64Canonical sz w) $! (-1 - toInteger w))
+ #else
+           in DecodedToken sz (BigIntToken (isWordCanonical sz (word64ToWord w))   $! (-1 - toInteger w))
+ #endif

@@ -1,0 +1,681 @@
+From 65a9af6663738c5e169a1779b8d0106c6223e96e Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 5 Jul 2022 17:36:19 +0200
+Subject: [PATCH 01/11] Don't forward-declare QStringList
+
+It doesn't work with Qt6
+---
+ lib/plugins/SignOn/authpluginif.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/plugins/SignOn/authpluginif.h b/lib/plugins/SignOn/authpluginif.h
+index 7b3243c..9cfc527 100644
+--- a/lib/plugins/SignOn/authpluginif.h
++++ b/lib/plugins/SignOn/authpluginif.h
+@@ -31,6 +31,7 @@
+ #include <QtCore/qobject.h>
+ #include <QtCore/qpointer.h>
+ #include <QtCore/qplugin.h>
++#include <QtCore/qstringlist.h>
+ 
+ #include <QVariantMap>
+ #include <SignOn/sessiondata.h>
+@@ -39,7 +40,6 @@
+ 
+ QT_BEGIN_NAMESPACE
+ class QString;
+-class QStringList;
+ class QByteArray;
+ class QVariant;
+ QT_END_NAMESPACE
+-- 
+GitLab
+
+
+From afef34ba90f525081226b49be76dd53aa158967d Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 5 Jul 2022 17:37:00 +0200
+Subject: [PATCH 02/11] Remove usage of Q_EXTERN_C
+
+It doesn't exist in Qt6 any more
+---
+ lib/plugins/SignOn/authpluginif.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/plugins/SignOn/authpluginif.h b/lib/plugins/SignOn/authpluginif.h
+index 9cfc527..cad5d35 100644
+--- a/lib/plugins/SignOn/authpluginif.h
++++ b/lib/plugins/SignOn/authpluginif.h
+@@ -73,7 +73,7 @@ enum AuthPluginState {
+         }
+ 
+ #define SIGNON_DECL_AUTH_PLUGIN(pluginclass) \
+-        Q_EXTERN_C AuthPluginInterface *auth_plugin_instance() \
++        extern "C" AuthPluginInterface *auth_plugin_instance() \
+         SIGNON_PLUGIN_INSTANCE(pluginclass)
+ 
+ /*!
+-- 
+GitLab
+
+
+From a089361356e73bcd721f14314ec9745bbf28c5be Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 5 Jul 2022 17:37:34 +0200
+Subject: [PATCH 03/11] Port from QProcess::pid to ::processId
+
+The former is deprecated
+---
+ src/signond/pluginproxy.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/signond/pluginproxy.cpp b/src/signond/pluginproxy.cpp
+index d31c712..582aef4 100644
+--- a/src/signond/pluginproxy.cpp
++++ b/src/signond/pluginproxy.cpp
+@@ -125,10 +125,10 @@ PluginProxy::~PluginProxy()
+ 
+             if (!m_process->waitForFinished(PLUGINPROCESS_STOP_TIMEOUT))
+             {
+-                if (m_process->pid()) {
++                if (m_process->processId()) {
+                     qCritical() << "The signon plugin seems to ignore kill(), "
+                         "killing it from command line";
+-                    QString killProcessCommand(QString::fromLatin1("kill -9 %1").arg(m_process->pid()));
++                    QString killProcessCommand(QString::fromLatin1("kill -9 %1").arg(m_process->processId()));
+                     QProcess::execute(killProcessCommand);
+                 }
+             }
+-- 
+GitLab
+
+
+From b48507f58d66356fbcdd349d14e6e145a4a60bbd Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 5 Jul 2022 17:38:08 +0200
+Subject: [PATCH 04/11] Port away from deprecated QString::SplitBehavior
+
+---
+ src/signond/signonidentityinfo.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/signond/signonidentityinfo.cpp b/src/signond/signonidentityinfo.cpp
+index a5ae15d..bf7985f 100644
+--- a/src/signond/signonidentityinfo.cpp
++++ b/src/signond/signonidentityinfo.cpp
+@@ -27,6 +27,7 @@
+ #include <QDBusArgument>
+ #include <QDataStream>
+ #include <QDebug>
++#include <QtGlobal>
+ 
+ namespace SignonDaemonNS {
+ 
+@@ -104,7 +105,11 @@ bool SignonIdentityInfo::checkMethodAndMechanism(const QString &method,
+      * mechanisms is allowed.
+      */
+     QStringList mechanisms =
++#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
++        mechanism.split(QLatin1Char(' '), Qt::SkipEmptyParts);
++#else
+         mechanism.split(QLatin1Char(' '), QString::SkipEmptyParts);
++#endif
+ 
+     /* if the list is empty of it has only one element, then we already know
+      * that it didn't pass the previous checks */
+-- 
+GitLab
+
+
+From 728bda378878e505ac6b7977306b6f3ffe9f53d6 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Tue, 5 Jul 2022 17:39:20 +0200
+Subject: [PATCH 05/11] Port away from QtContainer::toSet
+
+it's deprecated
+---
+ src/signond/signonsessioncore.cpp    | 12 ++++++++++--
+ tests/signond-tests/databasetest.cpp | 24 +++++++++++++++++-------
+ 2 files changed, 27 insertions(+), 9 deletions(-)
+
+diff --git a/src/signond/signonsessioncore.cpp b/src/signond/signonsessioncore.cpp
+index 93a7328..bebf934 100644
+--- a/src/signond/signonsessioncore.cpp
++++ b/src/signond/signonsessioncore.cpp
+@@ -217,8 +217,16 @@ SignonSessionCore::queryAvailableMechanisms(const QStringList &wantedMechanisms)
+     if (!wantedMechanisms.size())
+         return m_plugin->mechanisms();
+ 
+-    return m_plugin->mechanisms().toSet().
+-        intersect(wantedMechanisms.toSet()).toList();
++    const QStringList mechanisms = m_plugin->mechanisms();
++#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
++    QSet<QString> mechanismSet(mechanisms.begin(), mechanisms.end());
++    QSet<QString> wantedMechanismSet(wantedMechanisms.begin(), wantedMechanisms.end());
++#else
++    QSet<QString> mechanismSet = mechanisms.toSet();
++    QSet<QString> wantedMechanismSet = wantedMechanisms.toSet();
++#endif
++
++    return mechanismSet.intersect(wantedMechanismSet).values();
+ }
+ 
+ void SignonSessionCore::process(const PeerContext &peerContext,
+diff --git a/tests/signond-tests/databasetest.cpp b/tests/signond-tests/databasetest.cpp
+index b5ee761..b22ba54 100644
+--- a/tests/signond-tests/databasetest.cpp
++++ b/tests/signond-tests/databasetest.cpp
+@@ -32,6 +32,15 @@
+ const QString dbFile = QLatin1String("/tmp/signon_test.db");
+ const QString secretsDbFile = QLatin1String("/tmp/signon_test_secrets.db");
+ 
++static QSet<QString> toSet(const QStringList &list)
++{
++#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
++    return QSet<QString>(list.begin(), list.end());
++#else
++    return list.toSet();
++#endif
++}
++
+ void TestDatabase::initTestCase()
+ {
+     QFile::remove(dbFile);
+@@ -353,17 +362,18 @@ void TestDatabase::updateCredentialsTest()
+ 
+     /* The sorting of the method's mechanisms might vary, so we cannot just
+      * compare the whole method map as a whole. */
+-    QCOMPARE(retInfo.methods().keys().toSet(),
+-             updateInfo.methods().keys().toSet());
++    QCOMPARE(toSet(retInfo.methods().keys()),
++             toSet(updateInfo.methods().keys()));
++
+     QMapIterator<QString, QStringList> it(retInfo.methods());
+     while (it.hasNext()) {
+         it.next();
+-        QCOMPARE(it.value().toSet(), umethods.value(it.key()).toSet());
++        QCOMPARE(toSet(it.value()), toSet(umethods.value(it.key())));
+     }
+ 
+-    QCOMPARE(retInfo.realms().toSet(), updateInfo.realms().toSet());
+-    QCOMPARE(retInfo.accessControlList().toSet(),
+-             updateInfo.accessControlList().toSet());
++    QCOMPARE(toSet(retInfo.realms()), toSet(updateInfo.realms()));
++    QCOMPARE(toSet(retInfo.accessControlList()),
++             toSet(updateInfo.accessControlList()));
+ }
+ 
+ void TestDatabase::removeCredentialsTest()
+@@ -658,8 +668,8 @@ void TestDatabase::credentialsOwnerSecurityTokenTest()
+     QString token = m_db->credentialsOwnerSecurityToken(id);
+     QCOMPARE(token, QLatin1String("AID::12345678"));
+     QStringList tokens = m_db->ownerList(id);
+-    QCOMPARE(tokens.toSet(), testAcl.toSet());
+ 
++    QCOMPARE(toSet(tokens), toSet(testAcl));
+ }
+ 
+ QTEST_MAIN(TestDatabase)
+-- 
+GitLab
+
+
+From b1e63bd07f4fcf1a47f142674889b157b4d68af8 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Mon, 1 Aug 2022 19:27:34 +0200
+Subject: [PATCH 06/11] Port away from deprecated QMap::unite
+
+---
+ src/signond/signonidentity.cpp         | 3 +--
+ src/signond/signonsessioncoretools.cpp | 6 ++++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/signond/signonidentity.cpp b/src/signond/signonidentity.cpp
+index 92ff476..aef4a97 100644
+--- a/src/signond/signonidentity.cpp
++++ b/src/signond/signonidentity.cpp
+@@ -288,8 +288,7 @@ void SignonIdentity::verifyUser(const QVariantMap &params,
+     }
+ 
+     //create ui request to ask password
+-    QVariantMap uiRequest;
+-    uiRequest.unite(params);
++    QVariantMap uiRequest = params;
+     uiRequest.insert(SSOUI_KEY_QUERYPASSWORD, true);
+     uiRequest.insert(SSOUI_KEY_USERNAME, info.userName());
+     uiRequest.insert(SSOUI_KEY_CAPTION, info.caption());
+diff --git a/src/signond/signonsessioncoretools.cpp b/src/signond/signonsessioncoretools.cpp
+index 8b74840..e856d1a 100644
+--- a/src/signond/signonsessioncoretools.cpp
++++ b/src/signond/signonsessioncoretools.cpp
+@@ -34,6 +34,7 @@ QVariantMap SignonDaemonNS::mergeVariantMaps(const QVariantMap &map1,
+     if (map1.isEmpty()) return map2;
+     if (map2.isEmpty()) return map1;
+ 
++#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+     QVariantMap map = map1;
+     //map2 values will overwrite map1 values for the same keys.
+     QMapIterator<QString, QVariant> it(map2);
+@@ -43,6 +44,11 @@ QVariantMap SignonDaemonNS::mergeVariantMaps(const QVariantMap &map1,
+             map.remove(it.key());
+     }
+     return map.unite(map2);
++#else
++    QVariantMap map = map1;
++    map.insert(map2);
++    return map;
++#endif
+ }
+ 
+ /* --------------------- StoreOperation ---------------------- */
+-- 
+GitLab
+
+
+From 10f791a62e229bcb5e3975c752bcd5519758240f Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Mon, 1 Aug 2022 19:37:41 +0200
+Subject: [PATCH 07/11] Add Qt6 CI
+
+---
+ .gitlab-ci.yml | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 409f6e2..c784909 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -1,18 +1,14 @@
+-image: ubuntu:bionic
+-
+ cache:
+   key: apt-cache
+   paths:
+   - apt-cache/
+ 
+-before_script:
+-  - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
+-  - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y qt5-qmake qt5-default qtbase5-dev qtchooser pkg-config libqt5sql5-sqlite doxygen libdbus-1-dev
+-  - apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y dbus-test-runner libqtdbusmock1-dev libqtdbustest1-dev
+-  - apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y lcov gcovr
+-
+ build_amd64:
+   stage: build
++  image: ubuntu:bionic
++  before_script:
++    - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
++    - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y qt5-qmake qt5-default qtbase5-dev qtchooser pkg-config libqt5sql5-sqlite doxygen libdbus-1-dev
+   script:
+     - mkdir build
+     - cd build
+@@ -24,6 +20,10 @@ build_amd64:
+ 
+ test_amd64:
+   stage: test
++  image: ubuntu:bionic
++  before_script:
++    - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
++    - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y dbus-test-runner libqtdbusmock1-dev libqtdbustest1-dev lcov gcovr make qt5-qmake qt5-default qtbase5-dev qtchooser pkg-config libqt5sql5-sqlite doxygen libdbus-1-dev
+   script:
+     - find build | xargs touch # Avoid rebuilding
+     - cd build
+@@ -34,6 +34,38 @@ test_amd64:
+     paths:
+       - ./
+ 
++build_amd64_qt6:
++  stage: build
++  image: ubuntu:jammy
++  before_script:
++    - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
++    - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y qmake6 qt6-base-dev pkg-config libqt6sql6-sqlite doxygen libdbus-1-dev g++ make
++  script:
++    - mkdir build
++    - cd build
++    - qmake6 CONFIG+=debug CONFIG+=coverage CONFIG+=enable-backup CONFIG+=enable-p2p ..
++    - make -j 4
++  artifacts:
++    paths:
++      - build/
++
++test_amd64_qt6:
++  stage: test
++  image: ubuntu:jammy
++  before_script:
++    - export APT_CACHE_DIR=`pwd`/apt-cache && mkdir -pv $APT_CACHE_DIR
++    - export DEBIAN_FRONTEND=noninteractive
++    - apt-get update -yq && apt-get -o dir::cache::archives="$APT_CACHE_DIR" install -y dbus-test-runner libqtdbusmock1-dev libqtdbustest1-dev lcov gcovr make qmake6 qt6-base-dev pkg-config libqt6sql6-sqlite doxygen libdbus-1-dev g++ make
++  script:
++    - find build | xargs touch # Avoid rebuilding
++    - cd build
++    - make coverage-html
++  dependencies:
++    - build_amd64_qt6
++  artifacts:
++    paths:
++      - ./
++
+ pages:
+   stage: deploy
+   script:
+-- 
+GitLab
+
+
+From 929f34fb07e30e17fc6a6ec117207390675be03b Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Sat, 6 Aug 2022 15:46:16 +0200
+Subject: [PATCH 08/11] Use return instead of reference for DBus output
+ parameter
+
+From a DBus perspective it's the same but it seems to work better that way with Qt6
+---
+ src/signond/signondaemonadaptor.cpp | 7 ++++---
+ src/signond/signondaemonadaptor.h   | 3 +--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/signond/signondaemonadaptor.cpp b/src/signond/signondaemonadaptor.cpp
+index a407175..0f01d34 100644
+--- a/src/signond/signondaemonadaptor.cpp
++++ b/src/signond/signondaemonadaptor.cpp
+@@ -63,17 +63,18 @@ SignonDaemonAdaptor::registerObject(const QDBusConnection &connection,
+     return QDBusObjectPath(path);
+ }
+ 
+-void SignonDaemonAdaptor::registerNewIdentity(const QString &applicationContext,
+-                                              QDBusObjectPath &objectPath)
++QDBusObjectPath SignonDaemonAdaptor::registerNewIdentity(const QString &applicationContext)
+ {
+     Q_UNUSED(applicationContext);
+ 
+     SignonIdentity *identity = m_parent->registerNewIdentity();
+ 
+     QDBusConnection dbusConnection(parentDBusContext().connection());
+-    objectPath = registerObject(dbusConnection, identity);
++    QDBusObjectPath objectPath = registerObject(dbusConnection, identity);
+ 
+     SignonDisposable::destroyUnused();
++
++    return objectPath;
+ }
+ 
+ void SignonDaemonAdaptor::securityErrorReply()
+diff --git a/src/signond/signondaemonadaptor.h b/src/signond/signondaemonadaptor.h
+index c51a6b8..639a135 100644
+--- a/src/signond/signondaemonadaptor.h
++++ b/src/signond/signondaemonadaptor.h
+@@ -49,8 +49,7 @@ public:
+         { return *static_cast<QDBusContext *>(m_parent); }
+ 
+ public Q_SLOTS:
+-    void registerNewIdentity(const QString &applicationContext,
+-                             QDBusObjectPath &objectPath);
++    QDBusObjectPath registerNewIdentity(const QString &applicationContext);
+     void getIdentity(const quint32 id, const QString &applicationContext,
+                      QDBusObjectPath &objectPath,
+                      QVariantMap &identityData);
+-- 
+GitLab
+
+
+From 9b439d09712fe31cbb9b3f30a6cbc75cbbc11d20 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Fri, 7 Apr 2023 16:10:31 +0200
+Subject: [PATCH 09/11] Adjust buildsystem to include correct Qt Major version
+ number
+
+---
+ common-project-config.pri                             |  4 ++--
+ lib/SignOn/SignOnQt5Config.cmake.in                   |  2 +-
+ lib/SignOn/SignOnQt6Config.cmake.in                   |  7 +++++++
+ lib/SignOn/SignOnQt6ConfigVersion.cmake.in            | 10 ++++++++++
+ lib/SignOn/libsignon-qt.pri                           |  2 +-
+ lib/SignOn/libsignon-qt6.pc.in                        | 11 +++++++++++
+ .../signon-plugins-common/signon-plugins-common.pc.in |  2 +-
+ lib/plugins/signon-plugins.pc.in                      |  2 +-
+ lib/signond/SignOn/SignOnExtension.pc.in              |  2 +-
+ tests/libsignon-qt-tests/libsignon-qt-tests.pro       |  2 +-
+ tests/signond-tests/identity-tool.pro                 |  2 +-
+ .../mock-ac-plugin/identity-ac-helper.pro             |  2 +-
+ tests/signond-tests/signond-tests.pri                 |  2 +-
+ 13 files changed, 39 insertions(+), 11 deletions(-)
+ create mode 100644 lib/SignOn/SignOnQt6Config.cmake.in
+ create mode 100644 lib/SignOn/SignOnQt6ConfigVersion.cmake.in
+ create mode 100644 lib/SignOn/libsignon-qt6.pc.in
+
+diff --git a/common-project-config.pri b/common-project-config.pri
+index abe6cf6..af5f425 100644
+--- a/common-project-config.pri
++++ b/common-project-config.pri
+@@ -29,8 +29,8 @@ DEFINES += DEBUG_ENABLED
+ DEFINES += NO_SIGNON_USER
+ 
+ # Library name for CMake and pkg-config
+-LIBSIGNON = libsignon-qt5
+-CMAKE_BASENAME = SignOnQt5
++LIBSIGNON = libsignon-qt$${QT_MAJOR_VERSION}
++CMAKE_BASENAME = SignOnQt$${QT_MAJOR_VERSION}
+ 
+ #-----------------------------------------------------------------------------
+ # setup the installation prefix
+diff --git a/lib/SignOn/SignOnQt5Config.cmake.in b/lib/SignOn/SignOnQt5Config.cmake.in
+index 523fffb..128ee8d 100644
+--- a/lib/SignOn/SignOnQt5Config.cmake.in
++++ b/lib/SignOn/SignOnQt5Config.cmake.in
+@@ -4,4 +4,4 @@
+ 
+ set(SIGNONQT_LIBRARIES $${INSTALL_LIBDIR}/lib$${TARGET}.so)
+ set(SIGNONQT_LIBRARIES_STATIC $${INSTALL_LIBDIR}/lib$${TARGET}.a)
+-set(SIGNONQT_INCLUDE_DIRS $${INSTALL_PREFIX}/include/$${TARGET})
+\ No newline at end of file
++set(SIGNONQT_INCLUDE_DIRS $${INSTALL_PREFIX}/include/$${TARGET})
+diff --git a/lib/SignOn/SignOnQt6Config.cmake.in b/lib/SignOn/SignOnQt6Config.cmake.in
+new file mode 100644
+index 0000000..128ee8d
+--- /dev/null
++++ b/lib/SignOn/SignOnQt6Config.cmake.in
+@@ -0,0 +1,7 @@
++#  SIGNONQT_INCLUDE_DIRS - The libsignon-qt include directories
++#  SIGNONQT_LIBRARIES - The libraries needed to use libsignon-qt
++#  SIGNONQT_LIBRARIES_STATIC - The static version of libsignon-qt
++
++set(SIGNONQT_LIBRARIES $${INSTALL_LIBDIR}/lib$${TARGET}.so)
++set(SIGNONQT_LIBRARIES_STATIC $${INSTALL_LIBDIR}/lib$${TARGET}.a)
++set(SIGNONQT_INCLUDE_DIRS $${INSTALL_PREFIX}/include/$${TARGET})
+diff --git a/lib/SignOn/SignOnQt6ConfigVersion.cmake.in b/lib/SignOn/SignOnQt6ConfigVersion.cmake.in
+new file mode 100644
+index 0000000..616cd60
+--- /dev/null
++++ b/lib/SignOn/SignOnQt6ConfigVersion.cmake.in
+@@ -0,0 +1,10 @@
++set(PACKAGE_VERSION $${PROJECT_VERSION})
++
++if(\"${PACKAGE_VERSION}\" VERSION_LESS \"${PACKAGE_FIND_VERSION}\" )
++   set(PACKAGE_VERSION_COMPATIBLE FALSE)
++else(\"${PACKAGE_VERSION}\" VERSION_LESS \"${PACKAGE_FIND_VERSION}\" )
++   set(PACKAGE_VERSION_COMPATIBLE TRUE)
++   if( \"${PACKAGE_FIND_VERSION}\" STREQUAL \"${PACKAGE_VERSION}\")
++      set(PACKAGE_VERSION_EXACT TRUE)
++   endif( \"${PACKAGE_FIND_VERSION}\" STREQUAL \"${PACKAGE_VERSION}\")
++endif(\"${PACKAGE_VERSION}\" VERSION_LESS \"${PACKAGE_FIND_VERSION}\" )
+diff --git a/lib/SignOn/libsignon-qt.pri b/lib/SignOn/libsignon-qt.pri
+index 1458c50..a318fe8 100644
+--- a/lib/SignOn/libsignon-qt.pri
++++ b/lib/SignOn/libsignon-qt.pri
+@@ -2,7 +2,7 @@ include( ../../common-project-config.pri )
+ include( ../../common-vars.pri )
+ TEMPLATE = lib
+ 
+-TARGET = signon-qt5
++TARGET = signon-qt$${QT_MAJOR_VERSION}
+ 
+ # Input
+ public_headers += \
+diff --git a/lib/SignOn/libsignon-qt6.pc.in b/lib/SignOn/libsignon-qt6.pc.in
+new file mode 100644
+index 0000000..6a1bcb1
+--- /dev/null
++++ b/lib/SignOn/libsignon-qt6.pc.in
+@@ -0,0 +1,11 @@
++prefix=$$INSTALL_PREFIX
++exec_prefix=${prefix}
++libdir=$$INSTALL_LIBDIR
++includedir=${prefix}/include
++
++Name: libsignon-qt6
++Description: Client library for the Single Sign On daemon, Qt6 bindings.
++Version: $$PROJECT_VERSION
++Libs: -L${libdir} -lsignon-qt6
++Requires: Qt6Core
++Cflags: -I${includedir}/signon-qt6 -I${includedir}/signon-qt6/SignOn
+diff --git a/lib/plugins/signon-plugins-common/signon-plugins-common.pc.in b/lib/plugins/signon-plugins-common/signon-plugins-common.pc.in
+index 3d7f3db..8cbc9d4 100644
+--- a/lib/plugins/signon-plugins-common/signon-plugins-common.pc.in
++++ b/lib/plugins/signon-plugins-common/signon-plugins-common.pc.in
+@@ -6,5 +6,5 @@ plugin_includedir=${includedir}/signon-plugins/SignOn
+ Name: signon-plugins-common
+ Description: SignonPluginsCommon
+ Version: $$PROJECT_VERSION
+-Libs.private: -L/usr/lib -lQt5Core
++Libs.private: -L/usr/lib -lQt$${QT_MAJOR_VERSION}Core
+ Cflags:  -I${includedir}/signon-plugins -I${includedir}/signon-plugins/SignOn
+diff --git a/lib/plugins/signon-plugins.pc.in b/lib/plugins/signon-plugins.pc.in
+index 5be38df..8849e5a 100644
+--- a/lib/plugins/signon-plugins.pc.in
++++ b/lib/plugins/signon-plugins.pc.in
+@@ -8,6 +8,6 @@ Name: signon-plugins
+ Description: SignonPlugins
+ Version: $$PROJECT_VERSION
+ Requires: $${LIBSIGNON}
+-Libs.private: -L/usr/lib -lQt5Core
++Libs.private: -L/usr/lib -lQt$${QT_MAJOR_VERSION}Core
+ Cflags:  -I${includedir}/signon-plugins -I${includedir}/signon-plugins/SignOn
+ Libs: -lsignon-plugins
+diff --git a/lib/signond/SignOn/SignOnExtension.pc.in b/lib/signond/SignOn/SignOnExtension.pc.in
+index e439284..ce7ad9c 100644
+--- a/lib/signond/SignOn/SignOnExtension.pc.in
++++ b/lib/signond/SignOn/SignOnExtension.pc.in
+@@ -7,6 +7,6 @@ plugindir=$$SIGNOND_EXTENSIONS_DIR
+ Name: SignOnExtension
+ Description: SignOn extension development 
+ Version: $$PROJECT_VERSION
+-Requires: Qt5Core
++Requires: Qt$${QT_MAJOR_VERSION}Core
+ Libs: -L${libdir} -lsignon-extension
+ Cflags: -I${includedir}/signon-extension
+diff --git a/tests/libsignon-qt-tests/libsignon-qt-tests.pro b/tests/libsignon-qt-tests/libsignon-qt-tests.pro
+index 4dd6ce4..7e44272 100644
+--- a/tests/libsignon-qt-tests/libsignon-qt-tests.pro
++++ b/tests/libsignon-qt-tests/libsignon-qt-tests.pro
+@@ -10,7 +10,7 @@ QT += \
+     testlib
+ QT -= gui
+ 
+-LIBS *= -lsignon-qt5
++LIBS *= -lsignon-qt$${QT_MAJOR_VERSION}
+ QMAKE_LIBDIR += $${TOP_BUILD_DIR}/lib/SignOn
+ QMAKE_RPATHDIR = $${QMAKE_LIBDIR}
+ 
+diff --git a/tests/signond-tests/identity-tool.pro b/tests/signond-tests/identity-tool.pro
+index c90e046..3a99e9d 100644
+--- a/tests/signond-tests/identity-tool.pro
++++ b/tests/signond-tests/identity-tool.pro
+@@ -6,7 +6,7 @@ TARGET = identity-tool
+ QT += core
+ QT -= gui
+ 
+-LIBS += -lsignon-qt5
++LIBS += -lsignon-qt$${QT_MAJOR_VERSION}
+ 
+ QMAKE_LIBDIR += \
+     $${TOP_BUILD_DIR}/lib/signond/SignOn \
+diff --git a/tests/signond-tests/mock-ac-plugin/identity-ac-helper.pro b/tests/signond-tests/mock-ac-plugin/identity-ac-helper.pro
+index 2dac5ad..b78e691 100644
+--- a/tests/signond-tests/mock-ac-plugin/identity-ac-helper.pro
++++ b/tests/signond-tests/mock-ac-plugin/identity-ac-helper.pro
+@@ -6,7 +6,7 @@ TARGET = identity-ac-helper
+ QT += core
+ QT -= gui
+ 
+-LIBS += -lsignon-qt5
++LIBS += -lsignon-qt$${QT_MAJOR_VERSION}
+ 
+ QMAKE_LIBDIR += \
+     $${TOP_BUILD_DIR}/lib/signond/SignOn \
+diff --git a/tests/signond-tests/signond-tests.pri b/tests/signond-tests/signond-tests.pri
+index cbdfae3..74fa5b4 100644
+--- a/tests/signond-tests/signond-tests.pri
++++ b/tests/signond-tests/signond-tests.pri
+@@ -11,7 +11,7 @@ QT -= gui
+ 
+ LIBS += \
+     -lsignon-extension \
+-    -lsignon-qt5
++    -lsignon-qt$${QT_MAJOR_VERSION}
+ 
+ QMAKE_LIBDIR += \
+     $${TOP_BUILD_DIR}/lib/signond/SignOn \
+-- 
+GitLab
+
+
+From f4e9e3b541027eb0a360d4e3de27ac48b67411eb Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Sun, 15 Oct 2023 17:14:47 +0200
+Subject: [PATCH 10/11] Fix plugin datastream in Qt6
+
+We send the size of the to-be-sent data to the datastream
+
+In Qt6 QByteArray::size() is 64 bit, but the other side reads it as int, breaking the communication
+
+Cast the size to int to avoid that
+---
+ lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+index d156659..fe35031 100644
+--- a/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
++++ b/lib/plugins/signon-plugins-common/SignOn/blobiohandler.cpp
+@@ -63,7 +63,8 @@ bool BlobIOHandler::sendData(const QVariantMap &map)
+ 
+     QDataStream stream(m_writeChannel);
+     QByteArray ba = variantMapToByteArray(map);
+-    stream << ba.size();
++    // in Qt6 QByteArray::size() is 64 bit, but the receiving side expects int
++    stream << static_cast<int>(ba.size());
+ 
+     QVector<QByteArray> pages = pageByteArray(ba);
+     for (int i = 0; i < pages.count(); ++i)
+-- 
+GitLab
+
+
+From c8ad98249af541514ff7a81634d3295e712f1a39 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Sun, 15 Oct 2023 17:15:00 +0200
+Subject: [PATCH 11/11] Port away from deprecated QProcess signal
+
+---
+ src/signond/pluginproxy.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/signond/pluginproxy.cpp b/src/signond/pluginproxy.cpp
+index 582aef4..2b9b28d 100644
+--- a/src/signond/pluginproxy.cpp
++++ b/src/signond/pluginproxy.cpp
+@@ -99,8 +99,9 @@ PluginProxy::PluginProxy(QString type, QObject *parent):
+      */
+     connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)),
+             this, SLOT(onExit(int, QProcess::ExitStatus)));
+-    connect(m_process, SIGNAL(error(QProcess::ProcessError)),
+-            this, SLOT(onError(QProcess::ProcessError)));
++
++    connect(m_process, &PluginProcess::errorOccurred,
++            this, &PluginProxy::onError);
+ }
+ 
+ PluginProxy::~PluginProxy()
+-- 
+GitLab
+

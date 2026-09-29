@@ -1,0 +1,13 @@
+--- a/openpty.c
++++ b/openpty.c
+@@ -10,6 +10,10 @@
+ 
+ #include "zssh.h"
+ 
++#ifdef __ANDROID__
++#include <pty.h>
++#endif
++
+ #define GL_SLAVENAMELEN	50
+ static char	gl_slavename[GL_SLAVENAMELEN + 1] = {0};
+ 

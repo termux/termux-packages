@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://www.indilib.org"
+TERMUX_PKG_DESCRIPTION="Astronomical instrumentation control"
+TERMUX_PKG_LICENSE="GPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="3ls-it <3ls-it@pm.me>"
+TERMUX_PKG_VERSION="2.2.5"
+TERMUX_PKG_SRCURL="https://github.com/indilib/indi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=938cae0b3bfbd34e73ae797bd4a0e5a64fe21753d2b560d88cafab0c61771628
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="cfitsio, curl, fftw, gsl, iconv, libc++, libev, libjpeg-turbo, libnova, libnpth, libusb, libxisf, zlib"

@@ -1,0 +1,119 @@
+--- a/chromium/src/build/compiled_action.gni
++++ b/chromium/src/build/compiled_action.gni
+@@ -120,6 +120,52 @@
+   }
+ }
+ 
++template("compiled_action_prebuilt") {
++  assert(defined(invoker.tool), "tool must be defined for $target_name")
++  assert(defined(invoker.outputs), "outputs must be defined for $target_name")
++  assert(defined(invoker.args), "args must be defined for $target_name")
++
++  assert(!defined(invoker.sources),
++         "compiled_action doesn't take a sources arg. Use inputs instead.")
++
++  action(target_name) {
++    forward_variables_from(invoker,
++                           [
++                             "data_deps",
++                             "deps",
++                             "depfile",
++                             "inputs",
++                             "outputs",
++                             "testonly",
++                             "visibility",
++                           ])
++    if (!defined(deps)) {
++      deps = []
++    }
++    if (!defined(inputs)) {
++      inputs = []
++    }
++
++    script = "//build/gn_run_binary.py"
++
++    # Constuct the host toolchain version of the tool.
++    host_tool = invoker.tool + "($host_toolchain)"
++
++    # Get the path to the executable. Currently, this assumes that the tool
++    # does not specify output_name so that the target name is the name to use.
++    # If that's not the case, we'll need another argument to the script to
++    # specify this, since we can't know what the output name is (it might be in
++    # another file not processed yet).
++    host_executable =
++        "@TERMUX_PREFIX@/opt/carbonyl-host-tools/host/" +
++        get_label_info(host_tool, "name") + _host_executable_suffix
++
++    # The script takes as arguments the binary to run, and then the arguments
++    # to pass it.
++    args = [ rebase_path(host_executable, root_build_dir) ] + invoker.args
++  }
++}
++
+ template("compiled_action_foreach") {
+   assert(defined(invoker.sources), "sources must be defined for $target_name")
+   assert(defined(invoker.tool), "tool must be defined for $target_name")
+--- a/chromium/src/chrome/browser/new_tab_page/chrome_colors/BUILD.gn
++++ b/chromium/src/chrome/browser/new_tab_page/chrome_colors/BUILD.gn
+@@ -20,7 +20,7 @@
+   ]
+ }
+ 
+-compiled_action("generate_chrome_colors_info") {
++compiled_action_prebuilt("generate_chrome_colors_info") {
+   tool = ":generate_colors_info"
+   outputs = [ "$target_gen_dir/generated_colors_info.h" ]
+   args = rebase_path(outputs, root_build_dir)
+--- a/chromium/src/third_party/blink/renderer/platform/BUILD.gn
++++ b/chromium/src/third_party/blink/renderer/platform/BUILD.gn
+@@ -117,7 +117,7 @@
+   ]
+ }
+ 
+-compiled_action("character_data") {
++compiled_action_prebuilt("character_data") {
+   tool = ":character_data_generator"
+   outputs = [ "$blink_platform_output_dir/character_property_data.cc" ]
+   args = rebase_path(outputs, root_build_dir)
+--- a/chromium/src/net/data/ssl/chrome_root_store/BUILD.gn
++++ b/chromium/src/net/data/ssl/chrome_root_store/BUILD.gn
+@@ -4,7 +4,7 @@
+ import("//build/compiled_action.gni")
+ 
+ # Generate C++ include file for the Chrome root store.
+-compiled_action("gen_root_store_inc") {
++compiled_action_prebuilt("gen_root_store_inc") {
+   tool = "//net/tools/root_store_tool:root_store_tool"
+ 
+   inputs = [
+--- a/chromium/src/net/http/BUILD.gn
++++ b/chromium/src/net/http/BUILD.gn
+@@ -6,7 +6,7 @@
+ import("//net/features.gni")
+ 
+ # Generates a header file based on the real preload list.
+-compiled_action("generate_transport_security_state") {
++compiled_action_prebuilt("generate_transport_security_state") {
+   tool = "//net/tools/transport_security_state_generator"
+ 
+   # Inputs in order expected by the command line of the tool.
+--- a/chromium/src/components/url_formatter/spoof_checks/top_domains/BUILD.gn
++++ b/chromium/src/components/url_formatter/spoof_checks/top_domains/BUILD.gn
+@@ -36,7 +36,7 @@
+   }
+ }
+ 
+-compiled_action("generate_top_domains_trie") {
++compiled_action_prebuilt("generate_top_domains_trie") {
+   tool = ":top_domain_generator"
+ 
+   # Inputs in order expected by the command line of the tool.
+@@ -118,7 +118,7 @@
+ 
+ # TODO(crbug/915921): Combine this and the previous one into a
+ # compiled_action_foreach target.
+-compiled_action("generate_top_domain_list_variables_file") {
++compiled_action_prebuilt("generate_top_domain_list_variables_file") {
+   tool = ":make_top_domain_list_variables"
+ 
+   # Inputs in order expected by the command line of the tool.

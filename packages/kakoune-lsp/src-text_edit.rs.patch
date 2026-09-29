@@ -1,0 +1,12 @@
+diff -uNr kak-lsp-15.0.0/src/text_edit.rs kak-lsp-15.0.0.mod/src/text_edit.rs
+--- kak-lsp-15.0.0/src/text_edit.rs	2023-11-15 16:55:21.000000000 +0800
++++ kak-lsp-15.0.0.mod/src/text_edit.rs	2023-11-18 14:17:54.068254703 +0800
+@@ -216,7 +216,7 @@
+         Ok(updated_text) => {
+             std::fs::rename(&temp_path, filename)?;
+             unsafe {
+-                libc::chmod(path.as_ptr(), stat.st_mode);
++                libc::chmod(path.as_ptr(), stat.st_mode as libc::mode_t);
+             }
+             let params = DidOpenTextDocumentParams {
+                 text_document: TextDocumentItem {

@@ -1,0 +1,22 @@
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp	2017-08-11 03:47:32.000000000 +0200
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp	2017-09-10 20:14:54.636653647 +0200
+@@ -152,14 +152,11 @@
+     }
+   }
+ 
+-  const std::string &customGCCName = D.getCCCGenericGCCName();
+-  const char *GCCName;
+-  if (!customGCCName.empty())
+-    GCCName = customGCCName.c_str();
+-  else if (D.CCCIsCXX()) {
+-    GCCName = "g++";
+-  } else
+-    GCCName = "gcc";
++  // Termux modification: Disable calling into gcc from clang.
++  // Clang calls into gcc if it tries to compile a language it doesn't understand.
++  // On Termux gcc is a symlink to clang, so this leads into fork loop until
++  // the whole system runs out of memory.
++  const char *GCCName = "false";
+ 
+   const char *Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+   C.addCommand(llvm::make_unique<Command>(JA, *this, Exec, CmdArgs, Inputs));

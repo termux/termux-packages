@@ -1,0 +1,13 @@
+--- ./makefile
++++ ./makefile
+@@ -1,8 +1,8 @@
+-PREFIX = /usr/local
++PREFIX = @TERMUX_PREFIX@
+ MANDIR = $(PREFIX)/share/man
+ 
+ sssnake: main.c autopilot.c xymap.c structs.c snake.c draw.c
+-	$(CC) -w main.c autopilot.c xymap.c structs.c snake.c draw.c -o sssnake
++	$(CC) -w $(CPPFLAGS) $(CFLAGS) main.c autopilot.c xymap.c structs.c snake.c draw.c $(LDFLAGS) -o sssnake
+ 
+ debug: main.c autopilot.c xymap.c structs.c snake.c draw.c
+ 	$(CC) -w -Wall -g main.c autopilot.c xymap.c structs.c snake.c draw.c -o sssnake

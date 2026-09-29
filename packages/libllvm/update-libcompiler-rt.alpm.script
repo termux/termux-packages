@@ -1,0 +1,13 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+set -e
+
+RT_PATH="@TERMUX_PREFIX@/lib/clang/@LLVM_MAJOR_VERSION@/lib/linux"
+
+sort -r | while read -r lib; do
+	if [[ -f ${lib} ]]; then
+		ln -sf "/${lib}" "${RT_PATH}"
+	else
+		rm -fr "${RT_PATH}/${lib##*/}"
+	fi
+done

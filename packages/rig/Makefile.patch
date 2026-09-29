@@ -1,0 +1,17 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,11 +1,11 @@
+-PREFIX=/usr/local
++PREFIX=@TERMUX_PREFIX@
+ BINDIR=${PREFIX}/bin
+-MANDIR=${PREFIX}/man
++MANDIR=${PREFIX}/share/man
+ DATADIR=${PREFIX}/share/rig
+ 
+ all: rig rig.6
+ rig: rig.cc
+-	g++ -g rig.cc -o rig -Wall -DDATADIR="\"$(DATADIR)\""
++	$(CXX) $(CXXFLAGS) $(CPPFLAGS) rig.cc $(LDFLAGS) -o rig -Wall -DDATADIR="\"$(DATADIR)\""
+ 
+ rig.6: rig.6.in
+ 	sed s@DATADIR@"$(DATADIR)"@g < rig.6.in > rig.6

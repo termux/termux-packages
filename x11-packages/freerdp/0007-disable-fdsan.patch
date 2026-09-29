@@ -1,0 +1,39 @@
+--- src/client/X11/cli/xfreerdp.c.orig	2025-04-13 19:29:32.145689193 +0000
++++ src/client/X11/cli/xfreerdp.c	2025-04-13 19:34:48.128463328 +0000
+@@ -31,6 +31,24 @@
+ #include "../xf_client.h"
+ #include "../xfreerdp.h"
+ 
++#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static inline void termux_disable_fdsan()
++{
++	// For Android 11+.
++	void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++	if (lib_handle) {
++		void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++		if (set_fdsan_error_level) {
++			set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++		}
++		dlclose(lib_handle);
++	}
++}
++#endif
++
++
+ static void xfreerdp_print_help(void)
+ {
+ 	printf("Keyboard Shortcuts:\n");
+@@ -54,6 +72,11 @@
+ 
+ int main(int argc, char* argv[])
+ {
++
++	#ifdef __ANDROID__
++	termux_disable_fdsan();
++	#endif
++
+ 	int rc = 1;
+ 	int status = 0;
+ 	HANDLE thread = NULL;

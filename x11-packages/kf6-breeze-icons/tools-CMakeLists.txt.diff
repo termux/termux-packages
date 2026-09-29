@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,10 @@
+-include(ECMMarkNonGuiExecutable)
++cmake_minimum_required(VERSION 3.16)
++add_link_options("-Wl,-rpath=${TERMUX_PREFIX}/opt/qt6/cross/lib")
++
++find_package(Qt6 REQUIRED COMPONENTS Core Widgets Xml)
++
++function(ecm_mark_nongui_executable)
++endfunction()
+
+ if (CMAKE_CROSSCOMPILING AND KF6_HOST_TOOLING)
+     find_program(GENERATE_SYMBOLIC_DARK generate-symbolic-dark PATHS ${KF6_HOST_TOOLING} NO_CACHE NO_CMAKE_FIND_ROOT_PATH)
+@@ -38,3 +44,6 @@
+         install(TARGETS qrcAlias ${KF_INSTALL_TARGETS_DEFAULT_ARGS})
+     endif()
+ endif ()
++
++install(TARGETS qrcAlias DESTINATION bin)
++install(TARGETS generate-symbolic-dark DESTINATION bin)

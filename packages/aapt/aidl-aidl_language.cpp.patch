@@ -1,0 +1,17 @@
+--- a/vendor/aidl/aidl_language.cpp
++++ b/vendor/aidl/aidl_language.cpp
+@@ -677,6 +677,14 @@
+   return false;
+ }
+ 
++FixedSizeArray::FixedSizeArray(std::unique_ptr<AidlConstantValue> dim) {
++  dimensions.push_back(std::move(dim));
++}
++
++FixedSizeArray::~FixedSizeArray() = default;
++FixedSizeArray::FixedSizeArray(FixedSizeArray&&) noexcept = default;
++FixedSizeArray& FixedSizeArray::operator=(FixedSizeArray&&) noexcept = default;
++
+ std::vector<int32_t> FixedSizeArray::GetDimensionInts() const {
+   std::vector<int32_t> ints;
+   for (const auto& dim : dimensions) {

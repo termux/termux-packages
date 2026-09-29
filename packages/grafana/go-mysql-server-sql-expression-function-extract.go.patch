@@ -1,0 +1,34 @@
+--- ./vendor/github.com/dolthub/go-mysql-server/sql/expression/function/extract.go.orig	2025-05-21 05:07:08.318702781 +0000
++++ ./vendor/github.com/dolthub/go-mysql-server/sql/expression/function/extract.go	2025-05-21 05:08:29.422167185 +0000
+@@ -169,11 +169,11 @@
+ 		ss := dateTime.Second()
+ 		return dd + hh + mm + ss, nil
+ 	case "DAY_MICROSECOND":
+-		dd := dateTime.Day() * 1_00_00_00_000000
+-		hh := dateTime.Hour() * 1_00_00_000000
+-		mm := dateTime.Minute() * 1_00_000000
+-		ss := dateTime.Second() * 1_000000
+-		mmmmmm := dateTime.Nanosecond() / 1000
++		dd := uint64(dateTime.Day()) * 1_00_00_00_000000
++		hh := uint64(dateTime.Hour()) * 1_00_00_000000
++		mm := uint64(dateTime.Minute()) * 1_00_000000
++		ss := uint64(dateTime.Second()) * 1_000000
++		mmmmmm := uint64(dateTime.Nanosecond()) / 1000
+ 		return dd + hh + mm + ss + mmmmmm, nil
+ 	case "HOUR_MINUTE":
+ 		hh := dateTime.Hour() * 1_00
+@@ -185,10 +185,10 @@
+ 		ss := dateTime.Second()
+ 		return hh + mm + ss, nil
+ 	case "HOUR_MICROSECOND":
+-		hh := dateTime.Hour() * 1_00_00_000000
+-		mm := dateTime.Minute() * 1_00_000000
+-		ss := dateTime.Second() * 1_000000
+-		mmmmmm := dateTime.Nanosecond() / 1000
++		hh := uint64(dateTime.Hour()) * 1_00_00_000000
++		mm := uint64(dateTime.Minute()) * 1_00_000000
++		ss := uint64(dateTime.Second()) * 1_000000
++		mmmmmm := uint64(dateTime.Nanosecond()) / 1000
+ 		return hh + mm + ss + mmmmmm, nil
+ 	case "MINUTE_SECOND":
+ 		mm := dateTime.Minute() * 1_00

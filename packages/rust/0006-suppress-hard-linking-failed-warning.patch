@@ -1,0 +1,34 @@
+--- a/compiler/rustc_incremental/src/diagnostics.rs
++++ b/compiler/rustc_incremental/src/diagnostics.rs
+@@ -170,14 +170,6 @@
+ }
+ 
+ #[derive(Diagnostic)]
+-#[diag(
+-    "hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `{$path}`"
+-)]
+-pub(crate) struct HardLinkFailed<'a> {
+-    pub path: &'a Path,
+-}
+-
+-#[derive(Diagnostic)]
+ #[diag("failed to delete partly initialized session dir `{$path}`: {$err}")]
+ pub(crate) struct DeletePartial<'a> {
+     pub path: &'a Path,
+--- a/compiler/rustc_incremental/src/persist/fs.rs
++++ b/compiler/rustc_incremental/src/persist/fs.rs
+@@ -263,13 +263,9 @@
+         debug!("attempting to copy data from source: {}", source_directory.display());
+ 
+         // Try copying over all files from the source directory
+-        if let Ok(allows_links) = copy_files(sess, &session_dir, &source_directory) {
++        if let Ok(_allows_links) = copy_files(sess, &session_dir, &source_directory) {
+             debug!("successfully copied data from: {}", source_directory.display());
+ 
+-            if !allows_links {
+-                sess.dcx().emit_warn(diagnostics::HardLinkFailed { path: &session_dir });
+-            }
+-
+             return IncrCompSession { session_directory: session_dir, _lock_file: directory_lock };
+         } else {
+             debug!("copying failed - trying next directory");

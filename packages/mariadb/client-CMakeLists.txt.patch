@@ -1,0 +1,24 @@
+--- a/client/CMakeLists.txt
++++ b/client/CMakeLists.txt
+@@ -44,12 +44,6 @@
+   SET_TARGET_PROPERTIES(mariadb PROPERTIES ENABLE_EXPORTS TRUE)
+ ENDIF(UNIX)
+ 
+-MYSQL_ADD_EXECUTABLE(mariadb-test mysqltest.cc ${CMAKE_SOURCE_DIR}/sql/sql_string.cc COMPONENT Test)
+-SET_SOURCE_FILES_PROPERTIES(mysqltest.cc PROPERTIES COMPILE_FLAGS "-DTHREADS ${PCRE2_DEBIAN_HACK}")
+-TARGET_LINK_LIBRARIES(mariadb-test  ${CLIENT_LIB} pcre2-posix pcre2-8)
+-SET_TARGET_PROPERTIES(mariadb-test PROPERTIES ENABLE_EXPORTS TRUE)
+-
+-
+ MYSQL_ADD_EXECUTABLE(mariadb-check mysqlcheck.c)
+ TARGET_LINK_LIBRARIES(mariadb-check ${CLIENT_LIB})
+ 
+@@ -95,7 +89,7 @@
+ SET_TARGET_PROPERTIES (mariadb-check mariadb-dump mariadb-import mariadb-upgrade mariadb-show mariadb-slap mariadb-plugin async_example
+ PROPERTIES HAS_CXX TRUE)
+ 
+-FOREACH(t mariadb mariadb-test mariadb-check mariadb-dump mariadb-import mariadb-upgrade mariadb-show mariadb-plugin mariadb-binlog
++FOREACH(t mariadb mariadb-check mariadb-dump mariadb-import mariadb-upgrade mariadb-show mariadb-plugin mariadb-binlog
+   mariadb-admin mariadb-slap async_example)
+   ADD_DEPENDENCIES(${t} GenError ${CLIENT_LIB})
+ ENDFOREACH()

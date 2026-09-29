@@ -1,0 +1,11 @@
+--- a/build/npm/postinstall.ts
++++ b/build/npm/postinstall.ts
+@@ -232,6 +232,8 @@
+ 				const env: NodeJS.ProcessEnv = { ...process.env };
+ 				if (process.env['CC']) { env['CC'] = 'gcc'; }
+ 				if (process.env['CXX']) { env['CXX'] = 'g++'; }
++				if (process.env['CPPFLAGS']) { env['CPPFLAGS'] = ''; }
++				if (process.env['CFLAGS']) { env['CFLAGS'] = ''; }
+ 				if (process.env['CXXFLAGS']) { env['CXXFLAGS'] = ''; }
+ 				if (process.env['LDFLAGS']) { env['LDFLAGS'] = ''; }
+ 				setNpmrcConfig('build', env);

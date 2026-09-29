@@ -1,0 +1,12 @@
+diff -ur orig/udocker/container/structure.py mod/udocker/container/structure.py
+--- orig/udocker/container/structure.py	2024-08-28 16:01:10.000000000 +0200
++++ mod/udocker/container/structure.py	2025-05-12 15:33:59.978143281 +0200
+@@ -281,7 +281,7 @@
+             if Msg.level >= Msg.VER:
+                 verbose = 'v'
+                 Msg().out("Info: extracting:", tarf, l=Msg.INF)
+-            cmd = ["tar", "-C", destdir, "-x" + verbose,
++            cmd = ["proot", "--link2symlink", "tar", "-C", destdir, "-x" + verbose,
+                    "--one-file-system", "--no-same-owner", "--overwrite",
+                    "--exclude=dev/*", "--exclude=etc/udev/devices/*",
+                    "--no-same-permissions", r"--exclude=.wh.*",

@@ -1,0 +1,86 @@
+alternative to distutilsextra that can be inserted into setup.py
+based on https://davesteele.github.io/development/2015/12/11/add-i18n-to-setup-py/
+
+diff --git a/setup.py b/setup.py
+index 412527b..2e79447 100755
+--- a/setup.py
++++ b/setup.py
+@@ -20,13 +20,11 @@
+ 
+ import os
+ import sys
++import shutil
+ 
+ from glob import glob
+ from setuptools import setup
+-
+-import DistUtilsExtra.command.build_extra
+-import DistUtilsExtra.command.build_i18n
+-import DistUtilsExtra.command.clean_i18n
++from setuptools.command.build import build
+ 
+ # to update i18n .mo files (and merge .pot file into .po files) run on Linux:
+ #   tx pull -a --minimum-perc=5
+@@ -43,6 +41,48 @@ with open('mate-tweak') as f:
+ 
+ PROGRAM_VERSION = __VERSION__
+ 
++podir = "po"
++pos = [x for x in os.listdir(podir) if x[-3:] == ".po"]
++langs = sorted([os.path.split(x)[-1][:-3] for x in pos])
++
++def mkmo(lang):
++    outpath = os.path.join("build/mo", lang, "LC_MESSAGES")
++    if os.path.exists(outpath):
++        shutil.rmtree(outpath)
++    os.makedirs(outpath)
++
++    inpath = os.path.join(podir, lang + ".po")
++
++    cmd = "msgfmt %s -o %s/%s.mo" % (inpath, outpath, "mate-tweak")
++    os.system(cmd)
++
++def merge_i18n():
++    cmd = "LC_ALL=C intltool-merge -u -c ./po/.intltool-merge-cache ./po "
++    for infile in (x[:-3] for x in os.listdir('.') if x[-3:] == '.in'):
++        print("Processing %s.in to %s" % (infile, infile))
++
++        if 'desktop' in infile:
++            flag = '-d'
++        elif 'schema' in infile:
++            flag = '-s'
++        elif 'xml' in infile:
++            flag = '-x'
++        else:
++            flag = ''
++
++        if flag:
++            os.system("%s %s %s.in %s" % (cmd, flag, infile, infile))
++
++class custom_build(build):
++    def run(self, *args):
++        build.run(self, *args)
++
++        for lang in langs:
++            mkmo(lang)
++
++        merge_i18n()
++        data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
++
+ def datafilelist(installbase, sourcebase):
+     datafileList = []
+     for root, subFolders, files in os.walk(sourcebase):
+@@ -62,12 +102,9 @@ data_files = [
+     ('{prefix}/share/polkit-1/actions'.format(prefix=sys.prefix), ['data/org.mate.mate-tweak.policy',]),
+     ('{prefix}/lib/mate-tweak'.format(prefix=sys.prefix), ['data/mate-tweak.ui', 'util/mate-tweak-helper']),
+ ]
+-data_files.extend(datafilelist('{prefix}/share/locale'.format(prefix=sys.prefix), 'build/mo'))
+ 
+ cmdclass ={
+-    "build" : DistUtilsExtra.command.build_extra.build_extra,
+-    "build_i18n" :  DistUtilsExtra.command.build_i18n.build_i18n,
+-    "clean": DistUtilsExtra.command.clean_i18n.clean_i18n,
++    "build" : custom_build,
+ }
+ 
+ setup(

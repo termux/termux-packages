@@ -1,0 +1,33 @@
+--- a/lldb/source/Host/android/HostInfoAndroid.cpp	2022-06-09 10:25:39.097225683 +0530
++++ b/lldb/source/Host/android/HostInfoAndroid.cpp	2022-06-09 10:31:38.355331796 +0530
+@@ -28,16 +28,16 @@
+ }
+ 
+ FileSpec HostInfoAndroid::GetDefaultShell() {
+-  return FileSpec("/system/bin/sh");
++  return FileSpec("@TERMUX_PREFIX@/bin/sh");
+ }
+ 
+ FileSpec HostInfoAndroid::ResolveLibraryPath(const std::string &module_path,
+                                              const ArchSpec &arch) {
+   static const char *const ld_library_path_separator = ":";
+-  static const char *const default_lib32_path[] = {"/vendor/lib", "/system/lib",
+-                                                   nullptr};
+-  static const char *const default_lib64_path[] = {"/vendor/lib64",
+-                                                   "/system/lib64", nullptr};
++  static const char *const default_lib32_path[] = {
++      "@TERMUX_PREFIX@/lib", "/vendor/lib", "/system/lib", nullptr};
++  static const char *const default_lib64_path[] = {
++      "@TERMUX_PREFIX@/lib", "/vendor/lib64", "/system/lib64", nullptr};
+ 
+   if (module_path.empty() || module_path[0] == '/') {
+     FileSpec file_spec(module_path.c_str());
+@@ -88,7 +88,7 @@
+   // invalid directory, we substitute the path with /data/local/tmp, which is
+   // correct at least in some cases (i.e., when running as shell user).
+   if (!success || !FileSystem::Instance().Exists(file_spec))
+-    file_spec = FileSpec("/data/local/tmp");
++    file_spec = FileSpec("@TERMUX_PREFIX@/tmp");
+ 
+   return FileSystem::Instance().Exists(file_spec);
+ }

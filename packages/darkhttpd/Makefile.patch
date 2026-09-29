@@ -1,0 +1,14 @@
+diff --git a/Makefile b/Makefile
+index 7059a14..b09a8a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,6 +7,9 @@ all: darkhttpd
+ darkhttpd: darkhttpd.c
+ 	$(CC) $(CFLAGS) $(LIBS) darkhttpd.c -o $@
+ 
++install: all
++	install darkhttpd "$(DESTDIR)$(PREFIX)/bin/darkhttpd"
++
+ clean:
+ 	rm -f darkhttpd core darkhttpd.core
+ 

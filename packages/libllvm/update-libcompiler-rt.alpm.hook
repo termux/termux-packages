@@ -1,0 +1,13 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = @TERMUX_PREFIX_TARGET@/opt/ndk-multilib/cross-compiler-rt/lib*
+Target = !@TERMUX_PREFIX_TARGET@/opt/ndk-multilib/cross-compiler-rt/lib*-@TERMUX_ARCH@-*
+
+[Action]
+Description = Updating clang runtime libraries...
+When = PostTransaction
+Exec = @TERMUX_PREFIX@/share/libalpm/scripts/update-libcompiler-rt
+NeedsTargets

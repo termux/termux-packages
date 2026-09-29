@@ -1,0 +1,15 @@
+Fixes error:
+zbus-5.7.0/src/connection/socket/unix.rs:342:44
+no `PeerPidfd` in `sys::socket::sockopt`
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -118,7 +118,7 @@ version = "1"
+ optional = true
+ 
+ [target.'cfg(all(unix, not(target_os = "macos")))'.dependencies.zbus]
+-version = "5"
++version = "5.12.0"
+ optional = true
+ 
+ [target.'cfg(target_os="macos")'.dependencies.chrono]

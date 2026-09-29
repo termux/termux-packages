@@ -1,0 +1,48 @@
+diff -uNr qtbase/src/corelib/thread/qthread_unix.cpp qtbase.mod/src/corelib/thread/qthread_unix.cpp
+--- qtbase/src/corelib/thread/qthread_unix.cpp	2018-09-13 07:25:10.000000000 +0300
++++ qtbase.mod/src/corelib/thread/qthread_unix.cpp	2018-09-21 16:25:01.058662816 +0300
+@@ -92,7 +92,7 @@
+ # define SCHED_IDLE    5
+ #endif
+
+-#if defined(Q_OS_DARWIN) || !defined(Q_OS_ANDROID) && !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0)
++#if !defined(__ANDROID__) && (defined(Q_OS_DARWIN) || !defined(Q_OS_OPENBSD) && defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && (_POSIX_THREAD_PRIORITY_SCHEDULING-0 >= 0))
+ #define QT_HAS_THREAD_PRIORITY_SCHEDULING
+ #endif
+
+@@ -280,7 +280,7 @@ static void setCurrentThreadName(const char *name)
+
+ void *QThreadPrivate::start(void *arg)
+ {
+-#if !defined(Q_OS_ANDROID)
++#if !defined(__ANDROID__)
+     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
+ #endif
+     pthread_cleanup_push(QThreadPrivate::finish, arg);
+@@ -322,7 +322,7 @@ void *QThreadPrivate::start(void *arg)
+ #endif
+
+         emit thr->started(QThread::QPrivateSignal());
+-#if !defined(Q_OS_ANDROID)
++#if !defined(__ANDROID__)
+         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+         pthread_testcancel();
+ #endif
+@@ -724,7 +724,7 @@ void QThread::start(Priority priority)
+
+ void QThread::terminate()
+ {
+-#if !defined(Q_OS_ANDROID)
++#if !defined(__ANDROID__)
+     Q_D(QThread);
+     QMutexLocker locker(&d->mutex);
+
+@@ -765,7 +765,7 @@ void QThread::setTerminationEnabled(bool enabled)
+                "Current thread was not started with QThread.");
+
+     Q_UNUSED(thr)
+-#if defined(Q_OS_ANDROID)
++#if defined(__ANDROID__)
+     Q_UNUSED(enabled);
+ #else
+     pthread_setcancelstate(enabled ? PTHREAD_CANCEL_ENABLE : PTHREAD_CANCEL_DISABLE, nullptr);

@@ -1,0 +1,102 @@
+TERMUX_PKG_HOMEPAGE=https://yazi-rs.github.io/
+TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, based on async I/O"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="26.9.1"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=66857f1b670469daf258edd0bb2ea51d9ad3e2cab4eea9684028c80059fd6862
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, imagemagick"
+TERMUX_PKG_RECOMMENDS="7zip, chafa, fd, ffmpeg, fzf, imagemagick, jq, poppler, ripgrep, zoxide"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
+
+termux_step_pre_configure() {
+	termux_setup_rust
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		termux_setup_proot
+	fi
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/trash \
+		! -wholename ./vendor/cc \
+		-exec rm -rf '{}' \;
+
+	find vendor/trash -type f -print0 | \
+		xargs -0 sed -i \
+		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
+		-e "s|/tmp|$TERMUX_PREFIX/tmp|g"
+
+	# patch trash-rs
+	local patch="$TERMUX_PKG_BUILDER_DIR/trash-rs-implement-get_mount_points-android.diff"
+	local dir="vendor/trash"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	# patch rust-cc
+	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
+	local dir="vendor/cc"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	cat >> Cargo.toml <<-EOF
+		# these lines should be appended to [patch.crates-io]
+		trash = { path = "./vendor/trash" }
+		cc = { path = "./vendor/cc" }
+	EOF
+}
+
+termux_step_make() {
+	VERGEN_GIT_SHA="termux" \
+	YAZI_GEN_COMPLETIONS=true \
+	cargo build --jobs "$TERMUX_PKG_MAKE_PROCESSES" --target "$CARGO_TARGET_NAME" --release
+}
+
+termux_step_make_install() {
+	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/yazi"
+	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/ya"
+
+	# yazi completions
+	install -Dm644 yazi-boot/completions/yazi.bash "$TERMUX_PREFIX/share/bash-completion/completions/yazi.bash"
+	install -Dm644 yazi-boot/completions/yazi.elv  "$TERMUX_PREFIX/share/elvish/lib/yazi.elv"
+	install -Dm644 yazi-boot/completions/yazi.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/yazi.fish"
+	install -Dm644 yazi-boot/completions/yazi.nu   "$TERMUX_PREFIX/share/nushell/vendor/autoload/yazi.nu"
+	install -Dm644 yazi-boot/completions/_yazi     "$TERMUX_PREFIX/share/zsh/site-functions/_yazi"
+
+	# ya completions
+	install -Dm644 yazi-cli/completions/ya.bash "$TERMUX_PREFIX/share/bash-completion/completions/ya.bash"
+	install -Dm644 yazi-cli/completions/ya.elv  "$TERMUX_PREFIX/share/elvish/lib/ya.elv"
+	install -Dm644 yazi-cli/completions/ya.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/ya.fish"
+	install -Dm644 yazi-cli/completions/ya.nu   "$TERMUX_PREFIX/share/nushell/vendor/autoload/ya.nu"
+	install -Dm644 yazi-cli/completions/_ya     "$TERMUX_PREFIX/share/zsh/site-functions/_ya"
+
+	# desktop entry
+	install -Dm644 assets/yazi.desktop "$TERMUX_PREFIX/share/applications/yazi.desktop"
+
+	# application icons
+	local res
+	local termux_proot_run=''
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		termux_proot_run=termux-proot-run
+	fi
+	echo -n "Generating icons:"
+	for res in 16 24 32 48 64 128 256; do
+		mkdir -p "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps"
+		$termux_proot_run magick assets/logo.png \
+			-resize "${res}x${res}" \
+			"${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps/yazi.png"
+		[[ -e "${TERMUX_PREFIX}/share/icons/hicolor/${res}x${res}/apps/yazi.png" ]] && {
+			echo -n " ${res}x${res}"
+		}
+	done
+	echo
+}
+
+termux_step_create_debscripts() {
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	echo "Please change font from termux-styling addon"
+	POSTINST_EOF
+}

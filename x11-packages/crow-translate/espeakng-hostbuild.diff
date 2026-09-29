@@ -1,0 +1,12 @@
+--- a/src/3rdparty/espeak-ng/CMakeLists.txt
++++ b/src/3rdparty/espeak-ng/CMakeLists.txt
+@@ -18,7 +18,7 @@ add_subdirectory(src)
+ 
+ if (COMPILE_INTONATIONS)
+-  if (CMAKE_CROSSCOMPILING)
+-    find_program(NATIVEBUILD NAMES espeak-ng PATHS ${NativeBuild_DIR} NO_DEFAULT_PATH)
++  if (TRUE)
++    find_program(NATIVEBUILD NAMES espeak-ng PATHS @ESPEAKNG_DIR@ NO_DEFAULT_PATH)
+     if(NATIVEBUILD)
+       message(STATUS "Native build of espeak-ng is located at: ${NATIVEBUILD}")
+       include(cmake/data.cmake)

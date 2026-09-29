@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/mate/Makefile.in wireshark-2.6.1.mod/plugins/epan/mate/Makefile.in
+--- wireshark-2.6.1/plugins/epan/mate/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/mate/Makefile.in	2018-06-26 18:52:25.204980641 +0300
+@@ -914,7 +914,7 @@
+ 	}
+ 
+ mate.la: $(mate_la_OBJECTS) $(mate_la_DEPENDENCIES) $(EXTRA_mate_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(mate_la_LINK) -rpath $(epan_plugindir) $(mate_la_OBJECTS) $(mate_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(mate_la_LINK) -rpath $(epan_plugindir) $(mate_la_OBJECTS) $(mate_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lwsutil -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

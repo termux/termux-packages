@@ -1,0 +1,26 @@
+--- ./bin/fzf-tmux.orig	2025-10-13 19:43:40.743574690 +0530
++++ ./bin/fzf-tmux	2025-10-13 19:51:18.698594642 +0530
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/usr/bin/bash
+ # fzf-tmux: starts fzf in a tmux pane
+ # usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
+ 
+@@ -7,7 +7,7 @@
+   exit 2
+ }
+ 
+-fzf="$(command which fzf)" || fzf="$(dirname "$0")/fzf"
++fzf="$(command -v fzf)" || fzf="$(dirname "$0")/fzf"
+ [[ -x $fzf ]] || fail 'fzf executable not found'
+ 
+ args=()
+@@ -159,7 +159,7 @@
+ set -e
+ 
+ # Clean up named pipes on exit
+-tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/fzf-tmux-XXXXXX")
++tmpdir=$(mktemp -d "${TMPDIR:-@TERMUX_PREFIX@/tmp}/fzf-tmux-XXXXXX")
+ argsf="$tmpdir/args"
+ fifo1="$tmpdir/fifo1"
+ fifo2="$tmpdir/fifo2"

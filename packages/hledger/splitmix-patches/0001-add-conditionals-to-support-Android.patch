@@ -1,0 +1,27 @@
+From b97a93ed42bed73330237bd563c0e3c45aa50afd Mon Sep 17 00:00:00 2001
+From: Andriy Mykhaylyk <erp.lsf@gmail.com>
+Date: Sun, 15 Jun 2025 16:10:09 +0200
+Subject: [PATCH] add conditionals to support Android
+
+---
+ cbits-unix/init.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/cbits-unix/init.c b/cbits-unix/init.c
+index 255b667..25a6ce7 100644
+--- a/cbits-unix/init.c
++++ b/cbits-unix/init.c
+@@ -8,6 +8,10 @@
+ 
+ uint64_t splitmix_init() {
+ 	uint64_t result;
++#if (!defined(__ANDROID__) || __ANDROID_API__ >= 28)
+ 	int r = getentropy(&result, sizeof(uint64_t));
++#else
++	int r = -1;
++#endif
+ 	return r == 0 ? result : 0xfeed1000;
+ }
+-- 
+2.49.0
+

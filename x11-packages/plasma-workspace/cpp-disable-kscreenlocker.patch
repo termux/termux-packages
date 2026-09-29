@@ -1,0 +1,123 @@
+diff --git a/libkworkspace/sessionmanagement.cpp b/libkworkspace/sessionmanagement.cpp
+index 248147f..54b6958 100644
+--- a/libkworkspace/sessionmanagement.cpp
++++ b/libkworkspace/sessionmanagement.cpp
+@@ -18,7 +18,6 @@
+ #include <iostream>
+ 
+ #include "logoutprompt_interface.h"
+-#include "screenlocker_interface.h"
+ #include "shutdown_interface.h"
+ 
+ #include "libkworkspace_debug.h"
+@@ -147,18 +147,11 @@ void SessionManagement::requestLogoutPrompt()
+         return;
+     }
+ 
+-    OrgFreedesktopScreenSaverInterface ifaceScreenSaver(QStringLiteral("org.freedesktop.ScreenSaver"),
+-                                                        QStringLiteral("/ScreenSaver"),
+-                                                        QDBusConnection::sessionBus());
+-
+-    // Do not show Logoup prompt when in the lockscreen / screensaver
+-    if (!ifaceScreenSaver.GetActive()) {
+         // Don't bother to check for whether the user normally wants confirmation or
+         // not; if this function was invoked, it means they do want to see the logout
+         // prompt right now
+         LogoutPromptIface iface;
+         lockQuitUntilFinished(iface.promptAll());
+-    }
+ }
+ 
+ void SessionManagement::requestShutdown(ConfirmationMode confirmationMode)
+@@ -265,8 +258,6 @@ void SessionManagement::lock()
+     if (!canLock()) {
+         return;
+     }
+-    OrgFreedesktopScreenSaverInterface iface(QStringLiteral("org.freedesktop.ScreenSaver"), QStringLiteral("/ScreenSaver"), QDBusConnection::sessionBus());
+-    iface.Lock();
+ }
+ 
+ void SessionManagement::switchUser()
+@@ -279,28 +270,6 @@ void SessionManagement::switchUser()
+         qCWarning(LIBKWORKSPACE_DEBUG) << "Cannot switch user: XDG_SEAT_PATH not set";
+         return;
+     }
+-
+-    // lock first
+-    OrgFreedesktopScreenSaverInterface screenSaverIface(QStringLiteral("org.freedesktop.ScreenSaver"),
+-                                                        QStringLiteral("/ScreenSaver"),
+-                                                        QDBusConnection::sessionBus());
+-    QDBusPendingReply<> pendingLock = screenSaverIface.Lock();
+-
+-    // then tell the display manager to switch
+-    auto watcher = new QDBusPendingCallWatcher(pendingLock, this);
+-    connect(watcher, &QDBusPendingCallWatcher::finished, watcher, &QObject::deleteLater);
+-    connect(watcher, &QDBusPendingCallWatcher::finished, this, [](QDBusPendingCallWatcher *watcher) {
+-        if (watcher->isError()) {
+-            qCWarning(LIBKWORKSPACE_DEBUG) << "Failed to lock screen before switching user:" << watcher->error().message();
+-            return;
+-        }
+-        QDBusMessage switchToGreeterMessage = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.DisplayManager"),
+-                                                                             qEnvironmentVariable("XDG_SEAT_PATH"),
+-                                                                             QStringLiteral("org.freedesktop.DisplayManager.Seat"),
+-                                                                             u"SwitchToGreeter"_s);
+-
+-        QDBusConnection::systemBus().asyncCall(switchToGreeterMessage);
+-    });
+ }
+ 
+ void SessionManagement::saveSession()
+diff --git a/kcms/region_language/exampleutility.h b/kcms/region_language/exampleutility.h
+index c8e1228..5304d01 100644
+--- a/kcms/region_language/exampleutility.h
++++ b/kcms/region_language/exampleutility.h
+@@ -18,6 +18,49 @@
+ #include <QTextStream>
+ #include <langinfo.h>
+ 
++/* copied and pasted from perl source code */
++/* https://github.com/Perl/perl5/blob/eb8c4ad127fd11e9f7c8f2252f88d75574e9c427/perl_langinfo.h */
++#  define _NL_ADDRESS_POSTAL_FMT   -58
++#  define _NL_ADDRESS_COUNTRY_NAME -59
++#  define _NL_ADDRESS_COUNTRY_POST -60
++#  define _NL_ADDRESS_COUNTRY_AB2  -61
++#  define _NL_ADDRESS_COUNTRY_AB3  -62
++#  define _NL_ADDRESS_COUNTRY_CAR  -63
++#  define _NL_ADDRESS_COUNTRY_NUM  -64
++#  define _NL_ADDRESS_COUNTRY_ISBN -65
++#  define _NL_ADDRESS_LANG_NAME    -66
++#  define _NL_ADDRESS_LANG_AB      -67
++#  define _NL_ADDRESS_LANG_TERM    -68
++#  define _NL_ADDRESS_LANG_LIB     -69
++#  define _NL_IDENTIFICATION_TITLE        -70
++#  define _NL_IDENTIFICATION_SOURCE       -71
++#  define _NL_IDENTIFICATION_ADDRESS      -72
++#  define _NL_IDENTIFICATION_CONTACT      -73
++#  define _NL_IDENTIFICATION_EMAIL        -74
++#  define _NL_IDENTIFICATION_TEL          -75
++#  define _NL_IDENTIFICATION_FAX          -76
++#  define _NL_IDENTIFICATION_LANGUAGE     -77
++#  define _NL_IDENTIFICATION_TERRITORY    -78
++#  define _NL_IDENTIFICATION_AUDIENCE     -79
++#  define _NL_IDENTIFICATION_APPLICATION  -80
++#  define _NL_IDENTIFICATION_ABBREVIATION -81
++#  define _NL_IDENTIFICATION_REVISION     -82
++#  define _NL_IDENTIFICATION_DATE         -83
++#  define _NL_IDENTIFICATION_CATEGORY     -84
++#  define _NL_MEASUREMENT_MEASUREMENT -85
++#  define _NL_NAME_NAME_FMT     -86
++#  define _NL_NAME_NAME_GEN     -87
++#  define _NL_NAME_NAME_MR      -88
++#  define _NL_NAME_NAME_MRS     -89
++#  define _NL_NAME_NAME_MISS    -90
++#  define _NL_NAME_NAME_MS      -91
++#  define _NL_PAPER_HEIGHT  -92
++#  define _NL_PAPER_WIDTH   -93
++#  define _NL_TELEPHONE_TEL_INT_FMT  -94
++#  define _NL_TELEPHONE_TEL_DOM_FMT  -95
++#  define _NL_TELEPHONE_INT_SELECT   -96
++#  define _NL_TELEPHONE_INT_PREFIX   -97
++
+ class Utility
+ {
+     friend class ExampleUtilityTest;

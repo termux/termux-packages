@@ -1,0 +1,22 @@
+diff --git a/servconf.c b/servconf.c
+index ce388f1dd..0f0be09f4 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -324,7 +324,7 @@ fill_default_server_options(ServerOptions *options)
+ 	}
+ 	/* No certificates by default */
+ 	if (options->num_ports == 0)
+-		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
++		options->ports[options->num_ports++] = 8022 /* SSH_DEFAULT_PORT */;
+ 	if (options->listen_addrs == NULL)
+ 		add_listen_addr(options, NULL, NULL, 0);
+ 	if (options->pid_file == NULL)
+@@ -724,7 +724,7 @@ process_queued_listen_addrs(ServerOptions *options)
+ 	struct queued_listenaddr *qla;
+ 
+ 	if (options->num_ports == 0)
+-		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
++		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
+ 	if (options->address_family == -1)
+ 		options->address_family = AF_UNSPEC;
+ 

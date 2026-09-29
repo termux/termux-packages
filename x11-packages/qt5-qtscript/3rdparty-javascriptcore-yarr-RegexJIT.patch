@@ -1,0 +1,41 @@
+diff -uNr qtscript-everywhere-src-5.15.3/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.cpp qtscript-everywhere-src-5.15.3.mod/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.cpp
+--- qtscript-everywhere-src-5.15.3/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.cpp	2020-10-27 16:02:11.000000000 +0800
++++ qtscript-everywhere-src-5.15.3.mod/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.cpp	2022-09-18 10:16:45.485067410 +0800
+@@ -1396,11 +1396,6 @@
+     RegexGenerator generator(pattern);
+     generator.compile(globalData, jitObject);
+ 
+-    if (generator.generationFailed()) {
+-        JSRegExpIgnoreCaseOption ignoreCaseOption = ignoreCase ? JSRegExpIgnoreCase : JSRegExpDoNotIgnoreCase;
+-        JSRegExpMultilineOption multilineOption = multiline ? JSRegExpMultiline : JSRegExpSingleLine;
+-        jitObject.setFallback(jsRegExpCompile(reinterpret_cast<const UChar*>(patternString.data()), patternString.size(), ignoreCaseOption, multilineOption, &numSubpatterns, &error));
+-    }
+ }
+ 
+ }}
+diff -uNr qtscript-everywhere-src-5.15.3/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.h qtscript-everywhere-src-5.15.3.mod/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.h
+--- qtscript-everywhere-src-5.15.3/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.h	2020-10-27 16:02:11.000000000 +0800
++++ qtscript-everywhere-src-5.15.3.mod/src/3rdparty/javascriptcore/JavaScriptCore/yarr/RegexJIT.h	2022-09-18 10:17:42.355067388 +0800
+@@ -59,12 +59,6 @@
+     {
+     }
+ 
+-    ~RegexCodeBlock()
+-    {
+-        if (m_fallback)
+-            jsRegExpFree(m_fallback);
+-    }
+-
+     JSRegExp* getFallback() { return m_fallback; }
+     void setFallback(JSRegExp* fallback) { m_fallback = fallback; }
+ 
+@@ -85,9 +79,6 @@
+ 
+ inline int executeRegex(RegexCodeBlock& jitObject, const UChar* input, unsigned start, unsigned length, int* output, int outputArraySize)
+ {
+-    if (JSRegExp* fallback = jitObject.getFallback())
+-        return (jsRegExpExecute(fallback, input, length, start, output, outputArraySize) < 0) ? -1 : output[0];
+-
+     return jitObject.execute(input, start, length, output);
+ }
+ 

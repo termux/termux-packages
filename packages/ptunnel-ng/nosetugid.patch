@@ -1,0 +1,78 @@
+diff --git a/src/options.c b/src/options.c
+index 84227ae..125cef3 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -172,14 +172,14 @@ static const struct option_usage usage[] = {
+ 	},
+ 	/** --user */
+ 	{"user",         0, OPT_STR,    {.str = "nobody"},
+-#ifdef WIN32
++#if defined(WIN32) || defined(__ANDROID__)
+ 		"(Not available on this platform.)\n"
+ #endif
+ 		"When started in privileged mode, drop down to user's rights as soon as possible\n"
+ 	},
+ 	/** --group */
+ 	{"group",        0, OPT_STR,    {.str = "nogroup"},
+-#ifdef WIN32
++#if defined(WIN32) || defined(__ANDROID__)
+ 		"(Not available on this platform.)\n"
+ #endif
+ 		"When started in privileged mode, drop down to group's rights as soon as possible\n"
+@@ -268,6 +268,7 @@ static void set_options_defaults(void) {
+ #ifndef WIN32
+ 	opts.pid_path        = strdup(*(char **)get_default_optval(OPT_STR, "daemon"));
+ 
++#ifndef __ANDROID__
+ 	errno = 0;
+ 	tmp = *(char **) get_default_optval(OPT_STR, "user");
+ 	if (NULL == (pwnam = getpwnam(tmp)))
+@@ -282,6 +283,7 @@ static void set_options_defaults(void) {
+ 	tmp = *(char **) get_default_optval(OPT_STR, "group");
+ 	if (NULL != (grnam = getgrnam(tmp)))
+ 		opts.gid = grnam->gr_gid;
++#endif
+ 
+ 	opts.root_dir        = strdup(*(char **)get_default_optval(OPT_STR, "chroot"));
+ #endif
+@@ -508,6 +510,7 @@ int parse_options(int argc, char **argv) {
+ 			case 'S':
+ 				opts.use_syslog = 1;
+ 				break;
++#ifndef __ANDROID__
+ 			case 'u':
+ 				if (!optarg)
+ 					break;
+@@ -530,6 +533,12 @@ int parse_options(int argc, char **argv) {
+ 				}
+ 				opts.gid = grnam->gr_gid;
+ 				break;
++#else
++			case 'u':
++			case 'g':
++				pt_log(kLog_error, "-%c: %s\n", c, "feature not supported");
++				exit(1);
++#endif
+ 			case 'C':
+ 				opts.chroot = 1;
+ 				if (!optarg)
+diff --git a/src/ptunnel.c b/src/ptunnel.c
+index ac6ff4f..997d1d6 100644
+--- a/src/ptunnel.c
++++ b/src/ptunnel.c
+@@ -586,6 +586,7 @@ unsigned int __stdcall pt_proxy(void *args)
+ 	                  (opts.unprivileged ? "unprivileged" : "privileged"));
+ 
+ #ifndef WIN32
++#ifndef __ANDROID__
+ #ifdef HAVE_SELINUX
+ 	if (opts.uid || opts.gid || opts.selinux_context)
+ #else
+@@ -596,6 +597,7 @@ unsigned int __stdcall pt_proxy(void *args)
+ 		pt_log(kLog_error, "setgid(%d): %s\n", opts.gid, strerror(errno));
+ 	if (opts.uid && -1 == setuid(opts.uid))
+ 		pt_log(kLog_error, "setuid(%d): %s\n", opts.uid, strerror(errno));
++#endif
+ #ifdef HAVE_SELINUX
+ 	if (opts.selinux) {
+ 		if (NULL != opts.selinux_context && -1 == setcon(opts.selinux_context))

@@ -1,0 +1,21 @@
+Prevents:
+RuntimeError: Failed to dlopen /data/data/com.termux/files/usr/lib/kitty/kitty/glfw-x11.so
+with error: dlopen failed: cannot locate symbol "_glfwDetectJoystickConnectionLinux"
+referenced by "/data/data/com.termux/files/usr/lib/kitty/kitty/glfw-x11.so"...
+After the update to Python 3.13
+
+(this patch is roughly analogous to x11-packages/glfw/src-CMakeLists.txt.patch,
+but in the build system of kitty/the kitty fork of GLFW,
+instead of the original build system of the official GLFW)
+
+--- a/glfw/glfw.py
++++ b/glfw/glfw.py
+@@ -11,7 +11,7 @@
+ from typing import Any, Callable, Dict, List, NamedTuple, Optional, Sequence, Tuple
+ 
+ _plat = sys.platform.lower()
+-is_linux = 'linux' in _plat
++is_linux = 'linux' in _plat or 'android' in _plat
+ is_openbsd = 'openbsd' in _plat
+ base = os.path.dirname(os.path.abspath(__file__))
+ 

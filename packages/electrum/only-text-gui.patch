@@ -1,0 +1,21 @@
+--- a/electrum/daemon.py
++++ b/electrum/daemon.py
+@@ -673,7 +673,7 @@
+         threading.current_thread().name = 'GUI'
+         gui_name = self.config.GUI_NAME
+         if gui_name in ['lite', 'classic']:
+-            gui_name = 'qt'
++            gui_name = 'text'
+         self._plugins = Plugins(self.config, gui_name)  # init plugins
+         self.logger.info(f'launching GUI: {gui_name}')
+         try:
+--- a/electrum/simple_config.py
++++ b/electrum/simple_config.py
+@@ -811,6 +811,6 @@
+     DISABLE_MEMORY_HARDENING_LINUX = ConfigVar('nohardening', default=None, type_=bool) # default is False in add_global_options
+ 
+-    GUI_NAME = ConfigVar('gui', default='qt', type_=str)
++    GUI_NAME = ConfigVar('gui', default='text', type_=str)
+     CURRENT_WALLET = ConfigVar(
+         'current_wallet', default=None, type_=str,
+         convert_setter=lambda v: None if util.is_hidden_wallet_path(v) else v,  # don't save "hidden wallet" paths

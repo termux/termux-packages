@@ -1,0 +1,11 @@
+--- ./Source/cmExecProgramCommand.cxx.orig	2025-06-10 12:15:53.404143772 +0000
++++ ./Source/cmExecProgramCommand.cxx	2025-06-10 12:18:50.549046543 +0000
+@@ -206,7 +206,7 @@
+   }
+   fflush(stdout);
+   fflush(stderr);
+-  char const* cmd[] = { "/bin/sh", "-c", command.c_str(), nullptr };
++  char const* cmd[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command.c_str(), nullptr };
+   cmsysProcess_SetCommand(cp, cmd);
+ #endif
+ 

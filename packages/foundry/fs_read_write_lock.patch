@@ -1,0 +1,92 @@
+--- a/crates/common/src/fs.rs	2026-05-16 17:48:14.147489070 +0600
++++ b/crates/common/src/fs.rs	2026-05-17 16:55:54.076779778 +0600
+@@ -9,6 +9,31 @@
+     path::{Component, Path, PathBuf},
+ };
+ 
++// ──────────────── Termux compatibility ───────────────────
++// Android's /data filesystem does not support flock(LOCK_SH) or flock(LOCK_EX)
++// — both return EOPNOTSUPP.  We work around this as follows:
++//
++//   Reads  — safe to perform concurrently without any lock; no replacement
++//            needed.
++//
++//   Writes — replaced with a process-local Mutex so that parallel forge test
++//            threads cannot interleave writes to the same output files.
++//            A single global Mutex is sufficient: write durations are tiny and
++//            forge never intentionally writes the same file from two tests at
++//            once.
++#[cfg(target_os = "android")]
++static PROCESS_WRITE_LOCK: std::sync::OnceLock<std::sync::Mutex<()>> = std::sync::OnceLock::new();
++
++#[cfg(target_os = "android")]
++#[inline]
++fn process_write_guard() -> std::sync::MutexGuard<'static, ()> {
++    PROCESS_WRITE_LOCK
++        .get_or_init(|| std::sync::Mutex::new(()))
++        .lock()
++        .expect("foundry fs write lock poisoned")
++}
++// ──────────────────────── End ───────────────────────────────
++
+ /// The [`fs`](self) result type.
+ pub type Result<T> = std::result::Result<T, FsPathError>;
+ 
+@@ -71,9 +96,17 @@
+     let path = path.as_ref();
+     let mut file =
+         fs::OpenOptions::new().read(true).open(path).map_err(|err| FsPathError::open(err, path))?;
++
++    // Android/Termux: flock(LOCK_SH) is not supported on the /data filesystem.
++    // Concurrent reads cannot corrupt file contents so no fallback is needed.
++    #[cfg(not(target_os = "android"))]
+     file.lock_shared().map_err(|err| FsPathError::lock(err, path))?;
++
+     let contents = read_inner(path, &mut file)?;
++
++    #[cfg(not(target_os = "android"))]
+     file.unlock().map_err(|err| FsPathError::unlock(err, path))?;
++
+     Ok(contents)
+ }
+ 
+@@ -130,9 +163,18 @@
+         .truncate(true)
+         .open(path)
+         .map_err(|err| FsPathError::open(err, path))?;
++
++    // Android/Termux: replace OS lock with a process-local Mutex.
++    #[cfg(target_os = "android")]
++    let _guard = process_write_guard();
++    #[cfg(not(target_os = "android"))]
+     file.lock().map_err(|err| FsPathError::lock(err, path))?;
++
+     file.write_all(contents.as_ref()).map_err(|err| FsPathError::write(err, path))?;
+-    file.unlock().map_err(|err| FsPathError::unlock(err, path))
++    #[cfg(not(target_os = "android"))]
++    file.unlock().map_err(|err| FsPathError::unlock(err, path))?;
++
++    Ok(())
+ }
+ 
+ /// Writes a line in an exclusive locked file.
+@@ -148,9 +190,18 @@
+         .open(path)
+         .map_err(|err| FsPathError::open(err, path))?;
+ 
++    // Android/Termux: replace OS lock with a process-local Mutex.
++    #[cfg(target_os = "android")]
++    let _guard = process_write_guard();
++    #[cfg(not(target_os = "android"))]
+     file.lock().map_err(|err| FsPathError::lock(err, path))?;
++
+     writeln!(file, "{line}").map_err(|err| FsPathError::write(err, path))?;
+-    file.unlock().map_err(|err| FsPathError::unlock(err, path))
++
++    #[cfg(not(target_os = "android"))]
++    file.unlock().map_err(|err| FsPathError::unlock(err, path))?;
++
++    Ok(())
+ }
+ 
+ // Locking fails on Windows if the file is opened in append mode.

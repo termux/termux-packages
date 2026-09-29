@@ -1,0 +1,19 @@
+--- src/joe/path.c~	2016-07-18 17:11:09.000000000 +0200
++++ src/joe/path.c	2016-12-26 18:48:04.010421451 +0100
+@@ -401,14 +401,14 @@
+ {
+ 	char **lst = NULL;
+ 	struct passwd *pw;
+-
++#ifndef __ANDROID__
+ 	while((pw=getpwent()))
+ 		if (rmatch(word+1, pw->pw_name)) {
+ 			char *t = vsncpy(NULL,0,sc("~"));
+ 			lst = vaadd(lst, vsncpy(sv(t),sz(pw->pw_name)));
+ 			}
+ 	endpwent();
+-
++#endif
+ 	return lst;
+ }
+ /********************************************************************/

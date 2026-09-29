@@ -1,0 +1,10 @@
++++ ./CMakeScripts/DefineDependsandFlags.cmake
+@@ -394,7 +394,7 @@
+ endif()
+ if(MAGICK_FOUND)
+     sanitize_ldflags_for_libs(MAGICK_LDFLAGS)
+-    list(APPEND INKSCAPE_LIBS ${MAGICK_LDFLAGS})
++    list(APPEND INKSCAPE_LIBS -Wl,-Bstatic ${MAGICK_LDFLAGS} -Wl,-Bdynamic -ljasper -lheif -lwebp -ljxl_threads -ljxl -lwebpmux -lz)
+     add_definitions(${MAGICK_CFLAGS_OTHER})
+     list(APPEND INKSCAPE_INCS_SYS ${MAGICK_INCLUDE_DIRS})
+ 

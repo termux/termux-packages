@@ -1,0 +1,13 @@
+diff -u -r ../tmux-2.5/compat/setproctitle.c ./compat/setproctitle.c
+--- ../tmux-2.5/compat/setproctitle.c	2017-04-28 15:43:11.000000000 +0200
++++ ./compat/setproctitle.c	2017-07-02 11:16:40.393826133 +0200
+@@ -18,6 +18,9 @@
+ 
+ #include <stdarg.h>
+ #include <string.h>
++#ifdef __ANDROID__
++# include <stdlib.h> /* For getprogname() */
++#endif
+ 
+ #include "compat.h"
+ 

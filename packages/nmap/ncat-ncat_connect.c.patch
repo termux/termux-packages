@@ -1,0 +1,11 @@
+--- ./ncat/ncat_connect.c.orig	2022-01-26 14:17:18.457352337 +0530
++++ ./ncat/ncat_connect.c	2022-01-26 14:19:24.273745882 +0530
+@@ -1032,7 +1032,7 @@
+               char *tmpdir = getenv("TMPDIR");
+               size_t size=0, offset=0;
+               strbuf_sprintf(&tmp_name, &size, &offset, "%s/ncat.XXXXXX",
+-                  tmpdir ? tmpdir : "/tmp");
++                  tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp");
+               if (mkstemp(tmp_name) == -1) {
+                 bye("Failed to create name for temporary DGRAM source Unix domain socket (mkstemp).");
+               }

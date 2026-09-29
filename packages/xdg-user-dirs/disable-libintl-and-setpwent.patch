@@ -1,0 +1,31 @@
+--- a/meson.build
++++ b/meson.build
+@@ -15,12 +15,7 @@
+ #
+ 
+ # Gettext/libintl
+-libintl_dep = dependency('', required: false)
+-if cc.has_function('ngettext')
+-  libintl_dep = declare_dependency()
+-else
+-  libintl_dep = cc.find_library('intl', required: true)
+-endif
++libintl_dep = declare_dependency()
+ 
+ systemd_dep = dependency('systemd', required: false)
+ 
+
+--- a/src/xdg-user-dirs-update.c
++++ b/src/xdg-user-dirs-update.c
+@@ -338,9 +338,9 @@
+     }
+   else
+     {
+-      setpwent ();
++// setpwent();
+       pw = getpwuid (getuid ());
+-      endpwent ();
++// endpwent();
+ 
+       if (pw && pw->pw_dir)
+         home_dir = strdup (pw->pw_dir);

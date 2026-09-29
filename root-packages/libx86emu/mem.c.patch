@@ -1,0 +1,22 @@
+Not sure if this will work properly...
+
+--- a/mem.c
++++ b/mem.c
+@@ -33,9 +33,6 @@
+ 
+ 
+ #include "include/x86emu_int.h"
+-#if defined(__i386__) || defined (__x86_64__)
+-#include <sys/io.h>
+-#else
+ /* define some dummy macros; see also WITH_IOPL in x86emu_int.h */
+ #define inb(addr) 0xff
+ #define inw(addr) 0xffff
+@@ -43,7 +40,6 @@
+ #define outb(val, addr)
+ #define outw(val, addr)
+ #define outl(val, addr)
+-#endif
+ 
+ #define PERM16(a)	((a) + ((a) << 8))
+ #define PERM32(a)	(PERM16(a) + (PERM16(a) << 16))

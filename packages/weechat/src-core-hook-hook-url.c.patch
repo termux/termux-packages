@@ -1,0 +1,26 @@
+--- a/src/core/hook/hook-url.c	2026-06-11 15:06:23.835869142 +0300
++++ b/src/core/hook/hook-url.c	2026-06-11 15:06:55.292751369 +0300
+@@ -208,7 +208,11 @@
+                 HOOK_URL(hook, url),
+                 ((float)HOOK_URL(hook, timeout)) / 1000);
+         }
++#ifndef __ANDROID__
+         pthread_cancel (HOOK_URL(hook, thread_id));
++#else
++        HOOK_URL(hook, stop_transfer) = 1;
++#endif
+         usleep (1000);
+         unhook (hook);
+     }
+@@ -405,7 +409,11 @@
+     }
+     if (HOOK_URL(hook, thread_running))
+     {
++#ifndef __ANDROID__
+         pthread_cancel (HOOK_URL(hook, thread_id));
++#else
++        HOOK_URL(hook, stop_transfer) = 1;
++#endif
+         HOOK_URL(hook, thread_running) = 0;
+     }
+     if (HOOK_URL(hook, thread_created))

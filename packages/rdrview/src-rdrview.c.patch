@@ -1,0 +1,24 @@
+--- a/src/rdrview.c
++++ b/src/rdrview.c
+@@ -143,7 +143,7 @@
+ 	char *envdir = getenv("TMPDIR");
+ 
+ 	if (!tmpdir) {
+-		dir_template = mkstring("%s/XXXXXX", envdir ? envdir : "/tmp");
++		dir_template = mkstring("%s/XXXXXX", envdir ? envdir : "@TERMUX_PREFIX@/tmp");
+ 		tmpdir = mkdtemp(dir_template);
+ 		if (!tmpdir)
+ 			fatal_errno();
+@@ -571,9 +571,9 @@
+ {
+ 	static char *mailcap_paths[] = {
+ 		NULL, /* Placeholder for the user's mailcap */
+-		"/etc/mailcap",
+-		"/usr/share/etc/mailcap",
+-		"/usr/local/etc/mailcap",
++		"@TERMUX_PREFIX@/etc/mailcap",
++		"@TERMUX_PREFIX@/share/etc/mailcap",
++		"@TERMUX_PREFIX@/local/etc/mailcap",
+ 	};
+ 	char *homepath;
+ 	char *template = NULL;

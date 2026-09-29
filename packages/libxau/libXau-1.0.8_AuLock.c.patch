@@ -1,0 +1,12 @@
+diff -uNr libXau-1.0.8/AuLock.c libXau-1.0.8.mod/AuLock.c
+--- libXau-1.0.8/AuLock.c	2013-05-25 01:04:09.000000000 +0300
++++ libXau-1.0.8.mod/AuLock.c	2017-11-23 14:08:52.004479977 +0200
+@@ -91,7 +91,7 @@
+ 	    } else
+ #endif
+ 	    {
+-	    	if (link (creat_name, link_name) != -1)
++	    	if (symlink (creat_name, link_name) != -1)
+ 		    return LOCK_SUCCESS;
+ 		if (errno == ENOENT) {
+ 		    creat_fd = -1;	/* force re-creat next time around */

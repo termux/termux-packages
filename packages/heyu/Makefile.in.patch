@@ -1,0 +1,32 @@
+--- heyu-2.10.3/Makefile.in	2021-04-30 22:37:54.000000000 +0530
++++ heyu-patch/Makefile.in	2022-04-07 20:17:28.648579237 +0530
+@@ -36,11 +36,11 @@
+ 	history.txt version.h heyufaq.txt x10sched.5 process.h sun.h \
+ 	x10scripts.5 Configure Makefile.in install.sh AUTHORS COPYING INSTALL \
+         README.cm10a x10aux.5 x10state.h rfxcom.h digimax.h oregon.h x10rfxsensors.5\
+-	x10rfxmeters.5 x10digimax.5 x10oregon.5 x10kaku.5 README.webhook 
++	x10rfxmeters.5 x10digimax.5 x10oregon.5 x10kaku.5 README.webhook
+ 
+ EVERYTHING = $(OTHERSRC) $(SRCS)
+ 
+-all:	heyu 
++all:	heyu
+ 
+ heyu:	$(OBJS) version.h
+ 	$(CC) $(LDFLAGS) -o heyu $(OBJS) $(LIBS)
+@@ -90,10 +90,7 @@
+ $(BIN)/heyu:	heyu
+ 	mkdir -p -m 755 $(BIN)
+ 	cp heyu $(BIN)
+-	chgrp $(GROUP) $(BIN)/heyu
+ 	chmod 755 $(BIN)/heyu
+-	chown $(OWNER) $(BIN)/heyu
+-	./install.sh
+ 
+ $(MAN)/heyu.1: heyu.1
+ 	mkdir -p -m 755 $(MAN)
+@@ -256,4 +253,3 @@
+ 
+ $(EVERYTHING):
+ ##	co -r$(revision) $@
+-

@@ -1,0 +1,27 @@
+diff --git a/src/core/logging.cpp b/src/core/logging.cpp
+index 034a14d..b5e423e 100644
+--- a/src/core/logging.cpp
++++ b/src/core/logging.cpp
+@@ -29,6 +29,22 @@
+ #include <sys/mman.h>
+ #include <sys/sendfile.h>
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <linux/memfd.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++
++#ifndef MFD_ALLOW_SEALING
++#define MFD_ALLOW_SEALING 0x0002
++#endif
++
++#ifndef SYS_memfd_create
++#include <asm/unistd.h>
++#endif
++
++#define memfd_create(name, flags) syscall(SYS_memfd_create, name, flags)
++#endif
++
+ #include "instanceinfo.hpp"
+ #include "logcat.hpp"
+ #include "logging_p.hpp"

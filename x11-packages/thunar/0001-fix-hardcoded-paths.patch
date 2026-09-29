@@ -1,0 +1,22 @@
+--- a/plugins/thunar-sendto-email/main.c
++++ b/plugins/thunar-sendto-email/main.c
+@@ -434,7 +434,7 @@
+   gint     n;
+ 
+   /* create a temporary directory */
+-  tmpdir = g_strdup ("/tmp/thunar-sendto-email.XXXXXX");
++  tmpdir = g_strdup ("@TERMUX_PREFIX@/tmp/thunar-sendto-email.XXXXXX");
+   if (G_UNLIKELY (mkdtemp (tmpdir) == NULL))
+     {
+       /* tell the user that we failed to create a temporary directory */
+--- a/plugins/thunar-uca/thunar-uca-model.c
++++ b/plugins/thunar-uca/thunar-uca-model.c
+@@ -53,7 +53,7 @@
+ 
+ /* not all systems define _PATH_BSHELL */
+ #ifndef _PATH_BSHELL
+-#define _PATH_BSHELL "/bin/sh"
++#define _PATH_BSHELL "@TERMUX_PREFIX@/bin/sh"
+ #endif
+ 
+ 

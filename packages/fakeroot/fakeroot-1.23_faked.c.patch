@@ -1,0 +1,11 @@
+--- src/faked.c	2026-07-10 01:51:49.000000000 +0300
++++ src/faked.c.patch	2026-08-05 15:31:11.793442005 +0300
+@@ -1573,7 +1573,7 @@
+     /* literally copied from the linux klogd code, go to background */
+     if ((pid=fork()) == 0){
+       int fl;
+-      int num_fds = getdtablesize();
++      int num_fds = sysconf(_SC_OPEN_MAX);
+       int cr_ret = -1;
+ 
+       fflush(stdout);

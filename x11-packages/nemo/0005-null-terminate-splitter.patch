@@ -1,0 +1,23 @@
+Fixes https://github.com/termux/termux-packages/issues/26982
+g_strsplit() takes arguments as null-terminated gchar*, not pointer to individual char
+https://docs.gtk.org/glib/func.strsplit.html
+
+--- a/src/nemo-main-application.c
++++ b/src/nemo-main-application.c
+@@ -533,14 +533,14 @@ nemo_main_application_open (GApplication *app,
+ 	gboolean open_in_tabs = FALSE;
+ 	gchar *geometry = NULL;
+ 	gboolean open_in_existing_window = strcmp (options, "EXISTING_WINDOW") == 0;
+-	const char splitter = '=';
++	gchar splitter[2] = {'=', '\0'};
+ 
+ 	g_debug ("Open called on the GApplication instance; %d files", n_files);
+ 
+ 	if (!open_in_existing_window) {
+ 		/* Check if local command line passed --geometry or --tabs */
+ 		if (strlen (options) > 0) {
+-			gchar** split_options = g_strsplit (options, &splitter, 2);
++			gchar** split_options = g_strsplit (options, splitter, 2);
+ 			if (strcmp (split_options[0], "NULL") != 0) {
+ 				geometry = g_strdup (split_options[0]);
+ 			}

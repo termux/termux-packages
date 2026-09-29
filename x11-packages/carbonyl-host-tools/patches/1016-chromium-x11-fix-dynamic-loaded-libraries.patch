@@ -1,0 +1,28 @@
+--- a/ui/base/x/x11_cursor_loader.cc
++++ b/ui/base/x/x11_cursor_loader.cc
+@@ -139,7 +139,11 @@
+     void operator()(void* ptr) const { dlclose(ptr); }
+   };
+ 
++#ifdef __TERMUX__
++  std::unique_ptr<void, DlCloser> lib(dlopen("libXcursor.so", RTLD_LAZY));
++#else
+   std::unique_ptr<void, DlCloser> lib(dlopen("libXcursor.so.1", RTLD_LAZY));
++#endif
+   if (!lib)
+     return "";
+ 
+--- a/ui/gfx/x/xlib_support.cc
++++ b/ui/gfx/x/xlib_support.cc
+@@ -41,7 +41,11 @@
+   CHECK(xlib_loader->Load("libX11.so.6"));
+ 
+   auto* xlib_xcb_loader = GetXlibXcbLoader();
++#ifndef __TERMUX__
+   CHECK(xlib_xcb_loader->Load("libX11-xcb.so.1"));
++#else
++  CHECK(xlib_xcb_loader->Load("libX11-xcb.so"));
++#endif
+ 
+   CHECK(xlib_loader->XInitThreads());
+ 

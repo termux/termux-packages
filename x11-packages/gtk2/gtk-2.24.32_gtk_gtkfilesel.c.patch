@@ -1,0 +1,14 @@
+diff -uNr gtk-2.24.32/gtk/gtkfilesel.c gtk-2.24.32.mod/gtk/gtkfilesel.c
+--- gtk-2.24.32/gtk/gtkfilesel.c	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/gtk/gtkfilesel.c	2018-06-23 16:48:53.527453676 +0300
+@@ -26,6 +26,10 @@
+ 
+ #include "config.h"
+ 
++#ifdef HAVE_PWD_H
++#undef HAVE_PWD_H
++#endif
++
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>

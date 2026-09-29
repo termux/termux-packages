@@ -1,0 +1,13 @@
+diff --git a/external/mythes/ExternalProject_mythes.mk b/external/mythes/ExternalProject_mythes.mk
+index 7cdc20245..d13d19834 100644
+--- a/external/mythes/ExternalProject_mythes.mk
++++ b/external/mythes/ExternalProject_mythes.mk
+@@ -22,7 +22,7 @@ $(call gb_ExternalProject_get_state_target,mythes,build):
+ 	$(call gb_ExternalProject_run,build,\
+ 		CXXFLAGS=" $(CXXFLAGS) $(call gb_ExternalProject_get_build_flags,mythes)" \
+ 		LDFLAGS="$(call gb_ExternalProject_get_link_flags,mythes)" \
+-		LIBS="$(gb_STDLIBS) $(LIBS)" $(gb_RUN_CONFIGURE) ./configure --disable-shared --disable-werror --with-pic \
++		LIBS="$(gb_STDLIBS) $(LIBS)" $(gb_RUN_CONFIGURE) ./configure cross_compiling=yes --disable-shared --disable-werror --with-pic \
+ 		$(gb_CONFIGURE_PLATFORMS) \
+ 		$(if $(CROSS_COMPILING),gio_can_sniff=no) \
+ 		&& $(MAKE) \

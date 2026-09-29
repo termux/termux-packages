@@ -1,0 +1,37 @@
+diff --git a/configure b/configure
+index 78e120d..80e5418 100755
+--- a/configure
++++ b/configure
+@@ -53,11 +53,11 @@ datadir='${prefix}/share'
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
+-libdir='${exec_prefix}/lib'
++libdir='${prefix}/lib'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ infodir='${prefix}/info'
+-mandir='${prefix}/man'
++mandir='${prefix}/share/man'
+ 
+ # Initialize some other variables.
+ subdirs=
+@@ -2137,7 +2137,7 @@ EOF
+ echo $ac_n "checking for correct connect prototype""... $ac_c" 1>&6
+ echo "configure:2139: checking for correct connect prototype" >&5
+ PROTO=
+-PROTO1='int __fd, const struct sockaddr * __addr, int len'
++PROTO1='int __fd, const struct sockaddr * __addr, int __len'
+ PROTO2='int __fd, const struct sockaddr_in * __addr, socklen_t __len'
+ PROTO3='int __fd, struct sockaddr * __addr, int __len'
+ PROTO4='int __fd, const struct sockaddr * __addr, socklen_t __len'
+@@ -2228,7 +2228,8 @@ EOF
+ echo $ac_n "checking for correct poll prototype""... $ac_c" 1>&6
+ echo "configure:2230: checking for correct poll prototype" >&5
+ PROTO=
+-for testproto in 'struct pollfd *ufds, unsigned long nfds, int timeout' 
++# https://sourceforge.net/p/tsocks/support-requests/6/
++for testproto in 'struct pollfd *ufds, nfds_t nfds, int timeout'
+ do
+   if test "${PROTO}" = ""; then
+     cat > conftest.$ac_ext <<EOF

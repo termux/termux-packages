@@ -1,0 +1,44 @@
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 92f434a..8612ac6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -54,7 +54,7 @@ CFILES=	screen.c \
+ 	layout.c list_display.c list_generic.c list_license.o list_window.c logfile.c mark.c \
+ 	misc.c process.c pty.c resize.c sched.c search.c socket.c telnet.c \
+ 	term.c termcap.c tty.c utmp.c viewport.c window.c winmsg.c \
+-	winmsgbuf.c winmsgcond.c
++	winmsgbuf.c winmsgcond.c setuid.c
+ OFILES=$(CFILES:c=o)
+ 
+ TESTCFILES := $(wildcard tests/test-*.c)
+diff --git a/src/setuid.c b/src/setuid.c
+new file mode 100644
+index 0000000..73438d5
+--- /dev/null
++++ b/setuid.c
+@@ -0,0 +1,25 @@
++#include <pwd.h>
++
++int setuid(uid_t uid) {
++	return 0;
++}
++
++int setgid(gid_t gid) {
++	return 0;
++}
++
++int seteuid(gid_t gid) {
++	return 0;
++}
++
++int setegid(gid_t gid) {
++	return 0;
++}
++
++int setresuid(uid_t ruid, uid_t euid, uid_t suid) {
++	return 0;
++}
++
++int setresgid(gid_t rgid, gid_t egid, gid_t sgid) {
++	return 0;
++}

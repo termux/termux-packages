@@ -1,0 +1,82 @@
+diff --git a/cli-plugins/manager/manager_unix.go b/cli-plugins/manager/manager_unix.go
+index 6aa5b9e5c4..09d7abf393 100644
+--- a/cli-plugins/manager/manager_unix.go
++++ b/cli-plugins/manager/manager_unix.go
+@@ -4,6 +4,5 @@
+ package manager
+ 
+ var defaultSystemPluginDirs = []string{
+-	"/usr/local/lib/docker/cli-plugins", "/usr/local/libexec/docker/cli-plugins",
+-	"/usr/lib/docker/cli-plugins", "/usr/libexec/docker/cli-plugins",
++	"@TERMUX_PREFIX@/lib/docker/cli-plugins", "@TERMUX_PREFIX@/libexec/docker/cli-plugins",
+ }
+diff --git a/cli/config/config.go b/cli/config/config.go
+index b7c05c3f86..5e96972519 100644
+--- a/cli/config/config.go
++++ b/cli/config/config.go
+@@ -11,7 +11,6 @@ import (
+ 	"github.com/docker/cli/cli/config/configfile"
+ 	"github.com/docker/cli/cli/config/credentials"
+ 	"github.com/docker/cli/cli/config/types"
+-	"github.com/docker/docker/pkg/homedir"
+ 	"github.com/pkg/errors"
+ )
+ 
+@@ -37,7 +36,7 @@ func resetHomeDir() {
+ 
+ func getHomeDir() string {
+ 	if homeDir == "" {
+-		homeDir = homedir.Get()
++		homeDir = "@TERMUX_HOME@"
+ 	}
+ 	return homeDir
+ }
+diff --git a/man/docker.1.md b/man/docker.1.md
+index 4ec459b41c..b7605938ad 100644
+--- a/man/docker.1.md
++++ b/man/docker.1.md
+@@ -26,7 +26,7 @@ To see the man page for a command run **man docker <command>**.
+ **-D**, **--debug**=*true*|*false*
+   Enable debug mode. Default is false.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host]:[port][path] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port/path, unix:///path/to/socket, fd://* or fd://socketfd.
+diff --git a/man/dockerd.8.md b/man/dockerd.8.md
+index 04a185a4df..1cd40b32b8 100644
+--- a/man/dockerd.8.md
++++ b/man/dockerd.8.md
+@@ -229,7 +229,7 @@ $ sudo dockerd --add-runtime runc=runc --add-runtime custom=/usr/local/bin/my-ru
+   Group to assign the unix socket specified by -H when running in daemon mode.
+   use '' (the empty string) to disable setting of a group. Default is `docker`.
+ 
+-**-H**, **--host**=[*unix:///var/run/docker.sock*]: tcp://[host:port] to bind or
++**-H**, **--host**=[*unix://@TERMUX_PREFIX@/var/run/docker.sock*]: tcp://[host:port] to bind or
+ unix://[/path/to/socket] to use.
+   The socket(s) to bind to in daemon mode specified using one or more
+   tcp://host:port, unix:///path/to/socket, fd://\* or fd://socketfd.
+diff --git a/opts/hosts.go b/opts/hosts.go
+index 7cdd1218f7..a2bb449bd1 100644
+--- a/opts/hosts.go
++++ b/opts/hosts.go
+@@ -17,7 +17,7 @@ const (
+ 	defaultTLSHTTPPort = "2376" // Default TLS encrypted HTTP Port
+ 	// defaultUnixSocket Path for the unix socket.
+ 	// Docker daemon by default always listens on the default unix socket
+-	defaultUnixSocket = "/var/run/docker.sock"
++	defaultUnixSocket = "@TERMUX_PREFIX@/var/run/docker.sock"
+ 	// defaultTCPHost constant defines the default host string used by docker on Windows
+ 	defaultTCPHost = "tcp://" + defaultHTTPHost + ":" + defaultHTTPPort
+ 	// DefaultTLSHost constant defines the default host string used by docker for TLS sockets
+diff --git a/vendor/github.com/docker/docker/client/client_unix.go b/vendor/github.com/docker/docker/client/client_unix.go
+index 319b738d3e..852e03db07 100644
+--- a/vendor/github.com/docker/docker/client/client_unix.go
++++ b/vendor/github.com/docker/docker/client/client_unix.go
+@@ -5,4 +5,4 @@ package client // import "github.com/docker/docker/client"
+ 
+ // DefaultDockerHost defines OS-specific default host if the DOCKER_HOST
+ // (EnvOverrideHost) environment variable is unset or empty.
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"

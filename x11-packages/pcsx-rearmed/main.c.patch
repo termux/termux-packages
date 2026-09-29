@@ -1,0 +1,34 @@
+--- a/frontend/main.c
++++ b/frontend/main.c
+@@ -501,6 +501,10 @@ void emu_core_ask_exit(void)
+ 
+ static const char *get_home_dir(void)
+ {
++#ifdef __TERMUX__
++	// in Termux, we have PCSX_DOT_DIR strictly hardcoded as "@TERMUX_PREFIX@/etc/pcsx/"
++	return "";
++#else
+ #if defined(PANDORA) || !defined(__unix__) || defined(MIYOO)
+ 	return ".";
+ #else
+@@ -515,6 +519,7 @@ static const char *get_home_dir(void)
+ 		home = ".";
+ 	return home;
+ #endif
++#endif
+ }
+ 
+ void emu_make_path(char *buf, size_t size, const char *dir, const char *fname)
+@@ -528,10 +535,10 @@ void emu_make_path(char *buf, size_t size, const char *dir, const char *fname)
+ 
+ void emu_make_data_path(char *buff, const char *end, int size)
+ {
+-	int pos, end_len;
++	size_t pos, end_len;
+ 
+ 	end_len = strlen(end);
+-	pos = plat_get_root_dir(buff, size);
++	pos = plat_get_root_dir(buff);
+ 	strncpy(buff + pos, end, size - pos);
+ 	buff[size - 1] = 0;
+ 	if (pos + end_len > size - 1)

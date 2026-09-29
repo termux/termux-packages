@@ -1,0 +1,11 @@
+--- ../restart.c.orig	2021-02-04 16:19:28.622976160 +0000
++++ ./restart.c	2021-02-04 17:49:12.448526739 +0000
+@@ -230,7 +230,7 @@
+ 
+     // restrictive permissions for the metadata file.
+     // TODO: also for the mmap file eh? :P
+-    mode_t oldmask = umask(~(S_IRUSR | S_IWUSR));
++    mode_t oldmask = umask(S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+     FILE *f = fopen(metafile, "w");
+     umask(oldmask);
+     if (f == NULL) {

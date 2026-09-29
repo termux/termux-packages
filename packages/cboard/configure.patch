@@ -1,0 +1,60 @@
+diff -uNr cboard-0.7.5/configure cboard-0.7.5.mod/configure
+--- cboard-0.7.5/configure	2018-09-27 17:48:24.000000000 +0300
++++ cboard-0.7.5.mod/configure	2019-08-16 14:05:44.294565834 +0300
+@@ -12194,13 +12194,8 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Unix98 pty support" >&5
+ $as_echo_n "checking for Unix98 pty support... " >&6; }
+-if test -c "/dev/ptmx"; then
+-    have_ptmx=yes
+-else
+-    have_ptmx=no
+-fi
+-
+-ptmx_works=no
++have_ptmx=yes
++ptmx_works=yes
+ 
+ if test "x$have_ptmx" = "xyes"; then
+     ac_ext=c
+@@ -12210,40 +12205,7 @@
+ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+     if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
+-else
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-\
+-		   #include <stdio.h>
+-		   #include <sys/types.h>
+-		   #include <sys/stat.h>
+-		   #include <fcntl.h>
+-
+-		   int main()
+-		   {
+-		       int fd;
+-
+-		       if ((fd = open("/dev/ptmx", O_RDWR)) == -1)
+-		           exit(1);
+-
+-		       if (ptsname(fd) == NULL)
+-		           exit(1);
+-
+-		       exit(0);
+-		   }
+-
+-_ACEOF
+-if ac_fn_c_try_run "$LINENO"; then :
+   ptmx_works=yes
+-else
+-  ptmx_works=no
+-fi
+-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+-  conftest.$ac_objext conftest.beam conftest.$ac_ext
+ fi
+ 
+ 

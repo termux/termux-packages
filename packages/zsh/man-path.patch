@@ -1,0 +1,17 @@
+diff --git a/Completion/Unix/Command/_man b/Completion/Unix/Command/_man
+index 888d738..6023bde 100644
+--- a/Completion/Unix/Command/_man
++++ b/Completion/Unix/Command/_man
+@@ -198,9 +198,9 @@ _man() {
+   fi
+ 
+   (( $#_manpath )) || _manpath=(
+-    /usr/man(-/)
+-    /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/)
+-    /(opt|usr)/local/share/(cat|)man(-/)
++    @TERMUX_PREFIX@/man(-/)
++    @TERMUX_PREFIX@/(pkg|dt|share|X11R6|local)/(cat|)man(-/)
++    @TERMUX_PREFIX@/local/share/(cat|)man(-/)
+   )
+ 
+   # `sman' is the SGML manual directory for Solaris 7.

@@ -1,0 +1,25 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1155,11 +1155,11 @@
+ 
+ # Unix.
+ polyexport.o: polyimport bootstrap/Stage1.sml $(POLYIMPORT)
+-	./polyimport $(BOOTSTRAP_OPTIONS) $(POLYIMPORT) -I $(srcdir) < $(srcdir)/bootstrap/Stage1.sml
++	polyimport $(BOOTSTRAP_OPTIONS) $(POLYIMPORT) -I $(srcdir) < $(srcdir)/bootstrap/Stage1.sml
+ 
+ # Windows.  When building on Windows make sure that we provide both stdin and stdout to suppress the GUI.
+ polyexport.obj: polyimport$(EXEEXT) bootstrap/Stage1.sml $(POLYIMPORT)
+-	./polyimport $(BOOTSTRAP_OPTIONS) $(POLYIMPORT) -I $(srcdir) < $(srcdir)/bootstrap/Stage1.sml | cat
++	polyimport $(BOOTSTRAP_OPTIONS) $(POLYIMPORT) -I $(srcdir) < $(srcdir)/bootstrap/Stage1.sml | cat
+ 
+ polyresource.o: PolyML.rc poly.ico
+ 	$(WINDRES) -o polyresource.o $(srcdir)/PolyML.rc
+@@ -1169,7 +1169,7 @@
+ 
+ # Recompiler the compiler using the last step of the bootstrap process.
+ compiler: all
+-	./poly $(BOOTSTRAP_OPTIONS) --error-exit < bootstrap/Stage6.sml
++	poly $(BOOTSTRAP_OPTIONS) --error-exit < bootstrap/Stage6.sml
+ 	$(MAKE)
+ 
+ reboot: compiler

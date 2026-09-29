@@ -1,0 +1,37 @@
+--- a/netconf/src/ncx/val.c
++++ b/netconf/src/ncx/val.c
+@@ -3685,7 +3685,7 @@
+     size_t buf_len;
+ } serializer_node_t;
+ 
+-static ssize_t writer_fn(void *cookie, const void *buffer, size_t size)
++static int writer_fn(void *cookie, const char *buffer, int size)
+ {
+     serializer_node_t* ser = (serializer_node_t *)cookie;
+ 
+@@ -3717,15 +3717,9 @@
+     serializer_node_t ser;
+     status_t res;
+     FILE* fp;
+-    cookie_io_functions_t io_functions;
+     val_value_t* copy_val;
+ 
+-    io_functions.read=NULL;
+-    io_functions.write=(cookie_write_function_t *)writer_fn;
+-    io_functions.seek=NULL;
+-    io_functions.close=NULL;
+-
+-    fp=fopencookie (&ser, "w", io_functions);
++    fp=fwopen (&ser, writer_fn);
+     assert(fp != NULL);
+ 
+     ser.buf=NULL;
+@@ -3747,7 +3741,7 @@
+     }
+     fclose(fp);
+ 
+-    fp=fopencookie (&ser, "w", io_functions);
++    fp=fwopen (&ser, writer_fn);
+     assert(fp != NULL);
+ 
+     ser.buf=(char*)malloc(ser.buf_len+1);

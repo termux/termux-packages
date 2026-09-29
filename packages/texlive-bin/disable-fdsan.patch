@@ -1,0 +1,69 @@
+--- ./texk/web2c/texmfmp.h.orig	2021-06-25 11:32:31.312905780 +0000
++++ ./texk/web2c/texmfmp.h	2021-06-25 11:32:52.192921107 +0000
+@@ -266,11 +266,28 @@
+ #define bopenout(f)	open_output (&(f), FOPEN_WBIN_MODE)
+ #define bclose		aclose
+ #ifdef FMT_COMPRESS
++
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
++/* termux hack to disable file descriptor sanitizer */
++static int disable_fdsan() {
++  void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++  if (lib_handle) {
++    void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++    if (set_fdsan_error_level) {
++      set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++    }
++    dlclose(lib_handle);
++  }
++  return 1;
++}
++
+ /* f is declared as gzFile, but we temporarily use it for a FILE *
+    so that we can use the standard open calls */
+-#define wopenin(f)	(open_input ((FILE**)&(f), DUMP_FORMAT, FOPEN_RBIN_MODE) \
++#define wopenin(f)	(disable_fdsan() && open_input ((FILE**)&(f), DUMP_FORMAT, FOPEN_RBIN_MODE) \
+ 						&& (f = gzdopen(fileno((FILE*)f), FOPEN_RBIN_MODE)))
+-#define wopenout(f)	(open_output ((FILE**)&(f), FOPEN_WBIN_MODE) \
++#define wopenout(f)	(disable_fdsan() && open_output ((FILE**)&(f), FOPEN_WBIN_MODE) \
+ 						&& (f = gzdopen(fileno((FILE*)f), FOPEN_WBIN_MODE)) \
+ 						&& (gzsetparams(f, 1, Z_DEFAULT_STRATEGY) == Z_OK))
+ #define wclose(f)	gzclose(f)
+--- ./texk/web2c/luatexdir/tex/mainbody.c~	2021-04-11 21:33:43.000000000 +0000
++++ ./texk/web2c/luatexdir/tex/mainbody.c	2021-06-29 17:10:06.155100280 +0000
+@@ -23,6 +23,23 @@
+ 
+ #include "ptexlib.h"
+ 
++#ifdef __ANDROID__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++#endif
++
++void disable_fdsan() {
++  // For Android 11+.
++  void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++  if (lib_handle) {
++    void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++    if (set_fdsan_error_level) {
++      set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++    }
++    dlclose(lib_handle);
++  }
++}
++
+ /*tex
+ 
+ This is where the action starts. We're speaking of \LUATEX, a continuation of
+@@ -506,6 +523,9 @@
+     int bad = main_initialize();
+     /*tex in case we quit during initialization */
+     history = fatal_error_stop;
++#ifdef __ANDROID__
++    disable_fdsan();
++#endif
+     /*tex open the terminal for output */
+     t_open_out();
+     if (!luainit)

@@ -1,0 +1,4 @@
+TERMUX_SUBPKG_DESCRIPTION=".NET 8.0 Runtime"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
+TERMUX_SUBPKG_DEPENDS="dotnet-hostfxr-8.0, libicu, openssl, zlib"
+TERMUX_SUBPKG_INCLUDE=$(cat "${TERMUX_PKG_TMPDIR}"/dotnet-runtime.txt)

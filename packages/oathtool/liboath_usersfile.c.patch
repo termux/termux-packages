@@ -1,0 +1,11 @@
+--- a/liboath/usersfile.c
++++ b/liboath/usersfile.c
+@@ -496,7 +496,7 @@
+ 	return OATH_TIME_ERROR;
+
+-      old_umask = umask (~(S_IRUSR | S_IWUSR));
++      old_umask = umask ((~(S_IRUSR | S_IWUSR)) & 0777);
+
+       rc = update_usersfile (usersfile, username, otp, infh,
+ 			     &line, &n, timestamp, new_moving_factor,
+ 			     skipped_users);

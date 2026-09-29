@@ -1,0 +1,86 @@
+diff --git a/random/random.c b/random/random.c
+index d714c3c..45e1d67 100644
+--- a/random/random.c
++++ b/random/random.c
+@@ -105,7 +105,7 @@ get_random_conf_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" RANDOM_CONF_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" RANDOM_CONF_FILE;
+ #endif
+ }
+ 
+diff --git a/random/rndunix.c b/random/rndunix.c
+index aff2f85..53d414c 100644
+--- a/random/rndunix.c
++++ b/random/rndunix.c
+@@ -226,6 +226,34 @@ static struct RI {
+     const int hasAlternative;	    /* Whether source has alt.location */
+ } dataSources[] = {
+ 
++    // For Android
++    {	"/system/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"/system/xbin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"/system/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"/system/xbin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"/system/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"/system/xbin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"/system/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"/system/xbin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"/system/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"/system/xbin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"/system/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"/system/xbin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"/system/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"/system/xbin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"/system/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++    {	"/system/xbin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++
++    // For Termux
++    {	"@TERMUX_PREFIX@/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
++    {	"@TERMUX_PREFIX@/bin/netstat", "-s", SC(2), NULL, 0, 0, 0, 1 },
++    {	"@TERMUX_PREFIX@/bin/mpstat", NULL, SC(1), NULL, 0, 0, 0, 0     },
++    {	"@TERMUX_PREFIX@/bin/df", NULL, SC(1), NULL, 0, 0, 0, 0             },
++    {	"@TERMUX_PREFIX@/bin/iostat", NULL, SC(SC_0), NULL, 0, 0, 0, 0  },
++    {	"@TERMUX_PREFIX@/bin/uptime", NULL, SC(SC_0), NULL, 0, 0, 0, 1   },
++    {	"@TERMUX_PREFIX@/bin/ps", "aux", SC(0.3), NULL, 0, 0, 0, 1       },
++    {	"@TERMUX_PREFIX@/bin/arp", "-a", SC(0.1), NULL, 0, 0, 0, 1  },
++
+     {	"/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
+     {	"/usr/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 0},
+     {	"/bin/vmstat", "-c", SC(-3), NULL, 0, 0, 0, 1     },
+diff --git a/src/fips.c b/src/fips.c
+index d1aff8a..19ddba8 100644
+--- a/src/fips.c
++++ b/src/fips.c
+@@ -137,7 +137,7 @@ get_fips_force_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" FIPS_FORCE_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" FIPS_FORCE_FILE;
+ #endif
+ }
+ 
+diff --git a/src/hwfeatures.c b/src/hwfeatures.c
+index 1b107e6..fe4a691 100644
+--- a/src/hwfeatures.c
++++ b/src/hwfeatures.c
+@@ -153,7 +153,7 @@ get_hwf_deny_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" HWF_DENY_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" HWF_DENY_FILE;
+ #endif
+ }
+ 
+@@ -344,6 +344,6 @@ _gcry_get_sysconfdir (void)
+ 
+   return appdata;
+ #else  /*!HAVE_W32_SYSTEM*/
+-  return "/etc/gcrypt/";
++  return "@TERMUX_PREFIX@/etc/gcrypt/";
+ #endif /*!HAVE_W32_SYSTEM*/
+ }

@@ -1,0 +1,33 @@
+--- a/clients/mwm/WmFunction.c
++++ b/clients/mwm/WmFunction.c
+@@ -1124,7 +1124,7 @@
+ #ifdef SVR4
+         execl ("/usr/bin/sh", "sh", "-c", args, NULL);
+ #else
+-        execl ("/bin/sh", "sh", "-c", args, NULL);
++        execl ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", args, NULL);
+ #endif
+ 
+ 
+--- a/clients/uil/UilSrcSrc.c
++++ b/clients/uil/UilSrcSrc.c
+@@ -642,7 +642,7 @@
+ 	az_fcb->az_file_ptr = fopen(c_file_name, "r");
+ 
+     } else {
+-	static char XmConst	c_include_dir[]= "/usr/include/";
++	static char XmConst	c_include_dir[]= "@TERMUX_PREFIX@/include/";
+ 	Boolean			search_user_include=True;
+ 	Boolean			specific_directory=False;
+ 
+--- a/lib/Xm/ColorS.c
++++ b/lib/Xm/ColorS.c
+@@ -146,7 +146,7 @@
+   {
+     XmNrgbFile, XmCString, XmRString,
+     sizeof(String), XtOffsetOf(XmColorSelectorRec, cs.rgb_file),
+-    XmRString, (XtPointer) "/usr/lib/X11/rgb.txt"
++    XmRString, (XtPointer) "@TERMUX_PREFIX@/lib/X11/rgb.txt"
+   },
+ #endif
+   {

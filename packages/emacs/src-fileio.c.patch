@@ -1,0 +1,20 @@
+--- ./src/fileio.c.orig	2025-02-26 23:39:17.075413404 +0100
++++ ./src/fileio.c	2025-02-26 23:41:19.133155637 +0100
+@@ -2888,7 +2888,7 @@
+   check_vfs_filename (encoded_newname, "Trying to create hard link"
+ 		      " within special directory");
+ 
+-  if (link (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
++  if (symlink (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
+     return Qnil;
+ 
+   if (errno == EEXIST)
+@@ -2898,7 +2898,7 @@
+ 	barf_or_query_if_file_exists (newname, true, "make it a new name",
+ 				      FIXNUMP (ok_if_already_exists), false);
+       emacs_unlink (SSDATA (newname));
+-      if (link (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
++      if (symlink (SSDATA (encoded_file), SSDATA (encoded_newname)) == 0)
+ 	return Qnil;
+     }
+ 

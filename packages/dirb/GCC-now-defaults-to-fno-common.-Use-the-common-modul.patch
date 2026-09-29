@@ -1,0 +1,177 @@
+From d3a817e49142dc24c686da19ecabedc215079836 Mon Sep 17 00:00:00 2001
+From: Nikita Ermakov <sh1r4s3@mail.si-head.nl>
+Date: Sat, 19 Mar 2022 22:34:53 +0400
+Subject: [PATCH] GCC now defaults to -fno-common. Use the common module
+ variables.c for global variables.
+
+---
+ src/Makefile.am |  3 ++-
+ src/Makefile.in |  6 ++++--
+ src/dirb.h      |  1 -
+ src/variables.c | 30 ++++++++++++++++++++++++++++++
+ src/variables.h | 45 +++++++++++++++++++++++----------------------
+ 5 files changed, 59 insertions(+), 26 deletions(-)
+ create mode 100644 src/variables.c
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index c0d56c6..5e6f384 100755
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -11,7 +11,8 @@ base = crea_wordlist.c\
+ 	calculanec.c\
+ 	utils.c\
+ 	options.c\
+-	resume.c
++	resume.c\
++	variables.c
+ 
+ dirb_SOURCES = $(base)
+ 
+diff --git a/src/Makefile.in b/src/Makefile.in
+index add6c74..990de35 100755
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -50,7 +50,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+ PROGRAMS = $(bin_PROGRAMS)
+ am__objects_1 = crea_wordlist.$(OBJEXT) dirb.$(OBJEXT) \
+ 	get_url.$(OBJEXT) lanza_ataque.$(OBJEXT) calculanec.$(OBJEXT) \
+-	utils.$(OBJEXT) options.$(OBJEXT) resume.$(OBJEXT)
++	utils.$(OBJEXT) options.$(OBJEXT) resume.$(OBJEXT) variables.$(OBJEXT)
+ am_dirb_OBJECTS = $(am__objects_1)
+ dirb_OBJECTS = $(am_dirb_OBJECTS)
+ dirb_LDADD = $(LDADD)
+@@ -153,7 +153,8 @@ base = crea_wordlist.c\
+ 	calculanec.c\
+ 	utils.c\
+ 	options.c\
+-	resume.c
++	resume.c\
++	variables.c
+ 
+ dirb_SOURCES = $(base)
+ dirb_LDFLAGS = @NETWORK_LIBS@
+@@ -230,6 +231,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/options.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resume.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variables.Po@am__quote@
+ 
+ .c.o:
+ @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+diff --git a/src/dirb.h b/src/dirb.h
+index 5917adc..a3df2eb 100755
+--- a/src/dirb.h
++++ b/src/dirb.h
+@@ -8,7 +8,6 @@
+ 
+ #include "global.h"
+ #include "variables.h"
+-#include "estructuras.h"
+ #include "funciones.h"
+ 
+ 
+diff --git a/src/variables.c b/src/variables.c
+new file mode 100644
+index 0000000..55afcf0
+--- /dev/null
++++ b/src/variables.c
+@@ -0,0 +1,30 @@
++#include "variables.h"
++
++FILE *outfile;                    // Fichero de output
++CURL *curl;                       // Descriptor CURL
++struct opciones options;          // Array con las opciones recibidas del usuario
++
++struct result *nec[100];          // Array que almacena los NECs
++int contador;                     // Contador de palabras generadas
++int descargadas;                  // Numero de URLs descargadas
++int encontradas;                  // Numero de URLs encontradas
++int errores;                      // Contador de errores
++int existant;                     // Flag para determinar si la URL actual existe
++int listable;                     // Flag para determinar si un directorio es listable
++
++struct words *wordlist_base;      // Base de la lista de palabras
++struct words *wordlist_current;   // Nodo actual de la lista de palabras
++struct words *wordlist_final;     // Final de la lista de palabras
++
++struct words *exts_base;          // Base de la lista de extensiones
++struct words *exts_current;       // Nodo actual de la lista de externsiones
++int exts_num;                     // Numero de extensiones
++
++struct words *muts_base;          // Base de la lista de mutaciones
++
++struct words *dirlist_base;       // Base de la lista de los directorios encontrados
++struct words *dirlist_final;      // Final de la lista los directorios encontrados
++struct words *dirlist_current;    // Nodo actual de la lista los directorios encontrados
++
++int resuming;                     // Flag para saber si estamos en una sesion resumida
++int next_dir;					  // Flag para saber si tenemos que pasar al siguiente directorio
+diff --git a/src/variables.h b/src/variables.h
+index d06d6bf..0b0c271 100755
+--- a/src/variables.h
++++ b/src/variables.h
+@@ -7,38 +7,39 @@
+ 
+ 
+ #include "global.h"
++#include "estructuras.h"
+ 
+ 
+ /* Global variables */
+ 
+-FILE *outfile;                    // Fichero de output
+-CURL *curl;                       // Descriptor CURL
+-struct opciones options;          // Array con las opciones recibidas del usuario
++extern FILE *outfile;                    // Fichero de output
++extern CURL *curl;                       // Descriptor CURL
++extern struct opciones options;          // Array con las opciones recibidas del usuario
+ 
+-struct result *nec[100];          // Array que almacena los NECs
+-int contador;                     // Contador de palabras generadas
+-int descargadas;                  // Numero de URLs descargadas
+-int encontradas;                  // Numero de URLs encontradas
+-int errores;                      // Contador de errores
+-int existant;                     // Flag para determinar si la URL actual existe
+-int listable;                     // Flag para determinar si un directorio es listable
++extern struct result *nec[100];          // Array que almacena los NECs
++extern int contador;                     // Contador de palabras generadas
++extern int descargadas;                  // Numero de URLs descargadas
++extern int encontradas;                  // Numero de URLs encontradas
++extern int errores;                      // Contador de errores
++extern int existant;                     // Flag para determinar si la URL actual existe
++extern int listable;                     // Flag para determinar si un directorio es listable
+ 
+-struct words *wordlist_base;      // Base de la lista de palabras
+-struct words *wordlist_current;   // Nodo actual de la lista de palabras
+-struct words *wordlist_final;     // Final de la lista de palabras
++extern struct words *wordlist_base;      // Base de la lista de palabras
++extern struct words *wordlist_current;   // Nodo actual de la lista de palabras
++extern struct words *wordlist_final;     // Final de la lista de palabras
+ 
+-struct words *exts_base;          // Base de la lista de extensiones
+-struct words *exts_current;       // Nodo actual de la lista de externsiones
+-int exts_num;                     // Numero de extensiones
++extern struct words *exts_base;          // Base de la lista de extensiones
++extern struct words *exts_current;       // Nodo actual de la lista de externsiones
++extern int exts_num;                     // Numero de extensiones
+ 
+-struct words *muts_base;          // Base de la lista de mutaciones
++extern struct words *muts_base;          // Base de la lista de mutaciones
+ 
+-struct words *dirlist_base;       // Base de la lista de los directorios encontrados
+-struct words *dirlist_final;      // Final de la lista los directorios encontrados
+-struct words *dirlist_current;    // Nodo actual de la lista los directorios encontrados
++extern struct words *dirlist_base;       // Base de la lista de los directorios encontrados
++extern struct words *dirlist_final;      // Final de la lista los directorios encontrados
++extern struct words *dirlist_current;    // Nodo actual de la lista los directorios encontrados
+ 
+-int resuming;                     // Flag para saber si estamos en una sesion resumida
+-int next_dir;					  // Flag para saber si tenemos que pasar al siguiente directorio
++extern int resuming;                     // Flag para saber si estamos en una sesion resumida
++extern int next_dir;					  // Flag para saber si tenemos que pasar al siguiente directorio
+ 
+ 
+ 
+-- 
+2.36.0
+

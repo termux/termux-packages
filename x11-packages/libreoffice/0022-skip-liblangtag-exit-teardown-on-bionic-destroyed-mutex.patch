@@ -1,0 +1,38 @@
+From dbd82b930641cede8abf23876b28ff2e3d8c4fd3 Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Fri, 17 Jul 2026 14:06:05 +0530
+Subject: [PATCH] skip liblangtag teardown at exit on Android to avoid
+ destroyed-mutex abort
+
+LiblangtagDataRef's static destructor (libi18nlangtag) runs from
+__cxa_finalize after libxml2's finalizer has already destroyed its
+global mutexes. lt_db_finalize() frees liblangtag's XML documents via
+libxml2, which locks such a mutex; Bionic FORTIFY aborts with
+'pthread_mutex_lock called on a destroyed mutex' (SIGABRT tombstone:
+libi18nlangtag -> liblangtag -> libxml2 -> abort in __cxa_finalize).
+glibc tolerates this silently, Bionic does not. The abort also marks
+the session as crashed, so every subsequent launch enters document
+recovery. Teardown at process exit is only leak-checker tidiness;
+skip it and let the kernel reclaim.
+---
+ i18nlangtag/source/languagetag/languagetag.cxx | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/i18nlangtag/source/languagetag/languagetag.cxx b/i18nlangtag/source/languagetag/languagetag.cxx
+index 2b301efdb..89e7ad736 100644
+--- a/i18nlangtag/source/languagetag/languagetag.cxx
++++ b/i18nlangtag/source/languagetag/languagetag.cxx
+@@ -200,8 +200,10 @@ LiblangtagDataRef::LiblangtagDataRef()
+ 
+ LiblangtagDataRef::~LiblangtagDataRef()
+ {
++#if !defined(__ANDROID__)
+     if (mbInitialized)
+         teardown();
++#endif
+ }
+ 
+ void LiblangtagDataRef::setup()
+-- 
+2.55.0
+

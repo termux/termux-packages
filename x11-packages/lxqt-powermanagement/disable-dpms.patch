@@ -1,0 +1,45 @@
+--- a/src/idlenesswatcher.cpp
++++ b/src/idlenesswatcher.cpp
+@@ -35,7 +35,9 @@
+ #include <QDebug>
+ #include <LXQt/lxqtnotification.h>
+ #include <QObject>
++#ifndef __TERMUX__
+ #include <xcb/dpms.h>
++#endif
+ #include <xcb/screensaver.h>
+ 
+ IdlenessWatcher::IdlenessWatcher(QObject* parent):
+@@ -71,6 +73,7 @@
+     connect(&mPSettings, &LXQt::Settings::settingsChanged, this, &IdlenessWatcher::onSettingsChanged);
+ 
+     // retrieve DPMS timeouts
++    #ifndef __TERMUX__
+     mDpmsStandby = mDpmsSuspend = mDpmsOff = 0;
+     if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
+         if (auto x11NativeInterface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()) {
+@@ -85,7 +88,7 @@
+             }
+         }
+     }
+-
++    #endif
+     setup();
+ }
+ 
+@@ -96,6 +99,7 @@
+ }
+ 
+ void IdlenessWatcher::setDpmsTimeouts(bool restore) {
++    #ifndef __TERMUX__
+     if (QGuiApplication::platformName() == QStringLiteral("xcb")) {
+         if (auto x11NativeInterface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()) {
+             xcb_connection_t* c = x11NativeInterface->connection();
+@@ -109,6 +113,7 @@
+             }
+         }
+     }
++    #endif
+ }
+ 
+ void IdlenessWatcher::setup()

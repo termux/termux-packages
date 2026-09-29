@@ -1,0 +1,16 @@
+This prevents the error CANNOT LINK EXECUTABLE "dia": library "libxpm-pixbuf.so" not found at runtime after ./build-package.sh -I -f dia is used in the same $TERMUX_PREFIX an even (not odd) number of times in a row, i.e. the 2nd, 4th, and 6th builds in a row
+diff --git a/meson.build b/meson.build
+index 75d100d9..c12ac4b8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -22,7 +22,8 @@ libxml_dep  = dependency('libxml-2.0', version: '>= 2.14.0')
+ gmodule_dep = dependency('gmodule-2.0')
+ libcairo_dep = dependency('cairo')
+ graphene_dep = dependency('graphene-1.0', version: '>= 1.10')
+-xpm_dep = dependency('xpm-pixbuf')
++xpm_subproject = subproject('xpm-pixbuf')
++xpm_dep = xpm_subproject.get_variable('xpm_dep')
+ 
+ # Not required since not all platforms ship a separate libm.
+ libm_dep = cc.find_library('m', required: false)
+

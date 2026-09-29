@@ -1,0 +1,21 @@
+diff -uNr fvwm-2.6.9/fvwm/session.c fvwm-2.6.9.mod/fvwm/session.c
+--- fvwm-2.6.9/fvwm/session.c	2018-05-26 11:35:26.000000000 +0000
++++ fvwm-2.6.9.mod/fvwm/session.c	2019-10-13 18:59:27.680981153 +0000
+@@ -754,7 +754,6 @@
+ {
+ 	FSmProp prop1, prop2, prop3, prop4, prop5, prop6, prop7, *props[7];
+ 	FSmPropValue prop1val, prop2val, prop3val, prop4val, prop7val;
+-	struct passwd *pwd;
+ 	char *user_id;
+ 	char screen_num[32];
+ 	int numVals, i, priority = 30;
+@@ -775,8 +774,7 @@
+ 		return;
+ 	}
+ 
+-	pwd = getpwuid (getuid());
+-	user_id = pwd->pw_name;
++	user_id = "termux";
+ 
+ 	prop1.name = FSmProgram;
+ 	prop1.type = FSmARRAY8;

@@ -1,0 +1,23 @@
+--- a/comm/suite/Makefile.in
++++ b/comm/suite/Makefile.in
+@@ -26,7 +26,7 @@
+ 
+ 
+ vendored-rust-check:
+-ifdef MOZ_THUNDERBIRD_RUST
++ifeq (0,1)
+ 	@echo "Checking vendored Rust libs"
+ 	$(PYTHON3) $(commtopsrcdir)/python/rocbuild/rocbuild/rust.py verify_vendored_dependencies
+ endif
+--- a/comm/mail/Makefile.in
++++ b/comm/mail/Makefile.in
+@@ -25,7 +25,9 @@ libs:: $(DIST)/bin/platform.ini
+ 
+ 
+ vendored-rust-check:
++ifeq (0,1)
+ 	@echo "Checking vendored Rust libs"
+ 	$(PYTHON3) $(commtopsrcdir)/python/rocbuild/rocbuild/rust.py verify_vendored_dependencies
++endif
+ 
+ export:: vendored-rust-check

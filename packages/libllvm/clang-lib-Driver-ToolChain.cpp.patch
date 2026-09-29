@@ -1,0 +1,23 @@
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+@@ -840,6 +840,9 @@ void ToolChain::addFortranRuntimeLibs(const ArgList &Args,
+       if (AsNeeded)
+         addAsNeededOption(*this, Args, CmdArgs, /*as_needed=*/false);
+     }
++    if (getTriple().isAndroid()) {
++      CmdArgs.push_back("-l:libandroid-complex-math.a");
++    }
+     addFlangRTLibPath(Args, CmdArgs);
+ 
+     // needs libexecinfo for backtrace functions
+@@ -1060,7 +1060,10 @@
+ 
+   switch (Type) {
+   case ToolChain::CST_Libcxx:
+-    CmdArgs.push_back("-lc++");
++    if (getTriple().isWindowsGNUEnvironment())
++      CmdArgs.push_back("-lc++");
++    else
++      CmdArgs.push_back("-lc++_shared");
+     if (Args.hasArg(options::OPT_fexperimental_library))
+       CmdArgs.push_back("-lc++experimental");
+     break;

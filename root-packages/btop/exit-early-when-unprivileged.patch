@@ -1,0 +1,18 @@
+diff --git a/src/btop.cpp b/src/btop.cpp
+index 7826594..8c7e568 100644
+--- a/src/btop.cpp
++++ b/src/btop.cpp
+@@ -844,6 +844,13 @@ static auto configure_tty_mode(std::optional<bool> force_tty) {
+ 		}
+ 	}
+ 
++	// Few of btop's inputs are visible to unprivileged processes on android,
++	// and it handles those failures by quitting.
++	if (Global::set_uid != 0) {
++		Global::exit_error_msg = "btop can't do anything useful on Termux without root. Quitting!";
++		clean_quit(1);
++	}
++
+ 	Cli::Cli cli;
+ 	{
+ 		// Get the cli options or return with an exit code

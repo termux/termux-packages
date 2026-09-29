@@ -1,0 +1,23 @@
+--- a/src/pip/_internal/commands/install.py
++++ b/src/pip/_internal/commands/install.py
+@@ -448,6 +448,20 @@
+         try:
+             reqs = self.get_requirements(args, options, finder, session)
+ 
++            reqs_list = [req.name for req in reqs]
++            while reqs_list.count("pip") != 0:
++                reqs_index = reqs_list.index("pip")
++                if len(reqs)-reqs_list.count("pip") == 0:
++                    raise CommandError(
++                       "Installing pip is forbidden, this will break the python-pip package (termux)."
++                    )
++                elif reqs_list.count("pip") == 1:
++                    logger.warning(
++                       "Skip installing pip, this will break the python-pip package (termux)."
++                    )
++                del reqs_list[reqs_index]
++                del reqs[reqs_index]
++
+             wheel_cache = WheelCache(options.cache_dir)
+ 
+             preparer = self.make_requirement_preparer(

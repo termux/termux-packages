@@ -1,0 +1,13 @@
+diff -u -r ../gdb-7.6.2/gdb/linux-thread-db.c ./gdb/linux-thread-db.c
+--- ../gdb-7.6.2/gdb/linux-thread-db.c	2013-12-08 05:33:13.000000000 +0100
++++ ./gdb/linux-thread-db.c	2014-01-07 16:43:01.866311352 +0100
+@@ -447,9 +447,6 @@
+   struct thread_db_info *info;
+   struct thread_get_info_inout io = {0};
+ 
+-  /* Just in case td_ta_map_lwp2thr doesn't initialize it completely.  */
+-  th.th_unique = 0;
+-
+   /* This ptid comes from linux-nat.c, which should always fill in the
+      LWP.  */
+   gdb_assert (GET_LWP (ptid) != 0);

@@ -1,0 +1,18 @@
+--- a/unix/pty.c
++++ b/unix/pty.c
+@@ -563,6 +563,7 @@
+ #endif
+     }
+ 
++#ifndef __ANDROID__
+     /* Drop privs. */
+     {
+ #if HAVE_SETRESUID && HAVE_SETRESGID
+@@ -588,6 +589,7 @@
+         }
+ #endif
+     }
++#endif /* __ANDROID__ */
+ 
+ #endif /* NO_PTY_PRE_INIT */
+ 

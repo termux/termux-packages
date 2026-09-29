@@ -1,0 +1,14 @@
+Avoids this build error:
+vendor/CppQuickCheck/include/cppqc/Generator.h:131:58:
+error: member reference base type
+'detail::StatelessGenConcept<T> *const' is not a structure or union
+
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -182,6 +182,3 @@ IF(GTK2_FOUND)
+   INSTALL(TARGETS tome-gtk2 RUNTIME DESTINATION bin)
+ ENDIF()
+ 
+-# test harness executable
+-ADD_EXECUTABLE(harness ${SRCS_TESTS})
+-TARGET_LINK_LIBRARIES(harness game squelch ${LIBS})

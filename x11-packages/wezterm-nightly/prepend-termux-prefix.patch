@@ -1,0 +1,64 @@
+--- a/sync-color-schemes/src/main.rs
++++ b/sync-color-schemes/src/main.rs
+@@ -26,7 +26,7 @@ fn apply_nightly_version(metadata: &mut ColorSchemeMetaData) {
+ }
+ 
+ fn make_cache() -> Cache {
+-    let file_name = "/tmp/wezterm-sync-color-schemes.sqlite";
++    let file_name = "@TERMUX_PREFIX@/tmp/wezterm-sync-color-schemes.sqlite";
+     let connection = sqlite_cache::rusqlite::Connection::open(&file_name).unwrap();
+     Cache::new(sqlite_cache::CacheConfig::default(), connection).unwrap()
+ }
+--- a/wezterm-escape-parser/src/apc.rs
++++ b/wezterm-escape-parser/src/apc.rs
+@@ -222,8 +222,8 @@ impl KittyImageData {
+                 // temporary directory path before blindly unlinking it here.
+ 
+                 fn looks_like_temp_path(p: &str) -> bool {
+-                    if p.starts_with("/tmp/")
+-                        || p.starts_with("/var/tmp/")
++                    if p.starts_with("@TERMUX_PREFIX@/tmp/")
++                        || p.starts_with("@TERMUX_PREFIX@/var/tmp/")
+                         || p.starts_with("/dev/shm/")
+                     {
+                         return true;
+--- a/wezterm-ssh/src/config.rs
++++ b/wezterm-ssh/src/config.rs
+@@ -468,7 +468,7 @@ impl Config {
+         if let Some(home) = dirs_next::home_dir() {
+             self.add_config_file(home.join(".ssh").join("config"));
+         }
+-        self.add_config_file("/etc/ssh/ssh_config");
++        self.add_config_file("@TERMUX_PREFIX@/etc/ssh/ssh_config");
+         if let Ok(sysdrive) = std::env::var("SystemDrive") {
+             self.add_config_file(format!("{}/ProgramData/ssh/ssh_config", sysdrive));
+         }
+--- a/window/src/os/x11/cursor.rs
++++ b/window/src/os/x11/cursor.rs
+@@ -72,11 +72,11 @@ fn icon_path() -> Vec<PathBuf> {
+             let mut path = vec![];
+             xdg_location("XDG_DATA_HOME", "~/.local/share", &mut path);
+             path.push("~/.icons".into());
+-            xdg_location("XDG_DATA_DIRS", "/usr/local/share:/usr/share", &mut path);
+-            path.push("/usr/share/pixmaps".into());
++            xdg_location("XDG_DATA_DIRS", "@TERMUX_PREFIX@/share", &mut path);
++            path.push("@TERMUX_PREFIX@/share/pixmaps".into());
+             path.push("~/.cursors".into());
+-            path.push("/usr/share/cursors/xorg-x11".into());
+-            path.push("/usr/X11R6/lib/X11/icons".into());
++            path.push("@TERMUX_PREFIX@/share/cursors/xorg-x11".into());
++            path.push("@TERMUX_PREFIX@/X11R6/lib/X11/icons".into());
+ 
+             std::env::join_paths(path).expect("failed to compose default xcursor path")
+         }
+--- a/pty/src/cmdbuilder.rs
++++ b/pty/src/cmdbuilder.rs
+@@ -66,7 +66,7 @@ fn get_shell() -> String {
+             }
+         }
+     }
+-    "/bin/sh".into()
++    "@TERMUX_PREFIX@/bin/bash".into()
+ }
+ 
+ fn get_base_env() -> BTreeMap<OsString, EnvEntry> {

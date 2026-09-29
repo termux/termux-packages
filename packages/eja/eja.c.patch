@@ -1,0 +1,26 @@
+Include headers for alloca and luaL_openlibs to fix errors:
+eja.c:309:8: error: call to undeclared library function 'alloca' with type 'void *(unsigned long)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+ hints=alloca(sizeof *hints);
+       ^
+eja.c:309:8: note: include the header <stdlib.h> or explicitly provide a declaration for 'alloca'
+eja.c:439:2: error: call to undeclared function 'luaL_openlibs'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+ luaL_openlibs(L);
+ ^
+--- ../eja-13.11.25/eja.c	2020-11-25 09:55:52.000000000 +0000
++++ ./eja.c	2023-09-30 10:19:37.381933826 +0000
+@@ -1,6 +1,7 @@
+ /* Copyright (C) 2007-2020 by Ubaldo Porcheddu <ubaldo@eja.it> */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <math.h>
+ #include <sys/wait.h>
+@@ -14,6 +15,7 @@
+ #include <arpa/inet.h>
+                      
+ #include "lua.h"
++#include "lualib.h"
+ #include "lauxlib.h"
+ #include "eja.h"
+ 

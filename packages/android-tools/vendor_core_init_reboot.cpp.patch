@@ -1,0 +1,11 @@
+--- a/vendor/core/init/reboot.cpp	2026-08-01 08:20:11.000000000 +0300
++++ b/vendor/core/init/reboot.cpp	2026-09-18 12:03:55.465974778 +0300
+@@ -225,7 +225,7 @@
+     }
+     mntent* mentry;
+     while ((mentry = getmntent(fp.get())) != nullptr) {
+-        if (MountEntry::IsBlockDevice(*mentry) && hasmntopt(mentry, "rw")) {
++        if (MountEntry::IsBlockDevice(*mentry) && 0) {
+             std::string mount_dir(mentry->mnt_dir);
+             // These are R/O partitions changed to R/W after adb remount.
+             // Do not umount them as shutdown critical services may rely on them.

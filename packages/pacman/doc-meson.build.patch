@@ -1,0 +1,14 @@
+Fixes on-device build of
+./build-package.sh -I -f pacman
+
+--- a/doc/meson.build
++++ b/doc/meson.build
+@@ -101,7 +101,7 @@ foreach page: manpages + sitepages
+ endforeach
+ 
+ run_target('html',
+-           command : ['/bin/true'],
++           command : ['true'],
+            depends : html_targets)
+ 
+ meson.add_install_script(MESON_MAKE_SYMLINK,

@@ -1,0 +1,33 @@
+--- a/src/controller.cpp
++++ b/src/controller.cpp
+@@ -943,7 +943,7 @@
+ 		filename_template = Filepath::from_locale_string(tmpdir);
+ 		filename_template.push("newsboat-article.XXXXXX"_path);
+ 	} else {
+-		filename_template = "/tmp/newsboat-article.XXXXXX"_path;
++		filename_template = "@TERMUX_PREFIX@/tmp/newsboat-article.XXXXXX"_path;
+ 	}
+ 
+ 	auto template_string = filename_template.to_locale_string();
+--- a/src/formaction.cpp
++++ b/src/formaction.cpp
+@@ -874,7 +874,7 @@
+ 			return "";
+ 		} else {
+ 			const char* my_argv[4];
+-			my_argv[0] = "/bin/sh";
++			my_argv[0] = "@TERMUX_PREFIX@/bin/sh";
+ 			my_argv[1] = "-c";
+ 			my_argv[2] = cmdline.c_str();
+ 			my_argv[3] = nullptr;
+--- a/src/itemrenderer.cpp
++++ b/src/itemrenderer.cpp
+@@ -161,7 +161,7 @@
+ 		rnd.render(source, lines, thelinks, url);
+ 	} else {
+ 		const char* argv[4];
+-		argv[0] = "/bin/sh";
++		argv[0] = "@TERMUX_PREFIX@/bin/sh";
+ 		argv[1] = "-c";
+ 		const std::string renderer_locale_string = renderer.to_locale_string();
+ 		argv[2] = renderer_locale_string.c_str();

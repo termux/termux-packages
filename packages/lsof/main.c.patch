@@ -1,0 +1,11 @@
+--- a/src/main.c
++++ b/src/main.c
+@@ -118,7 +118,7 @@
+      * Make sure umask allows lsof to define its own file permissions.
+      */
+ 
+-    if ((MaxFd = (int)GET_MAX_FD()) < 53)
++    if ((MaxFd = (int)sysconf(_SC_OPEN_MAX)) < 53)
+         MaxFd = 53;
+ 
+     closefrom_shim(ctx, 3);

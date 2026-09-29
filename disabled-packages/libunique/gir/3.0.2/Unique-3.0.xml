@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="UniqueMessageData" get-type="unique_message_data_get_type"/>
+  <class name="UniqueApp" get-type="unique_app_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="startup-id" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="screen" type="GdkScreen" flags="231"/>
+    <property name="is-running" type="gboolean" flags="225" default-value="FALSE"/>
+    <signal name="message-received" return="UniqueResponse" when="last" no-recurse="1" no-hooks="1">
+      <param type="gint"/>
+      <param type="UniqueMessageData"/>
+      <param type="guint"/>
+    </signal>
+  </class>
+  <class name="UniqueBackend" get-type="unique_backend_get_type" parents="GObject" abstract="1">
+  </class>
+</dump>

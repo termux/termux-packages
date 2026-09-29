@@ -1,0 +1,43 @@
+From 92f1d8e710749f43d5bf80afe6955da8785bd63d Mon Sep 17 00:00:00 2001
+From: raveit65 <raveit65.sun@gmail.com>
+Date: Wed, 28 Jan 2026 11:21:21 +0100
+Subject: [PATCH] CI: fix some workflow issues (#371)
+
+* CI: update NEWS which caused some workflow issues
+
+* CI: disable gdk-pixbuf-thumbnailer for meson workflows
+
+ - gdk-pixbuf-thumbnailer is obsolete and should be replaced
+   with glycin-thumbnailer
+
+* meson: Only use girepository-2.0 if libpeas uses it too
+
+Fixes header conflicts on systems where glib has girepository-2.0 but
+libpeas still uses the old gobject-introspection-1.0 headers.
+
+---------
+
+Co-authored-by: Victor Kareh <vkareh@redhat.com>
+
+--- a/meson.build
++++ b/meson.build
+@@ -178,9 +178,17 @@ endif
+ if gobject_introspection.found()
+   conf.set('HAVE_INTROSPECTION', 1)
+   # Check for girepository-2.0 API (moved to glib in version 1.80+)
++  # We can only use girepository-2.0 if libpeas also uses it, otherwise we get conflicts
+   girepository2 = dependency('girepository-2.0', required: false)
+   if girepository2.found()
+-    conf.set('HAVE_GIREPOSITORY_2', 1)
++    # Check if libpeas requires girepository-2.0
++    pkgconfig = find_program('pkg-config', required: false)
++    if pkgconfig.found()
++      libpeas_requires = run_command(pkgconfig, '--print-requires', 'libpeas-1.0', check: false)
++      if libpeas_requires.returncode() == 0 and libpeas_requires.stdout().contains('girepository-2.0')
++        conf.set('HAVE_GIREPOSITORY_2', 1)
++      endif
++    endif
+   endif
+ endif
+ 
+

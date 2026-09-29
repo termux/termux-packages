@@ -1,0 +1,55 @@
+diff -uNr NXEngine-1.0.0.4-Rev4/graphics/font.cpp NXEngine-1.0.0.4-Rev4.mod/graphics/font.cpp
+--- NXEngine-1.0.0.4-Rev4/graphics/font.cpp	2014-01-25 15:05:18.000000000 +0200
++++ NXEngine-1.0.0.4-Rev4.mod/graphics/font.cpp	2021-08-19 21:20:45.912025765 +0300
+@@ -37,12 +37,12 @@
+ 	"'abcdefghijklmnopqrstuvwxyz{|}~"
+ };
+ 
+-const char *bmpfontfile = "smalfont.bmp";
++const char *bmpfontfile = "@TERMUX_PREFIX@/share/nxengine/smalfont.bmp";
+ 
+ #if defined(_320X240) || defined(_480X272)
+-const char *ttffontfile = "DroidSansMono.ttf";
++const char *ttffontfile = "@TERMUX_PREFIX@/share/nxengine/DroidSansMono.ttf";
+ #else
+-const char *ttffontfile = "font.ttf";
++const char *ttffontfile = "@TERMUX_PREFIX@/share/nxengine/font.ttf";
+ #endif
+ 
+ static SDL_Surface *sdl_screen = NULL;
+diff -uNr NXEngine-1.0.0.4-Rev4/graphics/sprites.cpp NXEngine-1.0.0.4-Rev4.mod/graphics/sprites.cpp
+--- NXEngine-1.0.0.4-Rev4/graphics/sprites.cpp	2014-01-25 15:05:18.000000000 +0200
++++ NXEngine-1.0.0.4-Rev4.mod/graphics/sprites.cpp	2021-08-19 21:18:38.227176965 +0300
+@@ -28,7 +28,7 @@
+ 	memset(spritesheet, 0, sizeof(spritesheet));
+ 	
+ 	// load sprites info--sheet positions, bounding boxes etc
+-	if (load_sif("sprites.sif"))
++	if (load_sif("@TERMUX_PREFIX@/share/nxengine/sprites.sif"))
+ 		return 1;
+ 	
+ 	num_spritesheets = sheetfiles.CountItems();
+diff -uNr NXEngine-1.0.0.4-Rev4/map.cpp NXEngine-1.0.0.4-Rev4.mod/map.cpp
+--- NXEngine-1.0.0.4-Rev4/map.cpp	2014-01-25 15:05:18.000000000 +0200
++++ NXEngine-1.0.0.4-Rev4.mod/map.cpp	2021-08-19 21:21:43.280404512 +0300
+@@ -326,7 +326,7 @@
+ int i;
+ 
+ 	stat("initmapfirsttime: loading tilekey.dat.");
+-	if (!(fp = fileopen("tilekey.dat", "rb")))
++	if (!(fp = fileopen("@TERMUX_PREFIX@/share/nxengine/tilekey.dat", "rb")))
+ 	{
+ 		staterr("tilekey.dat is missing!");
+ 		return 1;
+diff -uNr NXEngine-1.0.0.4-Rev4/settings.cpp NXEngine-1.0.0.4-Rev4.mod/settings.cpp
+--- NXEngine-1.0.0.4-Rev4/settings.cpp	2014-01-25 15:05:18.000000000 +0200
++++ NXEngine-1.0.0.4-Rev4.mod/settings.cpp	2021-08-19 21:17:52.594871268 +0300
+@@ -8,7 +8,7 @@
+ #include "replay.h"
+ #include "settings.fdh"
+ 
+-const char *setfilename = "settings.dat";
++const char *setfilename = "@TERMUX_PREFIX@/share/nxengine/settings.dat";
+ const uint16_t SETTINGS_VERSION = 0x1602;		// serves as both a version and magic
+ 
+ Settings normal_settings;

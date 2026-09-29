@@ -1,0 +1,40 @@
+TERMUX_PKG_HOMEPAGE=https://sabnzbd.org/
+TERMUX_PKG_DESCRIPTION="Fully automated Usenet Binary Downloader"
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0"
+TERMUX_PKG_LICENSE_FILE="LICENSE.txt, GPL2.txt, GPL3.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="5.1.3"
+TERMUX_PKG_SRCURL="https://github.com/sabnzbd/sabnzbd/releases/download/${TERMUX_PKG_VERSION}/SABnzbd-${TERMUX_PKG_VERSION}-src.tar.gz"
+TERMUX_PKG_SHA256=12a01e30ce166297a375ffc3a761f98bf7d93260e040391497f643f8a3525fed
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="python, python-cryptography, python-sabyenc3, termux-tools, par2, unrar, 7zip, unzip"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SERVICE_SCRIPT=("sabnzbd" 'exec sabnzbd -d 2>&1')
+
+termux_step_post_get_source() {
+	export TERMUX_PKG_PYTHON_TARGET_DEPS=""
+	while IFS="" read -r dep
+	do
+		# only install main requirements
+		if [ -z "$dep" ]; then
+			break
+		fi
+		dep="${dep/[# ]*}"
+		# https://github.com/termux/termux-packages/issues/20229
+		if [ -z "$dep" ] || [ -z "${dep/sabctools*}" ]; then
+			continue
+		fi
+		TERMUX_PKG_PYTHON_TARGET_DEPS+="'$dep', "
+	done < "$TERMUX_PKG_SRCDIR/requirements.txt"
+}
+
+termux_step_make_install() {
+	local sabnzbd="${TERMUX_PREFIX}/share/sabnzbd"
+	mkdir -p "${sabnzbd}"
+	cp -r email icons interfaces locale po sabnzbd scripts tools "${sabnzbd}"
+	find "${sabnzbd}" -type d -exec chmod 700 {} \;
+	find "${sabnzbd}" -type f -exec chmod 600 {} \;
+	install -Dm700 SABnzbd.py "${TERMUX_PREFIX}/bin/sabnzbd"
+	install -Dm600 linux/sabnzbd.bash-completion "${TERMUX_PREFIX}/share/bash-completion/completions/sabnzbd"
+}

@@ -1,0 +1,17 @@
+diff -u -r ../php-7.3.3/ext/pdo_pgsql/config.m4 ./ext/pdo_pgsql/config.m4
+--- ../php-7.3.3/ext/pdo_pgsql/config.m4	2019-03-05 13:50:40.000000000 +0000
++++ ./ext/pdo_pgsql/config.m4	2019-03-17 22:38:42.906375088 +0000
+@@ -14,12 +14,7 @@
+   PHP_EXPAND_PATH($PGSQL_INCLUDE, PGSQL_INCLUDE)
+ 
+   AC_MSG_CHECKING(for pg_config)
+-  for i in $PHP_PDO_PGSQL $PHP_PDO_PGSQL/bin /usr/local/pgsql/bin /usr/local/bin /usr/bin ""; do
+-    if test -x $i/pg_config; then
+-      PG_CONFIG="$i/pg_config"
+-      break;
+-    fi
+-  done
++  # Avoid picking up cross-compiled pg_config.
+ 
+   if test -n "$PG_CONFIG"; then
+     AC_MSG_RESULT([$PG_CONFIG])

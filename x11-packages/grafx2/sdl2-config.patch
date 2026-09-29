@@ -1,0 +1,35 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -715,10 +715,10 @@ endif
+         TESTSBIN = ../bin/tests-$(API)
+         COPT = -W -Wall -Wdeclaration-after-statement -std=c99 -g
+         ifeq ($(API),sdl)
+-          COPT += $(shell sdl-config --cflags)
++          COPT += $(shell ${SDL2CONFIG} --cflags)
+         endif
+         ifeq ($(API),sdl2)
+-          COPT += $(shell sdl2-config --cflags)
++          COPT += $(shell ${SDL2CONFIG} --cflags)
+         endif
+         COPT += $(TTFCOPT) $(LUACOPT) $(JOYCOPT) -O$(OPTIM)
+         COPT += $(shell $(PKG_CONFIG) --cflags libpng)
+@@ -740,7 +740,7 @@ endif
+           endif
+         endif
+         ifeq ($(API),sdl2)
+-          LOPT += $(shell sdl2-config --libs) -lSDL2_image
++          LOPT += $(shell ${SDL2CONFIG} --libs) -lSDL2_image
+           ifneq ($(NO_X11),1)
+             LOPT += $(shell $(PKG_CONFIG) --libs x11)
+             COPT += $(shell $(PKG_CONFIG) --cflags x11)
+--- a/tools/sdl_image_test/Makefile
++++ b/tools/sdl_image_test/Makefile
+@@ -2,7 +2,7 @@ CFLAGS = -Wall -O -g
+ 
+ ifeq ($(API),sdl2)
+ # SDL 2.x
+-SDLCONFIGNAME = sdl2-config
++SDLCONFIGNAME = ${SDL2CONFIG}
+ SDLIMAGE = SDL2_image
+ BIN = showimage-sdl2
+ CFLAGS += -DUSE_SDL2

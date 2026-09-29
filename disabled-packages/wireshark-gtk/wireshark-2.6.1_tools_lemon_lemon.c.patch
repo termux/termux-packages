@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/tools/lemon/lemon.c wireshark-2.6.1.mod/tools/lemon/lemon.c
+--- wireshark-2.6.1/tools/lemon/lemon.c	2018-05-22 21:53:09.000000000 +0300
++++ wireshark-2.6.1.mod/tools/lemon/lemon.c	2018-06-26 18:49:28.878305121 +0300
+@@ -3415,7 +3415,7 @@
+     *cp = c;
+   }else{
+     pathlist = getenv("PATH");
+-    if( pathlist==0 ) pathlist = ".:/bin:/usr/bin";
++    if( pathlist==0 ) pathlist = ".:@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets";
+     pathbuf = (char *) malloc( lemonStrlen(pathlist) + 1 );
+     if( pathbuf == 0 )
+       return NULL;

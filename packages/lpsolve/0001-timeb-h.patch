@@ -1,0 +1,40 @@
+diff --git a/lp_utils.c b/lp_utils.c
+index 418f7c8..fa7480d 100644
+--- a/lp_utils.c
++++ b/lp_utils.c
+@@ -5,7 +5,9 @@
+ #include "lp_lib.h"
+ #include "lp_utils.h"
+ #include <time.h>
++#ifndef __ANDROID__
+ #include <sys/timeb.h>
++#endif
+ #include "lp_bit.h"
+ 
+ #ifdef FORTIFY
+diff --git a/shared/commonlib.c b/shared/commonlib.c
+index 5ab4f12..d93f704 100644
+--- a/shared/commonlib.c
++++ b/shared/commonlib.c
+@@ -5,6 +5,8 @@
+ # include <time.h>
+ #elif defined EnhTime
+ # include <windows.h>
++#elif defined(__ANDROID__)
++#include <sys/time.h>
+ #else
+ # include <sys/timeb.h>
+ #endif
+@@ -843,6 +845,12 @@ double timeNow(void)
+     timeBase = clockNow() - (double) now.QuadPart/(double) freq.QuadPart;
+   }
+   return( timeBase + (double) now.QuadPart/(double) freq.QuadPart );
++#elif defined(__ANDROID__)
++  struct timeval tv;
++  struct timezone tz;
++
++  gettimeofday(&tv, &tz);
++  return((double)tv.tv_sec+((double)tv.tv_usec)/1000000.0);
+ #else
+   struct timeb buf;
+ 

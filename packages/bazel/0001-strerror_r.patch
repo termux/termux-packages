@@ -1,0 +1,13 @@
+Bionic libc's `strerror_r` returns `char *`, which is the same as GNU libc.
+
+--- a/src/main/native/unix_jni_linux.cc
++++ b/src/main/native/unix_jni_linux.cc
+@@ -31,7 +31,7 @@
+   // functionality which is not compatible with not the
+   // SUSv3-conformant one which returns an error code; see DESCRIPTION
+ // at strerror(3).
+-#if !__GLIBC__ || (_POSIX_C_SOURCE >= 200112L && !_GNU_SOURCE)
++#if (!__GLIBC__ && !defined(__ANDROID__)) || (_POSIX_C_SOURCE >= 200112L && !_GNU_SOURCE)
+   if (strerror_r(error_number, buf, sizeof buf) == -1) {
+     return std::string("");
+   } else {

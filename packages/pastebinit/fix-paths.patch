@@ -1,0 +1,24 @@
+--- a/pastebinit
++++ b/pastebinit
+@@ -76,10 +76,10 @@
+     # Files found later override files found earlier.
+     pastebind = {}
+     confdirs = []
+-    for confdir in ['/usr/share', '/usr/local/share'] \
++    for confdir in ['@TERMUX_PREFIX@/share'] \
+             + list(reversed(os.environ.get('XDG_DATA_DIRS', '').split(':'))) \
+             + list(reversed(os.environ.get('XDG_CONFIG_DIRS', '').split(':'))) \
+-            + ['/etc', '/usr/local/etc',
++            + ['@TERMUX_PREFIX@/etc',
+                os.environ.get('XDG_CONFIG_HOME',
+                    os.path.expanduser('~/.config')),
+                os.path.expanduser('~/.pastebin.d'),
+@@ -252,7 +252,7 @@
+         configfiles = []
+ 
+         for conffile in list(reversed(os.environ.get(
+-                'XDG_CONFIG_DIRS', '').split(':'))) + ['/etc', '/usr/local/etc',
++                'XDG_CONFIG_DIRS', '').split(':'))) + ['@TERMUX_PREFIX@/etc',
+                    os.environ.get('XDG_CONFIG_HOME',
+                        os.path.expanduser('~/.config')),
+                    os.path.expanduser('~/.pastebinit.xml')]:

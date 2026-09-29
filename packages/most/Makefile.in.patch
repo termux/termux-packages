@@ -1,0 +1,21 @@
+diff -uNr most-5.1.0/src/Makefile.in most-5.1.0.mod/src/Makefile.in
+--- most-5.1.0/src/Makefile.in	2018-10-29 09:55:02.000000000 +0200
++++ most-5.1.0.mod/src/Makefile.in	2020-01-01 20:35:56.916778816 +0200
+@@ -52,7 +52,7 @@
+ COMPILE_CMD = $(CC) -c $(ALL_CFLAGS) -DMOST_SYSTEM_INITFILE='"$(SYS_INITFILE)"'
+ #
+ all: $(EXEC)
+-$(EXEC): $(OBJDIR) $(CONFIG_H) slangversion $(OBJDIR)/$(EXEC)
++$(EXEC): $(OBJDIR) $(CONFIG_H) $(OBJDIR)/$(EXEC)
+ 	@echo $(EXEC) created in $(OBJDIR)
+ $(OBJDIR)/$(EXEC): $(OBJS)
+ 	cd $(OBJDIR); $(CC) $(OFILES) -o $(EXEC) $(LDFLAGS) $(EXECLIBS)
+@@ -83,7 +83,7 @@
+ 	$(MKINSDIR) $(DEST_MANDIR)/man1
+ 	$(MKINSDIR) $(DEST_BINDIR)
+ install: all installdirs
+-	$(INSTALL) -s $(OBJDIR)/most $(DEST_BINDIR)
++	$(INSTALL) $(OBJDIR)/most $(DEST_BINDIR)
+ 	$(INSTALL_DATA) ../doc/most.1 $(DEST_MANDIR)/man1
+ 	@for i in $(DOC_FILES); \
+ 	do \

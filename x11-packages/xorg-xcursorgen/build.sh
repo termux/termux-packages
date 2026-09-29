@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Create an X cursor file from PNG images"
+TERMUX_PKG_LICENSE="HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.9"
+TERMUX_PKG_SRCURL="https://xorg.freedesktop.org/releases/individual/app/xcursorgen-$TERMUX_PKG_VERSION.tar.xz"
+TERMUX_PKG_SHA256=0cc9e156ac84ca16ea902710af35e0faffa51d13797071e3b4b6cc7cbd493bbc
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libpng, libx11, libxcursor"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"

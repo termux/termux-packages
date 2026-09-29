@@ -1,0 +1,35 @@
+--- ../cache/vifm-0.9/src/cmd_completion.c	2017-06-18 14:31:25.000000000 +0000
++++ ./src/cmd_completion.c	2017-10-04 00:00:24.535121432 +0000
+@@ -1046,6 +1044,7 @@
+ 	size_t len;
+ 
+ 	len = strlen(str);
++#ifndef __ANDROID__
+ 	setpwent();
+ 	while((pw = getpwent()) != NULL)
+ 	{
+@@ -1054,6 +1053,7 @@
+ 			vle_compl_add_match(pw->pw_name, "");
+ 		}
+ 	}
++#endif
+ 	vle_compl_finish_group();
+ 	vle_compl_add_last_match(str);
+ }
+@@ -1063,7 +1063,7 @@
+ {
+ 	struct group *gr;
+ 	size_t len = strlen(str);
+-
++#ifndef __ANDROID__
+ 	setgrent();
+ 	while((gr = getgrent()) != NULL)
+ 	{
+@@ -1072,6 +1072,7 @@
+ 			vle_compl_add_match(gr->gr_name, "");
+ 		}
+ 	}
++#endif
+ 	vle_compl_finish_group();
+ 	vle_compl_add_last_match(str);
+ }

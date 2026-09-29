@@ -1,0 +1,29 @@
+diff -uNr lazyread-2.0/lazyread.c lazyread-2.0.mod/lazyread.c
+--- lazyread-2.0/lazyread.c	2003-02-02 15:28:15.000000000 +0200
++++ lazyread-2.0.mod/lazyread.c	2020-01-04 15:54:01.364514351 +0200
+@@ -437,10 +437,8 @@
+ 
+     if (unlink(lfile.lazy_file))
+         my_perror("unlink()");
+-    if (link(lfile.lazy_tmp, lfile.lazy_file) != 0)
+-        my_perror("link()");
+-    if (unlink(lfile.lazy_tmp))
+-        my_perror("unlink()");
++    if (rename(lfile.lazy_tmp, lfile.lazy_file) != 0)
++        my_perror("rename()");
+ }
+ 
+ void strip_extra_blanks(void)
+@@ -469,10 +467,8 @@
+     fclose(fp_write);
+     if (unlink(lfile.lazy_file))
+         my_perror("unlink()");
+-    if (link(lfile.lazy_tmp, lfile.lazy_file) != 0) 
+-        my_perror("link()");
+-    if (unlink(lfile.lazy_tmp))
+-        my_perror("unlink()");
++    if (rename(lfile.lazy_tmp, lfile.lazy_file) != 0) 
++        my_perror("rename()");
+ }
+ 
+ void scroll_it(unsigned int scroll_speed, int argc, char *filename_nodashf)

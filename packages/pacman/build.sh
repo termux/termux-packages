@@ -1,0 +1,58 @@
+TERMUX_PKG_HOMEPAGE=https://archlinux.org/pacman/
+TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@Maxython <mixython@gmail.com>"
+TERMUX_PKG_VERSION=7.1.0
+TERMUX_PKG_REVISION=9
+_PALT_VERSION=1.0.1
+TERMUX_PKG_SRCURL=(https://gitlab.archlinux.org/pacman/pacman/-/releases/v${TERMUX_PKG_VERSION}/downloads/pacman-${TERMUX_PKG_VERSION}.tar.xz
+		https://github.com/termux-pacman/pacman-alternatives/archive/refs/tags/v${_PALT_VERSION}.tar.gz)
+TERMUX_PKG_SHA256=(530e50d7edbb2a22581c6d6707d2113240276c1bec4ee39a99488e1243c32171
+		c479e53816b523ad792917710a460accf62045e03dc4fa33ae5564019b02e121)
+TERMUX_PKG_DEPENDS="bash, curl, gpgme, libandroid-glob, libarchive, libcurl, openssl, termux-licenses, termux-keyring"
+TERMUX_PKG_BUILD_DEPENDS="doxygen, asciidoc, nettle"
+TERMUX_PKG_GROUPS="base-devel"
+TERMUX_PKG_CONFFILES="etc/pacman.conf, etc/pacman.d/mirrorlist, etc/makepkg.conf, var/log/pacman.log"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--prefix=${TERMUX_PREFIX}
+--sysconfdir=${TERMUX_PREFIX}/etc
+--localstatedir=${TERMUX_PREFIX}/var
+-Dpkg-ext=.pkg.tar.xz
+-Dscriptlet-shell=${TERMUX_PREFIX}/bin/bash
+-Dmakepkg-template-dir=${TERMUX_PREFIX}/share/makepkg-template
+-Di18n=false
+"
+
+termux_step_pre_configure() {
+	rm -f ./scripts/libmakepkg/executable/sudo.sh.in
+	rm -f ./scripts/libmakepkg/executable/fakeroot.sh.in
+
+	sed -i "s/@TERMUX_ARCH@/${TERMUX_ARCH}/" ./etc/{pacman,makepkg}.conf.in
+}
+
+termux_step_post_configure() {
+	sed -i 's/$ARGS -o $out $in $LINK_ARGS/$ARGS -o $out $in $LINK_ARGS -landroid-glob/' ${TERMUX_PKG_BUILDDIR}/build.ninja
+}
+
+termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/etc/pacman.d
+	install -m644 $TERMUX_PKG_BUILDER_DIR/mirrorlist $TERMUX_PREFIX/etc/pacman.d/mirrorlist
+
+	cd $TERMUX_PKG_SRCDIR/pacman-alternatives-$_PALT_VERSION/
+	make DEF_OS="android" \
+		PREFIX="$TERMUX_PREFIX" \
+		SYSDIR="$TERMUX_PREFIX/"
+
+	for dir in var/lib/pacman/{sync,local,alternatives} var/cache/pacman/pkg share/pacman-alternatives; do
+		dir="${TERMUX_PREFIX}/${dir}"
+		mkdir -p ${dir}
+		touch ${dir}/.placeholder
+	done
+}
+
+termux_step_create_debscripts() {
+	if [[ "$TERMUX_PACKAGE_FORMAT" == "debian" ]]; then
+		echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+		echo "pacman-db-upgrade" >> postinst
+	fi
+}

@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=http://joe-editor.sourceforge.net
+TERMUX_PKG_DESCRIPTION="Wordstar like text editor"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_CONFLICTS="jupp"
+TERMUX_PKG_VERSION=4.8
+TERMUX_PKG_SRCURL=https://sourceforge.net/projects/joe-editor/files/JOE%20sources/joe-${TERMUX_PKG_VERSION}/joe-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=6995b28ee20dcdbbcb5a45a4c110642dc96d67748aea27450c74cdb4dd07cc20
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-termcap"

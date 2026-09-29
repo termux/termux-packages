@@ -1,0 +1,44 @@
+Works around error: use of undeclared identifier 'pthread_cancel'
+
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -203,6 +203,14 @@ void loop() {
+     #endif
+ }
+ 
++#ifdef __ANDROID__
++static void
++thread_signal_handler (int signum)
++{
++	pthread_exit (0);
++}
++#endif
++
+ // Main program
+ //============================================================================
+ int main(int argc, char **argv) {
+@@ -1113,11 +1121,24 @@ int main(int argc, char **argv) {
+     // Wait for watchers to end
+     fileWatcher.join();
+ 
++    #ifdef __ANDROID__
++    struct sigaction actions;
++    memset (&actions, 0, sizeof (actions));
++    sigemptyset (&actions.sa_mask);
++    actions.sa_flags = 0;
++    actions.sa_handler = thread_signal_handler;
++    sigaction (SIGUSR2, &actions, NULL);
++    #endif
++
+     // Force cinWatcher to finish (because is waiting for input)
+     #ifndef PLATFORM_WINDOWS
+     pthread_t cinHandler = cinWatcher.native_handle();
++    #ifdef __ANDROID__
++    pthread_kill(( cinHandler ), SIGUSR2);
++    #else
+     pthread_cancel( cinHandler );
+     #endif
++    #endif
+ 
+     #if defined(SUPPORT_NCURSES)
+     endwin();

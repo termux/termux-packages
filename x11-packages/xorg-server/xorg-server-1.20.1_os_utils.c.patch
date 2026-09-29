@@ -1,0 +1,161 @@
+diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
+--- xorg-server-1.20.1/os/utils.c	2018-08-07 19:31:05.000000000 +0300
++++ xorg-server-1.20.1.mod/os/utils.c	2018-10-08 21:07:16.844266287 +0300
+@@ -228,7 +228,7 @@
+  * server at a time.  This keeps the servers from stomping on each other
+  * if the user forgets to give them different display numbers.
+  */
+-#define LOCK_DIR "/tmp"
++#define LOCK_DIR "@TERMUX_PREFIX@/tmp"
+ #define LOCK_TMP_PREFIX "/.tX"
+ #define LOCK_PREFIX "/.X"
+ #define LOCK_SUFFIX "-lock"
+@@ -320,7 +320,7 @@
+     i = 0;
+     haslock = 0;
+     while ((!haslock) && (i++ < 3)) {
+-        haslock = (link(tmp, LockFile) == 0);
++        haslock = (rename(tmp, LockFile) == 0);
+         if (haslock) {
+             /*
+              * We're done.
+@@ -1383,11 +1383,7 @@
+         p = -1;
+         break;
+     case 0:                    /* child */
+-        if (setgid(getgid()) == -1)
+-            _exit(127);
+-        if (setuid(getuid()) == -1)
+-            _exit(127);
+-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     default:                   /* parent */
+         do {
+@@ -1453,10 +1449,6 @@
+ #endif
+         return NULL;
+     case 0:                    /* child */
+-        if (setgid(getgid()) == -1)
+-            _exit(127);
+-        if (setuid(getuid()) == -1)
+-            _exit(127);
+         if (*type == 'r') {
+             if (pdes[1] != 1) {
+                 /* stdout */
+@@ -1473,7 +1465,7 @@
+             }
+             close(pdes[1]);
+         }
+-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     }
+ 
+@@ -1531,10 +1523,6 @@
+         free(cur);
+         return NULL;
+     case 0:                    /* child */
+-        if (setgid(getgid()) == -1)
+-            _exit(127);
+-        if (setuid(getuid()) == -1)
+-            _exit(127);
+         if (*type == 'r') {
+             if (pdes[1] != 1) {
+                 /* stdout */
+@@ -1577,20 +1565,7 @@
+ 
+     return iop;
+ #else
+-    int ruid, euid;
+-
+-    ruid = getuid();
+-    euid = geteuid();
+-
+-    if (seteuid(ruid) == -1) {
+-        return NULL;
+-    }
+     iop = fopen(file, type);
+-
+-    if (seteuid(euid) == -1) {
+-        fclose(iop);
+-        return NULL;
+-    }
+     return iop;
+ #endif                          /* HAS_SAVED_IDS_AND_SETEUID */
+ }
+@@ -1670,7 +1645,7 @@
+     else if (getenv("TMP") != NULL)
+         return getenv("TMP");
+     else
+-        return "/tmp";
++        return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ int
+@@ -1722,64 +1697,7 @@
+ Bool
+ PrivsElevated(void)
+ {
+-    static Bool privsTested = FALSE;
+-    static Bool privsElevated = TRUE;
+-
+-    if (!privsTested) {
+-#if defined(WIN32)
+-        privsElevated = FALSE;
+-#else
+-        if ((getuid() != geteuid()) || (getgid() != getegid())) {
+-            privsElevated = TRUE;
+-        }
+-        else {
+-#if defined(HAVE_ISSETUGID)
+-            privsElevated = issetugid();
+-#elif defined(HAVE_GETRESUID)
+-            uid_t ruid, euid, suid;
+-            gid_t rgid, egid, sgid;
+-
+-            if ((getresuid(&ruid, &euid, &suid) == 0) &&
+-                (getresgid(&rgid, &egid, &sgid) == 0)) {
+-                privsElevated = (euid != suid) || (egid != sgid);
+-            }
+-            else {
+-                printf("Failed getresuid or getresgid");
+-                /* Something went wrong, make defensive assumption */
+-                privsElevated = TRUE;
+-            }
+-#else
+-            if (getuid() == 0) {
+-                /* running as root: uid==euid==0 */
+-                privsElevated = FALSE;
+-            }
+-            else {
+-                /*
+-                 * If there are saved ID's the process might still be privileged
+-                 * even though the above test succeeded. If issetugid() and
+-                 * getresgid() aren't available, test this by trying to set
+-                 * euid to 0.
+-                 */
+-                unsigned int oldeuid;
+-
+-                oldeuid = geteuid();
+-
+-                if (seteuid(0) != 0) {
+-                    privsElevated = FALSE;
+-                }
+-                else {
+-                    if (seteuid(oldeuid) != 0) {
+-                        FatalError("Failed to drop privileges.  Exiting\n");
+-                    }
+-                    privsElevated = TRUE;
+-                }
+-            }
+-#endif
+-        }
+-#endif
+-        privsTested = TRUE;
+-    }
+-    return privsElevated;
++    return FALSE;
+ }
+ 
+ /*

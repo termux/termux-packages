@@ -1,0 +1,20 @@
+--- a/tasks/toolchains/android.rake
++++ b/tasks/toolchains/android.rake
+@@ -158,7 +158,7 @@
+ 
+     v = sdk_version
+     case toolchain
+-    when :clang
++    when :nil
+       case arch
+       when /armeabi-v7a/  then flags += %W(-target armv7a-linux-androideabi#{v} -mfpu=#{armeabi_v7a_mfpu} -mfloat-abi=#{armeabi_v7a_mfloat_abi})
+       when /arm64-v8a/    then flags += %W(-target aarch64-linux-android#{v})
+@@ -198,7 +198,7 @@
+     v = sdk_version
+     case toolchain
+     when :clang
+-      case arch
++      case nil
+       when /armeabi-v7a/  then flags += %W(-target armv7-none-linux-androideabi#{v} -Wl,--fix-cortex-a8#{no_warn_mismatch})
+       when /arm64-v8a/    then flags += %W(-target aarch64-none-linux-android#{v})
+       when /x86_64/       then flags += %W(-target x86_64-none-linux-android#{v})

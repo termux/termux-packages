@@ -1,0 +1,47 @@
+--- a/src/xfpm-kbd-backlight.c
++++ b/src/xfpm-kbd-backlight.c
+@@ -273,7 +273,7 @@
+   backlight->priv->notify = NULL;
+   backlight->priv->n = NULL;
+ 
+-  backlight->priv->bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
++  backlight->priv->bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+ 
+   if (error)
+   {
+
+--- a/src/xfpm-manager.c
++++ b/src/xfpm-manager.c
+@@ -680,7 +680,7 @@
+     manager->priv->console = xfce_consolekit_get ();
+ 
+   /* Don't allow systemd to handle power/suspend/hibernate buttons and lid-switch */
+-  manager->priv->system_bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
++  manager->priv->system_bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+   if (manager->priv->system_bus)
+     manager->priv->inhibit_fd = xfpm_manager_inhibit_sleep_systemd (manager);
+   else
+
+--- a/src/xfpm-polkit.c
++++ b/src/xfpm-polkit.c
+@@ -412,7 +412,7 @@
+   polkit->priv->details = NULL;
+ #endif /*HAVE_POLKIT*/
+ 
+-  polkit->priv->bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
++  polkit->priv->bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+ 
+   if (error)
+   {
+
+--- a/src/xfpm-power.c
++++ b/src/xfpm-power.c
+@@ -1094,7 +1094,7 @@
+   g_signal_connect_object (power->priv->inhibit, "has-inhibit-changed",
+                            G_CALLBACK (xfpm_power_inhibit_changed_cb), power, 0);
+ 
+-  power->priv->bus = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
++  power->priv->bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+ 
+   if (error)
+   {

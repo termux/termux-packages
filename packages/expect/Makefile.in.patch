@@ -1,0 +1,33 @@
+diff -u -r ../expect5.45.3/Makefile.in ./Makefile.in
+--- ../expect5.45.3/Makefile.in	2010-09-30 19:14:07.000000000 +0200
++++ ./Makefile.in	2017-11-22 13:59:45.609495604 +0100
+@@ -32,16 +32,14 @@
+ # SCRIPTS is a target. If this is a problem, just comment out the
+ # SCRIPTS target itself.
+ 
+-SCRIPTS = timed-run timed-read ftp-rfc autopasswd lpunlock weather \
+-	passmass rftp kibitz rlogin-cwd xpstat tkpasswd dislocate xkibitz \
+-	tknewsbiff unbuffer mkpasswd cryptdir decryptdir autoexpect \
+-	multixterm
++SCRIPTS = timed-run timed-read \
++	unbuffer autoexpect
+ 
+ # A couple of the scripts have man pages of their own.
+ # You can delete these too if you don't want'em.
+ 
+-SCRIPTS_MANPAGES = kibitz dislocate xkibitz tknewsbiff unbuffer mkpasswd \
+-	passmass cryptdir decryptdir autoexpect multixterm
++SCRIPTS_MANPAGES = unbuffer \
++	autoexpect
+ 
+ 
+ # allow us to handle null list gracefully, "end_of_list" should not exist
+@@ -380,7 +378,7 @@
+ 	cp $(DIST_ROOT)/$(PKG_DIR).tar.gz $(top_builddir)
+ 
+ $(SCRIPTS):
+-	$(TCLSH) $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
++	cp $(srcdir)/example/$@ $@
+ 
+ ## We cannot use TCL_LIBS below (after TCL_LIB_SPEC) because its
+ ## expansion references the contents of LIBS, which contains linker

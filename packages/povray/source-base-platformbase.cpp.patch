@@ -1,0 +1,22 @@
+--- a/source/base/platformbase.cpp
++++ b/source/base/platformbase.cpp
+@@ -62,16 +62,16 @@
+ 
+ UCS2String DefaultPlatformBase::GetTemporaryPath()
+ {
+-    return ASCIItoUCS2String("/tmp/");
++    return ASCIItoUCS2String("@TERMUX_PREFIX@/tmp/");
+ }
+ 
+ UCS2String DefaultPlatformBase::CreateTemporaryFile()
+ {
+     static int cnt = 0;
+-    char buffer[32];
++    char buffer[] = "@TERMUX_PREFIX@/tmp/povXXXXXXXX.dat";
+ 
+     cnt++;
+-    sprintf(buffer, "/tmp/pov%08x.dat", cnt);
++    sprintf(buffer, "@TERMUX_PREFIX@/tmp/pov%08x.dat", cnt);
+ 
+     FILE *f = fopen(buffer, "wb");
+     if (f != nullptr)

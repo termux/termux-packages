@@ -1,0 +1,58 @@
+--- a/src/osdep/unix/Makefile
++++ b/src/osdep/unix/Makefile
+@@ -48,14 +48,14 @@
+ # Try to have some consistency in GCC builds.  We want optimization, but we
+ # also want to be able to debug.
+ 
+-GCCCFLAGS= -g $(GCCOPTLEVEL) -pipe -fno-omit-frame-pointer
++GCCCFLAGS= $(CFLAGS)
+ GCC4CFLAGS= $(GCCCFLAGS) -Wno-pointer-sign
+ 
+ 
+ # Extended flags needed for SSL.  You may need to modify.
+ 
+-SSLDIR=/usr/local/ssl
+-SSLCERTS=$(SSLDIR)/certs
++SSLDIR=@TERMUX_PREFIX@
++SSLCERTS=@TERMUX_PREFIX@/etc/tls/certs
+ SSLKEYS=$(SSLCERTS)
+ SSLINCLUDE=$(SSLDIR)/include
+ SSLLIB=$(SSLDIR)/lib
+@@ -96,18 +96,18 @@
+ LOGINPW=std
+ SIGTYPE=bsd
+ CRXTYPE=std
+-ACTIVEFILE=/usr/lib/news/active
+-SPOOLDIR=/usr/spool
++ACTIVEFILE=@TERMUX_PREFIX@/var/lib/news/active
++SPOOLDIR=@TERMUX_PREFIX@/var/spool
+ MAILSPOOL=$(SPOOLDIR)/mail
+ NEWSSPOOL=$(SPOOLDIR)/news
+ RSHPATH=/usr/ucb/rsh
+-MD5PWD=/etc/cram-md5.pwd
++MD5PWD=@TERMUX_PREFIX@/etc/cram-md5.pwd
+ # Tries one of the test alternatives below if not specified.
+ LOCKPGM=
+ # Test alternatives if LOCKPGM not specified
+-LOCKPGM1=/usr/libexec/mlock
+-LOCKPGM2=/usr/sbin/mlock
+-LOCKPGM3=/etc/mlock
++LOCKPGM1=@TERMUX_PREFIX@/libexec/mlock
++LOCKPGM2=@TERMUX_PREFIX@/bin/mlock
++LOCKPGM3=@TERMUX_PREFIX@/etc/mlock
+ 
+ 
+ # Default formats for creating new mailboxes and for empty mailboxes in the
+@@ -676,9 +676,9 @@
+ 	@echo If you want libc4 versions you must use sl4 instead!
+ 	$(BUILD) `$(CAT) SPECIALS` OS=$@ \
+ 	 SIGTYPE=psx CHECKPW=psx CRXTYPE=nfs \
+-	 SPOOLDIR=/var/spool \
+-	 ACTIVEFILE=/var/lib/news/active \
+-	 RSHPATH=/usr/bin/rsh \
++	 SPOOLDIR=@TERMUX_PREFIX@/var/spool \
++	 ACTIVEFILE=@TERMUX_PREFIX@/var/lib/news/active \
++	 RSHPATH=@TERMUX_PREFIX@/bin/rsh \
+ 	 BASECFLAGS="$(GCCCFLAGS)" \
+ 	 BASELDFLAGS="-lcrypt"
+ 

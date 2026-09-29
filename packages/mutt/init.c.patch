@@ -1,0 +1,13 @@
+--- a/init.c
++++ b/init.c
+@@ -3851,8 +3851,8 @@
+     MailcapPath = safe_strdup("~/.mailcap:" PKGDATADIR "/mailcap:" SYSCONFDIR "/mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap");
+   }
+ 
+-  Tempdir = safe_strdup((p = getenv("TMPDIR")) ? p : "/tmp");
+-  TempDraftDir = safe_strdup((p = getenv("TMPDIR")) ? p : "/var/tmp");
++  Tempdir = safe_strdup((p = getenv("TMPDIR")) ? p : "@TERMUX_PREFIX@/tmp");
++  TempDraftDir = safe_strdup((p = getenv("TMPDIR")) ? p : "@TERMUX_PREFIX@/var/tmp");
+ 
+   p = getenv("VISUAL");
+   if (!p)

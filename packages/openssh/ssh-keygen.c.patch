@@ -1,0 +1,15 @@
+diff -uNr openssh-portable-V_9_5_P1/ssh-keygen.c openssh-portable-V_9_5_P1.mod/ssh-keygen.c
+--- openssh-portable-V_9_5_P1/ssh-keygen.c	2023-10-04 07:34:10.000000000 +0300
++++ openssh-portable-V_9_5_P1.mod/ssh-keygen.c	2023-11-23 16:29:34.274542842 +0200
+@@ -1369,7 +1369,11 @@
+ 		/* Backup existing file */
+ 		if (unlink(old) == -1 && errno != ENOENT)
+ 			fatal("unlink %.100s: %s", old, strerror(errno));
++#ifdef __ANDROID__
++		if (rename(identity_file, old) == -1)
++#else
+ 		if (link(identity_file, old) == -1)
++#endif
+ 			fatal("link %.100s to %.100s: %s", identity_file, old,
+ 			    strerror(errno));
+ 		/* Move new one into place */

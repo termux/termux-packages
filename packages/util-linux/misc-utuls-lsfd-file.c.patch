@@ -1,0 +1,51 @@
+--- a/lsfd-cmd/file.c
++++ b/lsfd-cmd/file.c
+@@ -32,11 +32,15 @@
+ # endif
+ #endif
+ #include <linux/sched.h>
++#ifndef __ANDROID__
+ #include <sys/shm.h>
++#endif
+ 
+ #include <fcntl.h>
+ #include <sys/stat.h>
++#ifndef __ANDROID__
+ #include <mqueue.h>		/* mq_open */
++#endif
+ 
+ #include "buffer.h"
+ #include "idcache.h"
+@@ -425,6 +429,9 @@
+ 
+ static unsigned long get_minor_for_sysvipc(void)
+ {
++#ifdef __ANDROID__
++	return 0;
++#else
+ 	int id;
+ 	void *start;
+ 
+@@ -464,10 +471,14 @@
+ 	shmdt(start);
+ 	shmctl(id, IPC_RMID, NULL);
+ 	return m;
++#endif
+ }
+ 
+ static unsigned long get_minor_for_mqueue(void)
+ {
++#ifdef __ANDROID__
++	return 0;
++#else
+ 	mqd_t mq;
+ 	char mq_name[BUFSIZ];
+ 	struct mq_attr attr = {
+@@ -492,6 +503,7 @@
+ 	mq_close(mq);
+ 	mq_unlink(mq_name);
+ 	return minor(sb.st_dev);
++#endif
+ }
+ 
+ static unsigned long get_minor_for_pidfs(void)

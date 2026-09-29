@@ -1,0 +1,10 @@
+--- a/src/buildtools/config/linux.pri
++++ b/src/buildtools/config/linux.pri
+@@ -48,6 +48,7 @@
+ 
+ cross_compile:!host_build {
+     TOOLCHAIN_SYSROOT = $$[QT_SYSROOT]
++    isEmpty(TOOLCHAIN_SYSROOT): TOOLCHAIN_SYSROOT = $$DUMMY_SYSROOT
+     !isEmpty(TOOLCHAIN_SYSROOT): gn_args += target_sysroot=\"$${TOOLCHAIN_SYSROOT}\"
+ }
+ 

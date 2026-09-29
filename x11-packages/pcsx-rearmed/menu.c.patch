@@ -1,0 +1,50 @@
+diff --git a/frontend/menu.c b/frontend/menu.c
+index b28e53d..a6abaed 100644
+--- a/frontend/menu.c
++++ b/frontend/menu.c
+@@ -579,39 +579,24 @@ static int menu_write_config(int is_game)
+ 
+ static int menu_do_last_cd_img(int is_get)
+ {
+-	static const char *defaults[] = { "/media", "/mnt/sd", "/mnt" };
++	static const char default_dir[] = "@TERMUX_HOME@";
+ 	char path[256];
+-	struct STAT st;
+ 	FILE *f;
+-	int i, ret = -1;
+ 
+ 	emu_make_path(path, sizeof(path), PCSX_DOT_DIR, "lastcdimg.txt");
+ 	f = fopen(path, is_get ? "r" : "w");
+ 	if (f == NULL) {
+-		ret = -1;
+-		goto out;
++		if (is_get)
++			strcpy(last_selected_fname, default_dir);
++		return 1;
+ 	}
+ 
+-	if (is_get) {
+-		ret = fread(last_selected_fname, 1, sizeof(last_selected_fname) - 1, f);
+-		last_selected_fname[ret] = 0;
+-		mystrip(last_selected_fname);
+-	}
++	if (is_get)
++		fread(last_selected_fname, 1, sizeof(last_selected_fname) - 1, f);
+ 	else
+ 		fprintf(f, "%s\n", last_selected_fname);
+ 	fclose(f);
+ 
+-out:
+-	if (is_get) {
+-		for (i = 0; last_selected_fname[0] == 0
+-		       || STAT(last_selected_fname, &st) != 0; i++)
+-		{
+-			if (i >= ARRAY_SIZE(defaults))
+-				break;
+-			strcpy(last_selected_fname, defaults[i]);
+-		}
+-	}
+-
+ 	return 0;
+ }
+ 

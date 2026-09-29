@@ -1,0 +1,37 @@
+https://github.com/rust-lang/mdBook/commit/8f01d0234f708042ea8d0dc5cac63859b3f14cb1
+
+From 13035baeae417e41ce98f49c072220de0e6e4075 Mon Sep 17 00:00:00 2001
+From: mitchmindtree <mail@mitchellnordine.com>
+Date: Fri, 22 Jul 2022 15:10:05 +1000
+Subject: [PATCH] Workaround rust nightly borrowcheck error (#1860)
+
+Surprisingly, this fixes the error filed at #1860!
+
+This seems suspicious, perhaps indicative of a bug in Rust's non-lexical
+lifetime handling?
+
+The lifetimes in the `handlebars::Renderable::render` method signature
+are quite complicated, and its unclear to me whether or not Rust is
+catching some new safety edge-case that wasn't previously handled
+correctly...
+
+Possibly related to `drop` order, which I *think* is related to the
+order of binding statements?
+---
+ src/renderer/html_handlebars/helpers/navigation.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/renderer/html_handlebars/helpers/navigation.rs b/src/renderer/html_handlebars/helpers/navigation.rs
+index d3f6ca9086..65929bbfc1 100644
+--- a/src/renderer/html_handlebars/helpers/navigation.rs
++++ b/src/renderer/html_handlebars/helpers/navigation.rs
+@@ -149,8 +149,8 @@ fn render(
+     _h.template()
+         .ok_or_else(|| RenderError::new("Error with the handlebars template"))
+         .and_then(|t| {
+-            let mut local_rc = rc.clone();
+             let local_ctx = Context::wraps(&context)?;
++            let mut local_rc = rc.clone();
+             t.render(r, &local_ctx, &mut local_rc, out)
+         })?;
+ 

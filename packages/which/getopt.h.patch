@@ -1,0 +1,14 @@
+# getopt.h:105:12: error: conflicting types for 'getopt'
+
+--- a/getopt.h
++++ b/getopt.h
+@@ -102,7 +102,8 @@
+    errors, only prototype getopt for the GNU C library.  */
+ extern int getopt(int argc, char *const *argv, const char *shortopts);
+ #else  /* not __GNU_LIBRARY__ */
+-extern int getopt();
++/* from ndk */
++extern int getopt(int __argc, char* const _Nonnull __argv[_Nullable], const char* _Nonnull __options);
+ #endif /* __GNU_LIBRARY__ */
+ extern int getopt_long(int argc, char *const *argv, const char *shortopts, const struct option *longopts, int *longind);
+ extern int getopt_long_only(int argc, char *const *argv, const char *shortopts, const struct option *longopts,

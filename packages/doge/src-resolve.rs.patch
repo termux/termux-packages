@@ -1,0 +1,12 @@
+diff -uNr dog-0.2.9/src/resolve.rs dog-0.2.9.mod/src/resolve.rs
+--- dog-0.2.9/src/resolve.rs
++++ dog-0.2.9.mod/src/resolve.rs
+@@ -95,7 +95,7 @@
+         panic!("system_nameservers() called from test code");
+     }
+ 
+-    let f = File::open("/etc/resolv.conf")?;
++    let f = File::open("@TERMUX_PREFIX@/etc/resolv.conf")?;
+     let reader = BufReader::new(f);
+ 
+     let mut nameservers = Vec::new();

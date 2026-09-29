@@ -1,0 +1,66 @@
+diff --git a/conan/helpers/conan_environment.py b/conan/helpers/conan_environment.py
+index 28fc450f8..87f948434 100644
+--- a/conan/helpers/conan_environment.py
++++ b/conan/helpers/conan_environment.py
+@@ -7,6 +7,48 @@ from helpers.directories import directories
+ from helpers.version import version_tuple
+ 
+ 
++hookstr='''import os
++from conan.tools.files import replace_in_file
++def pre_build(conanfile):
++    conanfile.output.info(f"GOT {conanfile.name} VERSION {conanfile.version}")
++    patchlist = {
++        tuple(["portaudio", "19.7.0"]): {
++            "CMakeLists.txt": {
++                "CMAKE_MINIMUM_REQUIRED(VERSION 2.8)": "CMAKE_MINIMUM_REQUIRED(VERSION 3.5)"
++            }
++        },
++        tuple(["libpng", "1.6.39"]): {
++            "CMakeLists.txt": {
++                'cmake_minimum_required(VERSION 3.1)': 'cmake_minimum_required(VERSION 3.5)',
++                'cmake_policy(VERSION 3.1)': 'cmake_policy(VERSION 3.5)',
++                'set(M_LIBRARY "")': 'set(M_LIBRARY "m")'
++            }
++        },
++        tuple(["wxwidgets", "3.1.3.7-audacity"]): {
++            "CMakeLists.txt": {
++                'cmake_minimum_required(VERSION 2.8.12)': 'cmake_minimum_required(VERSION 3.5)'
++            },
++            "build/cmake/modules/cotire.cmake": {
++                'cmake_minimum_required(VERSION 2.8.12)': 'cmake_minimum_required(VERSION 3.5)'
++            }
++        }
++    }
++    for patchid in patchlist:
++        if tuple([conanfile.name, conanfile.version]) == patchid:
++            patch = patchlist[patchid]
++            for filename in patch:
++                conanfile.output.info(f"Patching {conanfile.name} {filename} to set cmake minimum version")
++                p = patch[filename]
++                for find in p:
++                    replace_in_file(
++                        conanfile,
++                        os.path.join(conanfile.source_folder, filename),
++                        find,
++                        p[find],
++                        strict=True
++                    )
++                conanfile.output.info(f"Successfully patched {filename}")
++'''
+ def __get_venv_tool_path(tool_name:str):
+     if sys.platform == 'win32':
+         return os.path.join(os.environ['VIRTUAL_ENV'], 'Scripts', f'{tool_name}.exe')
+@@ -109,6 +151,12 @@ def create_conan_venv(conan_venv:str=None):
+     directories.conan_home_dir = os.path.join(directories.build_dir, 'conan', 'home')
+     os.makedirs(directories.conan_home_dir, exist_ok=True)
+ 
++    hook_dir = os.path.join(directories.conan_home_dir, 'extensions', 'hooks')
++    os.makedirs(hook_dir, exist_ok=True)
++    with open(os.path.join(hook_dir, 'hook_portaudio.py'), 'w') as f:
++        f.write(hookstr)
++        print(f"wrote hook to {f.name}")
++
+     with ConanEnv(conan_venv):
+         return get_conan_version()
+ 

@@ -1,0 +1,28 @@
+--- a/Makefile
++++ b/Makefile
+@@ -14,18 +14,18 @@
+ MAKEFLAGS += --no-print-directory
+ endif
+ 
+-PREFIX?=/usr
+-SBINDIR?=/sbin
+-NETNS_RUN_DIR?=/var/run/netns
+-NETNS_ETC_DIR?=/etc/netns
++PREFIX?=$(PREFIX)/usr
++SBINDIR?=$(PREFIX)/bin
++NETNS_RUN_DIR?=$(PREFIX)/var/run/netns
++NETNS_ETC_DIR?=$(PREFIX)/etc/netns
+ DATADIR?=$(PREFIX)/share
+ HDRDIR?=$(PREFIX)/include/iproute2
+-CONF_ETC_DIR?=/etc/iproute2
++CONF_ETC_DIR?=$(PREFIX)/etc/iproute2
+ CONF_USR_DIR?=$(DATADIR)/iproute2
+ DOCDIR?=$(DATADIR)/doc/iproute2
+ MANDIR?=$(DATADIR)/man
+-ARPDDIR?=/var/lib/arpd
+-KERNEL_INCLUDE?=/usr/include
++ARPDDIR?=$(PREFIX)/var/lib/arpd
++KERNEL_INCLUDE?=$(PREFIX)/include
+ BASH_COMPDIR?=$(DATADIR)/bash-completion/completions
+ 
+ # Path to db_185.h include

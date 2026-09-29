@@ -1,0 +1,186 @@
+Enable jumbo build for almost every target in //components and //chrome
+
+Disable jumbo build for the following component(s)/source_set(s):
+- //components/input:input
+
+diff --git a/components/attribution_reporting/aggregatable_debug_reporting_config.cc b/components/attribution_reporting/aggregatable_debug_reporting_config.cc
+index a3307f77d8..4711eeeddc 100644
+--- a/src/3rdparty/chromium/components/attribution_reporting/aggregatable_debug_reporting_config.cc
++++ b/src/3rdparty/chromium/components/attribution_reporting/aggregatable_debug_reporting_config.cc
+@@ -29,6 +29,8 @@
+ #include "components/attribution_reporting/parsing_utils.h"
+ #include "third_party/abseil-cpp/absl/numeric/int128.h"
+ 
++#define ParseKeyPiece ParseKeyPiece_aggregatable_debug_reporting_config
++
+ namespace attribution_reporting {
+ 
+ namespace {
+@@ -434,3 +436,5 @@ void SourceAggregatableDebugReportingConfig::Serialize(
+ }
+ 
+ }  // namespace attribution_reporting
++
++#undef ParseKeyPiece
+diff --git a/components/input/BUILD.gn b/components/input/BUILD.gn
+index e445581e62..06a0fe58f8 100644
+--- a/src/3rdparty/chromium/components/input/BUILD.gn
++++ b/src/3rdparty/chromium/components/input/BUILD.gn
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//mojo/public/tools/bindings/mojom.gni")
+ 
+@@ -10,7 +9,7 @@ assert(
+     use_blink,
+     "//components/input can't be built without blink and shouldn't be included if use_blink is false")
+ 
+-jumbo_component("input") {
++component("input") {
+   defines = [ "IS_INPUT_IMPL" ]
+   sources = [
+     "child_frame_input_helper.cc",
+diff --git a/components/leveldb_proto/internal/proto_leveldb_wrapper.cc b/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
+index 0edf01631e..28aa7e154f 100644
+--- a/src/3rdparty/chromium/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
++++ b/src/3rdparty/chromium/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
+@@ -15,6 +15,9 @@
+ #include "components/leveldb_proto/internal/proto_leveldb_wrapper_metrics.h"
+ #include "components/leveldb_proto/public/proto_database.h"
+ 
++#define UpdateEntriesFromTaskRunner UpdateEntriesFromTaskRunner_proto_leveldb_wrapper
++#define UpdateEntriesWithRemoveFilterFromTaskRunner UpdateEntriesWithRemoveFilterFromTaskRunner_proto_leveldb_wrapper
++
+ namespace leveldb_proto {
+ 
+ namespace {
+@@ -424,3 +427,6 @@ ProtoLevelDBWrapper::task_runner() {
+ }
+ 
+ }  // namespace leveldb_proto
++
++#undef UpdateEntriesFromTaskRunner
++#undef UpdateEntriesWithRemoveFilterFromTaskRunner
+diff --git a/components/services/app_service/public/cpp/run_on_os_login_types.cc b/components/services/app_service/public/cpp/run_on_os_login_types.cc
+index f60796eeb8..30f48cebba 100644
+--- a/src/3rdparty/chromium/components/services/app_service/public/cpp/run_on_os_login_types.cc
++++ b/src/3rdparty/chromium/components/services/app_service/public/cpp/run_on_os_login_types.cc
+@@ -4,6 +4,8 @@
+ 
+ #include "components/services/app_service/public/cpp/run_on_os_login_types.h"
+ 
++#define kIsManagedKey kIsManagedKey_run_on_os_login_types
++
+ namespace apps {
+ 
+ namespace {
+@@ -53,3 +55,5 @@ std::optional<RunOnOsLogin> ConvertDictToRunOnOsLogin(
+ }
+ 
+ }  // namespace apps
++
++#undef kIsManagedKey
+diff --git a/components/update_client/op_puffin.cc b/components/update_client/op_puffin.cc
+index eb1d2717d5..b74a672e61 100644
+--- a/src/3rdparty/chromium/components/update_client/op_puffin.cc
++++ b/src/3rdparty/chromium/components/update_client/op_puffin.cc
+@@ -32,6 +32,11 @@
+ #include "components/update_client/utils.h"
+ #include "third_party/puffin/src/include/puffin/puffpatch.h"
+ 
++#define Patch Patch_Puffin
++#define PatchDone PatchDone_Puffin
++#define VerifyAndCleanUp VerifyAndCleanUp_Puffin
++#define CacheLookupDone CacheLookupDone__Puffin
++
+ namespace update_client {
+ 
+ namespace {
+@@ -158,3 +163,8 @@ base::OnceClosure PuffOperation(
+ }
+ 
+ }  // namespace update_client
++
++#undef Patch
++#undef PatchDone
++#undef VerifyAndCleanUp
++#undef CacheLookupDone
+diff --git a/components/webcrypto/algorithms/aes.cc b/components/webcrypto/algorithms/aes.cc
+index 872f43ad27..55f5abadec 100644
+--- a/src/3rdparty/chromium/components/webcrypto/algorithms/aes.cc
++++ b/src/3rdparty/chromium/components/webcrypto/algorithms/aes.cc
+@@ -15,6 +15,8 @@
+ #include "third_party/blink/public/platform/web_crypto_algorithm_params.h"
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_AES
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -221,3 +223,5 @@ Status AesAlgorithm::GetKeyLength(
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/aes_ctr.cc b/components/webcrypto/algorithms/aes_ctr.cc
+index 2df0b5a137..f986990d63 100644
+--- a/src/3rdparty/chromium/components/webcrypto/algorithms/aes_ctr.cc
++++ b/src/3rdparty/chromium/components/webcrypto/algorithms/aes_ctr.cc
+@@ -24,6 +24,8 @@
+ #include "third_party/boringssl/src/include/openssl/aes.h"
+ #include "third_party/boringssl/src/include/openssl/cipher.h"
+ 
++#define GetAESCipherByKeyLength GetAESCipherByKeyLength_AES_CTR
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -254,3 +256,5 @@ std::unique_ptr<AlgorithmImplementation> CreateAesCtrImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef GetAESCipherByKeyLength
+diff --git a/components/webcrypto/algorithms/ed25519.cc b/components/webcrypto/algorithms/ed25519.cc
+index 84f80d9ede..1684b462cf 100644
+--- a/src/3rdparty/chromium/components/webcrypto/algorithms/ed25519.cc
++++ b/src/3rdparty/chromium/components/webcrypto/algorithms/ed25519.cc
+@@ -22,6 +22,8 @@
+ #include "third_party/boringssl/src/include/openssl/curve25519.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_ed25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -509,3 +511,5 @@ std::unique_ptr<AlgorithmImplementation> CreateEd25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/pbkdf2.cc b/components/webcrypto/algorithms/pbkdf2.cc
+index cd362f04fc..c97152277f 100644
+--- a/src/3rdparty/chromium/components/webcrypto/algorithms/pbkdf2.cc
++++ b/src/3rdparty/chromium/components/webcrypto/algorithms/pbkdf2.cc
+@@ -17,6 +17,8 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define kAllKeyUsages kAllKeyUsages_pbkdf2
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -135,3 +137,5 @@ std::unique_ptr<AlgorithmImplementation> CreatePbkdf2Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef kAllKeyUsages

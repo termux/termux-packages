@@ -1,0 +1,38 @@
+Redirects all paths to the normally-bundled cmake
+to the paths of the cmake package this package depends on.
+
+--- a/src/cmake/__init__.py
++++ b/src/cmake/__init__.py
+@@ -25,15 +25,7 @@ def __dir__() -> list[str]:
+     return __all__
+ 
+ 
+-cmake_executable_path = None
+-cmake_files = distribution("cmake").files
+-assert cmake_files is not None, "This is the cmake package so it must be installed and have files"
+-for script in cmake_files:
+-    if str(script).startswith("cmake/data/bin/cmake"):
+-        resolved_script = Path(script.locate()).resolve(strict=True)
+-        cmake_executable_path = resolved_script.parents[1]
+-        break
+-CMAKE_DATA = str(cmake_executable_path) if cmake_executable_path else None
++CMAKE_DATA = "@TERMUX_PREFIX@"
+ 
+ assert CMAKE_DATA is not None
+ assert os.path.exists(CMAKE_DATA)
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -38,13 +38,6 @@ Source = "https://github.com/scikit-build/cmake-python-distributions"
+ "Mailing list" = "https://groups.google.com/forum/#!forum/scikit-build"
+ "Bug Tracker" = "https://github.com/scikit-build/cmake-python-distributions/issues"
+ 
+-[project.scripts]
+-ccmake = "cmake:ccmake"
+-cmake = "cmake:cmake"
+-cpack = "cmake:cpack"
+-ctest = "cmake:ctest"
+-
+-
+ [dependency-groups]
+ test = [
+   "coverage>=4.2",

@@ -1,0 +1,11 @@
+--- a/llvm-project/clang/tools/driver/cc1depscan_main.cpp	2022-08-28 12:37:53.827579690 +0000
++++ b/llvm-project/clang/tools/driver/cc1depscan_main.cpp	2022-08-28 12:39:25.307724796 +0000
+@@ -68,7 +68,7 @@
+ ALWAYS_ENABLED_STATISTIC(NumRequests, "Number of -cc1 update requests");
+ 
+ #ifdef CLANG_HAVE_RLIMITS
+-#if defined(__linux__) && defined(__PIE__)
++#if defined(__linux__) && defined(__PIE__) && !defined(__ANDROID__)
+ static size_t getCurrentStackAllocation() {
+   // If we can't compute the current stack usage, allow for 512K of command
+   // line arguments and environment.

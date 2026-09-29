@@ -1,0 +1,82 @@
+--- a/thirdparty/openxr/src/loader/android_utilities.h
++++ b/thirdparty/openxr/src/loader/android_utilities.h
+@@ -6,7 +6,7 @@
+ // Initial Author: Ryan Pavlik <ryan.pavlik@collabora.com>
+ 
+ #pragma once
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ #include "wrap/android.content.h"
+ 
+--- a/thirdparty/openxr/src/loader/android_utilities.cpp
++++ b/thirdparty/openxr/src/loader/android_utilities.cpp
+@@ -7,7 +7,7 @@
+ 
+ #include "android_utilities.h"
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <wrap/android.net.h>
+ #include <wrap/android.content.h>
+ #include <wrap/android.database.h>
+--- a/thirdparty/openxr/src/loader/loader_logger_recorders.hpp
++++ b/thirdparty/openxr/src/loader/loader_logger_recorders.hpp
+@@ -21,7 +21,7 @@
+ //! Standard Output logger used with XR_LOADER_DEBUG environment variable.
+ std::unique_ptr<LoaderLogRecorder> MakeStdOutLoaderLogRecorder(void* user_data, XrLoaderLogMessageSeverityFlags flags);
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ //! Android liblog ("logcat") logger
+ std::unique_ptr<LoaderLogRecorder> MakeLogcatLoaderLogRecorder();
+ #endif
+--- a/thirdparty/openxr/src/loader/loader_logger_recorders.cpp
++++ b/thirdparty/openxr/src/loader/loader_logger_recorders.cpp
+@@ -20,7 +20,7 @@
+ #include <iostream>
+ #include <sstream>
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "android/log.h"
+ #endif
+ 
+@@ -96,7 +96,7 @@
+    private:
+     PFN_xrDebugUtilsMessengerCallbackEXT _user_callback;
+ };
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ class LogcatLoaderLogRecorder : public LoaderLogRecorder {
+    public:
+@@ -195,7 +195,7 @@
+     return (_user_callback(message_severity, message_type, callback_data, _user_data) == XR_TRUE);
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ static inline android_LogPriority LoaderToAndroidLogPriority(XrLoaderLogMessageSeverityFlags message_severity) {
+     if (0 != (message_severity & XR_LOADER_LOG_MESSAGE_SEVERITY_ERROR_BIT)) {
+@@ -276,7 +276,7 @@
+     return recorder;
+ }
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ std::unique_ptr<LoaderLogRecorder> MakeLogcatLoaderLogRecorder() {
+     std::unique_ptr<LoaderLogRecorder> recorder(new LogcatLoaderLogRecorder());
+     return recorder;
+--- a/thirdparty/openxr/src/loader/loader_logger.cpp
++++ b/thirdparty/openxr/src/loader/loader_logger.cpp
+@@ -106,7 +106,7 @@
+     // present as "none" then we don't.
+     if (debug_string != "none") {
+         AddLogRecorder(MakeStdErrLoaderLogRecorder(nullptr));
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+         // Add a logcat logger by default.
+         AddLogRecorder(MakeLogcatLoaderLogRecorder());
+ #endif  // __ANDROID__

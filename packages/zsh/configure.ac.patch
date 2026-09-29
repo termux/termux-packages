@@ -1,0 +1,27 @@
+Since $TERMUX_PKG_EXTRA_CONFIGURE_ARGS isn't an array
+we can't prevent zsh_cv_64_bit_type=long long 
+from being split into two flags by termux_step_configure,
+if we added it directly to TERMUX_PKG_EXTRA_CONFIGURE_ARGS.
+To work around this, patch the configure file to set it to "long long".
+diff --git a/configure.ac b/configure.ac
+index c72148d..eff505b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -318,7 +318,7 @@ dnl Add /usr/local/share/zsh/site-functions if not yet present
+ dnl owing to $sitefndir, whether or not explicitly given.
+ dnl If not explicitly given, it hasn't been expanded yet.
+ if test X$sitefndir = X/usr/local/share/zsh/site-functions || \
+-   test X$sitefndir = Xno
++   test X$sitefndir = Xno || true
+ then fixed_sitefndir=''
+ elif test X$prefix != X/usr/local; then
+   if test X$prefix = XNONE && test X$ac_default_prefix = X/usr/local; then
+@@ -1080,7 +1080,7 @@ main() { return sizeof(ino_t) < 8; }
+        zsh_64_BIT_TYPE(off_t, zsh_cv_64_bit_type)
+      fi])
+     if test "$zsh_cv_64_bit_type" != no; then
+-      AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)
++      AC_DEFINE(ZSH_64_BIT_TYPE, "long long")
+ 
+       dnl Handle cases where unsigned type cannot be simply
+       dnl `unsigned ZSH_64_BIT_TYPE'.  More tests may be required.

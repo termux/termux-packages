@@ -1,0 +1,15 @@
+diff --git a/runtime/lua/vim/health/health.lua b/runtime/lua/vim/health/health.lua
+index 6418d26fba..2b826898cc 100644
+--- a/runtime/lua/vim/health/health.lua
++++ b/runtime/lua/vim/health/health.lua
+@@ -82,7 +82,9 @@ local function check_config()
+     })
+   end
+ 
+-  if vim.v.ctype == 'C' then
++  -- This check isn't meaningful on Android since there is no traditional locale mechanism.
++  -- Disable it to avoid false positives in `:checkhealth`
++  if false then
+     ok = false
+     health.error(
+       'Locale does not support UTF-8. Unicode characters may not display correctly.'

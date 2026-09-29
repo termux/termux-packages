@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Scientific calculator for X"
+TERMUX_PKG_LICENSE="MIT, HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.3"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xcalc-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=86e157b6174678675a4a912995dccd0ff4e2ce32b01bdd6f91bfe93333324980
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxaw, libxt, xorg-fonts-75dpi | xorg-fonts-100dpi"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"

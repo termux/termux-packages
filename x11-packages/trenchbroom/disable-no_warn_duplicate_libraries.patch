@@ -1,0 +1,11 @@
+--- a/cmake/CompilerConfig.cmake
++++ b/cmake/CompilerConfig.cmake
+@@ -4,7 +4,7 @@ add_library(CompilerConfig INTERFACE)
+ 
+ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+   # disable warning about duplicate libraries, see https://gitlab.kitware.com/cmake/cmake/-/issues/25297
+-  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15)
++  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15 AND NOT ANDROID)
+     target_link_options(CompilerConfig INTERFACE LINKER:-no_warn_duplicate_libraries)
+   endif()
+ 

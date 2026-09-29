@@ -1,0 +1,14 @@
+diff -uNr keepassxc-2.6.6/src/core/FileWatcher.cpp keepassxc-2.6.6.mod/src/core/FileWatcher.cpp
+--- keepassxc-2.6.6/src/core/FileWatcher.cpp	2021-06-12 05:13:52.000000000 +0300
++++ keepassxc-2.6.6.mod/src/core/FileWatcher.cpp	2021-07-25 20:21:11.853398555 +0300
+@@ -47,8 +47,9 @@
+ #if defined(Q_OS_LINUX)
+     struct statfs statfsBuf;
+     bool forcePolling = false;
++#ifndef NFS_SUPER_MAGIC
+     const auto NFS_SUPER_MAGIC = 0x6969;
+-
++#endif
+     if (!statfs(filePath.toLocal8Bit().constData(), &statfsBuf)) {
+         forcePolling = (statfsBuf.f_type == NFS_SUPER_MAGIC);
+     } else {

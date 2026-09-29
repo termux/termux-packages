@@ -1,0 +1,40 @@
+--- a/libqalculate/util.cc
++++ b/libqalculate/util.cc
+@@ -1065,9 +1065,25 @@ void Thread::doCleanup(void *data) {
+ 	thread->running = false;
+ }
+ 
++#ifdef __ANDROID__
++static void threadSignalHandler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ void Thread::enableAsynchronousCancel() {
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#else
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = threadSignalHandler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
+ }
+ 
+ void *Thread::doRun(void *data) {
+@@ -1090,7 +1106,11 @@ bool Thread::start() {
+ 
+ bool Thread::cancel() {
+ 	if(!running) return true;
++#ifndef __ANDROID__
+ 	running = pthread_cancel(m_thread) != 0;
++#else
++	running = pthread_kill(m_thread, SIGUSR2) != 0;
++#endif
+ 	return !running;
+ }
+ 

@@ -1,0 +1,218 @@
+diff -uNr gnupg-2.3.1/dirmngr/certcache.c gnupg-2.3.1.mod/dirmngr/certcache.c
+--- ./dirmngr/certcache.c.orig	2021-10-06 10:35:51.000000000 +0200
++++ ./dirmngr/certcache.c	2021-12-27 23:14:49.432199839 +0100
+@@ -690,11 +690,8 @@
+ #ifdef DEFAULT_TRUST_STORE_FILE
+     { DEFAULT_TRUST_STORE_FILE }
+ #else
+-    { "/etc/ssl/ca-bundle.pem" },
+-    { "/etc/ssl/certs/ca-certificates.crt" },
+-    { "/etc/pki/tls/cert.pem" },
+-    { "/usr/local/share/certs/ca-root-nss.crt" },
+-    { "/etc/ssl/cert.pem" }
++    { "@TERMUX_PREFIX@/etc/tls/cert.pem" },
++    { "@TERMUX_PREFIX@/etc/ssl/cert.pem" }
+ #endif /*!DEFAULT_TRUST_STORE_FILE*/
+   };
+   int idx;
+diff -uNr gnupg-2.3.1/dirmngr/dns.c gnupg-2.3.1.mod/dirmngr/dns.c
+--- gnupg-2.3.1/dirmngr/dns.c	2020-08-19 07:44:24.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/dns.c	2021-05-04 16:09:43.503444329 +0000
+@@ -5113,7 +5113,7 @@
+ 	if (!(hosts = dns_hosts_open(&error)))
+ 		goto error;
+ 
+-	if ((error = dns_hosts_loadpath(hosts, "/etc/hosts")))
++	if ((error = dns_hosts_loadpath(hosts, "@TERMUX_PREFIX@/etc/hosts")))
+ 		goto error;
+ 
+ 	return hosts;
+@@ -5430,7 +5430,7 @@
+ 	if (!(resconf = dns_resconf_open(&error)))
+ 		goto error;
+ 
+-	if ((error = dns_resconf_loadpath(resconf, "/etc/resolv.conf"))) {
++	if ((error = dns_resconf_loadpath(resconf, "@TERMUX_PREFIX@/etc/resolv.conf"))) {
+ 		/*
+ 		 * NOTE: Both the glibc and BIND9 resolvers ignore a missing
+ 		 * /etc/resolv.conf, defaulting to a nameserver of
+@@ -5442,7 +5442,7 @@
+ 			goto error;
+ 	}
+ 
+-	if ((error = dns_nssconf_loadpath(resconf, "/etc/nsswitch.conf"))) {
++	if ((error = dns_nssconf_loadpath(resconf, "@TERMUX_PREFIX@/etc/nsswitch.conf"))) {
+ 		if (error != ENOENT)
+ 			goto error;
+ 	}
+@@ -10469,7 +10469,7 @@
+ 		panic("dns_resconf_open: %s", dns_strerror(error));
+ 
+ 	if (!MAIN.resconf.count)
+-		MAIN.resconf.path[MAIN.resconf.count++]	= "/etc/resolv.conf";
++		MAIN.resconf.path[MAIN.resconf.count++]	= "@TERMUX_PREFIX@/etc/resolv.conf";
+ 
+ 	for (i = 0; i < MAIN.resconf.count; i++) {
+ 		path	= MAIN.resconf.path[i];
+@@ -10518,11 +10518,11 @@
+ 		return *hosts;
+ 
+ 	if (!MAIN.hosts.count) {
+-		MAIN.hosts.path[MAIN.hosts.count++]	= "/etc/hosts";
++		MAIN.hosts.path[MAIN.hosts.count++]	= "@TERMUX_PREFIX@/etc/hosts";
+ 
+ 		/* Explicitly test dns_hosts_local() */
+ 		if (!(*hosts = dns_hosts_local(&error)))
+-			panic("%s: %s", "/etc/hosts", dns_strerror(error));
++			panic("%s: %s", "@TERMUX_PREFIX@/etc/hosts", dns_strerror(error));
+ 
+ 		return *hosts;
+ 	}
+diff -uNr gnupg-2.3.1/dirmngr/dns-stuff.c gnupg-2.3.1.mod/dirmngr/dns-stuff.c
+--- gnupg-2.3.1/dirmngr/dns-stuff.c	2021-01-25 09:35:54.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/dns-stuff.c	2021-05-04 16:09:43.503444329 +0000
+@@ -115,7 +115,7 @@
+ #define DEFAULT_TIMEOUT 30
+ 
+ 
+-#define RESOLV_CONF_NAME "/etc/resolv.conf"
++#define RESOLV_CONF_NAME "@TERMUX_PREFIX@/etc/resolv.conf"
+ 
+ /* Two flags to enable verbose and debug mode.  */
+ static int opt_verbose;
+@@ -612,7 +612,7 @@
+     derr = dns_hosts_loadpath (ld.hosts, hosts_path);
+     xfree (hosts_path);
+ #else
+-    derr = dns_hosts_loadpath (ld.hosts, "/etc/hosts");
++    derr = dns_hosts_loadpath (ld.hosts, "@TERMUX_PREFIX@/etc/hosts");
+ #endif
+     if (derr)
+       {
+--- ./dirmngr/ks-engine-ldap.c.orig	2021-09-01 10:15:24.080814881 +0200
++++ ./dirmngr/ks-engine-ldap.c	2021-09-01 10:16:39.075546098 +0200
+@@ -2019,9 +2019,9 @@
+ 
+   if (dump_modlist)
+     {
+-      dump = es_fopen("/tmp/modlist.txt", "w");
++      dump = es_fopen("@TERMUX_PREFIX@/tmp/modlist.txt", "w");
+       if (! dump)
+-	log_error ("failed to open /tmp/modlist.txt: %s\n",
++	log_error ("failed to open @TERMUX_PREFIX@/tmp/modlist.txt: %s\n",
+ 		   gpg_strerror (gpg_error_from_syserror ()));
+ 
+       if (dump)
+diff -uNr gnupg-2.3.1/g10/photoid.c gnupg-2.3.1.mod/g10/photoid.c
+--- gnupg-2.3.1/g10/photoid.c	2021-03-01 08:43:21.000000000 +0000
++++ gnupg-2.3.1.mod/g10/photoid.c	2021-05-04 16:11:23.467445563 +0000
+@@ -362,7 +362,7 @@
+ #else /* More unixish systems */
+       if (!(tmp = getenv ("TMPDIR"))
+           && !(tmp = getenv ("TMP")))
+-        tmp = "/tmp";
++        tmp = "@TERMUX_PREFIX@/tmp";
+ 
+       len += strlen (tmp);
+       info->tempdir = xmalloc (len);
+diff -uNr gnupg-2.3.1/g13/be-encfs.c gnupg-2.3.1.mod/g13/be-encfs.c
+--- gnupg-2.3.1/g13/be-encfs.c	2017-04-03 15:13:56.000000000 +0000
++++ gnupg-2.3.1.mod/g13/be-encfs.c	2021-05-04 16:09:43.503444329 +0000
+@@ -410,7 +410,7 @@
+   if (err)
+     goto leave;
+ 
+-  mountpoint = xtrystrdup ("/tmp/.#g13_XXXXXX");
++  mountpoint = xtrystrdup ("@TERMUX_PREFIX@/tmp/.#g13_XXXXXX");
+   if (!mountpoint)
+     {
+       err = gpg_error_from_syserror ();
+@@ -420,7 +420,7 @@
+     {
+       err = gpg_error_from_syserror ();
+       log_error (_("can't create directory '%s': %s\n"),
+-                 "/tmp/.#g13_XXXXXX", gpg_strerror (err));
++                 "@TERMUX_PREFIX@/tmp/.#g13_XXXXXX", gpg_strerror (err));
+       goto leave;
+     }
+ 
+diff -uNr gnupg-2.3.1/g13/mount.c gnupg-2.3.1.mod/g13/mount.c
+--- gnupg-2.3.1/g13/mount.c	2020-10-23 18:37:22.000000000 +0000
++++ gnupg-2.3.1.mod/g13/mount.c	2021-05-04 16:09:43.503444329 +0000
+@@ -82,14 +82,14 @@
+ 
+   if (!mountpoint)
+     {
+-      mountpoint_buffer = xtrystrdup ("/tmp/g13-XXXXXX");
++      mountpoint_buffer = xtrystrdup ("@TERMUX_PREFIX@/tmp/g13-XXXXXX");
+       if (!mountpoint_buffer)
+         return gpg_error_from_syserror ();
+       if (!gnupg_mkdtemp (mountpoint_buffer))
+         {
+           err = gpg_error_from_syserror ();
+           log_error (_("can't create directory '%s': %s\n"),
+-                     "/tmp/g13-XXXXXX", gpg_strerror (err));
++                     "@TERMUX_PREFIX@/tmp/g13-XXXXXX", gpg_strerror (err));
+           xfree (mountpoint_buffer);
+           return err;
+         }
+diff -uNr gnupg-2.3.1/scd/scdaemon.c gnupg-2.3.1.mod/scd/scdaemon.c
+--- gnupg-2.3.1/scd/scdaemon.c	2021-04-20 08:33:22.000000000 +0000
++++ gnupg-2.3.1.mod/scd/scdaemon.c	2021-05-04 16:09:43.503444329 +0000
+@@ -763,10 +763,10 @@
+          write. */
+       if (allow_coredump)
+         {
+-          if (chdir("/tmp"))
+-            log_debug ("chdir to '/tmp' failed: %s\n", strerror (errno));
++          if (chdir("@TERMUX_PREFIX@/tmp"))
++            log_debug ("chdir to '@TERMUX_PREFIX@/tmp' failed: %s\n", strerror (errno));
+           else
+-            log_debug ("changed working directory to '/tmp'\n");
++            log_debug ("changed working directory to '@TERMUX_PREFIX@/tmp'\n");
+         }
+ 
+       /* In multi server mode we need to listen on an additional
+diff -uNr gnupg-2.3.1/tests/gpgscm/ffi.c gnupg-2.3.1.mod/tests/gpgscm/ffi.c
+--- gnupg-2.3.1/tests/gpgscm/ffi.c	2017-11-15 12:53:23.000000000 +0000
++++ gnupg-2.3.1.mod/tests/gpgscm/ffi.c	2021-05-04 16:09:43.503444329 +0000
+@@ -355,7 +355,7 @@
+     FFI_RETURN_STRING (sc, "/temp");
+   FFI_RETURN_STRING (sc, buffer);
+ #else
+-  FFI_RETURN_STRING (sc, "/tmp");
++  FFI_RETURN_STRING (sc, "@TERMUX_PREFIX@/tmp");
+ #endif
+ }
+ 
+diff -uNr gnupg-2.3.1/tools/addgnupghome gnupg-2.3.1.mod/tools/addgnupghome
+--- gnupg-2.3.1/tools/addgnupghome	2019-03-18 18:40:54.000000000 +0000
++++ gnupg-2.3.1.mod/tools/addgnupghome	2021-05-04 16:09:43.503444329 +0000
+@@ -70,10 +70,10 @@
+         return
+     fi
+     for f in $filelist; do
+-        if [ -d /etc/skel/.gnupg/$f ]; then
++        if [ -d @TERMUX_PREFIX@/etc/skel/.gnupg/$f ]; then
+             mkdir $f
+         else
+-            cp /etc/skel/.gnupg/$f $f
++            cp @TERMUX_PREFIX@/etc/skel/.gnupg/$f $f
+         fi
+         if ! chown $user $f ; then
+             error "error changing ownership of \`$f'"
+@@ -102,11 +102,11 @@
+     info "please note that only users from /etc/passwd are checked"
+ fi
+ 
+-if [ ! -d /etc/skel/.gnupg ]; then
+-    error "skeleton directory \`/etc/skel/.gnupg' does not exist"
++if [ ! -d @TERMUX_PREFIX@/etc/skel/.gnupg ]; then
++    error "skeleton directory \`@TERMUX_PREFIX@/etc/skel/.gnupg' does not exist"
+     exit 1
+ fi
+-cd "/etc/skel/.gnupg" || (error "error cd-ing to \`/etc/skel/.gnupg'"; exit 1)
++cd "@TERMUX_PREFIX@/etc/skel/.gnupg" || (error "error cd-ing to \`@TERMUX_PREFIX@/etc/skel/.gnupg'"; exit 1)
+ filelist=$(find . \( -type f -o -type d \) '!' -name '*~' '!' -name . -print)
+ 
+ 

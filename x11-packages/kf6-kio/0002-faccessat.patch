@@ -1,0 +1,15 @@
+Fixes:
+kf.kio.workers.trash: No trash directory found for  "/" ! TrashImpl::findTrashDirectory returned -3
+when sending anything to Trash in Dolphin on Samsung Galaxy A70 SM-A705FN
+
+--- a/src/kioworkers/trash/trashimpl.cpp
++++ b/src/kioworkers/trash/trashimpl.cpp
+@@ -250,7 +251,7 @@ bool TrashImpl::createInfo(const QString &origPath, int &trashId, QString &fileI
+         }
+         return false;
+     }
+-    if (::faccessat(AT_FDCWD, origPath_c.constData(), W_OK, AT_SYMLINK_NOFOLLOW) == -1) {
++    if (::faccessat(AT_FDCWD, origPath_c.constData(), W_OK, 0) == -1) {
+         error(KIO::ERR_ACCESS_DENIED, origPath);
+         return false;
+     }

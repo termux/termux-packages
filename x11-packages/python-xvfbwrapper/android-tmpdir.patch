@@ -1,0 +1,11 @@
+--- a/xvfbwrapper.py
++++ b/xvfbwrapper.py
+@@ -196,7 +196,7 @@
+                 return rand
+
+     def _local_display_exists(self, display: int) -> bool:
+-        tempdir = "/tmp"
++        tempdir = os.environ.get("TMPDIR", os.environ.get("PREFIX", "@TERMUX_PREFIX@") + "/tmp")
+         # We need read access to the real system temp directory
+         if not os.access(tempdir, os.R_OK):
+             raise RuntimeError(f"Could not access {tempdir} directory: {self._tempdir}")

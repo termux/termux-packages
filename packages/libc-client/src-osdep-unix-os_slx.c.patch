@@ -1,0 +1,17 @@
+--- a/src/osdep/unix/os_slx.c
++++ b/src/osdep/unix/os_slx.c
+@@ -40,7 +40,6 @@
+ #include <errno.h>
+ extern int errno;		/* just in case */
+ #include <pwd.h>
+-#include <shadow.h>
+ #include "misc.h"
+ 
+ 
+@@ -54,3 +53,6 @@
+ #include "gr_waitp.c"
+ #include "tz_sv4.c"
+ #include "flocklnx.c"
++#ifdef __ANDROID__
++#include "gethstid.c"
++#endif

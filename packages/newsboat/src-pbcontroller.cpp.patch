@@ -1,0 +1,11 @@
+--- a/src/pbcontroller.cpp
++++ b/src/pbcontroller.cpp
+@@ -275,7 +275,7 @@
+ 	cfgparser.register_handler("run-on-startup", null_cah);
+ 
+ 	try {
+-		cfgparser.parse_file("/etc/newsboat/config"_path);
++		cfgparser.parse_file("@TERMUX_PREFIX@/etc/newsboat/config"_path);
+ 		cfgparser.parse_file(config_file);
+ 	} catch (const ConfigException& ex) {
+ 		std::cout << ex.what() << std::endl;

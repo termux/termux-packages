@@ -1,0 +1,20 @@
+diff -uNr unicorn-2.0.0/qemu/configure unicorn-2.0.0.mod/qemu/configure
+--- unicorn-2.0.0/qemu/configure	2022-07-07 18:49:09.000000000 +0300
++++ unicorn-2.0.0.mod/qemu/configure	2022-07-21 10:59:08.603857423 +0300
+@@ -1799,6 +1799,8 @@
+ # check if __[u]int128_t is usable.
+ 
+ int128=no
++
++if [ "$TERMUX_ARCH" = "aarch64" ] || [ "$TERMUX_ARCH" = "x86_64" ]; then
+ cat > $TMPC << EOF
+ __int128_t a;
+ __uint128_t b;
+@@ -1812,6 +1814,7 @@
+ if compile_prog "" "" ; then
+     int128=yes
+ fi
++fi
+ 
+ #########################################
+ # See if 128-bit atomic operations are supported.

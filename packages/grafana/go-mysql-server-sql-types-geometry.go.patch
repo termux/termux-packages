@@ -1,0 +1,11 @@
+--- ./vendor/github.com/dolthub/go-mysql-server/sql/types/geometry.go.orig	2025-05-21 04:23:06.171272300 +0000
++++ ./vendor/github.com/dolthub/go-mysql-server/sql/types/geometry.go	2025-05-21 04:24:01.175528283 +0000
+@@ -545,7 +545,7 @@
+ }
+ 
+ func ValidateSRID(srid int, funcName string) error {
+-	if srid < 0 || srid > math.MaxUint32 {
++	if srid < 0 || int64(srid) > int64(math.MaxUint32) {
+ 		return sql.ErrInvalidSRID.New(funcName)
+ 	}
+ 	if _, ok := SupportedSRIDs[uint32(srid)]; !ok {

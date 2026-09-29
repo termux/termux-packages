@@ -1,0 +1,13 @@
+It introduces a significant overhead on Android.
+
+--- a/ml/device.go
++++ b/ml/device.go
+@@ -570,7 +570,7 @@
+ // all selected devices.
+ func FlashAttentionSupported(l []DeviceInfo) bool {
+ 	for _, gpu := range l {
+-		supportsFA := gpu.Library == "cpu" ||
++		supportsFA := false ||
+ 			gpu.Name == "Metal" || gpu.Library == "Metal" ||
+ 			cudaFlashAttentionSupported(gpu) ||
+ 			gpu.Library == "ROCm" ||

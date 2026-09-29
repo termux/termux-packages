@@ -1,0 +1,23 @@
+This call just slows things down noticeably (and permission is denied).
+diff --git a/Src/init.c b/Src/init.c
+index a8ceec1..ccc3806 100644
+--- a/Src/init.c
++++ b/Src/init.c
+@@ -716,7 +716,7 @@ mod_export void
+ init_shout(void)
+ {
+     static char shoutbuf[BUFSIZ];
+-#if defined(TIOCSETD) && defined(NTTYDISC)
++#if defined(TIOCSETD) && defined(NTTYDISC) && !defined(__ANDROID__)
+     int ldisc;
+ #endif
+ 
+@@ -727,7 +727,7 @@ init_shout(void)
+ 	return;
+     }
+ 
+-#if defined(TIOCSETD) && defined(NTTYDISC)
++#if defined(TIOCSETD) && defined(NTTYDISC) && !defined(__ANDROID__)
+     ldisc = NTTYDISC;
+     ioctl(SHTTY, TIOCSETD, (char *)&ldisc);
+ #endif

@@ -1,0 +1,176 @@
+diff --git a/src/cp.c b/src/cp.c
+index e17484b..aabaa95 100644
+--- a/src/cp.c
++++ b/src/cp.c
+@@ -1045,7 +1045,7 @@ main (int argc, char **argv)
+ 
+   atexit (close_stdin);
+ 
+-  selinux_enabled = (0 < is_selinux_enabled ());
++  selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
+   cp_option_init (&x);
+ 
+   int c;
+@@ -1227,7 +1227,7 @@ main (int argc, char **argv)
+             {
+               error (0, 0,
+                      _("warning: ignoring --context; "
+-                       "it requires an SELinux-enabled kernel"));
++                       "it requires an SELinux-enabled kernel and root access"));
+             }
+           break;
+ 
+@@ -1306,7 +1306,7 @@ main (int argc, char **argv)
+   if (x.require_preserve_context && ! selinux_enabled)
+     error (EXIT_FAILURE, 0,
+            _("cannot preserve security context "
+-             "without an SELinux-enabled kernel"));
++             "without an SELinux-enabled kernel and root access"));
+ 
+   /* FIXME: This handles new files.  But what about existing files?
+      I.e., if updating a tree, new files would have the specified context,
+diff --git a/src/install.c b/src/install.c
+index 359eb65..5c48b90 100644
+--- a/src/install.c
++++ b/src/install.c
+@@ -319,6 +319,10 @@ get_labeling_handle (void)
+ static void
+ setdefaultfilecon (char const *file)
+ {
++  /* NOTE: Return early, before `install`'s selinux logic,
++   * because we do not have suitable workaround for it */
++  return;
++
+   if (selinux_enabled != 1)
+     {
+       /* Indicate no context found. */
+@@ -845,7 +849,7 @@ main (int argc, char **argv)
+   bool strip_program_specified = false;
+   char const *scontext = NULL;
+   /* set iff kernel has extra selinux system calls */
+-  selinux_enabled = (0 < is_selinux_enabled ());
++  selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
+ 
+   initialize_main (&argc, &argv);
+   set_program_name (argv[0]);
+@@ -933,7 +937,7 @@ main (int argc, char **argv)
+           if (! selinux_enabled)
+             {
+               error (0, 0, _("WARNING: ignoring --preserve-context; "
+-                             "this kernel is not SELinux-enabled"));
++                             "this kernel is not SELinux-enabled, or you are using Termux and not running as root"));
+               break;
+             }
+           x.preserve_security_context = true;
+@@ -959,7 +963,7 @@ main (int argc, char **argv)
+             {
+               error (0, 0,
+                      _("warning: ignoring --context; "
+-                       "it requires an SELinux-enabled kernel"));
++                       "it requires an SELinux-enabled kernel and root access"));
+             }
+           break;
+         case_GETOPT_HELP_CHAR;
+diff --git a/src/mkdir.c b/src/mkdir.c
+index d52a498..4e92e3f 100644
+--- a/src/mkdir.c
++++ b/src/mkdir.c
+@@ -239,7 +239,7 @@ main (int argc, char **argv)
+               /* We don't yet support -Z to restore context with SMACK.  */
+               scontext = optarg;
+             }
+-          else if (is_selinux_enabled () > 0)
++          else if (is_selinux_enabled () > 0 && geteuid () == 0)
+             {
+               if (optarg)
+                 scontext = optarg;
+@@ -255,7 +255,7 @@ main (int argc, char **argv)
+             {
+               error (0, 0,
+                      _("warning: ignoring --context; "
+-                       "it requires an SELinux/SMACK-enabled kernel"));
++                       "it requires an SELinux/SMACK-enabled kernel and root access"));
+             }
+           break;
+         case_GETOPT_HELP_CHAR;
+diff --git a/src/mkfifo.c b/src/mkfifo.c
+index 12d9a42..5b8b5aa 100644
+--- a/src/mkfifo.c
++++ b/src/mkfifo.c
+@@ -105,7 +105,7 @@ main (int argc, char **argv)
+               /* We don't yet support -Z to restore context with SMACK.  */
+               scontext = optarg;
+             }
+-          else if (is_selinux_enabled () > 0)
++          else if (is_selinux_enabled () > 0 && geteuid () == 0)
+             {
+               if (optarg)
+                 scontext = optarg;
+@@ -121,7 +121,7 @@ main (int argc, char **argv)
+             {
+               error (0, 0,
+                      _("warning: ignoring --context; "
+-                       "it requires an SELinux/SMACK-enabled kernel"));
++                       "it requires an SELinux/SMACK-enabled kernel and root access"));
+             }
+           break;
+         case_GETOPT_HELP_CHAR;
+diff --git a/src/mknod.c b/src/mknod.c
+index 59b844f..f5dcc50 100644
+--- a/src/mknod.c
++++ b/src/mknod.c
+@@ -121,7 +121,7 @@ main (int argc, char **argv)
+               /* We don't yet support -Z to restore context with SMACK.  */
+               scontext = optarg;
+             }
+-          else if (is_selinux_enabled () > 0)
++          else if (is_selinux_enabled () > 0 && geteuid () == 0)
+             {
+               if (optarg)
+                 scontext = optarg;
+@@ -137,7 +137,7 @@ main (int argc, char **argv)
+             {
+               error (0, 0,
+                      _("warning: ignoring --context; "
+-                       "it requires an SELinux/SMACK-enabled kernel"));
++                       "it requires an SELinux/SMACK-enabled kernel and root access"));
+             }
+           break;
+         case_GETOPT_HELP_CHAR;
+diff --git a/src/mv.c b/src/mv.c
+index cd6aab4..5a65027 100644
+--- a/src/mv.c
++++ b/src/mv.c
+@@ -120,7 +120,7 @@ rm_option_init (struct rm_options *x)
+ static void
+ cp_option_init (struct cp_options *x)
+ {
+-  bool selinux_enabled = (0 < is_selinux_enabled ());
++  bool selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
+ 
+   cp_options_default (x);
+   x->copy_as_regular = false;  /* FIXME: maybe make this an option */
+@@ -349,7 +349,7 @@ main (int argc, char **argv)
+   bool remove_trailing_slashes = false;
+   char const *target_directory = NULL;
+   bool no_target_directory = false;
+-  bool selinux_enabled = (0 < is_selinux_enabled ());
++  bool selinux_enabled = (0 < is_selinux_enabled () && geteuid () == 0);
+ 
+   initialize_main (&argc, &argv);
+   set_program_name (argv[0]);
+diff --git a/src/runcon.c b/src/runcon.c
+index 272f4b5..96e730a 100644
+--- a/src/runcon.c
++++ b/src/runcon.c
+@@ -200,8 +200,8 @@ main (int argc, char **argv)
+       usage (EXIT_CANCELED);
+     }
+ 
+-  if (is_selinux_enabled () != 1)
+-    error (EXIT_CANCELED, 0, _("%s may be used only on a SELinux kernel"),
++  if (is_selinux_enabled () != 1 || geteuid () != 0)
++    error (EXIT_CANCELED, 0, _("%s may be used only on a SELinux kernel and must be run as root"),
+            program_name);
+ 
+   if (context)

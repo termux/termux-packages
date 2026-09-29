@@ -1,0 +1,11 @@
+--- a/src/missing.cc
++++ b/src/missing.cc
+@@ -141,7 +141,7 @@
+             unsigned int last_fd,
+             unsigned int flags)
+ {
+-#if defined(__linux__) && defined(SYS_close_range)
++#if defined(__linux__) && defined(SYS_close_range) && !defined(__ANDROID__)
+         return syscall(SYS_close_range,
+                        first_fd,
+                        last_fd == unsigned(-1) ? ~0u : last_fd,

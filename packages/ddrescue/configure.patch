@@ -1,0 +1,27 @@
+--- a/configure
++++ b/configure
+@@ -15,20 +15,19 @@
+ LC_ALL=C
+ export LC_ALL
+ srcdir=
+-prefix=/usr/local
++prefix?=/usr/local
+ exec_prefix='$(prefix)'
+ bindir='$(exec_prefix)/bin'
+ datarootdir='$(prefix)/share'
+ infodir='$(datarootdir)/info'
+ mandir='$(datarootdir)/man'
+-CXX=g++
++CXX?=g++
+ CPPFLAGS=
+-CXXFLAGS='-Wall -W -O2'
+-LDFLAGS=
++CXXFLAGS?='-Wall -W -O2'
++LDFLAGS?=
+ MAKEINFO=makeinfo
+ 
+ # checking whether we are using GNU C++.
+-/bin/sh -c "${CXX} --version" > /dev/null 2>&1 || { CXX=c++ ; CXXFLAGS=-O2 ; }
+ 
+ # Loop over all args
+ args=

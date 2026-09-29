@@ -1,0 +1,122 @@
+sem_open() and sem_unlink() are implemented in Termux by libandroid-posix-semaphore
+https://github.com/termux/termux-packages/issues/28777
+
+Important: patch this check out of both configure and configure.ac,
+because the one that gets used seems to be random when 'autoreconf -fi' is used
+(observed the configure.ac change fail sometimes
+to apply to configure during 'autoreconf -fi')
+https://github.com/termux/termux-packages/issues/29278
+
+--- a/configure
++++ b/configure
+@@ -18137,10 +18137,6 @@ if test "$ac_sys_system" = "Linux-android"; then
+   blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+     setregid setresgid setresuid setreuid setuid"
+ 
+-  # These functions are unimplemented and always return an error
+-  # (https://android.googlesource.com/platform/system/sepolicy/+/refs/heads/android13-release/public/domain.te#1044)
+-  blocked_funcs="$blocked_funcs sem_open sem_unlink"
+-
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
+   # follows the symlink.
+--- a/configure.ac
++++ b/configure.ac
+@@ -5197,10 +5197,6 @@ if test "$ac_sys_system" = "Linux-android"; then
+   blocked_funcs="chroot initgroups setegid seteuid setgid sethostname
+     setregid setresgid setresuid setreuid setuid"
+ 
+-  # These functions are unimplemented and always return an error
+-  # (https://android.googlesource.com/platform/system/sepolicy/+/refs/heads/android13-release/public/domain.te#1044)
+-  blocked_funcs="$blocked_funcs sem_open sem_unlink"
+-
+   # Before API level 23, when fchmodat is called with the unimplemented flag
+   # AT_SYMLINK_NOFOLLOW, instead of returning ENOTSUP as it should, it actually
+   # follows the symlink.
+--- a/Lib/multiprocessing/heap.py
++++ b/Lib/multiprocessing/heap.py
+@@ -70,7 +70,7 @@
+         """
+ 
+         if sys.platform == 'linux':
+-            _dir_candidates = ['/dev/shm']
++            _dir_candidates = []
+         else:
+             _dir_candidates = []
+ 
+
+--- a/Modules/_multiprocessing/posixshmem.c
++++ b/Modules/_multiprocessing/posixshmem.c
+@@ -11,6 +11,72 @@
+ #include <sys/mman.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <alloca.h>
++#include <fcntl.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++static int shm_unlink(const char *name) {
++    size_t namelen;
++    char *fname;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    return unlink(fname);
++}
++
++static int shm_open(const char *name, int oflag, mode_t mode) {
++    size_t namelen;
++    char *fname;
++    int fd;
++
++    /* Construct the filename.  */
++    while (name[0] == '/') ++name;
++
++    if (name[0] == '\0') {
++        /* The name "/" is not supported.  */
++        errno = EINVAL;
++        return -1;
++    }
++
++    namelen = strlen(name);
++    fname = (char *) alloca(sizeof("@TERMUX_PREFIX@/tmp/") - 1 + namelen + 1);
++    memcpy(fname, "@TERMUX_PREFIX@/tmp/", sizeof("@TERMUX_PREFIX@/tmp/") - 1);
++    memcpy(fname + sizeof("@TERMUX_PREFIX@/tmp/") - 1, name, namelen + 1);
++
++    fd = open(fname, oflag, mode);
++    if (fd != -1) {
++        /* We got a descriptor.  Now set the FD_CLOEXEC bit.  */
++        int flags = fcntl(fd, F_GETFD, 0);
++        flags |= FD_CLOEXEC;
++        flags = fcntl(fd, F_SETFD, flags);
++
++        if (flags == -1) {
++            /* Something went wrong.  We cannot return the descriptor.  */
++            int save_errno = errno;
++            close(fd);
++            fd = -1;
++            errno = save_errno;
++        }
++    }
++
++    return fd;
++}
++#endif
++
+ /*[clinic input]
+ module _posixshmem
+ [clinic start generated code]*/

@@ -1,0 +1,13 @@
+diff --git a/src/utils/browser.c b/src/utils/browser.c
+index c0f4380..7a4a043 100644
+--- a/src/utils/browser.c
++++ b/src/utils/browser.c
+@@ -308,7 +308,7 @@ int hs20_web_browser(const char *url, int ignore_tls)
+ #ifndef USE_WEBKIT2
+ 	s = webkit_get_default_session();
+ 	g_object_set(G_OBJECT(s), "ssl-ca-file",
+-		     "/etc/ssl/certs/ca-certificates.crt", NULL);
++		     "@TERMUX_PREFIX@/etc/tls/cert.pem", NULL);
+ 	if (ignore_tls)
+ 		g_object_set(G_OBJECT(s), "ssl-strict", FALSE, NULL);
+ #endif /* USE_WEBKIT2 */

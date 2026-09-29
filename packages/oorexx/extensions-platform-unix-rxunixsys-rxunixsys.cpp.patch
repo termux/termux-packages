@@ -1,0 +1,19 @@
+--- a/extensions/platform/unix/rxunixsys/rxunixsys.cpp
++++ b/extensions/platform/unix/rxunixsys/rxunixsys.cpp
+@@ -37,6 +37,7 @@
+ 
+ 
+ #include "rxunixsys.h"
++#include <crypt.h>
+ 
+ 
+ /**
+@@ -928,7 +929,7 @@
+              int, option)
+ {
+ 
+-    return euidaccess(file, option);
++    return access(file, option);
+ }
+ #endif
+ 

@@ -1,0 +1,41 @@
+Fix "a function declaration without a prototype" build errors with current clang.
+
+diff -u -r ../nfs-utils-2.6.4/utils/mount/fstab.c ./utils/mount/fstab.c
+--- ../nfs-utils-2.6.4/utils/mount/fstab.c	2023-11-17 17:32:39.000000000 +0000
++++ ./utils/mount/fstab.c	2024-06-18 09:49:18.571197808 +0000
+@@ -68,7 +68,7 @@
+ }
+ 
+ int
+-mtab_is_writable() {
++mtab_is_writable(void) {
+ 	int fd;
+ 
+ 	/* Should we write to /etc/mtab upon an update?
+@@ -175,7 +175,7 @@
+  * Return 0 on success.
+  */
+ static void
+-read_mounttable() {
++read_mounttable(void) {
+         mntFILE *mfp;
+         const char *fnam;
+         struct mntentchn *mc = &mounttable;
+@@ -207,7 +207,7 @@
+  * Return 0 on success.
+  */
+ static void
+-read_procmounts() {
++read_procmounts(void) {
+         mntFILE *mfp;
+         const char *fnam;
+         struct mntentchn *mc = &procmounts;
+@@ -226,7 +226,7 @@
+ }
+ 
+ static void
+-read_fstab()
++read_fstab(void)
+ {
+ 	mntFILE *mfp = NULL;
+ 	const char *fnam;

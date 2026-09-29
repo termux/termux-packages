@@ -1,0 +1,24 @@
+diff --git a/src/mesa/util/anon_file.c b/src/mesa/util/anon_file.c
+index 4f8a5fb..cf22817 100644
+--- a/src/mesa/util/anon_file.c
++++ b/src/mesa/util/anon_file.c
+@@ -43,7 +43,7 @@
+ #include <stdio.h>
+ #endif
+
+-#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || defined(HAVE_MKOSTEMP) || defined(__ANDROID__))
++#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || defined(HAVE_MKOSTEMP) || (defined(__ANDROID__) && !defined(__TERMUX__)))
+ static int
+ set_cloexec_or_close(int fd)
+ {
+@@ -67,7 +67,7 @@ err:
+ }
+ #endif
+
+-#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || defined(__ANDROID__))
++#if !(defined(__FreeBSD__) || defined(HAVE_MEMFD_CREATE) || (defined(__ANDROID__) && !defined(__TERMUX__)))
+ static int
+ create_tmpfile_cloexec(char *tmpname)
+ {
+
+

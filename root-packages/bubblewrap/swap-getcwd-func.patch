@@ -1,0 +1,16 @@
+--- a/bubblewrap.c
++++ b/bubblewrap.c
+@@ -3285,7 +3285,12 @@
+   if (mount ("tmpfs", base_path, "tmpfs", MS_NODEV | MS_NOSUID, NULL) != 0)
+     die_with_mount_error ("Failed to mount tmpfs");
+ 
+-  old_cwd = get_current_dir_name ();
++  /* get_current_dir_name() is not included in Bionic (Android's libc) */
++  /* old_cwd = get_current_dir_name (); */
++  old_cwd = getcwd(NULL, 0);
++  if (old_cwd == NULL)
++    die_with_error("failed in getting current working directory. "
++                    "probably the path length is equal to or longer than 4KiB");
+ 
+   /* Chdir to the new root tmpfs mount. This will be the CWD during
+      the entire setup. Access old or new root via "oldroot" and "newroot". */

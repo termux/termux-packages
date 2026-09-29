@@ -1,0 +1,42 @@
+--- ./makefile.orig	2022-03-27 13:31:57.231913431 +0530
++++ ./makefile	2022-03-27 13:33:07.581913404 +0530
+@@ -5,14 +5,14 @@
+ # 2024.08.19: -march=native isn't recognized on some platforms such as RISCV64.
+ # Thus we removed it. Clang ARM users can add -march=armv8-a+crypto to enable
+ # ARM NEON crypto.
+-CXX=c++
+-CXXFLAGS=-O2 -std=c++11 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
+-LIBFLAGS=-fPIC
++CXX?=c++
++CXXFLAGS?=
++CXXFLAGS+=-O3 -Wno-logical-op-parentheses -Wno-switch -Wno-dangling-else
++LIBFLAGS=$(LDFLAGS)
+ DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
+-STRIP=strip
+-AR=ar
+-LDFLAGS=-pthread
+-DESTDIR=/usr
++STRIP?=strip
++AR?=ar
++LDFLAGS?=-pthread
+ 
+ ##########################
+ 
+@@ -63,14 +63,14 @@
+ 	$(AR) rcs libunrar.a $(OBJECTS) $(LIB_OBJ)
+ 
+ install-unrar:
+-			install -D unrar $(DESTDIR)/bin/unrar
++			install -D unrar $(DESTDIR)$(PREFIX)/bin/unrar
+ 
+ uninstall-unrar:
+ 			rm -f $(DESTDIR)/bin/unrar
+ 
+ install-lib:
+-		install libunrar.so $(DESTDIR)/lib
+-		install libunrar.a $(DESTDIR)/lib
++		install libunrar.so $(DESTDIR)$(PREFIX)/lib
++		install libunrar.a $(DESTDIR)$(PREFIX)/lib
+ 
+ uninstall-lib:
+ 		rm -f $(DESTDIR)/lib/libunrar.so

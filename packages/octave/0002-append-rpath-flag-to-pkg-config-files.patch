@@ -1,0 +1,20 @@
+--- a/libinterp/octinterp.in.pc
++++ b/libinterp/octinterp.in.pc
+@@ -4,6 +4,6 @@
+ Version: @PACKAGE_VERSION@
+ Requires: octave = @PACKAGE_VERSION@
+ Requires.private:
+-Libs: -L@octlibdir@ @LIBOCTINTERP@
++Libs: -L@octlibdir@ -Wl,-rpath,@octlibdir@ @LIBOCTINTERP@
+ Libs.private:
+ Cflags: -I@octincludedir@/..
+--- a/liboctave/octave.in.pc
++++ b/liboctave/octave.in.pc
+@@ -4,6 +4,6 @@
+ Version: @PACKAGE_VERSION@
+ Requires:
+ Requires.private:
+-Libs: -L@octlibdir@ @LIBOCTAVE@
++Libs: -L@octlibdir@ -Wl,-rpath,@octlibdir@ @LIBOCTAVE@
+ Libs.private: @LIBOCTAVE_LINK_DEPS@
+ Cflags: -I@octincludedir@/..

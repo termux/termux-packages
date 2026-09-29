@@ -1,0 +1,74 @@
+--- a/daemon/controllers/batterycontroller.cpp
++++ b/daemon/controllers/batterycontroller.cpp
+@@ -23,17 +23,17 @@
+ BatteryController::BatteryController()
+     : QObject()
+ {
+-    QDBusConnection::systemBus().connect(UPOWER_SERVICE,
++    QDBusConnection::sessionBus().connect(UPOWER_SERVICE,
+                                          UPOWER_PATH,
+                                          u"org.freedesktop.DBus.Properties"_s,
+                                          u"PropertiesChanged"_s,
+                                          this,
+                                          SLOT(onPropertiesChanged(QString, QVariantMap, QStringList)));
+ 
+-    QDBusConnection::systemBus().connect(UPOWER_SERVICE, UPOWER_PATH, UPOWER_IFACE, u"DeviceAdded"_s, this, SLOT(slotDeviceAdded(QDBusObjectPath)));
+-    QDBusConnection::systemBus().connect(UPOWER_SERVICE, UPOWER_PATH, UPOWER_IFACE, u"DeviceRemoved"_s, this, SLOT(slotDeviceRemoved(QDBusObjectPath)));
++    QDBusConnection::sessionBus().connect(UPOWER_SERVICE, UPOWER_PATH, UPOWER_IFACE, u"DeviceAdded"_s, this, SLOT(slotDeviceAdded(QDBusObjectPath)));
++    QDBusConnection::sessionBus().connect(UPOWER_SERVICE, UPOWER_PATH, UPOWER_IFACE, u"DeviceRemoved"_s, this, SLOT(slotDeviceRemoved(QDBusObjectPath)));
+ 
+-    m_upowerInterface = new OrgFreedesktopUPowerInterface(UPOWER_SERVICE, u"/org/freedesktop/UPower"_s, QDBusConnection::systemBus(), this);
++    m_upowerInterface = new OrgFreedesktopUPowerInterface(UPOWER_SERVICE, u"/org/freedesktop/UPower"_s, QDBusConnection::sessionBus(), this);
+ 
+     m_onBattery = m_upowerInterface->onBattery();
+ 
+
+--- a/daemon/controllers/lidcontroller.cpp
++++ b/daemon/controllers/lidcontroller.cpp
+@@ -20,14 +20,14 @@
+ LidController::LidController()
+     : QObject()
+ {
+-    if (!QDBusConnection::systemBus().interface()->isServiceRegistered(UPOWER_SERVICE)) {
++    if (!QDBusConnection::sessionBus().interface()->isServiceRegistered(UPOWER_SERVICE)) {
+         // Activate it.
+-        QDBusConnection::systemBus().interface()->startService(UPOWER_SERVICE);
++        QDBusConnection::sessionBus().interface()->startService(UPOWER_SERVICE);
+     }
+ 
+-    m_upowerInterface = new OrgFreedesktopUPowerInterface(UPOWER_SERVICE, u"/org/freedesktop/UPower"_s, QDBusConnection::systemBus(), this);
++    m_upowerInterface = new OrgFreedesktopUPowerInterface(UPOWER_SERVICE, u"/org/freedesktop/UPower"_s, QDBusConnection::sessionBus(), this);
+ 
+-    QDBusConnection::systemBus().connect(UPOWER_SERVICE,
++    QDBusConnection::sessionBus().connect(UPOWER_SERVICE,
+                                          UPOWER_PATH,
+                                          u"org.freedesktop.DBus.Properties"_s,
+                                          u"PropertiesChanged"_s,
+@@ -69,4 +69,4 @@
+     return m_isLidPresent;
+ }
+ 
+-#include "moc_lidcontroller.cpp"
+\ No newline at end of file
++#include "moc_lidcontroller.cpp"
+
+--- a/daemon/upowerdevice.cpp
++++ b/daemon/upowerdevice.cpp
+@@ -17,7 +17,7 @@
+ UPowerDevice::UPowerDevice(const QString &dbusObjectPath)
+ {
+     qCDebug(POWERDEVIL) << "Creating UPowerDevice for" << dbusObjectPath;
+-    QDBusConnection::systemBus().connect(UPOWER_SERVICE,
++    QDBusConnection::sessionBus().connect(UPOWER_SERVICE,
+                                          dbusObjectPath,
+                                          QStringLiteral("org.freedesktop.DBus.Properties"),
+                                          QStringLiteral("PropertiesChanged"),
+@@ -27,7 +27,7 @@
+     auto call = QDBusMessage::createMethodCall(UPOWER_SERVICE, dbusObjectPath, QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("GetAll"));
+     call << UPOWER_IFACE_DEVICE;
+ 
+-    QDBusPendingReply<QVariantMap> reply = QDBusConnection::systemBus().asyncCall(call);
++    QDBusPendingReply<QVariantMap> reply = QDBusConnection::sessionBus().asyncCall(call);
+     reply.waitForFinished();
+ 
+     if (reply.isValid()) {

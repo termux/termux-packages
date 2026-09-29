@@ -1,0 +1,23 @@
+--- a/scite/gtk/makefile
++++ b/scite/gtk/makefile
+@@ -19,9 +19,8 @@
+ # thread also need to create Position Independent Executable -> search online documentation
+ SANITIZE = address
+ #SANITIZE = undefined
+-CXX = clang++
+-CC = clang
+-BASE_FLAGS += -fsanitize=$(SANITIZE)
++CXX ?= clang++
++CC ?= clang
+ WARNINGS += -Wno-deprecated-register
+ WARNINGS += -Wno-empty-body
+ else
+@@ -70,7 +69,7 @@
+ DEFINES += -DPIXMAP_PATH=\"$(pixmapdir)\" -DSYSCONF_PATH=\"$(SYSCONF_PATH)\"
+ 
+ DEFINES += -D$(if $(DEBUG),DEBUG,NDEBUG)
+-BASE_FLAGS += $(if $(DEBUG),-g,-O3)
++BASE_FLAGS += $(if $(DEBUG),-g,)
+ 
+ ifndef NO_LUA
+ LUA_CORE_OBJS = lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \

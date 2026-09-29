@@ -1,0 +1,51 @@
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -59,7 +59,6 @@ use rustix::fs::Mode;
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ use rustix::fs::{memfd_create, MemfdFlags};
+ use rustix::io::Errno;
+-use rustix::shm;
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ use std::ffi::CStr;
+ 
+@@ -445,39 +444,10 @@ fn create_shm_fd() -> IoResult<OwnedFd> {
+         ) {
+             Ok(fd) => return Ok(fd),
+             Err(Errno::INTR) => continue,
+-            Err(Errno::NOSYS) => break,
++            Err(Errno::NOSYS) => return Err(Errno::NOSYS.into()),
+             Err(errno) => return Err(errno.into()),
+         }
+     }
+-
+-    // Fallback to using shm_open.
+-    let sys_time = SystemTime::now();
+-    let mut mem_file_handle = format!(
+-        "/wayland-cursor-rs-{}",
+-        sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-    );
+-    loop {
+-        match shm::open(
+-            mem_file_handle.as_str(),
+-            shm::OFlags::CREATE | shm::OFlags::EXCL | shm::OFlags::RDWR,
+-            Mode::RUSR | Mode::WUSR,
+-        ) {
+-            Ok(fd) => match shm::unlink(mem_file_handle.as_str()) {
+-                Ok(_) => return Ok(fd),
+-                Err(errno) => return Err(IoError::from(errno)),
+-            },
+-            Err(Errno::EXIST) => {
+-                // If a file with that handle exists then change the handle
+-                mem_file_handle = format!(
+-                    "/wayland-cursor-rs-{}",
+-                    sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-                );
+-                continue;
+-            }
+-            Err(Errno::INTR) => continue,
+-            Err(errno) => return Err(IoError::from(errno)),
+-        }
+-    }
+ }
+ 
+ struct IgnoreObjectData;

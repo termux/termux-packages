@@ -1,0 +1,32 @@
+Same as qtermwidget/utmp_android.patch
+
+--- a/src/kpty.cpp
++++ b/src/kpty.cpp
+@@ -526,6 +526,7 @@
+     updwtmpx(_PATH_WTMPX, &l_struct);
+ #else
+     utmpname(_PATH_UTMP);
++#ifndef __ANDROID__
+     setutent();
+     pututline(&l_struct);
+     endutent();
+@@ -533,6 +534,7 @@
+ #endif
+ #endif
+ #endif
++#endif
+ }
+ 
+ void KPty::logout()
+@@ -589,7 +591,11 @@
+ #else
+     utmpname(_PATH_UTMP);
+     setutent();
++#ifndef __ANDROID__
+     if ((ut = getutline(&l_struct))) {
++#else
++    if ((ut = getutent())) {
++#endif
+ #endif
+         memset(ut->ut_name, 0, sizeof(*ut->ut_name));
+         memset(ut->ut_host, 0, sizeof(*ut->ut_host));

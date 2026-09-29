@@ -1,0 +1,68 @@
+--- a/key.dns_resolver.c
++++ b/key.dns_resolver.c
+@@ -46,7 +46,7 @@
+ static const char a_query_type[] = "a";
+ static const char aaaa_query_type[] = "aaaa";
+ static const char afsdb_query_type[] = "afsdb";
+-static const char *config_file = "/etc/keyutils/key.dns_resolver.conf";
++static const char *config_file = "@TERMUX_PREFIX@/etc/keyutils/key.dns_resolver.conf";
+ static bool config_specified = false;
+ key_serial_t key;
+ static int verbose;
+--- a/keyctl.c
++++ b/keyctl.c
+@@ -1319,7 +1319,7 @@
+ 	if (argc == 0) {
+ 		q = getenv("SHELL");
+ 		if (!q)
+-			q = "/bin/sh";
++			q = "@TERMUX_PREFIX@/bin/sh";
+ 		execl(q, q, NULL);
+ 		error(q);
+ 	}
+--- a/keyctl_watch.c
++++ b/keyctl_watch.c
+@@ -406,7 +406,7 @@
+ 	if (argc == 0) {
+ 		const char *q = getenv("SHELL");
+ 		if (!q)
+-			q = "/bin/sh";
++			q = "@TERMUX_PREFIX@/bin/sh";
+ 		execl(q, q, NULL);
+ 		error(q);
+ 	}
+--- a/request-key.c
++++ b/request-key.c
+@@ -278,8 +278,8 @@
+ static void lookup_action(struct parameters *params)
+ {
+ 	if (!xlocaldirs) {
+-		scan_conf_dir(params, "/etc/request-key.d");
+-		scan_conf_file(params, AT_FDCWD, "/etc/request-key.conf");
++		scan_conf_dir(params, "@TERMUX_PREFIX@/etc/request-key.d");
++		scan_conf_file(params, AT_FDCWD, "@TERMUX_PREFIX@/etc/request-key.conf");
+ 	} else {
+ 		scan_conf_dir(params, "request-key.d");
+ 		scan_conf_file(params, AT_FDCWD, "request-key.conf");
+--- a/request-key.conf
++++ b/request-key.conf
+@@ -31,11 +31,11 @@
+ 
+ #OP	TYPE	DESCRIPTION	CALLOUT INFO	PROGRAM ARG1 ARG2 ARG3 ...
+ #======	=======	===============	===============	===============================
+-create  dns_resolver *		*               /sbin/key.dns_resolver %k
+-create	user	debug:*		negate		/bin/keyctl negate %k 30 %S
+-create  user    debug:*         rejected        /bin/keyctl reject %k 30 %c %S
+-create  user    debug:*         expired         /bin/keyctl reject %k 30 %c %S
+-create  user    debug:*         revoked         /bin/keyctl reject %k 30 %c %S
+-create	user	debug:loop:*	*		|/bin/cat
+-create	user	debug:*		*		/usr/share/keyutils/request-key-debug.sh %k %d %c %S
+-negate	*	*		*		/bin/keyctl negate %k 30 %S
++create  dns_resolver *		*               @TERMUX_PREFIX@/bin/key.dns_resolver %k
++create	user	debug:*		negate		@TERMUX_PREFIX@/bin/keyctl negate %k 30 %S
++create  user    debug:*         rejected        @TERMUX_PREFIX@/bin/keyctl reject %k 30 %c %S
++create  user    debug:*         expired         @TERMUX_PREFIX@/bin/keyctl reject %k 30 %c %S
++create  user    debug:*         revoked         @TERMUX_PREFIX@/bin/keyctl reject %k 30 %c %S
++create	user	debug:loop:*	*		|@TERMUX_PREFIX@/bin/cat
++create	user	debug:*		*		@TERMUX_PREFIX@/share/keyutils/request-key-debug.sh %k %d %c %S
++negate	*	*		*		@TERMUX_PREFIX@/bin/keyctl negate %k 30 %S

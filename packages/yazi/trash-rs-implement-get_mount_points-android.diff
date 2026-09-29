@@ -1,0 +1,45 @@
+This dirty implementation of get_mount_points() for trash-rs for Android
+has been tested and confirmed to work good enough to suceessfully move files to trash
+in reverse dependency Yazi on Samsung Galaxy A70 SM-A705FN with LineageOS 20 Android 13 SELinux Enabled
+
+--- a/src/freedesktop.rs
++++ b/src/freedesktop.rs
+@@ -784,6 +784,28 @@ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
+     Ok(result)
+ }
+ 
++#[cfg(target_os = "android")]
++fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
++    // assume '/data' and '/strorage/emulated/0' are mounted
++    // for some reason, 'getmntent()' is not available in Rust on Android,
++    // despite being available in C on Android.
++    // https://github.com/rust-lang/libc/blob/0403150379d66216e90a0f8a804ae1ca33691067/src/unix/linux_like/android/mod.rs
++    let mut result = Vec::new();
++    let mount_point = MountPoint {
++        mnt_dir: "/data".into(),
++        _mnt_fsname: "/this/should/not/matter".to_string(),
++        _mnt_type: "ext4".to_string()
++    };
++    result.push(mount_point);
++    let mount_point = MountPoint {
++        mnt_dir: "/storage/emulated/0".into(),
++        _mnt_fsname: "/this/should/not/matter".to_string(),
++        _mnt_type: "fuse".to_string()
++    };
++    result.push(mount_point);
++    Ok(result)
++}
++
+ #[cfg(any(target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd"))]
+ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
+     use once_cell::sync::Lazy;
+@@ -898,7 +914,8 @@ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "openbsd",
+-    target_os = "netbsd"
++    target_os = "netbsd",
++    target_os = "android"
+ )))]
+ fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
+     // On platforms that don't have support yet, return an error

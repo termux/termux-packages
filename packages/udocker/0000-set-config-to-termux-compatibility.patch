@@ -1,0 +1,23 @@
+diff -ur orig/udocker/config.py mod/udocker/config.py
+--- orig/udocker/config.py	2024-08-28 16:01:10.000000000 +0200
++++ mod/udocker/config.py	2025-05-12 21:01:56.967859955 +0200
+@@ -79,7 +79,7 @@
+     # conf['proot_noseccomp'] = True
+     conf['proot_noseccomp'] = None
+     conf['proot_killonexit'] = True   # PRoot --kill-on-exit
+-    conf['proot_link2symlink'] = False   # PRoot --link2symlink
++    conf['proot_link2symlink'] = True   # PRoot --link2symlink
+ 
+     # fakechroot engine get ld_library_paths from ld.so.cache
+     conf['ld_so_cache'] = "/etc/ld.so.cache"
+@@ -128,8 +128,8 @@
+ 
+     # Force the use of specific executables
+     # UDOCKER = use executable from the udocker binary distribution/tarball
+-    conf['use_proot_executable'] = "UDOCKER"
+-    conf['use_patchelf_executable'] = "UDOCKER"
++    conf['use_proot_executable'] = "@TERMUX_PREFIX@/bin/proot"
++    conf['use_patchelf_executable'] = "@TERMUX_PREFIX@/bin/patchelf"
+     conf['use_runc_executable'] = ""
+     conf['use_singularity_executable'] = ""
+ 

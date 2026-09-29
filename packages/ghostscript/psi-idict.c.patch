@@ -1,0 +1,14 @@
+Workaround for miscompilation with optlevel `-Oz`.
+
+--- a/psi/idict.c
++++ b/psi/idict.c
+@@ -217,7 +217,8 @@
+         make_tasv(&pdict->keys, t_shortarray,
+                   r_space(&arr) | a_all | new_mask,
+                   asize, packed, pkp);
+-        for (pzp = pkp, i = 0; i < asize || i % packed_per_ref; pzp++, i++)
++        for (pzp = pkp, i = 0;                                ; pzp++, i++)
++            if (!(             i < asize || i % packed_per_ref)) break; else
+             *pzp = packed_key_empty;
+         *pkp = packed_key_deleted;	/* wraparound entry */
+     } else {			/* not packed */

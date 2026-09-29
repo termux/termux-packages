@@ -1,0 +1,142 @@
+--- a/src/io.c
++++ b/src/io.c
+@@ -48,6 +48,13 @@
+ #include "calcurse.h"
+ #include "sha1.h"
+ 
++#ifdef __ANDROID__
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ struct ht_keybindings_s {
+ 	const char *label;
+ 	enum vkey key;
+@@ -1432,12 +1439,23 @@
+ /* Thread used to periodically save data. */
+ static void *io_psave_thread(void *arg)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	int delay = conf.periodic_save;
+ 	EXIT_IF(delay < 0, _("Invalid delay"));
+ 	char *mesg = _("Periodic save cancelled. Data files have changed. "
+ 		     "Save and merge interactively");
+ 
++#ifndef __ANDROID__
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++#endif
+ 	for (;;) {
+ 		sleep(delay * MININSEC);
+ 		pthread_mutex_lock(&io_periodic_save_mutex);
+@@ -1462,7 +1480,11 @@
+ 
+ 	/* Lock the mutex to avoid cancelling the thread during saving. */
+ 	pthread_mutex_lock(&io_periodic_save_mutex);
++#ifndef __ANDROID__
+ 	pthread_cancel(io_t_psave);
++#else
++	pthread_kill(io_t_psave, SIGUSR2);
++#endif
+ 	pthread_join(io_t_psave, NULL);
+ 	pthread_mutex_unlock(&io_periodic_save_mutex);
+ 	io_t_psave = pthread_self();
+--- a/src/notify.c
++++ b/src/notify.c
+@@ -42,6 +42,14 @@
+ 
+ #include "calcurse.h"
+ 
++#ifdef __ANDROID__
++#include <signal.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ #define NOTIFY_FIELD_LENGTH	25
+ 
+ struct notify_vars {
+@@ -194,7 +202,11 @@
+ 	if (pthread_equal(notify_t_main, pthread_self()))
+ 		return;
+ 
++#ifndef __ANDROID__
+ 	pthread_cancel(notify_t_main);
++#else
++	pthread_kill(notify_t_main, SIGUSR2);
++#endif
+ 	pthread_join(notify_t_main, NULL);
+ 	notify_t_main = pthread_self();
+ }
+@@ -324,6 +336,15 @@
+ /* ARGSUSED0 */
+ static void *notify_main_thread(void *arg)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	const unsigned thread_sleep = 1;
+ 	const unsigned check_app = MININSEC;
+ 	int elapse = 0;
+--- a/src/ui-calendar.c
++++ b/src/ui-calendar.c
+@@ -44,6 +44,14 @@
+ 
+ #include "calcurse.h"
+ 
++#ifdef __ANDROID__
++#include <signal.h>
++static void thread_signal_handler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ static struct date today, slctd_day;
+ static unsigned ui_calendar_view;
+ static int wday_start; /* this is used in signed arithmetic */
+@@ -89,6 +97,15 @@
+ /* ARGSUSED0 */
+ static void *ui_calendar_date_thread(void *arg)
+ {
++#ifdef __ANDROID__
++	struct sigaction actions;
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_flags = 0;
++	actions.sa_handler = thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	time_t actual, tomorrow;
+ 
+ 	for (;;) {
+@@ -118,7 +135,11 @@
+ 	if (pthread_equal(ui_calendar_t_date, pthread_self()))
+ 		return;
+ 
++#ifndef __ANDROID__
+ 	pthread_cancel(ui_calendar_t_date);
++#else
++	pthread_kill(ui_calendar_t_date, SIGUSR2);
++#endif
+ 	pthread_join(ui_calendar_t_date, NULL);
+ 	ui_calendar_t_date = pthread_self();
+ }

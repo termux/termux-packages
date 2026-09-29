@@ -1,0 +1,40 @@
+--- a/src/server.h
++++ b/src/server.h
+@@ -1040,7 +1040,7 @@ typedef struct readyList {
+ #define SELECTOR_FLAG_ALLDBS (1 << 4)      /* Allow all databases */
+ 
+ 
+-typedef struct user {
++typedef struct valkey_user {
+     sds name;         /* The username as an SDS string. */
+     uint32_t flags;   /* See USER_FLAG_* */
+     list *passwords;  /* A list of SDS valid passwords for this user. */
+--- a/src/connection.h
++++ b/src/connection.h
+@@ -48,7 +48,7 @@
+ #define NET_HOST_PORT_STR_LEN (NET_HOST_STR_LEN + 32) /* Must be enough for hostname:port */
+ 
+ struct aeEventLoop;
+-struct user;
++struct valkey_user;
+ typedef struct connection connection;
+ typedef struct connListener connListener;
+ 
+@@ -150,7 +150,7 @@ typedef struct ConnectionType {
+ 
+     /* Get peer user based on connection type. If cert_username is non-NULL,
+      * it is set to the extracted certificate field value. */
+-    struct user *(*get_peer_user)(connection *conn, sds *cert_username);
++    struct valkey_user *(*get_peer_user)(connection *conn, sds *cert_username);
+ 
+     /* Miscellaneous */
+     int (*connIntegrityChecked)(void); // return 1 if connection type has built-in integrity checks
+@@ -428,7 +428,7 @@ static inline sds connGetPeerCert(connection *conn) {
+ 
+ /* Get peer user based on connection type. If cert_username is non-NULL,
+  * it is set to the extracted certificate field value. */
+-static inline struct user *connGetPeerUser(connection *conn, sds *cert_username) {
++static inline struct valkey_user *connGetPeerUser(connection *conn, sds *cert_username) {
+     if (conn->type && conn->type->get_peer_user) {
+         return conn->type->get_peer_user(conn, cert_username);
+     }

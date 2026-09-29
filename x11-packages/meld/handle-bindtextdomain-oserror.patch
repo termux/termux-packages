@@ -1,0 +1,11 @@
+--- a/bin/meld
++++ b/bin/meld
+@@ -141,7 +141,7 @@ try:
+         locale.bindtextdomain(locale_domain, str(locale_dir))
+         locale.bind_textdomain_codeset(locale_domain, 'UTF-8')
+         locale.textdomain(locale_domain)
+-except AttributeError as e:
++except (AttributeError,OSError) as e:
+     # Python builds linked without libintl (i.e., OSX) don't have
+     # bindtextdomain(), which causes Gtk.Builder translations to fail.
+     print(

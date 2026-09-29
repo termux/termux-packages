@@ -1,0 +1,111 @@
+nonetchange is pretty much mandatory on Android, so we enable it by default
+We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
+
+--- a/Emby.Server.Implementations/ConfigurationOptions.cs
++++ b/Emby.Server.Implementations/ConfigurationOptions.cs
+@@ -21,7 +21,7 @@ namespace Emby.Server.Implementations
+             { SqliteCacheSizeKey, "20000" },
+             { FfmpegSkipValidationKey, bool.FalseString },
+             { FfmpegImgExtractPerfTradeoffKey, bool.FalseString },
+-            { DetectNetworkChangeKey, bool.TrueString }
++            { DetectNetworkChangeKey, bool.FalseString }
+         };
+     }
+ }
+--- a/Jellyfin.Server/StartupOptions.cs
++++ b/Jellyfin.Server/StartupOptions.cs
+@@ -68,10 +68,10 @@ namespace Jellyfin.Server
+         public string? PublishedServerUrl { get; set; }
+ 
+         /// <summary>
+-        /// Gets or sets a value indicating whether the server should not detect network status change.
++        /// Gets or sets a value indicating whether the server should detect network status change.
+         /// </summary>
+-        [Option("nonetchange", Required = false, HelpText = "Indicates that the server should not detect network status change.")]
+-        public bool NoDetectNetworkChange { get; set; }
++        [Option("netchange", Required = false, HelpText = "Indicates that the server should detect network status change.")]
++        public bool DetectNetworkChange { get; set; }
+ 
+         /// <summary>
+         /// Gets or sets the path to an jellyfin backup archive to restore the application to.
+@@ -102,9 +102,9 @@ namespace Jellyfin.Server
+                 config.Add(FfmpegPathKey, FFmpegPath);
+             }
+ 
+-            if (NoDetectNetworkChange)
++            if (DetectNetworkChange)
+             {
+-                config.Add(DetectNetworkChangeKey, bool.FalseString);
++                config.Add(DetectNetworkChangeKey, bool.TrueString);
+             }
+ 
+             return config;
+--- a/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
++++ b/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
+@@ -217,7 +217,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
+         [GeneratedRegex(@"((?<name>lib\w+)\s+(?<major>[0-9]+)\.\s*(?<minor>[0-9]+))", RegexOptions.Multiline)]
+         private static partial Regex LibraryRegex();
+ 
+-        public bool ValidateVersion()
++        public bool ValidateVersion(bool noerr = false)
+         {
+             string output;
+             try
+@@ -226,13 +226,17 @@ namespace MediaBrowser.MediaEncoding.Encoder
+             }
+             catch (Exception ex)
+             {
+-                _logger.LogError(ex, "Error validating encoder");
++                if (!noerr) {
++                        _logger.LogError(ex, "Error validating encoder");
++                }
+                 return false;
+             }
+ 
+             if (string.IsNullOrWhiteSpace(output))
+             {
+-                _logger.LogError("FFmpeg validation: The process returned no result");
++                if (!noerr) {
++                        _logger.LogError("FFmpeg validation: The process returned no result");
++                }
+                 return false;
+             }
+ 
+--- a/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
++++ b/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
+@@ -199,7 +199,10 @@ namespace MediaBrowser.MediaEncoding.Encoder
+                 }
+             }
+ 
+-            if (!ValidatePath(ffmpegPath))
++            if (ffmpegPathSetMethodText == "system $PATH" && !ValidatePath("@TERMUX_PREFIX@/opt/jellyfin/bin/ffmpeg", true)) {
++                _ffmpegPath = null;
++            }
++            if (string.IsNullOrEmpty(_ffmpegPath) && !ValidatePath(ffmpegPath))
+             {
+                 _ffmpegPath = null;
+                 _logger.LogError("FFmpeg: Path set by {FfmpegPathSetMethodText} is invalid", ffmpegPathSetMethodText);
+@@ -287,17 +290,20 @@ namespace MediaBrowser.MediaEncoding.Encoder
+         /// </summary>
+         /// <param name="path">FQPN to test.</param>
++        /// <param name="noerr">If set to true, logger is not used</param>
+         /// <returns><c>true</c> if the version validation succeeded; otherwise, <c>false</c>.</returns>
+-        private bool ValidatePath(string path)
++        private bool ValidatePath(string path, bool noerr = false)
+         {
+             if (string.IsNullOrEmpty(path))
+             {
+                 return false;
+             }
+ 
+-            bool rc = new EncoderValidator(_logger, path).ValidateVersion();
++            bool rc = new EncoderValidator(_logger, path).ValidateVersion(noerr);
+             if (!rc)
+             {
+-                _logger.LogError("FFmpeg: Failed version check: {Path}", path);
++                if (!noerr) {
++                        _logger.LogError("FFmpeg: Failed version check: {Path}", path);
++                }
+                 return false;
+             }
+ 

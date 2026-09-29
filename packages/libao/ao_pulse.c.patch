@@ -1,0 +1,49 @@
+diff --git a/src/plugins/pulse/ao_pulse.c b/src/plugins/pulse/ao_pulse.c
+index 2d10d57..6780830 100644
+--- a/src/plugins/pulse/ao_pulse.c
++++ b/src/plugins/pulse/ao_pulse.c
+@@ -41,7 +41,7 @@
+ #include <ao/ao.h>
+ #include <ao/plugin.h>
+ 
+-#define AO_PULSE_BUFFER_TIME 20000
++#define AO_PULSE_BUFFER_TIME 20
+ 
+ /* Unfortunately libao doesn't allow "const" for these structures... */
+ static char * ao_pulse_options[] = {
+@@ -73,7 +73,7 @@ typedef struct ao_pulse_internal {
+     struct pa_simple *simple;
+     char *server, *sink, *client_name;
+     pa_usec_t static_delay;
+-    pa_usec_t buffer_time;
++    int buffer_time;
+ } ao_pulse_internal;
+ 
+ /* Yes, this is very ugly, but required nonetheless... */
+@@ -174,8 +174,8 @@ int ao_plugin_set_option(ao_device *device, const char *key, const char *value)
+     } else if (!strcmp(key, "client_name")) {
+         free(internal->client_name);
+         internal->client_name = strdup(value);
+-    }else if (!strcmp(key, "buffer_time")){
+-      internal->buffer_time = atoi(value) * 1000;
++    } else if (!strcmp(key, "buffer_time")) {
++        internal->buffer_time = atoi(value);
+     }
+ 
+     return 1;
+@@ -256,12 +256,10 @@ int ao_plugin_open(ao_device *device, ao_sample_format *format) {
+     }
+ 
+     /* buffering attributes */
+-    battr.prebuf = battr.minreq = battr.fragsize = -1;
++    battr.prebuf = battr.minreq = battr.fragsize = battr.maxlength = -1;
+ 
+-    battr.tlength = (int)(internal->buffer_time * format->rate) / 1000000 *
+-      ((format->bits+7)/8) * device->output_channels;
+-    battr.minreq = battr.tlength/4;
+-    battr.maxlength = battr.tlength+battr.minreq;
++    battr.tlength = internal->buffer_time * format->rate / 1000 *
++      (format->bits / 8) * device->output_channels;
+ 
+     internal->simple = pa_simple_new(internal->server, t, PA_STREAM_PLAYBACK,
+                                      internal->sink, t2, &ss,

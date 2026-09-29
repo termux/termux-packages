@@ -1,0 +1,29 @@
+--- a/Makefile.linux
++++ b/Makefile.linux
+@@ -71,20 +71,20 @@
+ 	rm -f $@
+ 	$(AR) rcs $@ $^
+ 
+-../UniversalDetector/libUniversalDetector.a:
+-	make -C ../UniversalDetector -f Makefile.linux
++UniversalDetector/libUniversalDetector.a:
++	make -C UniversalDetector -f Makefile.linux
+ 
+-unar: $(UNAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
++unar: $(UNAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a UniversalDetector/libUniversalDetector.a
+ 	$(LD) $(ALL_LDFLAGS) -o $@ $^ $(LIBS)
+ 
+-lsar: $(LSAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
++lsar: $(LSAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a UniversalDetector/libUniversalDetector.a
+ 	$(LD) $(ALL_LDFLAGS) -o $@ $^ $(LIBS)
+ 
+ clean:
+ 	rm -rf $(BUILD_DIR) $(EXECUTABLE_FILES) $(LIBRARY_FILES)
+-	make -C ../UniversalDetector -f Makefile.linux clean
++	make -C UniversalDetector -f Makefile.linux clean
+ 
+-.PHONY: ../UniversalDetector/libUniversalDetector.a clean
++.PHONY: UniversalDetector/libUniversalDetector.a clean
+ 
+ # Suffix rules
+ 

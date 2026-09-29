@@ -1,0 +1,55 @@
+--- a/Makefile
++++ b/Makefile
+@@ -35,7 +35,7 @@
+ JBINDIR = $(JOVEHOME)/bin
+ DBINDIR = $(DESTDIR)$(JBINDIR)
+ XEXT=
+-JMANDIR = $(JOVEHOME)/man/man$(MANEXT)
++JMANDIR = $(JOVEHOME)/share/man/man$(MANEXT)
+ DMANDIR = $(DESTDIR)$(JMANDIR)
+ MANEXT = 1
+ 
+@@ -52,10 +52,10 @@
+ # (in case the system startup salvages tempfiles by moving them,
+ # which is probably a good idea).
+ 
+-JETCDIR = /etc/jove
++JETCDIR = @TERMUX_PREFIX@/etc/jove
+ DETCDIR = $(DESTDIR)$(JETCDIR)
+-JTMPDIR = /var/tmp
+-JRECDIR = /var/lib/jove/preserve
++JTMPDIR = @TERMUX_PREFIX@/tmp
++JRECDIR = @TERMUX_PREFIX@/var/lib/jove/preserve
+ DRECDIR = $(DESTDIR)$(JRECDIR)
+ 
+ # Install permission for DRECDIR
+@@ -65,7 +65,7 @@
+ RPMHOME = $(HOME)/rpmbuild/SOURCES
+ 
+ # DFLTSHELL is the default shell invoked by JOVE.
+-DFLTSHELL = /bin/sh
++DFLTSHELL = @TERMUX_PREFIX@/bin/sh
+ 
+ # The install commands of BSD and System V differ in unpleasant ways:
+ # -c: copy (BSD); -c dir: destination directory (SysV)
+@@ -134,7 +134,7 @@
+ LDLIBS = $(TERMCAPLIB) $(EXTRALIBS)
+ 
+ # linker flags (LDFLAGS) not needed for most systems
+-LDFLAGS = 
++LDFLAGS ?= 
+ 
+ # LDCC can be used for link-time alternatives to CC.  Also useful
+ # for purify or similar link-time processing.
+@@ -149,9 +149,9 @@
+ # flags are usually needed (other than Xenix?!), since setmaps is 
+ # run just once, so use whatever compiles fastest.
+ 
+-LOCALCC = $(CC)
++LOCALCC = $(CC_FOR_BUILD)
+ LOCALCFLAGS = # nothing really needed for setmaps
+-LOCALLDFLAGS = $(LDFLAGS)
++LOCALLDFLAGS = #
+ LOCALEXTRALIBS = # nothing really needed for setmaps
+ LOCALEXT = # default is a Un*x-style machine, not Windows
+ 

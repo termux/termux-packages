@@ -1,0 +1,12 @@
+diff -u -r ../cache/orc-2.3.0/c++/src/ColumnReader.cc ./c++/src/ColumnReader.cc
+--- ../cache/orc-2.3.0/c++/src/ColumnReader.cc	2026-02-25 11:39:00.000000000 +0000
++++ ./c++/src/ColumnReader.cc	2026-03-10 07:58:48.002881995 +0000
+@@ -464,7 +464,7 @@
+       uint64_t bufferNum = 0;
+       if constexpr (isLittleEndian && std::is_same_v<ValueType, ItemType>) {
+         bufferNum =
+-            std::min(numValues, static_cast<size_t>(bufferEnd_ - bufferPointer_) / bytesPerValue_);
++            std::min(numValues, static_cast<uint64_t>(bufferEnd_ - bufferPointer_) / bytesPerValue_);
+         uint64_t bufferBytes = bufferNum * bytesPerValue_;
+         if (bufferBytes > 0) {
+           memcpy(outArray, bufferPointer_, bufferBytes);

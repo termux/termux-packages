@@ -1,0 +1,20 @@
+--- a/src/main.c
++++ b/src/main.c
+@@ -124,7 +124,7 @@
+ }
+ 
+ static void
+-open (GApplication *application,
++ghex_open (GApplication *application,
+ 		GFile **files,
+ 		int n_files,
+ 		const char *hint,
+@@ -166,7 +166,7 @@
+ 			_("GHex - A hex editor for the GNOME desktop"));;
+ 
+ 	g_signal_connect (app, "activate", G_CALLBACK(activate), NULL);
+-	g_signal_connect (app, "open", G_CALLBACK(open), NULL);
++	g_signal_connect (app, "open", G_CALLBACK(ghex_open), NULL);
+ 	g_signal_connect (app, "handle-local-options",
+ 			G_CALLBACK(handle_local_options), NULL);
+ 

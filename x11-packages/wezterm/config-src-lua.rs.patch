@@ -1,0 +1,25 @@
+From 2b76c63bb618d26609434c06282c8755229c4099 Mon Sep 17 00:00:00 2001
+From: Sean Estabrooks <sean.estabrooks@eztux.com>
+Date: Sun, 15 Sep 2024 16:49:41 -0400
+Subject: [PATCH] Suppress compiler warnings, due to never type (!)
+
+As per <https://github.com/rust-lang/rust/issues/123748>
+! will no longer degrades into () which in this situation
+breaks type deduction; so specify it explicitly.
+---
+ config/src/lua.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/src/lua.rs b/config/src/lua.rs
+index b36e506832d..5b8167fd9c4 100644
+--- a/config/src/lua.rs
++++ b/config/src/lua.rs
+@@ -276,7 +276,7 @@ end
+         "#,
+         )
+         .set_name("=searcher")
+-        .eval()
++        .eval::<()>()
+         .context("replace package.searchers")?;
+ 
+         wezterm_mod.set(

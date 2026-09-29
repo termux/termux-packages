@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://drobilla.net/software/sratom.html
+TERMUX_PKG_DESCRIPTION="A small library for serialising LV2 atoms to and from RDF"
+TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.6.22"
+TERMUX_PKG_SRCURL=https://download.drobilla.net/sratom-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=0209b7d0f22c96abb416722ed735b0933be47931ecff4aa4b26ded7760b4f252
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="lv2, serd, sord"

@@ -1,0 +1,143 @@
+--- a/internal/pathutil/pathutil_unix_test.go
++++ b/internal/pathutil/pathutil_unix_test.go
+@@ -19,7 +19,7 @@
+ 	require.Equal(t, home, pathutil.UserHomeDir())
+ 
+ 	os.Unsetenv("HOME")
+-	require.Equal(t, "/", pathutil.UserHomeDir())
++	require.Equal(t, "@TERMUX_HOME@", pathutil.UserHomeDir())
+ }
+ 
+ func TestExpandHome(t *testing.T) {
+--- a/internal/pathutil/pathutil_unix.go
++++ b/internal/pathutil/pathutil_unix.go
+@@ -16,7 +16,7 @@
+ 		return home
+ 	}
+ 
+-	return "/"
++	return "@TERMUX_HOME@"
+ }
+ 
+ // Exists returns true if the specified path exists.
+--- a/paths_unix.go
++++ b/paths_unix.go
+@@ -19,12 +17,12 @@
+ func initBaseDirs(home string) {
+ 	// Initialize standard directories.
+ 	baseDirs.dataHome = pathutil.EnvPath(envDataHome, filepath.Join(home, ".local", "share"))
+-	baseDirs.data = pathutil.EnvPathList(envDataDirs, "/usr/local/share", "/usr/share")
++	baseDirs.data = pathutil.EnvPathList(envDataDirs, "@TERMUX_PREFIX@/share")
+ 	baseDirs.configHome = pathutil.EnvPath(envConfigHome, filepath.Join(home, ".config"))
+-	baseDirs.config = pathutil.EnvPathList(envConfigDirs, "/etc/xdg")
++	baseDirs.config = pathutil.EnvPathList(envConfigDirs, "@TERMUX_PREFIX@/etc/xdg")
+ 	baseDirs.stateHome = pathutil.EnvPath(envStateHome, filepath.Join(home, ".local", "state"))
+ 	baseDirs.cacheHome = pathutil.EnvPath(envCacheHome, filepath.Join(home, ".cache"))
+-	baseDirs.runtime = pathutil.EnvPath(envRuntimeDir, filepath.Join("/run/user", strconv.Itoa(os.Getuid())))
++	baseDirs.runtime = pathutil.EnvPath(envRuntimeDir, filepath.Join("@TERMUX_PREFIX@/var/run/user", strconv.Itoa(os.Getuid())))
+ 
+ 	// Initialize non-standard directories.
+ 	baseDirs.binHome = pathutil.EnvPath(envBinHome, filepath.Join(home, ".local", "bin"))
+@@ -32,16 +30,14 @@
+ 	appDirs := []string{
+ 		filepath.Join(baseDirs.dataHome, "applications"),
+ 		filepath.Join(home, ".local/share/applications"),
+-		"/usr/local/share/applications",
+-		"/usr/share/applications",
++		"@TERMUX_PREFIX@/share/applications",
+ 	}
+ 
+ 	fontDirs := []string{
+ 		filepath.Join(baseDirs.dataHome, "fonts"),
+ 		filepath.Join(home, ".fonts"),
+ 		filepath.Join(home, ".local/share/fonts"),
+-		"/usr/local/share/fonts",
+-		"/usr/share/fonts",
++		"@TERMUX_PREFIX@/share/fonts",
+ 	}
+ 
+ 	for _, dir := range baseDirs.data {
+--- a/paths_unix_test.go
++++ b/paths_unix_test.go
+@@ -24,7 +23,7 @@
+ 		},
+ 		&envSample{
+ 			name:     "XDG_DATA_DIRS",
+-			expected: []string{"/usr/local/share", "/usr/share"},
++			expected: []string{"@TERMUX_PREFIX@/share"},
+ 			actual:   &xdg.DataDirs,
+ 		},
+ 		&envSample{
+@@ -34,7 +33,7 @@
+ 		},
+ 		&envSample{
+ 			name:     "XDG_CONFIG_DIRS",
+-			expected: []string{"/etc/xdg"},
++			expected: []string{"@TERMUX_PREFIX@/etc/xdg"},
+ 			actual:   &xdg.ConfigDirs,
+ 		},
+ 		&envSample{
+@@ -49,7 +48,7 @@
+ 		},
+ 		&envSample{
+ 			name:     "XDG_RUNTIME_DIR",
+-			expected: filepath.Join("/run/user", strconv.Itoa(os.Getuid())),
++			expected: filepath.Join("@TERMUX_PREFIX@/var/run/user", strconv.Itoa(os.Getuid())),
+ 			actual:   &xdg.RuntimeDir,
+ 		},
+ 		&envSample{
+@@ -61,8 +60,7 @@
+ 			name: "XDG_APPLICATION_DIRS",
+ 			expected: []string{
+ 				filepath.Join(home, ".local/share/applications"),
+-				"/usr/local/share/applications",
+-				"/usr/share/applications",
++				"@TERMUX_PREFIX@/share/applications",
+ 			},
+ 			actual: &xdg.ApplicationDirs,
+ 		},
+@@ -71,8 +69,7 @@
+ 			expected: []string{
+ 				filepath.Join(home, ".local/share/fonts"),
+ 				filepath.Join(home, ".fonts"),
+-				"/usr/local/share/fonts",
+-				"/usr/share/fonts",
++				"@TERMUX_PREFIX@/share/fonts",
+ 			},
+ 			actual: &xdg.FontDirs,
+ 		},
+@@ -91,10 +88,10 @@
+ 		},
+ 		&envSample{
+ 			name:  "XDG_DATA_DIRS",
+-			value: "~/.local/data:/usr/share",
++			value: "~/.local/data:@TERMUX_PREFIX@/share",
+ 			expected: []string{
+ 				filepath.Join(home, ".local/data"),
+-				"/usr/share",
++				"@TERMUX_PREFIX@/share",
+ 			},
+ 			actual: &xdg.DataDirs,
+ 		},
+@@ -106,10 +103,10 @@
+ 		},
+ 		&envSample{
+ 			name:  "XDG_CONFIG_DIRS",
+-			value: "~/.local/config:/etc/xdg",
++			value: "~/.local/config:@TERMUX_PREFIX@/etc/xdg",
+ 			expected: []string{
+ 				filepath.Join(home, ".local/config"),
+-				"/etc/xdg",
++				"@TERMUX_PREFIX@/etc/xdg",
+ 			},
+ 			actual: &xdg.ConfigDirs,
+ 		},
+@@ -248,7 +245,7 @@
+ 	require.NoError(t, os.Unsetenv(envHomeVar))
+ 
+ 	xdg.Reload()
+-	require.Equal(t, "/", xdg.Home)
++	require.Equal(t, "@TERMUX_HOME@", xdg.Home)
+ 
+ 	require.NoError(t, os.Setenv(envHomeVar, envHomeVal))
+ 	xdg.Reload()

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="UpDevice" get-type="up_device_get_type" parents="GObject">
+    <property name="update-time" type="guint64" flags="3" default-value="0"/>
+    <property name="vendor" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="serial" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="native-path" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="power-supply" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="online" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="is-present" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="is-rechargeable" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="has-history" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="has-statistics" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="kind" type="guint" flags="3" default-value="0"/>
+    <property name="state" type="guint" flags="3" default-value="0"/>
+    <property name="technology" type="guint" flags="3" default-value="0"/>
+    <property name="capacity" type="gdouble" flags="3" default-value="100.000000"/>
+    <property name="energy" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="energy-empty" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="energy-full" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="energy-full-design" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="energy-rate" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="voltage" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="luminosity" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="time-to-empty" type="gint64" flags="3" default-value="0"/>
+    <property name="time-to-full" type="gint64" flags="3" default-value="0"/>
+    <property name="percentage" type="gdouble" flags="3" default-value="100.000000"/>
+    <property name="temperature" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="warning-level" type="guint" flags="3" default-value="0"/>
+    <property name="battery-level" type="guint" flags="3" default-value="1"/>
+    <property name="icon-name" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="charge-cycles" type="gint" flags="3" default-value="-1"/>
+    <property name="charge-start-threshold" type="guint" flags="3" default-value="0"/>
+    <property name="charge-end-threshold" type="guint" flags="3" default-value="100"/>
+    <property name="charge-threshold-enabled" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="charge-threshold-supported" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <class name="UpClient" get-type="up_client_get_type" parents="GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <property name="daemon-version" type="gchararray" flags="1" default-value="NULL"/>
+    <property name="on-battery" type="gboolean" flags="1" default-value="FALSE"/>
+    <property name="lid-is-closed" type="gboolean" flags="-2147483647" default-value="FALSE"/>
+    <property name="lid-is-present" type="gboolean" flags="-2147483647" default-value="FALSE"/>
+    <signal name="device-added" return="void" when="last">
+      <param type="UpDevice"/>
+    </signal>
+    <signal name="device-removed" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="UpHistoryItem" get-type="up_history_item_get_type" parents="GObject">
+    <property name="value" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="time" type="guint" flags="3" default-value="0"/>
+    <property name="state" type="guint" flags="3" default-value="0"/>
+  </class>
+  <class name="UpStatsItem" get-type="up_stats_item_get_type" parents="GObject">
+    <property name="value" type="gdouble" flags="3" default-value="0.000000"/>
+    <property name="accuracy" type="gdouble" flags="3" default-value="0.000000"/>
+  </class>
+</dump>

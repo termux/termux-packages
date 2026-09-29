@@ -1,0 +1,24 @@
+--- a/panel/backends/wayland/wlroots/lxqttaskbarwlrwm.cpp
++++ b/panel/backends/wayland/wlroots/lxqttaskbarwlrwm.cpp
+@@ -28,8 +28,8 @@
+ static inline QString getPixmapIcon(QString name)
+ {
+     QStringList paths{
+-        U8Str("/usr/local/share/pixmaps/"),
+-        U8Str("/usr/share/pixmaps/"),
++        U8Str("@TERMUX_PREFIX@/local/share/pixmaps/"),
++        U8Str("@TERMUX_PREFIX@/share/pixmaps/"),
+     };
+ 
+     QStringList sfxs{
+@@ -78,8 +78,8 @@
+ 
+     QStringList appDirs = {
+         QDir::home().filePath(U8Str(".local/share/applications/")),
+-        U8Str("/usr/local/share/applications/"),
+-        U8Str("/usr/share/applications/"),
++        U8Str("@TERMUX_PREFIX@/local/share/applications/"),
++        U8Str("@TERMUX_PREFIX@/share/applications/"),
+     };
+ 
+     /**

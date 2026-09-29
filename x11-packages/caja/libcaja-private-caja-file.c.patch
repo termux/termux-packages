@@ -1,0 +1,18 @@
+--- a/libcaja-private/caja-file.c
++++ b/libcaja-private/caja-file.c
+@@ -5814,6 +5814,7 @@
+ 
+ 	list = NULL;
+ 
++#ifndef __ANDROID__
+ 	setpwent ();
+ 
+ 	while ((user = getpwent ()) != NULL) {
+@@ -5830,6 +5831,7 @@
+ 	}
+ 
+ 	endpwent ();
++#endif /* __ANDROID__ */
+ 
+ 	return eel_g_str_list_alphabetize (list);
+ }

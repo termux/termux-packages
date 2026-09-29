@@ -1,0 +1,181 @@
+Reverts https://github.com/fish-shell/fish-shell/commit/50819666b114d6561347613d99c5a292c6a0859b,
+because partial-revert-d68f8bd.patch and revert-70bd49f.patch both depend on reverting 5081966
+and are both still necessary.
+
+--- a/build.rs
++++ b/build.rs
+@@ -49,6 +49,9 @@ fn main() {
+     #[cfg(feature = "gettext-extract")]
+     rsconf::rebuild_if_env_changed("FISH_GETTEXT_EXTRACTION_FILE");
+ 
++    rsconf::rebuild_if_path_changed("src/libc.c");
++    cc::Build::new().file("src/libc.c").compile("flibc.a");
++
+     let build = cc::Build::new();
+     let mut target = Target::new_from(build).unwrap();
+     // Keep verbose mode on until we've ironed out rust build script stuff
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -40,6 +40,8 @@ pub mod io;
+ pub mod job_group;
+ pub mod key;
+ pub mod kill;
++#[allow(non_snake_case)]
++pub mod libc;
+ pub mod locale;
+ pub mod nix;
+ pub mod null_terminated_array;
+diff --git a/src/libc.c b/src/libc.c
+new file mode 100644
+index 0000000..c12ffd2
+--- /dev/null
++++ b/src/libc.c
+@@ -0,0 +1,141 @@
++#include <locale.h>
++#include <paths.h>  // _PATH_BSHELL
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/mount.h>
++#include <sys/resource.h>
++#include <sys/statvfs.h>
++#include <unistd.h>
++
++uint64_t C_ST_LOCAL() {
++#if defined(ST_LOCAL)
++    return ST_LOCAL;
++#else
++    return 0;
++#endif
++}
++
++const char* C_PATH_BSHELL() { return _PATH_BSHELL; }
++
++FILE* stdout_stream() { return stdout; }
++
++int C_RLIMIT_CORE() { return RLIMIT_CORE; }
++int C_RLIMIT_DATA() { return RLIMIT_DATA; }
++int C_RLIMIT_FSIZE() { return RLIMIT_FSIZE; }
++int C_RLIMIT_NOFILE() { return RLIMIT_NOFILE; }
++int C_RLIMIT_STACK() { return RLIMIT_STACK; }
++int C_RLIMIT_CPU() { return RLIMIT_CPU; }
++
++int C_RLIMIT_SBSIZE() {
++#ifdef RLIMIT_SBSIZE
++    return RLIMIT_SBSIZE;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_NICE() {
++#ifdef RLIMIT_NICE
++    return RLIMIT_NICE;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_SIGPENDING() {
++#ifdef RLIMIT_SIGPENDING
++    return RLIMIT_SIGPENDING;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_MEMLOCK() {
++#ifdef RLIMIT_MEMLOCK
++    return RLIMIT_MEMLOCK;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_RSS() {
++#ifdef RLIMIT_RSS
++    return RLIMIT_RSS;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_MSGQUEUE() {
++#ifdef RLIMIT_MSGQUEUE
++    return RLIMIT_MSGQUEUE;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_RTPRIO() {
++#ifdef RLIMIT_RTPRIO
++    return RLIMIT_RTPRIO;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_NPROC() {
++#ifdef RLIMIT_NPROC
++    return RLIMIT_NPROC;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_AS() {
++#ifdef RLIMIT_AS
++    return RLIMIT_AS;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_SWAP() {
++#ifdef RLIMIT_SWAP
++    return RLIMIT_SWAP;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_RTTIME() {
++#ifdef RLIMIT_RTTIME
++    return RLIMIT_RTTIME;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_KQUEUES() {
++#ifdef RLIMIT_KQUEUES
++    return RLIMIT_KQUEUES;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_NPTS() {
++#ifdef RLIMIT_NPTS
++    return RLIMIT_NPTS;
++#else
++    return -1;
++#endif
++}
++
++int C_RLIMIT_NTHR() {
++#ifdef RLIMIT_NTHR
++    return RLIMIT_NTHR;
++#else
++    return -1;
++#endif
++}
+diff --git a/src/libc.rs b/src/libc.rs
+new file mode 100644
+index 0000000..8b13789
+--- /dev/null
++++ b/src/libc.rs
+@@ -0,0 +1 @@
++

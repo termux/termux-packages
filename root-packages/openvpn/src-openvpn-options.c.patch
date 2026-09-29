@@ -1,0 +1,12 @@
+diff -uNr openvpn-2.4.7/src/openvpn/options.c openvpn-2.4.7.mod/src/openvpn/options.c
+--- openvpn-2.4.7/src/openvpn/options.c	2019-02-20 14:28:23.000000000 +0200
++++ openvpn-2.4.7.mod/src/openvpn/options.c	2019-09-18 14:41:05.337638310 +0300
+@@ -898,7 +898,7 @@
+     o->tmp_dir = getenv("TMPDIR");
+     if (!o->tmp_dir)
+     {
+-        o->tmp_dir = "/tmp";
++        o->tmp_dir = "@TERMUX_PREFIX@/tmp";
+     }
+ #endif /* _WIN32 */
+ #endif /* P2MP_SERVER */

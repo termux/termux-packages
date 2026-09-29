@@ -1,0 +1,24 @@
+diff -uNr elfutils-0.177/lib/color.c elfutils-0.177.mod/lib/color.c
+--- elfutils-0.177/lib/color.c	2019-08-14 13:12:33.000000000 +0300
++++ elfutils-0.177.mod/lib/color.c	2019-09-18 16:23:09.802519067 +0300
+@@ -40,6 +40,8 @@
+ #include "libeu.h"
+ #include "color.h"
+ 
++extern char* __progname;
++
+ /* Prototype for option handler.  */
+ static error_t parse_opt (int key, char *arg, struct argp_state *state);
+ 
+@@ -130,9 +132,9 @@
+   - 'always', 'yes', 'force'\n\
+   - 'never', 'no', 'none'\n\
+   - 'auto', 'tty', 'if-tty'\n"),
+-		     program_invocation_short_name, arg);
++		     __progname, arg);
+ 	      argp_help (&color_argp, stderr, ARGP_HELP_SEE,
+-			 (char *) program_invocation_short_name);
++			 __progname);
+ 	      exit (EXIT_FAILURE);
+ 	    }
+ 	}

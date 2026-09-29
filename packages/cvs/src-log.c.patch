@@ -1,0 +1,18 @@
+diff -u -r ../cvs-1.12.13+real-26/src/log.c ./src/log.c
+--- ../cvs-1.12.13+real-26/src/log.c	2018-06-26 04:32:38.051089628 +0200
++++ ./src/log.c	2018-06-26 04:42:11.865303837 +0200
+@@ -1790,12 +1790,14 @@
+ 	int buftag = 'M';
+ 	static char has_logm = 0;
+ 
++#ifdef SERVER_SUPPORT
+ 	if (server_active) {
+ 		if (!has_logm)
+ 			has_logm = supported_response("LOGM") ? 1 : 2;
+ 		if (has_logm == 1)
+ 			buftag = CVS_OUTPUT_EX_LOGM;
+ 	}
++#endif
+ 
+ 	cvs_output_ex(str, len, buftag);
+ 	if (/*len > 0 &&*/ str[len - 1] != '\n')

@@ -1,0 +1,13 @@
+--- a/protocols.cc
++++ b/protocols.cc
+@@ -98,8 +98,8 @@
+   int res;
+ 
+   if (nmap_fetchfile(filename, sizeof(filename), "nmap-protocols") != 1) {
+-    error("Unable to find nmap-protocols!  Resorting to /etc/protocols");
+-    bufset(filename, "/etc/protocols");
++    error("Unable to find nmap-protocols!  Resorting to @TERMUX_PREFIX@/etc/protocols");
++    bufset(filename, "@TERMUX_PREFIX@/etc/protocols");
+   }
+ 
+   fp = fopen(filename, "r");

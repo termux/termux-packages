@@ -1,0 +1,102 @@
+TERMUX_PKG_HOMEPAGE=https://www.7-zip.org
+TERMUX_PKG_DESCRIPTION="7-Zip file archiver with a high compression ratio"
+TERMUX_PKG_LICENSE="LGPL-2.1, BSD 3-Clause, BSD 2-Clause"
+TERMUX_PKG_LICENSE_FILE="
+DOC/copying.txt
+DOC/License.txt
+DOC/unRarLicense.txt
+"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="26.04"
+TERMUX_PKG_SRCURL=(
+	"https://github.com/ip7z/7zip/releases/download/${TERMUX_PKG_VERSION}/7z${TERMUX_PKG_VERSION//./}-src.tar.xz"
+	"https://github.com/ip7z/7zip/releases/download/${TERMUX_PKG_VERSION}/7z${TERMUX_PKG_VERSION//./}-linux-arm.tar.xz" # for manual, arm is smallest
+)
+TERMUX_PKG_SHA256=(
+	9691944c0fe0d01bb49373a704fb983fd33bc98b1738695179dfbf99ac1734f6
+	9caf5e6942cfcfc50d7c0d7d7effe816f576206a081b78b2eb65c5fa28f076df
+)
+TERMUX_PKG_BUILD_DEPENDS="dos2unix"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_CONFLICTS="p7zip"
+TERMUX_PKG_PROVIDES="p7zip"
+TERMUX_PKG_REPLACES="p7zip"
+
+# The original "termux_extract_src_archive" always strips the first components
+# but the source of 7zip is directly under the root directory of the tar file
+termux_extract_src_archive() {
+	local file
+	file="$TERMUX_PKG_CACHEDIR/$(basename "$TERMUX_PKG_SRCURL")"
+	mkdir -p "$TERMUX_PKG_SRCDIR"
+	tar -xf "$file" -C "$TERMUX_PKG_SRCDIR"
+}
+
+termux_step_post_get_source() {
+	# convert CRLF to LF like in libpluto package
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		DOS2UNIX="$TERMUX_PKG_TMPDIR/dos2unix"
+		(
+			. "$TERMUX_SCRIPTDIR/packages/dos2unix/build.sh"
+			. "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_unpack_src_archive.sh"
+			TERMUX_PKG_SRCDIR="$DOS2UNIX" termux_step_get_source
+			cd "$DOS2UNIX" && make dos2unix
+		)
+		export PATH="$DOS2UNIX:$PATH"
+	fi
+
+	find "$TERMUX_PKG_SRCDIR" -type f -print0 | xargs -0 dos2unix
+}
+
+termux_step_pre_configure() {
+	# Remove executable perms from docs
+	chmod -x DOC/*.txt
+	# Remove -Werror to make build succeed
+	sed -i -e 's/-Werror//' CPP/7zip/7zip_gcc.mak
+}
+
+termux_step_make() {
+	local -a optim_args=()
+	case "$TERMUX_ARCH" in
+		aarch64) optim_args=("-f" "../../cmpl_clang_arm64.mak") ;;
+		arm)     optim_args=("-f" "../../cmpl_clang.mak" "PLATFORM=arm" "USE_ASM=1") ;;
+		i686)    optim_args=("-f" "../../cmpl_clang_x86.mak") ;;
+		x86_64)  optim_args=("-f" "../../cmpl_clang_x64.mak") ;;
+	esac
+
+	# from https://git.alpinelinux.org/aports/tree/community/7zip/APKBUILD?id=b4601c88f608662c75422311b7ca3c26fab4b1f4
+	# -D_GNU_SOURCE: broken sched.h defines
+	local bin
+	for bin in Bundles/{Format7zF,Alone,Alone7z,Alone2,SFXCon} UI/Console; do
+		make -C "CPP/7zip/$bin" \
+			CC="$CC $CFLAGS $LDFLAGS -D_GNU_SOURCE" \
+			CXX="$CXX $CXXFLAGS $LDFLAGS -D_GNU_SOURCE" \
+			O=b/c \
+			"${optim_args[@]}" \
+			--jobs "$TERMUX_PKG_MAKE_PROCESSES"
+	done
+}
+
+termux_step_make_install() {
+	install -Dm0755 \
+		-t "$TERMUX_PREFIX"/bin \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/UI/Console/b/c/7z \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone/b/c/7za \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone7z/b/c/7zr \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Alone2/b/c/7zz
+	install -Dm0755 \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/SFXCon/b/c/7zCon \
+		"$TERMUX_PREFIX"/libexec/7zip/7zCon.sfx
+	install -Dm0755 \
+		-t "$TERMUX_PREFIX"/libexec/7zip \
+		"$TERMUX_PKG_BUILDDIR"/CPP/7zip/Bundles/Format7zF/b/c/7z.so
+	install -Dm0644 \
+		-t "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		"$TERMUX_PKG_BUILDDIR"/DOC/{7zC,7zFormat,lzma,Methods,readme,src-history}.txt
+	# shellcheck disable=SC2031
+	tar -C "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-xvf "$TERMUX_PKG_CACHEDIR/$(basename "${TERMUX_PKG_SRCURL[1]}")" MANUAL
+	# Remove carriage returns from docs
+	find "$TERMUX_PREFIX"/share/doc/"$TERMUX_PKG_NAME" \
+		-type f -execdir sed -i -e 's/\r$//g' {} +
+}

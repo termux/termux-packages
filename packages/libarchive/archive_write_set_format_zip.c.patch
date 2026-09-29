@@ -1,0 +1,15 @@
+diff -u -r ../libarchive-3.2.0/libarchive/archive_write_set_format_zip.c ./libarchive/archive_write_set_format_zip.c
+--- ../libarchive-3.2.0/libarchive/archive_write_set_format_zip.c	2016-01-01 17:18:57.000000000 -0500
++++ ./libarchive/archive_write_set_format_zip.c	2016-05-02 20:09:52.331542213 -0400
+@@ -651,10 +651,8 @@
+ 			if (strcmp(archive_string_conversion_charset_name(
+ 					zip->opt_sconv), "UTF-8") == 0)
+ 				zip->entry_flags |= ZIP_ENTRY_FLAG_UTF8_NAME;
+-#if HAVE_NL_LANGINFO
+-		} else if (strcmp(nl_langinfo(CODESET), "UTF-8") == 0) {
++		} else {
+ 			zip->entry_flags |= ZIP_ENTRY_FLAG_UTF8_NAME;
+-#endif
+ 		}
+ 	}
+ 	filename_length = path_length(zip->entry);

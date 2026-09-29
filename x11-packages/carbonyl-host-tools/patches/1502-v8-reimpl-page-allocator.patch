@@ -1,0 +1,13 @@
+--- a/v8/include/v8-platform.h
++++ b/v8/include/v8-platform.h
+@@ -925,7 +925,9 @@
+    * Allows the embedder to manage memory page allocations.
+    * Returning nullptr will cause V8 to use the default page allocator.
+    */
+-  virtual PageAllocator* GetPageAllocator() = 0;
++  virtual PageAllocator* GetPageAllocator() {
++    return nullptr;
++  }
+ 
+   /**
+    * Allows the embedder to specify a custom allocator used for zones.

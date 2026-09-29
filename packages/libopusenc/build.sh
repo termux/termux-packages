@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/xiph/libopusenc
+TERMUX_PKG_DESCRIPTION="High-level API for encoding .opus files"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.3"
+TERMUX_PKG_SRCURL=https://downloads.xiph.org/releases/opus/libopusenc-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=f616d3aff9b2034547894ccb8ab56c36cf1a4acb0d922c5d7119f97bbe58642c
+TERMUX_PKG_DEPENDS="libopus"
+TERMUX_PKG_BREAKS="libopusenc-dev"
+TERMUX_PKG_REPLACES="libopusenc-dev"
+TERMUX_PKG_AUTO_UPDATE=true

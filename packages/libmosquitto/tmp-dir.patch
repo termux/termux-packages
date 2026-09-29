@@ -1,0 +1,20 @@
+--- a/apps/mosquitto_passwd/mosquitto_passwd.c
++++ b/apps/mosquitto_passwd/mosquitto_passwd.c
+@@ -75,7 +75,7 @@
+ 
+ static char unsigned alphanum[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+ 
+-static unsigned char tmpfile_path[36];
++static unsigned char tmpfile_path[36 + strlen("@TERMUX_PREFIX@")];
+ 
+ 
+ static FILE *mpw_tmpfile(void)
+@@ -87,7 +87,7 @@
+ 		return NULL;
+ 	}
+ 
+-	strcpy((char *)tmpfile_path, "/tmp/");
++	strcpy((char *)tmpfile_path, "@TERMUX_PREFIX@/tmp/");
+ 
+ 	for(i=strlen((char *)tmpfile_path); i<sizeof(tmpfile_path)-8; i++){
+ 		tmpfile_path[i] = alphanum[tmpfile_path[i]%(sizeof(alphanum)-1)];

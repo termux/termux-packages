@@ -1,0 +1,14 @@
+--- a/cmake/local.cmake
++++ b/cmake/local.cmake
+@@ -318,6 +317,11 @@
+         ${_llama_cache_args}
+     )
+ 
++    if (DEFINED ENV{TARGET_CMAKE_TOOLCHAIN_FILE})
++        list(APPEND _cmake_args
++            -DCMAKE_TOOLCHAIN_FILE=$ENV{TARGET_CMAKE_TOOLCHAIN_FILE})
++    endif()
++
+     if(APPLE)
+         if(CMAKE_OSX_ARCHITECTURES)
+             list(APPEND _cmake_args

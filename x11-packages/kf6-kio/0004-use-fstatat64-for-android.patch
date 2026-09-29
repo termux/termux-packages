@@ -1,0 +1,14 @@
+diff --git a/src/kioworkers/file/stat_unix.h b/src/kioworkers/file/stat_unix.h
+index 3015206..0c35e66 100644
+--- a/src/kioworkers/file/stat_unix.h
++++ b/src/kioworkers/file/stat_unix.h
+@@ -159,7 +159,7 @@ inline static uint64_t stat_mnt_id(const struct statx &buf)
+ inline int LSTATAT(int dfd, const char *path, QT_STATBUF *buff, KIO::StatDetails details)
+ {
+     Q_UNUSED(details)
+-    return fstatat(dfd, path, buff, AT_SYMLINK_NOFOLLOW);
++    return fstatat64(dfd, path, buff, AT_SYMLINK_NOFOLLOW);
+ }
+ #endif
+ 
+

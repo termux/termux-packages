@@ -1,0 +1,18 @@
+--- a/src/hstr_utils.c
++++ b/src/hstr_utils.c
+@@ -154,6 +154,7 @@
+     char *b=buffer;
+     if(access(PROC_HOSTNAME, F_OK) != -1) {
+         FILE *file = fopen(PROC_HOSTNAME, "r");
++        if (file == NULL) goto fail;
+         b=fgets(buffer, bufferSize, file);
+         fclose(file);
+         if(b) {
+@@ -161,6 +162,7 @@
+             return;
+         }
+     }
++fail:
+     strcpy(buffer, "localhost");
+ }
+ 

@@ -1,0 +1,42 @@
+diff --git a/src/undetected_chromedriver/patcher.py b/src/undetected_chromedriver/patcher.py
+index 7a60f76..e235618 100644
+--- a/src/undetected_chromedriver/patcher.py
++++ b/src/undetected_chromedriver/patcher.py
+@@ -22,7 +22,7 @@ from multiprocessing import Lock
+ 
+ logger = logging.getLogger(__name__)
+ 
+-IS_POSIX = sys.platform.startswith(("darwin", "cygwin", "linux", "linux2", "freebsd"))
++IS_POSIX = sys.platform.startswith(("darwin", "cygwin", "linux", "linux2", "freebsd", "android"))
+ 
+ 
+ class Patcher(object):
+@@ -83,7 +83,7 @@ class Patcher(object):
+             os.makedirs(self.data_path, exist_ok=True)
+ 
+         if not executable_path:
+-            if sys.platform.startswith("freebsd"):
++            if sys.platform.startswith(("freebsd", "android")):
+                 self.executable_path = os.path.join(
+                     self.data_path, self.exe_name
+                 )
+@@ -138,6 +138,9 @@ class Patcher(object):
+         if self.platform.startswith("freebsd"):
+             self.platform_name = "freebsd"
+             self.exe_name %= ""
++        if self.platform.startswith("android"):
++            self.platform_name = "android"
++            self.exe_name %= ""
+ 
+     def auto(self, executable_path=None, force=False, version_main=None, _=None):
+         """
+@@ -178,7 +181,7 @@ class Patcher(object):
+             self.force = force
+ 
+ 
+-        if self.platform_name == "freebsd":
++        if self.platform_name in ("freebsd", "android"):
+             chromedriver_path = shutil.which("chromedriver")
+ 
+             if not os.path.isfile(chromedriver_path) or not os.access(chromedriver_path, os.X_OK):
+

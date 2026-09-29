@@ -1,0 +1,27 @@
+diff --git a/src/common/onion.c b/src/common/onion.c
+index 6a61d83..05d21fc 100644
+--- a/src/common/onion.c
++++ b/src/common/onion.c
+@@ -151,7 +151,7 @@ void onion_pool_destroy(struct onion_pool *pool)
+ 		onion_entry_destroy(pool->entries[i]);
+ 	}
+ 
+-	free(pool->entries);
++	free(*(struct onion_entry **)pool->entries);
+ }
+ 
+ /*
+diff --git a/src/lib/torsocks.c b/src/lib/torsocks.c
+index 16f2da0..2b991c7 100644
+--- a/src/lib/torsocks.c
++++ b/src/lib/torsocks.c
+@@ -348,7 +348,8 @@ static void tsocks_exit(void)
+ 	/* Cleanup every entries in the onion pool. */
+ 	onion_pool_destroy(&tsocks_onion_pool);
+ 	/* Cleanup allocated memory in the config file. */
+-	config_file_destroy(&tsocks_config.conf_file);
++	/* This triggers a tagged pointer truncation error/sigabrt on Android 11. */
++	/* config_file_destroy(&tsocks_config.conf_file); */
+ 	/* Clean up logging. */
+ 	log_destroy();
+ }

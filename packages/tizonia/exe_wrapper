@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+cmd_orig="$1"
+shift
+if [ "$(basename "$cmd_orig")" == "tizonia-dbusxx-xml2cpp" ]; then
+	exec tizonia-dbusxx-xml2cpp "$@"
+elif [ "$(head -c 4 "$cmd_orig")" == "$(echo -ne "\0177ELF")" ]; then
+	exit 0
+else
+	exec "$cmd_orig" "$@"
+fi

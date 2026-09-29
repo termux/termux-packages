@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/seccomp/libseccomp
+TERMUX_PKG_DESCRIPTION="Enhanced seccomp library"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2.6.1"
+TERMUX_PKG_SRCURL="https://github.com/seccomp/libseccomp/releases/download/v${TERMUX_PKG_VERSION}/libseccomp-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=501f66c667225d53791b97e1d7cf85ab764c297d04881f60f38f451c4b0ee1be
+TERMUX_PKG_BREAKS="libseccomp-dev"
+TERMUX_PKG_REPLACES="libseccomp-dev"

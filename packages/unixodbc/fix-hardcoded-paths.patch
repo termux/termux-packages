@@ -1,0 +1,60 @@
+--- a/DriverManager/__handles.c
++++ b/DriverManager/__handles.c
+@@ -468,7 +468,7 @@
+                     ( toupper( tracing_string[ 0 ] ) == 'O' &&
+                     toupper( tracing_string[ 1 ] ) == 'N' ))
+         {
+-            SQLGetPrivateProfileString( "ODBC", "TraceFile", "/tmp/sql.log",
++            SQLGetPrivateProfileString( "ODBC", "TraceFile", "@TERMUX_PREFIX@/tmp/sql.log",
+                     tracing_file, sizeof( tracing_file ), 
+                     "odbcinst.ini" );
+ 
+--- a/DriverManager/__info.c
++++ b/DriverManager/__info.c
+@@ -5722,7 +5722,7 @@
+ 
+         if ( !log_info.log_file_name )
+         {
+-            strcpy( file_name, "/tmp/sql.log" );
++            strcpy( file_name, "@TERMUX_PREFIX@/tmp/sql.log" );
+         }
+         else
+         {
+@@ -5739,7 +5739,7 @@
+     {
+         if ( !log_info.log_file_name )
+         {
+-            fp = uo_fopen( "/tmp/sql.log", "a" );
++            fp = uo_fopen( "@TERMUX_PREFIX@/tmp/sql.log", "a" );
+         }
+         else
+         {
+@@ -5809,7 +5809,7 @@
+ 
+         if ( !log_info.log_file_name )
+         {
+-            strcpy( file_name, "/tmp/sql.log" );
++            strcpy( file_name, "@TERMUX_PREFIX@/tmp/sql.log" );
+         }
+         else
+         {
+@@ -5826,7 +5826,7 @@
+     {
+         if ( !log_info.log_file_name )
+         {
+-            fp = uo_fopen( "/tmp/sql.log", "a" );
++            fp = uo_fopen( "@TERMUX_PREFIX@/tmp/sql.log", "a" );
+         }
+         else
+         {
+--- a/man/odbcinst.ini.5
++++ b/man/odbcinst.ini.5
+@@ -58,7 +58,7 @@
+ .IP \fBTraceFile
+ Specifies the system path or path-pattern to which ODBC driver trace output will
+ be written. This option has no effect unless \fBTrace\fR is enabled. The default
+-file location for trace output is \fB/tmp/sql.log\fR.
++file location for trace output is \fB@TERMUX_PREFIX@/tmp/sql.log\fR.
+ 
+ \fIWARNING\fR: Setting \fBTraceFile\fR to a path writable by multiple users
+ might not work correctly, as only the first user will be able to create and open

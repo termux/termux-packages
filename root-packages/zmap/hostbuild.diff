@@ -1,0 +1,33 @@
+libjudy must not use cross-compiled binaries in non-termux environments.
+Documentation is also being disabled. The package is not going to be installed.
+
++++ ./Makefile.in
+@@ -193,7 +193,7 @@
+ # test (for libJudy).
+ #SUBDIRS = src tool doc test make_includes
+ #SUBDIRS = src/JudyCommon src/JudyL src/Judy1 src/JudySL src/JudyHS src/obj
+-SUBDIRS = src tool doc test
++SUBDIRS = src tool
+ 
+ # These files will be included in our tarballs, even though automake knows
+ # nothing else about them.
++++ ./src/Judy1/Makefile.in
+@@ -560,7 +560,7 @@
+ 
+ 
+ Judy1Tables.c: Judy1TablesGen.c
+-	$(CC) $(INCLUDES) $(AM_CFLAGS) @CFLAGS@ -o Judy1TablesGen Judy1TablesGen.c; ./Judy1TablesGen
++	clang $(INCLUDES) $(AM_CFLAGS) @JU_64BIT@ -o Judy1TablesGen Judy1TablesGen.c; ./Judy1TablesGen
+ 
+ Judy1ByCount.c:../JudyCommon/JudyByCount.c
+ 	cp -f ../JudyCommon/JudyByCount.c      		Judy1ByCount.c   
++++ ./src/JudyL/Makefile.in
+@@ -560,7 +560,7 @@
+ 
+ 
+ JudyLTables.c: JudyLTablesGen.c
+-	$(CC) $(INCLUDES) $(AM_CFLAGS) @CFLAGS@ -o JudyLTablesGen JudyLTablesGen.c; ./JudyLTablesGen 
++	clang $(INCLUDES) $(AM_CFLAGS) @JU_64BIT@ -o JudyLTablesGen JudyLTablesGen.c; ./JudyLTablesGen
+ 
+ JudyLByCount.c:   ../JudyCommon/JudyByCount.c
+ 	cp -f ../JudyCommon/JudyByCount.c      		JudyLByCount.c   

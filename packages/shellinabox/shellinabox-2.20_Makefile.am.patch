@@ -1,0 +1,13 @@
+diff -uNr shellinabox-2.20/Makefile.am shellinabox-2.20.mod/Makefile.am
+--- shellinabox-2.20/Makefile.am	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/Makefile.am	2020-01-03 01:28:00.029246370 +0200
+@@ -208,8 +208,7 @@
+ 	@rm -f "$@"
+ 	ln "$?" "$@"
+ 
+-shellinaboxd.1: ${top_srcdir}/shellinabox/shellinaboxd.man.in                 \
+-		${top_srcdir}/config.h
++shellinaboxd.1: ${top_srcdir}/shellinabox/shellinaboxd.man.in
+ 	@src="${top_srcdir}/shellinabox/shellinaboxd.man.in";                 \
+ 	echo preprocess  "$$src" '>'"$@";                                     \
+ 	if sed -e 's/^#define \([^ ]*\).*/\1/' -e t -e d config.h |           \

@@ -1,0 +1,68 @@
+From 5fe61dff78202d8a3c738741c60ec4a08752e6ea Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Thu, 30 Jan 2025 15:50:50 +0800
+Subject: [PATCH] Fixes for jumbo build 2
+
+To fix the following errors
+
+[34/999] CXX host/obj/third_party/blink/renderer/core/core/core_jumbo_16.o
+  In file included from host/gen/third_party/blink/renderer/core/core_jumbo_16.cc:26:
+  In file included from ./../../../src/chromium/src/third_party/blink/renderer/core/fetch/request.cc:15:
+  host/gen/third_party/blink/public/mojom/permissions_policy/permissions_policy_feature.mojom-blink.h:39:8: error: explicit specialization of 'WTF::HashTraits<blink::mojom::PermissionsPolicyFeature>' after instantiation
+    39 | struct HashTraits<::blink::mojom::PermissionsPolicyFeature>
+        |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ../../../src/chromium/src/third_party/blink/renderer/platform/wtf/hash_map.h:92:20: note: implicit instantiation first required here
+    92 |   typedef typename MappedTraits::TraitType MappedType;
+        |                    ^
+  4 warnings and 1 error generated.
+[1/965] CXX host/obj/third_party/blink/renderer/core/core/core_jumbo_16.o
+  In file included from host/gen/third_party/blink/renderer/core/core_jumbo_16.cc:53:
+  In file included from ./../../../src/chromium/src/third_party/blink/renderer/core/frame/attribution_src_loader.cc:37:
+  host/gen/third_party/blink/public/mojom/permissions_policy/permissions_policy_feature.mojom-blink.h:39:8: error: explicit specialization of 'WTF::HashTraits<blink::mojom::PermissionsPolicyFeature>' after instantiation
+    39 | struct HashTraits<::blink::mojom::PermissionsPolicyFeature>
+        |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ../../../src/chromium/src/third_party/blink/renderer/platform/wtf/hash_map.h:92:20: note: implicit instantiation first required here
+    92 |   typedef typename MappedTraits::TraitType MappedType;
+        |                    ^
+  4 warnings and 1 error generated.
+[1/889] CXX host/obj/third_party/blink/renderer/core/core/core_jumbo_30.o
+  In file included from host/gen/third_party/blink/renderer/core/core_jumbo_30.cc:62:
+  In file included from ./../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_view.cc:5:
+  ../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_view.h:15:5: error: explicit instantiation declaration (with 'extern') follows explicit instantiation definition (without 'extern')
+    15 |     LayoutNGBlockFlowMixin<LayoutView>;
+        |     ^
+  ./../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_block_flow_mixin.cc:297:37: note: explicit instantiation definition is here
+    297 | template class CORE_TEMPLATE_EXPORT LayoutNGBlockFlowMixin<LayoutView>;
+        |                                     ^
+  In file included from host/gen/third_party/blink/renderer/core/core_jumbo_30.cc:62:
+  In file included from ./../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_view.cc:5:
+  ../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_view.h:16:51: error: explicit instantiation declaration (with 'extern') follows explicit instantiation definition (without 'extern')
+    16 | extern template class CORE_EXTERN_TEMPLATE_EXPORT LayoutNGMixin<LayoutView>;
+        |                                                   ^
+  ../../../src/chromium/src/third_party/blink/renderer/core/layout/ng/layout_ng_block_flow_mixin.h:37:39: note: explicit instantiation definition is here
+    37 | class LayoutNGBlockFlowMixin : public LayoutNGMixin<Base> {
+        |                                       ^
+  2 errors generated.
+
+---
+ third_party/blink/renderer/core/BUILD.gn | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/third_party/blink/renderer/core/BUILD.gn b/third_party/blink/renderer/core/BUILD.gn
+index b5867d2da..9880bc00f 100644
+--- a/third_party/blink/renderer/core/BUILD.gn
++++ b/third_party/blink/renderer/core/BUILD.gn
+@@ -370,6 +370,10 @@ jumbo_component("core") {
+   jumbo_excluded_sources += rebase_path([ "scroll_animator.cc" ], "", "scroll")
+   jumbo_excluded_sources += rebase_path([ "grid_baseline_alignment.cc" ], "", "layout")
+   jumbo_excluded_sources += rebase_path([ "grid_track_sizing_algorithm.cc" ], "", "layout")
++  jumbo_excluded_sources += rebase_path([ "request.cc" ], "", "fetch")
++  jumbo_excluded_sources += rebase_path([ "attribution_src_loader.cc" ], "", "frame")
++  jumbo_excluded_sources += rebase_path([ "ng/layout_ng_block_flow_mixin.cc" ], "", "layout")
++  jumbo_excluded_sources += rebase_path([ "ng/layout_ng_view.cc" ], "", "layout")
+ 
+   public_configs = [ ":core_include_dirs" ]
+ 
+-- 
+2.43.0
+

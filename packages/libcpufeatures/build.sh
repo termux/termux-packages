@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/google/cpu_features
+TERMUX_PKG_DESCRIPTION="A cross-platform C library to retrieve CPU features (such as available instructions) at runtime"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.11.0"
+TERMUX_PKG_SRCURL=https://github.com/google/cpu_features/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=ab2463f2d38fcaff1ce806be8e4c91333449931f5e02009d543b2569a3fa471a
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_NO_STATICSPLIT=true

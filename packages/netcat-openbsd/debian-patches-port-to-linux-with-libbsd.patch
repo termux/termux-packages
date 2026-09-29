@@ -1,0 +1,277 @@
+diff --git a/debian/patches/port-to-linux-with-libbsd.patch b/debian/patches/port-to-linux-with-libbsd.patch
+index cb1650b..37157bd 100644
+--- a/debian/patches/port-to-linux-with-libbsd.patch
++++ b/debian/patches/port-to-linux-with-libbsd.patch
+@@ -11,7 +11,7 @@ Forwarded: not-needed
+  4 files changed, 139 insertions(+), 63 deletions(-)
+ 
+ diff --git a/Makefile b/Makefile
+-index 5f20c40..2c92548 100644
++index 5f20c40..14e24de 100644
+ --- a/Makefile
+ +++ b/Makefile
+ @@ -5,4 +5,18 @@ SRCS=	netcat.c atomicio.c socks.c
+@@ -23,7 +23,7 @@ index 5f20c40..2c92548 100644
+ +LIBS ?= `$(PKG_CONFIG) --libs libbsd` -lresolv
+ +OBJS=  $(SRCS:.c=.o)
+ +CFLAGS=  -g -O2
+-+LDFLAGS=  -Wl,--no-add-needed
+++LDFLAGS=  -Wl,--no-copy-dt-needed-entries
+ +
+ +all: nc
+ +nc: $(OBJS)
+@@ -56,7 +56,7 @@ index 2ffdcd1..75ac68b 100644
+  .Cm netcontrol ,
+  .Cm throughput ,
+ diff --git a/netcat.c b/netcat.c
+-index 9361ff5..f044c3b 100644
++index 9361ff5..1fc0709 100644
+ --- a/netcat.c
+ +++ b/netcat.c
+ @@ -32,6 +32,8 @@
+@@ -68,7 +68,7 @@ index 9361ff5..f044c3b 100644
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <sys/uio.h>
+-@@ -41,6 +43,49 @@
++@@ -41,6 +43,53 @@
+  #include <netinet/tcp.h>
+  #include <netinet/ip.h>
+  #include <arpa/telnet.h>
+@@ -76,7 +76,7 @@ index 9361ff5..f044c3b 100644
+ +# include <linux/in6.h>
+ +#endif
+ +
+-+#ifndef IPTOS_LOWDELAY
+++#ifdef __ANDROID__
+ +# define IPTOS_LOWDELAY 0x10
+ +# define IPTOS_THROUGHPUT 0x08
+ +# define IPTOS_RELIABILITY 0x04
+@@ -114,11 +114,15 @@ index 9361ff5..f044c3b 100644
+ +#ifndef IPTOS_DSCP_EF
+ +# define	IPTOS_DSCP_EF		0xb8
+ +#endif /* IPTOS_DSCP_EF */
+++
+++#ifndef IPTOS_DSCP_VA
+++# define	IPTOS_DSCP_VA		0x2c
+++#endif /* IPTOS_DSCP_VA */
+ +
+  
+  #include <ctype.h>
+  #include <err.h>
+-@@ -56,6 +101,8 @@
++@@ -56,6 +105,8 @@
+  #include <time.h>
+  #include <tls.h>
+  #include <unistd.h>
+@@ -127,7 +131,7 @@ index 9361ff5..f044c3b 100644
+  
+  #include "atomicio.h"
+  
+-@@ -272,10 +319,14 @@ main(int argc, char *argv[])
++@@ -272,10 +323,14 @@ main(int argc, char *argv[])
+  			uflag = 1;
+  			break;
+  		case 'V':
+@@ -142,7 +146,7 @@ index 9361ff5..f044c3b 100644
+  			break;
+  		case 'v':
+  			vflag = 1;
+-@@ -324,7 +375,11 @@ main(int argc, char *argv[])
++@@ -324,7 +379,11 @@ main(int argc, char *argv[])
+  			oflag = optarg;
+  			break;
+  		case 'S':
+@@ -154,7 +158,7 @@ index 9361ff5..f044c3b 100644
+  			break;
+  		case 'T':
+  			errstr = NULL;
+-@@ -349,13 +404,22 @@ main(int argc, char *argv[])
++@@ -349,13 +408,22 @@ main(int argc, char *argv[])
+  	argc -= optind;
+  	argv += optind;
+  
+@@ -177,7 +181,7 @@ index 9361ff5..f044c3b 100644
+  	} else if (argc == 1 && lflag) {
+  		uport = argv[0];
+  	} else if (argc == 2) {
+-@@ -401,33 +465,6 @@ main(int argc, char *argv[])
++@@ -401,33 +469,6 @@ main(int argc, char *argv[])
+  		}
+  	}
+  
+@@ -211,7 +215,7 @@ index 9361ff5..f044c3b 100644
+  	if (!lflag && kflag)
+  		errx(1, "must use -l with -k");
+  	if (uflag && usetls)
+-@@ -586,10 +623,6 @@ main(int argc, char *argv[])
++@@ -586,10 +627,6 @@ main(int argc, char *argv[])
+  			if (s == -1)
+  				err(1, NULL);
+  			if (uflag && kflag) {
+@@ -222,7 +226,7 @@ index 9361ff5..f044c3b 100644
+  				/*
+  				 * For UDP and -k, don't connect the socket,
+  				 * let it receive datagrams from multiple
+-@@ -616,10 +649,6 @@ main(int argc, char *argv[])
++@@ -616,10 +653,6 @@ main(int argc, char *argv[])
+  				if (rv == -1)
+  					err(1, "connect");
+  
+@@ -233,7 +237,7 @@ index 9361ff5..f044c3b 100644
+  				if (vflag)
+  					report_sock("Connection received",
+  					    (struct sockaddr *)&z, len,
+-@@ -945,8 +974,10 @@ remote_connect(const char *host, const char *port, struct addrinfo hints,
++@@ -945,8 +978,10 @@ remote_connect(const char *host, const char *port, struct addrinfo hints,
+  		if (sflag || pflag) {
+  			struct addrinfo ahints, *ares;
+  
+@@ -244,7 +248,7 @@ index 9361ff5..f044c3b 100644
+  			memset(&ahints, 0, sizeof(struct addrinfo));
+  			ahints.ai_family = res->ai_family;
+  			ahints.ai_socktype = uflag ? SOCK_DGRAM : SOCK_STREAM;
+-@@ -1059,9 +1090,15 @@ local_listen(const char *host, const char *port, struct addrinfo hints)
++@@ -1059,9 +1094,15 @@ local_listen(const char *host, const char *port, struct addrinfo hints)
+  		    res->ai_protocol)) == -1)
+  			continue;
+  
+@@ -260,7 +264,7 @@ index 9361ff5..f044c3b 100644
+  
+  		set_common_sockopts(s, res->ai_family);
+  
+-@@ -1571,11 +1608,13 @@ set_common_sockopts(int s, int af)
++@@ -1571,11 +1612,13 @@ set_common_sockopts(int s, int af)
+  {
+  	int x = 1;
+  
+@@ -274,7 +278,7 @@ index 9361ff5..f044c3b 100644
+  	if (Dflag) {
+  		if (setsockopt(s, SOL_SOCKET, SO_DEBUG,
+  		    &x, sizeof(x)) == -1)
+-@@ -1586,9 +1625,14 @@ set_common_sockopts(int s, int af)
++@@ -1586,9 +1629,14 @@ set_common_sockopts(int s, int af)
+  		    IP_TOS, &Tflag, sizeof(Tflag)) == -1)
+  			err(1, "set IP ToS");
+  
+@@ -289,7 +293,7 @@ index 9361ff5..f044c3b 100644
+  	}
+  	if (Iflag) {
+  		if (setsockopt(s, SOL_SOCKET, SO_RCVBUF,
+-@@ -1606,19 +1650,34 @@ set_common_sockopts(int s, int af)
++@@ -1606,19 +1654,34 @@ set_common_sockopts(int s, int af)
+  		    IP_TTL, &ttl, sizeof(ttl)))
+  			err(1, "set IP TTL");
+  
+@@ -324,7 +328,7 @@ index 9361ff5..f044c3b 100644
+  	}
+  }
+  
+-@@ -1653,6 +1712,7 @@ process_tos_opt(char *s, int *val)
++@@ -1653,6 +1716,7 @@ process_tos_opt(char *s, int *val)
+  		{ "cs7",		IPTOS_DSCP_CS7 },
+  		{ "ef",			IPTOS_DSCP_EF },
+  		{ "inetcontrol",	IPTOS_PREC_INTERNETCONTROL },
+@@ -332,7 +336,7 @@ index 9361ff5..f044c3b 100644
+  		{ "lowdelay",		IPTOS_LOWDELAY },
+  		{ "netcontrol",		IPTOS_PREC_NETCONTROL },
+  		{ "reliability",	IPTOS_RELIABILITY },
+-@@ -1823,6 +1883,9 @@ report_sock(const char *msg, const struct sockaddr *sa, socklen_t salen,
++@@ -1823,6 +1887,9 @@ report_sock(const char *msg, const struct sockaddr *sa, socklen_t salen,
+  void
+  help(void)
+  {
+@@ -342,7 +346,7 @@ index 9361ff5..f044c3b 100644
+  	usage(0);
+  	fprintf(stderr, "\tCommand Summary:\n\
+  	\t-4		Use IPv4\n\
+-@@ -1865,7 +1928,7 @@ help(void)
++@@ -1865,7 +1932,7 @@ help(void)
+  	\t-Z		Peer certificate file\n\
+  	\t-z		Zero-I/O mode [used for scanning]\n\
+  	Port numbers can be individual or ranges: lo-hi [inclusive]\n");
+@@ -352,10 +356,10 @@ index 9361ff5..f044c3b 100644
+  
+  void
+ diff --git a/socks.c b/socks.c
+-index 1f1fb96..d2bcfda 100644
++index 1f1fb96..1919443 100644
+ --- a/socks.c
+ +++ b/socks.c
+-@@ -38,7 +38,7 @@
++@@ -38,9 +38,15 @@
+  #include <string.h>
+  #include <unistd.h>
+  #include <resolv.h>
+@@ -363,8 +367,16 @@ index 1f1fb96..d2bcfda 100644
+ +#include <bsd/readpassphrase.h>
+  #include "atomicio.h"
+  
+++#ifdef __ANDROID__
+++static void *(*volatile explicit_memset)(void *, int, size_t) = memset;
+++#undef explicit_bzero
+++#define explicit_bzero(s, n) explicit_memset(s, 0, n)
+++#endif
+++
+  #define SOCKS_PORT	"1080"
+-@@ -217,11 +217,11 @@ socks_connect(const char *host, const char *port,
++ #define HTTP_PROXY_PORT	"3128"
++ #define HTTP_MAXHDRS	64
++@@ -217,11 +223,11 @@ socks_connect(const char *host, const char *port,
+  		buf[2] = SOCKS_NOAUTH;
+  		cnt = atomicio(vwrite, proxyfd, buf, 3);
+  		if (cnt != 3)
+@@ -378,7 +390,7 @@ index 1f1fb96..d2bcfda 100644
+  
+  		if (buf[1] == SOCKS_NOMETHOD)
+  			errx(1, "authentication method negotiation failed");
+-@@ -270,11 +270,11 @@ socks_connect(const char *host, const char *port,
++@@ -270,11 +276,11 @@ socks_connect(const char *host, const char *port,
+  
+  		cnt = atomicio(vwrite, proxyfd, buf, wlen);
+  		if (cnt != wlen)
+@@ -392,7 +404,7 @@ index 1f1fb96..d2bcfda 100644
+  		if (buf[1] != 0) {
+  			errx(1, "connection failed, SOCKSv5 error: %s",
+  			    socks5_strerror(buf[1]));
+-@@ -283,12 +283,12 @@ socks_connect(const char *host, const char *port,
++@@ -283,12 +289,12 @@ socks_connect(const char *host, const char *port,
+  		case SOCKS_IPV4:
+  			cnt = atomicio(read, proxyfd, buf + 4, 6);
+  			if (cnt != 6)
+@@ -407,7 +419,7 @@ index 1f1fb96..d2bcfda 100644
+  			break;
+  		default:
+  			errx(1, "connection failed, unsupported address type");
+-@@ -322,11 +322,11 @@ socks_connect(const char *host, const char *port,
++@@ -322,11 +328,11 @@ socks_connect(const char *host, const char *port,
+  		}
+  		cnt = atomicio(vwrite, proxyfd, buf, wlen);
+  		if (cnt != wlen)
+@@ -421,7 +433,7 @@ index 1f1fb96..d2bcfda 100644
+  		if (buf[1] != 90) {
+  			errx(1, "connection failed, SOCKSv4 error: %s",
+  			    socks4_strerror(buf[1]));
+-@@ -340,21 +340,21 @@ socks_connect(const char *host, const char *port,
++@@ -340,21 +346,21 @@ socks_connect(const char *host, const char *port,
+  
+  		/* Try to be sane about numeric IPv6 addresses */
+  		if (strchr(host, ':') != NULL) {
+@@ -447,7 +459,7 @@ index 1f1fb96..d2bcfda 100644
+  
+  		if (authretry > 1) {
+  			char proxypass[256];
+-@@ -362,20 +362,20 @@ socks_connect(const char *host, const char *port,
++@@ -362,20 +368,20 @@ socks_connect(const char *host, const char *port,
+  
+  			getproxypass(proxyuser, proxyhost,
+  			    proxypass, sizeof proxypass);
+@@ -473,7 +485,7 @@ index 1f1fb96..d2bcfda 100644
+  			explicit_bzero(proxypass, sizeof proxypass);
+  			explicit_bzero(buf, sizeof buf);
+  		}
+-@@ -385,23 +385,23 @@ socks_connect(const char *host, const char *port,
++@@ -385,23 +391,23 @@ socks_connect(const char *host, const char *port,
+  			err(1, "write failed (%zu/2)", cnt);
+  
+  		/* Read status reply */

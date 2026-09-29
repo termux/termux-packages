@@ -1,0 +1,47 @@
+--- a/sys/unix/hints/linux-minimal
++++ b/sys/unix/hints/linux-minimal
+@@ -7,13 +7,25 @@
+ # Hints file for a minimal build
+ # This hints file provides the base for a minimal tty build for Linux
+ 
+-PREFIX=$(wildcard ~)/nethack-minimal
++PREFIX=@TERMUX_PREFIX@
+ HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+-SHELLDIR=$(PREFIX)/games
+-INSTDIR=$(HACKDIR)
+-VARDIR=$(HACKDIR)
+-
+-CFLAGS=-g -I../include
++SHELLDIR=$(DESTDIR)$(PREFIX)/games
++INSTDIR=$(DESTDIR)$(HACKDIR)
++VARDIR=$(DESTDIR)$(HACKDIR)
++
++POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
++
++CFLAGS+= -I../include -DNOTPARMDECL
++CFLAGS+=-DDLB
++CFLAGS+=-DCOMPRESS=\"@TERMUX_PREFIX@/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
++CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
++CFLAGS+=-DTIMED_DELAY
++CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
++CFLAGS+=-DDUMPLOG
++CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
++CFLAGS+=-DCURSES_GRAPHICS
++CFLAGS+=-DNCURSES_WIDECHAR
++CFLAGS+=-DNOCRASHREPORT
+ 
+ # when building liblua.a, avoid warning that use of tmpnam() should be
+ # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+@@ -22,9 +34,9 @@
+ 
+ LINK=$(CC)
+ 
+-WINSRC = $(WINTTYSRC)
+-WINOBJ = $(WINTTYOBJ)
+-WINLIB = $(WINTTYLIB)
++WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
++WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)
++WINLIB = $(WINTTYLIB) $(WINCURSESLIB)
+ 
+ WINTTYLIB=-lncurses -ltinfo
+ 

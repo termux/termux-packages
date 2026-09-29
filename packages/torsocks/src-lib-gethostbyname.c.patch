@@ -1,0 +1,11 @@
+--- ./src/lib/gethostbyname.c	2016-10-18 22:14:01.000000000 +0530
++++ ../gethostbyname.c	2016-12-22 10:14:38.497288603 +0530
+@@ -74,7 +74,7 @@
+ 
+ 	/* Man page specifies that it can either be an hostname or IPv4 address.
+ 	 * If it's an address, go with it else try to resolve it through Tor. */
+-	if (utils_is_address_ipv4(name)) {
++	if (utils_is_address_ipv4(name) == 1) {
+ 		if (inet_pton(AF_INET, name, &ip) <= 0) {
+ 			goto error;
+ 		}

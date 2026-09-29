@@ -1,0 +1,27 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,7 +23,7 @@
+     SET(CMAKE_ASM_FORMAT "elf")
+ ELSEIF (CMAKE_SYSTEM MATCHES "Darwin")
+     SET(CMAKE_ASM_FORMAT "macho")
+-ELSE ()
++ELSEIF (FALSE)
+     MESSAGE(FATAL_ERROR "Unsupported Platform")
+ ENDIF(CMAKE_SYSTEM MATCHES "Windows")
+ 
+@@ -34,12 +34,12 @@
+ 
+ include_directories(${PROJECT_BINARY_DIR})
+ 
+-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -O3 -Wall -DLE_ARCH")
+-SET(CMAKE_EXE_LINKER_FLAGS "-m32 -lpng -lz -L${PROJECT_SOURCE_DIR}/lib/")
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -DLE_ARCH")
++SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lpng -lz -L${PROJECT_SOURCE_DIR}/lib/")
+ 
+ SET(CMAKE_ASM_FLAGS "-f ${CMAKE_ASM_FORMAT} -m x86 -DARCH_X86_64=0 -DPREFIX=1")
+ SET(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> -o <OBJECT> ${CMAKE_ASM_FLAGS} <SOURCE>")
+ 
+ aux_source_directory(. DIR_SRCS)
+ 
+-add_executable(ass2bdnxml ${DIR_SRCS} frame-a.asm)
++add_executable(ass2bdnxml ${DIR_SRCS})

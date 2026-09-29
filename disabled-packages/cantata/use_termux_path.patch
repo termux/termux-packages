@@ -1,0 +1,109 @@
+diff --git a/3rdparty/solid-lite/backends/hal/halfstabhandling.cpp b/3rdparty/solid-lite/backends/hal/halfstabhandling.cpp
+index 535343f..1ae444d 100644
+--- a/3rdparty/solid-lite/backends/hal/halfstabhandling.cpp
++++ b/3rdparty/solid-lite/backends/hal/halfstabhandling.cpp
+@@ -36,9 +36,9 @@
+ #endif
+ 
+ #ifdef Q_OS_SOLARIS
+-#define FSTAB "/etc/vfstab"
++#define FSTAB "@TERMUX_PREFIX@/etc/vfstab"
+ #else
+-#define FSTAB "/etc/fstab"
++#define FSTAB "@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ 
+ typedef QMultiHash<QString, QString> QStringMultiHash;
+@@ -167,7 +167,7 @@ QProcess *Solid::Backends::Hal::FstabHandling::callSystemCommand(const QString &
+                                                                  QObject *obj, const char *slot)
+ {
+     QStringList env = QProcess::systemEnvironment();
+-    env.replaceInStrings(QRegExp("^PATH=(.*)", Qt::CaseInsensitive), "PATH=/sbin:/bin:/usr/sbin/:/usr/bin");
++    env.replaceInStrings(QRegExp("^PATH=(.*)", Qt::CaseInsensitive), "PATH=@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/local/bin");
+ 
+     QProcess *process = new QProcess(obj);
+ 
+diff --git a/3rdparty/solid-lite/xdgbasedirs.cpp b/3rdparty/solid-lite/xdgbasedirs.cpp
+index d6ba5a0..3bae748 100644
+--- a/3rdparty/solid-lite/xdgbasedirs.cpp
++++ b/3rdparty/solid-lite/xdgbasedirs.cpp
+@@ -70,12 +70,12 @@ QStringList Solid::XdgBaseDirs::systemPathList( const char *resource )
+ {
+   if ( qstrncmp( "data", resource, 4 ) == 0 ) {
+     if ( instance()->mDataDirs.isEmpty() ) {
+-      instance()->mDataDirs = instance()->systemPathList( "XDG_DATA_DIRS", "/usr/local/share:/usr/share" );
++      instance()->mDataDirs = instance()->systemPathList( "XDG_DATA_DIRS", "@TERMUX_PREFIX@/local/share:@TERMUX_PREFIX@/share" );
+     }
+     return instance()->mDataDirs;
+   } else if ( qstrncmp( "config", resource, 6 ) == 0 ) {
+     if ( instance()->mConfigDirs.isEmpty() ) {
+-      instance()->mConfigDirs = instance()->systemPathList( "XDG_CONFIG_DIRS", "/etc/xdg" );
++      instance()->mConfigDirs = instance()->systemPathList( "XDG_CONFIG_DIRS", "@TERMUX_PREFIX@/etc/xdg" );
+     }
+     return instance()->mConfigDirs;
+   }
+diff --git a/gui/settings.cpp b/gui/settings.cpp
+index 5c77961..82906ee 100644
+--- a/gui/settings.cpp
++++ b/gui/settings.cpp
+@@ -39,7 +39,7 @@ struct MpdDefaults
+ {
+     MpdDefaults()
+         : host("localhost")
+-        , dir("/var/lib/mpd/music/")
++        , dir("@TERMUX_PREFIX@/var/lib/mpd/music/")
+         , port(6600) {
+     }
+ 
+@@ -58,7 +58,7 @@ struct MpdDefaults
+     };
+ 
+     void read() {
+-        QFile f("/etc/mpd.conf");
++        QFile f("@TERMUX_PREFIX@/etc/mpd.conf");
+ 
+         if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+             int details=0;
+diff --git a/playlists/cantata-dynamic b/playlists/cantata-dynamic
+index 110f65a..800bb46 100755
+--- a/playlists/cantata-dynamic
++++ b/playlists/cantata-dynamic
+@@ -1071,8 +1071,8 @@ sub stop() {
+ # #####################################
+ # SERVER MODE
+ # #####################################
+-$filesDir="/var/lib/mpd/dynamic";
+-$pidFile="/var/run/cantata-dynamic/pid";
++$filesDir="@TERMUX_PREFIX@/var/lib/mpd/dynamic";
++$pidFile="@TERMUX_PREFIX@/var/run/cantata-dynamic/pid";
+ 
+ sub encodeString() {
+     my $str=shift;
+@@ -1098,10 +1098,10 @@ sub decodeString() {
+ sub loadConfig() {
+     my $config=shift;
+     if (!$config || ($config=~ m/^(default)/)) {
+-        $config="/etc/cantata-dynamic.conf";
++        $config="@TERMUX_PREFIX@/etc/cantata-dynamic.conf";
+     }
+     open(my $fileHandle, $config)  || die "ERROR: Failed to load config $config - $!\n";
+-    $activeFile="/var/run/cantata-dynamic/rules";
++    $activeFile="@TERMUX_PREFIX@/var/run/cantata-dynamic/rules";
+     if (tell($fileHandle) != -1) {
+         my @lines = <$fileHandle>; # Read into an array...
+         close($fileHandle);
+diff --git a/playlists/cantata-dynamic.service b/playlists/cantata-dynamic.service
+index 53ebc41..1a91512 100755
+--- a/playlists/cantata-dynamic.service
++++ b/playlists/cantata-dynamic.service
+@@ -7,8 +7,8 @@ After=mpd.service
+ User=mpd
+ Group=audio
+ Type=forking
+-ExecStart=/usr/share/cantata/scripts/cantata-dynamic server /etc/cantata-dynamic.conf
+-ExecStop=/usr/share/cantata/scripts/cantata-dynamic stopserver /etc/cantata-dynamic.conf
++ExecStart=@TERMUX_PREFIX@/share/cantata/scripts/cantata-dynamic server @TERMUX_PREFIX@/etc/cantata-dynamic.conf
++ExecStop=@TERMUX_PREFIX@/share/cantata/scripts/cantata-dynamic stopserver @TERMUX_PREFIX@/etc/cantata-dynamic.conf
+ RuntimeDirectory=cantata-dynamic
+ PIDFile=/run/cantata-dynamic/pid
+ 

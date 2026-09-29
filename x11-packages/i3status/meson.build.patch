@@ -1,0 +1,39 @@
+--- a/meson.build
++++ b/meson.build
+@@ -155,20 +155,16 @@
+   'src/format_placeholders.c',
+   'src/general.c',
+   'src/output.c',
+-  'src/print_battery_info.c',
+   'src/print_cpu_temperature.c',
+   'src/print_cpu_usage.c',
+   'src/print_ddate.c',
+   'src/print_disk_info.c',
+-  'src/print_eth_info.c',
+   'src/print_ip_addr.c',
+   'src/print_ipv6_addr.c',
+-  'src/print_load.c',
+   'src/print_mem.c',
+   'src/print_path_exists.c',
+   'src/print_run_watch.c',
+   'src/print_time.c',
+-  'src/print_volume.c',
+   'src/print_wireless_info.c',
+   'src/print_file_contents.c',
+   'src/process_runs.c',
+@@ -192,10 +188,13 @@
+ endif
+ 
+ host_os = host_machine.system()
+-if host_os == 'linux'
++if host_os == 'linux' or host_os == 'android'
+   nlgenl_dep = dependency('libnl-genl-3.0', method: 'pkg-config')
++  i3status_deps += [nlgenl_dep]
++endif
++if host_os == 'linux'
+   alsa_dep = dependency('alsa', method: 'pkg-config')
+-  i3status_deps += [nlgenl_dep, alsa_dep]
++  i3status_deps += [alsa_dep]
+ endif
+ if host_os == 'netbsd'
+   prop_dep = cc.find_library('prop')

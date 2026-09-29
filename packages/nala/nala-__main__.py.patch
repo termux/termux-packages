@@ -1,0 +1,22 @@
+diff -uNr nala-v0.14.0/nala/__main__.py nala-v0.14.0.mod/nala/__main__.py
+--- nala-v0.14.0/nala/__main__.py	2023-10-11 04:12:17.000000000 +0300
++++ nala-v0.14.0.mod/nala/__main__.py	2023-12-15 10:50:56.463044169 +0200
+@@ -26,6 +26,7 @@
+ 
+ import errno
+ import sys
++import os
+ 
+ # Imports to get all of the subcommands into typer
+ import nala.fetch as _fetch  # pylint: disable=unused-import
+@@ -38,6 +39,10 @@
+ 
+ def main() -> None:
+ 	"""Nala function to reference from the entry point."""
++	if os.getuid() == 0:
++		print("Ability to run this command as root has been disabled permanently for safety purposes.")
++		sys.exit(1)
++
+ 	try:
+ 		nala()
+ 	except KeyboardInterrupt:

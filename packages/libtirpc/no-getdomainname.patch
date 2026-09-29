@@ -1,0 +1,14 @@
+diff -uNr libtirpc-1.2.6/src/rpcdname.c libtirpc-1.2.6.mod/src/rpcdname.c
+--- libtirpc-1.2.6/src/rpcdname.c	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/src/rpcdname.c	2020-06-07 03:06:34.961407640 +0300
+@@ -44,8 +44,10 @@
+ 
+ 	if (default_domain)
+ 		return (default_domain);
++#ifndef __ANDROID__
+ 	if (getdomainname(temp, sizeof(temp)) < 0)
+ 		return (0);
++#endif
+ 	if ((int) strlen(temp) > 0) {
+ 		default_domain = (char *)malloc((strlen(temp)+(unsigned)1));
+ 		if (default_domain == 0)

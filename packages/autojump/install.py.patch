@@ -1,0 +1,31 @@
+--- a/install.py
++++ b/install.py
+@@ -68,8 +68,8 @@
+     default_user_prefix = ''
+     default_user_zshshare = 'functions'
+     default_system_destdir = '/'
+-    default_system_prefix = '/usr/local'
+-    default_system_zshshare = '/usr/share/zsh/site-functions'
++    default_system_prefix = '@TERMUX_PREFIX@'
++    default_system_zshshare = '@TERMUX_PREFIX@/share/zsh/site-functions'
+     default_clink_dir = os.path.join(os.getenv('LOCALAPPDATA', ''), 'clink')
+ 
+     parser = ArgumentParser(
+@@ -111,7 +111,7 @@
+         if sys.version_info[0] == 2 and sys.version_info[1] < 6:
+             print('Python v2.6+ or v3.0+ required.', file=sys.stderr)
+             sys.exit(1)
+-        if args.system:
++        if False:
+             if platform.system() == 'Windows':
+                 print(
+                     'System-wide installation is not supported on Windows.',
+@@ -187,7 +187,7 @@
+         print('Installing autojump to %s ...' % args.destdir)
+ 
+     bin_dir = os.path.join(args.destdir, args.prefix, 'bin')
+-    etc_dir = os.path.join(args.destdir, 'etc', 'profile.d')
++    etc_dir = os.path.join(args.destdir, args.prefix, 'etc', 'profile.d')
+     doc_dir = os.path.join(args.destdir, args.prefix, 'share', 'man', 'man1')
+     share_dir = os.path.join(args.destdir, args.prefix, 'share', 'autojump')
+     zshshare_dir = os.path.join(args.destdir, args.zshshare)

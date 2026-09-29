@@ -1,0 +1,21 @@
+--- a/src/ids/Makefile
++++ b/src/ids/Makefile
+@@ -53,11 +53,14 @@
+ check_hd: check_hd.c
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+ 
++check_hd_host: check_hd.c
++	gcc -O2 $< -o $@
++
+ hd_ids.c: hd_ids.h hd_ids_tiny.h
+ 
+-hd_ids.h hd.ids: check_hd $(IDFILES)
+-	./check_hd --check --sort --cfile hd_ids.h $(IDFILES)
++hd_ids.h hd.ids: check_hd check_hd_host $(IDFILES)
++	./check_hd_host --check --sort --cfile hd_ids.h $(IDFILES)
+ 
+-hd_ids_tiny.h: check_hd hd.ids
+-	./check_hd --mini --cfile hd_ids_tiny.h --log=hd_tiny.log --out=hd_tiny.ids hd.ids
++hd_ids_tiny.h: check_hd check_hd_host hd.ids
++	./check_hd_host --mini --cfile hd_ids_tiny.h --log=hd_tiny.log --out=hd_tiny.ids hd.ids
+ 

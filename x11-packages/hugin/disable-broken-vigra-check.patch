@@ -1,0 +1,21 @@
+This doesn't work anymore because vigra no longer hardcodes the version in a single string in its header
+after this commit:
+https://github.com/ukoethe/vigra/commit/0a97238fb1562c74136c6128efa3bc2bfdf3d62b
+
+--- a/CMakeModules/FindVIGRA.cmake
++++ b/CMakeModules/FindVIGRA.cmake
+@@ -55,14 +55,6 @@ IF (VIGRA_FOUND)
+   ENDIF()
+   FILE(STRINGS "${VIGRA_CONFIG_VERSION_HXX}" VIGRA_VERSION_HXX REGEX ".*#define +VIGRA_VERSION +\"")
+   STRING(REGEX REPLACE ".*#define +VIGRA_VERSION +\"([.0-9]+).*" "\\1" VIGRA_VERSION "${VIGRA_VERSION_HXX}")
+-  IF(${VIGRA_VERSION} VERSION_EQUAL VIGRA_FIND_VERSION OR ${VIGRA_VERSION} VERSION_GREATER VIGRA_FIND_VERSION)
+-    SET(VIGRA_VERSION_CHECK TRUE)
+-    MESSAGE(STATUS "VIGRA version: ${VIGRA_VERSION}")
+-  ELSE()
+-    MESSAGE(FATAL_ERROR 
+-        "VIGRA lib is too old.\nHugin requires at least version 1.9.0, but found version ${VIGRA_VERSION}."
+-    )
+-  ENDIF()
+ 
+   # check if vigraimpex is linked against OpenEXR
+   IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")

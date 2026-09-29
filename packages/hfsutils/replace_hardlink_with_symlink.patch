@@ -1,0 +1,26 @@
+diff -ur hfsutils-3.2.6-orig/Makefile.in hfsutils-3.2.6/Makefile.in
+--- hfsutils-3.2.6-orig/Makefile.in	2017-08-03 04:55:38.195906965 +0200
++++ hfsutils-3.2.6/Makefile.in	2017-08-03 04:57:31.204993434 +0200
+@@ -114,11 +114,9 @@
+ 	$(BININSTALL) $(HFSUTIL) "$(BINDEST)/."
+ 
+ 	for file in $(CLITARGETS); do  \
+-		$(HARDLINK) "$(BINDEST)/$(HFSUTIL)" "$(BINDEST)/$$file";  \
++		ln -sf "$(HFSUTIL)" "$(BINDEST)/$$file";  \
+ 	done
+ 
+-	rm -f "$(BINDEST)/$(HFSUTIL)"
+-
+ 	for file in $(GENERALDOCS) $(CLIDOCS); do  \
+ 		$(LIBINSTALL) doc/man/$$file  \
+ 		"$(MANDEST)/man$(MANEXT)/`basename $$file .1`.$(MANEXT)";  \
+@@ -232,7 +230,7 @@
+ 		-lhfs $(LIBS) $(LIBOBJS) -o $@
+ 
+ $(CLITARGETS): $(HFSUTIL)
+-	-$(HARDLINK) $(HFSUTIL) $@
++	-ln -sf $(HFSUTIL) $@
+ 
+ hfssh: $(LIBHFS) hfssh.o tclhfs.o $(UTILOBJS) $(LIBOBJS)
+ 	$(CC) $(LDFLAGS) hfssh.o tclhfs.o $(UTILOBJS)  \
+Only in hfsutils-3.2.6: Makefile.in~

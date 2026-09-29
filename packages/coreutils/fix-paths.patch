@@ -1,0 +1,114 @@
+diff --git a/lib/tmpdir.c b/lib/tmpdir.c
+index a1473e2..19267bd 100644
+--- a/lib/tmpdir.c
++++ b/lib/tmpdir.c
+@@ -35,7 +35,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ # endif
+ #endif
+ 
+@@ -131,8 +131,8 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
+ #endif
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff --git a/src/mktemp.c b/src/mktemp.c
+index 72523be..94e0f08 100644
+--- a/src/mktemp.c
++++ b/src/mktemp.c
+@@ -92,7 +92,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+       oputs (_("\
+   -p DIR, --tmpdir[=DIR]\n\
+          interpret TEMPLATE relative to DIR;\n\
+-         if DIR is not specified, use $TMPDIR if set, else /tmp.\n\
++         if DIR is not specified, use $TMPDIR if set, else @TERMUX_PREFIX@/tmp.\n\
+          With this option, TEMPLATE must not be an absolute name;\n\
+          unlike with -t, TEMPLATE may contain slashes,\n\
+          but mktemp creates only the final component\n\
+@@ -101,7 +101,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+   -t\n\
+          interpret TEMPLATE as a single file name component,\n\
+          relative to a directory: $TMPDIR, if set;\n\
+-         else the directory specified via -p; else /tmp [deprecated]\n\
++         else the directory specified via -p; else @TERMUX_PREFIX@/tmp [deprecated]\n\
+ "));
+       oputs (HELP_OPTION_DESCRIPTION);
+       oputs (VERSION_OPTION_DESCRIPTION);
+@@ -283,7 +283,7 @@ main (int argc, char **argv)
+           else if (dest_dir_arg && *dest_dir_arg)
+             dest_dir = dest_dir_arg;
+           else
+-            dest_dir = "/tmp";
++            dest_dir = "@TERMUX_PREFIX@/tmp";
+ 
+           if (last_component (template) != template)
+             error (EXIT_FAILURE, 0,
+@@ -297,7 +297,7 @@ main (int argc, char **argv)
+           else
+             {
+               char *env = getenv ("TMPDIR");
+-              dest_dir = (env && *env ? env : "/tmp");
++              dest_dir = (env && *env ? env : "@TERMUX_PREFIX@/tmp");
+             }
+           if (IS_ABSOLUTE_FILE_NAME (template))
+             error (EXIT_FAILURE, 0,
+diff --git a/src/sort.c b/src/sort.c
+index eaf06d2..99f9a9d 100644
+--- a/src/sort.c
++++ b/src/sort.c
+@@ -81,9 +81,7 @@ struct rlimit { size_t rlim_cur; };
+ 
+ #define UCHAR_LIM (UCHAR_MAX + 1)
+ 
+-#ifndef DEFAULT_TMPDIR
+-# define DEFAULT_TMPDIR "/tmp"
+-#endif
++#define DEFAULT_TMPDIR "@TERMUX_PREFIX@/tmp"
+ 
+ /* Maximum number of lines to merge every time a NODE is taken from
+    the merge queue.  Node is at LEVEL in the binary merge tree,
+diff --git a/src/split.c b/src/split.c
+index aca6432..de989ae 100644
+--- a/src/split.c
++++ b/src/split.c
+@@ -308,7 +308,7 @@ CHUNKS may be:\n\
+   r/K/N   likewise but only output Kth of N to standard output\n\
+ "), stdout);
+       fputs (_("\n\
+--n (except -nr) will buffer to $TMPDIR, defaulting to /tmp,\n\
++-n (except -nr) will buffer to $TMPDIR, defaulting to @TERMUX_PREFIX@/tmp,\n\
+ if the input size cannot easily be determined.\n\
+ "), stdout);
+       emit_ancillary_info (PROGRAM_NAME);
+@@ -593,7 +593,7 @@ create (char const *name)
+ 
+       char const *shell_prog = getenv ("SHELL");
+       if (shell_prog == NULL)
+-        shell_prog = "/bin/sh";
++        shell_prog = "@TERMUX_PREFIX@/bin/sh";
+       char const *const argv[] = { last_component (shell_prog), "-c",
+                                    filter_command, NULL };
+ 
+diff --git a/src/tac.c b/src/tac.c
+index 161a5ea..5436f42 100644
+--- a/src/tac.c
++++ b/src/tac.c
+@@ -138,7 +138,7 @@ Write each FILE to standard output, last line first.\n\
+       oputs (HELP_OPTION_DESCRIPTION);
+       oputs (VERSION_OPTION_DESCRIPTION);
+       fputs (_("\n\
+-Non-seekable input is buffered to $TMPDIR, defaulting to /tmp.\n\
++Non-seekable input is buffered to $TMPDIR, defaulting to @TERMUX_PREFIX@/tmp.\n\
+ "), stdout);
+       emit_ancillary_info (PROGRAM_NAME);
+     }

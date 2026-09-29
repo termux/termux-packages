@@ -1,0 +1,68 @@
+diff -uNr lxc-3.1.0/src/lxc/cgroups/cgfsng.c lxc-3.1.0.mod/src/lxc/cgroups/cgfsng.c
+--- lxc-3.1.0/src/lxc/cgroups/cgfsng.c	2018-12-14 01:13:51.000000000 +0200
++++ lxc-3.1.0.mod/src/lxc/cgroups/cgfsng.c	2019-07-13 20:47:37.511164109 +0300
+@@ -395,7 +395,7 @@
+ 	}
+ 	oldv = *lastslash;
+ 	*lastslash = '\0';
+-	fpath = must_make_path(path, "cpuset.cpus", NULL);
++	fpath = must_make_path(path, "cpus", NULL);
+ 	posscpus = read_file(fpath);
+ 	if (!posscpus) {
+ 		SYSERROR("Failed to read file \"%s\"", fpath);
+@@ -412,7 +412,7 @@
+ 		DEBUG("The path \""__ISOL_CPUS"\" to read isolated cpus from does not exist");
+ 		cpulist = posscpus;
+ 		/* No isolated cpus but we weren't already initialized by
+-		 * someone. We should simply copy the parents cpuset.cpus
++		 * someone. We should simply copy the parents cpus
+ 		 * values.
+ 		 */
+ 		if (!am_initialized) {
+@@ -434,7 +434,7 @@
+ 		TRACE("No isolated cpus detected");
+ 		cpulist = posscpus;
+ 		/* No isolated cpus but we weren't already initialized by
+-		 * someone. We should simply copy the parents cpuset.cpus
++		 * someone. We should simply copy the parents cpus
+ 		 * values.
+ 		 */
+ 		if (!am_initialized) {
+@@ -491,7 +491,7 @@
+ copy_parent:
+ 	*lastslash = oldv;
+ 	free(fpath);
+-	fpath = must_make_path(path, "cpuset.cpus", NULL);
++	fpath = must_make_path(path, "cpus", NULL);
+ 	ret = lxc_write_to_file(fpath, cpulist, strlen(cpulist), false, 0666);
+ 	if (ret < 0) {
+ 		SYSERROR("Failed to write cpu list to \"%s\"", fpath);
+@@ -606,7 +606,7 @@
+ 		return false;
+ 	}
+ 
+-	/* Make sure any isolated cpus are removed from cpuset.cpus. */
++	/* Make sure any isolated cpus are removed from cpus. */
+ 	if (!cg_legacy_filter_and_set_cpus(cgpath, v == '1')) {
+ 		SYSERROR("Failed to remove isolated cpus");
+ 		free(clonechildrenpath);
+@@ -623,8 +623,8 @@
+ 	}
+ 
+ 	/* copy parent's settings */
+-	if (!copy_parent_file(cgpath, "cpuset.mems")) {
+-		SYSERROR("Failed to copy \"cpuset.mems\" settings");
++	if (!copy_parent_file(cgpath, "mems")) {
++		SYSERROR("Failed to copy \"mems\" settings");
+ 		free(cgpath);
+ 		free(clonechildrenpath);
+ 		return false;
+@@ -742,7 +742,7 @@
+ 	 * verify /sys/fs/cgroup/ in this field.
+ 	 */
+ 	if (strncmp(p, "/sys/fs/cgroup/", 15) != 0) {
+-		ERROR("Found hierarchy not under /sys/fs/cgroup: \"%s\"", p);
++		WARN("Found hierarchy not under /sys/fs/cgroup: \"%s\"", p);
+ 		return NULL;
+ 	}
+ 

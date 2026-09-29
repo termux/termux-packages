@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Jan Alexander Steffens (heftig)" <jan.steffens@gmail.com>
+Date: Fri, 7 Jan 2022 18:59:10 +0000
+Subject: [PATCH] glib-compile-schemas: Remove noisy deprecation warnings
+diff --git a/gio/glib-compile-schemas.c b/gio/glib-compile-schemas.c
+index 81e675f53e8b..1a10a8d098c5 100644
+--- a/gio/glib-compile-schemas.c
++++ b/gio/glib-compile-schemas.c
+@@ -1232,19 +1232,6 @@ parse_state_start_schema (ParseState  *state,
+       return;
+     }
+ 
+-  if (path && (g_str_has_prefix (path, "/apps/") ||
+-               g_str_has_prefix (path, "/desktop/") ||
+-               g_str_has_prefix (path, "/system/")))
+-    {
+-      gchar *message = NULL;
+-      message = g_strdup_printf (_("Warning: Schema “%s” has path “%s”.  "
+-                                   "Paths starting with "
+-                                   "“/apps/”, “/desktop/” or “/system/” are deprecated."),
+-                                 id, path);
+-      g_printerr ("%s\n", message);
+-      g_free (message);
+-    }
+-
+   state->schema_state = schema_state_new (path, gettext_domain,
+                                           extends, extends_name, list_of);
+ 

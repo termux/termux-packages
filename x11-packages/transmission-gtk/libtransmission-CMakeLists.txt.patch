@@ -1,0 +1,21 @@
+--- a/libtransmission/CMakeLists.txt
++++ b/libtransmission/CMakeLists.txt
+@@ -262,10 +262,6 @@
+         ${CMAKE_CURRENT_BINARY_DIR}/..
+         ${Intl_INCLUDE_DIRS})
+ 
+-if(ANDROID)
+-    find_library(log-lib log)
+-endif()
+-
+ target_link_libraries(${TR_NAME}
+     PRIVATE
+         Threads::Threads
+@@ -290,7 +286,6 @@
+         $<$<BOOL:${WIN32}>:crypt32>
+         $<$<BOOL:${WIN32}>:shlwapi>
+         "$<$<BOOL:${APPLE}>:-framework Foundation>"
+-        "$<$<BOOL:${ANDROID}>:${log-lib}>"
+         $<$<BOOL:${HAVE_LIBATOMIC}>:atomic>
+     PUBLIC
+         transmission::crypto_impl

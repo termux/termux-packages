@@ -1,0 +1,70 @@
+--- a/meson.build
++++ b/meson.build
+@@ -577,7 +577,7 @@
+   pangoft2     = dependency('pangoft2',    version: '>='+pango_minver)
+ endif
+ 
+-if cc.run('''
++if not meson.is_cross_build() and cc.run('''
+   #include <pango/pango.h>
+   #include <string.h>
+   #include <stdlib.h>
+@@ -1585,28 +1585,7 @@
+ endif
+ 
+ if shmem_choice == 'sysv'
+-  check_ip_rmid_deferred_release = cc.run('''
+-  #include <sys/types.h>
+-  #include <sys/ipc.h>
+-  #include <sys/shm.h>
+-  int main() {
+-    int id = shmget(IPC_PRIVATE, 4, IPC_CREAT | 0600);
+-    if (id == -1)
+-      return 2;
+-
+-    char *shmaddr = shmat(id, 0, 0);
+-    shmctl(id, IPC_RMID, 0);
+-    if ((char*) shmat(id, 0, 0) == (char*) -1) {
+-      shmdt(shmaddr);
+-      return 1;
+-    }
+-    shmdt(shmaddr);
+-    shmdt(shmaddr);
+-    return 0;
+-  }
+-  ''',
+-  name: 'shmctl IPC_RMID allows subsequent attaches').returncode() == 0
+-  conf.set('IPC_RMID_DEFERRED_RELEASE', check_ip_rmid_deferred_release)
++  conf.set('IPC_RMID_DEFERRED_RELEASE', true)
+   conf.set('USE_SYSV_SHM', true)
+ elif shmem_choice == 'posix'
+   conf.set('USE_POSIX_SHM', true)
+@@ -2037,7 +2016,7 @@
+ endif
+ gimp_run_env.set('GIMP_PYTHON_WITH_GI', python.full_path())
+ 
+-if meson.can_run_host_binaries() and have_gobject_introspection
++if have_gobject_introspection
+   if enable_console_bin
+     gimp_real_exe = gimpconsole_exe
+   else
+--- a/gimp-data/images/meson.build
++++ b/gimp-data/images/meson.build
+@@ -7,6 +7,7 @@
+ 
+ ## Splash Image and Welcome Dialog ##
+ 
++if not meson.is_cross_build()
+ splash = custom_target('gimp-splash.png',
+                        input : [ 'export-splash.py' ],
+                        output: [ 'gimp-splash.png', ],
+@@ -22,6 +23,9 @@
+                        env: data_env,
+                        install_dir: gimpdatadir / 'images',
+                        install: true)
++else
++  install_data('gimp-splash.png', install_dir: gimpdatadir / 'images')
++endif
+ 
+ ## Windows Installer's Splash Image and Intro Banner ##
+ 

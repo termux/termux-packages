@@ -1,0 +1,41 @@
+diff -uNr 8086tiny/8086tiny.c 8086tiny.mod/8086tiny.c
+--- 8086tiny/8086tiny.c	2014-03-20 01:08:16.000000000 +0200
++++ 8086tiny.mod/8086tiny.c	2020-01-24 20:36:56.725634080 +0200
+@@ -6,7 +6,37 @@
+ // This work is licensed under the MIT License. See included LICENSE.TXT.
+ 
+ #include <time.h>
++#ifndef __ANDROID__
+ #include <sys/timeb.h>
++#else
++struct timeb {
++	time_t time;        /* Seconds since epoch, as from `time'.  */
++	unsigned short int millitm; /* Additional milliseconds.  */
++	short int timezone;     /* Minutes west of GMT.  */
++	short int dstflag;      /* Nonzero if Daylight Savings Time used.  */
++};
++
++int ftime(struct timeb *tb)
++{
++	struct timeval  tv;
++	struct timezone tz;
++
++	if (gettimeofday (&tv, &tz) < 0)
++		return -1;
++
++	tb->time    = tv.tv_sec;
++	tb->millitm = (tv.tv_usec + 500) / 1000;
++
++	if (tb->millitm == 1000) {
++		++tb->time;
++		tb->millitm = 0;
++	}
++	tb->timezone = tz.tz_minuteswest;
++	tb->dstflag  = tz.tz_dsttime;
++
++	return 0;
++}
++#endif
+ #include <memory.h>
+ 
+ #ifndef _WIN32

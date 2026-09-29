@@ -1,0 +1,32 @@
+From 548685f5beb71102e34bdcb894db6df569802c6a Mon Sep 17 00:00:00 2001
+From: alex09x <lol@lol.lol>
+Date: Mon, 3 Aug 2026 22:11:26 -0700
+Subject: [PATCH 2/2] fix(value): ensure MetaNode matches Value layout on
+ 32-bit platforms for transmute safety
+
+---
+ src/value/node.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/value/node.rs b/src/value/node.rs
+index 386aca87..88f82399 100644
+--- a/src/value/node.rs
++++ b/src/value/node.rs
+@@ -1536,6 +1536,8 @@ impl<'a> DocumentVisitor<'a> {
+ #[repr(C)]
+ struct MetaNode {
+     shared: *const Shared,
++    #[cfg(target_pointer_width = "32")]
++    _padding: u32,
+     canary: u64,
+ }
+ 
+@@ -1549,6 +1551,8 @@ impl MetaNode {
+         let canary = b"SONICRS\0";
+         MetaNode {
+             shared,
++            #[cfg(target_pointer_width = "32")]
++            _padding: 0,
+             canary: u64::from_ne_bytes(*canary),
+         }
+     }

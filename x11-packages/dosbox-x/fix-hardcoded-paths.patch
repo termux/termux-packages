@@ -1,0 +1,114 @@
+diff --git a/src/gui/midi_synth.h b/src/gui/midi_synth.h
+index 5eea88632..362dea410 100644
+--- a/src/gui/midi_synth.h
++++ b/src/gui/midi_synth.h
+@@ -186,16 +186,16 @@ public:
+ #else
+ 			// Default on "other" platforms according to fluidsynth docs
+ 			// This works on RH and Fedora, if a soundfont is installed
+-			if (FILE *file = fopen("/usr/share/soundfonts/default.sf2", "r")) {
++			if (FILE *file = fopen("@TERMUX_PREFIX@/share/soundfonts/default.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/soundfonts/default.sf2";
++				sf = "@TERMUX_PREFIX@/share/soundfonts/default.sf2";
+ 			// Ubuntu and Debian don't have a default.sf2...
+-			} else if (FILE *file = fopen("/usr/share/sounds/sf2/FluidR3_GM.sf2", "r")) {
++			} else if (FILE *file = fopen("@TERMUX_PREFIX@/share/sounds/sf2/FluidR3_GM.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/sounds/sf2/FluidR3_GM.sf2";
+-			} else if (FILE *file = fopen("/usr/share/sounds/sf2/GeneralUser_GS.sf2", "r")) {
++				sf = "@TERMUX_PREFIX@/share/sounds/sf2/FluidR3_GM.sf2";
++			} else if (FILE *file = fopen("@TERMUX_PREFIX@/share/sounds/sf2/GeneralUser_GS.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/sounds/sf2/GeneralUser_GS.sf2";
++				sf = "@TERMUX_PREFIX@/share/sounds/sf2/GeneralUser_GS.sf2";
+ 			} else {
+ 				LOG_MSG("MIDI:synth: Specify .SF2 sound font file with midiconfig=");
+ 				return false;
+@@ -363,16 +363,16 @@ public:
+ #else
+ 			// Default on "other" platforms according to fluidsynth docs
+ 			// This works on RH and Fedora, if a soundfont is installed
+-			if (FILE *file = fopen("/usr/share/soundfonts/default.sf2", "r")) {
++			if (FILE *file = fopen("@TERMUX_PREFIX@/share/soundfonts/default.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/soundfonts/default.sf2";
++				sf = "@TERMUX_PREFIX@/share/soundfonts/default.sf2";
+ 			// Ubuntu and Debian don't have a default.sf2...
+-			} else if (FILE *file = fopen("/usr/share/sounds/sf2/FluidR3_GM.sf2", "r")) {
++			} else if (FILE *file = fopen("@TERMUX_PREFIX@/share/sounds/sf2/FluidR3_GM.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/sounds/sf2/FluidR3_GM.sf2";
+-			} else if (FILE *file = fopen("/usr/share/sounds/sf2/GeneralUser_GS.sf2", "r")) {
++				sf = "@TERMUX_PREFIX@/share/sounds/sf2/FluidR3_GM.sf2";
++			} else if (FILE *file = fopen("@TERMUX_PREFIX@/share/sounds/sf2/GeneralUser_GS.sf2", "r")) {
+ 				fclose(file);
+-				sf = "/usr/share/sounds/sf2/GeneralUser_GS.sf2";
++				sf = "@TERMUX_PREFIX@/share/sounds/sf2/GeneralUser_GS.sf2";
+ 			} else {
+ 				LOG_MSG("MIDI:fluidsynth: SoundFont not specified, and no system SoundFont found");
+ 				return false;
+diff --git a/src/hardware/parport/printer.cpp b/src/hardware/parport/printer.cpp
+index 9853fca32..9785815b5 100644
+--- a/src/hardware/parport/printer.cpp
++++ b/src/hardware/parport/printer.cpp
+@@ -401,7 +401,7 @@ void CPrinter::updateFont()
+         }
+         basedir = std::string(windir) + "\\fonts\\";
+ #else
+-        basedir = "/usr/share/fonts/";
++        basedir = "@TERMUX_PREFIX@/share/fonts/";
+ #endif
+         switch (LQtypeFace)
+         {
+diff --git a/src/misc/cross.cpp b/src/misc/cross.cpp
+index 2ba476994..b02559aca 100644
+--- a/src/misc/cross.cpp
++++ b/src/misc/cross.cpp
+@@ -144,9 +144,9 @@ std::string Cross::GetPlatformResDir() {
+ 
+     struct stat info;
+     if((stat(in.c_str(), &info) != 0) || (!(info.st_mode & S_IFDIR)))
+-        in = "/usr/local/share/dosbox-x";
++        in = "@TERMUX_PREFIX@/local/share/dosbox-x";
+     if((stat(in.c_str(), &info) != 0) || (!(info.st_mode & S_IFDIR)))
+-        in = "/usr/share/dosbox-x";
++        in = "@TERMUX_PREFIX@/share/dosbox-x";
+     if((stat(in.c_str(), &info) != 0) || (!(info.st_mode & S_IFDIR)))
+         in = RESDIR;
+ 
+diff --git a/src/output/output_ttf.cpp b/src/output/output_ttf.cpp
+index 7384c3e9a..eb9575c3d 100644
+--- a/src/output/output_ttf.cpp
++++ b/src/output/output_ttf.cpp
+@@ -395,7 +395,7 @@ bool readTTF(const char *fName, bool bold, bool ital) {
+             }
+         }
+ #elif defined(LINUX)
+-        strcpy(fontdir, "/usr/share/fonts/");
++        strcpy(fontdir, "@TERMUX_PREFIX@/share/fonts/");
+ #elif defined(MACOSX)
+         strcpy(fontdir, "/Library/Fonts/");
+ #else
+@@ -412,7 +412,7 @@ bool readTTF(const char *fName, bool bold, bool ital) {
+ #if defined(LINUX) || defined(MACOSX)
+             if (!ttf_fh) {
+ #if defined(LINUX)
+-                strcpy(fontdir, "/usr/share/fonts/truetype/");
++                strcpy(fontdir, "@TERMUX_PREFIX@/share/fonts/truetype/");
+ #else
+                 strcpy(fontdir, "/System/Library/Fonts/");
+ #endif
+diff --git a/vs/sdl/src/cdrom/linux/SDL_syscdrom.c b/vs/sdl/src/cdrom/linux/SDL_syscdrom.c
+index 3cc02315c..2c6ed71d1 100644
+--- a/vs/sdl/src/cdrom/linux/SDL_syscdrom.c
++++ b/vs/sdl/src/cdrom/linux/SDL_syscdrom.c
+@@ -68,7 +68,7 @@
+ #ifdef MNTTAB
+ #define _PATH_MNTTAB	MNTTAB
+ #else
+-#define _PATH_MNTTAB	"/etc/fstab"
++#define _PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ #endif /* !_PATH_MNTTAB */
+ 

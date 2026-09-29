@@ -1,0 +1,218 @@
+diff --git a/gui/util/bitmap.c b/gui/util/bitmap.c
+index 6aa4dbe..b8e7be6 100644
+--- a/gui/util/bitmap.c
++++ b/gui/util/bitmap.c
+@@ -187,7 +187,6 @@ static int pngRead(const char *fname, guiImage *img, int *pix_fmt)
+ 
+     avcodec_send_packet(avctx, NULL);   // flush the decoder
+ 
+-    avcodec_close(avctx);
+     av_free(frame);
+     av_free(avctx);
+     av_free(data);
+diff --git a/libaf/af_lavcac3enc.c b/libaf/af_lavcac3enc.c
+index 9c8b6ee..e43a0b2 100644
+--- a/libaf/af_lavcac3enc.c
++++ b/libaf/af_lavcac3enc.c
+@@ -100,8 +100,12 @@ static int control(struct af_instance_s *af, int cmd, void *arg)
+                 s->lavc_actx->sample_rate != af->data->rate ||
+                 s->lavc_actx->bit_rate != bit_rate) {
+ 
+-            if (s->lavc_actx->codec)
+-                avcodec_close(s->lavc_actx);
++            avcodec_free_context(&s->lavc_actx);
++            s->lavc_actx = avcodec_alloc_context3(NULL);
++            if (!s->lavc_actx) {
++                mp_msg(MSGT_AFILTER, MSGL_ERR, MSGTR_CouldntAllocateLavcContext);
++                return AF_ERROR;
++            }
+ 
+             // Put sample parameters
+             s->lavc_actx->ch_layout.nb_channels = af->data->nch;
+@@ -157,9 +161,7 @@ static void uninit(struct af_instance_s* af)
+         af_ac3enc_t *s = af->setup;
+         af->setup = NULL;
+         if(s->lavc_actx) {
+-            if (s->lavc_actx->codec)
+-                avcodec_close(s->lavc_actx);
+-            free(s->lavc_actx);
++            avcodec_free_context(&s->lavc_actx);
+         }
+         free(s->pending_data);
+         free(s);
+@@ -280,12 +282,6 @@ static int af_open(af_instance_t* af){
+         return AF_ERROR;
+     }
+ 
+-    s->lavc_actx = avcodec_alloc_context3(NULL);
+-    if (!s->lavc_actx) {
+-        mp_msg(MSGT_AFILTER, MSGL_ERR, MSGTR_CouldntAllocateLavcContext);
+-        return AF_ERROR;
+-    }
+-
+     return AF_OK;
+ }
+ 
+diff --git a/libmpcodecs/ad_ffmpeg.c b/libmpcodecs/ad_ffmpeg.c
+index 2b4417e..04f656f 100644
+--- a/libmpcodecs/ad_ffmpeg.c
++++ b/libmpcodecs/ad_ffmpeg.c
+@@ -196,11 +196,9 @@ static void uninit(sh_audio_t *sh)
+ {
+     AVCodecContext *lavc_context = sh->context;
+ 
+-    if (avcodec_close(lavc_context) < 0)
+-	mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
+     av_freep(&lavc_context->opaque);
+     av_freep(&lavc_context->extradata);
+-    av_freep(&lavc_context);
++    avcodec_free_context(&lavc_context);
+ }
+ 
+ static int control(sh_audio_t *sh,int cmd,void* arg, ...)
+diff --git a/libmpcodecs/vd_ffmpeg.c b/libmpcodecs/vd_ffmpeg.c
+index cf7eb27..5b9b81f 100644
+--- a/libmpcodecs/vd_ffmpeg.c
++++ b/libmpcodecs/vd_ffmpeg.c
+@@ -521,9 +521,6 @@ static void uninit(sh_video_t *sh){
+     }
+ 
+     if (avctx) {
+-        if (avctx->codec && avcodec_close(avctx) < 0)
+-            mp_msg(MSGT_DECVIDEO, MSGL_ERR, MSGTR_CantCloseCodec);
+-
+         av_freep(&avctx->extradata);
+         av_freep(&avctx->hwaccel_context);
+     }
+@@ -1085,8 +1082,8 @@ static mp_image_t *decode(sh_video_t *sh, void *data, int len, int flags){
+ //    mpi->qscale = av_frame_get_qp_table(pic, &mpi->qstride, &mpi->qscale_type);
+     mpi->pict_type=pic->pict_type;
+     mpi->fields = MP_IMGFIELD_ORDERED;
+-    if(pic->interlaced_frame) mpi->fields |= MP_IMGFIELD_INTERLACED;
+-    if(pic->top_field_first ) mpi->fields |= MP_IMGFIELD_TOP_FIRST;
++    if(pic->flags & AV_FRAME_FLAG_INTERLACED) mpi->fields |= MP_IMGFIELD_INTERLACED;
++    if(pic->flags &AV_FRAME_FLAG_TOP_FIELD_FIRST ) mpi->fields |= MP_IMGFIELD_TOP_FIRST;
+     if(pic->repeat_pict == 1) mpi->fields |= MP_IMGFIELD_REPEAT_FIRST;
+ 
+     return mpi;
+diff --git a/libmpcodecs/ve_lavc.c b/libmpcodecs/ve_lavc.c
+index b7beec7..95e7168 100644
+--- a/libmpcodecs/ve_lavc.c
++++ b/libmpcodecs/ve_lavc.c
+@@ -152,7 +152,7 @@ static int lavc_param_video_global_header= 0;
+ static int lavc_param_mv0_threshold = 256;
+ static int lavc_param_refs = 1;
+ static int lavc_param_b_sensitivity = 40;
+-static int lavc_param_level = FF_LEVEL_UNKNOWN;
++static int lavc_param_level = AV_LEVEL_UNKNOWN;
+ 
+ char *lavc_param_acodec = "mp2";
+ int lavc_param_atag = 0;
+@@ -723,12 +723,12 @@ static int put_image(struct vf_instance *vf, mp_image_t *mpi, double pts, double
+ 
+     if(lavc_param_interlaced_dct){
+         if((mpi->fields & MP_IMGFIELD_ORDERED) && (mpi->fields & MP_IMGFIELD_INTERLACED))
+-            pic->top_field_first= !!(mpi->fields & MP_IMGFIELD_TOP_FIRST);
++            pic->flags |= (mpi->fields & MP_IMGFIELD_TOP_FIRST) ? AV_FRAME_FLAG_TOP_FIELD_FIRST : 0;
+         else
+-            pic->top_field_first= 1;
++            pic->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+ 
+         if(lavc_param_top!=-1)
+-            pic->top_field_first= lavc_param_top;
++            pic->flags= (pic->flags & ~AV_FRAME_FLAG_TOP_FIELD_FIRST) | lavc_param_top ? AV_FRAME_FLAG_TOP_FIELD_FIRST : 0;
+     }
+ 
+     return encode_frame(vf, pic, pts) >= 0;
+@@ -853,9 +853,6 @@ static void uninit(struct vf_instance *vf){
+     av_freep(&lavc_venc_context->intra_matrix);
+     av_freep(&lavc_venc_context->inter_matrix);
+ 
+-    if (lavc_venc_context->codec)
+-        avcodec_close(lavc_venc_context);
+-
+     if(stats_file) fclose(stats_file);
+ 
+     /* free rc_override */
+diff --git a/libmpcodecs/vf_mcdeint.c b/libmpcodecs/vf_mcdeint.c
+index d7c91e1..06c746b 100644
+--- a/libmpcodecs/vf_mcdeint.c
++++ b/libmpcodecs/vf_mcdeint.c
+@@ -313,8 +313,7 @@ static void uninit(struct vf_instance *vf){
+     }
+ #endif
+     if (vf->priv->avctx_enc) {
+-    avcodec_close(vf->priv->avctx_enc);
+-    av_freep(&vf->priv->avctx_enc);
++        avcodec_free_context(&vf->priv->avctx_enc);
+     }
+ 
+     free(vf->priv->outbuf);
+diff --git a/libmpcodecs/vf_screenshot.c b/libmpcodecs/vf_screenshot.c
+index e8b87fa..b3a63b4 100644
+--- a/libmpcodecs/vf_screenshot.c
++++ b/libmpcodecs/vf_screenshot.c
+@@ -279,8 +279,7 @@ static int query_format(struct vf_instance *vf, unsigned int fmt)
+ 
+ static void uninit(vf_instance_t *vf)
+ {
+-    avcodec_close(vf->priv->avctx);
+-    av_freep(&vf->priv->avctx);
++    avcodec_free_context(&vf->priv->avctx);
+     if(vf->priv->ctx) sws_freeContext(vf->priv->ctx);
+     av_freep(&vf->priv->pic->data[0]);
+     av_frame_free(&vf->priv->pic);
+diff --git a/libmpdemux/demux_lavf.c b/libmpdemux/demux_lavf.c
+index a31ed71..01c9baf 100644
+--- a/libmpdemux/demux_lavf.c
++++ b/libmpdemux/demux_lavf.c
+@@ -367,7 +367,10 @@ static void handle_stream(demuxer_t *demuxer, AVFormatContext *avfc, int i) {
+                 st->discard= AVDISCARD_ALL;
+             if (priv->audio_streams == 0) {
+                 size_t rg_size;
+-                AVReplayGain *rg = (AVReplayGain*)av_stream_get_side_data(st, AV_PKT_DATA_REPLAYGAIN, &rg_size);
++                const AVPacketSideData *sd = av_packet_side_data_get(st->codecpar->coded_side_data,
++                                                                     st->codecpar->nb_coded_side_data,
++                                                                     AV_PKT_DATA_REPLAYGAIN);
++                AVReplayGain *rg = sd ? (AVReplayGain*)sd->data : NULL;
+                 if (rg && rg_size >= sizeof(*rg)) {
+                     priv->r_gain = rg->track_gain / 10000;
+                 }
+diff --git a/libvo/vo_png.c b/libvo/vo_png.c
+index 7523dca..86a3d0c 100644
+--- a/libvo/vo_png.c
++++ b/libvo/vo_png.c
+@@ -126,8 +126,7 @@ config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uin
+ 
+ 
+     if (avctx && png_format != format) {
+-        avcodec_close(avctx);
+-        av_freep(&avctx);
++        avcodec_free_context(&avctx);
+     }
+ 
+     if (!avctx) {
+@@ -214,8 +213,7 @@ query_format(uint32_t format)
+ }
+ 
+ static void uninit(void){
+-    avcodec_close(avctx);
+-    av_freep(&avctx);
++    avcodec_free_context(&avctx);
+     av_freep(&outbuffer);
+     outbuffer_size = 0;
+     free(png_outdir);
+diff --git a/sub/av_sub.c b/sub/av_sub.c
+index fcb98a0..0af4360 100644
+--- a/sub/av_sub.c
++++ b/sub/av_sub.c
+@@ -30,8 +30,7 @@ void reset_avsub(struct sh_sub *sh)
+         AVCodecContext *ctx = sh->context;
+         ctx->extradata = NULL;
+         ctx->extradata_size = 0;
+-        avcodec_close(sh->context);
+-        av_freep(&sh->context);
++        avcodec_free_context((AVCodecContext **)&sh->context);
+     }
+ }
+ 

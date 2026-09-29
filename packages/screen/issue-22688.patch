@@ -1,0 +1,12 @@
+This reverts https://git.savannah.gnu.org/cgit/screen.git/commit/?id=7fc842ddc6e5905da2c5961547e3ff7385bbcc44
+
+--- a/display.c
++++ b/display.c
+@@ -437,6 +437,7 @@
+ {
+ 
+ 	if (D_encoding == UTF8) {
++		c = (c & 255) | (unsigned char)D_rend.font << 8;
+ 		if (D_mbcs) {
+ 			c = D_mbcs;
+ 			if (D_x == D_width)

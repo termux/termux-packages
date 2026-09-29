@@ -1,0 +1,302 @@
+--- a/src/msbuild/src/Shared/NamedPipeUtil.cs
++++ b/src/msbuild/src/Shared/NamedPipeUtil.cs
+@@ -31,7 +31,7 @@ namespace Microsoft.Build.Shared
+                 // '/tmp' is mandated by POSIX to always be a valid temp directory, so we can use that
+                 // instead.
+ #if !CLR2COMPATIBILITY
+-                return Path.Combine("/tmp", pipeName);
++                return Path.Combine("@TERMUX_PREFIX@/tmp", pipeName);
+ #else
+                 // We should never get here. This would be a net35 task host running on unix.
+                 ErrorUtilities.ThrowInternalError("Task host used on unix in retrieving the pipe name.");
+--- a/src/runtime/src/coreclr/debug/createdump/createdumpmain.cpp
++++ b/src/runtime/src/coreclr/debug/createdump/createdumpmain.cpp
+@@ -7,7 +7,7 @@
+ #define DEFAULT_DUMP_PATH "%TEMP%\\"
+ #define DEFAULT_DUMP_TEMPLATE "dump.%p.dmp"
+ #else
+-#define DEFAULT_DUMP_PATH "/tmp/"
++#define DEFAULT_DUMP_PATH "@TERMUX_PREFIX@/tmp/"
+ #define DEFAULT_DUMP_TEMPLATE "coredump.%p"
+ #endif
+ 
+--- a/src/runtime/src/coreclr/debug/createdump/createdumppal.cpp
++++ b/src/runtime/src/coreclr/debug/createdump/createdumppal.cpp
+@@ -142,7 +142,7 @@ QueryPerformanceFrequency(
+     return TRUE;
+ }
+ 
+-#define TEMP_DIRECTORY_PATH "/tmp/"
++#define TEMP_DIRECTORY_PATH "@TERMUX_PREFIX@/tmp/"
+ 
+ DWORD
+ PALAPI
+--- a/src/runtime/src/coreclr/nativeaot/Runtime/eventpipe/ep-rt-aot.h
++++ b/src/runtime/src/coreclr/nativeaot/Runtime/eventpipe/ep-rt-aot.h
+@@ -1033,7 +1033,7 @@ ep_rt_temp_path_get (
+         if (path == NULL){
+             path = getenv ("TEMP");
+             if (path == NULL)
+-                path = "/tmp/";
++                path = "@TERMUX_PREFIX@/tmp/";
+         }
+     }
+ 
+--- a/src/runtime/src/coreclr/pal/src/include/pal/palinternal.h
++++ b/src/runtime/src/coreclr/pal/src/include/pal/palinternal.h
+@@ -234,7 +234,7 @@ function_name() to call the system's implementation
+ #else
+ // On Android, "/tmp/" doesn't exist; temporary files should go to
+ // /data/local/tmp/
+-#define TEMP_DIRECTORY_PATH "/data/local/tmp/"
++#define TEMP_DIRECTORY_PATH "@TERMUX_PREFIX@/tmp/"
+ #endif
+ 
+ #define PROCESS_PIPE_NAME_PREFIX ".dotnet-pal-processpipe"
+--- a/src/runtime/src/coreclr/vm/perfmap.cpp
++++ b/src/runtime/src/coreclr/vm/perfmap.cpp
+@@ -23,7 +23,7 @@
+ #else
+ // On Android, "/tmp/" doesn't exist; temporary files should go to
+ // /data/local/tmp/
+-#define TEMP_DIRECTORY_PATH "/data/local/tmp"
++#define TEMP_DIRECTORY_PATH "@TERMUX_PREFIX@/tmp"
+ #endif
+ 
+ Volatile<bool> PerfMap::s_enabled = false;
+--- a/src/runtime/src/libraries/Common/src/System/Net/NetworkInformation/UnixCommandLinePing.cs
++++ b/src/runtime/src/libraries/Common/src/System/Net/NetworkInformation/UnixCommandLinePing.cs
+@@ -10,7 +10,7 @@ namespace System.Net.NetworkInformation
+     internal static class UnixCommandLinePing
+     {
+         // Ubuntu has ping under /bin, OSX under /sbin, ArchLinux under /usr/bin, Android under /system/bin, NixOS under /run/current-system/sw/bin.
+-        private static readonly string[] s_binFolders = { "/bin", "/sbin", "/usr/bin", "/system/bin", "/run/current-system/sw/bin" };
++        private static readonly string[] s_binFolders = { "@TERMUX_PREFIX@/bin", "/bin", "/sbin", "/usr/bin", "/system/bin", "/run/current-system/sw/bin" };
+ 
+         private const string s_ipv4PingFile = "ping4";
+         private const string s_ipv4v6PingFile = "ping";
+--- a/src/runtime/src/libraries/Microsoft.Extensions.DependencyModel/src/Resolution/DotNetReferenceAssembliesPathResolver.cs
++++ b/src/runtime/src/libraries/Microsoft.Extensions.DependencyModel/src/Resolution/DotNetReferenceAssembliesPathResolver.cs
+@@ -49,6 +49,11 @@ public class DotNetReferenceAssembliesPathResolver
+                 return "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/xbuild-frameworks";
+             }
+ 
++            if (fileSystem.Directory.Exists("@TERMUX_PREFIX@/lib/mono/xbuild-frameworks"))
++            {
++                return "@TERMUX_PREFIX@/lib/mono/xbuild-frameworks";
++            }
++
+             if (fileSystem.Directory.Exists("/usr/local/lib/mono/xbuild-frameworks"))
+             {
+                 return "/usr/local/lib/mono/xbuild-frameworks";
+--- a/src/runtime/src/libraries/System.Console/src/System/TermInfo.DatabaseFactory.cs
++++ b/src/runtime/src/libraries/System.Console/src/System/TermInfo.DatabaseFactory.cs
+@@ -16,11 +16,11 @@ internal sealed class DatabaseFactory
+         /// This is the ordering of well-known locations used by ncurses.
+         /// </summary>
+         internal static readonly string[] SystemTermInfoLocations = {
+-            "/etc/terminfo",
+-            "/lib/terminfo",
+-            "/usr/share/terminfo",
+-            "/usr/share/misc/terminfo",
+-            "/usr/local/share/terminfo"
++            "@TERMUX_PREFIX@/etc/terminfo",
++            "@TERMUX_PREFIX@/lib/terminfo",
++            "@TERMUX_PREFIX@/share/terminfo",
++            "@TERMUX_PREFIX@/share/misc/terminfo",
++            "@TERMUX_PREFIX@/local/share/terminfo"
+         };
+ 
+         internal static string? HomeTermInfoLocation
+--- a/src/runtime/src/libraries/System.Formats.Tar/src/System/Formats/Tar/TarHeader.Write.cs
++++ b/src/runtime/src/libraries/System.Formats.Tar/src/System/Formats/Tar/TarHeader.Write.cs
+@@ -1176,7 +1176,7 @@ private static string GenerateGlobalExtendedAttributeName(int globalExtendedAttr
+ 
+             string result = $"{tmp}/GlobalHead.{Environment.ProcessId}.{globalExtendedAttributesEntryNumber}";
+             return result.Length >= FieldLengths.Name ?
+-                string.Concat("/tmp", result.AsSpan(tmp.Length)) :
++                string.Concat("@TERMUX_PREFIX@/tmp", result.AsSpan(tmp.Length)) :
+                 result;
+         }
+ 
+--- a/src/runtime/src/libraries/System.Net.NetworkInformation/src/System/Net/NetworkInformation/NetworkFiles.cs
++++ b/src/runtime/src/libraries/System.Net.NetworkInformation/src/System/Net/NetworkInformation/NetworkFiles.cs
+@@ -17,15 +17,15 @@ internal static class NetworkFiles
+         public const string SockstatFile = "/proc/net/sockstat";
+         public const string Sockstat6File = "/proc/net/sockstat6";
+         public const string SysClassNetFolder = "/sys/class/net";
+-        public const string EtcResolvConfFile = "/etc/resolv.conf";
++        public const string EtcResolvConfFile = "@TERMUX_PREFIX@/etc/resolv.conf";
+         public const string Tcp4ConnectionsFile = "/proc/net/tcp";
+         public const string Tcp6ConnectionsFile = "/proc/net/tcp6";
+         public const string Udp4ConnectionsFile = "/proc/net/udp";
+         public const string Udp6ConnectionsFile = "/proc/net/udp6";
+-        public const string DHClientLeasesFile = "/var/lib/dhcp/dhclient.leases";
+-        public const string DHClientInterfaceLeasesFile = "/var/lib/dhcp/dhclient.{0}.leases";
+-        public const string DHClientSecondaryInterfaceLeasesFile = "/var/lib/dhcp/dhclient6.{0}.leases";
+-        public const string SmbConfFile = "/etc/samba/smb.conf";
++        public const string DHClientLeasesFile = "@TERMUX_PREFIX@/var/lib/dhcp/dhclient.leases";
++        public const string DHClientInterfaceLeasesFile = "@TERMUX_PREFIX@/var/lib/dhcp/dhclient.{0}.leases";
++        public const string DHClientSecondaryInterfaceLeasesFile = "@TERMUX_PREFIX@/var/lib/dhcp/dhclient6.{0}.leases";
++        public const string SmbConfFile = "@TERMUX_PREFIX@/etc/samba/smb.conf";
+ 
+         // Individual file names
+         public const string AllNetworkInterfaceFileName = "all";
+--- a/src/runtime/src/libraries/System.Private.CoreLib/src/System/Environment.Android.cs
++++ b/src/runtime/src/libraries/System.Private.CoreLib/src/System/Environment.Android.cs
+@@ -80,7 +80,7 @@ private static string GetFolderPathCore(SpecialFolder folder, SpecialFolderOptio
+                     return Path.Combine(home, "Videos");
+ 
+                 case SpecialFolder.CommonTemplates:
+-                    return "/usr/share/templates";
++                    return "@TERMUX_PREFIX@/share/templates";
+ 
+                 case SpecialFolder.Fonts:
+                     return Path.Combine(home, ".fonts");
+@@ -89,7 +89,7 @@ private static string GetFolderPathCore(SpecialFolder folder, SpecialFolderOptio
+                     return home;
+ 
+                 case SpecialFolder.CommonApplicationData:
+-                    return "/usr/share";
++                    return "@TERMUX_PREFIX@/share";
+ 
+                 default:
+                     return string.Empty;
+--- a/src/runtime/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs
++++ b/src/runtime/src/libraries/System.Private.CoreLib/src/System/Environment.GetFolderPathCore.Unix.cs
+@@ -52,8 +52,8 @@ private static string GetFolderPathCore(SpecialFolder folder, SpecialFolderOptio
+             // https://www.freedesktop.org/software/systemd/man/file-hierarchy.html
+             switch (folder)
+             {
+-                case SpecialFolder.CommonApplicationData: return "/usr/share";
+-                case SpecialFolder.CommonTemplates: return "/usr/share/templates";
++                case SpecialFolder.CommonApplicationData: return "@TERMUX_PREFIX@/share";
++                case SpecialFolder.CommonTemplates: return "@TERMUX_PREFIX@/share/templates";
+ #if TARGET_OSX
+                 case SpecialFolder.ProgramFiles: return "/Applications";
+                 case SpecialFolder.System: return "/System";
+--- a/src/runtime/src/libraries/System.Private.CoreLib/src/System/IO/Path.Unix.NoniOS.cs
++++ b/src/runtime/src/libraries/System.Private.CoreLib/src/System/IO/Path.Unix.NoniOS.cs
+@@ -5,6 +5,6 @@ namespace System.IO
+ {
+     public static partial class Path
+     {
+-        private static string DefaultTempPath => "/tmp/";
++        private static string DefaultTempPath => "@TERMUX_PREFIX@/tmp/";
+     }
+ }
+--- a/src/runtime/src/libraries/System.Private.CoreLib/src/System/TimeZoneInfo.Unix.cs
++++ b/src/runtime/src/libraries/System.Private.CoreLib/src/System/TimeZoneInfo.Unix.cs
+@@ -19,7 +19,7 @@ public sealed partial class TimeZoneInfo
+ #if TARGET_ILLUMOS || TARGET_SOLARIS
+         private const string DefaultTimeZoneDirectory = "/usr/share/lib/zoneinfo/";
+ #else
+-        private const string DefaultTimeZoneDirectory = "/usr/share/zoneinfo/";
++        private const string DefaultTimeZoneDirectory = "@TERMUX_PREFIX@/share/zoneinfo/";
+ #endif
+ 
+         // Set fallback values using abbreviations, base offset, and id
+--- a/src/runtime/src/libraries/System.Security.Cryptography/src/System/Security/Cryptography/X509Certificates/OpenSslCachedSystemStoreProvider.cs
++++ b/src/runtime/src/libraries/System.Security.Cryptography/src/System/Security/Cryptography/X509Certificates/OpenSslCachedSystemStoreProvider.cs
+@@ -181,7 +181,7 @@ private static Tuple<SafeX509StackHandle, SafeX509StackHandle> LoadMachineStores
+ 
+             if (firstLoad && !hasStoreData && s_defaultRootDir)
+             {
+-                const string DefaultCertDir = "/etc/ssl/certs";
++                const string DefaultCertDir = "@TERMUX_PREFIX@/etc/ssl/certs";
+                 hasStoreData = ProcessDir(DefaultCertDir, out DateTime lastModified);
+                 if (hasStoreData)
+                 {
+--- a/src/runtime/src/mono/mono/eglib/gmisc-unix.c
++++ b/src/runtime/src/mono/mono/eglib/gmisc-unix.c
+@@ -121,7 +121,7 @@ g_get_tmp_dir (void)
+ 				if (tmp_dir == NULL){
+ 					tmp_dir = g_getenv ("TEMP");
+ 					if (tmp_dir == NULL)
+-						tmp_dir = "/tmp";
++						tmp_dir = "@TERMUX_PREFIX@/tmp";
+ 				}
+ 			}
+ 		}
+--- a/src/runtime/src/mono/mono/mini/graph.c
++++ b/src/runtime/src/mono/mono/mini/graph.c
+@@ -203,7 +203,7 @@ mono_draw_graph (MonoCompile *cfg, MonoGraphOptions draw_options)
+ 	const char *fn;
+ 	FILE *fp;
+ 
+-	fn = "/tmp/minidtree.graph";
++	fn = "@TERMUX_PREFIX@/tmp/minidtree.graph";
+ 	fp = fopen (fn, "w+");
+ 	g_assert (fp);
+ 
+--- a/src/runtime/src/mono/mono/mini/mini-posix.c
++++ b/src/runtime/src/mono/mono/mini/mini-posix.c
+@@ -976,7 +976,7 @@ mono_gdb_render_native_backtraces (pid_t crashed_pid)
+ 
+ 	char commands_filename [100];
+ 	commands_filename [0] = '\0';
+-	g_snprintf (commands_filename, sizeof (commands_filename), "/tmp/mono-gdb-commands.%d", crashed_pid);
++	g_snprintf (commands_filename, sizeof (commands_filename), "@TERMUX_PREFIX@/tmp/mono-gdb-commands.%d", crashed_pid);
+ 
+ 	// Create this file, overwriting if it already exists
+ 	int commands_handle = g_open (commands_filename, O_TRUNC | O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
+--- a/src/runtime/src/mono/mono/mini/mini-runtime.c
++++ b/src/runtime/src/mono/mono/mini/mini-runtime.c
+@@ -1986,7 +1986,7 @@ mono_enable_jit_map (void)
+ {
+ 	if (!perf_map_file) {
+ 		char name [64];
+-		g_snprintf (name, sizeof (name), "/tmp/perf-%d.map", getpid ());
++		g_snprintf (name, sizeof (name), "@TERMUX_PREFIX@/tmp/perf-%d.map", getpid ());
+ 		unlink (name);
+ 		perf_map_file = fopen (name, "w");
+ 	}
+@@ -2111,7 +2111,7 @@ mono_enable_jit_dump (void)
+ 		mono_os_mutex_init (&perf_dump_mutex);
+ 		mono_os_mutex_lock (&perf_dump_mutex);
+ 
+-		g_snprintf (name, sizeof (name), "/tmp/jit-%d.dump", perf_dump_pid);
++		g_snprintf (name, sizeof (name), "@TERMUX_PREFIX@/tmp/jit-%d.dump", perf_dump_pid);
+ 		unlink (name);
+ 		perf_dump_file = fopen (name, "w+");
+ 
+--- a/src/runtime/src/mono/mono/mini/viewstat.pl
++++ b/src/runtime/src/mono/mono/mini/viewstat.pl
+@@ -75,7 +75,7 @@ if ($stattitle ne "") {
+ $outfile = $Opts{'o'};
+ 
+ if ($outfile eq "") {
+-    $tmp = $outfile = "/tmp/viewstat" . $$ . ".png";
++    $tmp = $outfile = "@TERMUX_PREFIX@/tmp/viewstat" . $$ . ".png";
+ }
+ 
+ $graph->plot(\@data);
+--- a/src/runtime/src/native/corehost/hostmisc/pal.unix.cpp
++++ b/src/runtime/src/native/corehost/hostmisc/pal.unix.cpp
+@@ -416,7 +416,7 @@ bool pal::get_global_dotnet_dirs(std::vector<pal::string_t>* recv)
+ 
+ pal::string_t pal::get_dotnet_self_registered_config_location(pal::architecture arch)
+ {
+-    pal::string_t config_location = _X("/etc/dotnet");
++    pal::string_t config_location = _X("@TERMUX_PREFIX@/etc/dotnet");
+ 
+     //  ***Used only for testing***
+     pal::string_t environment_install_location_override;
+@@ -608,7 +608,7 @@ bool pal::get_default_installation_dir_for_arch(pal::architecture arch, pal::str
+         recv->assign(_X("/usr/local/share/dotnet"));
+     }
+ #else
+-    recv->assign(_X("/usr/share/dotnet"));
++    recv->assign(_X("@TERMUX_PREFIX@/share/dotnet"));
+ #endif
+     return true;
+ }
+@@ -813,7 +813,7 @@ pal::string_t normalize_linux_rid(pal::string_t rid)
+ pal::string_t pal::get_current_os_rid_platform()
+ {
+     pal::string_t ridOS;
+-    pal::string_t versionFile(_X("/etc/os-release"));
++    pal::string_t versionFile(_X("@TERMUX_PREFIX@/etc/os-release"));
+ 
+     if (pal::file_exists(versionFile))
+     {

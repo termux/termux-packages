@@ -1,0 +1,14 @@
+diff -u -r ../wol-0.7.1/src/magic.c ./src/magic.c
+--- ../wol-0.7.1/src/magic.c	2003-08-12 16:45:22.000000000 +0000
++++ ./src/magic.c	2017-07-07 06:18:14.306649401 +0000
+@@ -114,7 +114,9 @@
+ 	XFREE ((void *) m);
+ }
+ 
+-
++#ifdef __ANDROID__
++extern int ether_hostton(const char *, struct ether_addr *);
++#endif
+ 
+ int
+ magic_assemble (struct magic *magic_buf, const char *mac_str,

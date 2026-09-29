@@ -1,0 +1,36 @@
+--- src/SConstruct	2021-05-17 10:52:36.910193982 +0000
++++ src/SConstruct	2021-05-17 10:53:54.856878859 +0000
+@@ -155,6 +155,7 @@
+ env = Environment(variables=opts,
+                   tools=('default', 'textfile',),
+                   CPPPATH=['.', ],
++                  PLATFORM='posix'
+                   )
+ 
+ env.Append(BUILDERS = {
+@@ -216,7 +217,8 @@
+ # from current_version, so don't use the PATCH level to avoid that build and
+ # runtime patch levels have to be identical.
+ if sys.platform != 'sunos5':
+-  env['SHLIBVERSION'] = '%d.%d.%d' % (MAJOR, MINOR, 0)
++  #env['SHLIBVERSION'] = '%d.%d.%d' % (MAJOR, MINOR, 0)
++  env['SHLIBSUFFIX'] = '.so'
+ 
+ LIBNAME = 'libserf-%d' % (MAJOR,)
+ if sys.platform != 'win32':
+@@ -257,7 +259,6 @@
+   env = conf.Finish()
+ 
+   if have_gcc:
+-    env.Append(CFLAGS=['-std=c89'])
+     env.Append(CCFLAGS=['-Wdeclaration-after-statement',
+                         '-Wmissing-prototypes',
+                         '-Wall'])
+@@ -266,7 +267,6 @@
+     env.Append(CCFLAGS=['-g'])
+     env.Append(CPPDEFINES=['DEBUG', '_DEBUG'])
+   else:
+-    env.Append(CCFLAGS=['-O2'])
+     env.Append(CPPDEFINES=['NDEBUG'])
+ 
+   ### works for Mac OS. probably needs to change

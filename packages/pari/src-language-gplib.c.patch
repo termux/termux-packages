@@ -1,0 +1,11 @@
+--- a/src/language/gplib.c
++++ b/src/language/gplib.c
+@@ -806,7 +806,7 @@ gprc_get(void)
+     f = gprc_chk(str); /* in $HOME */
+     if (!f) f = gprc_chk(s); /* in . */
+ #ifndef _WIN32
+-    if (!f) f = gprc_chk("/etc/gprc");
++    if (!f) f = gprc_chk("@TERMUX_PREFIX@/etc/gprc");
+ #else
+     if (!f)  /* in basedir */
+     {

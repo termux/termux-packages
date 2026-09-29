@@ -1,0 +1,80 @@
+diff --git a/kcms/region_language/localegenhelper/localegenhelper.cpp b/kcms/region_language/localegenhelper/localegenhelper.cpp
+index 4016356..ae880e6 100644
+--- a/kcms/region_language/localegenhelper/localegenhelper.cpp
++++ b/kcms/region_language/localegenhelper/localegenhelper.cpp
+@@ -17,7 +17,6 @@
+ using namespace Qt::StringLiterals;
+ 
+ LocaleGenHelper::LocaleGenHelper()
+-    : m_authority(PolkitQt1::Authority::instance())
+ {
+     new LocaleGenHelperAdaptor(this);
+     if (!QDBusConnection::systemBus().registerService(QStringLiteral("org.kde.localegenhelper"))) {
+@@ -28,7 +27,6 @@ LocaleGenHelper::LocaleGenHelper()
+         qWarning() << "unable to register service interface to dbus";
+         QCoreApplication::instance()->exit();
+     }
+-    connect(m_authority, &PolkitQt1::Authority::checkAuthorizationFinished, this, &LocaleGenHelper::enableLocalesPrivate);
+     connect(&m_timer, &QTimer::timeout, this, [] {
+         QCoreApplication::instance()->exit();
+     });
+@@ -49,30 +47,12 @@ void LocaleGenHelper::enableLocales(const QStringList &locales)
+     processLocales(locales);
+     m_isGenerating = true;
+     if (shouldGenerate()) {
+-        m_authority->checkAuthorization(QStringLiteral("org.kde.localegenhelper.enableLocales"),
+-                                        PolkitQt1::SystemBusNameSubject(message().service()),
+-                                        PolkitQt1::Authority::AllowUserInteraction);
+     } else {
+         exitAfterTimeOut();
+         Q_EMIT success();
+     }
+ }
+ 
+-void LocaleGenHelper::enableLocalesPrivate(PolkitQt1::Authority::Result result)
+-{
+-    qDebug() << result;
+-    if (result != PolkitQt1::Authority::Result::Yes) {
+-        Q_EMIT error(i18n("Unauthorized to edit locale configuration file"));
+-        exitAfterTimeOut();
+-        return;
+-    }
+-
+-    // if success, handleLocaleGen will call exit
+-    if (editLocaleGen()) {
+-        exitAfterTimeOut();
+-    }
+-}
+-
+ bool LocaleGenHelper::shouldGenerate()
+ {
+     QFile localegen(QStringLiteral("/etc/locale.gen"));
+diff --git a/kcms/region_language/localegenhelper/localegenhelper.h b/kcms/region_language/localegenhelper/localegenhelper.h
+index 7996e7c..4f0dd5b 100644
+--- a/kcms/region_language/localegenhelper/localegenhelper.h
++++ b/kcms/region_language/localegenhelper/localegenhelper.h
+@@ -5,7 +5,6 @@
+     SPDX-License-Identifier: GPL-2.0-or-later
+ */
+ #pragma once
+-#include <PolkitQt1/Authority>
+ #include <QCoreApplication>
+ #include <QDBusContext>
+ #include <QFile>
+@@ -27,8 +26,6 @@ public:
+ Q_SIGNALS:
+     Q_SCRIPTABLE void success();
+     Q_SCRIPTABLE void error(const QString &msg);
+-private Q_SLOTS:
+-    void enableLocalesPrivate(PolkitQt1::Authority::Result result);
+ 
+ private:
+     void handleLocaleGen(int statusCode, QProcess::ExitStatus status, QProcess *process);
+@@ -40,7 +37,6 @@ private:
+     std::atomic<bool> m_isGenerating = false;
+     bool m_comment = false;
+     std::set<QString> m_alreadyEnabled;
+-    PolkitQt1::Authority *m_authority = nullptr;
+     QStringList m_locales;
+     QTimer m_timer;
+ };

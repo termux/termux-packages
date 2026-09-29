@@ -1,0 +1,46 @@
+--- a/src/pstd/src/posix.cc
++++ b/src/pstd/src/posix.cc
+@@ -8,6 +8,15 @@
+  * Wrappers for Unix process control functions
+  ********************************************/
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCELED ((void *)-1)
++static void
++thread_signal_handler(int signum)
++{
++  pthread_exit(PTHREAD_CANCELED);
++}
++#endif
++
+ /* $begin forkwrapper */
+ pid_t Fork() {
+   pid_t pid;
+@@ -397,6 +406,15 @@ struct hostent* Gethostbyaddr(const char* addr, int len, int type) {
+ void Pthread_create(pthread_t* tidp, pthread_attr_t* attrp, void* (*routine)(void*), void* argp) {
+   int rc;
+ 
++#ifdef __ANDROID__
++  struct sigaction actions;
++  memset(&actions, 0, sizeof(actions));
++  sigemptyset(&actions.sa_mask);
++  actions.sa_flags = 0;
++  actions.sa_handler = thread_signal_handler;
++  sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+   if (rc = pthread_create(tidp, attrp, routine, argp); rc != 0) {
+     LOG(ERROR) << "Pthread_create error: " << strerror(rc);
+   }
+@@ -405,7 +423,11 @@ void Pthread_create(pthread_t* tidp, pthread_attr_t* attrp, void* (*routine)(voi
+ void Pthread_cancel(pthread_t tid) {
+   int rc;
+ 
++#ifdef __ANDROID__
++  if (rc = pthread_kill(tid, SIGUSR2); rc != 0) {
++#else
+   if (rc = pthread_cancel(tid); rc != 0) {
++#endif
+     LOG(ERROR) << "Pthread_cancel error: " << strerror(rc);
+   }
+ }

@@ -1,0 +1,29 @@
+--- a/zig/lib/std/os/linux.zig
++++ b/zig/lib/std/os/linux.zig
+@@ -563,7 +563,7 @@
+ }
+ 
+ pub fn access(path: [*:0]const u8, mode: u32) usize {
+-    if (@hasField(SYS, "access")) {
++    if (@hasField(SYS, "access") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall2(.access, @ptrToInt(path), mode);
+     } else {
+         return syscall4(.faccessat, @bitCast(usize, @as(isize, AT.FDCWD)), @ptrToInt(path), mode, 0);
+@@ -577,7 +577,7 @@
+ pub fn pipe(fd: *[2]i32) usize {
+     if (comptime (native_arch.isMIPS() or native_arch.isSPARC())) {
+         return syscall_pipe(fd);
+-    } else if (@hasField(SYS, "pipe")) {
++    } else if (@hasField(SYS, "pipe") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall1(.pipe, @ptrToInt(fd));
+     } else {
+         return syscall2(.pipe2, @ptrToInt(fd), 0);
+@@ -1313,7 +1313,7 @@
+ }
+ 
+ pub fn statx(dirfd: i32, path: [*]const u8, flags: u32, mask: u32, statx_buf: *Statx) usize {
+-    if (@hasField(SYS, "statx")) {
++    if (@hasField(SYS, "statx") and (comptime builtin.cpu.arch != .aarch64) and (comptime builtin.cpu.arch != .arm) and (comptime builtin.cpu.arch != .riscv64) and (comptime builtin.cpu.arch != .x86) and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall5(
+             .statx,
+             @bitCast(usize, @as(isize, dirfd)),

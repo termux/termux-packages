@@ -1,0 +1,15 @@
+TERMUX_PKG_HOMEPAGE="https://invent.kde.org/plasma/breeze-gtk"
+TERMUX_PKG_DESCRIPTION="Breeze widget theme for GTK 2 and 3"
+TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="6.7.5"
+TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/breeze-gtk-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=4e0e913b0515de75492155d028c086c4a522a3f68ebb6f4fab10f8bc646cd518
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_DEPENDS="breeze, extra-cmake-modules, pycairo, sassc"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_SYSTEM_NAME=Linux
+-DKDE_INSTALL_QMLDIR=lib/qt6/qml
+-DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
+"

@@ -1,0 +1,13 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/06_correct_test_open_syscall
+
+--- a/ntreg.c
++++ b/ntreg.c
+@@ -4133,7 +4133,7 @@ int writeHive(struct hive *hdesc)
+   if ( !(hdesc->state & HMODE_DIRTY)) return(0);
+ 
+   if ( !(hdesc->state & HMODE_OPEN)) { /* File has been closed */
+-    if (!(hdesc->filedesc = open(hdesc->filename,O_RDWR))) {
++    if ((hdesc->filedesc = open(hdesc->filename,O_RDWR)) < 0) {
+       fprintf(stderr,"writeHive: open(%s) failed: %s, FILE NOT WRITTEN!\n",hdesc->filename,strerror(errno));
+       return(1);
+     }

@@ -1,0 +1,58 @@
+--- a/frontend/libpicofe/linux/plat.c
++++ b/frontend/libpicofe/linux/plat.c
+@@ -25,6 +25,7 @@
+ #endif
+ 
+ #include "../plat.h"
++#include "../../main.h"
+ #include "../posix.h"
+ 
+ /* XXX: maybe unhardcode pagesize? */
+@@ -81,6 +81,15 @@ static int plat_get_exe_dir(char *dst, int len)
+ #endif
+ }
+ 
++#ifdef __ANDROID__
++size_t plat_get_skin_dir(char *dst)
++{
++	static const char path[] = PCSX_DOT_DIR "skin/";
++	static const size_t len = sizeof path / sizeof path[0];
++	memcpy(dst, path, len);
++	return len - 1;
++}
++#else
+ int plat_get_skin_dir(char *dst, int len)
+ {
+ 	int ret = plat_get_exe_dir(dst, len);
+@@ -90,6 +99,7 @@ int plat_get_skin_dir(char *dst, int len)
+ 	memcpy(dst + ret, "skin/", sizeof "skin/");
+ 	return ret + sizeof("skin/") - 1;
+ }
++#endif
+ 
+ #ifndef PICO_HOME_DIR
+ #define PICO_HOME_DIR "/.picodrive/"
+@@ -104,6 +105,15 @@ int plat_get_skin_dir(char *dst, int len)
+ #ifndef PICO_HOME_DIR
+ #define PICO_HOME_DIR "/.picodrive/"
+ #endif
++#ifdef __ANDROID__
++size_t plat_get_root_dir(char *dst)
++{
++	static const char path[] = PCSX_DOT_DIR;
++	static const size_t len = sizeof path / sizeof path[0];
++	memcpy(dst, path, len);
++	return len - 1;
++}
++#else
+ int plat_get_root_dir(char *dst, int len)
+ {
+ #if !defined(NO_HOME_DIR) && !defined(__GP2X__) && !defined(PANDORA)
+@@ -120,6 +130,7 @@ int plat_get_root_dir(char *dst, int len)
+ #endif
+ 	return plat_get_exe_dir(dst, len);
+ }
++#endif
+ 
+ #ifdef __GP2X__
+ /* Wiz has a borked gettimeofday().. */

@@ -1,0 +1,56 @@
+--- a/common/crypto/aes256-aarch64.cpp
++++ b/common/crypto/aes256-aarch64.cpp
+@@ -78,7 +78,7 @@
+ void crypto_aarch64_aes256_set_decrypt_key(vk_aes_ctx_t *vk_ctx, const uint8_t key[32]) {
+   crypto_aarch64_aes256_set_encrypt_key(vk_ctx, key);
+ 
+-  unsigned char *a = align16(&vk_ctx->u.ctx.a);
++  unsigned char *a = (unsigned char *)align16(&vk_ctx->u.ctx.a);
+   for (int i = 1; i <= 13; i++) {
+     asm volatile("mov x9, %[key] ;"
+                  "ld1 {v0.16b}, [x9] ;"
+@@ -97,7 +97,7 @@
+ 
+   asm volatile("mov x9, %[iv]  ;"       // move IV address in x9
+                "mov x10, %[out] ;"      // move out address in x10
+-               "mov x11, %[size] ;"     // move size value in x11
++               "mov w11, %w[size] ;"    // move size value in x11
+                "mov x12, %[in] ;"       // move plaintext address in x12
+                "mov x13, %[key] ;"      // move key address in x13
+                "ld1 {v25.16b}, [x9] ;"  // load IV to v0.16b
+@@ -167,7 +167,7 @@
+ 
+   asm volatile("mov x9, %[iv]  ;"       // move IV address in x9
+                "mov x10, %[out] ;"      // move out address in x10
+-               "mov x11, %[size] ;"     // move size value in x11
++               "mov w11, %w[size] ;"    // move size value in x11
+                "mov x12, %[in] ;"       // move ciphertext address in x12
+                "mov x13, %[key] ;"      // move key address in x13
+                "ld1 {v25.16b}, [x9] ;"  // load IV to v25.16b
+@@ -238,7 +238,7 @@
+ 
+   asm volatile("mov x9, %[iv]  ;"             // move IGE IV address in x9
+                "mov x10, %[out] ;"            // move out address in x10
+-               "mov x11, %[size] ;"           // move size value in x11
++               "mov w11, %w[size] ;"          // move size value in x11
+                "mov x12, %[in] ;"             // move plaintext address in x12
+                "mov x13, %[key] ;"            // move key address in x13
+                "ld1 {v25.16b}, [x9], #16 ;"   // load IGE IV Y to v25.16b
+@@ -313,7 +313,7 @@
+ 
+   asm volatile("mov x9, %[iv]  ;"           // move IGE IV address in x9
+                "mov x10, %[out] ;"          // move out address in x10
+-               "mov x11, %[size] ;"         // move size value in x11
++               "mov w11, %w[size] ;"        // move size value in x11
+                "mov x12, %[in] ;"           // move cyphertext address in x12
+                "mov x13, %[key] ;"          // move key address in x13
+                "ld1 {v25.16b}, [x9], #16 ;" // load IGE IV Y to v25.16b
+@@ -439,7 +439,7 @@
+                "mov x10, %[in] ;"       // move plaintext address in x10
+                "mov x11, %[key] ;"      // move key address in x11
+                "mov x12, %[iv]  ;"      // move IV address in x12
+-               "mov x13, %[n] ;"        // move n value in x11
++               "mov w13, %w[n] ;"       // move n value in x11
+                "ld1 {v26.16b}, [x12] ;" // load IV to v0.16b
+                "eor v25.16b, v25.16b, v25.16b ;"
+                "mov w15, #1 ;"

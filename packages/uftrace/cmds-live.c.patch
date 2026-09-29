@@ -1,0 +1,11 @@
+--- a/cmds/live.c
++++ b/cmds/live.c
+@@ -427,7 +427,7 @@
+ 	int ret;
+ 
+ 	if (!opts->record) {
+-		const char *tmpdir = getenv("TMPDIR") ?: "/tmp";
++		const char *tmpdir = getenv("TMPDIR") ?: "@TERMUX_PREFIX@/tmp";
+ 
+ 		snprintf(tmp_dirname, sizeof(tmp_dirname), "%s/" LIVE_NAME, tmpdir);
+ 		umask(022);

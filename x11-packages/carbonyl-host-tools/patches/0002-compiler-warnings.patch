@@ -1,0 +1,45 @@
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -1608,6 +1608,12 @@
+       "-Wno-unused-parameter",  # Unused function parameters.
+     ]
+ 
++    cflags_cc += [
++      # Disables for C++ only
++      "-Wno-invalid-offsetof",  # offsetof on non-standard-layout type
++                                # (crbug.com/40285259)
++    ]
++
+     if (!is_nacl || is_nacl_saigo) {
+       cflags += [
+         # An ABI compat warning we don't care about, https://crbug.com/1102157
+@@ -1618,6 +1624,11 @@
+     }
+   }
+ 
++  cflags += [
++    "-Wno-unknown-warning-option",
++    "-Wno-unknown-pragmas",
++  ]
++
+   if (is_clang) {
+     cflags += [
+       "-Wloop-analysis",
+@@ -1636,6 +1647,17 @@
+       }
+ 
+       cflags += [
++        # TODO(crbug.com/40284799): Fix and re-enable.
++        "-Wno-thread-safety-reference-return",
++      ]
++
++      cflags_cc += [
++          # Will be fix later, disable it for now
++          "-Wno-deprecated-this-capture",
++          "-Wno-vla-cxx-extension",
++      ]
++
++      cflags += [
+         "-Wenum-compare-conditional",
+ 
+         # Ignore warnings about MSVC optimization pragmas.

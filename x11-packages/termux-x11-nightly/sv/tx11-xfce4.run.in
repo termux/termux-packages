@@ -1,0 +1,7 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+# Create a file for DISPLAY number. Users can do something like
+# export DISPLAY=":$(cat $PREFIX/var/run/tx11-xfce4.display)"
+# to use it.
+exec 3<> @TERMUX_PREFIX@/var/run/tx11-xfce4.display
+exec termux-x11 -displayfd 3 -xstartup "dbus-launch --exit-with-session xfce4-session" 2>&1

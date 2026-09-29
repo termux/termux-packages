@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GaClient" get-type="ga_client_get_type" parents="GObject">
+    <property name="state" type="GaClientState" flags="161" default-value="GA_CLIENT_STATE_NOT_STARTED"/>
+    <property name="flags" type="GaClientFlags" flags="171" default-value="GA_CLIENT_FLAG_NO_FLAGS"/>
+    <signal name="state-changed" return="void" when="last" detailed="1">
+      <param type="GaClientState"/>
+    </signal>
+  </class>
+  <class name="GaEntryGroup" get-type="ga_entry_group_get_type" parents="GObject">
+    <property name="state" type="GaEntryGroupState" flags="161" default-value="GA_ENTRY_GROUP_STATE_UNCOMMITED"/>
+    <signal name="state-changed" return="void" when="last" detailed="1">
+      <param type="GaEntryGroupState"/>
+    </signal>
+  </class>
+  <class name="GaRecordBrowser" get-type="ga_record_browser_get_type" parents="GObject">
+    <property name="protocol" type="GaProtocol" flags="163" default-value="GA_PROTOCOL_UNSPEC"/>
+    <property name="interface" type="gint" flags="163" default-value="-1"/>
+    <property name="name" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="class" type="guint" flags="163" default-value="0"/>
+    <property name="type" type="guint" flags="163" default-value="0"/>
+    <property name="flags" type="GaLookupFlags" flags="163" default-value="GA_LOOKUP_NO_FLAGS"/>
+    <signal name="new-record" return="void" when="last">
+      <param type="gint"/>
+      <param type="GaProtocol"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gpointer"/>
+      <param type="gint"/>
+      <param type="GaLookupResultFlags"/>
+    </signal>
+    <signal name="removed-record" return="void" when="last">
+      <param type="gint"/>
+      <param type="GaProtocol"/>
+      <param type="gchararray"/>
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gpointer"/>
+      <param type="gint"/>
+      <param type="GaLookupResultFlags"/>
+    </signal>
+    <signal name="all-for-now" return="void" when="last">
+    </signal>
+    <signal name="cache-exhausted" return="void" when="last">
+    </signal>
+    <signal name="failure" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+  </class>
+  <class name="GaServiceBrowser" get-type="ga_service_browser_get_type" parents="GObject">
+    <property name="protocol" type="GaProtocol" flags="163" default-value="GA_PROTOCOL_UNSPEC"/>
+    <property name="interface" type="gint" flags="163" default-value="-1"/>
+    <property name="type" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="domain" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="flags" type="GaLookupFlags" flags="163" default-value="GA_LOOKUP_NO_FLAGS"/>
+    <signal name="all-for-now" return="void" when="last">
+    </signal>
+    <signal name="cache-exhausted" return="void" when="last">
+    </signal>
+    <signal name="failure" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="new-service" return="void" when="last">
+      <param type="gint"/>
+      <param type="GaProtocol"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GaLookupResultFlags"/>
+    </signal>
+    <signal name="removed-service" return="void" when="last">
+      <param type="gint"/>
+      <param type="GaProtocol"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="GaLookupResultFlags"/>
+    </signal>
+  </class>
+  <class name="GaServiceResolver" get-type="ga_service_resolver_get_type" parents="GObject">
+    <property name="protocol" type="GaProtocol" flags="163" default-value="GA_PROTOCOL_UNSPEC"/>
+    <property name="interface" type="gint" flags="163" default-value="-1"/>
+    <property name="name" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="type" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="domain" type="gchararray" flags="163" default-value="NULL"/>
+    <property name="flags" type="GaLookupFlags" flags="163" default-value="GA_LOOKUP_NO_FLAGS"/>
+    <property name="aprotocol" type="GaProtocol" flags="163" default-value="GA_PROTOCOL_UNSPEC"/>
+    <signal name="failure" return="void" when="last">
+      <param type="gpointer"/>
+    </signal>
+    <signal name="found" return="void" when="last">
+      <param type="gint"/>
+      <param type="GaProtocol"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+      <param type="gpointer"/>
+      <param type="gint"/>
+      <param type="gpointer"/>
+      <param type="GaLookupResultFlags"/>
+    </signal>
+  </class>
+  <enum name="GaClientState" get-type="ga_client_state_get_type">
+    <member name="GA_CLIENT_STATE_NOT_STARTED" nick="GA_CLIENT_STATE_NOT_STARTED" value="-1"/>
+    <member name="GA_CLIENT_STATE_S_REGISTERING" nick="GA_CLIENT_STATE_S_REGISTERING" value="1"/>
+    <member name="GA_CLIENT_STATE_S_RUNNING" nick="GA_CLIENT_STATE_S_RUNNING" value="2"/>
+    <member name="GA_CLIENT_STATE_S_COLLISION" nick="GA_CLIENT_STATE_S_COLLISION" value="3"/>
+    <member name="GA_CLIENT_STATE_FAILURE" nick="GA_CLIENT_STATE_FAILURE" value="100"/>
+    <member name="GA_CLIENT_STATE_CONNECTING" nick="GA_CLIENT_STATE_CONNECTING" value="101"/>
+  </enum>  <enum name="GaClientFlags" get-type="ga_client_flags_get_type">
+    <member name="GA_CLIENT_FLAG_NO_FLAGS" nick="GA_CLIENT_FLAG_NO_FLAGS" value="0"/>
+    <member name="GA_CLIENT_FLAG_IGNORE_USER_CONFIG" nick="GA_CLIENT_FLAG_IGNORE_USER_CONFIG" value="1"/>
+    <member name="GA_CLIENT_FLAG_NO_FAIL" nick="GA_CLIENT_FLAG_NO_FAIL" value="2"/>
+  </enum>  <enum name="GaEntryGroupState" get-type="ga_entry_group_state_get_type">
+    <member name="GA_ENTRY_GROUP_STATE_UNCOMMITED" nick="GA_ENTRY_GROUP_STATE_UNCOMMITED" value="0"/>
+    <member name="GA_ENTRY_GROUP_STATE_REGISTERING" nick="GA_ENTRY_GROUP_STATE_REGISTERING" value="1"/>
+    <member name="GA_ENTRY_GROUP_STATE_ESTABLISHED" nick="GA_ENTRY_GROUP_STATE_ESTABLISHED" value="2"/>
+    <member name="GA_ENTRY_GROUP_STATE_COLLISTION" nick="GA_ENTRY_GROUP_STATE_COLLISTION" value="3"/>
+    <member name="GA_ENTRY_GROUP_STATE_FAILURE" nick="GA_ENTRY_GROUP_STATE_FAILURE" value="4"/>
+  </enum>  <enum name="GaProtocol" get-type="ga_protocol_get_type">
+    <member name="GA_PROTOCOL_INET" nick="GA_PROTOCOL_INET" value="0"/>
+    <member name="GA_PROTOCOL_INET6" nick="GA_PROTOCOL_INET6" value="1"/>
+    <member name="GA_PROTOCOL_UNSPEC" nick="GA_PROTOCOL_UNSPEC" value="-1"/>
+  </enum>  <enum name="GaLookupResultFlags" get-type="ga_lookup_result_flags_get_type">
+    <member name="GA_LOOKUP_RESULT_CACHED" nick="GA_LOOKUP_RESULT_CACHED" value="1"/>
+    <member name="GA_LOOKUP_RESULT_WIDE_AREA" nick="GA_LOOKUP_RESULT_WIDE_AREA" value="2"/>
+    <member name="GA_LOOKUP_RESULT_MULTICAST" nick="GA_LOOKUP_RESULT_MULTICAST" value="4"/>
+    <member name="GA_LOOKUP_RESULT_LOCAL" nick="GA_LOOKUP_RESULT_LOCAL" value="8"/>
+    <member name="GA_LOOKUP_RESULT_OUR_OWN" nick="GA_LOOKUP_RESULT_OUR_OWN" value="16"/>
+    <member name="GA_LOOKUP_RESULT_STATIC" nick="GA_LOOKUP_RESULT_STATIC" value="32"/>
+  </enum>  <enum name="GaLookupFlags" get-type="ga_lookup_flags_get_type">
+    <member name="GA_LOOKUP_NO_FLAGS" nick="GA_LOOKUP_NO_FLAGS" value="0"/>
+    <member name="GA_LOOKUP_USE_WIDE_AREA" nick="GA_LOOKUP_USE_WIDE_AREA" value="1"/>
+    <member name="GA_LOOKUP_USE_MULTICAST" nick="GA_LOOKUP_USE_MULTICAST" value="2"/>
+    <member name="GA_LOOKUP_NO_TXT" nick="GA_LOOKUP_NO_TXT" value="4"/>
+    <member name="GA_LOOKUP_NO_ADDRESS" nick="GA_LOOKUP_NO_ADDRESS" value="8"/>
+  </enum>  <enum name="GaResolverEvent" get-type="ga_resolver_event_get_type">
+    <member name="GA_RESOLVER_FOUND" nick="GA_RESOLVER_FOUND" value="0"/>
+    <member name="GA_RESOLVER_FAILURE" nick="GA_RESOLVER_FAILURE" value="1"/>
+  </enum>  <enum name="GaBrowserEvent" get-type="ga_browser_event_get_type">
+    <member name="GA_BROWSER_NEW" nick="GA_BROWSER_NEW" value="0"/>
+    <member name="GA_BROWSER_REMOVE" nick="GA_BROWSER_REMOVE" value="1"/>
+    <member name="GA_BROWSER_CACHE_EXHAUSTED" nick="GA_BROWSER_CACHE_EXHAUSTED" value="2"/>
+    <member name="GA_BROWSER_ALL_FOR_NOW" nick="GA_BROWSER_ALL_FOR_NOW" value="3"/>
+    <member name="GA_BROWSER_FAILURE" nick="GA_BROWSER_FAILURE" value="4"/>
+  </enum>  <error-quark function="ga_error_quark" domain="ga_error"/>
+</dump>

@@ -1,0 +1,51 @@
+--- a/services/device/hid/hid_service.cc
++++ b/services/device/hid/hid_service.cc
+@@ -26,6 +26,39 @@
+ #include "services/device/hid/hid_service_win.h"
+ #elif BUILDFLAG(IS_FUCHSIA)
+ #include "services/device/hid/hid_service_fuchsia.h"
++#elif defined(__TERMUX__)
++
++#include "base/notreached.h"
++#include "services/device/hid/hid_connection.h"
++ 
++namespace device {
++
++class HidServiceDummy : public HidService {
++ public:
++  HidServiceDummy() = default;
++  ~HidServiceDummy() = default;
++
++  HidServiceDummy(const HidServiceDummy&) = delete;
++  HidServiceDummy& operator=(const HidServiceDummy&) = delete;
++
++ private:
++  // HidService implementation.
++  void Connect(const std::string& device_id,
++               bool allow_protected_reports,
++               bool allow_fido_reports,
++               ConnectCallback callback) override {
++    // TODO(https://crbug.com/1311019): Implement this.
++    NOTIMPLEMENTED_LOG_ONCE();
++    std::move(callback).Run(nullptr);
++  }
++  base::WeakPtr<HidService> GetWeakPtr() override {
++    return weak_factory_.GetWeakPtr();
++  }
++
++  base::WeakPtrFactory<HidServiceDummy> weak_factory_{this};
++};
++
++}  // namespace device
+ #endif
+ 
+ namespace device {
+@@ -74,6 +107,8 @@
+   return std::make_unique<HidServiceWin>();
+ #elif BUILDFLAG(IS_FUCHSIA)
+   return std::make_unique<HidServiceFuchsia>();
++#elif defined(__TERMUX__)
++  return std::make_unique<HidServiceDummy>();
+ #else
+   return nullptr;
+ #endif

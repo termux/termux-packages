@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X11 damaged region extension library"
+TERMUX_PKG_LICENSE="HPND"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.1.7"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXdamage-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=127067f521d3ee467b97bcb145aeba1078e2454d448e8748eb984d5b397bde24
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxfixes"
+TERMUX_PKG_BUILD_DEPENDS="xorgproto"

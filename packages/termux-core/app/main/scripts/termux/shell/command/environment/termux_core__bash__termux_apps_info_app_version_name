@@ -1,0 +1,195 @@
+##### @TERMUX_CORE__BASH__TERMUX_APPS_INFO_ENV_VARIABLE@ to be replaced at build time. #####
+
+##### @TERMUX_CORE__BASH__TERMUX_APPS_INFO_APP_VERSION_NAME@ replaced at build time. (START) #####
+
+##
+# Get/Unset variable values of the app version name environment
+# variables `*_APP__APP_VERSION_NAME` for Termux app `TERMUX_APP__`,
+# its plugin apps `TERMUX_*_APP__` and external apps `*_APP__` app
+# scoped that exist in the `termux-apps-info.env` file, with support
+# for validation of values.
+#
+# **See Also:**
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-apps-info-app-version-name.md
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/app/main/scripts/termux/shell/command/environment/termux-apps-info-app-version-name.bash.in
+# - @TERMUX_PKGS__REPO_URL@/blob/master/packages/termux-core/app/main/scripts/termux/shell/command/environment/termux_core__bash__termux_apps_info_app_version_name
+# .
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-apps-info-env-variable.md
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/app/main/scripts/termux/shell/command/environment/termux-apps-info-env-variable.bash.in
+# - @TERMUX_PKGS__REPO_URL@/blob/master/packages/termux-core/app/main/scripts/termux/shell/command/environment/termux_core__bash__termux_apps_info_env_variable
+# .
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/site/pages/en/projects/docs/usage/utils/termux/shell/command/environment/termux-scoped-env-variable.md
+# - @TERMUX_CORE_PKG__REPO_URL@/blob/master/app/main/scripts/termux/shell/command/environment/termux-scoped-env-variable.bash.in
+# - @TERMUX_PKGS__REPO_URL@/blob/master/packages/termux-core/app/main/scripts/termux/shell/command/environment/termux_core__bash__termux_scoped_env_variable
+#
+#
+# `termux_core__bash__termux_apps_info_app_version_name` `get-value` [`<command_options>`] \
+#     `<output_mode>` `<scoped_var_scope_mode>`
+# `termux_core__bash__termux_apps_info_app_version_name` `unset-value` \
+#     `<scoped_var_scope_mode>`
+##
+termux_core__bash__termux_apps_info_app_version_name() {
+
+    local return_value
+
+    local command_type="${1:-}"
+    [ $# -gt 0 ] && shift 1
+
+    if [ "$command_type" = "get-value" ]; then
+        local opt; local opt_arg; local OPTARG=""; local OPTIND=1;
+
+        local extended_validator='r+=^(()|((googleplay\.)?[0-9].*))$'
+        local skip_sourcing_option="--skip-sourcing-if-cur-app-var"
+
+        if [ $# -eq 0 ]; then
+            echo "No arguments passed for the 'get-value' command. \
+The 'termux_core__bash__termux_apps_info_app_version_name' function expects 2 arguments." 1>&2
+            return 64 # EX__USAGE
+        fi
+
+        while getopts ":-:" opt; do
+            opt_arg="${OPTARG:-}"
+            case "${opt}" in
+                -)
+                    case "${OPTARG}" in *?=*) opt_arg="${OPTARG#*=}";; *) opt_arg="";; esac
+                    case "${OPTARG}" in
+                        extended-validator=?*)
+                            extended_validator="$opt_arg"
+                            ;;
+                        extended-validator | extended-validator=)
+                            echo "No argument set for arg option '--${OPTARG%=*}'." 1>&2
+                            return 64 # EX__USAGE
+                            ;;
+                        skip-sourcing)
+                            skip_sourcing_option="--skip-sourcing"
+                            ;;
+                        skip-sourcing=*)
+                            echo "Arguments not allowed for flag option '--${OPTARG%=*}': \`--${OPTARG:-}\`." 1>&2
+                            return 64 # EX__USAGE
+                            ;;
+                        '')
+                            break # End of options `--`.
+                            ;;
+                        *)
+                            echo "Unknown option: '--${OPTARG:-}'." 1>&2
+                            return 64 # EX__USAGE
+                            ;;
+                    esac
+                    ;;
+                :)
+                    echo "No argument passed for arg option '-$OPTARG'." 1>&2
+                    return 64 # EX__USAGE
+                    ;;
+                \?)
+                    echo "Unknown option${OPTARG:+": '-${OPTARG:-}'"}." 1>&2
+                    return 64 # EX__USAGE
+                    ;;
+            esac
+        done
+        shift $((OPTIND - 1)) # Remove already processed arguments from arguments array.
+
+        if [ $# -lt 2 ]; then
+            echo "Invalid argument count $# for the 'get-value' command. \
+The 'termux_core__bash__termux_apps_info_app_version_name' function expects 2 arguments." 1>&2
+            printf 'Arguments: %s\n' "$*" 1>&2
+            return 64 # EX__USAGE
+        fi
+
+        local output_mode="${1:-}"
+        local scoped_var_scope_mode="${2:-}"
+    elif [ "$command_type" = "unset-value" ]; then
+        local scoped_var_scope_mode="${1:-}"
+    else
+        echo "The command '$command_type' passed to 'termux_core__bash__termux_apps_info_app_version_name' is not valid." 1>&2
+        return 64 # EX__USAGE
+    fi
+
+
+    if [ "$command_type" = "get-value" ]; then
+        local __app_version_name=""
+
+        if [ "$output_mode" != ">" ] && [ "$output_mode" != "-" ]; then
+            # A valid environment variable name (like `TERMUX__VAR`) or a bash array variable (like `TERMUX__ARRAY[0]`).
+            local valid_bash_variable_name_regex='^[a-zA-Z_][a-zA-Z0-9_]*(\[[0-9]+\])?$' # ' single quote for linter error false positive against `IFS=$'\n'`
+
+            # If `output_mode` is not a valid environment variable name.
+            if [[ ! "$output_mode" =~ $valid_bash_variable_name_regex ]]; then
+                echo "The output_mode '$output_mode' argument passed to \
+'termux_core__bash__termux_apps_info_app_version_name' is not a valid environment variable name, or equal to \`>\` or \`-\`." 1>&2
+                return 64 # EX__USAGE
+            fi
+        fi
+
+
+        return_value=0
+        termux_core__bash__termux_apps_info_env_variable get-value \
+            "$skip_sourcing_option" __app_version_name \
+            "$scoped_var_scope_mode" "APP_VERSION_NAME" "$extended_validator" || return_value=$?
+
+
+        # If getting version name of the Termux app but failed to get it,
+        # likely due to Termux app scoped `APP_VERSION_NAME` environment
+        # variable not being exported if running in Termux app version
+        # `<= 0.119.0` (as `TERMUX_ENV__S_ROOT` environment variable is
+        # not exported), then fallback to reading the old/deprecated
+        # `TERMUX_VERSION` environment variable.
+        # This may give outdated/wrong values if running in a plugin
+        # app like Termux:Float app and Termux app got updated in the
+        # background, as `TERMUX_VERSION` would be set to the version
+        # at the time the Termux:Float shell was started, and not the
+        # updated version.
+        if [ $return_value -eq 0 ] && [ -z "$__app_version_name" ] && \
+            { [ "$scoped_var_scope_mode" = cn="termux-app" ] || [ "$scoped_var_scope_mode" = ss="APP__" ]; } && \
+            [ -z "${TERMUX_ENV__S_ROOT:-}" ]; then
+            return_value=0
+            termux_core__bash__termux_scoped_env_variable get-value \
+                __app_version_name "" "" "$extended_validator" "${TERMUX_VERSION:-}" || return_value=$?
+        fi
+
+
+        # If either above commands failed.
+        if [ $return_value -ne 0 ]; then
+            # If a valid value not found.
+            if [ $return_value -eq 81 ]; then # C_EX__NOT_FOUND
+                # Set output variable in `output_mode` to an empty string
+                # since it may already be set, as callers may try to use
+                # that wrong value without checking the exit code.
+                # We unset after reading the values, otherwise if
+                # `var_to_get_name` generated in
+                # `termux_core__bash__termux_scoped_env_variable()` is
+                # equal to output variable in `output_mode` passed to this
+                # function, then `var_to_get_name` would get unset before
+                # its read.
+                if [ "$output_mode" != ">" ] && [ "$output_mode" != "-" ]; then
+                    printf -v "$output_mode" "%s" "" || return $?
+                fi
+            fi
+            return $return_value
+        fi
+
+
+        # If a valid value found.
+        if [ "$output_mode" = ">" ]; then
+            printf "%s" "$__app_version_name"
+            return $?
+        elif [ "$output_mode" != "-" ]; then
+            printf -v "$output_mode" "%s" "$__app_version_name"
+            return $?
+        else
+            return 0
+        fi
+    elif [ "$command_type" = "unset-value" ]; then
+        termux_core__bash__termux_scoped_env_variable unset-value \
+            "$scoped_var_scope_mode" "APP_VERSION_NAME" || return $?
+
+        if [ "$scoped_var_scope_mode" = cn="termux-app" ] || \
+            [ "$scoped_var_scope_mode" = ss="APP__" ]; then
+            unset TERMUX_VERSION
+        fi
+
+        return 0
+    fi
+
+}
+
+##### @TERMUX_CORE__BASH__TERMUX_APPS_INFO_APP_VERSION_NAME@ replaced at build time. (END) #####

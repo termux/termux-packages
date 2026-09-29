@@ -1,0 +1,11 @@
+--- a/va/va_internal.h
++++ b/va/va_internal.h
+@@ -30,7 +30,7 @@
+ #endif
+ 
+ #ifndef HAVE_SECURE_GETENV
+-#ifdef _WIN32
++#if defined(_WIN32) || defined (__ANDROID__)
+ /* No setuid/setgid on Windows, secure_getenv is just getenv */
+ #define secure_getenv getenv
+ #else

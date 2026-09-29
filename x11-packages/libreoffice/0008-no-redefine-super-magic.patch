@@ -1,0 +1,14 @@
+diff --git a/sal/osl/unx/file.cxx b/sal/osl/unx/file.cxx
+index eaad16612..5b2be64d8 100644
+--- a/sal/osl/unx/file.cxx
++++ b/sal/osl/unx/file.cxx
+@@ -68,7 +68,8 @@
+ 
+ #include <vector>
+ 
+-#ifdef LINUX
++#include <sys/vfs.h>
++#if defined(LINUX) && !defined(__ANDROID__)
+ #include <sys/vfs.h>
+ // As documented by the kernel
+ constexpr decltype(std::declval<struct statfs>().f_type) SMB_SUPER_MAGIC = 0x517B;

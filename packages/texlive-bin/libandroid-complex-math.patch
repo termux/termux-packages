@@ -1,0 +1,12 @@
+--- a/texk/web2c/luatexdir/luaffi/ffi.h
++++ b/texk/web2c/luatexdir/luaffi/ffi.h
+@@ -55,6 +55,9 @@ extern "C" {
+ #include <complex.h>
+ #define HAVE_COMPLEX
+ #endif
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++double complex cpow(double complex, double complex);
++#endif
+ #define HAVE_LONG_DOUBLE
+ 
+ #ifndef NDEBUG

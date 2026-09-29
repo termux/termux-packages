@@ -1,0 +1,57 @@
+--- a/meson.build
++++ b/meson.build
+@@ -105,10 +105,9 @@ lsusb_sources = [
+   'ccan/list/list.h',
+ ]
+ 
+-libudev = dependency('libudev', version: '>= 196')
+ libusb = dependency('libusb-1.0', version: '>= 1.0.22')
+ 
+-executable('lsusb', lsusb_sources, dependencies: [libusb, libudev], install: true)
++executable('lsusb', lsusb_sources, dependencies: [libusb], install: true)
+ 
+ ################################
+ # usbhid-dump build instructions
+diff --git a/names.c b/names.c
+index 6c25404..f7231d0 100644
+--- a/names.c
++++ b/names.c
+@@ -18,7 +18,6 @@
+ #include <stdbool.h>
+ 
+ #include <libusb.h>
+-#include <libudev.h>
+ 
+ #include "usb-spec.h"
+ #include "names.h"
+@@ -83,12 +82,6 @@ const char *names_countrycode(unsigned int countrycode)
+ 
+ static const char *hwdb_get(const char *modalias, const char *key)
+ {
+-	struct udev_list_entry *entry;
+-
+-	udev_list_entry_foreach(entry, udev_hwdb_get_properties_list_entry(hwdb, modalias, 0))
+-		if (strcmp(udev_list_entry_get_name(entry), key) == 0)
+-			return udev_list_entry_get_value(entry);
+-
+ 	return NULL;
+ }
+ 
+@@ -238,16 +231,9 @@ void get_vendor_product_with_fallback(char *vendor, int vendor_len,
+ 
+ int names_init(void)
+ {
+-	udev = udev_new();
+-	if (!udev)
+-		return -1;
+-
+-	hwdb = udev_hwdb_new(udev);
+-	return hwdb ? 0 : -1;
++	return -1;
+ }
+ 
+ void names_exit(void)
+ {
+-	hwdb = udev_hwdb_unref(hwdb);
+-	udev = udev_unref(udev);
+ }

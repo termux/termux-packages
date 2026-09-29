@@ -1,0 +1,52 @@
+diff -uNr apk-tools-2.10.3/src/archive.c apk-tools-2.10.3.mod/src/archive.c
+--- apk-tools-2.10.3/src/archive.c	2018-11-15 15:09:07.000000000 +0200
++++ apk-tools-2.10.3.mod/src/archive.c	2018-11-19 17:36:03.835900565 +0200
+@@ -20,6 +20,7 @@
+ #include <sysexits.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <sys/xattr.h>
+ #include <limits.h>
+ #include <stdint.h>
+@@ -441,7 +442,9 @@
+ 			      struct apk_istream *is,
+ 			      apk_progress_cb cb, void *cb_ctx)
+ {
++#ifndef __ANDROID__
+ 	struct apk_xattr *xattr;
++#endif
+ 	const char *fn = extract_name ?: ae->name;
+ 	int fd, r = -1, atflags = 0, ret = 0;
+ 
+@@ -487,12 +490,14 @@
+ 		return ret;
+ 	}
+ 
++#ifndef __ANDROID__
+ 	r = fchownat(atfd, fn, ae->uid, ae->gid, atflags);
+ 	if (r < 0) {
+ 		apk_error("Failed to set ownership on %s: %s",
+ 			  fn, strerror(errno));
+ 		if (!ret) ret = -errno;
+ 	}
++#endif
+ 
+ 	/* chown resets suid bit so we need set it again */
+ 	if (ae->mode & 07000) {
+@@ -506,6 +511,7 @@
+ 	}
+ 
+ 	/* extract xattrs */
++#ifndef __ANDROID__
+ 	if (!S_ISLNK(ae->mode) && ae->xattrs && ae->xattrs->num) {
+ 		r = 0;
+ 		fd = openat(atfd, fn, O_RDWR);
+@@ -527,6 +533,7 @@
+ 			if (!ret) ret = r;
+ 		}
+ 	}
++#endif
+ 
+ 	if (!S_ISLNK(ae->mode)) {
+ 		/* preserve modification time */

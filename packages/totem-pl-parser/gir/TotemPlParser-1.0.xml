@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="TotemPlParserResult" get-type="totem_pl_parser_result_get_type">
+    <member name="TOTEM_PL_PARSER_RESULT_UNHANDLED" nick="unhandled" value="0"/>
+    <member name="TOTEM_PL_PARSER_RESULT_ERROR" nick="error" value="1"/>
+    <member name="TOTEM_PL_PARSER_RESULT_SUCCESS" nick="success" value="2"/>
+    <member name="TOTEM_PL_PARSER_RESULT_IGNORED" nick="ignored" value="3"/>
+    <member name="TOTEM_PL_PARSER_RESULT_CANCELLED" nick="cancelled" value="4"/>
+  </enum>  <enum name="TotemPlParserType" get-type="totem_pl_parser_type_get_type">
+    <member name="TOTEM_PL_PARSER_PLS" nick="pls" value="0"/>
+    <member name="TOTEM_PL_PARSER_M3U" nick="m3u" value="1"/>
+    <member name="TOTEM_PL_PARSER_M3U_DOS" nick="m3u-dos" value="2"/>
+    <member name="TOTEM_PL_PARSER_XSPF" nick="xspf" value="3"/>
+    <member name="TOTEM_PL_PARSER_IRIVER_PLA" nick="iriver-pla" value="4"/>
+  </enum>  <enum name="TotemPlParserError" get-type="totem_pl_parser_error_get_type">
+    <member name="TOTEM_PL_PARSER_ERROR_NO_DISC" nick="no-disc" value="0"/>
+    <member name="TOTEM_PL_PARSER_ERROR_MOUNT_FAILED" nick="mount-failed" value="1"/>
+    <member name="TOTEM_PL_PARSER_ERROR_EMPTY_PLAYLIST" nick="empty-playlist" value="2"/>
+  </enum>  <class name="TotemPlPlaylist" get-type="totem_pl_playlist_get_type" parents="GObject">
+  </class>
+  <class name="TotemPlParser" get-type="totem_pl_parser_get_type" parents="GObject">
+    <property name="recurse" type="gboolean" flags="7" default-value="TRUE"/>
+    <property name="debug" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="force" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="disable-unsafe" type="gboolean" flags="3" default-value="FALSE"/>
+    <signal name="entry-parsed" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="TotemPlParserMetadata"/>
+    </signal>
+    <signal name="playlist-started" return="void" when="last">
+      <param type="gchararray"/>
+      <param type="TotemPlParserMetadata"/>
+    </signal>
+    <signal name="playlist-ended" return="void" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <boxed name="TotemPlParserMetadata" get-type="totem_pl_parser_metadata_get_type"/>
+  <error-quark function="totem_pl_parser_error_quark" domain="totem_pl_parser_error"/>
+</dump>

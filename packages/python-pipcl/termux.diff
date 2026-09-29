@@ -1,0 +1,18 @@
+Needed by python-mupdf and python-pymupdf for finding the Python include and link flags.
+
+--- a/src/pipcl.py
++++ b/src/pipcl.py
+@@ -3415,8 +3415,11 @@ class PythonFlags:
+             try:
+                 self.includes = run( f'{python_config} --includes', capture=1, verbose=0).strip()
+             except Exception as e:
+-                raise Exception('We require python development tools to be installed.') from e
+-            self.ldflags = run( f'{python_config} --ldflags', capture=1, verbose=0).strip()
++                self.includes = "-I@TERMUX_PREFIX@/include/python@TERMUX_PYTHON_VERSION@"
++            try:
++                self.ldflags = run( f'{python_config} --ldflags', capture=1, verbose=0).strip()
++            except Exception as e:
++                self.ldflags = "-L@TERMUX_PREFIX@/lib -lpython@TERMUX_PYTHON_VERSION@"
+             if linux():
+                 # It seems that with python-3.10 on Linux, we can get an
+                 # incorrect -lcrypt flag that on some systems (e.g. WSL)

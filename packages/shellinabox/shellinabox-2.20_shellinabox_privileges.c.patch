@@ -1,0 +1,57 @@
+diff -uNr shellinabox-2.20/shellinabox/privileges.c shellinabox-2.20.mod/shellinabox/privileges.c
+--- shellinabox-2.20/shellinabox/privileges.c	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/shellinabox/privileges.c	2020-01-03 01:34:35.341048035 +0200
+@@ -95,6 +95,10 @@
+ #endif
+ 
+ static void removeGroupPrivileges(int showError) {
++#ifdef __ANDROID__
++  return;
++#endif
++
+   gid_t rg, eg, sg;
+   check(!getresgid(&rg, &eg, &sg));
+ 
+@@ -128,6 +132,10 @@
+ }
+ 
+ void lowerPrivileges(void) {
++#ifdef __ANDROID__
++  return;
++#endif
++
+   uid_t r, e, g;
+   check(!getresuid(&r, &e, &g));
+ 
+@@ -159,6 +167,10 @@
+ }
+ 
+ void dropPrivileges(void) {
++#ifdef __ANDROID__
++  return;
++#endif
++
+   uid_t r, e, s;
+   check(!getresuid(&r, &e, &s));
+ 
+@@ -256,6 +268,10 @@
+ #endif
+ 
+ uid_t getUserId(const char *name) {
++#ifdef __ANDROID__
++  return getuid();
++#endif
++
+   struct passwd pwbuf, *pw;
+   char *buf;
+   #ifdef _SC_GETPW_R_SIZE_MAX
+@@ -364,6 +380,9 @@
+ #endif
+ 
+ gid_t getGroupId(const char *name) {
++#if __ANDROID__
++  return getgid();
++#endif
+   static const long gr_max = 64 * 1024;
+   struct group grbuf, *gr;
+   char *temp;

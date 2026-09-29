@@ -1,0 +1,231 @@
+This is https://github.com/freebsd/freebsd-ports/commit/0ddd6468fb3cb9ba390973520517cb1ca2cd690d
+
+--- a/src/3rdparty/chromium/v8/src/inspector/string-16.cc.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/v8/src/inspector/string-16.cc
+@@ -27,7 +27,7 @@ bool isSpaceOrNewLine(UChar c) {
+   return isASCII(c) && c <= ' ' && (c == ' ' || (c <= 0xD && c >= 0x9));
+ }
+ 
+-int64_t charactersToInteger(const UChar* characters, size_t length,
++int64_t charactersToInteger(const uint16_t* characters, size_t length,
+                             bool* ok = nullptr) {
+   std::vector<char> buffer;
+   buffer.reserve(length + 1);
+@@ -50,6 +50,8 @@ String16::String16(const UChar* characters, size_t siz
+ 
+ String16::String16(const UChar* characters, size_t size)
+     : m_impl(characters, size) {}
++String16::String16(const uint16_t* characters, size_t size)
++    : m_impl(reinterpret_cast<const UChar*>(characters), size) {}
+ 
+ String16::String16(const UChar* characters) : m_impl(characters) {}
+ 
+@@ -231,6 +233,10 @@ String16 String16::fromUTF16LE(const UChar* stringStar
+   // No need to do anything on little endian machines.
+   return String16(stringStart, length);
+ #endif  // V8_TARGET_BIG_ENDIAN
++}
++
++String16 String16::fromUTF16LE(const uint16_t* stringStart, size_t length) {
++  return fromUTF16LE(reinterpret_cast<const UChar*>(stringStart), length);
+ }
+ 
+ std::string String16::utf8() const {
+--- a/src/3rdparty/chromium/v8/src/inspector/string-16.h.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/v8/src/inspector/string-16.h
+@@ -6,6 +6,8 @@
+ #define V8_INSPECTOR_STRING_16_H_
+ 
+ #include <stdint.h>
++#include <uchar.h>
++ 
+ #include <cctype>
+ #include <climits>
+ #include <cstring>
+@@ -17,7 +19,7 @@ namespace v8_inspector {
+ 
+ namespace v8_inspector {
+ 
+-using UChar = uint16_t;
++using UChar = char16_t;
+ 
+ class String16 {
+  public:
+@@ -27,6 +29,7 @@ class String16 {
+   String16(const String16&) V8_NOEXCEPT = default;
+   String16(String16&&) V8_NOEXCEPT = default;
+   String16(const UChar* characters, size_t size);
++  String16(const uint16_t* characters, size_t size);
+   V8_EXPORT String16(const UChar* characters);  // NOLINT(runtime/explicit)
+   V8_EXPORT String16(const char* characters);   // NOLINT(runtime/explicit)
+   String16(const char* characters, size_t size);
+@@ -45,7 +48,9 @@ class String16 {
+   int64_t toInteger64(bool* ok = nullptr) const;
+   int toInteger(bool* ok = nullptr) const;
+   String16 stripWhiteSpace() const;
+-  const UChar* characters16() const { return m_impl.c_str(); }
++  const uint16_t* characters16() const {
++    return reinterpret_cast<const uint16_t*>(m_impl.c_str());
++  }
+   size_t length() const { return m_impl.length(); }
+   bool isEmpty() const { return !m_impl.length(); }
+   UChar operator[](size_t index) const { return m_impl[index]; }
+@@ -74,6 +79,8 @@ class String16 {
+   // Instantiates a String16 in native endianness from UTF16 LE.
+   // On Big endian architectures, byte order needs to be flipped.
+   V8_EXPORT static String16 fromUTF16LE(const UChar* stringStart,
++                                        size_t length);
++  V8_EXPORT static String16 fromUTF16LE(const uint16_t* stringStart,
+                                         size_t length);
+ 
+   std::size_t hash() const {
+--- a/src/3rdparty/chromium/v8/src/inspector/v8-string-conversions.cc.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/v8/src/inspector/v8-string-conversions.cc
+@@ -12,7 +12,7 @@ namespace {
+ 
+ namespace v8_inspector {
+ namespace {
+-using UChar = uint16_t;
++using UChar = char16_t;
+ using UChar32 = uint32_t;
+ 
+ bool isASCII(UChar c) { return !(c & ~0x7F); }
+@@ -389,7 +389,7 @@ std::basic_string<UChar> UTF8ToUTF16(const char* strin
+ 
+ std::basic_string<UChar> UTF8ToUTF16(const char* stringStart, size_t length) {
+   if (!stringStart || !length) return std::basic_string<UChar>();
+-  std::vector<uint16_t> buffer(length);
++  std::vector<UChar> buffer(length);
+   UChar* bufferStart = buffer.data();
+ 
+   UChar* bufferCurrent = bufferStart;
+@@ -398,7 +398,7 @@ std::basic_string<UChar> UTF8ToUTF16(const char* strin
+                          reinterpret_cast<const char*>(stringStart + length),
+                          &bufferCurrent, bufferCurrent + buffer.size(), nullptr,
+                          true) != conversionOK)
+-    return std::basic_string<uint16_t>();
++    return std::basic_string<UChar>();
+   size_t utf16Length = bufferCurrent - bufferStart;
+   return std::basic_string<UChar>(bufferStart, bufferStart + utf16Length);
+ }
+--- a/src/3rdparty/chromium/v8/src/inspector/v8-string-conversions.h.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/v8/src/inspector/v8-string-conversions.h
+@@ -5,14 +5,16 @@
+ #ifndef V8_INSPECTOR_V8_STRING_CONVERSIONS_H_
+ #define V8_INSPECTOR_V8_STRING_CONVERSIONS_H_
+ 
++#include <uchar.h>
++
+ #include <cstdint>
+ #include <string>
+ 
+ // Conversion routines between UT8 and UTF16, used by string-16.{h,cc}. You may
+ // want to use string-16.h directly rather than these.
+ namespace v8_inspector {
+-std::basic_string<uint16_t> UTF8ToUTF16(const char* stringStart, size_t length);
+-std::string UTF16ToUTF8(const uint16_t* stringStart, size_t length);
++std::basic_string<char16_t> UTF8ToUTF16(const char* stringStart, size_t length);
++std::string UTF16ToUTF8(const char16_t* stringStart, size_t length);
+ }  // namespace v8_inspector
+ 
+ #endif  // V8_INSPECTOR_V8_STRING_CONVERSIONS_H_
+--- a/src/3rdparty/chromium/v8/third_party/inspector_protocol/crdtp/test_platform_v8.cc.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/v8/third_party/inspector_protocol/crdtp/test_platform_v8.cc
+@@ -11,13 +11,16 @@ std::string UTF16ToUTF8(span<uint16_t> in) {
+ namespace v8_crdtp {
+ 
+ std::string UTF16ToUTF8(span<uint16_t> in) {
+-  return v8_inspector::UTF16ToUTF8(in.data(), in.size());
++  return v8_inspector::UTF16ToUTF8(reinterpret_cast<const char16_t*>(in.data()),
++                                   in.size());
+ }
+ 
+ std::vector<uint16_t> UTF8ToUTF16(span<uint8_t> in) {
+-  std::basic_string<uint16_t> utf16 = v8_inspector::UTF8ToUTF16(
++  std::basic_string<char16_t> utf16 = v8_inspector::UTF8ToUTF16(
+       reinterpret_cast<const char*>(in.data()), in.size());
+-  return std::vector<uint16_t>(utf16.begin(), utf16.end());
++  return std::vector<uint16_t>(
++      reinterpret_cast<const uint16_t*>(utf16.data()),
++      reinterpret_cast<const uint16_t*>(utf16.data()) + utf16.size());
+ }
+ 
+ }  // namespace v8_crdtp
+--- a/src/3rdparty/chromium/third_party/blink/renderer/platform/wtf/hash_table.h.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/third_party/blink/renderer/platform/wtf/hash_table.h
+@@ -1786,7 +1786,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits
+     }
+   }
+   table_ = temporary_table;
+-  Allocator::template BackingWriteBarrier(&table_);
++  Allocator::template BackingWriteBarrier<>(&table_);
+ 
+   if (Traits::kEmptyValueIsZero) {
+     memset(original_table, 0, new_table_size * sizeof(ValueType));
+@@ -1844,7 +1844,7 @@ HashTable<Key, Value, Extractor, HashFunctions, Traits
+   // This swaps the newly allocated buffer with the current one. The store to
+   // the current table has to be atomic to prevent races with concurrent marker.
+   AsAtomicPtr(&table_)->store(new_hash_table.table_, std::memory_order_relaxed);
+-  Allocator::template BackingWriteBarrier(&table_);
++  Allocator::template BackingWriteBarrier<>(&table_);
+   table_size_ = new_table_size;
+ 
+   new_hash_table.table_ = old_table;
+@@ -2012,8 +2012,8 @@ void HashTable<Key,
+   // on the mutator thread, which is also the only one that writes to them, so
+   // there is *no* risk of data races when reading.
+   AtomicWriteSwap(table_, other.table_);
+-  Allocator::template BackingWriteBarrier(&table_);
+-  Allocator::template BackingWriteBarrier(&other.table_);
++  Allocator::template BackingWriteBarrier<>(&table_);
++  Allocator::template BackingWriteBarrier<>(&other.table_);
+   if (IsWeak<ValueType>::value) {
+     // Weak processing is omitted when no backing store is present. In case such
+     // an empty table is later on used it needs to be strongified.
+--- a/src/3rdparty/chromium/third_party/perfetto/include/perfetto/tracing/internal/track_event_data_source.h.orig	2024-08-13 14:59:47 UTC
++++ b/src/3rdparty/chromium/third_party/perfetto/include/perfetto/tracing/internal/track_event_data_source.h
+@@ -107,7 +107,7 @@ class TrackEventDataSource
+   }
+ 
+   static void Flush() {
+-    Base::template Trace([](typename Base::TraceContext ctx) { ctx.Flush(); });
++    Base::Trace([](typename Base::TraceContext ctx) { ctx.Flush(); });
+   }
+ 
+   // Determine if tracing for the given static category is enabled.
+@@ -121,7 +121,7 @@ class TrackEventDataSource
+   static bool IsDynamicCategoryEnabled(
+       const DynamicCategory& dynamic_category) {
+     bool enabled = false;
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       enabled = IsDynamicCategoryEnabled(&ctx, dynamic_category);
+     });
+     return enabled;
+@@ -428,7 +428,7 @@ class TrackEventDataSource
+                                  const protos::gen::TrackDescriptor& desc) {
+     PERFETTO_DCHECK(track.uuid == desc.uuid());
+     TrackRegistry::Get()->UpdateTrack(track, desc.SerializeAsString());
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       TrackEventInternal::WriteTrackDescriptor(
+           track, ctx.tls_inst_->trace_writer.get());
+     });
+@@ -545,7 +545,7 @@ class TrackEventDataSource
+   static void TraceWithInstances(uint32_t instances,
+                                  Lambda lambda) PERFETTO_ALWAYS_INLINE {
+     if (CategoryIndex == TrackEventCategoryRegistry::kDynamicCategoryIndex) {
+-      Base::template TraceWithInstances(instances, std::move(lambda));
++      Base::TraceWithInstances(instances, std::move(lambda));
+     } else {
+       Base::template TraceWithInstances<
+           CategoryTracePointTraits<CategoryIndex>>(instances,
+@@ -560,7 +560,7 @@ class TrackEventDataSource
+       const TrackType& track,
+       std::function<void(protos::pbzero::TrackDescriptor*)> callback) {
+     TrackRegistry::Get()->UpdateTrack(track, std::move(callback));
+-    Base::template Trace([&](typename Base::TraceContext ctx) {
++    Base::Trace([&](typename Base::TraceContext ctx) {
+       TrackEventInternal::WriteTrackDescriptor(
+           track, ctx.tls_inst_->trace_writer.get());
+     });

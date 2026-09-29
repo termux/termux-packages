@@ -1,0 +1,14 @@
+--- a/finger/finger.c
++++ b/finger/finger.c
+@@ -76,6 +76,11 @@
+ #include "finger.h"
+ #include "../version.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 26
++#define getpwent() (NULL)
++#define setpwent() ((void)0)
++#endif
++
+ static void loginlist(void);
+ static void userlist(int argc, char *argv[]);
+ 

@@ -1,0 +1,30 @@
+--- a/scintilla/gtk/makefile
++++ b/scintilla/gtk/makefile
+@@ -16,8 +16,8 @@
+ 
+ WARNINGS = -Wpedantic -Wall
+ ifdef CLANG
+-CXX = clang++
+-CC = clang
++CXX ?= clang++
++CC ?= clang
+ WARNINGS += -Wno-deprecated-register
+ ifdef windir
+ # Turn off some warnings that occur when Clang is being used on Windows where it
+@@ -35,7 +35,6 @@
+ # thread also need to create Position Independent Executable -> search online documentation
+ SANITIZE = address
+ #SANITIZE = undefined
+-BASE_FLAGS += -fsanitize=$(SANITIZE)
+ endif
+ ARFLAGS = rc
+ RANLIB ?= ranlib
+@@ -82,7 +81,7 @@
+ endif
+ 
+ DEFINES += -D$(if $(DEBUG),DEBUG,NDEBUG)
+-BASE_FLAGS += $(if $(DEBUG),-g,-O3)
++BASE_FLAGS += $(if $(DEBUG),-g,)
+ 
+ CXX_BASE_FLAGS =--std=c++17 $(BASE_FLAGS)
+ CXX_ALL_FLAGS =$(DEFINES) $(INCLUDES) $(CXX_BASE_FLAGS) $(CONFIG_FLAGS)

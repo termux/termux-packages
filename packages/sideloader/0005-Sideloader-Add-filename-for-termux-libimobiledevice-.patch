@@ -1,0 +1,26 @@
+From ef7cb8dc4fcec3bd72d52085bf1ffb03d7ba5e62 Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Thu, 1 Jan 2026 23:42:14 +0800
+Subject: [PATCH 5/5] [Sideloader] Add filename for termux
+ libimobiledevice-1.0.so
+
+---
+ source/imobiledevice/libimobiledevice.d | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/imobiledevice/libimobiledevice.d b/source/imobiledevice/libimobiledevice.d
+index 097d99d..11c0a1e 100644
+--- a/source/imobiledevice/libimobiledevice.d
++++ b/source/imobiledevice/libimobiledevice.d
+@@ -11,7 +11,7 @@ version (Windows) {
+ } else version (OSX) {
+     enum libimobiledevice = LibImport("libimobiledevice-1.0.6.dylib");
+ } else {
+-    enum libimobiledevice = LibImport("libimobiledevice-1.0.so.6", "libimobiledevice.so.1");
++    enum libimobiledevice = LibImport("libimobiledevice-1.0.so.6", "libimobiledevice-1.0.so" , "libimobiledevice.so.1");
+ }
+ 
+ mixin makeBindings;
+-- 
+2.51.2
+

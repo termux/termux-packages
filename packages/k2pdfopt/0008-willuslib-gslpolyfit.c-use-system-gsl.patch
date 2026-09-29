@@ -1,0 +1,45 @@
+From 1f5d84c558356a9c7090fd8613ae2e11b30dce5a Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Sun, 14 Jun 2020 12:48:01 +0800
+Subject: [PATCH 08/10] willuslib/gslpolyfit.c: use system gsl
+
+---
+ CMakeLists.txt         | 8 ++++++--
+ willuslib/gslpolyfit.c | 2 +-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 06c8406..98094d5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,8 +61,12 @@ endif(JASPER_FOUND)
+ 
+ set(HAVE_GHOSTSCRIPT 1)
+ 
+-# willus.h
+-# HAVE_GSL_LIB
++pkg_check_modules(GSL gsl)
++if(GSL_FOUND)
++  set(HAVE_GSL_LIB 1)
++  include_directories(SYSTEM ${GSL_INCLUDEDIR})
++  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${GSL_LDFLAGS})
++endif(GSL_FOUND)
+ 
+ 
+ # libfreetype6 (>= 2.3.9), libjbig2dec0, libjpeg8 (>= 8c), libx11-6, libxext6, zlib1g (>= 1:1.2.0)
+diff --git a/willuslib/gslpolyfit.c b/willuslib/gslpolyfit.c
+index 5d2b6fb..b34f4b5 100644
+--- a/willuslib/gslpolyfit.c
++++ b/willuslib/gslpolyfit.c
+@@ -24,7 +24,7 @@
+ #include <stdlib.h>
+ #include "willus.h"
+ #ifdef HAVE_GSL_LIB
+-#include <gsl.h>
++#include <gsl/gsl_multifit.h>
+ #endif
+ 
+ void gslpolyfit(double *x,double *y0,int n,int d,double *c0)
+-- 
+2.28.0
+

@@ -1,0 +1,17 @@
+--- a/Source/WebDriver/WebDriverService.cpp
++++ b/Source/WebDriver/WebDriverService.cpp
+@@ -381,5 +381,6 @@ void WebDriverService::handleRequest(HTTPRequestHandler::Request&& request, Function<void (HTTPRequestHandler::Response&&)>&& replyHandler)
+ {
+     Function<void (HTTPRequestHandler::Response&&)> actualReplyHandler = WTF::move(replyHandler);
++#if !LOG_DISABLED || !RELEASE_LOG_DISABLED
+     if (LOG_CHANNEL(WebDriverClassic).state != WTFLogChannelState::Off) {
+         RELEASE_LOG_INFO(WebDriverClassic, "HTTP request %s %s (body=%zu bytes)", request.method.utf8().data(), request.path.utf8().data(), request.dataLength);
+         actualReplyHandler = [startTime = MonotonicTime::now(), replyHandler = WTF::move(actualReplyHandler)](HTTPRequestHandler::Response&& response) mutable {
+@@ -387,6 +388,7 @@ void WebDriverService::handleRequest(HTTPRequestHandler::Request&& request, Function<void (HTTPRequestHandler::Response&&)>&& replyHandler)
+             replyHandler(WTF::move(response));
+         };
+     }
++#endif
+ 
+     auto method = toCommandHTTPMethod(request.method);
+     if (!method) {

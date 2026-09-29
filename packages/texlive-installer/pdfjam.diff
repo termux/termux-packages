@@ -1,0 +1,20 @@
+--- ./texmf-dist/scripts/pdfjam/pdfjam.orig	2025-03-07 09:43:36.952306694 +0100
++++ ./texmf-dist/scripts/pdfjam/pdfjam	2025-03-09 17:38:19.448789584 +0100
+@@ -22,7 +22,7 @@
+ ##  The path searched for site-wide configuration files can be set     ##
+ ##  by editing the following variable:                                 ##
+ ##                                                                     ##
+-    configpath='/etc:/usr/share/etc:/usr/local/share:/usr/local/etc'   ##
++    configpath='@TERMUX_PREFIX@/etc:@TERMUX_PREFIX@/share/etc:/usr/local/share:/usr/local/etc'   ##
+ ##                                                                     ##
+ ##  Nothing else in this file should need to be changed.               ##
+ ##                                                                     ##
+@@ -930,7 +930,7 @@
+ 		trap "IFS='$OIFS'$tidycode;exit 1" HUP INT TERM
+ 		trap "IFS='$OIFS'$tidycode" EXIT
+ 		get_tempfile_dir() {
+-			for i in "$TMPDIR" "$TMP" /tmp /var/tmp .; do
++			for i in "$TMPDIR" "$TMP" "@TERMUX_PREFIX@/tmp" /var/tmp .; do
+ 				[ -d "$i" ] && [ -w "$i" ] && printf %s "$i" && return
+ 			done
+ 			return 1

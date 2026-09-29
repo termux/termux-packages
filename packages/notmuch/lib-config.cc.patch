@@ -1,0 +1,21 @@
+diff -uNr notmuch-0.32/lib/config.cc notmuch-0.32.mod/lib/config.cc
+--- notmuch-0.32/lib/config.cc	2021-05-02 10:05:44.000000000 +0000
++++ notmuch-0.32.mod/lib/config.cc	2021-05-05 14:32:33.893497609 +0000
+@@ -473,6 +473,7 @@
+ 	pw_buf = (char *) talloc_zero_size (ctx, pw_buf_size);
+     }
+ 
++#if !defined(__ANDROID__) || defined(__LP64__)
+     if (e == 0) {
+ 	char *comma = strchr (passwd.pw_gecos, ',');
+ 	if (comma)
+@@ -483,6 +484,9 @@
+     } else {
+ 	name = talloc_strdup (ctx, "");
+     }
++#else
++    name = talloc_strdup (ctx, "");
++#endif
+ 
+     talloc_free (pw_buf);
+ 

@@ -1,0 +1,76 @@
+diff -u -r ../unzip60/unix/configure ./unix/configure
+--- ../unzip60/unix/configure	2009-04-16 21:25:12.000000000 +0200
++++ ./unix/configure	2017-07-07 08:56:05.197092127 +0200
+@@ -379,72 +379,6 @@
+ 
+ # Check for missing functions
+ # add NO_'function_name' to flags if missing
+-for func in fchmod fchown lchown nl_langinfo
+-do
+-  echo Check for $func
+-  echo "int main(){ $func(); return 0; }" > conftest.c
+-  $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
+-  [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+-done
+-
+-# Check (seriously) for a working lchmod.
+-echo 'Check for lchmod'
+-temp_file="/tmp/unzip_test_$$"
+-temp_link="link_$$"
+-( echo '#include <unistd.h>' ; \
+-  echo "int main() { lchmod(\"${temp_file}\", 0666); }" \
+-) > conftest.c
+-ln -s "${temp_link}" "${temp_file}" && \
+- $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null && \
+- ./conftest
+-[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_LCHMOD"
+-rm -f "${temp_file}"
+-
+-echo Check for memset
+-echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DZMEM"
+-
+-echo Check for errno declaration
+-cat > conftest.c << _EOF_
+-#include <errno.h>
+-main()
+-{
+-  errno = 0;
+-  return 0;
+-}
+-_EOF_
+-$CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_ERRNO"
+-
+-echo Check for directory libraries
+-cat > conftest.c << _EOF_
+-int main() { return closedir(opendir(".")); }
+-_EOF_
+-
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  OPT=""
+-  for lib in ndir dir ucb bsd BSD PW x dirent
+-  do
+-    $CC -o conftest conftest.c -l$lib >/dev/null 2>/dev/null
+-    [ $? -eq 0 ] && OPT=-l$lib && break
+-  done
+-  if [ ${OPT} ]; then
+-    LFLAGS2="${LFLAGS2} ${OPT}"
+-  else
+-    CFLAGSR="${CFLAGSR} -DNO_DIR"
+-  fi
+-fi
+-
+-# Dynix/ptx 1.3 needed this
+-echo Check for readlink
+-echo "int main(){ return readlink(); }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-if [ $? -ne 0 ]; then
+-  $CC -o conftest conftest.c -lseq >/dev/null 2>/dev/null
+-  [ $? -eq 0 ] && LFLAGS2="${LFLAGS2} -lseq"
+-fi
+ 
+ echo Check for directory include file
+ OPT=""

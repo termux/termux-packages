@@ -1,0 +1,42 @@
+From d4c14314e3eaaa9a59180c4608d6ce8b48f2cc37 Mon Sep 17 00:00:00 2001
+From: xingguangcuican6666 <xingguangcuican666@foxmail.com>
+Date: Fri, 3 Jul 2026 22:02:09 +0800
+Subject: [PATCH 2/2] build: exclude prebuilt aapt2 binaries, disable tests,
+ and remove unsupported flags
+
+---
+ brut.apktool/apktool-lib/build.gradle.kts | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/brut.apktool/apktool-lib/build.gradle.kts b/brut.apktool/apktool-lib/build.gradle.kts
+index b3465dfe..1534b8ac 100644
+--- a/brut.apktool/apktool-lib/build.gradle.kts
++++ b/brut.apktool/apktool-lib/build.gradle.kts
+@@ -17,6 +17,9 @@ dependencies {
+ 
+ tasks {
+     processResources {
++        exclude("prebuilt/linux/**")
++        exclude("prebuilt/macosx/**")
++        exclude("prebuilt/windows/**")
+         from("src/main/resources") {
+             include("**/*.jar")
+             duplicatesStrategy = DuplicatesStrategy.INCLUDE
+@@ -25,6 +28,7 @@ tasks {
+     }
+ 
+     test {
++        enabled = false
+         // https://github.com/iBotPeaches/Apktool/issues/3174 - CVE-2023-22036
+         // Increases validation of extra field of zip header. Some older Android apps
+         // used this field to store data violating the zip specification.
+@@ -34,4 +38,4 @@ tasks {
+         // Required for tests that use ImageIO operations (nine-patch processing, etc.)
+         systemProperty("java.awt.headless", true)
+     }
+-}
++}
+\ No newline at end of file
+-- 
+2.54.0
+

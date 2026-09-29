@@ -1,0 +1,51 @@
+--- a/doc/lrzip.conf.example
++++ b/doc/lrzip.conf.example
+@@ -48,7 +48,7 @@
+ # REPLACEFILE = YES 
+ 
+ # Override for Temporary Directory. Only valid when stdin/out or Test is used
+-# TMPDIR = /tmp
++# TMPDIR = @TERMUX_PREFIX@/tmp
+ 
+ # Whether to use encryption on compression YES, NO (-e)
+ # ENCRYPT = NO
+--- a/lrzip.c
++++ b/lrzip.c
+@@ -470,10 +470,10 @@
+ 	/* Use /tmp if nothing is writeable so far */
+ 	if (fd_in == -1) {
+ 		dealloc(control->infile);
+-		control->infile = malloc(20);
++		control->infile = malloc(sizeof("@TERMUX_PREFIX@/tmp/lrzipin.XXXXXX"));
+ 		if (unlikely(!control->infile))
+ 			fatal_return(("Failed to allocate infile name\n"), -1);
+-		strcpy(control->infile, "/tmp/lrzipin.XXXXXX");
++		strcpy(control->infile, "@TERMUX_PREFIX@/tmp/lrzipin.XXXXXX");
+ 		fd_in = mkstemp(control->infile);
+ 	}
+ 
+--- a/man/lrzip.conf.5
++++ b/man/lrzip.conf.5
+@@ -12,7 +12,7 @@
+ three places\&:
+ .nf
+ $PWD \- Current Directory
+-/etc/lrzip
++@TERMUX_PREFIX@/etc/lrzip
+ $HOME/\&.lrzip
+ .PP
+ Parameters are set in \fBPARAMETER\&=VALUE\fP fashion where any line
+--- a/util.c
++++ b/util.c
+@@ -209,9 +209,9 @@
+ 		}
+ 	}
+ 	if (fp == NULL) {
+-		fp = fopen("/etc/lrzip/lrzip.conf", "r");
++		fp = fopen("@TERMUX_PREFIX@/etc/lrzip/lrzip.conf", "r");
+ 		if (fp)
+-			fprintf(control->msgout, "Using configuration file /etc/lrzip/lrzip.conf\n");
++			fprintf(control->msgout, "Using configuration file @TERMUX_PREFIX@/etc/lrzip/lrzip.conf\n");
+ 	}
+ 	if (fp == NULL)
+ 		return false;

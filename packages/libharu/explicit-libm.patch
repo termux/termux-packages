@@ -1,0 +1,23 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,9 +52,6 @@ find_package(ZLIB)
+ # check png availability
+ find_package(PNG)
+ 
+-# Find math library, sometimes needs to be explicitly linked against
+-find_library(M_LIB m)
+-
+ # =======================================================================
+ # configure header files, add compiler flags
+ # =======================================================================
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -93,7 +93,7 @@ endif()
+ 
+ # Math library
+ if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
+-    target_link_libraries (hpdf ${M_LIB})
++    target_link_libraries (hpdf m)
+ endif()
+ 
+ install(

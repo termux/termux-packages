@@ -1,0 +1,29 @@
+diff --git a/scripts/docs/generate-man.sh b/scripts/docs/generate-man.sh
+index 6afed3fa87..7dd8d3416f 100755
+--- a/scripts/docs/generate-man.sh
++++ b/scripts/docs/generate-man.sh
+@@ -26,13 +26,13 @@ trap clean EXIT
+   # update vendor
+   ./scripts/vendor update
+   # build gen-manpages
+-  go build -mod=vendor -modfile=vendor.mod -tags manpages -o /tmp/gen-manpages ./man/generate.go
++  go build -mod=vendor -modfile=vendor.mod -tags manpages -o "${TMPDIR:-/tmp}"/gen-manpages ./man/generate.go
+   # build go-md2man
+-  go build -mod=vendor -modfile=vendor.mod -o /tmp/go-md2man ./vendor/github.com/cpuguy83/go-md2man/v2
++  go build -mod=vendor -modfile=vendor.mod -o "${TMPDIR:-/tmp}"/go-md2man ./vendor/github.com/cpuguy83/go-md2man/v2
+ )
+ 
+ mkdir -p man/man1
+-(set -x ; /tmp/gen-manpages --root "." --target "$(pwd)/man/man1")
++(set -x ; "${TMPDIR:-/tmp}"/gen-manpages --root "." --target "$(pwd)/man/man1")
+ 
+ (
+   cd man
+@@ -45,6 +45,6 @@ mkdir -p man/man1
+       continue
+     fi
+     mkdir -p "./man${num}"
+-    (set -x ; /tmp/go-md2man -in "$FILE" -out "./man${num}/${name}")
++    (set -x ; "${TMPDIR:-/tmp}"/go-md2man -in "$FILE" -out "./man${num}/${name}")
+   done
+ )

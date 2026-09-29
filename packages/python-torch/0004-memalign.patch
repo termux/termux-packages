@@ -1,0 +1,12 @@
+diff -u -r ../cache/tmp-checkout/torch/csrc/jit/python/script_init.cpp ./torch/csrc/jit/python/script_init.cpp
+--- a/torch/csrc/jit/python/script_init.cpp
++++ b/torch/csrc/jit/python/script_init.cpp
+@@ -874,7 +874,7 @@
+   std::shared_ptr<char> bytes_copy(
+       static_cast<char*>(_aligned_malloc(size, kFlatbufferDataAlignmentBytes)),
+       _aligned_free);
+-#elif defined(__APPLE__)
++#elif defined(__APPLE__) || defined(__ANDROID__)
+   void* p;
+   ::posix_memalign(&p, kFlatbufferDataAlignmentBytes, size);
+   TORCH_INTERNAL_ASSERT(p, "Could not allocate memory for flatbuffer");

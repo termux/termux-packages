@@ -1,0 +1,283 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/15_added_samunlock_binary
+
+--- a/Makefile
++++ b/Makefile
+@@ -26,7 +26,7 @@ OSSLLIB=$(OSSLPATH)/lib
+ LIBS=-L$(OSSLLIB)
+ 
+ 
+-all: chntpw cpnt reged samusrgrp sampasswd
++all: chntpw cpnt reged samusrgrp sampasswd samunlock
+ 
+ chntpw: chntpw.o ntreg.o edlib.o libsam.o
+ 	$(CC) $(CFLAGS) -o chntpw chntpw.o ntreg.o edlib.o libsam.o $(LIBS)
+@@ -53,8 +53,10 @@ sampasswd: sampasswd.o ntreg.o libsam.o
+ 	$(CC) $(CFLAGS) -o sampasswd sampasswd.o ntreg.o libsam.o 
+ 
+ sampasswd.static: sampasswd.o ntreg.o libsam.o
+-	$(CC) -static $(CFLAGS) -o sampasswd.static sampasswd.o ntreg.o libsam.o 
++	$(CC) -static $(CFLAGS) -o sampasswd.static sampasswd.o ntreg.o libsam.o
+ 
++samunlock: samunlock.o ntreg.o libsam.o
++	$(CC) $(CFLAGS) -o samunlock samunlock.o ntreg.o libsam.o
+ 
+ 
+ #ts: ts.o ntreg.o
+@@ -66,5 +68,5 @@ sampasswd.static: sampasswd.o ntreg.o libsam.o
+ 	$(CC) -c $(CFLAGS) $<
+ 
+ clean:
+-	rm -f *.o chntpw cpnt reged samusrgrp sampasswd *~
++	rm -f *.o chntpw cpnt reged samusrgrp sampasswd samunlock *~
+ 
+--- /dev/null
++++ b/samunlock.c
+@@ -0,0 +1,248 @@
++/*
++ * samunlock.c - SAM database, Unlock user
++ *
++ * Command line utility, non-interactive to unlock a user
++ * in the SAM database
++ *
++ * Changes:
++ * 2014 - oct: First version, some code from earlier sampasswd.c.
++ *
++ *****
++ *
++ * Copyright (c) 2014 Adrian Gibanel
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * See file GPL.txt for the full license.
++ *
++ *****
++ */
++
++
++#include <stdio.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "ntreg.h"
++#include "sam.h"
++
++
++const char samunlock_version[] = "samunlock version 0.1 141018, (c) Adrian Gibanel";
++
++
++/* Global verbosity flag */
++int gverbose = 0;
++
++/* Array of loaded hives */
++#define MAX_HIVES 10
++struct hive *hive[MAX_HIVES+1];
++int no_hives = 0;
++
++int H_SAM = -1;
++
++
++
++int do_unlock(char *user, int inrid, int verb)
++{
++  int rid = 0;
++  int ret;
++  char *resolvedname = NULL;
++  char s[200];
++  unsigned short acb;
++
++  if ((H_SAM < 0) || (!user && !inrid) ) return(1);
++
++  if (inrid) {
++    rid = inrid;
++  } else {
++    if (*user == '0' && *(user+1) == 'x') sscanf(user,"%i",&rid);
++  }
++
++  if (!rid) { /* Look up username */
++    /* Extract the unnamed value out of the username-key, value is RID  */
++    snprintf(s,180,"\\SAM\\Domains\\Account\\Users\\Names\\%s\\@",user);
++    rid = get_dword(hive[H_SAM],0,s, TPF_VK_EXACT|TPF_VK_SHORT);
++    if (rid == -1) {
++      printf("ERROR: User <%s> not found\n",user);
++      return(1);
++    }
++  }
++
++  /* At this point we have a RID, so get the real username it maps to just to show it */
++  resolvedname = sam_get_username(hive[H_SAM], rid);
++
++  if (!resolvedname) return(1);  /* RID lookup failed, no such user */
++
++  if (gverbose) printf("do_unlock: Username: %s, RID = %d (0x%0x)\n",resolvedname,rid,rid);
++
++  acb = sam_handle_accountbits(hive[H_SAM], rid,2);
++
++  ret = acb & 0x8000; /* ret != 0 means locked ; ret == 0 means unlocked */
++
++  if (!ret && verb) printf("Unlock user %s, RID = %d [0x%0x]\n",resolvedname,rid,rid);
++
++  FREE(resolvedname);
++  return(ret);
++
++}
++
++
++
++void usage(void)
++{
++  printf(" [-U|-l] [-H] -u <user> <samhive>\n"
++	 "Unlock user or list users in SAM database\n"
++         "Mode:\n"
++	 "   -U = Unlock user\n"
++         "   -l = list users in sam\n"
++         "Parameters:\n"
++         "   <user> can be given as a username or a RID in hex with 0x in front\n"
++         "   Example:\n"
++         "   -U -u theboss -> Unlocks user named 'theboss' if found\n"
++         "   -U -u 0x3ea -> Unlocks user with RID 0x3ea (hex)\n"
++	 "   -U -f -> Unlocks admin user with lowest RID\n"
++	 "            not counting built-in admin (0x1f4) unless it is the only admin\n"
++         "   Usernames with international characters usually fails to be found,\n"
++         "   please use RID number instead\n"
++	 "   If success, there will be no output, and exit code is 0\n"
++	 "Options:\n"
++	 "   -H : For list: Human readable listing (default is parsable table)\n"
++	 "   -H : For unlock: Will output confirmation message if success\n"
++	 "   -N : No allocate mode, only allow edit of existing values with same size\n"
++	 "   -E : No expand mode, do not expand hive file (safe mode)\n"
++	 "   -t : Debug trace of allocated blocks\n"
++	 "   -v : Some more verbose messages/debug\n"
++	 );
++}
++
++
++int main(int argc, char **argv)
++{
++
++  extern int optind;
++  extern char* optarg;
++
++  int what = 0;
++  int unlock = 0;
++  int list = 0;
++  int mode = 0;
++  int human = 0;
++  int adm = 0;
++  int first = 0;
++  int ret, wret, il;
++  char *hivename;
++  char c;
++  char *usr = NULL;
++
++  char *options = "UlHu:vNEthaf";
++
++  while((c=getopt(argc,argv,options)) > 0) {
++    switch(c) {
++    case 'U': unlock = 1; break;
++    case 'l': list  = 2; break;
++    case 'u': usr = optarg; break;
++    case 'f': first = 1; break;
++    case 'H': human = 1; break;
++    case 'v': mode |= HMODE_VERBOSE; gverbose = 1; break;
++    case 'N': mode |= HMODE_NOALLOC; break;
++    case 'E': mode |= HMODE_NOEXPAND; break;
++    case 't': mode |= HMODE_TRACE; break;
++    case 'h': printf("%s\n%s ",samunlock_version,argv[0]); usage(); exit(0); break;
++    default: printf("%s\n%s ",samunlock_version,argv[0]); usage(); exit(1); break;
++    }
++  }
++
++  if (!unlock && !list && !what) {
++    fprintf(stderr,"%s: ERROR: Mode -U or -l must be specified. -h for help\n",argv[0]);
++    exit(1);
++  }
++
++#if 0   /* Should both be allowed at same time?? */
++  if (list && unlock) {
++    fprintf(stderr,"%s: ERROR: Mode -U and -l impossible at the same time. -h for help\n",argv[0]);
++    exit(1);
++  }
++#endif
++
++  if (unlock && !first && (!usr || !*usr)) {
++    fprintf(stderr,"%s: ERROR: Need a user for unlock, -u must be specified.\n",argv[0]);
++    exit(1);
++  }
++
++
++  /* Load hives. Only first SAM hive will be used however */
++
++  hivename = argv[optind+no_hives];
++  if (!hivename || !*hivename) {
++    fprintf(stderr,"%s: ERROR: You must specify a SAM registry hive filename.\n",argv[0]);
++    exit(1);
++  }
++  do {
++    if (!(hive[no_hives] = openHive(hivename,
++				    HMODE_RW|mode))) {
++      fprintf(stderr,"%s: ERROR: Unable to open/read registry hive, cannot continue\n",argv[0]);
++      exit(1);
++    }
++    switch(hive[no_hives]->type) {
++    case HTYPE_SAM:      H_SAM = no_hives; break;
++      // case HTYPE_SOFTWARE: H_SOF = no_hives; break;
++      // case HTYPE_SYSTEM:   H_SYS = no_hives; break;
++      // case HTYPE_SECURITY: H_SEC = no_hives; break;
++    }
++    no_hives++;
++    hivename = argv[optind+no_hives];
++  } while (hivename && *hivename && no_hives < MAX_HIVES);
++
++  if (H_SAM == -1) {
++    fprintf(stderr,"%s: WARNING: Hive file does not look like SAM, but continuing anyway in case detection was wrong\n"
++	    "%s: WARNING: If it really is not a SAM file you will get strange errors or bad results\n",argv[0],argv[0]);
++    H_SAM = 0;
++  }
++
++
++  /* Do logic */
++
++  if (list) {
++    adm = sam_list_users(hive[H_SAM], human);
++    if (gverbose) printf("   sam_list_users found admin to be 0x%x\n",adm);
++  }
++
++  if (unlock) {
++    if (first) {
++      adm = sam_list_users(hive[H_SAM], 2);
++      if (!adm) {
++	fprintf(stderr,"%s: ERROR: Unable to unlock, no admin users found\n",argv[0]);
++      } else {
++	//	printf("Resetting password of user with RID %x\n",adm);
++	ret = do_unlock(usr, adm, human);
++      }
++    } else {
++      ret = do_unlock(usr, 0, human);
++      if (ret) {
++	fprintf(stderr,"%s: ERROR: Failed to unlock %s\n",argv[0],usr);
++      }
++    }
++  }
++
++  /* write registry hive (if needed) */
++
++  wret = 0;
++  for (il = 0; il < no_hives; il++) {
++    wret |= writeHive(hive[il]);
++    if (hive[il]->state & HMODE_DIDEXPAND)
++      fprintf(stderr," WARNING: Registry file %s was expanded! Experimental! Use at own risk!\n",hive[il]->filename);
++    while (no_hives > 0)
++      closeHive(hive[--no_hives]);
++  }
++
++  return(ret | wret);
++}
++

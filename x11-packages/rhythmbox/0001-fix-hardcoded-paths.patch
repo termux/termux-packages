@@ -1,0 +1,33 @@
+--- a/lib/rb-file-helpers.c
++++ b/lib/rb-file-helpers.c
+@@ -187,7 +187,7 @@
+ 	if (dir == NULL) {
+ 		dir = getenv ("HOME");
+ 		if (dir == NULL) {
+-			dir = "/tmp";
++			dir = "@TERMUX_PREFIX@/tmp";
+ 		}
+ 	}
+ 	rb_debug ("user music dir: %s", dir);
+--- a/metadata/rb-metadata-dbus-client.c
++++ b/metadata/rb-metadata-dbus-client.c
+@@ -249,7 +249,7 @@
+ 			i++;
+ 		}
+ 
+-		g_ptr_array_add (argv, "unix:tmpdir=/tmp");
++		g_ptr_array_add (argv, "unix:tmpdir=@TERMUX_PREFIX@/tmp");
+ 		g_ptr_array_add (argv, NULL);
+ 
+ 		local_error = NULL;
+--- a/metadata/rb-metadata-dbus-service.c
++++ b/metadata/rb-metadata-dbus-service.c
+@@ -391,7 +391,7 @@
+ 		svc.external = TRUE;
+ 	}
+ 	if (argv[1] == NULL) {
+-		address = "unix:tmpdir=/tmp";
++		address = "unix:tmpdir=@TERMUX_PREFIX@/tmp";
+ 	} else {
+ 		address = argv[1];
+ 	}

@@ -1,0 +1,81 @@
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Sun, 19 Jul 2026 12:00:00 +0530
+Subject: [PATCH] disable Bionic heap pointer tagging at process start
+
+On Android 11+ (arm64) Bionic's allocator returns heap pointers with a
+tag in the top byte (0xb4...), so bit 63 is always set. LibreOffice
+round-trips raw pointers through decimal strings in several places and
+parses them back with signed toInt64 (rtl_str_toInt64_WithLength clamps
+values above INT64_MAX to 0):
+
+  - vcl/unx/gtk3/gtksalmenu.cxx: GtkSalMenu* encoded into GAction
+    names; the clamped parse returned null and the first click on any
+    menubar entry crashed in GtkSalMenu::Activate (SIGSEGV at the
+    mpVCLMenu load, verified on device).
+  - sw/source/core/fields/cellfml.cxx: SwTableBox* in Writer table
+    formulas (8 sites).
+  - sw/source/uibase/misc/redlndlg.cxx, svx/source/dialog/
+    docrecovery.cxx: pointers in tree-view row ids.
+
+Rather than patching each site, disable heap tagging for the whole
+process before anything is allocated, the same workaround Termux
+applies to qemu and openjdk:
+https://github.com/termux/termux-packages/blob/ec0fa2f/packages/qemu-system-x86-64-headless/0016-Add-workaround-for-tagged-pointers-on-Android-12.patch
+
+sal_detail_initialize is run first by every SAL_IMPLEMENT_MAIN binary
+(soffice.bin, unopkg, ...), so hooking it covers them all. mallopt is
+resolved via dlsym because the M_BIONIC_SET_HEAP_TAGGING_LEVEL
+interface only exists on Bionic (API 31+); on older API levels the
+android_mallopt fallback is used. Only allocations made after the call
+are untagged, hence the placement at the very top, before the
+InitializeSoffice early return.
+---
+
+--- a/sal/osl/unx/salinit.cxx
++++ b/sal/osl/unx/salinit.cxx
+@@ -42,9 +42,45 @@
+ #include <syslog.h>
+ #endif
+ 
++#ifdef __TERMUX__
++#include <dlfcn.h>
++#include <android/api-level.h>
++
++#ifndef M_BIONIC_SET_HEAP_TAGGING_LEVEL
++#define M_BIONIC_SET_HEAP_TAGGING_LEVEL (-204)
++#endif
++
++// Bionic tags heap pointers in the top byte (0xb4...), which breaks the
++// signed toInt64 round-trips LibreOffice uses to pass raw pointers through
++// strings (gtksalmenu.cxx GAction names, cellfml.cxx table formulas,
++// tree-view row ids). Turn tagging off for the whole process before any
++// such pointer can be allocated.
++static void android_disable_heap_tagging() {
++    void* lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (!lib_handle)
++        return;
++    if (android_get_device_api_level() >= 31) {
++        auto mallopt_func
++            = reinterpret_cast<int (*)(int, int)>(dlsym(lib_handle, "mallopt"));
++        if (mallopt_func)
++            mallopt_func(M_BIONIC_SET_HEAP_TAGGING_LEVEL, 0);
++        return;
++    }
++    auto android_mallopt = reinterpret_cast<bool (*)(int, void*, size_t)>(
++        dlsym(lib_handle, "android_mallopt"));
++    if (android_mallopt) {
++        int tag_level = 0;
++        android_mallopt(8, &tag_level, sizeof(tag_level));
++    }
++}
++#endif
++
+ extern "C" {
+ 
+ void sal_detail_initialize(int argc, char ** argv) {
++#ifdef __TERMUX__
++    android_disable_heap_tagging();
++#endif
+     if (argc == sal::detail::InitializeSoffice)
+     {
+         sal::detail::setSoffice();

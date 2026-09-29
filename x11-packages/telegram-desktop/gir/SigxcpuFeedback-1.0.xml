@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="SigxcpuFeedbackHaptic" get-type="sigxcpu_feedback_haptic_get_type">
+    <signal name="handle-vibrate" return="gboolean" when="last">
+      <param type="GDBusMethodInvocation"/>
+      <param type="gchararray"/>
+      <param type="GVariant"/>
+    </signal>
+  </interface>
+  <class name="SigxcpuFeedbackHapticProxy" get-type="sigxcpu_feedback_haptic_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="SigxcpuFeedbackHaptic"/>
+  </class>
+  <class name="SigxcpuFeedbackHapticSkeleton" get-type="sigxcpu_feedback_haptic_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="SigxcpuFeedbackHaptic"/>
+  </class>
+  <interface name="SigxcpuFeedbackObject" get-type="sigxcpu_feedback_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="haptic" type="SigxcpuFeedbackHaptic" flags="227"/>
+  </interface>
+  <class name="SigxcpuFeedbackObjectProxy" get-type="sigxcpu_feedback_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="SigxcpuFeedbackObject"/>
+  </class>
+  <class name="SigxcpuFeedbackObjectSkeleton" get-type="sigxcpu_feedback_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="SigxcpuFeedbackObject"/>
+  </class>
+  <class name="SigxcpuFeedbackObjectManagerClient" get-type="sigxcpu_feedback_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

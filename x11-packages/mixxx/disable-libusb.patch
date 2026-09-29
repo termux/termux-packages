@@ -1,0 +1,35 @@
+Unfortunately, when tested, mixxx crashes here when launched if this is not disabled:
+
+Thread 27 "Controller" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x63d5 (LWP 25557)]
+0x0000007f6993a278 in pthread_mutex_lock () from /apex/com.android.runtime/lib64/bionic/libc.so
+(gdb) bt
+#0  0x0000007f6993a278 in pthread_mutex_lock () from /apex/com.android.runtime/lib64/bionic/libc.so
+#1  0x0000007f82550ad8 in ?? () from /data/data/com.termux/files/usr/lib/libusb-1.0.so
+#2  0x0000007f82550d78 in libusb_get_device_list () from /data/data/com.termux/files/usr/lib/libusb-1.0.so
+#3  0x00000055561b5c24 in BulkEnumerator::queryDevices (this=0xb400007d9007ade0)
+    at /home/builder/.termux-build/mixxx/src/src/controllers/bulk/bulkenumerator.cpp:37
+#4  0x0000005555972a5c in ControllerManager::updateControllerList (this=this@entry=0xb400007df0299608)
+    at /home/builder/.termux-build/mixxx/src/src/controllers/controllermanager.cpp:203
+#5  0x0000005555970a68 in ControllerManager::slotSetUpDevices (this=0xb400007df0299608)
+
+Since this doesn't seem to happen with other libusb reverse dependencies, it might be a problem with mixxx itself.
+
+--- a/src/controllers/bulk/bulkenumerator.cpp
++++ b/src/controllers/bulk/bulkenumerator.cpp
+@@ -34,7 +34,7 @@ static bool is_interesting(struct libusb_device_descriptor *desc) {
+ QList<Controller*> BulkEnumerator::queryDevices() {
+     qDebug() << "Scanning USB Bulk devices:";
+     libusb_device **list;
+-    ssize_t cnt = libusb_get_device_list(m_context, &list);
++    ssize_t cnt = 0;
+     ssize_t i = 0;
+     int err = 0;
+ 
+@@ -56,6 +56,5 @@ QList<Controller*> BulkEnumerator::queryDevices() {
+             m_devices.push_back(currentDevice);
+         }
+     }
+-    libusb_free_device_list(list, 1);
+     return m_devices;
+ }

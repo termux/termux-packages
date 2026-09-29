@@ -1,0 +1,15 @@
+diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
+index 1de22c3..f988297 100644
+--- a/src/subprocess-posix.cc
++++ b/src/subprocess-posix.cc
+@@ -110,8 +110,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   if (err != 0)
+     Fatal("posix_spawnattr_setflags: %s", strerror(err));
+ 
+-  const char* spawned_args[] = { "/bin/sh", "-c", command.c_str(), NULL };
+-  err = posix_spawn(&pid_, "/bin/sh", &action, &attr,
++  const char* spawned_args[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command.c_str(), NULL };
++  err = posix_spawn(&pid_, "@TERMUX_PREFIX@/bin/sh", &action, &attr,
+         const_cast<char**>(spawned_args), environ);
+   if (err != 0)
+     Fatal("posix_spawn: %s", strerror(err));

@@ -1,0 +1,30 @@
+diff -uNr apk-tools-2.10.3/src/commit.c apk-tools-2.10.3.mod/src/commit.c
+--- apk-tools-2.10.3/src/commit.c	2018-11-15 15:09:07.000000000 +0200
++++ apk-tools-2.10.3.mod/src/commit.c	2018-11-19 17:44:44.799596053 +0200
+@@ -19,6 +19,8 @@
+ 
+ #include "apk_print.h"
+ 
++#include "termux_prefix.h"
++
+ static inline int pkg_available(struct apk_database *db, struct apk_package *pkg)
+ {
+ 	if (pkg->repos & db->available_repos)
+@@ -235,7 +237,7 @@
+ 	if (file[0] == '.') return 0;
+ 	if ((apk_flags & (APK_NO_SCRIPTS | APK_SIMULATE)) != 0) return 0;
+ 
+-	snprintf(fn, sizeof(fn), "etc/apk/commit_hooks.d" "/%s", file);
++	snprintf(fn, sizeof(fn), TERMUX_PREFIX_RELATIVE"etc/apk/commit_hooks.d" "/%s", file);
+ 	if ((apk_flags & APK_NO_COMMIT_HOOKS) != 0) {
+ 		apk_message("Skipping: %s %s", fn, commit_hook_str[hook->type]);
+ 		return 0;
+@@ -251,7 +253,7 @@
+ static int run_commit_hooks(struct apk_database *db, int type)
+ {
+ 	struct apk_commit_hook hook = { .db = db, .type = type };
+-	return apk_dir_foreach_file(openat(db->root_fd, "etc/apk/commit_hooks.d", O_RDONLY | O_CLOEXEC),
++	return apk_dir_foreach_file(openat(db->root_fd, TERMUX_PREFIX_RELATIVE"etc/apk/commit_hooks.d", O_RDONLY | O_CLOEXEC),
+ 				    run_commit_hook, &hook);
+ }
+ 

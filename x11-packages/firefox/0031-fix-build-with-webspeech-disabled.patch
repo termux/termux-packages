@@ -1,0 +1,192 @@
+Firefox 157 unconditionally includes PSpeechRecognition and the HWInference
+speech recognition plumbing even with --disable-webspeech, but the
+recognition directory is only built when MOZ_WEBSPEECH is set.
+
+--- a/dom/ipc/ContentParent.cpp
++++ b/dom/ipc/ContentParent.cpp
+@@ -153,7 +153,9 @@
+ #include "mozilla/hal_sandbox/PHalParent.h"
+ #ifndef ANDROID
+ #  include "mozilla/hwinference/HWInferenceParent.h"
+-#  include "mozilla/hwinference/PSpeechRecognitionChild.h"
++#  ifdef MOZ_WEBSPEECH
++#    include "mozilla/hwinference/PSpeechRecognitionChild.h"
++#  endif
+ #endif  // !ANDROID
+ #include "mozilla/intl/L10nRegistry.h"
+ #include "mozilla/intl/LocaleService.h"
+@@ -5188,6 +5190,7 @@
+   return IPC_OK();
+ }
+ 
++#ifdef MOZ_WEBSPEECH
+ mozilla::ipc::IPCResult ContentParent::RecvCreateSpeechRecognition(
+     Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint) {
+   if (!mHWInferenceConnections) {
+@@ -5206,6 +5209,7 @@
+       std::move(aEndpoint), mChildID);
+   return IPC_OK();
+ }
++#endif  // MOZ_WEBSPEECH
+ 
+ mozilla::ipc::IPCResult ContentParent::RecvReleaseHWInferenceConnection() {
+   if (mHWInferenceConnections == 0) {
+--- a/dom/ipc/ContentParent.h
++++ b/dom/ipc/ContentParent.h
+@@ -1125,8 +1125,10 @@
+ 
+   mozilla::ipc::IPCResult RecvAcquireHWInferenceProcess();
+ 
++#ifdef MOZ_WEBSPEECH
+   mozilla::ipc::IPCResult RecvCreateSpeechRecognition(
+       Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint);
++#endif  // MOZ_WEBSPEECH
+ 
+   mozilla::ipc::IPCResult RecvReleaseHWInferenceConnection();
+ #endif  // !ANDROID
+--- a/dom/ipc/PContent.ipdl
++++ b/dom/ipc/PContent.ipdl
+@@ -42,7 +42,9 @@
+ include protocol PVRManager;
+ include protocol PRemoteMediaManager;
+ #ifndef ANDROID
++#ifdef MOZ_WEBSPEECH
+ include protocol PSpeechRecognition;
++#endif  // MOZ_WEBSPEECH
+ #endif  // !ANDROID
+ include protocol PRemoteWorkerDebuggerManager;
+ include protocol PRemoteWorkerService;
+@@ -1202,7 +1204,9 @@
+ 
+ #ifndef ANDROID
+     async AcquireHWInferenceProcess();
++#ifdef MOZ_WEBSPEECH
+     async CreateSpeechRecognition(Endpoint<PSpeechRecognitionParent> endpoint);
++#endif  // MOZ_WEBSPEECH
+ 
+     // One call per AcquireHWInferenceProcess. The process is shut down once
+     // nothing holds it anymore.
+--- a/toolkit/components/ml/backends/llama/moz.build
++++ b/toolkit/components/ml/backends/llama/moz.build
+@@ -29,6 +29,9 @@
+         "/xpcom/build",
+     ]
+ 
++    if not CONFIG["MOZ_WEBSPEECH"]:
++        DIRS += ["/third_party/parakeet.cpp"]
++
+     include("/ipc/chromium/chromium-config.mozbuild")
+ 
+     FINAL_LIBRARY = "xul"
+--- a/toolkit/components/ml/ipc/HWInferenceChild.cpp
++++ b/toolkit/components/ml/ipc/HWInferenceChild.cpp
+@@ -5,7 +5,9 @@
+ 
+ #include "HWInferenceChild.h"
+ #include "mozilla/Logging.h"
++#ifdef MOZ_WEBSPEECH
+ #include "mozilla/hwinference/SpeechRecognitionParent.h"
++#endif
+ 
+ namespace mozilla::hwinference {
+ 
+@@ -17,6 +19,7 @@
+ 
+ void HWInferenceChild::Shutdown() { PHWInferenceChild::Close(); }
+ 
++#ifdef MOZ_WEBSPEECH
+ ipc::IPCResult HWInferenceChild::RecvNewContentSpeechRecognition(
+     Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint,
+     const dom::ContentParentId& aContentId) {
+@@ -35,6 +38,7 @@
+        fmt::ptr(this), __func__, static_cast<uint64_t>(aContentId));
+   return IPC_OK();
+ }
++#endif  // MOZ_WEBSPEECH
+ 
+ RefPtr<HWInferenceChild::IsModelAvailablePromise>
+ HWInferenceChild::SendIsModelAvailable(const nsCString& aTask,
+--- a/toolkit/components/ml/ipc/HWInferenceChild.h
++++ b/toolkit/components/ml/ipc/HWInferenceChild.h
+@@ -22,9 +22,11 @@
+ 
+   void Shutdown();
+ 
++#ifdef MOZ_WEBSPEECH
+   mozilla::ipc::IPCResult RecvNewContentSpeechRecognition(
+       Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint,
+       const dom::ContentParentId& aContentId);
++#endif  // MOZ_WEBSPEECH
+ 
+   RefPtr<IsModelAvailablePromise> SendIsModelAvailable(const nsCString& aTask,
+                                                        const nsCString& aId);
+--- a/toolkit/components/ml/ipc/HWInferenceParent.cpp
++++ b/toolkit/components/ml/ipc/HWInferenceParent.cpp
+@@ -202,6 +202,7 @@
+   return sInstance;
+ }
+ 
++#ifdef MOZ_WEBSPEECH
+ /* static */
+ void HWInferenceParent::StartContentSpeechRecognition(
+     Endpoint<PSpeechRecognitionParent>&& aEndpoint,
+@@ -219,6 +220,7 @@
+         LOGD("HWInference never came up: dropping the speech endpoint");
+       });
+ }
++#endif  // MOZ_WEBSPEECH
+ 
+ void HWInferenceParent::ActorDestroy(ActorDestroyReason aReason) {
+   LOGD("{}", __func__);
+--- a/toolkit/components/ml/ipc/HWInferenceParent.h
++++ b/toolkit/components/ml/ipc/HWInferenceParent.h
+@@ -49,12 +49,14 @@
+   // process goes away before it can be.
+   RefPtr<GenericNonExclusivePromise> WhenReady() { return mReadyPromise; }
+ 
++#ifdef MOZ_WEBSPEECH
+   // Forwards aEndpoint to the HWInference process once its actor is ready. The
+   // caller must hold a keep-alive, see
+   // UtilityProcessManager::AcquireContentHWInferenceProcess().
+   static void StartContentSpeechRecognition(
+       Endpoint<PSpeechRecognitionParent>&& aEndpoint,
+       dom::ContentParentId aChildId);
++#endif  // MOZ_WEBSPEECH
+ 
+   static RefPtr<HWInferenceParent> GetSingleton();
+ 
+--- a/toolkit/components/ml/ipc/PHWInference.ipdl
++++ b/toolkit/components/ml/ipc/PHWInference.ipdl
+@@ -3,7 +3,9 @@
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
++#ifdef MOZ_WEBSPEECH
+ include protocol PSpeechRecognition;
++#endif
+ 
+ using mozilla::dom::ContentParentId from "mozilla/dom/ipc/IdType.h";
+ using mozilla::hwinference::ModelInstallResult from "mozilla/hwinference/HWInferenceTypes.h";
+@@ -68,9 +70,11 @@
+     async GetModelFile(nsCString task,
+                        nsCString id) returns (GetModelFileResult result);
+ 
++#ifdef MOZ_WEBSPEECH
+   child:
+     async NewContentSpeechRecognition(Endpoint<PSpeechRecognitionParent> endpoint,
+                                       ContentParentId contentId);
++#endif
+ };
+ 
+ } // namespace hwinference
+--- a/toolkit/components/ml/ipc/moz.build
++++ b/toolkit/components/ml/ipc/moz.build
+@@ -18,7 +18,7 @@
+     "HWInferenceParent.cpp",
+ ]
+ 
+-IPDL_SOURCES = [
++PREPROCESSED_IPDL_SOURCES += [
+     "PHWInference.ipdl",
+ ]
+ 

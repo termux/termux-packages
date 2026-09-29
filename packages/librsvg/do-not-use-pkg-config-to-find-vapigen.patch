@@ -1,0 +1,22 @@
+Sometimes, if other packages (exact reproduction steps unknown)
+were built in the same $TERMUX_PREFIX before librsvg,
+the build of librsvg will fail because the vapigen placed in $PATH by termux_setup_gir()
+will not be found. This prevents that by forcing librsvg to search $PATH for vapigen.
+
+Before:
+../src/meson.build:131:17: ERROR: Dependency "vapigen" not found, tried pkgconfig
+
+After:
+Program vapigen found: YES (/home/builder/.termux-build/_cache/gir-cross/bin/vapigen)
+
+--- a/meson.build
++++ b/meson.build
+@@ -128,7 +128,7 @@ gidocgen       = find_program('gi-docgen', version: gidocgen_required,
+ gi_dep         = dependency('gobject-introspection-1.0',
+                             version: introspection_required,
+                             required: get_option('introspection'))
+-vapigen_dep    = dependency('vapigen',
++vapigen_dep    = find_program('vapigen',
+                             version: vapigen_required,
+                             required: get_option('vala'))
+ 

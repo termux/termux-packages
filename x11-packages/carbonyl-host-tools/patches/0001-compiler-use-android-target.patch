@@ -1,0 +1,24 @@
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -960,8 +960,8 @@
+     } else if (current_cpu == "arm") {
+       if (is_clang && !is_android && !is_nacl &&
+           !(is_chromeos_lacros && is_chromeos_device)) {
+-        cflags += [ "--target=arm-linux-gnueabihf" ]
+-        ldflags += [ "--target=arm-linux-gnueabihf" ]
++        cflags += [ "--target=armv7a-linux-android24" ]
++        ldflags += [ "--target=armv7a-linux-android24" ]
+       }
+       if (!is_nacl) {
+         cflags += [
+@@ -975,8 +975,8 @@
+     } else if (current_cpu == "arm64") {
+       if (is_clang && !is_android && !is_nacl && !is_fuchsia &&
+           !(is_chromeos_lacros && is_chromeos_device)) {
+-        cflags += [ "--target=aarch64-linux-gnu" ]
+-        ldflags += [ "--target=aarch64-linux-gnu" ]
++        cflags += [ "--target=aarch64-linux-android24" ]
++        ldflags += [ "--target=aarch64-linux-android24" ]
+       }
+     } else if (current_cpu == "mipsel" && !is_nacl) {
+       ldflags += [ "-Wl,--hash-style=sysv" ]

@@ -1,0 +1,31 @@
+diff --git a/meson.build b/meson.build
+index 2baf475..16c6215 100644
+--- a/meson.build
++++ b/meson.build
+@@ -658,6 +658,7 @@ endif
+ 
+ ### Tests and test setups ######################################################
+ 
++if not get_option('skip_tests')
+ # External code should not error out even when building with -Werror
+ gi_tests = subproject('gobject-introspection-tests',
+     default_options: ['werror=false', 'cairo=true',
+@@ -710,6 +711,8 @@ zeal11_environment = environment()
+ zeal11_environment.set('JS_GC_ZEAL', '11')
+ add_test_setup('post_verify', timeout_multiplier: 2, env: zeal11_environment)
+ 
++endif
++
+ ### Warn about conditions that may affect runtime ##############################
+ 
+ if tests_locale == 'C' or tests_locale == 'N/A'
+diff --git a/meson_options.txt b/meson_options.txt
+index fe425ef..953f7f4 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -24,3 +24,5 @@ option('skip_gtk_tests', type: 'boolean', value: false,
+     description: 'Skip tests that need a display connection')
+ option('verbose_logs', type: 'boolean', value: false,
+     description: 'Enable extra log messages that may decrease performance (not allowed in release builds)')
++option('skip_tests', type: 'boolean', value: false,
++    description: 'Skip all the tests')

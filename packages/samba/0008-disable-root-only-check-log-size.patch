@@ -1,0 +1,18 @@
+--- a/lib/util/debug.c
++++ b/lib/util/debug.c
+@@ -1509,6 +1509,7 @@
+ {
+ 	off_t maxlog;
+ 
++#ifndef __ANDROID__
+ 	if (geteuid() != 0) {
+ 		/*
+ 		 * We need to be root to change the log file (tests use a fake
+@@ -1518,6 +1519,7 @@
+ 		 */
+ 		return;
+ 	}
++#endif
+ 
+ 	if(log_overflow || (!state.schedule_reopen_logs && !need_to_check_log_size())) {
+ 		return;

@@ -1,0 +1,745 @@
+#!/usr/bin/env bash
+
+set -u
+
+# Following variables should be set in environment outside of this script.
+# Build updated packages.
+: "${BUILD_PACKAGES:=false}"
+# Github Action create issue for failed updates.
+: "${CREATE_ISSUE:=false}"
+# Commit changes to Git.
+: "${GIT_COMMIT_PACKAGES:=false}"
+# Push changes to remote.
+: "${GIT_PUSH_PACKAGES:=false}"
+
+: "${TERMUX_ARCH:="aarch64"}"
+
+export TERMUX_PKG_UPDATE_METHOD=""             # Which method to use for updating? (repology, github or gitlab)
+export TERMUX_PKG_UPDATE_TAG_TYPE=""           # Whether to use latest-release-tag, latest-regex or newest-tag.
+export TERMUX_PKG_AUTO_UPDATE=false            # Whether to auto-update or not. Disabled by default.
+export TERMUX_PKG_UPDATE_VERSION_REGEXP=""     # Regexp to extract version with `grep -oP`.
+export TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="" # Regexp to extract version with `sed`.
+export TERMUX_REPOLOGY_DATA_FILE
+# Clean up any old repology data files
+rm "${TMPDIR:-/tmp}/termux-repology".* &> /dev/null
+TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store repology data.
+
+export TERMUX_SCRIPTDIR
+TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
+
+readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+
+# Define few more variables used by scripts.
+# shellcheck source=scripts/properties.sh
+. "${TERMUX_SCRIPTDIR}/scripts/properties.sh"
+
+# Utility function to write error message to stderr.
+# shellcheck source=scripts/build/termux_error_exit.sh
+. "${TERMUX_SCRIPTDIR}/scripts/build/termux_error_exit.sh"
+
+# Utility function to write updated version to build.sh.
+# shellcheck source=scripts/updates/utils/termux_pkg_upgrade_version.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/utils/termux_pkg_upgrade_version.sh
+
+# Utility function to check if package needs to be updated, based on version comparison.
+# shellcheck source=scripts/updates/utils/termux_pkg_is_update_needed.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/utils/termux_pkg_is_update_needed.sh
+
+# Wrapper around github api to get latest release or newest tag.
+# shellcheck source=scripts/updates/api/termux_github_api_get_tag.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_github_api_get_tag.sh
+
+# Wrapper around gitlab api to get latest release or newest tag.
+# shellcheck source=scripts/updates/api/termux_gitlab_api_get_tag.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_gitlab_api_get_tag.sh
+
+# Function to get latest version of a package as per repology.
+# shellcheck source=scripts/updates/api/termux_repology_api_get_latest_version.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/api/termux_repology_api_get_latest_version.sh
+
+# Default auto update script for packages hosted on github.com. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_github_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_github_auto_update.sh
+
+# Default auto update script for packages hosted on hosts using gitlab-ci. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_gitlab_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_gitlab_auto_update.sh
+
+# Default auto update script for rest packages. Should not be overrided by build.sh.
+# To use custom algorithm, one should override termux_pkg_auto_update().
+# shellcheck source=scripts/updates/internal/termux_repology_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_repology_auto_update.sh
+
+# shellcheck source=scripts/updates/internal/termux_github_graphql.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/internal/termux_github_graphql.sh
+
+# Main script to:
+# - by default, decide which update method to use,
+# - but can be overridden by build.sh to use custom update method.
+# - For example: see cmake's build.sh.
+# shellcheck source=scripts/updates/termux_pkg_auto_update.sh
+. "${TERMUX_SCRIPTDIR}"/scripts/updates/termux_pkg_auto_update.sh
+
+# Converts milliseconds to human-readable format.
+# Example: `ms_to_human_readable 123456789` => 34h 17m 36s 789ms
+#
+# We need to manually clamp the inputs to 13 digits since uutils `date`
+# does not handle widths for the '%N' specifier correctly as of version 0.8.0
+# which is what currently ships with Ubuntu 26.04.
+# This commit can be reverted once Ubuntu ships uutils >= 0.9.0 or backports the fix.
+ms_to_human_readable() {
+    local now="${1:0:13}" start="${2:0:13}"
+    local span="$(( now - start ))" hrs=0 mins=0 secs=0 ms=0
+	(( ms = span%1000, span /= 1000, secs = span%60, span /= 60, mins = span%60, hrs = span/60 ))
+	echo "${hrs}h ${mins}m ${secs}s ${ms}ms" | sed 's/0h //;s/0m //;s/0s //'
+}
+
+# Runs a command without displaying its output in the case if trace is disabled and displays output in the case if it is enabled.
+# Needed only for debugging
+quiet() {
+	if [[ "$-" == *"x"* ]]; then
+		"$@"
+	else
+		"$@" &> /dev/null
+	fi
+	return $?
+}
+
+_update() {
+	export TERMUX_PKG_NAME
+	TERMUX_PKG_NAME="$(basename "$1")"
+	export TERMUX_PKG_BUILDER_DIR
+	TERMUX_PKG_BUILDER_DIR="$(realpath "$1")" # Directory containing build.sh.
+
+	IFS="," read -r -a EXCLUDED_ARCH <<< "${TERMUX_PKG_EXCLUDED_ARCHES:-}"
+	export TERMUX_ARCH="" # Arch to test updates.
+	for arch in aarch64 arm i686 x86_64; do
+		if [[ " ${EXCLUDED_ARCH[*]} " != *" ${arch} "* ]]; then
+			TERMUX_ARCH="${arch}"
+			break
+		fi
+	done
+	# Set +e +u to avoid:
+	# - ending on errors such as $(which prog), where prog is not installed.
+	# - error on unbound variable. (All global variables used should be covered by properties.sh and above.)
+	set +e +u
+	# shellcheck source=/dev/null
+	. "${TERMUX_PKG_BUILDER_DIR}"/build.sh 2>/dev/null
+	set -e -u
+
+	# Colorize the codepaths if not in CI for at a glance identification.
+	if [[ -z "${CI:-}" ]]; then
+		[[ -n "${_is_dependency:-}" ]] && printf -v _is_dependency '(\e[1;95m%s\e[m)' "${_is_dependency:1:-1}"
+		case "$_tag_type" in
+			"newest-tag") printf -v _tag_type '\e[1;33m%s\e[m' "$_tag_type";;
+			"latest-regex") printf -v _tag_type '\e[1;34m%s\e[m' "$_tag_type";;
+			"latest-release-tag") printf -v _tag_type '\e[1;32m%s\e[m' "$_tag_type";;
+		esac
+
+		case "$_update_method" in
+			"github") printf -v _update_method '\e[1;92m%s\e[m' "$_update_method";;
+			"gitlab") printf -v _update_method '\e[1;93m%s\e[m' "$_update_method";;
+			"repology") printf -v _update_method '\e[1;96m%s\e[m' "$_update_method";;
+		esac
+	fi
+
+	# INFO: Updating <package name> [<current version>, <update api>(/<tag type>)?]
+	printf '\nINFO: Updating %s [%s, %s%s]\n' \
+		"${TERMUX_PKG_NAME}" \
+		"Current version: ${TERMUX_PKG_VERSION}" \
+		"${_update_method}${_tag_type:+/}${_tag_type}" \
+		"${_is_dependency:-}"
+
+	# Throw FD 3 into the FIFO for reporting
+	exec {IPC_FIFO_FD}<>"$IPC_FIFO"
+	termux_pkg_auto_update 3>& "${IPC_FIFO_FD}"
+	exec {IPC_FIFO_FD}>&-
+}
+
+declare -A _LATEST_TAGS=()
+declare -A _FAILED_UPDATES=()
+declare -A _ALREADY_SEEN=() # Array of successful updates or packages and their old/new version.
+declare -A _SUMMARY=(       # Updater codepath, package and dependency counts for the summary.
+    [dependencies]=0        # Initialize [dependencies] and
+    [total]=0               # [total] to 0 so they have values even if all packages are cache hits.
+)
+
+# _fetch_and_cache_tags fetches all possible tags using termux_pkg_auto_update, but using Ninja build system.
+# The key difference is that we make the process concurrent, allowing us to fetch tags simultaneously rather than one at a time.
+# Once all tags are cached, the termux_pkg_auto_update function will operate much more quickly.
+# We avoid packages with overwritten termux_pkg_auto_update to prevent unexpected modifications to the package`s build.sh.
+# shellcheck disable=SC2015
+_fetch_and_cache_tags() {
+	echo "INFO: Fetching and caching tags"
+
+	local -a __PACKAGES=() __GITHUB_PACKAGES=() __UNCACHED_PACKAGES=()
+
+	# Find all packages to be processed that don't have custom termux_pkg_auto_update() functions
+	local pkg_dir
+	for pkg_dir in "$@"; do
+		# Skip packages with custom termux_pkg_auto_update() functions
+		if [[ "$(<"$pkg_dir/build.sh")" == *$'\ntermux_pkg_auto_update'* ]]; then
+			# Save these for the summary but don't try to do any caching.
+			__UNCACHED_PACKAGES+=("$pkg_dir")
+			continue
+		fi
+
+		BUILD_PACKAGES=false quiet _should_update "${pkg_dir}" || continue # Skip if not needed.
+		__PACKAGES+=("${pkg_dir}")
+
+		# bash-builtin version of `grep '^TERMUX_PKG_SRCURL=' "${pkg_dir}/build.sh" | grep -q 'github.com'` without spawning extra processes
+		if [[ "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_SRCURL=[^[:space:]]*github\.com ]] &&
+			[[ "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_UPDATE_METHOD=[^[:space:]]*github || ! "$(<"$pkg_dir/build.sh")" =~ TERMUX_PKG_UPDATE_METHOD=[^[:space:]]* ]]; then
+			__GITHUB_PACKAGES+=("$pkg_dir")
+		fi
+	done
+
+	echo "INFO: Building GraphQL queries"
+
+	local GITHUB_GRAPHQL_QUERIES=() COUNTER=0
+	declare -A __GITHUB_GRAPHQL_PACKAGES=()
+	# Ignore non-constant sources
+	# shellcheck disable=SC1091
+	for pkg_dir in "${__GITHUB_PACKAGES[@]}"; do
+		local PKG_SRCURL="" TAG_TYPE="" REGEXP=""
+		read -r PKG_SRCURL TAG_TYPE REGEXP < <(
+			set +eu
+			source "${pkg_dir}/build.sh"
+			echo "${TERMUX_PKG_SRCURL}" "${TERMUX_PKG_UPDATE_TAG_TYPE:-"none"}" "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}"
+		)
+
+		local user="" repo=""
+		IFS=/ read -r user repo _ <<< "${PKG_SRCURL#*://github.com/}"
+
+		if [[ "${TAG_TYPE}" == "none" ]]; then # If not set, then decide on the basis of url.
+			if [[ "${PKG_SRCURL:0:4}" == "git+" ]]; then
+				TAG_TYPE="newest-tag" # Get newest tag.
+			elif [[ -n "$REGEXP" ]]; then
+				TAG_TYPE="latest-regex" # Get the latest release tag.
+			else
+				TAG_TYPE="latest-release-tag" # Get the latest release tag.
+			fi
+		fi
+
+		# We prepare the query snippets for `termux_github_graphql` here
+		# since we already have the needed information available.
+		GITHUB_GRAPHQL_QUERIES+=( "_$((COUNTER++)): repository(owner: \\\"${user}\\\", name: \\\"${repo}\\\") { ..._${TAG_TYPE//-/_} }" )
+	done
+
+	# This is called indirectly in subshell
+	# So silence shellcheck's unreachable code warning
+	# shellcheck disable=SC2329
+	__main__() {
+		cd "${TERMUX_SCRIPTDIR}"
+		export TERMUX_PKG_NAME="${1##*/}" TERMUX_PKG_BUILDER_DIR=${1}
+		set +eu
+		for i in scripts/build/termux_error_exit.sh scripts/updates/{**/,}*.sh "${1}/build.sh"; do
+			# shellcheck disable=SC1090
+			source "${i}"
+		done
+		set -eu
+
+		# PKG means regular version to be cached normally.
+		# SKIP means we know package is up to date and we can safely skip checks.
+		# LOCAL is for obtaining current package version, to be compared with version obtained with GraphQL
+
+		termux_github_api_get_tag() {
+			local ver="${TERMUX_PKG_VERSION#*:}"
+			echo "LOCAL|${TERMUX_PKG_NAME}|${ver}"
+			exit 0
+		}
+		termux_pkg_upgrade_version() {
+			local action; action="$( [[ "${1:-}" == "${TERMUX_PKG_VERSION#*:}" ]] && echo SKIP || echo PKG )"
+			[[ "${1:-}" == "LOCAL|"* ]] && { echo "$1"; exit 0; } # Forwarded from termux_github_api_get_tag
+			[[ -n "$1" ]] && echo "${action}|${TERMUX_PKG_NAME}|${1#*:}"
+			exit 0
+		}
+		termux_repology_auto_update() {
+			local ver; ver="$(termux_repology_api_get_latest_version "${TERMUX_PKG_NAME}")"
+			if [[ "${ver}" == "null" ]]; then
+				# it returns `null` in the case if the version is up to date so we can safely skip the package
+				echo "SKIP|${TERMUX_PKG_NAME}|${TERMUX_PKG_VERSION#*:}"
+			else
+				# The package needs to be updated
+				echo "PKG|${TERMUX_PKG_NAME}|${ver}"
+			fi
+			exit 0
+		}
+		termux_pkg_auto_update
+	}
+
+	echo "${CI:+::group::}INFO: Fetching GitHub packages via GraphQL API"
+
+	local line
+	local -a LATEST_TAGS=() LATEST_TAGS_GITHUB=()
+
+	while IFS='' read -r line; do
+		case "$line" in
+			# The entries can be single or multi-line
+			# but each new entry starts with 'GIT|'
+			'GIT|'*) LATEST_TAGS_GITHUB+=("$line");;
+			# If the line didn't start a new entry, append it to the previous entry.
+			*)       LATEST_TAGS_GITHUB[-1]+=$'\n'"$line";;
+		esac
+	done < <(termux_github_graphql "${GITHUB_GRAPHQL_QUERIES[@]}")
+
+	echo "${CI:+::endgroup::}"
+
+	echo "INFO: Fetching non-GitHub packages"
+	while read -r line; do
+		case "$line" in
+			# The entries can be single or multi-line
+			# but each new entry starts with 'GIT|'
+			'LOCAL|'*|'SKIP|'*|'PKG|'*) LATEST_TAGS+=("$line");;
+			# If the line didn't start a new entry, append it to the previous entry.
+			*)       LATEST_TAGS[-1]+=$'\n'"$line";;
+		esac
+		# Provide a running tally for local runs.
+		# Don't do this in the CI since that would spam the logs
+		[[ -z "${CI:-}" ]] && printf '\rINFO: Caching tags - %s' "${#LATEST_TAGS[*]}"
+	done < <(
+	if (( ${#__PACKAGES[@]} )); then
+		export -f __main__
+		export TERMUX_SCRIPTDIR GITHUB_TOKEN TERMUX_REPOLOGY_DATA_FILE
+		printf '%s\0' "${__PACKAGES[@]}" | xargs -0 -n1 -P"$(nproc)" bash -c '__main__ "$@"' _
+	fi
+	)
+	# make sure the running tally gets a proper newline on local runs
+	[[ -z "${CI:-}" ]] && echo
+
+	unset -f __main__
+
+	local -A __GITHUB_CURRENT_TAGS=()
+	echo "${CI:+::group::}INFO: Skipping the following up-to-date packages"
+	local pkg pkg_type pkg_name pkg_version
+	for pkg in "${LATEST_TAGS[@]}" "${LATEST_TAGS_GITHUB[@]}"; do
+		pkg_type="${pkg%%|*}"
+		pkg_name="${pkg#*|}"; pkg_name="${pkg_name%|*}"
+		pkg_version="${pkg##*|}"
+		case "${pkg_type}" in
+			"LOCAL") # Local package version for a GitHub GraphQL request.
+				__GITHUB_CURRENT_TAGS["${pkg_name:-_}"]="$pkg_version"
+				continue
+			;;
+			"GIT") # GitHub GraphQL results, can be skipped if it matches the local version.
+				if [[ "${__GITHUB_CURRENT_TAGS["${pkg_name:-}"]:-}" == "${pkg_version}" ]]; then
+					echo "INFO: Skipping ${pkg_name}: already at version ${pkg_version}"
+					: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
+				fi
+			;;
+			"SKIP") # SKIP means we know package is up to date and we can safely skip checks.
+				: "${_ALREADY_SEEN["${pkg_name}"]:=""}"
+				echo "INFO: Skipping ${pkg_name}: already at version ${pkg_version}"
+			;;
+		esac
+		_LATEST_TAGS["${pkg_name:-_}"]="$pkg_version"
+		(( _SUMMARY["total"]++ ))
+	done
+
+	echo "${CI:+::endgroup::}"
+
+	# Sum up results
+	echo "INFO: Fetched ${_SUMMARY[total]} tags."
+	echo "INFO: GitHub - ${#LATEST_TAGS_GITHUB[*]}"
+	echo "INFO: Other  - $(( _SUMMARY[total] - ${#LATEST_TAGS_GITHUB[*]} ))"
+	echo "INFO: Cached - $(( _SUMMARY[total] - ${#__UNCACHED_PACKAGES[@]} ))"
+	if (( ${#__UNCACHED_PACKAGES[@]} )); then
+	printf '%s\n' \
+		"${CI:+::group::}INFO: Uncached - ${#__UNCACHED_PACKAGES[*]}" \
+		"Not cacheable due to custom \`termux_pkg_auto_update()\`" \
+		"${__UNCACHED_PACKAGES[@]##*/}" \
+		"${CI:+::endgroup::}"
+	fi
+}
+
+_check_updated() {
+	local latest_tag="${_LATEST_TAGS[${1##*/}]:-}"
+
+	if [[ -z "${latest_tag}" ]]; then
+		return 1
+	fi
+
+	(
+	set +eu
+	quiet source "${1}/build.sh"
+	# shellcheck disable=SC2030
+	TERMUX_PKG_NAME="${1##*/}"
+	export TERMUX_PKG_UPGRADE_VERSION_DRY_RUN=1
+	# The call to `termux_pkg_upgrade_version` is delibrately
+	# not wrapped by `quiet` to let warnings on stderr bubble up.
+	if termux_pkg_upgrade_version "${latest_tag}" > /dev/null; then
+		echo "INFO: Skipping ${1##*/}: already at version ${TERMUX_PKG_VERSION}"
+		: "${_ALREADY_SEEN["${TERMUX_PKG_NAME}"]:=""}"
+		return 0
+	fi
+	return 1
+	)
+}
+
+declare -A _CACHED_ISSUES=()
+# Check if an issue with same title already exists and is open.
+_gh_check_issue_exists() {
+	local pkg_name="$1" number
+
+	# Check the cache.
+	for number in "${!_CACHED_ISSUES[@]}"; do
+		# shellcheck disable=SC2076 # We want literal match here, not regex based.
+		if [[ "${_CACHED_ISSUES[$number]}" =~ "'Auto update failing for ${pkg_name}'" ]]; then
+				echo "$number"
+				return 0
+		fi
+	done
+	return 1
+}
+
+_run_update() {
+	local pkg_dir="$1" pkg_name
+	pkg_name="$(basename "${pkg_dir}")"
+	# needed for 'termux_pkg_is_update_needed'
+	# shellcheck disable=SC2031
+	export TERMUX_PKG_NAME="${pkg_name}"
+
+	local output="" _CURRENT_VERSION _NEWEST_VERSION _ISSUE
+
+	# shellcheck disable=SC1091 # Ignore shellcheck's inability to follow the source
+	{
+	local _SRCURL _REGEXP _tag_type _update_method _is_dependency
+	_CURRENT_VERSION="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_VERSION#*:}")"
+	_SRCURL="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_SRCURL}")"
+	_REGEXP="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_UPDATE_VERSION_REGEXP:-}")"
+	_tag_type="$(set +eu; . "$(realpath "$pkg_dir")/build.sh"; echo "${TERMUX_PKG_UPDATE_TAG_TYPE:-}")"
+	_update_method="$(termux_pkg_get_update_method "$_SRCURL")"
+	} &> /dev/null
+
+	# Repology method only has a $_tag_type if set explicitly.
+	if [[ -z "${_tag_type}" && "${_update_method}" != 'repology' ]]; then
+		if [[ "${_SRCURL:0:4}" == "git+" ]]; then
+			_tag_type="newest-tag"
+		elif [[ -n "$_REGEXP" ]]; then
+			_tag_type="latest-regex"
+		else
+			_tag_type="latest-release-tag"
+		fi
+	fi
+
+	# Keep a running count for each of the methods
+	(( _SUMMARY["${_update_method}${_tag_type:+/}${_tag_type}"]++ ))
+
+
+	# If this package hasn't been seen before update the total.
+	if [[ -z ${_LATEST_TAGS[${pkg_name}]:-} ]]; then
+		(( _SUMMARY["total"]++ ))
+		# Check if this is running though _update_dependencies()
+		if [[ "${FUNCNAME[1]}" == '_update_dependencies' ]]; then
+			_is_dependency='(dependency)'
+			(( _SUMMARY["dependencies"]++ ))
+		fi
+	fi
+
+	# Ensure the FIFO is empty at the start of each update.
+	# This clears stale data from dependency checks, to prevent
+	# stale/incorrect version numbers in the summary.
+	read -rt0.001 _ < "$IPC_FIFO"
+	# Run each package update in separate process since we include their environment variables.
+	if output="$(
+		set -euo pipefail
+		# Pass cached tag we obtained earlier
+		[[ -n "${_LATEST_TAGS[${pkg_name}]:-}" ]] && export __CACHED_TAG="${_LATEST_TAGS[${pkg_name}]}" || :
+		exec > >(tee /dev/fd/2) 2>&1 # output everything on stderr to stdout as well.
+		_update "${pkg_dir}"
+	)"; then
+		# For whatever reason reads from the FIFO are not instant even if there is data.
+		# So put a 1ms timeout on it that way it doesn't wait infinitely if there's nothing in the FIFO,
+		# since it only receives new data if `termux_pkg_upgrade_version()` ran.
+		read -rt0.001 _NEWEST_VERSION < "$IPC_FIFO"
+		# If we didn't get a version back treat it as current.
+		# This mainly happens when Repology doesn't report a newer version for a package.
+		# Which is returned as `null` in the API response, and which we treat as a skip.
+		# See: scripts/updates/internal/termux_repology_auto_update.sh
+		: "${_NEWEST_VERSION:="${_CURRENT_VERSION}"}"
+
+		# Check associated issues if able.
+		if (( ${#_CACHED_ISSUES[*]} )); then
+			_ISSUE="$(_gh_check_issue_exists "${pkg_name}")"
+		fi
+
+		if termux_pkg_is_update_needed "${_CURRENT_VERSION}" "${_NEWEST_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}${_ISSUE:+" - Open issue: #${_ISSUE}"}"
+		elif termux_pkg_is_update_needed "${_NEWEST_VERSION}" "${_CURRENT_VERSION}"; then
+			_ALREADY_SEEN["$pkg_name"]="${pkg_name} ${_CURRENT_VERSION} => ${_NEWEST_VERSION}${_ISSUE:+" - Open issue: #${_ISSUE}"} (Error? current version is larger than latest fetched version)"
+		else
+			_ALREADY_SEEN["$pkg_name"]=""
+		fi
+	else
+		_FAILED_UPDATES["$pkg_name"]="${output}"
+	fi
+}
+
+_should_update() {
+	local pkg_dir="$1"
+
+	if [[ ! -f "${pkg_dir}/build.sh" ]]; then
+		# Fail if detected a non-package directory.
+		termux_error_exit "directory '${pkg_dir}' is not a package."
+	fi
+
+	# `[[ "$(<"$file")" =~ regex ]]` is bash builtin solution for `grep -q` without spawning extra process
+	# it is needed to pre-fetch and filter packages as fast as possible (it is 6.5 times faster than `grep`)
+	local build_sh=$'\n'"$(<"$pkg_dir/build.sh")"$'\n'
+	case "${PACKAGES_OPT_OUT:-}" in
+		"true") [[ "$build_sh" != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* && ( "$build_sh" != *$'\n'TERMUX_PKG_ESSENTIAL=true$'\n'* || "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ) ]] || return 1 ;; # Skip.
+			*) [[ "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
+	esac
+
+	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " == *" ${pkg_dir##*/} "* ]]; then
+		return 1 # Skip.
+	fi
+
+	local _ISSUE
+	if [[ "${BUILD_PACKAGES}${GITHUB_ACTIONS:-}" == "truetrue" ]] && _ISSUE="$(_gh_check_issue_exists "${pkg_dir##*/}")"; then
+		echo "INFO: Skipping '${pkg_dir##*/}', an update issue (#${_ISSUE}) for it hasn't been resolved yet."
+		return 1
+	fi
+
+	return 0
+}
+
+shopt -s extglob
+_update_dependencies() {
+	local pkg_dir="$1"
+
+	if ! grep -qE "^(TERMUX_PKG_DEPENDS|TERMUX_PKG_BUILD_DEPENDS|TERMUX_SUBPKG_DEPENDS)=" \
+		"${pkg_dir}"/+(build|*.subpackage).sh; then
+		return 0
+	fi
+	while read -r dep dep_dir; do
+		if [[ -z "${dep}" ]]; then
+			continue
+		elif [[ "${dep}" == "ERROR" ]]; then
+			termux_error_exit "Obtaining update order failed for ${pkg_dir##*/}"
+		fi
+		_should_update "${dep_dir}" && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
+	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" "${TERMUX_PACKAGES_DIRECTORIES[@]}" || echo "ERROR")
+}
+
+echo "INFO: Running updates for: $*"
+
+# If we have `gh` and a GitHub token,
+# cache the open auto-update issues for `_gh_check_issue_exists`
+if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
+	_start_time="$(date +%10s%3N)"
+
+	while read -r number title; do
+		_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
+	done < <(
+		gh issue list \
+			--limit 10000 \
+			--label "auto update failing" --label "bot" \
+			--state open \
+			--search "Auto update failing for in:title type:issue" \
+			--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
+	)
+	printf "Cached %s existing issues - took %s\n" \
+		"${#_CACHED_ISSUES[*]}" \
+		"$(ms_to_human_readable "$(date +%10s%3N)" "$_start_time")"
+fi
+_start_time="$(date +%10s%3N)"
+
+# Remove any leftover FIFOs that may not have been cleaned up.
+rm "${TMPDIR:-/tmp}/termux_ipc_"*.fifo &> /dev/null
+# Set up a side channel FIFO for reporting parsed latest versions
+export IPC_FIFO="${TMPDIR:-/tmp}/termux_ipc_$$.fifo"
+mkfifo "$IPC_FIFO"
+exec {IPC_FIFO_FD}<>"$IPC_FIFO"
+
+echo "INFO: Running the 'dump-repology-data' script"
+if python3 "${TERMUX_SCRIPTDIR}"/scripts/updates/api/dump-repology-data "${TERMUX_REPOLOGY_DATA_FILE}"; then
+	echo "INFO: The 'dump-repology-data' script was successful"
+else
+	echo "INFO: The 'dump-repology-data' script was unsuccessful, so an empty json is being placed in \${TERMUX_REPOLOGY_DATA_FILE}"
+	echo "{}" > "${TERMUX_REPOLOGY_DATA_FILE}"
+fi
+
+if [[ "$1" == "@all" ]]; then
+	declare -a PACKAGE_LIST=()
+	for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+		for pkg_dir in "${channel}"/*; do
+			PACKAGE_LIST+=("$pkg_dir")
+		done
+	done
+	set -- "${PACKAGE_LIST[@]}"
+	unset PACKAGE_LIST
+fi
+
+declare -a PACKAGE_DIRS_LIST=()
+for pkg in "$@"; do
+	pkg_dir="${pkg}"
+	if [[ ! -d "${pkg}" ]]; then # If only package name is given, try to find its directory.
+		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}/repo.json"); do
+			if [[ -d "${channel}/${pkg}" ]]; then
+				pkg_dir="${channel}/${pkg}"
+				break
+			fi
+		done
+	fi
+	PACKAGE_DIRS_LIST+=("$pkg_dir")
+done
+
+# To conserve API limits and speed up update checking,
+# pre-cache the latest tags
+_fetch_and_cache_tags "${PACKAGE_DIRS_LIST[@]}"
+
+for pkg_dir in "${PACKAGE_DIRS_LIST[@]}"; do
+	_unix_millis="$(date +%10s%3N)"
+	# eliminate packages without updates
+	# when it is possible to determine that from the API response alone.
+	# Check if we should be updating this package.
+	# Skip it if:
+	# - it doesn't have auto-updates enabled
+	# - it was already cached by _fetch_and_cache_tags
+	# - or there is an open auto-update issue for it
+	_should_update "${pkg_dir}" || continue
+	_update_dependencies "${pkg_dir}"
+	_run_update "${pkg_dir}"
+	echo "termux - took $(ms_to_human_readable "$(date +%10s%3N)" "$_unix_millis")"
+done
+
+exec {IPC_FIFO_FD}<&- # close the FIFO
+# Clean up our FIFO and repology data file
+rm "$IPC_FIFO" "$TERMUX_REPOLOGY_DATA_FILE"
+
+############################################CALCULATE CODEPATH SUMMARY###########################################
+
+for update_codepath in "${!_SUMMARY[@]}"; do
+	case "${update_codepath}" in
+		'dependencies'|'total');;
+		*)
+			printf -v codepaths '%s%-30s%s\n' \
+				"${codepaths:-}" \
+				"${update_codepath}:" \
+				"${_SUMMARY[$update_codepath]}"
+		;;
+	esac
+done
+
+#################################################REPORT CHANGES##################################################
+
+echo ""
+echo "SUMMARY: Checked ${_SUMMARY[total]} packages - took $(ms_to_human_readable "$(date +%10s%3N)" "$_start_time") in total."
+echo "SUMMARY: $# (Directly passed), ${_SUMMARY[dependencies]} (Dependencies)"
+echo "SUMMARY: Update methods and release types."
+sort <<< "${codepaths:-}"
+echo ""
+echo "=================================================="
+echo ""
+echo "SUMMARY: Detected updates"
+printf '%s\n' "${_ALREADY_SEEN[@]}" | grep -ve '^$' | sort
+echo ""
+echo "SUMMARY: ${#_FAILED_UPDATES[*]} failed updates."
+echo "${!_FAILED_UPDATES[@]}"
+
+unset IPC_FIFO IPC_FIFO_FD _unix_millis _start_time _pkg update_codepath codepaths
+
+################################################FAILURE HANDLING#################################################
+
+_gh_create_new_issue() {
+	local pkg_name="$1"
+	local max_body_length=65536 # Max length of the body for one request.
+	local issue_number
+	local body
+	local link
+	local assignee=""
+	[[ "${GITHUB_ACTOR:-termuxbot2}" != "termuxbot2" ]] && assignee="--assignee $GITHUB_ACTOR"
+
+	if [[ "${CREATE_ISSUE}" != "true" ]]; then
+		echo "INFO: CREATE_ISSUE set to '${CREATE_ISSUE}'. Not creating new issue."
+		return 1
+	fi
+	if _gh_check_issue_exists "${pkg_name}"; then
+		echo "INFO: An existing update issue for '${pkg_name}' hasn't been resolved yet."
+		return
+	fi
+
+	# Extract origin URL, commit hash and builder directory and put everything together
+	link="$(git config --get remote.origin.url | sed -E 's|\.git$||; s|git@([^:]+):(.+)|https://\1/\2|')/blob/$(git rev-parse HEAD)/$(echo */"$1")"
+
+	body="$(
+		cat <<-EOF
+			Hi, I'm Termux 🤖.
+
+			I'm here to help you update your Termux packages.
+
+			I've tried to update the [${pkg_name}](${link}) package, but it failed.
+
+			Here's the output of the update script:
+			<details>
+				<summary>Show log</summary>
+				<pre lang="console">${_FAILED_UPDATES["${pkg_name}"]}</pre>
+			</details>
+
+			<hr>
+			<i>
+			Above error occurred when I last tried to update at $(date -u +"%Y-%m-%d %H:%M:%S UTC").<br>
+			Run ID: <a href="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}">${GITHUB_RUN_ID}</a><br><br>
+			<b>Note:</b> Automatic updates will be disabled until this issue is resolved.<br>
+			</i>
+		EOF
+	)"
+	# shellcheck disable=SC2086
+	issue_number=$(
+		gh issue create \
+			--title "Auto update failing for ${pkg_name}" \
+			--body "${body:0:${max_body_length}}" \
+			--label "auto update failing" --label "bot" \
+			$assignee |
+			grep -oE "[0-9]+" # Last component of the URL returned is the issue number.
+	)
+	if [ -z "${issue_number}" ]; then
+		echo "ERROR: Failed to create issue."
+		return 1
+	fi
+
+	echo "INFO: Created issue ${issue_number} for ${pkg_name}."
+
+	if [[ -n "${body:${max_body_length}}" ]]; then
+		# The body was too long, so we need to append the rest.
+		while true; do
+			body="${body:${max_body_length}}"
+			if [[ -z "${body}" ]]; then
+				break
+			fi
+			sleep 5 # Otherwise we might get rate limited.
+			gh issue edit "$issue_number" \
+				--body-file - <<<"$(
+					gh issue view "$issue_number" \
+						--json body \
+						--jq '.body'
+				)${body:0:${max_body_length}}" >/dev/null
+			# NOTE: we use --body-file instead of --body to avoid shell error 'argument list too long'.
+		done
+	fi
+}
+
+_handle_failure() {
+	echo # Newline.
+	if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+		echo "INFO: Creating issue for failed updates...(if any)"
+		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
+			_gh_create_new_issue "${pkg_name}"
+		done
+	else
+		echo "==> Failed updates:"
+		local count=0
+		for pkg_name in "${!_FAILED_UPDATES[@]}"; do
+			count=$((count + 1))
+			echo "${count}. ${pkg_name}"
+		done
+		exit 1
+	fi
+}
+
+if [[ ${#_FAILED_UPDATES[@]} -gt 0 ]]; then
+	_handle_failure
+fi

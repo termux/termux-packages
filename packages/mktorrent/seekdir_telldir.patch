@@ -1,0 +1,41 @@
+diff -uNr mktorrent-1.1/ftw.c mktorrent-1.1.mod/ftw.c
+--- mktorrent-1.1/ftw.c	2017-01-11 23:13:16.000000000 +0200
++++ mktorrent-1.1.mod/ftw.c	2019-01-30 16:51:09.927683504 +0200
+@@ -45,6 +45,20 @@
+ 	off_t offset;
+ };
+ 
++struct DIR {
++	int fd_;
++};
++
++static long telldir_custom(struct DIR *dirp)
++{
++	return (long) lseek(dirp->fd_, 0, SEEK_CUR);
++}
++
++static void seekdir_custom(DIR *dirp, long loc)
++{
++	(void) lseek(dirp->fd_, loc, SEEK_SET);
++}
++
+ static struct dir_state *dir_state_new(struct dir_state *prev,
+ 		struct dir_state *next)
+ {
+@@ -88,14 +102,14 @@
+ 
+ 	name[ds->length] = DIRSEP_CHAR;
+ 
+-	seekdir(ds->dir, ds->offset);
++	seekdir_custom(ds->dir, ds->offset);
+ 
+ 	return 0;
+ }
+ 
+ static unsigned int dir_state_close(struct dir_state *ds)
+ {
+-	ds->offset = telldir(ds->dir);
++	ds->offset = telldir_custom(ds->dir);
+ 	if (ds->offset < 0) {
+ 		fprintf(stderr, "Error getting dir offset: %s\n",
+ 				strerror(errno));

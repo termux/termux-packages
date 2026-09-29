@@ -1,0 +1,13 @@
+--- a/src/os/unix/os.c
++++ b/src/os/unix/os.c
+@@ -79,8 +79,8 @@
+                 all_data_paths[i++] = util_concat(p, "/.local/share/1oom", NULL);;
+             }
+         }
+-        all_data_paths[i++] = lib_stralloc("/usr/share/1oom");
+-        all_data_paths[i++] = lib_stralloc("/usr/local/share/1oom");
++        all_data_paths[i++] = lib_stralloc("@TERMUX_PREFIX@/share/1oom");
++        all_data_paths[i++] = lib_stralloc("@TERMUX_PREFIX@/local/share/1oom");
+         all_data_paths[i++] = lib_stralloc(".");
+         all_data_paths[i] = NULL;
+         num_data_paths = i;

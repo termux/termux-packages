@@ -1,0 +1,15 @@
+diff -u -r ../elfutils-0.166/src/ranlib.c ./src/ranlib.c
+--- ../elfutils-0.166/src/ranlib.c	2015-11-27 08:36:29.000000000 -0500
++++ ./src/ranlib.c	2016-05-04 14:18:56.314550152 -0400
+@@ -138,11 +138,6 @@
+ 
+   assert (off + n <= len);
+ 
+-  /* Tell the kernel we will read all the pages sequentially.  */
+-  size_t ps = sysconf (_SC_PAGESIZE);
+-  if (n > 2 * ps)
+-    posix_madvise (rawfile + (off & ~(ps - 1)), n, POSIX_MADV_SEQUENTIAL);
+-
+   return write_retry (newfd, rawfile + off, n) != (ssize_t) n;
+ }
+ 

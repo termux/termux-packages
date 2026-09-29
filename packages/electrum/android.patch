@@ -1,0 +1,82 @@
+--- a/electrum/electrum
++++ b/electrum/electrum
+@@ -42,7 +42,7 @@
+ 
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_pyinstaller = getattr(sys, 'frozen', False)
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
+ # is_local: unpacked tar.gz but not pip installed, or git clone
+--- a/electrum/logging.py
++++ b/electrum/logging.py
+@@ -345,7 +345,7 @@
+ 
+ 
+ def describe_os_version() -> str:
+-    if 'ANDROID_DATA' in os.environ:
++    if False:
+         import jnius
+         bv = jnius.autoclass('android.os.Build$VERSION')
+         b = jnius.autoclass('android.os.Build')
+--- a/electrum/simple_config.py
++++ b/electrum/simple_config.py
+@@ -468,7 +468,7 @@
+     def get_backup_dir(self) -> Optional[str]:
+         # this is used to save wallet file backups (without active lightning channels)
+         # on Android, the export backup button uses android_backup_dir()
+-        if 'ANDROID_DATA' in os.environ:
++        if False:
+             return None
+         else:
+             return self.WALLET_BACKUP_DIRECTORY
+--- a/electrum/util.py
++++ b/electrum/util.py
+@@ -415,7 +415,7 @@
+             self.wake_up_event.clear()
+ 
+     def on_stop(self):
+-        if 'ANDROID_DATA' in os.environ:
++        if False:
+             import jnius
+             jnius.detach()
+             self.logger.info("jnius detach")
+@@ -621,7 +621,7 @@
+ 
+ 
+ def is_android_debug_apk() -> bool:
+-    is_android = 'ANDROID_DATA' in os.environ
++    is_android = False
+     if not is_android:
+         return False
+     from jnius import autoclass
+@@ -631,7 +631,7 @@
+ 
+ 
+ def get_android_package_name() -> str:
+-    is_android = 'ANDROID_DATA' in os.environ
++    is_android = False
+     assert is_android
+     from jnius import autoclass
+     from android.config import ACTIVITY_CLASS_NAME
+@@ -695,7 +695,7 @@
+ def user_dir():
+     if "ELECTRUMDIR" in os.environ:
+         return os.environ["ELECTRUMDIR"]
+-    elif 'ANDROID_DATA' in os.environ:
++    elif False:
+         return android_data_dir()
+     elif os.name == 'posix':
+         return os.path.join(os.environ["HOME"], ".electrum")
+--- a/run_electrum
++++ b/run_electrum
+@@ -42,7 +42,7 @@
+ 
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_pyinstaller = getattr(sys, 'frozen', False)
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
+ # is_local: unpacked tar.gz but not pip installed, or git clone

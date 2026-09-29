@@ -1,0 +1,11 @@
+--- a/netconf/src/yangrpc/example/yangrpc-parse-example.c
++++ b/netconf/src/yangrpc/example/yangrpc-parse-example.c
+@@ -22,7 +22,7 @@
+ 
+     res = yangrpc_init(NULL);
+     assert(res==NO_ERR);
+-    res = yangrpc_connect("localhost"/*server*/, 830/*port*/, "vladimir"/*user*/,"mysecretpass"/*password*/,"/home/vladimir/.ssh/id_rsa.pub"/*public_key*/, "/home/vladimir/.ssh/id_rsa"/*private_key*/, NULL, &yangrpc_cb_ptr);
++    res = yangrpc_connect("localhost"/*server*/, 830/*port*/, "vladimir"/*user*/,"mysecretpass"/*password*/,"@TERMUX_HOME@/.ssh/id_rsa.pub"/*public_key*/, "@TERMUX_HOME@/.ssh/id_rsa"/*private_key*/, NULL, &yangrpc_cb_ptr);
+     assert(res==NO_ERR);
+ 
+     res = yangrpc_parse_cli(yangrpc_cb_ptr, "xget /interfaces-state", &request_val);

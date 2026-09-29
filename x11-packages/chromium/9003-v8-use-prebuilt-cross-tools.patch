@@ -1,0 +1,115 @@
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -2139,7 +2139,9 @@
+       "tools/gcmole/:*",
+     ]
+ 
++if (false) {
+     deps = [ ":torque($toolchain)" ]
++}
+ 
+     script = "tools/run.py"
+ 
+@@ -2181,8 +2183,14 @@
+       ]
+     }
+ 
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/chromium-host-tools/"
++}
++
+     args = [
+-      "./" + rebase_path(
++      arg0_prefix + rebase_path(
+               get_label_info(":torque($toolchain)", "root_out_dir") + "/torque",
+               root_build_dir),
+       "-o",
+@@ -2343,9 +2351,18 @@
+ action("generate_bytecode_builtins_list") {
+   script = "tools/run.py"
+   outputs = [ "$target_gen_dir/builtins-generated/bytecodes-builtins-list.h" ]
++if (false) {
+   deps = [ ":bytecode_builtins_list_generator($v8_generator_toolchain)" ]
++}
++
++if (false) {
++  arg0_prefix = "./"
++} else {
++  arg0_prefix = "@TERMUX_PREFIX@/opt/chromium-host-tools/"
++}
++
+   args = [
+-    "./" + rebase_path(
++    arg0_prefix + rebase_path(
+             get_label_info(
+                     ":bytecode_builtins_list_generator($v8_generator_toolchain)",
+                     "root_out_dir") + "/bytecode_builtins_list_generator",
+@@ -2373,12 +2390,16 @@
+     suffix = "_$name"
+   }
+   action("run_mksnapshot_" + name) {
++if (false) {
+     deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
+     if (v8_verify_deterministic_mksnapshot) {
+       # We archive the snapshot executable when verifying snapshot
+       # determinism to ease debugging.
+       data_deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
+     }
++} else {
++    deps = []
++}
+ 
+     script = "tools/run.py"
+ 
+@@ -2405,6 +2424,7 @@
+ 
+     args = []
+ 
++if (false) {
+     if (v8_verify_deterministic_mksnapshot) {
+       # Output redirection must be the first argument to run.py. We capture
+       # output when verifying snapshot determinism for debugging.
+@@ -2415,9 +2435,16 @@
+       ]
+       data += [ "$root_out_dir/mksnapshot_output${suffix}.log" ]
+     }
++}
++
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/chromium-host-tools/"
++}
+ 
+     args += [
+-      "./" + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
++      arg0_prefix + rebase_path(get_label_info(":mksnapshot($v8_snapshot_toolchain)",
+                                         "root_out_dir") + "/mksnapshot",
+                          root_build_dir),
+       "--turbo_instruction_scheduling",
+@@ -7458,14 +7485,22 @@
+ 
+     script = "tools/run.py"
+ 
++if (false) {
+     deps = [ ":gen-regexp-special-case($v8_generator_toolchain)" ]
++}
+ 
+     output_file = "$target_gen_dir/src/regexp/special-case.cc"
+ 
+     outputs = [ output_file ]
+ 
++if (false) {
++    arg0_prefix = "./"
++} else {
++    arg0_prefix = "@TERMUX_PREFIX@/opt/chromium-host-tools/"
++}
++
+     args = [
+-      "./" + rebase_path(
++      arg0_prefix + rebase_path(
+               get_label_info(
+                       ":gen-regexp-special-case($v8_generator_toolchain)",
+                       "root_out_dir") + "/gen-regexp-special-case",

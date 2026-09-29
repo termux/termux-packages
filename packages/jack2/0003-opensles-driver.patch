@@ -1,0 +1,42 @@
+diff --git a/android/opensl_io.c b/android/opensl_io.c
+index 38b6ec0..0af9bc5 100644
+--- a/android/opensl_io.c
++++ b/android/opensl_io.c
+@@ -512,7 +512,7 @@ int waitThreadLock(void *lock)
+   }
+   p->s = (unsigned char) 0;
+   pthread_mutex_unlock(&(p->m));
+-  return NULL;
++  return 0;
+ }
+ 
+ void notifyThreadLock(void *lock)
+diff --git a/wscript b/wscript
+index 86eb395..09b0411 100644
+--- a/wscript
++++ b/wscript
+@@ -699,6 +699,11 @@ def build_drivers(bld):
+         'solaris/oss/JackOSSDriver.cpp'
+     ]
+ 
++    opensles_src = [
++        'android/JackOpenSLESDriver.cpp', 
++        'android/opensl_io.c'
++    ]
++
+     portaudio_src = [
+         'windows/portaudio/JackPortAudioDevices.cpp',
+         'windows/portaudio/JackPortAudioDriver.cpp',
+@@ -741,6 +746,12 @@ def build_drivers(bld):
+ 
+     # Create hardware driver objects. Lexically sorted after the conditional,
+     # e.g. BUILD_DRIVER_ALSA.
++    create_driver_obj(
++        bld,
++        target='opensles',
++        source=opensles_src, 
++        lib=['OpenSLES'])
++    
+     if bld.env['BUILD_DRIVER_ALSA']:
+         create_driver_obj(
+             bld,

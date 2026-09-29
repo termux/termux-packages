@@ -1,0 +1,32 @@
+commit 1e4105bdbd36c8a2cb34a16958a285b2372859a1
+Author: Henrik Grimler <henrik@grimler.se>
+Date:   Fri Jan 8 20:42:21 2021 +0100
+
+    Create TMPDIR if it does not exist
+    
+    Applications tend to assume that TMPDIR exists, and might fail
+    otherwise.
+
+diff --git a/shell/tsu.sh b/shell/tsu.sh
+index 8b349a9..8874cc4 100755
+--- a/shell/tsu.sh
++++ b/shell/tsu.sh
+@@ -155,15 +155,15 @@ env_path_helper() {
+ 	log_DEBUG SWITCH_USER
+ 	if [[ -z "$SWITCH_USER" ]]; then
+ 		## By default we start a fresh root shell with HOME set to that of the root home
+-
+-		# Creat root $HOME if it doesnt exsists yet
+-		[[ -d "$ROOT_HOME" ]] || mkdir "$ROOT_HOME"
+ 		NEW_HOME="$ROOT_HOME"
+ 
+ 		EXP_ENV[PREFIX]="$PREFIX"
+ 		EXP_ENV[TMPDIR]="$ROOT_HOME/.tmp"
+ 		EXP_ENV[LD_PRELOAD]="$LD_PRELOAD"
+ 
++		# Create $TMPDIR, and $HOME, if they do not exist
++		[[ -d "${EXP_ENV[TMPDIR]}" ]] || mkdir -p "${EXP_ENV[TMPDIR]}"
++
+ 		log_DEBUG _TSU_AS_SUDO
+ 		if [[ "$_TSU_AS_SUDO" == true ]]; then
+ 			# sudo copies PATH variable, so most user binaries can run as root

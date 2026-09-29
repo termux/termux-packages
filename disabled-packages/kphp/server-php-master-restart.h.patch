@@ -1,0 +1,14 @@
+--- a/server/php-master-restart.h
++++ b/server/php-master-restart.h
+@@ -51,7 +51,11 @@
+ #if !defined(__APPLE__)
+ 
+ static constexpr size_t MASTER_DATA_T_SIZEOF = 272;
++#ifdef __ANDROID__
++static constexpr size_t SHARED_DATA_T_SIZEOF = 648;
++#else
+ static constexpr size_t SHARED_DATA_T_SIZEOF = 656;
++#endif
+ 
+ static_assert(sizeof(master_data_t) == MASTER_DATA_T_SIZEOF, "Layout of this struct must be the same in any KPHP version unless shared data magic is used, "
+                                                              "otherwise restart won't work");

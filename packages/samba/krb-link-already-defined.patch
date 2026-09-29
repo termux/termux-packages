@@ -1,0 +1,10 @@
+--- a/third_party/heimdal_build/et_compile_wrapper.sh
++++ b/third_party/heimdal_build/et_compile_wrapper.sh
+@@ -43,6 +43,7 @@
+ 	mv "${SOURCE}" "${TMP}" && {
+ 		echo "#include \"config.h\"" > "${SOURCE}" && {
+ 			cat "${TMP}" >> "${SOURCE}"
++			sed -i 's/link/link_et/g' "${SOURCE}" || :
+ 		}
+ 	}
+ 	rm -f "${TMP}"

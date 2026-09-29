@@ -1,0 +1,50 @@
+diff -uNr gatling-0.13/GNUmakefile gatling-0.13.mod/GNUmakefile
+--- gatling-0.13/GNUmakefile	2012-04-19 19:42:36.000000000 +0300
++++ gatling-0.13.mod/GNUmakefile	2020-01-01 23:37:28.967790097 +0200
+@@ -6,7 +6,7 @@
+ man1dir=$(MANDIR)/man1
+ 
+ TARGETS=gatling httpbench bindbench dl ioerr bench tlsgatling_nofail \
+-pthreadbench cgi ptlsgatling_nofail tlsdl_nofail ptlsdl_nofail
++pthreadbench cgi tlsdl_nofail
+ TARGETS2=mktestdata mmapbench manymapbench forkbench forksbench
+ ALLTARGETS=$(TARGETS) acc hcat referrer hitprofile matchiprange getlinks \
+ rellink $(TARGETS2)
+@@ -19,13 +19,13 @@
+ path = $(subst :, ,$(PATH))
+ gcc_path = $(foreach dir,$(path),$(wildcard $(dir)/$(CROSS)gcc))
+ ifeq ($(strip $(gcc_path)),)
+-CC=$(CROSS)clang
++CC?=$(CROSS)clang
+ else
+-CC=$(CROSS)gcc
++CC?=$(CROSS)gcc
+ endif
+ 
+-CFLAGS=-pipe -Wall
+-LDFLAGS=
++CFLAGS?=-pipe -Wall
++LDFLAGS?=
+ 
+ #CFLAGS+=-DSTATE_DEBUG -DMOREDEBUG -DDEBUG_EVENTS -DSMDEBUG
+ 
+@@ -47,10 +47,7 @@
+ CFLAGS+=-g -Og
+ LDFLAGS+=-g
+ else
+-CFLAGS+=-O2 -fomit-frame-pointer -I/usr/local/include
+-LDFLAGS+=-s
+ ifneq ($(DIET),)
+-DIET+=-Os
+ endif
+ endif
+ 
+@@ -81,7 +78,7 @@
+ 	$(CC) $< -o $@ -I. $(CFLAGS) $(LDFLAGS) $(LDLIBS)
+ 
+ forksbench: forkbench.o
+-	$(CC) -static -o $@ forkbench.o $(LDFLAGS) $(LDLIBS)
++	$(CC) -o $@ forkbench.o $(LDFLAGS) $(LDLIBS)
+ 
+ gatling.o tlsgatling ptlsgatling: havesetresuid.h
+ 

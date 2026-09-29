@@ -1,0 +1,80 @@
+diff -u -r ../../glkterm/Makefile ./glkterm/Makefile
+--- ../../glkterm/Makefile	2012-10-14 19:21:09.000000000 +0200
++++ ./glkterm/Makefile	2014-02-15 13:43:48.000000000 +0100
+@@ -10,21 +10,21 @@
+ 
+ # Pick a C compiler.
+ #CC = cc
+-CC = gcc -ansi
++#CC = gcc -ansi
+ 
+ # You may need to set directories to pick up the ncursesw library.
+ #INCLUDEDIRS = -I/usr/5include
+ #LIBDIRS = -L/usr/5lib
+-LIBS = -lncursesw
++LIBS = $(LDFLAGS) -lncursesw
+ 
+ # Use this LIBS line instead of the above if you do not have ncursesw
+ # available. For example, on a standard Mac OSX setup. (You will 
+ # probably also have to set LOCAL_NCURSESW in CFLAGS or in gtoption.h.)
+ #LIBS = -lncurses
+ 
+-OPTIONS = -g -Wall
++#OPTIONS = -g -Wall
+ 
+-CFLAGS = $(OPTIONS) $(INCLUDEDIRS)
++#CFLAGS = $(OPTIONS) $(INCLUDEDIRS)
+ 
+ GLKLIB = libglktermw.a
+ 
+@@ -44,8 +44,8 @@
+ cgunicod.o: cgunigen.c
+ 
+ $(GLKLIB): $(GLKTERM_OBJS)
+-	ar r $(GLKLIB) $(GLKTERM_OBJS)
+-	ranlib $(GLKLIB)
++	$(AR) r $(GLKLIB) $(GLKTERM_OBJS)
++	$(RANLIB) $(GLKLIB)
+ 
+ Make.glktermw:
+ 	echo LINKLIBS = $(LIBDIRS) $(LIBS) > Make.glktermw
+diff -u -r ../../glkterm/cgdate.c ./glkterm/cgdate.c
+--- ../../glkterm/cgdate.c	2012-10-14 19:21:09.000000000 +0200
++++ ./glkterm/cgdate.c	2014-02-15 13:45:27.000000000 +0100
+@@ -7,6 +7,24 @@
+ #include "glk.h"
+ #include "glkterm.h"
+ 
++#ifdef __ANDROID__
++time_t timegm (struct tm *tm) {
++	time_t ret;
++	char *tz;
++
++	tz = getenv("TZ");
++	setenv("TZ", "", 1);
++	tzset();
++	ret = mktime(tm);
++	if (tz)
++		setenv("TZ", tz, 1);
++	else
++		unsetenv("TZ");
++	tzset();
++	return ret;
++}
++#endif
++
+ /* This file is copied directly from the cheapglk package.
+    (Except that warning string constants are changed to L"..." constants.) */
+ 
+diff -u -r ../../glkterm/gtncursesw.c ./glkterm/gtncursesw.c
+--- ../../glkterm/gtncursesw.c	2012-10-14 19:21:09.000000000 +0200
++++ ./glkterm/gtncursesw.c	2014-02-15 13:43:48.000000000 +0100
+@@ -92,7 +92,7 @@
+ #else /* LOCAL_NCURSESW */
+ 
+ #define _XOPEN_SOURCE_EXTENDED /* ncursesw *wch* and *wstr* functions */
+-#include <ncursesw/ncurses.h>
++#include <ncurses.h>
+ 
+ int local_get_wch (wint_t *ch)
+ {

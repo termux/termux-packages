@@ -1,0 +1,9 @@
+# Contributor: @Neo-Oli
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/ed/
+TERMUX_PKG_DESCRIPTION="Classic UNIX line editor"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
+TERMUX_PKG_VERSION="1.22.6"
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/ed/ed-${TERMUX_PKG_VERSION}.tar.lz
+TERMUX_PKG_SHA256=3f33b22135219c39c3c695f7b7171c2567d3e2a17c798c0a90607320cbb268f2
+TERMUX_PKG_AUTO_UPDATE=true

@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/wiretap/usbdump/Makefile.in wireshark-2.6.1.mod/plugins/wiretap/usbdump/Makefile.in
+--- wireshark-2.6.1/plugins/wiretap/usbdump/Makefile.in	2018-05-22 21:53:30.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/wiretap/usbdump/Makefile.in	2018-06-26 19:43:25.458467636 +0300
+@@ -830,7 +830,7 @@
+ 	}
+ 
+ usbdump.la: $(usbdump_la_OBJECTS) $(usbdump_la_DEPENDENCIES) $(EXTRA_usbdump_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(usbdump_la_LINK) -rpath $(wiretap_plugindir) $(usbdump_la_OBJECTS) $(usbdump_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(usbdump_la_LINK) -rpath $(wiretap_plugindir) $(usbdump_la_OBJECTS) $(usbdump_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwiretap -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

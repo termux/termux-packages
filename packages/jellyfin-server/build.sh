@@ -1,0 +1,193 @@
+TERMUX_PKG_HOMEPAGE="https://jellyfin.org"
+TERMUX_PKG_DESCRIPTION="A free media system for organizing and streaming media (server)"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=(
+	12.1
+	8.1.2.5
+)
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=(
+	"https://github.com/jellyfin/jellyfin/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
+	"https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.zip"
+	"https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	b78b5103c51596dd9fd1cab6c2d5dae1bb3d5c0e70581894cc4f838c7867dcae
+	cccced259a1ef75e7a7495ca1d71dc163200e8639cc033cbe5b563ad80832d4c
+	2d871248eb86f15ce54dad8d57787cf2c098b5c675b556d1f40025b1ae53acd0
+)
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp (>= 3.119), libskiasharp (<< 4), libesqlite3, jellyfin-ffmpeg"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"
+TERMUX_PKG_SERVICE_SCRIPT=(
+	"jellyfin"
+	"exec ${TERMUX_PREFIX}/bin/jellyfin --datadir \"\$HOME/.local/share/jellyfin\" --configdir \"\$HOME/.config/jellyfin\" 2>&1"
+)
+TERMUX_PKG_EXCLUDED_ARCHES="arm"
+TERMUX_DOTNET_VERSION=10.0
+TERMUX_PKG_RM_AFTER_INSTALL="
+opt/jellyfin/include
+opt/jellyfin/lib/pkgconfig
+opt/jellyfin/share
+"
+termux_step_post_get_source() {
+	pushd jellyfin-ffmpeg-"${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}"
+	# If quilt is added to termux-build-helper:
+	# if [[ -f "debian/patches/series" ]]; then
+	# quilt push -a
+	# fi
+	local _patch
+	for _patch in $(<debian/patches/series); do
+		git apply --whitespace=nowarn "debian/patches/${_patch}"
+	done
+	popd
+}
+
+termux_step_pre_configure() {
+	termux_setup_dotnet
+	termux_setup_nodejs
+
+	pushd jellyfin-web-"${TERMUX_PKG_VERSION[0]}"
+	npm install
+
+	# Replace git describe in webpack.common.js with exact version string to prevent git status 128 errors when building from source tarballs
+	sed -i "s/execSync('git describe --always --dirty')/execSync('echo v${TERMUX_PKG_VERSION[0]}')/g" webpack.common.js
+
+	# git warning in build log here is normal, the commit hash is not needed
+	npm run build:production
+	cp -R ./dist "$TERMUX_PKG_BUILDDIR/jellyfin-web"
+
+	# ~1GiB cleanup
+	rm -rf ./node_modules
+	popd
+
+	pushd jellyfin-ffmpeg-"${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}"
+	local _ARCH=""
+	local _FFMPEG_PREFIX="${TERMUX_PREFIX}/opt/jellyfin"
+	LDFLAGS="-Wl,-rpath=${_FFMPEG_PREFIX}/lib ${LDFLAGS}"
+
+	local _EXTRA_CONFIGURE_FLAGS=""
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		_ARCH="x86"
+		# Specify --disable-asm to prevent text relocations on i686,
+		# see https://trac.ffmpeg.org/ticket/4928
+		_EXTRA_CONFIGURE_FLAGS="--disable-asm"
+		#	elif [ "$TERMUX_ARCH" = "arm" ]; then
+		#		_ARCH="armeabi-v7a"
+		#		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		_ARCH="x86_64"
+	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		_ARCH="$TERMUX_ARCH"
+		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
+	else
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
+	fi
+
+	_EXTRA_CONFIGURE_FLAGS+=" --disable-indev=android_camera"
+
+	# generated using ffmpeg-configureopts.sh
+	# if names of variables used in this command are changed, please update variable names in ffmpeg-configureopts.sh as well
+	./configure --prefix="${_FFMPEG_PREFIX}" \
+		--arch="${_ARCH}" \
+		--as="$AS" \
+		--cc="$CC" \
+		--cxx="$CXX" \
+		--nm="$NM" \
+		--ar="$AR" \
+		--ranlib=llvm-ranlib \
+		--pkg-config="$PKG_CONFIG" \
+		--strip="$STRIP" \
+		--enable-cross-compile \
+		--extra-version="Jellyfin" \
+		--extra-cflags="" \
+		--extra-cxxflags="" \
+		--extra-ldflags="" \
+		--extra-ldexeflags="-pie" \
+		--extra-libs="-ldl -landroid-glob" \
+		--target-os=android \
+		--disable-static \
+		--enable-shared \
+		--enable-gpl \
+		--enable-version3 \
+		--disable-ffplay \
+		--disable-debug \
+		--disable-doc \
+		--disable-sdl2 \
+		--disable-libxcb \
+		--disable-xlib \
+		--disable-indevs \
+		--disable-outdevs \
+		--enable-indev=lavfi \
+		--enable-lto=auto \
+		--enable-iconv \
+		--enable-zlib \
+		--enable-libfreetype \
+		--enable-libfribidi \
+		--enable-gmp \
+		--enable-libxml2 \
+		--enable-openssl \
+		--enable-lzma \
+		--enable-fontconfig \
+		--enable-libharfbuzz \
+		--enable-libvorbis \
+		--enable-opencl \
+		--enable-chromaprint \
+		--enable-libdav1d \
+		--enable-libass \
+		--enable-libbluray \
+		--enable-libmp3lame \
+		--enable-libopus \
+		--enable-libtheora \
+		--enable-libvpx \
+		--enable-libwebp \
+		--enable-libopenmpt \
+		--enable-libsrt \
+		--enable-libsvtav1 \
+		--enable-libx264 \
+		--enable-libx265 \
+		--enable-libzimg \
+		${_EXTRA_CONFIGURE_FLAGS} \
+		--disable-vulkan
+
+	make -j"$TERMUX_PKG_MAKE_PROCESSES"
+	make install
+	popd
+}
+
+termux_step_make() {
+	dotnet publish "$TERMUX_PKG_SRCDIR"/Jellyfin.Server --configuration Release --runtime "$DOTNET_TARGET_NAME" --output "$TERMUX_PKG_BUILDDIR"/build --no-self-contained -p:DebugType=None
+	dotnet build-server shutdown
+}
+
+termux_step_make_install() {
+	# we provide bionic builds of these in the repo
+	rm -f "${TERMUX_PKG_BUILDDIR}/build/"{libe_sqlite3,libSkiaSharp,libHarfBuzzSharp}.so*
+	chmod 0700 "${TERMUX_PKG_BUILDDIR}/build"
+
+	mv "${TERMUX_PKG_BUILDDIR}/jellyfin-web" "${TERMUX_PKG_BUILDDIR}/build"
+	# XML cruft generated during build used to provide documentation for functions and objects
+	find "${TERMUX_PKG_BUILDDIR}/build" -name '*.xml' -type f -exec rm '{}' +
+	find "${TERMUX_PKG_BUILDDIR}/build" ! \( -name 'jellyfin' -o -type d \) -exec chmod 0600 '{}' \;
+	find "${TERMUX_PKG_BUILDDIR}/build" \( -name 'jellyfin' -o -type d \) -exec chmod 0700 '{}' \;
+	rm -rf "${TERMUX_PREFIX}/lib/jellyfin"
+	mv "${TERMUX_PKG_BUILDDIR}/build" "${TERMUX_PREFIX}/lib/jellyfin"
+
+	mkdir -p "${TERMUX_PREFIX}/bin"
+	ln -sf "${TERMUX_PREFIX}/lib/jellyfin/jellyfin" "${TERMUX_PREFIX}/bin/jellyfin"
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF >./postinst
+		#!${TERMUX_PREFIX}/bin/sh
+		echo ""
+		echo "jellyfin-server: if you're upgrading from 10.11.x, the database"
+		echo "needs to migrate to the 12.0 schema on first launch."
+		echo "Restart the jellyfin service (e.g. 'sv restart jellyfin' if using"
+		echo "runit) and watch progress at"
+		echo "http://localhost:8096 before using any client - do not force-stop"
+		echo "the server mid-migration."
+		echo ""
+	EOF
+	chmod 0755 ./postinst
+}

@@ -1,0 +1,23 @@
+diff -u -r ../gnucobol-3.1.2/libcob/common.c ./libcob/common.c
+--- ../gnucobol-3.1.2/libcob/common.c	2020-12-23 10:51:14.000000000 +0000
++++ ./libcob/common.c	2024-05-16 12:22:08.291881565 +0000
+@@ -136,6 +136,7 @@
+ #if defined (WITH_XML2)
+ #include <libxml/xmlversion.h>
+ #include <libxml/xmlwriter.h>
++#include <libxml/parser.h>
+ #endif
+ 
+ #if defined (WITH_CJSON)
+@@ -5973,9 +5974,9 @@
+ #else
+ 	 && (tmpdir = check_valid_env_tmpdir ("TMP")) == NULL
+ 	 && (tmpdir = check_valid_env_tmpdir ("TEMP")) == NULL) {
+-		if (!check_valid_dir ("/tmp")) {
++		if (!check_valid_dir ("@TERMUX_PREFIX@/tmp")) {
+ 			tmp = cob_fast_malloc (5U);
+-			strcpy (tmp, "/tmp");
++			strcpy (tmp, "@TERMUX_PREFIX@/tmp");
+ 			tmpdir = tmp;
+ 		}
+ #endif

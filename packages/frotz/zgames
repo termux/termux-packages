@@ -1,0 +1,88 @@
+# Lots of resources at: http://www.ifarchive.org/indexes/if-archiveXgamesXzcode.html
+
+set -e -u
+
+FG_FOLDER=$HOME/.zgames
+mkdir -p $FG_FOLDER
+
+FG_TMPFILE=$FG_FOLDER/tmp
+
+#--backtitle "Frotz games" \
+set +e
+dialog \
+	       --title "Select Game" --clear \
+	       --radiolist "Choose game to play, select with space" 0 0 0 \
+	       "Adventure"		"Welcome to Adventure" off \
+	       "Castle Adventure!"	"Old-school style" off \
+	       "Zork I"			"The game that started it all" off \
+	       "Zork II"		"The next step downward to danger" off \
+	       "Zork III"		"It all comes down to this" off \
+	       "Super Z Trek"		"The classic Star Trek" off \
+	       "The Hitchhiker's Guide to the Galaxy"	"Don't Panic!" off \
+	       "zRogue"			"Port of the classic game Rogue" off \
+	       "Z Racer"		"Real-time racing game" off \
+	       2> $FG_TMPFILE
+retval=$?
+set -e
+clear
+
+case $retval in
+	0)
+		FG_GAME=`cat $FG_TMPFILE`;;
+	1)
+		# Cancel pressed
+		exit;;
+	255)
+		# Esc pressed
+		exit;;
+esac
+
+case $FG_GAME in
+	"Adventure")
+		FG_FILEDOWNLOAD=http://www.ifarchive.org/if-archive/games/zcode/advent.z8
+		FG_GAMEFOLDER=$FG_FOLDER/adventure;;
+	"Castle Adventure!")
+		FG_FILEDOWNLOAD=http://www.ifarchive.org/if-archive/games/zcode/castle.z8
+		FG_GAMEFOLDER=$FG_FOLDER/castle_adventure;;
+	"Zork I")
+		FG_FILEDOWNLOAD=http://www.infocom-if.org/downloads/zork1.zip
+		FG_GAMEFILE=DATA/ZORK1.DAT
+		FG_GAMEFOLDER=$FG_FOLDER/zork1;;
+	"Zork II")
+		FG_FILEDOWNLOAD=http://www.infocom-if.org/downloads/zork2.zip
+		FG_GAMEFILE=DATA/ZORK2.DAT
+		FG_GAMEFOLDER=$FG_FOLDER/zork2;;
+	"Zork III")
+		FG_FILEDOWNLOAD=http://www.infocom-if.org/downloads/zork3.zip
+		FG_GAMEFILE=DATA/ZORK3.DAT
+		FG_GAMEFOLDER=$FG_FOLDER/zork3;;
+	"Super Z Trek")
+		FG_FILEDOWNLOAD=http://www.ifarchive.org/if-archive/games/zcode/ztrek.z5
+		FG_GAMEFOLDER=$FG_FOLDER/superztrek;;
+	"The Hitchhiker's Guide to the Galaxy")
+		FG_FILEDOWNLOAD=http://www.douglasadams.com/creations/hhgg.z3
+		FG_GAMEFOLDER=$FG_FOLDER/hhgg;;
+	"zRogue")
+		FG_FILEDOWNLOAD=http://www.ifarchive.org/if-archive/games/zcode/rogue.z5
+		FG_GAMEFOLDER=$FG_FOLDER/zrogue;;
+	"Z Racer")
+		FG_FILEDOWNLOAD=http://www.ifarchive.org/if-archive/games/zcode/zracer.z5
+		FG_GAMEFOLDER=$FG_FOLDER/zracer;;
+	*)
+		exit;;
+esac
+
+FG_FILENAME=`basename $FG_FILEDOWNLOAD`
+mkdir -p $FG_GAMEFOLDER/saves
+cd $FG_GAMEFOLDER
+if [ ! -f $FG_FILENAME ]; then
+	curl $FG_FILEDOWNLOAD -o $FG_FILENAME
+	if [ "${FG_FILENAME#*.}" = "zip" ]; then
+		unzip $FG_FILENAME;
+	fi
+fi
+
+if [ "${FG_FILENAME#*.}" != "zip" ]; then FG_GAMEFILE=`basename $FG_FILEDOWNLOAD`; fi
+
+cd saves
+frotz ../$FG_GAMEFILE

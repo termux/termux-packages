@@ -1,0 +1,24 @@
+Fix the build error:
+
+> gdbsupport/eintr.h:85:10:
+> error: no matching function for call to 'handle_eintr'>     return gdb::handle_eintr (-1, ::open, pathname, flags);
+> note: candidate template ignored: couldn't infer template argument 'Fun'
+> handle_eintr (ErrorValType errval, const Fun &f, const Args &... args)
+
+diff -u -r ../cache/gdb-16.3/gdbsupport/eintr.h ./gdbsupport/eintr.h
+--- ../cache/gdb-16.3/gdbsupport/eintr.h	2025-04-20 17:22:06.000000000 +0000
++++ ./gdbsupport/eintr.h	2025-09-14 08:08:32.262925635 +0000
+@@ -82,7 +82,12 @@
+ inline int
+ open (const char *pathname, int flags)
+ {
+-  return gdb::handle_eintr (-1, ::open, pathname, flags);
++  ssize_t ret;
++  do {
++      errno = 0;
++      ret = ::open(pathname, flags);
++  } while (ret == -1 && errno == EINTR);
++  return ret;
+ }
+ 
+ #ifdef HAVE_WAIT

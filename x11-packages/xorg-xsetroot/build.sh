@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Classic X utility to set your root window background to a given pattern or color"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.1.4
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xsetroot-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=1315a3f7e9abe06357363b93461e272601f67225ce0bc075c430cce35073362b
+TERMUX_PKG_DEPENDS="libx11, libxcursor, libxmu"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_BUILD_DEPENDS="xbitmaps, xorg-util-macros"

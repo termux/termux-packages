@@ -1,0 +1,22 @@
+--- a/tiledb/platform/cert_file.cc
++++ b/tiledb/platform/cert_file.cc
+@@ -43,6 +43,7 @@
+ std::string get() {
+   // This will execute only once since C++11.
+   static auto cert_file = []() -> std::string {
++#ifndef __ANDROID__
+     const std::array<std::string, 6> cert_files = {
+         "/etc/ssl/certs/ca-certificates.crt",  // Debian/Ubuntu/Gentoo etc.
+         "/etc/pki/tls/certs/ca-bundle.crt",    // Fedora/RHEL 6
+@@ -51,6 +52,11 @@
+         "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",  // CentOS/RHEL 7
+         "/etc/ssl/cert.pem"                                   // Alpine Linux
+     };
++#else
++    const std::array<std::string, 1> cert_files = {
++        "@TERMUX_PREFIX@/etc/tls/cert.pem"
++    };
++#endif
+ 
+     for (const std::string& cert : cert_files) {
+       std::error_code ec;

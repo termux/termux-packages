@@ -1,0 +1,47 @@
+--- a/include/unixconf.h
++++ b/include/unixconf.h
+@@ -120,9 +120,7 @@
+  * FILE_AREA_DOC	For human-readable documentation
+  */
+ 
+-#ifdef PUBLIC_SERVER
+ #define FILE_AREAS 		/* Use file areas */
+-#endif
+ 
+ #ifdef FILE_AREAS
+ 
+@@ -157,11 +155,11 @@
+ 
+ #else /* PUBLIC_SERVER */
+ 
+-#define FILE_AREA_VAR		"/var/games/slex/"
+-#define FILE_AREA_SAVE		"/var/games/slex/save/"
+-#define FILE_AREA_SHARE		"/usr/share/games/slex/"
+-#define FILE_AREA_UNSHARE	"/usr/lib/games/slex/"
+-#define FILE_AREA_DOC		"/usr/share/doc/slex/"
++#define FILE_AREA_VAR		"@TERMUX_PREFIX@/var/games/slex/"
++#define FILE_AREA_SAVE		"@TERMUX_PREFIX@/var/games/slex/save/"
++#define FILE_AREA_SHARE		"@TERMUX_PREFIX@/share/games/slex/"
++#define FILE_AREA_UNSHARE	"@TERMUX_PREFIX@/var/games/slex/unshare/"
++#define FILE_AREA_DOC		"@TERMUX_PREFIX@/share/doc/slex/"
+ 
+ #define FILE_AREA_BONES		FILE_AREA_VAR
+ #define FILE_AREA_LEVL		FILE_AREA_VAR
+@@ -178,7 +176,7 @@
+  *		Ralf Brown, 7/26/89 (from v2.3 hack of 10/10/88)
+  */
+ 
+-/* #define NO_FILE_LINKS */	/* if no hard links */
++#define NO_FILE_LINKS	/* if no hard links */
+ 
+ #ifdef NO_FILE_LINKS
+ # ifdef FILE_AREAS
+@@ -236,7 +234,7 @@
+  * A stat system call is done on the mailbox every MAILCKFREQ moves.
+  */
+ 
+-#define MAIL 			/* Deliver mail during the game */
++#undef MAIL			/* Deliver mail during the game */
+ 
+ #ifdef PUBLIC_SERVER		/* No reason to have mail except on a server. */
+ #define SIMPLE_MAIL		/* dgamelaunch simple mail */

@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="Print contents of X events"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.2.7"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xev-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=95167895924de58e34b1013b2b0c8476e90d0888c6c39e7ae9bc35e3a19dba04
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxrandr"

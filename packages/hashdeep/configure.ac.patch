@@ -1,0 +1,23 @@
+Remove -MD option as that avoids pie wrapper script functionality.
+
+diff -u -r ../hashdeep-4.4/configure.ac ./configure.ac
+--- ../hashdeep-4.4/configure.ac	2015-04-01 02:12:52.000000000 +0200
++++ ./configure.ac	2017-09-23 02:18:08.770776322 +0200
+@@ -64,7 +64,7 @@
+ ################################################################
+ ### I am a glutten for punishment and this is security-critical software
+ # Check GCC
+-WARNINGS_TO_TEST="-MD -D_FORTIFY_SOURCE=2 -Wpointer-arith -Wmissing-declarations -Wmissing-prototypes \
++WARNINGS_TO_TEST="-D_FORTIFY_SOURCE=2 -Wpointer-arith -Wmissing-declarations -Wmissing-prototypes \
+     -Wshadow -Wwrite-strings -Wcast-align -Waggregate-return \
+     -Wbad-function-cast -Wcast-qual -Wundef -Wredundant-decls -Wdisabled-optimization \
+     -Wfloat-equal -Wmissing-format-attribute -Wmultichar -Wc++-compat -Wmissing-noreturn  -funit-at-a-time"
+@@ -97,7 +97,7 @@
+ # -Wcast-qual 
+ # -Wmissing-format-attribute  - can't get this one right
+ AC_LANG_PUSH(C++)
+-WARNINGS_TO_TEST="-Wall -MD -D_FORTIFY_SOURCE=2 -Wpointer-arith \
++WARNINGS_TO_TEST="-Wall -D_FORTIFY_SOURCE=2 -Wpointer-arith \
+     -Wshadow -Wwrite-strings -Wcast-align  \
+     -Wredundant-decls -Wdisabled-optimization \
+     -Wfloat-equal -Wmultichar -Wmissing-noreturn \

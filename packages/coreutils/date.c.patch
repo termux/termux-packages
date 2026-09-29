@@ -1,0 +1,14 @@
+diff -uNr coreutils-9.4/src/date.c coreutils-9.4.mod/src/date.c
+--- coreutils-9.4/src/date.c	2023-07-05 12:09:55.000000000 +0100
++++ coreutils-9.4.mod/src/date.c	2023-09-12 18:13:27.556340784 +0100
+@@ -633,6 +633,10 @@
+ 
+       if (set_date)
+         {
++          if (getuid() != 0)
++            {
++              error (EXIT_FAILURE, 0, "only root user can change date/time");
++            }
+           /* Set the system clock to the specified date, then regardless of
+              the success of that operation, format and print that date.  */
+           if (settime (&when) != 0)

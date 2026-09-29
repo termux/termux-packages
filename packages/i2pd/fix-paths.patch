@@ -1,0 +1,42 @@
+diff -uNr i2pd-2.43.0/libi2pd/Config.cpp i2pd-2.43.0.mod/libi2pd/Config.cpp
+--- i2pd-2.43.0/libi2pd/Config.cpp	2022-08-22 03:40:41.000000000 +0800
++++ i2pd-2.43.0.mod/libi2pd/Config.cpp	2022-08-22 08:52:00.452412943 +0800
+@@ -35,7 +35,7 @@ namespace config {
+ #elif defined(__HAIKU__)
+ #define path_to_file(file) "~/config/settings/i2pd/" #file
+ #else
+-#define path_to_file(file) "~/.i2pd/" #file " or /var/lib/i2pd/" #file
++#define path_to_file(file) "~/.i2pd/" #file " or @TERMUX_PREFIX@/var/lib/i2pd/" #file
+ #endif
+ 
+ 	void Init()
+@@ -58,7 +58,7 @@
+ 			("reservedrange", bool_switch()->default_value(true),             "Check remote RI for being in blacklist of reserved IP ranges (default: enabled)")
+ 			("netid", value<int>()->default_value(I2PD_NET_ID),               "Specify NetID. Main I2P is 2")
+ 			("daemon", bool_switch()->default_value(false),                   "Router will go to background after start (default: disabled)")
+-			("service", bool_switch()->default_value(false),                  "Router will use system folders like '/var/lib/i2pd' (default: disabled)")
++			("service", bool_switch()->default_value(false),                  "Router will use system folders like '@TERMUX_PREFIX@/var/lib/i2pd' (default: disabled)")
+ 			("notransit", bool_switch()->default_value(false),                "Router will not accept transit tunnels at startup (default: disabled)")
+ 			("floodfill", bool_switch()->default_value(false),                "Router will be floodfill (default: disabled)")
+ 			("bandwidth", value<std::string>()->default_value(""),            "Transit traffic bandwidth limit: integer in KBps or letters: L (32), O (256), P (2048), X (>9000)")
+diff -uNr i2pd-2.43.0/libi2pd/FS.cpp i2pd-2.43.0.mod/libi2pd/FS.cpp
+--- i2pd-2.43.0/libi2pd/FS.cpp	2022-08-22 03:40:41.000000000 +0800
++++ i2pd-2.43.0.mod/libi2pd/FS.cpp	2022-08-22 08:53:49.542412901 +0800
+@@ -85,7 +85,7 @@
+ 				dataDir = boost::filesystem::wpath(commonAppData).string() + "\\" + appName;
+ 			}
+ #else
+-			dataDir = "/var/lib/" + appName;
++			dataDir = "@TERMUX_PREFIX@/var/lib/" + appName;
+ #endif
+ 			return;
+ 		}
+@@ -151,7 +151,7 @@
+ 		if (home != NULL && strlen(home) > 0) {
+ 			dataDir = std::string(home) + "/." + appName;
+ 		} else {
+-			dataDir = "/tmp/" + appName;
++			dataDir = "@TERMUX_PREFIX@/tmp/" + appName;
+ 		}
+ 		return;
+ #endif

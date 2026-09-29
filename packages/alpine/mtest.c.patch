@@ -1,0 +1,11 @@
+--- ../cache/alpine-2.21/imap/src/mtest/mtest.c	2017-02-06 00:06:22.499218141 +0000
++++ ./imap/src/mtest/mtest.c	2017-04-25 11:05:20.133809205 +0000
+@@ -97,7 +97,7 @@
+   }
+ #endif
+   curusr = cpystr (((s = myusername ()) && *s) ? s : "somebody");
+-#if UNIXLIKE
++#if UNIXLIKE && !defined __ANDROID__
+   {
+     char *suffix;
+     struct passwd *pwd = getpwnam (curusr);

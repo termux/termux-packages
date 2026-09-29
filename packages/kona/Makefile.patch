@@ -1,0 +1,37 @@
+diff -uNr kona-Win64-20201009/Makefile kona-Win64-20201009.mod/Makefile
+--- kona-Win64-20201009/Makefile	2020-10-10 06:03:41.000000000 +0300
++++ kona-Win64-20201009.mod/Makefile	2020-11-10 21:27:29.229030807 +0200
+@@ -1,10 +1,8 @@
+-PREFIX = /usr/local
+-CFLAGS=-g
+-PRODFLAGS = -O3 #-pg -g3
++PRODFLAGS =
+ LIB=libkona.a
+ DEVFLAGS = -O0 -g3 -DDEBUG -Wall
+ 
+-OS := $(shell uname -s | tr "[:upper:]" "[:lower:]")
++OS := android
+ $(info OS="$(OS)")
+ 
+ # Win-64
+@@ -31,16 +29,12 @@
+ endif
+ 
+ ifeq (android,$(OS))
+-CC=arm-linux-androideabi-gcc
+-OBJS= src/0.o src/bswap.o src/c.o src/getline.o src/getline_android.o src/mt.o src/p.o  \
++OBJS= src/0.o src/bswap.o src/c.o src/getline.o src/mt.o src/p.o  \
+       src/r.o src/k.o src/kc.o src/kx.o src/kg.o src/km.o src/kn.o src/ko.o  \
+       src/ks.o src/v.o src/va.o src/vc.o src/vd.o src/vf.o src/vg.o src/vq.o
+-LDFLAGS = -Wl,--gc-sections -Wl,-z,nocopyreloc -lgcc -no-canonical-prefixes \
+-          -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -mthumb \
+-          -lc -lm -ldl
+-CFLAGS += -fPIE -fpic -ffunction-sections -funwind-tables -fstack-protector \
+-          -no-canonical-prefixes -mtune=xscale -msoft-float -mthumb \
+-          -fomit-frame-pointer -fno-strict-aliasing
++LDFLAGS += -Wl,--gc-sections -Wl,-z,nocopyreloc -lgcc -no-canonical-prefixes \
++          -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
++          -lm
+ endif
+ 
+ ifeq (linux,$(OS))

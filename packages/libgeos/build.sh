@@ -1,0 +1,15 @@
+TERMUX_PKG_HOMEPAGE=https://geos.osgeo.org/
+TERMUX_PKG_DESCRIPTION="Geometry Engine, C++ port of the Java Topology Suite"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
+TERMUX_PKG_VERSION="3.15.0"
+TERMUX_PKG_SRCURL="https://github.com/libgeos/geos/releases/download/$TERMUX_PKG_VERSION/geos-$TERMUX_PKG_VERSION.tar.bz2"
+TERMUX_PKG_SHA256=d5e5192a686d065eaed082de14dd26244c5c8e02bff16b2c6cce3265f648e00e
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE=latest-regex
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!beta|rc)'
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_BREAKS="libgeos-dev"
+TERMUX_PKG_REPLACES="libgeos-dev"
+TERMUX_PKG_GROUPS="science"
+TERMUX_PKG_FORCE_CMAKE=true

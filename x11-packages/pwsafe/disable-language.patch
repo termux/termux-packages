@@ -1,0 +1,11 @@
+--- a/src/ui/wxWidgets/PWSafeApp.cpp
++++ b/src/ui/wxWidgets/PWSafeApp.cpp
+@@ -387,7 +387,7 @@ bool PWSafeApp::OnInit()
+   // Otherwise fall back to English before touching the locale.
+   wxLanguage effectiveLang = ActivateLanguage(selectedLang, true) ? selectedLang : wxLANGUAGE_ENGLISH;
+ 
+-#ifndef LOCALE_WX322
++#if defined(LOCALE_WX322) && !defined(__ANDROID__)
+   m_PWSLocaleIsSet = m_locale->Init(effectiveLang);
+ #endif
+ 

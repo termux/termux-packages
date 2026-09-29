@@ -1,0 +1,14 @@
+Prevents
+error: reinterpret_cast from 'pthread_t' (aka 'long') to 'unsigned long' is not allowed
+
+--- a/src/net/src/thread_pool.cc
++++ b/src/net/src/thread_pool.cc
+@@ -25,7 +25,7 @@ int ThreadPool::Worker::start() {
+       return -1;
+     } else {
+       start_.store(true);
+-      std::string thread_id_str = std::to_string(reinterpret_cast<unsigned long>(thread_id_));
++      std::string thread_id_str = std::to_string(thread_id_);
+       SetThreadName(thread_id_, thread_pool_->thread_pool_name() + "_Worker_" + thread_id_str);
+     }
+   }

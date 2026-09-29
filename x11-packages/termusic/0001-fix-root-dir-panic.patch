@@ -1,0 +1,27 @@
+From 7fe27e655c2c93f091758cbdb9e78131a1919452 Mon Sep 17 00:00:00 2001
+From: hasezoey <hasezoey@gmail.com>
+Date: Fri, 28 Aug 2026 18:25:10 +0200
+Subject: [PATCH] fix(tui::ui::components::orx_music_library): fix
+ "MusicLibData::new" not actually using the verified "cell"
+
+Backported from upstream:
+https://github.com/tramhao/termusic/pull/766
+Fixes https://github.com/tramhao/termusic/issues/765
+
+---
+ tui/src/ui/components/orx_music_library/music_library.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tui/src/ui/components/orx_music_library/music_library.rs b/tui/src/ui/components/orx_music_library/music_library.rs
+index 012bbe3b8..4587ded52 100644
+--- a/tui/src/ui/components/orx_music_library/music_library.rs
++++ b/tui/src/ui/components/orx_music_library/music_library.rs
+@@ -73,7 +73,7 @@ impl MusicLibData {
+             is_dir,
+             is_loading: false,
+             is_error: false,
+-            as_str: OnceCell::default(),
++            as_str: cell,
+         }
+     }
+ }

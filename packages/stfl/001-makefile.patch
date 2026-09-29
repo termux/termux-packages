@@ -1,0 +1,52 @@
+--- a/Makefile
++++ b/Makefile
+@@ -20,9 +20,12 @@
+ 
+ include Makefile.cfg
+ 
+-export CC = gcc -pthread
+-export CFLAGS += -I. -Wall -Os -ggdb -D_GNU_SOURCE -fPIC
+-export LDLIBS += -lncursesw
++CC ?= gcc
++AR ?= ar
++RANLIB ?= ranlib
++
++CFLAGS += -Wall -D_GNU_SOURCE -fPIC -I.
++LDLIBS += -lncursesw
+ 
+ SONAME  := libstfl.so.0
+ VERSION := 0.24
+@@ -34,12 +37,12 @@
+ libstfl.a: public.o base.o parser.o dump.o style.o binding.o iconv.o \
+            $(patsubst %.c,%.o,$(wildcard widgets/*.c))
+ 	rm -f $@
+-	ar qc $@ $^
+-	ranlib $@
++	$(AR) qc $@ $^
++	$(RANLIB) $@
+ 
+ libstfl.so.$(VERSION): public.o base.o parser.o dump.o style.o binding.o iconv.o \
+                        $(patsubst %.c,%.o,$(wildcard widgets/*.c))
+-	$(CC) -shared -Wl,-soname,$(SONAME) -o $@ $(LDLIBS) $^
++	$(CC) $(LDFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $(LDLIBS) $^
+ 
+ clean:
+ 	rm -f libstfl.a example core core.* *.o Makefile.deps
+@@ -65,6 +68,7 @@
+ 	install -m 644 stfl.pc $(DESTDIR)$(prefix)/$(libdir)/pkgconfig/
+ 	install -m 644 libstfl.so.$(VERSION) $(DESTDIR)$(prefix)/$(libdir)
+ 	ln -fs libstfl.so.$(VERSION) $(DESTDIR)$(prefix)/$(libdir)/libstfl.so
++	ln -fs libstfl.so.$(VERSION) $(DESTDIR)$(prefix)/$(libdir)/libstfl.so.0
+ 
+ stfl.pc: stfl.pc.in
+ 	sed 's,@VERSION@,$(VERSION),g' < $< | sed 's,@PREFIX@,$(prefix),g' > $@
+--- a/Makefile.cfg
++++ b/Makefile.cfg
+@@ -20,7 +20,6 @@
+ 
+ export libdir ?= lib
+ export prefix ?= /usr/local
+-export DESTDIR ?= /
+ 
+ ifneq ($(shell spl-config --cflags 2>/dev/null),)
+ FOUND_SPL = 1

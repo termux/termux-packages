@@ -1,0 +1,11 @@
+--- a/Foundation/src/NamedMutex_UNIX.cpp
++++ b/Foundation/src/NamedMutex_UNIX.cpp
+@@ -158,7 +158,7 @@
+ #if defined(sun) || defined(__APPLE__) || defined(__QNX__)
+ 	std::string fn = "/";
+ #else
+-	std::string fn = "/tmp/";
++	std::string fn = "@TERMUX_PREFIX@/tmp/";
+ #endif
+ 	fn.append(_name);
+ 	fn.append(".mutex");

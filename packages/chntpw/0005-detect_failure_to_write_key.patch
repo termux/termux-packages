@@ -1,0 +1,20 @@
+https://salsa.debian.org/debian/chntpw/-/blob/e00c8dd756fdb6a04d6dd27e7bedf19981a398f8/debian/patches/07_detect_failure_to_write_key
+
+--- a/ntreg.c
++++ b/ntreg.c
+@@ -3493,7 +3493,14 @@ void export_key(struct hive *hdesc, int nkofs, char *name, char *filename, char
+ 
+     fprintf(file,"\r\n"); /* Must end file with an empty line, windows does that */
+ 
+-    fclose(file);
++    if (ferror (file)) {
++	printf("failed to write file '%s'\n", filename);
++	fclose (file);
++	return;
++    }
++    if (fclose(file))
++      printf("failed to write file '%s': %s\n", filename,
++	     strerror(errno));
+ }
+ 
+ /* ================================================================ */

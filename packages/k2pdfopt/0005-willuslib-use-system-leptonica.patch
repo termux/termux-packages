@@ -1,0 +1,49 @@
+From edda6dc15300ba8dcb92c9f004e18cd9aafb3f32 Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Mon, 7 Jan 2019 16:51:09 +0800
+Subject: [PATCH 05/10] willuslib: use system leptonica
+
+---
+ willuslib/ocrtess.c    | 3 +--
+ willuslib/wleptonica.c | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/willuslib/ocrtess.c b/willuslib/ocrtess.c
+index 2ba8a3c..bd3ce4b 100644
+--- a/willuslib/ocrtess.c
++++ b/willuslib/ocrtess.c
+@@ -25,8 +25,7 @@
+ #include <string.h>
+ #include <ctype.h>
+ #include <locale.h>
+-#include <leptonica.h>
+-#include <tesseract.h>
++#include <leptonica/allheaders.h>
+ #include "willus.h"
+ 
+ char *ocrtess_langnames[] =
+diff --git a/willuslib/wleptonica.c b/willuslib/wleptonica.c
+index a4e3cfd..a85be09 100644
+--- a/willuslib/wleptonica.c
++++ b/willuslib/wleptonica.c
+@@ -23,7 +23,7 @@
+ #include "willus.h"
+ 
+ #ifdef HAVE_LEPTONICA_LIB
+-#include <leptonica.h>
++#include <leptonica/allheaders.h>
+ 
+ static void wlept_pix_from_bmp(PIX **pixptr,WILLUSBITMAP *bmp);
+ static void wlept_bmp_from_pix(WILLUSBITMAP *bmp,PIX *pix);
+@@ -135,7 +135,7 @@ pixWrite("pixb.png",pixb,IFF_PNG);
+     dew1=dewarpCreate(pixb,1);
+     pixDestroy(&pixb);
+     dewarpaInsertDewarp(dewa,dew1);
+-    dewarpBuildPageModel_ex(dew1,debug,fit_order);
++    dewarpBuildPageModel(dew1,debug);
+     if (bmp1!=NULL)
+         {
+         PIX *pix2,*pix2d;
+-- 
+2.28.0
+

@@ -1,0 +1,24 @@
+--- ./lib/configure.orig	2019-01-24 22:42:28.083237847 +0100
++++ ./lib/configure	2019-01-24 22:42:52.323237693 +0100
+@@ -28,17 +28,17 @@
+ echo "LIBS = -ldl \\" >Make.libs
+     
+ rm -f a.out
+-c++ test_readline.cc -lreadline -ltermcap
++c++ test_readline.cc $CXXFLAGS $CPPFLAGS $LDFLAGS -lreadline
+ if [ -f a.out ] ; then
+     echo "using readline"
+     echo "-DHAVE_LIBREADLINE \\" >>Make.ccflags
+-    echo "-lreadline -ltermcap \\" >>Make.libs
++    echo "-lreadline \\" >>Make.libs
+ else
+-    echo "warning: either libtermcap or libreadline is missing - building without readline"
++    echo "warning: libreadline is missing - building without readline"
+ fi
+ rm -f a.out
+ 
+-echo "-DUNIX -O2 -DNDEBUG -I. -I../include -I../../include -W" >>Make.ccflags
++echo "-DUNIX -O2 -DNDEBUG \$(CPPFLAGS) -I. -I../include -I../../include -W" >>Make.ccflags
+ echo "" >>Make.libs
+ echo "PREFIX = " $prefix >>Make.libs
+ echo "" >>Make.libs

@@ -1,0 +1,28 @@
+diff --git a/cmake/Modules/luac.lua b/cmake/Modules/luac.lua
+index 5b7747f..cc671f4 100644
+--- a/cmake/Modules/luac.lua
++++ b/cmake/Modules/luac.lua
+@@ -16,8 +16,21 @@ s
+ ]]
+ local src, gen = ...
+ 
+-local chunk = assert(loadfile(src, nil, '@'..src))
+-local bytecode = string.dump(chunk)
++local parser = require("dumbParser")
++
++local bytecode
++xpcall(function()
++   local tokens = assert(parser.tokenizeFile(src))
++   local ast = assert(parser.parse(tokens))
++   parser.minify(ast, true)
++   bytecode = assert(parser.toLua(ast))
++end, function(err)
++	 print(err)
++	 print("Skipped minifying")
++	 local f = assert(io.open(src, "r"))
++	 bytecode = f:read("*a")
++	 f:close()
++end)
+ 
+ local function basename(name)
+    return name:match("([^/\\]+)$")

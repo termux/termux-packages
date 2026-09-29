@@ -1,0 +1,105 @@
+--- a/include/ares.h
++++ b/include/ares.h
+@@ -85,7 +85,7 @@
+ #  include <netinet/in.h>
+ #endif
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include <jni.h>
+ #endif
+ 
+@@ -348,7 +348,7 @@
+                                        void *(*arealloc)(void  *ptr,
+                                                          size_t size));
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ CARES_EXTERN void ares_library_init_jvm(JavaVM *jvm);
+ CARES_EXTERN int  ares_library_init_android(jobject connectivity_manager);
+ CARES_EXTERN int  ares_library_android_initialized(void);
+--- a/src/lib/ares_android.c
++++ b/src/lib/ares_android.c
+@@ -23,7 +23,7 @@
+  *
+  * SPDX-License-Identifier: MIT
+  */
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include "ares_private.h"
+ #  include <jni.h>
+ 
+--- a/src/lib/ares_library_init.c
++++ b/src/lib/ares_library_init.c
+@@ -32,7 +32,7 @@
+ 
+ /* library-private global and unique instance vars */
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include "ares_android.h"
+ #endif
+ 
+@@ -141,7 +141,7 @@
+ 
+   /* NOTE: ARES_LIB_INIT_WIN32 flag no longer used */
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+   ares_library_cleanup_android();
+ #endif
+ 
+--- a/src/lib/ares_init.c
++++ b/src/lib/ares_init.c
+@@ -47,7 +47,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+--- a/src/lib/ares_sysconfig_files.c
++++ b/src/lib/ares_sysconfig_files.c
+@@ -47,7 +47,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+--- ../c-ares-1.34.1/src/lib/ares_sysconfig.c	2024-10-10 00:53:50.000000000 +0000
++++ ./src/lib/ares_sysconfig.c	2024-10-10 10:05:49.277204271 +0000
+@@ -45,7 +45,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+@@ -196,7 +198,7 @@
+ }
+ #endif
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ static ares_status_t ares_init_sysconfig_android(const ares_channel_t *channel,
+                                                  ares_sysconfig_t *sysconfig)
+ {
+@@ -510,7 +512,7 @@
+   status = ares_init_sysconfig_riscos(channel, &sysconfig);
+ #elif defined(WATT32)
+   status = ares_init_sysconfig_watt32(channel, &sysconfig);
+-#elif defined(ANDROID) || defined(__ANDROID__)
++#elif 0
+   status = ares_init_sysconfig_android(channel, &sysconfig);
+ #elif defined(__APPLE__)
+   status = ares_init_sysconfig_macos(channel, &sysconfig);

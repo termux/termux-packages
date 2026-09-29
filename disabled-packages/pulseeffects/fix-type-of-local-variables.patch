@@ -1,0 +1,40 @@
+https://github.com/wwmm/easyeffects/pull/1536
+
+https://github.com/termux/termux-packages/issues/10643
+
+From ccda4ff52b4d317914994edcf5f41d4fa46e90af Mon Sep 17 00:00:00 2001
+From: xtkoba <69125751+xtkoba@users.noreply.github.com>
+Date: Fri, 20 May 2022 05:21:03 +0900
+Subject: [PATCH] [pulseaudio-legacy] Fix type of local variables
+
+in `on_message_latency`.
+---
+ src/pipeline_base.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/pipeline_base.cpp b/src/pipeline_base.cpp
+index 3d39701ae..d8b6ce7d3 100644
+--- a/src/pipeline_base.cpp
++++ b/src/pipeline_base.cpp
+@@ -116,8 +116,8 @@ void on_message_state_changed(const GstBus* gst_bus, GstMessage* message, Pipeli
+ 
+ void on_message_latency(const GstBus* gst_bus, GstMessage* message, PipelineBase* pb) {
+   if (std::strcmp(GST_OBJECT_NAME(message->src), "source") == 0) {
+-    int latency = 0;
+-    int buffer = 0;
++    pa_usec_t latency = 0;
++    pa_usec_t buffer = 0;
+ 
+     g_object_get(pb->source, "latency-time", &latency, nullptr);
+     g_object_get(pb->source, "buffer-time", &buffer, nullptr);
+@@ -125,8 +125,8 @@ void on_message_latency(const GstBus* gst_bus, GstMessage* message, PipelineBase
+     util::debug(pb->log_tag + "pulsesrc latency [us]: " + std::to_string(latency));
+     util::debug(pb->log_tag + "pulsesrc buffer [us]: " + std::to_string(buffer));
+   } else if (std::strcmp(GST_OBJECT_NAME(message->src), "sink") == 0) {
+-    int latency = 0;
+-    int buffer = 0;
++    pa_usec_t latency = 0;
++    pa_usec_t buffer = 0;
+ 
+     g_object_get(pb->sink, "latency-time", &latency, nullptr);
+     g_object_get(pb->sink, "buffer-time", &buffer, nullptr);

@@ -1,0 +1,48 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,7 +67,6 @@
+ # cmake modules
+ include(CheckCCompilerFlag)
+ include(CheckCSourceCompiles)
+-include(CheckIPOSupported)
+ include(GNUInstallDirs)
+ 
+ # custom cmake modules
+@@ -91,7 +91,6 @@
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+ 
+ # required dependencies
+-find_library(MATH_LIB m REQUIRED)
+ find_package(Threads REQUIRED)
+ find_package(PCRE2 REQUIRED)
+ find_package(OpenSSL REQUIRED)
+@@ -163,6 +161,8 @@
+   endif()
+   message("Searching for lua")
+   find_package(Lua)
++  set(LUA_LIBRARIES lua5.4)
++  set(LUA_FOUND TRUE)
+   if(LUA_FOUND)
+     if(NOT LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.3.0")
+       message("Lua is disabled because a version lower than 5.3.0 was found")
+@@ -260,7 +260,7 @@
+     "-fstack-protector-strong"
+     "-pedantic"
+     "-Wall"
+-    "-Werror"
++    "-Wno-unused-command-line-argument"
+     "-Wextra"
+     "-Wformat"
+     "-Wformat-security"
+@@ -433,10 +433,9 @@
+     add_compile_options("-g")
+   endif()
+   # IPO/LTO support
+-  check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_OUTPUT)
+   if(IPO_SUPPORTED)
+     message(STATUS "IPO is supported: ${IPO_OUTPUT}")
+-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
++    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION FALSE)
+   else()
+     message(STATUS "IPO is not supported: ${IPO_OUTPUT}")
+   endif()

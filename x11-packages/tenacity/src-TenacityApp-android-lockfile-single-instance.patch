@@ -1,0 +1,220 @@
+--- a/src/TenacityApp.cpp	2026-02-11 00:08:39.000000000 -0500
++++ b/src/TenacityApp.cpp	2026-02-15 21:12:49.753648023 -0500
+@@ -1579,9 +1579,17 @@
+ 
+ #if defined(__UNIX__)
+ 
++#if defined(__ANDROID__)
++#include <stdint.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <errno.h>
++#include <string.h>
++#else
+ #include <sys/ipc.h>
+ #include <sys/sem.h>
+ #include <sys/shm.h>
++#endif
+ 
+ // Return true if there are no other instances of Audacity running,
+ // false otherwise.
+@@ -1594,6 +1602,176 @@
+    wxIPV4address addr;
+    addr.LocalHost();
+ 
++#if defined(__ANDROID__)
++   // Lock-file implementation using fcntl record locks, avoiding SysV IPC syscalls
++   // (Android seccomp blocks semget/shmget).
++   wxString lockPath = FileNames::DataDir() + "/tenacity.lock";
++
++   // Open/create lock file
++   int lockFd = open(lockPath.c_str(), O_RDWR | O_CREAT, 0666);
++   if (lockFd == -1)
++   {
++       AudacityMessageBox(
++           XO("Unable to create/open lock file.\n\n"
++              "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++           XO("Tenacity Startup Failure"),
++           wxOK | wxICON_ERROR);
++       return false;
++   }
++
++   // Ensure at least 2 bytes exist (byte 0 = server lock, byte 1 = client lock)
++   if (ftruncate(lockFd, 2) == -1)
++   {
++       AudacityMessageBox(
++           XO("Unable to resize lock file.\n\n"
++              "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++           XO("Tenacity Startup Failure"),
++           wxOK | wxICON_ERROR);
++       close(lockFd);
++       return false;
++   }
++
++   uint16_t portnum = 0;
++
++   // Acquire CLIENT lock (byte 1) with wait: blocks while server is starting up
++   {
++       struct flock client = {};
++       client.l_type = F_WRLCK;
++       client.l_whence = SEEK_SET;
++       client.l_start = 1;
++       client.l_len = 1;
++
++       if (fcntl(lockFd, F_SETLKW, &client) == -1)
++       {
++           AudacityMessageBox(
++               XO("Failed to obtain client lock.\n\n"
++                  "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++               XO("Tenacity Startup Failure"),
++               wxOK | wxICON_ERROR);
++           close(lockFd);
++           return false;
++       }
++   }
++
++   // Try to acquire SERVER lock (byte 0) without wait
++   {
++       struct flock server = {};
++       server.l_type = F_WRLCK;
++       server.l_whence = SEEK_SET;
++       server.l_start = 0;
++       server.l_len = 1;
++   
++
++       if (fcntl(lockFd, F_SETLK, &server) == -1)
++       {
++           if (errno == EAGAIN || errno == EACCES)
++           {
++               isServer = false;
++           }
++           else
++           {
++               AudacityMessageBox(
++                   XO("Failed to obtain server lock.\n\n"
++                      "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++                   XO("Tenacity Startup Failure"),
++                   wxOK | wxICON_ERROR);
++               close(lockFd);
++               return false;
++           }
++       }
++       else
++       {
++           isServer = true;
++       }
++   }
++
++   if (isServer)
++   {
++       // The system will randomly assign a port
++       addr.Service(0);
++
++       auto serv = std::make_unique<wxSocketServer>(addr, wxSOCKET_NOWAIT);
++       if (serv && serv->IsOk())
++       {
++           serv->SetEventHandler(*this, ID_IPC_SERVER);
++           serv->SetNotify(wxSOCKET_CONNECTION_FLAG);
++           serv->Notify(true);
++           mIPCServ = std::move(serv);
++
++           // Save port for clients
++           mIPCServ->GetLocal(addr);
++           portnum = (uint16_t)addr.Service();
++
++           if (lseek(lockFd, 0, SEEK_SET) == -1 || write(lockFd, &portnum, 2) != 2)
++           {
++               AudacityMessageBox(
++                   XO("Failed to write IPC port.\n\n"
++                      "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++                   XO("Tenacity Startup Failure"),
++                   wxOK | wxICON_ERROR);
++               mIPCServ.reset();
++               close(lockFd);
++               return false;
++           }
++       }
++
++       // Release CLIENT lock (byte 1) so clients can proceed
++       {
++           struct flock client = {};
++           client.l_type = F_UNLCK;
++           client.l_whence = SEEK_SET;
++           client.l_start = 1;
++           client.l_len = 1;
++           (void)fcntl(lockFd, F_SETLK, &client);
++       }
++
++       if (mIPCServ == nullptr)
++       {
++           AudacityMessageBox(
++               XO("The Tenacity IPC server failed to initialize.\n\n"
++                  "This is likely due to a resource shortage\n"
++                  "and a reboot may be required."),
++               XO("Tenacity Startup Failure"),
++               wxOK | wxICON_ERROR);
++           close(lockFd);
++           return false;
++       }
++
++       // Keep FD open so server lock stays held
++       if (mSingleInstanceLockFd != -1)
++           close(mSingleInstanceLockFd);
++       mSingleInstanceLockFd = lockFd;
++
++       return true;
++   }
++
++   // Client: read port, release CLIENT lock, then close FD
++   if (lseek(lockFd, 0, SEEK_SET) == -1 || read(lockFd, &portnum, 2) != 2)
++   {
++       AudacityMessageBox(
++           XO("Failed to read IPC port.\n\n"
++              "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++           XO("Tenacity Startup Failure"),
++           wxOK | wxICON_ERROR);
++       close(lockFd);
++       return false;
++   }
++   addr.Service(portnum);
++
++   // Release CLIENT lock (byte 1)
++   {
++       struct flock client = {};
++       client.l_type = F_UNLCK;
++       client.l_whence = SEEK_SET;
++       client.l_start = 1;
++       client.l_len = 1;
++       (void)fcntl(lockFd, F_SETLK, &client);
++   }
++
++   close(lockFd);
++
++#else
++
+    struct sembuf op = {};
+ 
+    // Generate the IPC key we'll use for both shared memory and semaphores.
+@@ -1761,6 +1939,8 @@
+    op.sem_op = 1;
+    semop(lockid, &op, 1);
+ 
++#endif // defined(__ANDROID__)
++
+    // If we get here, then Audacity is currently active. So, we connect
+    // to it and we forward all filenames listed on the command line to
+    // the active process.
+@@ -1962,6 +2142,13 @@
+       Dispatch();
+    }
+ 
++#if defined(__ANDROID__)
++   if (mSingleInstanceLockFd != -1) {
++       close(mSingleInstanceLockFd);
++       mSingleInstanceLockFd = -1;
++   }
++#endif
++
+    Importer::Get().Terminate();
+ 
+    if(gPrefs)

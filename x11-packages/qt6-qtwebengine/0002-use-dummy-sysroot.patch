@@ -1,0 +1,11 @@
+--- a/cmake/QtToolchainHelpers.cmake
++++ b/cmake/QtToolchainHelpers.cmake
+@@ -584,6 +584,8 @@
+         endif()
+         if(CMAKE_SYSROOT)
+             list(APPEND gnArgArg target_sysroot="${CMAKE_SYSROOT}")
++        elseif(DUMMY_SYSROOT)
++            list(APPEND gnArgArg target_sysroot="${DUMMY_SYSROOT}")
+         endif()
+     elseif(MACOS)
+         get_gn_arch(cpu ${arch})

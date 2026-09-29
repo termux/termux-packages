@@ -1,0 +1,17 @@
+--- a/src/zzat.c
++++ b/src/zzat.c
+@@ -51,6 +51,14 @@
+ 
+ #include "util/getopt.h"
+ 
++#if defined HAVE___FREAD_CHK
++extern size_t __fread_chk(void *ptr, size_t ptrlen, size_t size,
++                          size_t nmemb, FILE *stream);
++#endif
++#if defined HAVE___FGETS_CHK
++char *__fgets_chk(char *s, size_t ptrlen, int size, FILE *stream);
++#endif
++
+ static int run(char const *sequence, char const *file);
+ static void output(char const *buf, size_t len);
+ 
