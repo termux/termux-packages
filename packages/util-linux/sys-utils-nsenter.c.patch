@@ -1,0 +1,11 @@
+--- a/sys-utils/nsenter.c
++++ b/sys-utils/nsenter.c
+@@ -57,7 +57,7 @@
+ #include "linux_version.h"
+ #include "pidutils.h"
+ 
+-#if defined(HAVE_STRUCT_NSFS_FILE_HANDLE) && defined(HAVE_PIDFD_OPEN)
++#if defined(HAVE_STRUCT_NSFS_FILE_HANDLE) && defined(HAVE_PIDFD_OPEN) && !defined(__ANDROID__)
+ # define USE_NAMESPACE_ID_SUPPORT
+ #endif
+ 
