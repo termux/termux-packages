@@ -46,9 +46,9 @@ for package_dir in "$@"; do
 		buildsh_path="${package_dir}/build.sh"
 		package_dir="$(basename "${package_dir}")"
 	else # If we did not, search each channel listed in repo.json for that package directory.
-		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$REPO_ROOT/repo.json"); do
+		for channel in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$REPO_ROOT/scripts/repo.json"); do
 			if [[ -d "${channel}/${package_dir}" && -f "${channel}/${package_dir}/build.sh" ]]; then
-				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\"; \"\")" "$REPO_ROOT/repo.json")"
+				repo="$(jq --raw-output ".[\"$channel\"].name | sub(\"^termux-\"; \"\")" "$REPO_ROOT/scripts/repo.json")"
 				buildsh_path="${channel}/${package_dir}/build.sh"
 				package_dir="$(basename "${package_dir}")"
 			fi

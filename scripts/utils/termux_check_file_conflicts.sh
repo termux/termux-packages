@@ -81,10 +81,10 @@ rm -f "$local_contents"
 trap - EXIT
 
 # Stage 2: Check newly built packages against packages already published in repositories.
-for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-	distribution=$(jq --raw-output '.["'"${repo}"'"].distribution' repo.json)
-	component=$(jq --raw-output '.["'"${repo}"'"].component' repo.json)
-	url=$(jq --raw-output '.["'"${repo}"'"].url' repo.json)
+for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' scripts/repo.json); do
+	distribution=$(jq --raw-output '.["'"${repo}"'"].distribution' scripts/repo.json)
+	component=$(jq --raw-output '.["'"${repo}"'"].component' scripts/repo.json)
+	url=$(jq --raw-output '.["'"${repo}"'"].url' scripts/repo.json)
 
 	for arch in aarch64 arm i686 x86_64; do
 		if [[ ! -f "Packages-${repo}-${arch}" ]]; then

@@ -11,7 +11,7 @@ termux_step_cleanup_packages() {
 	# No need to cleanup if there is enough disk space
 	(( AVAILABLE <= TERMUX_CLEANUP_BUILT_PACKAGES_THRESHOLD )) || return 0
 
-	readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+	readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/scripts/repo.json)
 
 	# Build package name regex to be used with `find`, avoiding loops.
 	PKGS="$(find "${TERMUX_PACKAGES_DIRECTORIES[@]}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')"
