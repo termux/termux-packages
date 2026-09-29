@@ -304,6 +304,7 @@ PACKAGES+=" libfontconfig1:i386"
 PACKAGES+=" libcups2-dev"
 PACKAGES+=" libglib2.0-0t64:i386"
 PACKAGES+=" libexpat1:i386"
+PACKAGES+=" libx11-6:i386"
 
 # Required by code-oss
 PACKAGES+=" libxkbfile-dev"
