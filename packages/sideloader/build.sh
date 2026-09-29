@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE="https://github.com/Dadoum/Sideloader"
 TERMUX_PKG_DESCRIPTION="Open-source cross-platform iOS app sideloader. Alternative to Sideloadly, AltServer, SideServer, Cydia Impactor, iOS App Signer…"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER=@termux
-_COMMIT="35f486caa3cb01127508958f5e057d6c834d9cf7"
-_COMMIT_DATE=2025.8.25
+_COMMIT="ed89e287ec64d39f09cacc1d1903b8a5af074201"
+_COMMIT_DATE=2026.9.18
 TERMUX_PKG_VERSION="1.0~pre4.${_COMMIT_DATE}"
 TERMUX_PKG_DEPENDS="usbmuxd, libplist, libimobiledevice"
 TERMUX_PKG_BUILD_DEPENDS="ldc, ndk-sysroot, jq"
 TERMUX_PKG_SRCURL="https://github.com/Dadoum/Sideloader/archive/${_COMMIT}.zip"
-TERMUX_PKG_SHA256="9f3764b86ee596032d43302a4a4b900cea40b45c5f7f6e6ee58145e0cb65a4b7"
+TERMUX_PKG_SHA256="d491d4e8fd4412069ad00850bf59fe93ba10d25bd63581f4d595c7f89f03aa48"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686" # ldc 1.30 contains broken a std.range.repeat that causes argparse to not compile.
 
@@ -20,6 +20,10 @@ termux_step_post_get_source() {
 }
 
 termux_step_configure() {
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		UBUNTU_RELEASE=jammy termux_download_ubuntu_packages libxml2 libicu70
+		export LD_LIBRARY_PATH="$TERMUX_PKG_HOSTBUILD_DIR/ubuntu_packages/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+	fi
 	termux_setup_ldc
 	dub clean --all-packages
 	# Patch Provision
