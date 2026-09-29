@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/x-motemen/ghq
 TERMUX_PKG_DESCRIPTION="Manage remote repository clones, like go get does"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.10.1"
+TERMUX_PKG_VERSION="1.11.0"
 TERMUX_PKG_SRCURL=https://github.com/x-motemen/ghq/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=67ff0fc695ba8d82ab1240c8a7be7106294c3d1493807903d3a49004ae56667a
+TERMUX_PKG_SHA256=4a95d38e7d89f2c1508d01d8933ced225eb4e6c31343304fa812fa69d002fa69
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
