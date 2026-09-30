@@ -1,6 +1,6 @@
 --- a/test/test_setattr.c
 +++ b/test/test_setattr.c
-@@ -20,6 +20,7 @@
+@@ -23,6 +23,7 @@
  #include <stddef.h>
  #include <unistd.h>
  #include <pthread.h>
@@ -8,7 +8,7 @@
  
  #ifndef __linux__
  #include <limits.h>
-@@ -128,6 +129,15 @@ static struct fuse_lowlevel_ops tfs_oper = {
+@@ -131,6 +132,15 @@
  static void* run_fs(void *data) {
      struct fuse_session *se = (struct fuse_session*) data;
      assert(fuse_session_loop(se) == 0);
@@ -24,7 +24,7 @@
      return NULL;
  }
  
-@@ -164,13 +174,16 @@ int main(int argc, char *argv[]) {
+@@ -167,13 +177,16 @@
      assert(fuse_session_mount(se, fuse_opts.mountpoint) == 0);
  
      /* Start file-system thread */

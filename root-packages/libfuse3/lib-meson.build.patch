@@ -1,9 +1,8 @@
-diff -uNr libfuse-fuse-3.9.1/lib/meson.build libfuse-fuse-3.9.1.mod/lib/meson.build
---- libfuse-fuse-3.9.1/lib/meson.build	2020-03-19 22:00:41.000000000 +0200
-+++ libfuse-fuse-3.9.1.mod/lib/meson.build	2020-08-11 20:32:33.806112774 +0300
+--- a/lib/meson.build
++++ b/lib/meson.build
 @@ -4,11 +4,7 @@
                     'helper.c', 'modules/subdir.c', 'mount_util.c',
-                    'fuse_log.c' ]
+                    'fuse_log.c', 'compat.c', 'util.c', 'util.h' ]
  
 -if host_machine.system().startswith('linux')
 -   libfuse_sources += [ 'mount.c' ]
@@ -13,4 +12,4 @@ diff -uNr libfuse-fuse-3.9.1/lib/meson.build libfuse-fuse-3.9.1.mod/lib/meson.bu
 +libfuse_sources += [ 'mount.c' ]
  
  deps = [ thread_dep ]
- if cfg.get('HAVE_ICONV')
+ if private_cfg.get('HAVE_ICONV')
