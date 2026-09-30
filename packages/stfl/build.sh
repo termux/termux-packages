@@ -11,6 +11,7 @@ TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/newsboat/stfl/archive/c2c10b8a50fef613c0aacdc5d06a0fa610bf79e9.zip
 TERMUX_PKG_SHA256=dd912547e64f9fab5dab82731f4acea061f3bdc038dad374e0b82bf32722b729
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses"
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BREAKS="stfl-dev"
 TERMUX_PKG_REPLACES="stfl-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
