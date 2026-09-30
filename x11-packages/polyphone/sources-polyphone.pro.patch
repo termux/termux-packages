@@ -1,13 +1,14 @@
 --- a/sources/polyphone.pro
 +++ b/sources/polyphone.pro
-@@ -61,9 +61,8 @@
+@@ -89,9 +89,9 @@
+         lib/_option_rtaudio/rtaudio/include/iasiothiscallresolver.cpp
  }
  unix:!macx {
-     QMAKE_CXXFLAGS += -std=c++11 -ffloat-store
--    DEFINES += __LINUX_ALSASEQ__ __UNIX_JACK__
+-    DEFINES += __LINUX_ALSASEQ__ __UNIX_JACK__ __LINUX_ALSA__ #__LINUX_PULSE__
++    DEFINES += __LINUX_PULSE__
      CONFIG += link_pkgconfig
--    PKGCONFIG += alsa jack portaudio-2.0 zlib ogg flac vorbis vorbisfile vorbisenc glib-2.0
-+    PKGCONFIG += portaudio-2.0 zlib ogg flac vorbis vorbisfile vorbisenc glib-2.0
+-    PKGCONFIG += alsa jack zlib ogg vorbis vorbisfile vorbisenc sndfile
++    PKGCONFIG += libpulse libpulse-simple zlib ogg vorbis vorbisfile vorbisenc sndfile
      contains(DEFINES, USE_WOLFSSL) {
          PKGCONFIG += wolfssl
      } else {
