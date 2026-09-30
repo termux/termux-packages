@@ -13,7 +13,7 @@ It uses `android_res_nquery`, but this function only got added in API level 29
    sNativeHTTPSSupported = jni::GetAPIVersion() >= 29;
 --- a/netwerk/dns/moz.build
 +++ b/netwerk/dns/moz.build
-@@ -53,17 +53,7 @@
+@@ -51,19 +51,7 @@
      "nsEffectiveTLDService.cpp",  # Excluded from UNIFIED_SOURCES due to special build flags.
  ]
  
@@ -22,6 +22,8 @@ It uses `android_res_nquery`, but this function only got added in API level 29
 -elif CONFIG["OS_TARGET"] == "Linux":
 -    SOURCES += ["PlatformDNSUnix.cpp"]
 -    OS_LIBS += ["resolv"]
+-elif CONFIG["OS_TARGET"] == "FreeBSD":
+-    SOURCES += ["PlatformDNSUnix.cpp"]
 -elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "cocoa":
 -    SOURCES += ["PlatformDNSMac.cpp"]
 -elif CONFIG["MOZ_WIDGET_TOOLKIT"] == "android":
