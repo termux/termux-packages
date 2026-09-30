@@ -1,0 +1,30 @@
+diff --git a/packages/bruno-electron/src/utils/encryption.js b/packages/bruno-electron/src/utils/encryption.js
+index 4f80f8c..a6223f7 100644
+--- a/packages/bruno-electron/src/utils/encryption.js
++++ b/packages/bruno-electron/src/utils/encryption.js
+@@ -1,7 +1,24 @@
+ const crypto = require('crypto');
+-const { machineIdSync } = require('@usebruno/node-machine-id');
++const fs = require('fs');
++const os = require('os');
+ const { safeStorage } = require('electron');
+ 
++// Termux: execSync in @usebruno/node-machine-id fails with EFAULT, so read the
++// machine id directly. Same result as the library on Linux.
++const machineIdSync = () => {
++  let id = '';
++  for (const file of ['/var/lib/dbus/machine-id', '/etc/machine-id']) {
++    try {
++      id = fs.readFileSync(file, 'utf8').split('\n')[0].trim();
++    } catch (e) {
++      // try next file
++    }
++    if (id) break;
++  }
++  id = (id || os.hostname()).replace(/\s+/g, '').toLowerCase();
++  return crypto.createHash('sha256').update(id).digest('hex');
++};
++
+ // Constants for algorithm identification
+ const ELECTRONSAFESTORAGE_ALGO = '00';
+ const AES256_ALGO = '01';
