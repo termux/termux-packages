@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://mapserver.org/
 TERMUX_PKG_DESCRIPTION="MapServer is CGI-based platform for publishing spatial data and interactive mapping applications to the web"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=8.2.2
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=8.6.6
 TERMUX_PKG_SRCURL="https://download.osgeo.org/mapserver/mapserver-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=47d8ee4bd12ddd2f04b24aa84c6e58f8e6990bcd5c150ba42e22f30ad30568e4
+TERMUX_PKG_SHA256=e908e76b65541042042e9c5e4ae16a131f064cf6d3c76e9542c89b25158968c9
 TERMUX_PKG_DEPENDS="freetype, gdal, libc++, libcairo, libcurl, libgeos, libiconv, libjpeg-turbo, libpng, libprotobuf-c, libxml2, proj"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_BREAKS="mapserver-dev"
 TERMUX_PKG_REPLACES="mapserver-dev"
 TERMUX_PKG_GROUPS="science"
@@ -34,3 +34,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_GIF=OFF
 -DWITH_EXEMPI=OFF
 "
+
+termux_step_pre_configure() {
+	termux_setup_proot
+	local protoc_wrapper="${TERMUX_PKG_TMPDIR}/protoc-proot"
+	printf '#!/bin/bash\nexec termux-proot-run %s/bin/protoc "$@"\n' "${TERMUX_PREFIX}" > "${protoc_wrapper}"
+	chmod +x "${protoc_wrapper}"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPROTOBUFC_COMPILER=${protoc_wrapper}"
+}
