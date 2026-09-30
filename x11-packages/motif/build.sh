@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/motif/Motif%20${TERMUX_PKG_VERSION}%20Source%20Code/motif-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=859b723666eeac7df018209d66045c9853b50b4218cecadb794e2359619ebce7
 TERMUX_PKG_DEPENDS="fontconfig, freetype, libandroid-support, libice, libiconv, libjpeg-turbo, libpng, libsm, libx11, libxext, libxft, libxmu, libxt"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="flex, xbitmaps, xorgproto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_file__usr_X_include_X11_X_h=no
@@ -15,6 +16,18 @@ ac_cv_func_setpgrp_void=yes
 "
 TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_HOSTBUILD=true
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(curl --silent https://sourceforge.net/projects/motif/files/ | grep -oP 'Motif%20\K[0-9]+(\.[0-9]+)+(?=%20Source%20Code/)' | sort -V | tail -n1)"
+
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_post_get_source() {
 	rm -f tools/wml/{wmllex,wmluiltok}.c
