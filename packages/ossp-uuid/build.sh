@@ -17,6 +17,11 @@ termux_pkg_auto_update() {
 	latest_version="$(curl --silent http://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/ | \
 		sed -n 's|.*href="uuid-\([0-9.]*\)\.tar\.gz".*|\1|p' | sort -V | tail -n1)"
 
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
