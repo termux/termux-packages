@@ -1,5 +1,6 @@
-+++ ./src/utils/os_config_init.c
-@@ -527,10 +527,8 @@
+--- a/src/utils/os_config_init.c
++++ b/src/utils/os_config_init.c
+@@ -549,10 +549,8 @@
  			if (check_file_exists("gui/gui.bt", app_path, file_path)) return 1;
  
  			/*failsafe - look in possible install dirs ...*/
@@ -12,20 +13,20 @@
  
  		} else if ((path_type==GF_PATH_MODULES) && root) {
  			//if arch-specific scheme try it first (to avoid loading 64bit versions for 32bit shared...)
-@@ -541,26 +539,12 @@
+@@ -563,26 +561,12 @@
  				if (check_file_exists(TEST_MODULE, app_path, file_path)) return 1;
  				root[0]=0;
  			}
--			strcat(app_path, "/lib64/gpac");
+-			gf_strcat(app_path, "/lib64/gpac");
 -			if (check_file_exists(TEST_MODULE, app_path, file_path)) return 1;
 -			root[0]=0;
- 			strcat(app_path, "/lib/gpac");
+ 			gf_strcat(app_path, "/lib/gpac");
  			if (check_file_exists(TEST_MODULE, app_path, file_path)) return 1;
 -			root[0]=0;
--			strcat(app_path, "/lib/x86_64-linux-gnu/gpac");
+-			gf_strcat(app_path, "/lib/x86_64-linux-gnu/gpac");
 -			if (check_file_exists(TEST_MODULE, app_path, file_path)) return 1;
 -			root[0]=0;
--			strcat(app_path, "/lib/i386-linux-gnu/gpac");
+-			gf_strcat(app_path, "/lib/i386-linux-gnu/gpac");
 -			if (check_file_exists(TEST_MODULE, app_path, file_path)) return 1;
  
  			/*failsafe - look in possible install dirs ...*/
@@ -41,12 +42,12 @@
  		}
  	}
  
-@@ -735,7 +719,7 @@
- 	strcpy(szPath, "/system/fonts/");
+@@ -759,7 +743,7 @@
+ 	gf_strlcpy(szPath, "/system/fonts/", GF_MAX_PATH);
  #else
  	//scan all /usr/share/fonts, not just /usr/share/fonts/truetype/ which does not exist in some distrros
--	strcpy(szPath, "/usr/share/fonts/");
-+	strcpy(szPath, "@TERMUX_PREFIX@/share/fonts/");
+-	gf_strlcpy(szPath, "/usr/share/fonts/", GF_MAX_PATH);
++	gf_strlcpy(szPath, "@TERMUX_PREFIX@/share/fonts/", GF_MAX_PATH);
  #endif
  }
  
