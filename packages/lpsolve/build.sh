@@ -6,7 +6,20 @@ TERMUX_PKG_VERSION="5.5.2.11"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/lpsolve/lpsolve/${TERMUX_PKG_VERSION}/lp_solve_${TERMUX_PKG_VERSION}_source.tar.gz"
 TERMUX_PKG_SHA256=6d4abff5cc6aaa933ae8e6c17a226df0fc0b671c438f69715d41d09fe81f902f
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(curl --silent https://sourceforge.net/projects/lpsolve/files/lpsolve/ | grep -oP '/files/lpsolve/\K[0-9]+(\.[0-9]+)+(?=/)' | sort -V | tail -n1)"
+
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_configure() {
 	:
