@@ -1,0 +1,1528 @@
+diff -ruN tauri-src-orig/crates/tauri/Cargo.toml tauri-src/crates/tauri/Cargo.toml
+--- tauri-src-orig/crates/tauri/Cargo.toml	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/Cargo.toml	2026-09-27 13:35:27.697767259 +0000
+@@ -97,7 +97,7 @@
+ ], optional = true }
+ 
+ # desktop
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "windows", target_os = "macos"))'.dependencies]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "windows", target_os = "macos"))'.dependencies]
+ muda = { version = "0.19", default-features = false, features = [
+   "serde",
+   "gtk",
+@@ -107,7 +107,7 @@
+ ], optional = true }
+ 
+ # linux
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies]
+ gtk = { version = "0.18", features = ["v3_24"] }
+ webkit2gtk = { version = "2", features = ["v2_40"], optional = true }
+ 
+diff -ruN tauri-src-orig/crates/tauri/build.rs tauri-src/crates/tauri/build.rs
+--- tauri-src-orig/crates/tauri/build.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/build.rs	2026-09-27 08:57:46.979473609 +0000
+@@ -265,7 +265,7 @@
+   );
+ 
+   let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+-  let mobile = target_os == "ios" || target_os == "android";
++  let mobile = target_os == "ios";
+   alias("desktop", !mobile);
+   alias("mobile", mobile);
+ 
+diff -ruN tauri-src-orig/crates/tauri/src/app/plugin.rs tauri-src/crates/tauri/src/app/plugin.rs
+--- tauri-src-orig/crates/tauri/src/app/plugin.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/app/plugin.rs	2026-09-27 09:01:05.763870480 +0000
+@@ -138,7 +138,7 @@
+       supports_multiple_windows,
+     ])
+     .setup(|_app, _api| {
+-      #[cfg(target_os = "android")]
++      #[cfg(all(target_os = "android", not(target_os = "android")))]
+       {
+         let handle = _api.register_android_plugin("app.tauri", "AppPlugin")?;
+         _app.manage(AppPlugin(handle));
+diff -ruN tauri-src-orig/crates/tauri/src/app.rs tauri-src/crates/tauri/src/app.rs
+--- tauri-src-orig/crates/tauri/src/app.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/app.rs	2026-09-27 09:01:40.570323979 +0000
+@@ -705,7 +705,7 @@
+     self
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Option<crate::Result<String>> {
+     None
+   }
+@@ -765,7 +765,7 @@
+     self.handle()
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Option<crate::Result<String>> {
+     None
+   }
+@@ -1121,7 +1121,7 @@
+       }
+ 
+       /// Whether the application supports multiple windows.
+-      #[cfg(target_os = "android")]
++      #[cfg(all(target_os = "android", not(target_os = "android")))]
+       pub fn supports_multiple_windows(&self) -> bool {
+         let runtime_handle = match self.runtime() {
+           RuntimeOrDispatch::Runtime(runtime) => runtime.handle(),
+@@ -1688,6 +1688,7 @@
+     platform_specific_attributes: Vec<R::PlatformSpecificInitAttribute>,
+     #[cfg(any(
+       target_os = "linux",
++     target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -1702,6 +1703,7 @@
+       platform_specific_attributes,
+       #[cfg(any(
+         target_os = "linux",
++       target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -2365,6 +2367,7 @@
+ 
+     #[cfg(any(
+       target_os = "linux",
++     target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -2388,6 +2391,7 @@
+       platform_specific_attributes,
+       #[cfg(any(
+         target_os = "linux",
++       target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/lib.rs tauri-src/crates/tauri/src/lib.rs
+--- tauri-src-orig/crates/tauri/src/lib.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/lib.rs	2026-09-27 13:33:31.123926718 +0000
+@@ -152,53 +152,10 @@
+ #[doc(hidden)]
+ #[macro_export]
+ macro_rules! android_binding {
+-  ($domain:ident, $app_name:ident, $main:ident, $wry:path) => {
+-    use $wry::{
+-      android_setup,
+-      prelude::{JClass, JNIEnv, JString},
+-    };
+-
+-    ::tauri::wry::android_binding!($domain, $app_name, $wry);
+-
+-    ::tauri::tao::android_binding!($domain, $app_name, Rust, android_setup, $main, ::tauri::tao);
+-
+-    // be careful when renaming this, the `Java_app_tauri_plugin_PluginManager_handlePluginResponse` symbol is checked by the CLI
+-    ::tauri::tao::platform::android::prelude::android_fn!(
+-      app_tauri,
+-      plugin,
+-      PluginManager,
+-      handlePluginResponse,
+-      [i32, JString, JString],
+-    );
+-    ::tauri::tao::platform::android::prelude::android_fn!(
+-      app_tauri,
+-      plugin,
+-      PluginManager,
+-      sendChannelData,
+-      [i64, JString],
+-    );
+-
+-    // this function is a glue between PluginManager.kt > handlePluginResponse and Rust
+-    #[allow(non_snake_case)]
+-    pub fn handlePluginResponse(
+-      mut env: JNIEnv,
+-      _: JClass,
+-      id: i32,
+-      success: JString,
+-      error: JString,
+-    ) {
+-      ::tauri::handle_android_plugin_response(&mut env, id, success, error);
+-    }
+-
+-    // this function is a glue between PluginManager.kt > sendChannelData and Rust
+-    #[allow(non_snake_case)]
+-    pub fn sendChannelData(mut env: JNIEnv, _: JClass, id: i64, data: JString) {
+-      ::tauri::send_channel_data(&mut env, id, data);
+-    }
+-  };
++  ($domain:ident, $app_name:ident, $main:ident, $wry:path) => {};
+ }
+ 
+-#[cfg(all(feature = "wry", target_os = "android"))]
++#[cfg(all(feature = "wry", target_os = "android", not(target_os = "android")))]
+ #[doc(hidden)]
+ pub use plugin::mobile::{handle_android_plugin_response, send_channel_data};
+ #[cfg(all(feature = "wry", target_os = "android"))]
+@@ -1095,7 +1052,7 @@
+     fn manager_owned(&self) -> Arc<AppManager<R>>;
+     fn runtime(&self) -> RuntimeOrDispatch<'_, R>;
+     fn managed_app_handle(&self) -> &AppHandle<R>;
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     fn activity_name(&self) -> Option<crate::Result<String>>;
+     #[cfg(target_os = "ios")]
+     fn scene_identifier(&self) -> Option<crate::Result<String>>;
+diff -ruN tauri-src-orig/crates/tauri/src/manager/menu.rs tauri-src/crates/tauri/src/manager/menu.rs
+--- tauri-src-orig/crates/tauri/src/manager/menu.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/manager/menu.rs	2026-09-27 09:01:32.457180241 +0000
+@@ -80,6 +80,7 @@
+         }
+         #[cfg(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/manager/mod.rs tauri-src/crates/tauri/src/manager/mod.rs
+--- tauri-src-orig/crates/tauri/src/manager/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/manager/mod.rs	2026-09-27 13:34:29.300406689 +0000
+@@ -768,7 +768,7 @@
+     {
+       assert_eq!(
+         manager.get_app_url(false).to_string(),
+-        if cfg!(windows) || cfg!(target_os = "android") {
++        if cfg!(windows) {
+           "http://tauri.localhost/"
+         } else {
+           "tauri://localhost"
+@@ -776,7 +776,7 @@
+       );
+       assert_eq!(
+         manager.get_app_url(true).to_string(),
+-        if cfg!(windows) || cfg!(target_os = "android") {
++        if cfg!(windows) {
+           "https://tauri.localhost/"
+         } else {
+           "tauri://localhost"
+diff -ruN tauri-src-orig/crates/tauri/src/manager/webview.rs tauri-src/crates/tauri/src/manager/webview.rs
+--- tauri-src-orig/crates/tauri/src/manager/webview.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/manager/webview.rs	2026-09-27 13:33:00.404631404 +0000
+@@ -510,7 +510,7 @@
+ 
+     pending.url = url.to_string();
+ 
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     {
+       pending = pending.on_webview_created(move |ctx| {
+         let plugin_manager = ctx
+@@ -544,7 +544,8 @@
+ 
+     // in `windows`, we need to force a data_directory
+     // but we do respect user-specification
+-    #[cfg(any(target_os = "linux", target_os = "windows"))]
++    #[cfg(any(target_os = "linux",
++target_os = "android", target_os = "windows"))]
+     if pending.webview_attributes.data_directory.is_none() {
+       let local_app_data = manager.path().resolve(
+         &app_manager.config.identifier,
+diff -ruN tauri-src-orig/crates/tauri/src/menu/menu.rs tauri-src/crates/tauri/src/menu/menu.rs
+--- tauri-src-orig/crates/tauri/src/menu/menu.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/menu/menu.rs	2026-09-27 09:01:32.457969383 +0000
+@@ -58,6 +58,7 @@
+ 
+       #[cfg(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -204,6 +205,7 @@
+         )?,
+         #[cfg(not(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/menu/submenu.rs tauri-src/crates/tauri/src/menu/submenu.rs
+--- tauri-src-orig/crates/tauri/src/menu/submenu.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/menu/submenu.rs	2026-09-27 09:01:32.458802990 +0000
+@@ -51,6 +51,7 @@
+ 
+       #[cfg(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/path/mod.rs tauri-src/crates/tauri/src/path/mod.rs
+--- tauri-src-orig/crates/tauri/src/path/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/path/mod.rs	2026-09-27 13:34:02.117197368 +0000
+@@ -16,14 +16,12 @@
+ 
+ use crate::error::*;
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ mod android;
+-#[cfg(not(target_os = "android"))]
+ mod desktop;
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub use android::PathResolver;
+-#[cfg(not(target_os = "android"))]
+ pub use desktop::PathResolver;
+ 
+ /// A wrapper for [`PathBuf`] that prevents path traversal.
+diff -ruN tauri-src-orig/crates/tauri/src/path/plugin.rs tauri-src/crates/tauri/src/path/plugin.rs
+--- tauri-src-orig/crates/tauri/src/path/plugin.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/path/plugin.rs	2026-09-27 09:00:57.253229550 +0000
+@@ -229,13 +229,12 @@
+     ])
+     .js_init_script(init_js.to_string())
+     .setup(|app, _api| {
+-      #[cfg(target_os = "android")]
++      #[cfg(all(target_os = "android", not(target_os = "android")))]
+       {
+         let handle = _api.register_android_plugin("app.tauri", "PathPlugin")?;
+         app.manage(PathResolver(handle));
+       }
+ 
+-      #[cfg(not(target_os = "android"))]
+       {
+         app.manage(PathResolver(app.clone()));
+       }
+diff -ruN tauri-src-orig/crates/tauri/src/plugin/mobile.rs tauri-src/crates/tauri/src/plugin/mobile.rs
+--- tauri-src-orig/crates/tauri/src/plugin/mobile.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/plugin/mobile.rs	2026-09-27 09:00:43.545322833 +0000
+@@ -5,7 +5,7 @@
+ use super::{PluginApi, PluginHandle};
+ 
+ use crate::{AppHandle, Runtime, ipc::Channel};
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ use crate::{
+   runtime::RuntimeHandle,
+   sealed::{ManagerBase, RuntimeOrDispatch},
+@@ -41,7 +41,7 @@
+   #[error("the webview is unreachable")]
+   UnreachableWebview,
+   /// JNI error.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   #[error("jni error: {0}")]
+   Jni(#[from] jni::errors::Error),
+   /// Error returned from direct mobile plugin invoke.
+@@ -64,7 +64,7 @@
+ }
+ 
+ /// Glue between Rust and the Kotlin code that sends the plugin response back.
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub fn handle_android_plugin_response(
+   env: &mut jni::JNIEnv<'_>,
+   id: i32,
+@@ -106,7 +106,7 @@
+ }
+ 
+ /// Glue between Rust and the Kotlin code that sends the channel data.
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub fn send_channel_data(
+   env: &mut jni::JNIEnv<'_>,
+   channel_id: i64,
+@@ -197,7 +197,7 @@
+   }
+ 
+   /// Registers an Android plugin.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   pub fn register_android_plugin(
+     &self,
+     plugin_identifier: &str,
+@@ -425,7 +425,7 @@
+   Ok(())
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub(crate) fn run_command<
+   R: Runtime,
+   C: AsRef<str>,
+diff -ruN tauri-src-orig/crates/tauri/src/test/mock_runtime.rs tauri-src/crates/tauri/src/test/mock_runtime.rs
+--- tauri-src-orig/crates/tauri/src/test/mock_runtime.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/test/mock_runtime.rs	2026-09-27 09:01:32.455474514 +0000
+@@ -242,7 +242,8 @@
+         raw_window_handle::WindowsDisplayHandle::new(),
+       ))
+     });
+-    #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
++    #[cfg(not(any(target_os = "linux",
++target_os = "android", target_os = "macos", windows)))]
+     unimplemented!();
+   }
+ 
+@@ -489,6 +490,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -824,6 +826,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -835,6 +838,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -879,7 +883,8 @@
+         )),
+       ))
+     };
+-    #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
++    #[cfg(not(any(target_os = "linux",
++target_os = "android", target_os = "macos", windows)))]
+     unimplemented!();
+   }
+ 
+@@ -1214,6 +1219,7 @@
+   #[cfg(any(
+     windows,
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1346,6 +1352,7 @@
+     target_os = "macos",
+     windows,
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/webview/mod.rs tauri-src/crates/tauri/src/webview/mod.rs
+--- tauri-src-orig/crates/tauri/src/webview/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/webview/mod.rs	2026-09-27 13:34:20.057264353 +0000
+@@ -174,6 +174,7 @@
+   /// Returns [`webkit2gtk::WebView`] handle.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -183,6 +184,7 @@
+     docsrs,
+     doc(cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -248,7 +250,7 @@
+   }
+ 
+   /// Returns handle for JNI execution.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   pub fn jni_handle(&self) -> tauri_runtime_wry::wry::JniHandle {
+     self.0
+   }
+@@ -1365,6 +1367,7 @@
+   /// Useful if you need to link a webview to another, for instance when using the [`Self::on_new_window`].
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1756,7 +1759,7 @@
+         window.setBackgroundColor(Some(&bg_color));
+       }
+ 
+-      #[cfg(target_os = "android")]
++      #[cfg(all(target_os = "android", not(target_os = "android")))]
+       {
+         use jni::objects::JValue;
+         webview.jni_handle().exec(|env, _, webview| {
+@@ -2497,7 +2500,7 @@
+     &self.app_handle
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Option<crate::Result<String>> {
+     Some(self.window().activity_name())
+   }
+diff -ruN tauri-src-orig/crates/tauri/src/webview/webview_window.rs tauri-src/crates/tauri/src/webview/webview_window.rs
+--- tauri-src-orig/crates/tauri/src/webview/webview_window.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/webview/webview_window.rs	2026-09-27 13:34:12.340927120 +0000
+@@ -729,6 +729,7 @@
+   /// See <https://docs.gtk.org/gtk3/method.Window.set_transient_for.html>
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -744,6 +745,7 @@
+   /// See <https://docs.gtk.org/gtk3/method.Window.set_transient_for.html>
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1360,6 +1362,7 @@
+     target_os = "macos",
+     windows,
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1401,6 +1404,7 @@
+   /// Useful if you need to link a webview to another, for instance when using the [`Self::on_new_window`].
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1426,7 +1430,7 @@
+ }
+ 
+ // Android specific APIs
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
+   /// The name of the activity to create for this webview window.
+   pub fn activity_name<S: Into<String>>(mut self, class_name: S) -> Self {
+@@ -1865,6 +1869,7 @@
+   /// Note that this type can only be used on the main thread.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1879,6 +1884,7 @@
+   /// Note that this type can only be used on the main thread.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1889,7 +1895,7 @@
+   }
+ 
+   /// Returns the name of the Android activity associated with this window.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   pub fn activity_name(&self) -> crate::Result<String> {
+     self.window.activity_name()
+   }
+@@ -2791,7 +2797,7 @@
+     self.webview.managed_app_handle()
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Option<crate::Result<String>> {
+     Some(self.window.activity_name())
+   }
+diff -ruN tauri-src-orig/crates/tauri/src/window/mod.rs tauri-src/crates/tauri/src/window/mod.rs
+--- tauri-src-orig/crates/tauri/src/window/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/window/mod.rs	2026-09-27 13:32:50.821820137 +0000
+@@ -362,7 +362,7 @@
+     #[cfg(desktop)]
+     let theme = self.window_builder.get_theme();
+ 
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     if !self.created_by_activity_name_set {
+       if let Some(manager_window_activity_name) = self.manager.activity_name() {
+         self.window_builder = self
+@@ -646,6 +646,7 @@
+ 
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -727,6 +728,7 @@
+   /// **Note:** This is a low level API. See [`Self::parent`] for a higher level wrapper for Tauri windows.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -744,6 +746,7 @@
+   /// **Note:** This is a low level API. See [`Self::parent`] and [`Self::transient_for`] for higher level wrappers for Tauri windows.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -945,7 +948,7 @@
+   }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ impl<R: Runtime, M: Manager<R>> WindowBuilder<'_, R, M> {
+   /// The name of the activity to create for this webview window.
+   pub fn activity_name<S: Into<String>>(mut self, class_name: S) -> Self {
+@@ -1086,7 +1089,7 @@
+     &self.app_handle
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Option<crate::Result<String>> {
+     Some(self.activity_name())
+   }
+@@ -1301,6 +1304,7 @@
+       }
+       #[cfg(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -1342,6 +1346,7 @@
+         }
+         #[cfg(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+@@ -1374,6 +1379,7 @@
+         }
+         #[cfg(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+@@ -1402,6 +1408,7 @@
+         }
+         #[cfg(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+@@ -1431,6 +1438,7 @@
+         }
+         #[cfg(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+@@ -1682,6 +1690,7 @@
+   /// Note that this type can only be used on the main thread.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1696,6 +1705,7 @@
+   /// Note that this type can only be used on the main thread.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1706,7 +1716,7 @@
+   }
+ 
+   /// Returns the name of the Android activity associated with this window.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   pub fn activity_name(&self) -> crate::Result<String> {
+     self.window.dispatcher.activity_name().map_err(Into::into)
+   }
+@@ -2328,7 +2338,8 @@
+ #[cfg(desktop)]
+ #[cfg_attr(
+   docsrs,
+-  doc(cfg(any(target_os = "macos", target_os = "linux", windows)))
++  doc(cfg(any(target_os = "macos", target_os = "linux",
++ target_os = "android", windows)))
+ )]
+ #[derive(serde::Deserialize, Debug)]
+ pub struct ProgressBarState {
+diff -ruN tauri-src-orig/crates/tauri/src/window/plugin.rs tauri-src/crates/tauri/src/window/plugin.rs
+--- tauri-src-orig/crates/tauri/src/window/plugin.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri/src/window/plugin.rs	2026-09-27 13:32:28.692891263 +0000
+@@ -79,7 +79,7 @@
+   getter!(is_enabled, bool);
+   getter!(title, String);
+   getter!(theme, Theme);
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   getter!(activity_name, String);
+   #[cfg(target_os = "ios")]
+   getter!(scene_identifier, String);
+@@ -269,7 +269,7 @@
+       commands::is_enabled,
+       commands::title,
+       commands::theme,
+-      #[cfg(target_os = "android")]
++      #[cfg(all(target_os = "android", not(target_os = "android")))]
+       commands::activity_name,
+       #[cfg(target_os = "ios")]
+       commands::scene_identifier,
+diff -ruN tauri-src-orig/crates/tauri-runtime/Cargo.toml tauri-src/crates/tauri-runtime/Cargo.toml
+--- tauri-src-orig/crates/tauri-runtime/Cargo.toml	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime/Cargo.toml	2026-09-27 08:31:12.345241922 +0000
+@@ -39,7 +39,7 @@
+ version = "0.61"
+ features = ["Win32_Foundation", "Win32_System_WinRT"]
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
++[target."cfg(any(target_os = \"linux\", target_os = \"android\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+ gtk = { version = "0.18", features = ["v3_24"] }
+ 
+ [target."cfg(target_os = \"android\")".dependencies]
+diff -ruN tauri-src-orig/crates/tauri-runtime/build.rs tauri-src/crates/tauri-runtime/build.rs
+--- tauri-src-orig/crates/tauri-runtime/build.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime/build.rs	2026-09-27 04:00:07.607259229 +0000
+@@ -13,7 +13,7 @@
+ 
+ fn main() {
+   let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+-  let mobile = target_os == "ios" || target_os == "android";
++  let mobile = target_os == "ios";
+   alias("desktop", !mobile);
+   alias("mobile", mobile);
+ }
+diff -ruN tauri-src-orig/crates/tauri-runtime/src/lib.rs tauri-src/crates/tauri-runtime/src/lib.rs
+--- tauri-src-orig/crates/tauri-runtime/src/lib.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime/src/lib.rs	2026-09-27 04:21:49.528644268 +0000
+@@ -357,7 +357,7 @@
+   fn set_device_event_filter(&self, filter: DeviceEventFilter);
+ 
+   /// Finds an Android class in the project scope.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn find_class<'a>(
+     &self,
+     env: &mut jni::JNIEnv<'a>,
+@@ -368,7 +368,7 @@
+   /// Dispatch a closure to run on the Android context.
+   ///
+   /// The closure takes the JNI env, the Android activity instance and the possibly null webview.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn run_on_android_context<F>(&self, f: F)
+   where
+     F: FnOnce(&mut jni::JNIEnv, &jni::objects::JObject, &jni::objects::JObject) + Send + 'static;
+@@ -397,6 +397,7 @@
+ pub struct RuntimeInitArgs<A> {
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -450,6 +451,7 @@
+   #[cfg(any(
+     windows,
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -460,6 +462,7 @@
+     doc(cfg(any(
+       windows,
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -799,6 +802,7 @@
+   /// Returns the `ApplicationWindow` from gtk crate that is used by this window.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -809,6 +813,7 @@
+   /// Returns the vertical [`gtk::Box`] that is added by default as the sole child of this window.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -817,7 +822,7 @@
+   fn default_vbox(&self) -> Result<gtk::Box>;
+ 
+   /// Returns the name of the Android activity associated with this window.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Result<String>;
+ 
+   /// Returns the identifier of the UIScene tied to this UIWindow.
+diff -ruN tauri-src-orig/crates/tauri-runtime/src/webview.rs tauri-src/crates/tauri-runtime/src/webview.rs
+--- tauri-src-orig/crates/tauri-runtime/src/webview.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime/src/webview.rs	2026-09-26 17:57:35.096632915 +0000
+@@ -4,7 +4,7 @@
+ 
+ //! A layer between raw [`Runtime`] webviews and Tauri.
+ //!
+-#[cfg(not(any(target_os = "android", target_os = "ios")))]
++#[cfg(not(target_os = "ios"))]
+ use crate::window::WindowId;
+ use crate::{Rect, Runtime, UserEvent, window::is_label_valid};
+ 
+@@ -75,7 +75,7 @@
+   },
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub struct CreationContext<'a, 'b> {
+   pub env: &'a mut jni::JNIEnv<'b>,
+   pub activity: &'a jni::objects::JObject<'b>,
+@@ -142,7 +142,7 @@
+   /// Allow the window to be opened, with the given window.
+   ///
+   /// The window must be created referencing the opener window so it can inherit the appropriate attributes.
+-  #[cfg(not(any(target_os = "android", target_os = "ios")))]
++  #[cfg(not(target_os = "ios"))]
+   Create { window_id: WindowId },
+   /// Deny the window from being opened.
+   Deny,
+@@ -200,7 +200,7 @@
+   /// The resolved URL to load on the webview.
+   pub url: String,
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   #[allow(clippy::type_complexity)]
+   pub on_webview_created:
+     Option<Box<dyn Fn(CreationContext<'_, '_>) -> Result<(), jni::errors::Error> + Send + Sync>>,
+@@ -238,7 +238,7 @@
+         document_title_changed_handler: None,
+         address_changed_handler: None,
+         url: "tauri://localhost".to_string(),
+-        #[cfg(target_os = "android")]
++        #[cfg(all(target_os = "android", not(target_os = "android")))]
+         on_webview_created: None,
+         web_resource_request_handler: None,
+         on_page_load_handler: None,
+@@ -266,7 +266,7 @@
+       .insert(uri_scheme, Box::new(protocol_handler));
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   pub fn on_webview_created<
+     F: Fn(CreationContext<'_, '_>) -> Result<(), jni::errors::Error> + Send + Sync + 'static,
+   >(
+diff -ruN tauri-src-orig/crates/tauri-runtime/src/window.rs tauri-src/crates/tauri-runtime/src/window.rs
+--- tauri-src-orig/crates/tauri-runtime/src/window.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime/src/window.rs	2026-09-27 04:21:49.527551145 +0000
+@@ -447,6 +447,7 @@
+   /// See <https://docs.gtk.org/gtk3/method.Window.set_transient_for.html>
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -499,13 +500,13 @@
+   fn window_classname<S: Into<String>>(self, window_classname: S) -> Self;
+ 
+   /// The name of the activity to create for this webview window.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name<S: Into<String>>(self, class_name: S) -> Self;
+ 
+   /// Sets the name of the activity that is creating this webview window.
+   ///
+   /// This is important to determine which stack the activity will belong to.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn created_by_activity_name<S: Into<String>>(self, class_name: S) -> Self;
+ 
+   /// Sets the identifier of the UIScene that is requesting the creation of this new scene,
+@@ -643,6 +644,7 @@
+   pub hwnd: isize,
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -651,6 +653,7 @@
+   pub gtk_window: &'a gtk::ApplicationWindow,
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/Cargo.toml tauri-src/crates/tauri-runtime-wry/Cargo.toml
+--- tauri-src-orig/crates/tauri-runtime-wry/Cargo.toml	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/Cargo.toml	2026-09-27 03:59:51.946394090 +0000
+@@ -36,7 +36,7 @@
+ version = "0.61"
+ features = ["Win32_Foundation", "Win32_Graphics_Dwm"]
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
++[target."cfg(any(target_os = \"linux\", target_os = \"android\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+ gtk = { version = "0.18", features = ["v3_24"] }
+ webkit2gtk = { version = "=2.0", features = ["v2_40"] }
+ percent-encoding = "2"
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/build.rs tauri-src/crates/tauri-runtime-wry/build.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/build.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/build.rs	2026-09-27 03:59:54.355809195 +0000
+@@ -13,7 +13,7 @@
+ 
+ fn main() {
+   let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+-  let mobile = target_os == "ios" || target_os == "android";
++  let mobile = target_os == "ios";
+   alias("desktop", !mobile);
+   alias("mobile", mobile);
+ }
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/lib.rs tauri-src/crates/tauri-runtime-wry/src/lib.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/lib.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/lib.rs	2026-09-27 04:22:45.319210977 +0000
+@@ -35,12 +35,13 @@
+ 
+ #[cfg(target_vendor = "apple")]
+ use objc2::rc::Retained;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ use tao::platform::android::{WindowBuilderExtAndroid, WindowExtAndroid};
+ #[cfg(target_os = "macos")]
+ use tao::platform::macos::{EventLoopWindowTargetExtMacOS, WindowBuilderExtMacOS};
+ #[cfg(any(
+   target_os = "linux",
++ target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -100,17 +101,12 @@
+ 
+ #[cfg(windows)]
+ use wry::WebViewExtWindows;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ use wry::{
+   WebViewBuilderExtAndroid, WebViewExtAndroid,
+   prelude::{dispatch, find_class},
+ };
+-#[cfg(not(any(
+-  target_os = "windows",
+-  target_os = "macos",
+-  target_os = "ios",
+-  target_os = "android"
+-)))]
++#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "ios")))]
+ use wry::{WebViewBuilderExtUnix, WebViewExtUnix};
+ 
+ #[cfg(target_os = "ios")]
+@@ -149,6 +145,7 @@
+ #[cfg(any(
+   windows,
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -170,6 +167,7 @@
+   /// This must be set as the related view of the new webview.
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -208,6 +206,7 @@
+   /// Useful if you need to link a webview to another, for instance when using the [`PendingWebview::new_window_handler`].
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -953,6 +952,7 @@
+ 
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -963,7 +963,7 @@
+       window.inner = window.inner.with_cursor_moved_event(false);
+     }
+ 
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     {
+       if let Some(activity_name) = &config.activity_name {
+         window.inner = window.inner.with_activity_name(activity_name.clone());
+@@ -985,7 +985,7 @@
+     }
+ 
+     // ignore size from config for mobile for backward compatibility
+-    #[cfg(not(any(target_os = "ios", target_os = "android")))]
++    #[cfg(not(target_os = "ios"))]
+     {
+       window = window.inner_size(config.width, config.height);
+     }
+@@ -1238,6 +1238,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1315,6 +1316,7 @@
+   #[cfg(any(
+     windows,
+     target_os = "linux",
++   target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1325,7 +1327,7 @@
+     self
+   }
+ 
+-  #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
++  #[cfg(any(target_os = "macos", target_os = "ios"))]
+   fn skip_taskbar(self, _skip: bool) -> Self {
+     self
+   }
+@@ -1364,13 +1366,13 @@
+     self
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name<S: Into<String>>(mut self, class_name: S) -> Self {
+     self.inner = self.inner.with_activity_name(class_name.into());
+     self
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn created_by_activity_name<S: Into<String>>(mut self, class_name: S) -> Self {
+     self.inner = self.inner.with_created_by_activity_name(class_name.into());
+     self
+@@ -1387,6 +1389,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1395,6 +1398,7 @@
+ pub struct GtkWindow(pub gtk::ApplicationWindow);
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1405,6 +1409,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1413,6 +1418,7 @@
+ pub struct GtkBox(pub gtk::Box);
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1460,6 +1466,7 @@
+   AvailableMonitors(Sender<Vec<MonitorHandle>>),
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1468,13 +1475,14 @@
+   GtkWindow(Sender<GtkWindow>),
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+     target_os = "openbsd"
+   ))]
+   GtkBox(Sender<GtkBox>),
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   ActivityName(Sender<String>),
+   #[cfg(target_os = "ios")]
+   SceneIdentifier(Sender<String>),
+@@ -2188,6 +2196,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -2199,6 +2208,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -2209,7 +2219,7 @@
+   }
+ 
+   /// Returns the name of the Android activity associated with this window.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn activity_name(&self) -> Result<String> {
+     window_getter!(self, WindowMessage::ActivityName)
+   }
+@@ -2659,6 +2669,7 @@
+         // WebKit on macOS handles this itself.
+         #[cfg(not(any(
+           target_os = "linux",
++          target_os = "android",
+           target_os = "dragonfly",
+           target_os = "freebsd",
+           target_os = "netbsd",
+@@ -2935,7 +2946,7 @@
+     );
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn find_class<'a>(
+     &self,
+     env: &mut jni::JNIEnv<'a>,
+@@ -2945,7 +2956,7 @@
+     find_class(env, activity, name.into())
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   fn run_on_android_context<F>(&self, f: F)
+   where
+     F: FnOnce(&mut jni::JNIEnv, &jni::objects::JObject, &jni::objects::JObject) + Send + 'static,
+@@ -2990,6 +3001,7 @@
+ 
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -3050,6 +3062,7 @@
+   }
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -3277,7 +3290,7 @@
+   /// On Windows and Android, custom schemes use `http://<scheme>.localhost` or `https://<scheme>.localhost`.
+   /// On other platforms, custom schemes use `<scheme>://localhost`.
+   fn custom_scheme_url(scheme: &str, _https: bool) -> String {
+-    if cfg!(any(windows, target_os = "android")) {
++    if cfg!(windows) {
+       format!(
+         "{}://{scheme}.localhost",
+         if _https { "https" } else { "http" }
+@@ -3532,6 +3545,7 @@
+           }
+           #[cfg(any(
+             target_os = "linux",
++            target_os = "android",
+             target_os = "dragonfly",
+             target_os = "freebsd",
+             target_os = "netbsd",
+@@ -3540,6 +3554,7 @@
+           WindowMessage::GtkWindow(tx) => tx.send(GtkWindow(window.gtk_window().clone())).unwrap(),
+           #[cfg(any(
+             target_os = "linux",
++            target_os = "android",
+             target_os = "dragonfly",
+             target_os = "freebsd",
+             target_os = "netbsd",
+@@ -3548,7 +3563,7 @@
+           WindowMessage::GtkBox(tx) => tx
+             .send(GtkBox(window.default_vbox().unwrap().clone()))
+             .unwrap(),
+-          #[cfg(target_os = "android")]
++          #[cfg(all(target_os = "android", not(target_os = "android")))]
+           WindowMessage::ActivityName(tx) => {
+             tx.send(window.activity_name()).unwrap();
+           }
+@@ -3678,6 +3693,7 @@
+             #[cfg(any(
+               windows,
+               target_os = "linux",
++              target_os = "android",
+               target_os = "dragonfly",
+               target_os = "freebsd",
+               target_os = "netbsd",
+@@ -3729,6 +3745,7 @@
+ 
+             #[cfg(any(
+               target_os = "linux",
++              target_os = "android",
+               target_os = "dragonfly",
+               target_os = "freebsd",
+               target_os = "netbsd",
+@@ -3789,6 +3806,7 @@
+         target_os = "macos",
+         windows,
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -3819,6 +3837,7 @@
+ 
+             #[cfg(any(
+               target_os = "linux",
++              target_os = "android",
+               target_os = "dragonfly",
+               target_os = "freebsd",
+               target_os = "netbsd",
+@@ -4101,6 +4120,7 @@
+           WebviewMessage::WithWebview(f) => {
+             #[cfg(any(
+               target_os = "linux",
++             target_os = "android",
+               target_os = "dragonfly",
+               target_os = "freebsd",
+               target_os = "netbsd",
+@@ -4142,7 +4162,7 @@
+                 environment: webview.environment(),
+               });
+             }
+-            #[cfg(target_os = "android")]
++            #[cfg(all(target_os = "android", not(target_os = "android")))]
+             {
+               f(webview.handle())
+             }
+@@ -4703,7 +4723,7 @@
+     }
+   };
+ 
+-  #[cfg(any(target_os = "macos", target_os = "linux"))]
++  #[cfg(any(target_os = "macos", target_os = "linux", target_os = "android"))]
+   let (initial_position, is_fullscreen) = (
+     window_builder.inner.window.position,
+     window_builder.inner.window.fullscreen.is_some(),
+@@ -4711,7 +4731,7 @@
+ 
+   // If fullscreen is requested with an explicit position, resolve the target
+   // monitor up front so the window is created fullscreen on that display.
+-  #[cfg(any(target_os = "macos", target_os = "linux"))]
++  #[cfg(any(target_os = "macos", target_os = "linux", target_os = "android"))]
+   if let (true, Some(position)) = (is_fullscreen, initial_position)
+     && let Some(target_monitor) =
+       find_monitor_for_position(event_loop.available_monitors(), position)
+@@ -4755,6 +4775,7 @@
+       hwnd: window.hwnd(),
+       #[cfg(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -4763,6 +4784,7 @@
+       gtk_window: window.gtk_window(),
+       #[cfg(any(
+         target_os = "linux",
++        target_os = "android",
+         target_os = "dragonfly",
+         target_os = "freebsd",
+         target_os = "netbsd",
+@@ -4943,7 +4965,7 @@
+     webview_builder = webview_builder.with_webview_configuration(webview_configuration.clone());
+   }
+ 
+-  #[cfg(any(target_os = "windows", target_os = "android"))]
++  #[cfg(target_os = "windows")]
+   {
+     webview_builder = webview_builder.with_https_scheme(webview_attributes.use_https_scheme);
+   }
+@@ -5066,6 +5088,7 @@
+             webview: wry::WebViewExtMacOS::webview(&*webview).as_super().into(),
+             #[cfg(any(
+               target_os = "linux",
++              target_os = "android",
+               target_os = "dragonfly",
+               target_os = "freebsd",
+               target_os = "netbsd",
+@@ -5210,6 +5233,7 @@
+   #[cfg(any(
+     windows,
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -5223,6 +5247,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -5315,6 +5340,7 @@
+     // and you cannot register a scheme more than once
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -5347,7 +5373,7 @@
+     webview_builder = webview_builder.with_devtools(webview_attributes.devtools.unwrap_or(true));
+   }
+ 
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   {
+     if let Some(on_webview_created) = pending.on_webview_created {
+       webview_builder = webview_builder.on_webview_created(move |ctx| {
+@@ -5361,38 +5387,18 @@
+   }
+ 
+   let webview = match kind {
+-    #[cfg(not(any(
+-      target_os = "windows",
+-      target_os = "macos",
+-      target_os = "ios",
+-      target_os = "android"
+-    )))]
++    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "ios")))]
+     WebviewKind::WindowChild => {
+       // only way to account for menu bar height, and also works for multiwebviews :)
+       let vbox = window.default_vbox().unwrap();
+       webview_builder.build_gtk(vbox)
+     }
+-    #[cfg(any(
+-      target_os = "windows",
+-      target_os = "macos",
+-      target_os = "ios",
+-      target_os = "android"
+-    ))]
++    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "ios"))]
+     WebviewKind::WindowChild => webview_builder.build_as_child(&window),
+     WebviewKind::WindowContent => {
+-      #[cfg(any(
+-        target_os = "windows",
+-        target_os = "macos",
+-        target_os = "ios",
+-        target_os = "android"
+-      ))]
++      #[cfg(any(target_os = "windows", target_os = "macos", target_os = "ios"))]
+       let builder = webview_builder.build(&window);
+-      #[cfg(not(any(
+-        target_os = "windows",
+-        target_os = "macos",
+-        target_os = "ios",
+-        target_os = "android"
+-      )))]
++      #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "ios")))]
+       let builder = {
+         let vbox = window.default_vbox().unwrap();
+         webview_builder.build_gtk(vbox)
+@@ -5405,6 +5411,7 @@
+   if kind == WebviewKind::WindowContent {
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/monitor/mod.rs tauri-src/crates/tauri-runtime-wry/src/monitor/mod.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/monitor/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/monitor/mod.rs	2026-09-27 04:21:49.526867929 +0000
+@@ -6,6 +6,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/undecorated_resizing.rs tauri-src/crates/tauri-runtime-wry/src/undecorated_resizing.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/undecorated_resizing.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/undecorated_resizing.rs	2026-09-27 04:21:49.525796048 +0000
+@@ -5,6 +5,7 @@
+ #![cfg(any(
+   windows,
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/webview.rs tauri-src/crates/tauri-runtime-wry/src/webview.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/webview.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/webview.rs	2026-09-27 04:22:27.840764983 +0000
+@@ -4,6 +4,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -38,7 +39,7 @@
+   }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ mod imp {
+   use wry::JniHandle;
+   pub type Webview = JniHandle;
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/window/linux.rs tauri-src/crates/tauri-runtime-wry/src/window/linux.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/window/linux.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/window/linux.rs	2026-09-27 04:21:49.526185993 +0000
+@@ -5,6 +5,7 @@
+ use gtk::prelude::*;
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri-runtime-wry/src/window/mod.rs tauri-src/crates/tauri-runtime-wry/src/window/mod.rs
+--- tauri-src-orig/crates/tauri-runtime-wry/src/window/mod.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-runtime-wry/src/window/mod.rs	2026-09-27 04:21:49.526535938 +0000
+@@ -4,6 +4,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+diff -ruN tauri-src-orig/crates/tauri/src/error.rs tauri-src/crates/tauri/src/error.rs
+--- tauri-src-orig/crates/tauri/src/error.rs	2026-09-27 14:38:11.731562864 +0000
++++ tauri-src/crates/tauri/src/error.rs	2026-09-27 14:38:15.667847297 +0000
+@@ -126,11 +126,11 @@
+   #[error("failed to read current dir: {0}")]
+   CurrentDir(std::io::Error),
+   /// Unknown path.
+-  #[cfg(not(target_os = "android"))]
++  #[cfg(any(not(target_os = "android"), target_os = "android"))]
+   #[error("unknown path")]
+   UnknownPath,
+   /// Failed to invoke mobile plugin.
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   #[error(transparent)]
+   PluginInvoke(#[from] crate::plugin::mobile::PluginInvokeError),
+   /// window not found.
+diff -ruN tauri-src-orig/crates/tauri-utils/src/platform.rs tauri-src/crates/tauri-utils/src/platform.rs
+--- tauri-src-orig/crates/tauri-utils/src/platform.rs	2026-09-21 14:13:20.000000000 +0000
++++ tauri-src/crates/tauri-utils/src/platform.rs	2026-09-21 14:13:40.000000000 +0000
+@@ -228,7 +228,7 @@
+   Ok(format!("{arch}-{os}"))
+ }
+ 
+-#[cfg(all(not(test), not(target_os = "android")))]
++#[cfg(all(not(test), any(not(target_os = "android"), target_os = "android")))]
+ fn is_cargo_output_directory(path: &std::path::Path) -> bool {
+   path.join(".cargo-lock").exists()
+ }
+@@ -262,21 +262,21 @@
+ ///   with that, you can read the files through [`FsExt::fs`](https://docs.rs/tauri-plugin-fs/latest/tauri_plugin_fs/trait.FsExt.html#tymethod.fs)
+ ///   like this: `app.fs().read_to_string(app.path().resource_dir().unwrap().join("resource"));`
+ pub fn resource_dir(package_info: &PackageInfo, env: &Env) -> crate::Result<PathBuf> {
+-  #[cfg(target_os = "android")]
++  #[cfg(all(target_os = "android", not(target_os = "android")))]
+   return resource_dir_android(package_info, env);
+-  #[cfg(not(target_os = "android"))]
++  #[cfg(any(not(target_os = "android"), target_os = "android"))]
+   {
+     let exe = current_exe()?;
+     resource_dir_from(exe, package_info, env)
+   }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ fn resource_dir_android(_package_info: &PackageInfo, _env: &Env) -> crate::Result<PathBuf> {
+   Ok(PathBuf::from(ANDROID_ASSET_PROTOCOL_URI_PREFIX))
+ }
+ 
+-#[cfg(not(target_os = "android"))]
++#[cfg(any(not(target_os = "android"), target_os = "android"))]
+ #[allow(unused_variables)]
+ fn resource_dir_from<P: AsRef<std::path::Path>>(
+   exe: P,
+@@ -294,7 +294,8 @@
+   // and see if there's a .cargo-lock file along the executable
+   // This ensures the check is safer so it doesn't affect apps in production
+   // Windows also includes the resources in the executable folder so we check that too
+-  if cfg!(target_os = "windows")
++  // (android/termux installs them next to the executable as well)
++  if cfg!(any(target_os = "windows", target_os = "android"))
+     || ((len >= 2 && parts[len - 2] == "target") || (len >= 3 && parts[len - 3] == "target"))
+       && is_cargo_output_directory(exe_dir)
+   {
+diff -ruN tauri-src-orig/crates/tauri-build/src/lib.rs tauri-src/crates/tauri-build/src/lib.rs
+--- tauri-src-orig/crates/tauri-build/src/lib.rs	2026-05-16 18:20:20.000000000 +0000
++++ tauri-src/crates/tauri-build/src/lib.rs	2026-09-28 05:30:00.000000000 +0000
+@@ -498,7 +498,7 @@
+   println!("cargo:rerun-if-env-changed=TAURI_CONFIG");
+ 
+   let target_os = env::var_os("CARGO_CFG_TARGET_OS").unwrap();
+-  let mobile = target_os == "ios" || target_os == "android";
++  let mobile = target_os == "ios";
+   cfg_alias("desktop", !mobile);
+   cfg_alias("mobile", mobile);
+ 
