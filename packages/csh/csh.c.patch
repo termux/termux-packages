@@ -1,6 +1,6 @@
 --- a/csh.c
 +++ b/csh.c
-@@ -37,12 +37,14 @@
+@@ -35,13 +35,15 @@
  #include <fcntl.h>
  #include <errno.h>
  #include <pwd.h>
@@ -9,6 +9,7 @@
  #include <string.h>
  #include <locale.h>
  #include <unistd.h>
+ #include <limits.h>
 -#include <vis.h>
 +#include <bsd/vis.h>
  #include <stdarg.h>
@@ -16,3 +17,17 @@
  
  #include "csh.h"
  #include "proc.h"
+@@ -224,11 +226,13 @@
+     if (loginsh)
+ 	(void) time(&chktim);
+ 
++#ifdef __OpenBSD__
+     if (pledge("stdio rpath wpath cpath fattr getpw proc exec tty",
+ 	NULL) == -1) {
+ 	    perror("pledge");
+ 	    exit(1);
+     }
++#endif
+ 
+     /*
+      * Move the descriptors to safe places. The variable didfds is 0 while we
