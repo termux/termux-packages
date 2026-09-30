@@ -1,7 +1,7 @@
-diff --git a/src/file.rs b/src/file.rs
---- a/src/file.rs
-+++ b/src/file.rs
-@@ -204,7 +204,10 @@
+diff --git a/crates/mise-util/src/file.rs b/crates/mise-util/src/file.rs
+--- a/crates/mise-util/src/file.rs
++++ b/crates/mise-util/src/file.rs
+@@ -201,7 +201,10 @@
          };
      // Compare the whole type field: sockets and block devices share the
      // directory bit.
@@ -12,6 +12,20 @@ diff --git a/src/file.rs b/src/file.rs
      if kind == nix::sys::stat::SFlag::S_IFDIR {
          let fd = nix::fcntl::openat(
              &parent,
+diff --git a/src/system/files.rs b/src/system/files.rs
+--- a/src/system/files.rs
++++ b/src/system/files.rs
+@@ -5514,7 +5514,10 @@
+         Mode::empty(),
+     )
+     .wrap_err_with(|| format!("failed to open {}", path.display_user()))?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = SFlag::from_bits_truncate(fstat(&fd)?.st_mode) & SFlag::S_IFMT;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = SFlag::from_bits_truncate(fstat(&fd)?.st_mode as u16) & SFlag::S_IFMT;
+     if kind == SFlag::S_IFLNK {
+         bail!(
+             "{} is a symlink, which is never followed",
 diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
 --- a/src/system/managed_files.rs
 +++ b/src/system/managed_files.rs
@@ -89,7 +103,7 @@ diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/
 diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cask/mod.rs
 --- a/src/system/packages/brew/cask/mod.rs
 +++ b/src/system/packages/brew/cask/mod.rs
-@@ -2584,9 +2584,14 @@
+@@ -2592,9 +2592,14 @@
      use std::os::unix::fs::PermissionsExt;
  
      let metadata = from.symlink_metadata()?;
@@ -104,7 +118,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
      if metadata.file_type().is_symlink() {
          nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
      } else if metadata.is_dir() {
-@@ -2823,6 +2828,7 @@
+@@ -2831,6 +2836,7 @@
              || current_groups.contains(&stat.st_gid);
          let writable_by_untrusted = stat.st_mode & 0o002 != 0
              || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
@@ -112,7 +126,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
          if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
              || !trusted_owner
              || writable_by_untrusted
-@@ -2832,6 +2838,17 @@
+@@ -2840,6 +2846,17 @@
                  directory.display()
              );
          }
@@ -130,7 +144,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
          Ok(())
      };
      let mut directory = resolved_root.to_path_buf();
-@@ -3262,9 +3279,14 @@
+@@ -3270,9 +3287,14 @@
      // Restore the bundle's own permissions, which the private staging mode hid.
      if let Ok(metadata) = from.symlink_metadata() {
          use std::os::unix::fs::PermissionsExt;
