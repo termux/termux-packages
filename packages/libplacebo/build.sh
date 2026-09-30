@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Reusable library for GPU-accelerated video/image renderi
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.360.1"
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://code.videolan.org/videolan/libplacebo/-/archive/v${TERMUX_PKG_VERSION}/libplacebo-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=14c0a99f4b01557ec9826ce6b1d52f6de21be274ba03fd5aab7307f18766dc39
 TERMUX_PKG_DEPENDS="littlecms, glslang, python, vulkan-icd"
