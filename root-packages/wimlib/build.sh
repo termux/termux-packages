@@ -8,6 +8,8 @@ TERMUX_PKG_SRCURL="https://github.com/ebiggers/wimlib/archive/refs/tags/v${TERMU
 TERMUX_PKG_SHA256=5f9416b3750c29d6ad35a2fc3bd6697807566ee287b28e004b0111c3787b1ce2
 
 TERMUX_PKG_DEPENDS="libandroid-glob, libandroid-utimes, libfuse3, liblzma, libxml2, ntfs-3g, openssl, zlib"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
