@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="34.0.4"
 TERMUX_PKG_SRCURL="https://github.com/nextcloud/desktop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=2ee6cbdb8afd6573eaa62263e25300a92a6e3bf6661811bdf41aecc8de0b5bcb
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^v\d+\.\d+\.\d+$'
 TERMUX_PKG_DEPENDS="dbus, dbus-glib, libc++, libp11, openssl, qtkeychain, qt6-qtbase, inotify-tools, libsqlite, kdsingleapplication, kf6-karchive, kf6-kdbusaddons, kf6-kguiaddons, qt6-qtwebsockets, qt6-qtsvg, qt6-qt5compat"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qttools-cross-tools, pkg-config, qt6-qttools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
