@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser (Host tools)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="149.0.7827.155"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="152.0.7977.82"
 TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
-TERMUX_PKG_SHA256=4e39fd0ae3ad64fd4bff6a523d94fe5e2917ad51a7f46a73c84a5736d9dda862
+TERMUX_PKG_SHA256=67ac37f365dfdac763c428862e5e460e5948940b3d6f856374da2ce219981417
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 # TODO: Split chromium-common and chromium-headless
@@ -93,6 +92,7 @@ termux_step_post_get_source() {
 termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	termux_setup_ninja
+	termux_setup_golang
 
 	# Fetch depot_tools
 	export DEPOT_TOOLS_UPDATE=0
@@ -132,7 +132,10 @@ EOF
 	./tools/clang/scripts/update.py
 
 	# Link to system tools required by the build
+	mkdir -p third_party/jdk/current/bin/
 	ln -sf $(command -v java) third_party/jdk/current/bin/
+	mkdir -p third_party/dawn/tools/golang/linux-amd64/bin/
+	ln -sf $(command -v go) third_party/dawn/tools/golang/linux-amd64/bin/
 
 	# Install nodejs
 	if [ ! -f "third_party/node/linux/node-linux-x64/bin/node" ]; then
@@ -207,6 +210,9 @@ print(deps['src/third_party/node/node_modules']['objects'][0]['sha256sum'])
 		# This is needed to build cups
 		cp -Rf $TERMUX_PREFIX/bin/cups-config usr/bin/
 		chmod +x usr/bin/cups-config
+		# Temporarily disable check
+		# Will be enabled after investigating how to correctly append android build target flags to `bindgen`
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/9999-sysroot-disable-target-check.diff
 		popd
 		mv $TERMUX_PKG_TMPDIR/sysroot $TERMUX_PKG_CACHEDIR/sysroot-$TERMUX_ARCH
 	fi

@@ -1,0 +1,15 @@
+diff --git a/third_party/dawn/tools/generate-sources-gn.py b/third_party/dawn/tools/generate-sources-gn.py
+index 85d11bbd84..2bdc613edf 100644
+--- a/third_party/dawn/tools/generate-sources-gn.py
++++ b/third_party/dawn/tools/generate-sources-gn.py
+@@ -68,6 +68,10 @@ def main() -> int:
+     os.environ['GO111MODULE'] = 'on'
+     # Disable CGO since it causes problems when cross-compiling (see https://crbug.com/516926043).
+     os.environ['CGO_ENABLED'] = '0'
++    # Unset things about cross-compiling
++    for e in ['GOOS', 'GOARCH', 'CGO_LDFLAGS'] + \
++            ['CC', 'CXX', 'CFLAGS', 'CXXFLAGS', 'LDFLAGS']:
++        os.environ.pop(e, None)
+ 
+     proc = subprocess.run(cmd, check=False, cwd=DAWN_ROOT)
+     return proc.returncode
