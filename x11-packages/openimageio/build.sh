@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://openimageio.org
 TERMUX_PKG_DESCRIPTION="A library for reading and writing images, including classes, utilities, and applications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.1.17.0"
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION="3.1.18.0"
 TERMUX_PKG_SRCURL="https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=92a26c0af4ffc6676d72d9dfe0e991eb45fdf3192abee3d0855a24d6c721b013
+TERMUX_PKG_SHA256=c54c5536c2bfb9abece4a2e1981842a4d7d377eb949b044bbba1d88b8919d9a8
 # configure-time error if ptex and ptex-static are not both installed
 TERMUX_PKG_DEPENDS="boost, dcmtk, ffmpeg, fmt, freetype, imath, libc++, libhdf5, libheif, libjpeg-turbo, libjxl, libpng, libraw, libtbb, libtiff, libwebp, libyaml-cpp, opencolorio, opencv, openexr, openjpeg, openvdb, ptex, pybind11, python, qt6-qtbase, libpugixml, dbus"
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, fontconfig, libjpeg-turbo-static, libxrender, mesa, ptex-static, robin-map"
