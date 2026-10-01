@@ -1,0 +1,38 @@
+`rust-cc` changed how it collects `CFLAGS` from environment variables.
+It retrieves environment variables according to a specific set of rules,
+which are described in [1]. Previously, it used the first match [2,3],
+but now it concatenates all matches and passes them to `CC` [4,5]. This
+breaks Termux's build since Termux's `CFLAGS` include flags related to
+the Android target and unrelated to the target when compiling `glslopt`
+as a host tool, which is `x86_64-linux-gnu`.
+
+This patch will restore the old behaviour. For Termux we know how it is going.
+
+[1] https://docs.rs/cc/latest/cc/
+[2] https://github.com/rust-lang/cc-rs/blob/fcf940ef66f23f411aa50473baa14df9ed2f2cda/src/lib.rs#L1910
+[3] https://github.com/rust-lang/cc-rs/blob/fcf940ef66f23f411aa50473baa14df9ed2f2cda/src/lib.rs#L3669-3681
+[4] https://github.com/rust-lang/cc-rs/blob/cda8b386d419f3adb0c15b729af5504201689aa1/src/lib.rs#L1977
+[5] https://github.com/rust-lang/cc-rs/blob/cda8b386d419f3adb0c15b729af5504201689aa1/src/lib.rs#L3836-L3858
+
+take from x11-packages/firefox/0029-rust-cc-do-not-concatenates-all-the-CFLAGS.patch by @robertkirkman
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -3806,14 +3806,13 @@
+
+     /// Get values from CFLAGS-style environment variable.
+     fn envflags(&self, env: &str) -> Result<Option<Vec<String>>, Error> {
+-        // Collect from all environment variables, in reverse order as in
+-        // `getenv_with_target_prefixes` precedence (so that `CFLAGS_$TARGET`
+-        // can override flags in `TARGET_CFLAGS`, which overrides those in
+-        // `CFLAGS`).
+         let mut any_set = false;
+         let mut res = vec![];
+-        for env in self.target_envs(env)?.iter().rev() {
++        for env in self.target_envs(env)?.iter() {
+             if let Some(var) = self.getenv(env) {
++                if any_set {
++                    continue;
++                }
+                 any_set = true;
+
+                 let var = var.to_string_lossy();
