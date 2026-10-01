@@ -12,7 +12,7 @@ Discussion: https://github.com/termux/termux-packages/pull/23911
 
 --- a/comm/mail/components/compose/content/MsgComposeCommands.js
 +++ b/comm/mail/components/compose/content/MsgComposeCommands.js
-@@ -1157,7 +1157,8 @@ var defaultController = {
+@@ -1258,7 +1258,8 @@
          return gMsgCompose && gMsgCompose.composeHTML;
        },
        doCommand() {
@@ -179,7 +179,7 @@ index f84b2610..22451b50 100644
                         tooltiptext="&absoluteFontSizeToolbarCmd.tooltip;"
 --- a/comm/mail/components/compose/content/messengercompose.xhtml
 +++ b/comm/mail/components/compose/content/messengercompose.xhtml
-@@ -2416,12 +2416,22 @@
+@@ -2414,12 +2414,22 @@
        </hbox>
      </toolbar>
  
@@ -207,7 +207,7 @@ index f84b2610..22451b50 100644
      </toolbox>
 --- a/comm/mail/components/extensions/parent/ext-composeAction.js
 +++ b/comm/mail/components/extensions/parent/ext-composeAction.js
-@@ -41,8 +41,8 @@ this.composeAction = class extends ToolbarButtonAPI {
+@@ -39,8 +39,8 @@
      ];
      const isFormatToolbar =
        extension.manifest.compose_action.default_area == "formattoolbar";
@@ -218,7 +218,7 @@ index f84b2610..22451b50 100644
    }
  
    static onUninstall(extensionId) {
-@@ -54,7 +54,7 @@ this.composeAction = class extends ToolbarButtonAPI {
+@@ -52,7 +52,7 @@
      // Check all possible toolbars and remove the toolbarbutton if found.
      // Sadly we have to hardcode these values here, as the add-on is already
      // shutdown when onUninstall is called.
@@ -227,7 +227,7 @@ index f84b2610..22451b50 100644
      for (const toolbar of toolbars) {
        for (const setName of ["currentset", "extensionset"]) {
          const set = Services.xulStore
-@@ -121,7 +121,7 @@ this.composeAction = class extends ToolbarButtonAPI {
+@@ -119,7 +119,7 @@
  
    makeButton(window) {
      const button = super.makeButton(window);
@@ -254,7 +254,7 @@ index f84b2610..22451b50 100644
    background-color: inherit;
    color: inherit;
    margin-inline: 3px;
-@@ -155,7 +162,12 @@ menu[command="cmd_convertCloud"] .menu-iconic-left {
+@@ -149,7 +156,12 @@
      background-image: none;
    }
  
@@ -270,7 +270,7 @@ index f84b2610..22451b50 100644
    }
 --- a/comm/mail/themes/osx/mail/compose/messengercompose.css
 +++ b/comm/mail/themes/osx/mail/compose/messengercompose.css
-@@ -171,7 +171,22 @@ toolbar[nowindowdrag="true"] {
+@@ -171,7 +171,22 @@
  
  /* ::::: format toolbar ::::: */
  
@@ -296,7 +296,7 @@ index f84b2610..22451b50 100644
    margin-block-end: 3px;
 --- a/comm/mail/themes/shared/mail/messengercompose.css
 +++ b/comm/mail/themes/shared/mail/messengercompose.css
-@@ -26,7 +26,7 @@
+@@ -13,7 +13,7 @@
  /* Styles for the default system dark theme */
  
  :root[lwt-tree] {
@@ -305,7 +305,7 @@ index f84b2610..22451b50 100644
      background-color: var(--toolbar-background-color) !important;
      color: var(--lwt-text-color);
    }
-@@ -364,7 +364,8 @@
+@@ -329,7 +329,8 @@
    display: grid;
    grid-template:
      "contacts contacts-splitter headers" minmax(auto, var(--headersSplitter-height))
@@ -315,7 +315,7 @@ index f84b2610..22451b50 100644
      "contacts contacts-splitter headers-splitter" min-content
      "contacts contacts-splitter message" minmax(33%, 1fr)
      "contacts contacts-splitter attachment-splitter" min-content
-@@ -479,7 +480,7 @@
+@@ -459,7 +460,7 @@
    }
  }
  
@@ -324,7 +324,7 @@ index f84b2610..22451b50 100644
    background-color: var(--layout-background-2);
    color: var(--layout-color-1);
    color-scheme: light-dark;
-@@ -492,8 +493,12 @@
+@@ -472,8 +473,12 @@
    grid-template-columns: auto;
  }
  
@@ -339,7 +339,7 @@ index f84b2610..22451b50 100644
  }
  
  #headersSplitter {
-@@ -580,7 +580,36 @@
+@@ -575,7 +580,36 @@
  
  /* :::: Format toolbar :::: */
  
@@ -379,7 +379,7 @@ index f84b2610..22451b50 100644
    & > menulist {
 --- a/comm/mail/themes/windows/mail/compose/messengercompose.css
 +++ b/comm/mail/themes/windows/mail/compose/messengercompose.css
-@@ -124,7 +124,11 @@
+@@ -125,7 +125,11 @@
  
  /* ::::: format toolbar ::::: */
  

@@ -2,6 +2,12 @@ Disable Rust LTO for gkrust to avoid out-of-memory failures on ARM builds.
 
 --- a/config/makefiles/rust.mk
 +++ b/config/makefiles/rust.mk
-@@ -120,1 +120,1 @@
+@@ -89,7 +89,7 @@
+ ifeq (,$(RUST_SANCOV_FLAGS))
+ # Never enable when coverage is enabled to work around https://github.com/rust-lang/rust/issues/90045.
+ ifndef MOZ_CODE_COVERAGE
 -ifeq (,$(findstring gkrust_gtest,$(RUST_LIBRARY_FILE)))
 +ifeq (,$(filter libgkrust.a libgkrust_gtest.a,$(notdir $(RUST_LIBRARY_FILE))))
+ cargo_rustc_flags += -Clto$(if $(filter full,$(MOZ_LTO_RUST_CROSS)),=fat)
+ endif
+ # We need -Cembed-bitcode=yes for all crates when using -Clto.

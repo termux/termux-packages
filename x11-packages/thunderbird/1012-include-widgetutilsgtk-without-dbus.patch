@@ -1,0 +1,15 @@
+nsAppShell.cpp calls IsGnomeDesktopEnvironment() under MOZ_WAYLAND but includes WidgetUtilsGtk.h only under MOZ_ENABLE_DBUS.
+
+--- a/widget/gtk/nsAppShell.cpp
++++ b/widget/gtk/nsAppShell.cpp
+@@ -29,9 +29,8 @@
+ #include "prenv.h"
+ #ifdef MOZ_ENABLE_DBUS
+ #  include <gio/gio.h>
+-
+-#  include "WidgetUtilsGtk.h"
+ #endif
++#include "WidgetUtilsGtk.h"
+ #include "HeadlessScreenHelper.h"
+ #include "ScreenHelperGTK.h"
+ #include "WakeLockListener.h"

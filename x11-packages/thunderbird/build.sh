@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Standalone mail and news reader from mozilla.org"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="156.0.1"
+TERMUX_PKG_VERSION="157.0"
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
-TERMUX_PKG_SHA256=4b12574dbf5106e0a764dd6a90b800ae332fa194a9b1d9f3fe7bd14fb0111c1d
+TERMUX_PKG_SHA256=c276e8687b529fc7472df62c8fca11ea19f3bf06109217437210cfe48e5b01c9
 TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -52,14 +52,6 @@ termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
 	echo "Applying sed substitution to ${f}"
 	sed -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' -i ${f}
-
-	# Update Cargo.toml to use the patched cc
-	sed -i 's|^\(\[patch\.crates-io\]\)$|\1\ncc = { path = "third_party/rust/cc" }|g' \
-		Cargo.toml
-	(
-		termux_setup_rust
-		cargo update -p cc
-	)
 }
 
 termux_step_pre_configure() {
@@ -94,20 +86,15 @@ termux_step_pre_configure() {
 	fi
 
 	# vendor crates that otherwise cause 'error: failed to calculate checksum of... .gitmodules'
-	# when '--frozen' is removed because the thunderbird archive doesn't contain any .gitmodules files,
-	# then vendor the cc crate last so that the CFLAGS-related patch can be applied to it
-	local crate dir crate_src_dir crate_dest_dir patch
-	for crate in minimal-lexical cubeb-sys sfv glslopt cc; do
+	# when '--frozen' is removed because the thunderbird archive doesn't contain any .gitmodules files
+	local crate dir crate_src_dir crate_dest_dir
+	for crate in minimal-lexical cubeb-sys sfv glslopt; do
 		dir="$TERMUX_PKG_SRCDIR/comm/third_party/rust"
 		crate_src_dir="$dir/$crate"
 		crate_dest_dir="$crate_src_dir-custom"
 		cp -r "$crate_src_dir" "$crate_dest_dir"
 		sed -i "/\[patch.crates-io\]/a $crate = { path = \"$crate_dest_dir\" }" "$TERMUX_PKG_SRCDIR/comm/rust/Cargo.toml"
 	done
-
-	patch="$TERMUX_PKG_BUILDER_DIR/0028-rust-cc-do-not-concatenates-all-the-CFLAGS.patch"
-	echo "Applying patch: $patch"
-	patch -p4 -d "$crate_dest_dir" < "$patch"
 }
 
 termux_step_configure() {
