@@ -1,0 +1,14 @@
+Backport of CCExtractor/ccextractor#2321: set the I-frame type for tx3g tracks
+so that min_pts is initialized and subtitle timestamps are correct.
+
+--- a/src/lib_ccx/mp4.c
++++ b/src/lib_ccx/mp4.c
+@@ -1125,7 +1125,7 @@
+ 					// so that set_fts() will set min_pts from the first sample.
+ 					// Without video frames, frame type would stay Unknown and
+ 					// min_pts would never be set, causing broken timestamps.
+-					if (type == GF_ISOM_MEDIA_CLOSED_CAPTION)
++					if (type == GF_ISOM_MEDIA_TEXT || type == GF_ISOM_MEDIA_SUBT || type == GF_ISOM_MEDIA_CLOSED_CAPTION)
+ 						dec_ctx->timing->current_picture_coding_type = CCX_FRAME_TYPE_I_FRAME;
+ 					set_fts(dec_ctx->timing);
+ 
