@@ -33,6 +33,7 @@ if [ ! -d "$ANDROID_HOME" ]; then
 		$ANDROID_SDK_SHA256
 	rm -Rf android-sdk-$TERMUX_SDK_REVISION
 	unzip -q tools-$TERMUX_SDK_REVISION.zip -d android-sdk-$TERMUX_SDK_REVISION
+	rm -f tools-$TERMUX_SDK_REVISION.zip
 fi
 
 if [ ! -d "$NDK" ]; then
@@ -47,6 +48,7 @@ if [ ! -d "$NDK" ]; then
 		$ANDROID_NDK_SHA256
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
 	unzip -q ndk-r${TERMUX_NDK_VERSION}.zip
+	rm -f ndk-r${TERMUX_NDK_VERSION}.zip
 
 	# Remove unused parts
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION/sources/cxx-stl/system

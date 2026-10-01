@@ -251,11 +251,14 @@ jobs:
         priority: 100
         device_name: /dev/zram0
 
+    - name: Set up Docker Buildx
+      if: ${{ steps.build-info.outputs.needs-docker-build == 'true' }}
+      uses: docker/setup-buildx-action@v4
+
     - name: Build docker image
       if: ${{ steps.build-info.outputs.needs-docker-build == 'true' }}
       run: |
-        docker build -t ghcr.io/termux/package-builder:latest scripts/
-        docker buildx prune -af
+        docker buildx bake --load package-builder
 
     - name: Load Docker image
       if: ${{ steps.build-info.outputs.free-space == 'true' && steps.build-info.outputs.skip-building != 'true' }}
