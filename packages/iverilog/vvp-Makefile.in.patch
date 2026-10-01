@@ -1,7 +1,7 @@
 --- a/vvp/Makefile.in
 +++ b/vvp/Makefile.in
-@@ -32,8 +32,8 @@
- includedir = @includedir@
+@@ -35,8 +35,8 @@
+ pdfdir = @docdir@
  
  # For a cross compile these defines will need to be set accordingly.
 -HOSTCC = @CC@
@@ -11,12 +11,12 @@
  
  BUILDCC = @CC_FOR_BUILD@
  BUILDEXT = @BUILD_EXEEXT@
-@@ -130,7 +130,7 @@
+@@ -168,7 +168,7 @@
  	mv $*.d dep/$*.d
  
  tables.cc: $(srcdir)/draw_tt.c
--	$(BUILDCC) $(CFLAGS) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
-+	$(BUILDCC) $(CFLAGS_FOR_BUILD) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
+-	$(BUILDCC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
++	$(BUILDCC) $(CPPFLAGS_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o draw_tt$(BUILDEXT) $(srcdir)/draw_tt.c
  	./draw_tt$(BUILDEXT) > tables.cc
  	rm draw_tt$(BUILDEXT)
  
