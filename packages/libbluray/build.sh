@@ -15,7 +15,8 @@ termux_pkg_auto_update() {
 	local url="https://code.videolan.org/videolan/libbluray/-/tags?sort=updated_desc" latest_version
 	latest_version="$(curl --fail --silent --show-error --location --retry 5 "$url" | sed -rn 's|.*href="/videolan/libbluray/-/tags/([0-9]+(\.[0-9]+)+)".*|\1|p' | sort -Vr | head -n1)"
 	if [[ -z "$latest_version" ]]; then
-		termux_error_exit "Unable to get the latest libbluray version."
+		echo "WARN: Unable to get the latest version." >&2
+		return
 	fi
 	termux_pkg_upgrade_version "$latest_version"
 }
