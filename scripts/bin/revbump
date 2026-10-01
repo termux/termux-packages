@@ -2,6 +2,7 @@
 ## Maintainer : @T-Dynamos
 import os
 import json
+import re
 import sys
 
 filename = os.path.basename(sys.argv[0])
@@ -30,13 +31,18 @@ def is_dep(DEP: str, line: str) -> bool:
     """
     Checks if the dep is in line
     """
-    tmp_deps = line.split("=")[1]
+    # Split on the first "=" only: the value may contain "=" itself, as in
+    # TERMUX_PKG_DEPENDS="libcurl (>= 7.0), libplist".
+    tmp_deps = line.split("=", 1)[1]
     if tmp_deps.startswith('"'):
         deps = [dep.strip() for dep in tmp_deps.split('"')[1].split(",")]
     elif tmp_deps.startswith("'"):
         deps = [dep.strip() for dep in tmp_deps.split("'")[1].split(",")]
     else:
         deps = [tmp_deps]
+
+    # Drop version constraints, as in "libcurl (>= 7.0)" -> "libcurl".
+    deps = [re.sub(r"\s*\(.*\)\s*$", "", dep).strip() for dep in deps]
 
     return DEP in deps
 
