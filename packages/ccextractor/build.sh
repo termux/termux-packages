@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tool used to produce subtitles for TV recordings"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.96.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/CCExtractor/ccextractor/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d2bda9d2071ccf7a81a43c10e82ec00899b2a25b391c300e965274f92ad46208
 TERMUX_PKG_DEPENDS="freetype, gpac, libiconv, libmd, libpng, libprotobuf-c, utf8proc"
