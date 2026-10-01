@@ -2,10 +2,12 @@ TERMUX_PKG_HOMEPAGE=http://eigen.tuxfamily.org
 TERMUX_PKG_DESCRIPTION="Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (Version 3)"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+# libceres-solver hardcodes the exact Eigen version: always bump its revision
+# and rebuild it when bumping version.
 TERMUX_PKG_VERSION="3.4.1"
 TERMUX_PKG_SHA256=b93c667d1b69265cdb4d9f30ec21f8facbbe8b307cf34c0b9942834c6d4fdbe2
 TERMUX_PKG_SRCURL=https://gitlab.com/libeigen/eigen/-/archive/${TERMUX_PKG_VERSION}/eigen-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_VERSION_REGEXP='^3\.4\.\d+$'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_BUILD_TYPE=Release
