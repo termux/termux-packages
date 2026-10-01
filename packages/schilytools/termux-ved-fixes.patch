@@ -1,0 +1,67 @@
+- Increase size of filename buffers
+- Prepend @TERMUX_PREFIX@ to absolute paths
+- ved.help must not be in share/man because termux_step_massage cleans folders not
+  named 'man*' out from there
+
+--- a/ved/Makefile.help
++++ b/ved/Makefile.help
+@@ -7,7 +7,7 @@ RULESDIR=	RULES
+ include		$(SRCROOT)/$(RULESDIR)/rules.top
+ ###########################################################################
+ 
+-INSDIR=		share/man/help
++INSDIR=		share/doc/ved
+ TARGET=		ved.help
+ #XMK_FILE=	Makefile.man
+ 
+diff --git a/ved/ved.c b/ved/ved.c
+index 25eb1a0..b7a4884 100644
+--- a/ved/ved.c
++++ b/ved/ved.c
+@@ -530,9 +530,9 @@ gethelpfile()
+ 	Uchar	*hfile = HELPFILE;
+ 	Uchar	*name;
+ 
+-	name = _gethelpfile("share/man/help/ved.help");
++	name = _gethelpfile("share/doc/ved/ved.help");
+ 	if (name == NULL)
+-		name = _gethelpfile("man/help/ved.help");
++		name = _gethelpfile("doc/ved/ved.help");
+ 
+ 	if (name == NULL)
+ 		return (hfile);
+--- a/ved/ved.h
++++ b/ved/ved.h
+@@ -156,16 +156,16 @@ extern	iobuf_t	_bb;
+ #define	max(x, y)	(((x) < (y)) ? (y) : (x))
+ /*#define	abs(x)	(((x) > 0) ? (x) : (-x))*/
+ 
+-#define	TMPNSIZE	28	/* Size of temporary filename buffers	*/
+-#define	NAMESIZE	256	/* Size of several temporary buffers	*/
+-#define	FNAMESIZE	1024	/* Size of edited filename		*/
++#define	TMPNSIZE	256	/* Size of temporary filename buffers	*/
++#define	NAMESIZE	4096	/* Size of several temporary buffers	*/
++#define	FNAMESIZE	4096	/* Size of edited filename		*/
+ 
+ #ifdef	JOS
+ #define	DEFSHELL	"/bin/command"
+ #define	HELPFILE	UC "/doc/cmds/ved.help"
+ #else
+-#define	DEFSHELL	"/bin/sh"
+-#define	HELPFILE	UC "/opt/schily/share/man/help/ved.help"
++#define	DEFSHELL	"@TERMUX_PREFIX@/bin/sh"
++#define	HELPFILE	UC "@TERMUX_PREFIX@/share/doc/ved/ved.help"
+ #endif
+ 
+ /*
+--- a/ved/vedtmpops.c
++++ b/ved/vedtmpops.c
+@@ -73,7 +73,7 @@ extern	long	gftime		__PR((char *file));
+ LOCAL	Uchar	EDTMP[] = ".EDTMP";
+ #endif
+ LOCAL	Uchar	vedtmp[] = ".vedtmp";
+-LOCAL	Uchar	uvedtmp[20];
++LOCAL	Uchar	uvedtmp[256];
+ LOCAL	long	uid	 = -1;
+ 
+ LOCAL	void	vedtmp_name	__PR((void));

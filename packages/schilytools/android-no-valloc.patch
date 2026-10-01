@@ -1,0 +1,14 @@
+valloc is supposed to be configured out, but in this particular location it isn't
+gated by any preprocessor conditions.
+
+--- a/libscg/scsi-linux-sg.c
++++ b/libscg/scsi-linux-sg.c
+@@ -1128,7 +1128,7 @@ scgo_getbuf(scgp, amt)
+ 	 * copying the whole buffer contents when
+ 	 * setting up the /dev/sg data structures.
+ 	 */
+-	ret = valloc((size_t)(amt+getpagesize()));
++	ret = memalign(getpagesize(), (size_t)(amt+getpagesize()));
+ 	if (ret == NULL)
+ 		return (ret);
+ 	scgp->bufbase = ret;

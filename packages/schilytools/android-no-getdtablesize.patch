@@ -1,0 +1,14 @@
+getdtablesize is supposed to be configured out, but in this particular location it isn't
+gated by any preprocessor conditions.
+
+--- a/sccs/sccs/cmd/src/delta.c
++++ b/sccs/sccs/cmd/src/delta.c
+@@ -1318,7 +1318,7 @@ int difflim;
+ 			rlim.rlim_cur = 20;	/* Suffifient for bdiff/diff */
+ 		setrlimit(RLIMIT_NOFILE, &rlim);
+ #endif
+-		n = getdtablesize();	/* We are single threaded, so cache */
++		n = sysconf(_SC_OPEN_MAX);	/* We are single threaded, so cache */
+ 		for (i = 5; i < n; i++)
+ 			close(i);
+ #endif
