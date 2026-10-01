@@ -1,16 +1,31 @@
 diff --git a/vtest/vtest_shm.c b/vtest/vtest_shm.c
 --- a/vtest/vtest_shm.c
 +++ b/vtest/vtest_shm.c
-@@ -44,6 +44,30 @@
+@@ -22,6 +22,8 @@
+  *
+  **************************************************************************/
+ 
++#define __ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ 1
++
+ #include "util.h"
+ #include "vtest_shm.h"
+ 
+@@ -44,6 +46,36 @@
  #endif
  }
 
 +#ifdef __ANDROID__
 +#include <sys/ioctl.h>
++#include <android/sharedmem.h>
 +static int vtest_new_android_ashm(size_t size)
 +{
 +   int fd, ret;
 +   long flags;
++   if (__builtin_available(android 26, *)) {
++      fd = ASharedMemory_create(NULL, size);
++      if (fd >= 0)
++         return fd;
++   }
 +   fd = open("/dev/ashmem", O_RDWR | O_CLOEXEC);
 +   if (fd < 0)
 +      return fd;
@@ -32,7 +47,7 @@ diff --git a/vtest/vtest_shm.c b/vtest/vtest_shm.c
  int vtest_new_shm(uint32_t handle, size_t size)
  {
     int fd, ret;
-@@ -54,6 +77,12 @@
+@@ -54,6 +86,12 @@
     fd = memfd_create(str, MFD_ALLOW_SEALING);
     free(str);
     if (fd < 0) {
@@ -45,7 +60,7 @@ diff --git a/vtest/vtest_shm.c b/vtest/vtest_shm.c
        return report_failed_call("memfd_create", -errno);
     }
 
-@@ -68,6 +97,10 @@
+@@ -68,6 +106,10 @@
 
  int vtest_shm_check(void)
  {
