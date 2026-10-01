@@ -6,4 +6,5 @@ TERMUX_PKG_VERSION=6.4.0
 TERMUX_PKG_SRCURL=https://github.com/swiftlang/swift-llbuild/archive/refs/tags/swift-${TERMUX_PKG_VERSION}-RELEASE.tar.gz
 TERMUX_PKG_SHA256=4ea396e158eea664deffdf414c93872cc8e512b42bdd4bb29ad4cbdb108097aa
 TERMUX_PKG_DEPENDS="libc++, libandroid-spawn, libsqlite"
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_NO_STATICSPLIT=true
