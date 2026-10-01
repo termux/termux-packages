@@ -1,0 +1,698 @@
+diff --git a/codex-rs/Cargo.lock b/codex-rs/Cargo.lock
+index a24fb43..d73f4df 100644
+--- a/codex-rs/Cargo.lock
++++ b/codex-rs/Cargo.lock
+@@ -2305,6 +2305,7 @@ dependencies = [
+  "codex-state",
+  "codex-uds",
+  "codex-utils-absolute-path",
++ "codex-utils-file-lock",
+  "codex-utils-rustls-provider",
+  "codex-websocket-auth",
+  "codex-websocket-client",
+@@ -2362,6 +2363,7 @@ dependencies = [
+  "codex-sandboxing",
+  "codex-shell-escalation",
+  "codex-utils-absolute-path",
++ "codex-utils-file-lock",
+  "codex-utils-home-dir",
+  "codex-utils-pty",
+  "codex-windows-sandbox",
+@@ -2960,6 +2962,7 @@ dependencies = [
+  "codex-utils-audio",
+  "codex-utils-cache",
+  "codex-utils-cargo-bin",
++ "codex-utils-file-lock",
+  "codex-utils-git-discovery",
+  "codex-utils-home-dir",
+  "codex-utils-image",
+@@ -3280,6 +3283,7 @@ dependencies = [
+  "anyhow",
+  "clap",
+  "codex-utils-absolute-path",
++ "codex-utils-file-lock",
+  "multimap",
+  "pretty_assertions",
+  "serde",
+@@ -3801,6 +3805,7 @@ dependencies = [
+  "codex-protocol",
+  "codex-secrets",
+  "codex-terminal-detection",
++ "codex-utils-file-lock",
+  "codex-utils-process",
+  "codex-utils-template",
+  "codex-workload-identity",
+@@ -3985,6 +3990,7 @@ name = "codex-message-history"
+ version = "0.0.0"
+ dependencies = [
+  "codex-config",
++ "codex-utils-file-lock",
+  "memchr",
+  "pretty_assertions",
+  "serde",
+@@ -4095,6 +4101,7 @@ dependencies = [
+  "chrono",
+  "clap",
+  "codex-utils-absolute-path",
++ "codex-utils-file-lock",
+  "codex-utils-home-dir",
+  "codex-utils-path-uri",
+  "codex-utils-rustls-provider",
+@@ -4372,6 +4379,7 @@ dependencies = [
+  "codex-protocol",
+  "codex-secrets",
+  "codex-utils-cargo-bin",
++ "codex-utils-file-lock",
+  "codex-utils-home-dir",
+  "codex-utils-path-uri",
+  "codex-utils-pty",
+@@ -4417,6 +4425,7 @@ dependencies = [
+  "codex-protocol",
+  "codex-state",
+  "codex-utils-absolute-path",
++ "codex-utils-file-lock",
+  "codex-utils-path",
+  "codex-utils-process",
+  "pretty_assertions",
+@@ -4880,6 +4889,7 @@ name = "codex-user-verification"
+ version = "0.0.0"
+ dependencies = [
+  "base64 0.22.1",
++ "codex-utils-file-lock",
+  "core-foundation 0.10.1",
+  "dirs",
+  "objc2",
+@@ -4964,6 +4974,13 @@ dependencies = [
+ name = "codex-utils-elapsed"
+ version = "0.0.0"
+ 
++[[package]]
++name = "codex-utils-file-lock"
++version = "0.0.0"
++dependencies = [
++ "libc",
++]
++
+ [[package]]
+ name = "codex-utils-fuzzy-match"
+ version = "0.0.0"
+diff --git a/codex-rs/Cargo.toml b/codex-rs/Cargo.toml
+index 9860de0..c04d6c0 100644
+--- a/codex-rs/Cargo.toml
++++ b/codex-rs/Cargo.toml
+@@ -133,6 +133,7 @@ members = [
+     "utils/string",
+     "utils/cli",
+     "utils/elapsed",
++    "utils/file-lock",
+     "utils/sandbox-summary",
+     "utils/sleep-inhibitor",
+     "utils/approval-presets",
+@@ -291,6 +292,7 @@ codex-utils-cache = { path = "utils/cache" }
+ codex-utils-cargo-bin = { path = "utils/cargo-bin" }
+ codex-utils-cli = { path = "utils/cli" }
+ codex-utils-elapsed = { path = "utils/elapsed" }
++codex-utils-file-lock = { path = "utils/file-lock" }
+ codex-utils-fuzzy-match = { path = "utils/fuzzy-match" }
+ codex-utils-git-discovery = { path = "utils/git-discovery" }
+ codex-utils-home-dir = { path = "utils/home-dir" }
+diff --git a/codex-rs/app-server-transport/Cargo.toml b/codex-rs/app-server-transport/Cargo.toml
+index f78bfeb..6e08941 100644
+--- a/codex-rs/app-server-transport/Cargo.toml
++++ b/codex-rs/app-server-transport/Cargo.toml
+@@ -14,6 +14,7 @@ workspace = true
+ 
+ [dependencies]
+ codex-http-client = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ codex-websocket-client = { workspace = true }
+ axum = { workspace = true, default-features = false, features = [
+     "http1",
+diff --git a/codex-rs/app-server-transport/src/transport/unix_socket.rs b/codex-rs/app-server-transport/src/transport/unix_socket.rs
+index 3f70bcc..497a26e 100644
+--- a/codex-rs/app-server-transport/src/transport/unix_socket.rs
++++ b/codex-rs/app-server-transport/src/transport/unix_socket.rs
+@@ -26,6 +26,7 @@ use tokio_util::sync::CancellationToken;
+ use tracing::error;
+ use tracing::info;
+ use tracing::warn;
++use codex_utils_file_lock::FileLockExt;
+ 
+ #[cfg(unix)]
+ const CONTROL_SOCKET_MODE: u32 = 0o600;
+@@ -312,7 +313,7 @@ pub async fn acquire_app_server_startup_lock(
+             .read(true)
+             .write(true)
+             .open(startup_lock_path.as_path())?;
+-        file.lock()?;
++        file.lock_compat()?;
+         Ok(AppServerStartupLock { _file: file })
+     })
+     .await
+diff --git a/codex-rs/arg0/Cargo.toml b/codex-rs/arg0/Cargo.toml
+index b6d4c2d..b8ac43b 100644
+--- a/codex-rs/arg0/Cargo.toml
++++ b/codex-rs/arg0/Cargo.toml
+@@ -22,6 +22,7 @@ codex-linux-sandbox = { workspace = true }
+ codex-sandboxing = { workspace = true }
+ codex-shell-escalation = { workspace = true }
+ codex-utils-absolute-path = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ codex-utils-home-dir = { workspace = true }
+ codex-utils-pty = { workspace = true }
+ dotenvy = { workspace = true }
+diff --git a/codex-rs/arg0/src/lib.rs b/codex-rs/arg0/src/lib.rs
+index 5bed3b9..5668c51 100644
+--- a/codex-rs/arg0/src/lib.rs
++++ b/codex-rs/arg0/src/lib.rs
+@@ -17,6 +17,7 @@ use codex_windows_sandbox::CODEX_WINDOWS_SANDBOX_ARG1;
+ #[cfg(unix)]
+ use std::os::unix::fs::symlink;
+ use tempfile::TempDir;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const APPLY_PATCH_ARG0: &str = "apply_patch";
+ const MISSPELLED_APPLY_PATCH_ARG0: &str = "applypatch";
+@@ -387,7 +388,7 @@ fn prepare_path_entry_for_codex_aliases(
+         .create(true)
+         .truncate(false)
+         .open(&lock_path)?;
+-    lock_file.try_lock()?;
++    lock_file.try_lock_compat()?;
+ 
+     for filename in &[
+         APPLY_PATCH_ARG0,
+@@ -528,7 +529,7 @@ fn try_lock_dir(dir: &Path) -> std::io::Result<Option<File>> {
+         Err(err) => return Err(err),
+     };
+ 
+-    match lock_file.try_lock() {
++    match lock_file.try_lock_compat() {
+         Ok(()) => Ok(Some(lock_file)),
+         Err(std::fs::TryLockError::WouldBlock) => Ok(None),
+         Err(err) => Err(err.into()),
+diff --git a/codex-rs/core/Cargo.toml b/codex-rs/core/Cargo.toml
+index d5fd95d..be0d787 100644
+--- a/codex-rs/core/Cargo.toml
++++ b/codex-rs/core/Cargo.toml
+@@ -12,6 +12,7 @@ path = "src/lib.rs"
+ workspace = true
+ 
+ [dependencies]
++codex-utils-file-lock = { workspace = true }
+ codex-utils-process = { workspace = true }
+ anyhow = { workspace = true }
+ arc-swap = { workspace = true }
+diff --git a/codex-rs/core/src/installation_id.rs b/codex-rs/core/src/installation_id.rs
+index a42e6b6..495e1e1 100644
+--- a/codex-rs/core/src/installation_id.rs
++++ b/codex-rs/core/src/installation_id.rs
+@@ -13,6 +13,7 @@ use std::os::unix::fs::PermissionsExt;
+ use codex_utils_absolute_path::AbsolutePathBuf;
+ use tokio::fs;
+ use uuid::Uuid;
++use codex_utils_file_lock::FileLockExt;
+ 
+ pub(crate) const INSTALLATION_ID_FILENAME: &str = "installation_id";
+ 
+@@ -29,7 +30,7 @@ pub async fn resolve_installation_id(codex_home: &AbsolutePathBuf) -> Result<Str
+         }
+ 
+         let mut file = options.open(&path)?;
+-        file.lock()?;
++        file.lock_compat()?;
+ 
+         #[cfg(unix)]
+         {
+diff --git a/codex-rs/execpolicy/Cargo.toml b/codex-rs/execpolicy/Cargo.toml
+index 4204022..398e2b5 100644
+--- a/codex-rs/execpolicy/Cargo.toml
++++ b/codex-rs/execpolicy/Cargo.toml
+@@ -21,6 +21,7 @@ workspace = true
+ anyhow = { workspace = true }
+ clap = { workspace = true, features = ["derive"] }
+ codex-utils-absolute-path = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ multimap = { workspace = true }
+ serde = { workspace = true, features = ["derive"] }
+ serde_json = { workspace = true }
+diff --git a/codex-rs/execpolicy/src/amend.rs b/codex-rs/execpolicy/src/amend.rs
+index e25fd1b..58fe0be 100644
+--- a/codex-rs/execpolicy/src/amend.rs
++++ b/codex-rs/execpolicy/src/amend.rs
+@@ -10,6 +10,7 @@ use crate::decision::Decision;
+ use crate::rule::NetworkRuleProtocol;
+ use crate::rule::normalize_network_rule_host;
+ use thiserror::Error;
++use codex_utils_file_lock::FileLockExt;
+ 
+ #[derive(Debug, Error)]
+ pub enum AmendError {
+@@ -154,7 +155,7 @@ fn append_locked_line(policy_path: &Path, line: &str) -> Result<(), AmendError>
+             path: policy_path.to_path_buf(),
+             source,
+         })?;
+-    file.lock().map_err(|source| AmendError::LockPolicyFile {
++    file.lock_compat().map_err(|source| AmendError::LockPolicyFile {
+         path: policy_path.to_path_buf(),
+         source,
+     })?;
+diff --git a/codex-rs/features/src/lib.rs b/codex-rs/features/src/lib.rs
+index ebd6d89..bcfa9e2 100644
+--- a/codex-rs/features/src/lib.rs
++++ b/codex-rs/features/src/lib.rs
+@@ -944,7 +944,9 @@ pub const FEATURES: &[FeatureSpec] = &[
+         id: Feature::DaemonAutoStart,
+         key: "daemon_auto_start",
+         stage: Stage::Stable,
+-        default_enabled: true,
++        // The managed daemon needs a packaged CLI layout, which Android builds
++        // (e.g. Termux) do not ship.
++        default_enabled: !cfg!(target_os = "android"),
+     },
+     FeatureSpec {
+         id: Feature::TranscriptV2,
+diff --git a/codex-rs/login/Cargo.toml b/codex-rs/login/Cargo.toml
+index 8772f46..ea2e73e 100644
+--- a/codex-rs/login/Cargo.toml
++++ b/codex-rs/login/Cargo.toml
+@@ -8,6 +8,7 @@ license.workspace = true
+ workspace = true
+ 
+ [dependencies]
++codex-utils-file-lock = { workspace = true }
+ codex-utils-process = { workspace = true }
+ base64 = { workspace = true }
+ chrono = { workspace = true, features = ["serde"] }
+diff --git a/codex-rs/login/src/gateway_auth_storage.rs b/codex-rs/login/src/gateway_auth_storage.rs
+index 9ef7ece..ef7cad6 100644
+--- a/codex-rs/login/src/gateway_auth_storage.rs
++++ b/codex-rs/login/src/gateway_auth_storage.rs
+@@ -15,6 +15,7 @@ use codex_secrets::SecretName;
+ use codex_secrets::SecretScope;
+ use codex_secrets::SecretsBackendKind;
+ use codex_secrets::SecretsManager;
++use codex_utils_file_lock::FileLockExt;
+ 
+ pub(super) async fn lock_credentials(codex_home: &Path) -> io::Result<File> {
+     let directory = codex_home.join("secrets");
+@@ -30,7 +31,7 @@ pub(super) async fn lock_credentials(codex_home: &Path) -> io::Result<File> {
+         .open(path)?;
+     tokio::time::timeout(Duration::from_secs(/*secs*/ 60), async {
+         loop {
+-            match file.try_lock() {
++            match file.try_lock_compat() {
+                 Ok(()) => return Ok(()),
+                 Err(TryLockError::WouldBlock) => {
+                     tokio::time::sleep(Duration::from_millis(/*millis*/ 50)).await
+diff --git a/codex-rs/message-history/Cargo.toml b/codex-rs/message-history/Cargo.toml
+index 176b957..f5f518b 100644
+--- a/codex-rs/message-history/Cargo.toml
++++ b/codex-rs/message-history/Cargo.toml
+@@ -14,6 +14,7 @@ workspace = true
+ 
+ [dependencies]
+ codex-config = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ memchr = { workspace = true }
+ serde = { workspace = true, features = ["derive"] }
+ serde_json = { workspace = true }
+diff --git a/codex-rs/message-history/src/batch.rs b/codex-rs/message-history/src/batch.rs
+index 6adf7e7..958c80a 100644
+--- a/codex-rs/message-history/src/batch.rs
++++ b/codex-rs/message-history/src/batch.rs
+@@ -15,6 +15,7 @@ use super::MAX_RETRIES;
+ use super::RETRY_SLEEP;
+ use super::history_filepath;
+ use super::log_identity;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const MAX_BATCH_ROWS: usize = 128;
+ const MAX_BATCH_BYTES: usize = 64 * 1024;
+@@ -121,7 +122,7 @@ pub fn lookup_batch(
+     }
+ 
+     for _ in 0..MAX_RETRIES {
+-        match file.try_lock_shared() {
++        match file.try_lock_shared_compat() {
+             Ok(()) => return scan_batch(&mut file, cursor, config),
+             Err(std::fs::TryLockError::WouldBlock) => std::thread::sleep(RETRY_SLEEP),
+             Err(error) => return Err(error.into()),
+diff --git a/codex-rs/message-history/src/lib.rs b/codex-rs/message-history/src/lib.rs
+index 4b2ce27..60ed668 100644
+--- a/codex-rs/message-history/src/lib.rs
++++ b/codex-rs/message-history/src/lib.rs
+@@ -47,6 +47,7 @@ pub use batch::lookup_batch;
+ use std::os::unix::fs::OpenOptionsExt;
+ #[cfg(unix)]
+ use std::os::unix::fs::PermissionsExt;
++use codex_utils_file_lock::FileLockExt;
+ 
+ /// Filename that stores the message history inside `~/.codex`.
+ const HISTORY_FILENAME: &str = "history.jsonl";
+@@ -382,7 +383,7 @@ fn lookup_history_entry(path: &Path, log_id: u64, offset: usize) -> Option<Histo
+     // Open & lock file for reading using a shared lock.
+     // Retry a few times to avoid indefinite blocking.
+     for _ in 0..MAX_RETRIES {
+-        let lock_result = file.try_lock_shared();
++        let lock_result = file.try_lock_shared_compat();
+ 
+         match lock_result {
+             Ok(()) => {
+diff --git a/codex-rs/network-proxy/Cargo.toml b/codex-rs/network-proxy/Cargo.toml
+index bda4261..cb6df6a 100644
+--- a/codex-rs/network-proxy/Cargo.toml
++++ b/codex-rs/network-proxy/Cargo.toml
+@@ -22,6 +22,7 @@ base64 = { workspace = true }
+ clap = { workspace = true, features = ["derive"] }
+ chrono = { workspace = true }
+ codex-utils-absolute-path = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ codex-utils-home-dir = { workspace = true }
+ codex-utils-path-uri = { workspace = true }
+ codex-utils-rustls-provider = { workspace = true }
+diff --git a/codex-rs/network-proxy/src/certs.rs b/codex-rs/network-proxy/src/certs.rs
+index fb3a7f5..c4d30e2 100644
+--- a/codex-rs/network-proxy/src/certs.rs
++++ b/codex-rs/network-proxy/src/certs.rs
+@@ -40,6 +40,7 @@ use std::time::SystemTime;
+ use std::time::UNIX_EPOCH;
+ use tracing::info;
+ use tracing::warn;
++use codex_utils_file_lock::FileLockExt;
+ 
+ pub(super) struct ManagedMitmCa {
+     issuer: Issuer<'static, KeyPair>,
+@@ -645,7 +646,7 @@ fn lock_managed_ca_certificate(certificate_path: &Path) -> Result<File> {
+     let lock_path = managed_ca_certificate_lock_path(certificate_path)
+         .ok_or_else(|| anyhow!("managed MITM CA certificate path is missing a file name"))?;
+     let file = open_managed_ca_lock(&lock_path)?;
+-    file.lock_shared()
++    file.lock_shared_compat()
+         .with_context(|| format!("failed to lock {}", lock_path.display()))?;
+     Ok(file)
+ }
+@@ -653,7 +654,7 @@ fn lock_managed_ca_certificate(certificate_path: &Path) -> Result<File> {
+ fn lock_managed_ca_artifacts(proxy_dir: &Path) -> Result<File> {
+     let lock_path = proxy_dir.join(MANAGED_MITM_CA_ARTIFACT_LOCK);
+     let file = open_managed_ca_lock(&lock_path)?;
+-    file.lock()
++    file.lock_compat()
+         .with_context(|| format!("failed to lock {}", lock_path.display()))?;
+     Ok(file)
+ }
+@@ -746,7 +747,7 @@ fn remove_inactive_managed_ca_certificate(certificate_path: &Path) {
+     let Ok(lock_file) = open_managed_ca_lock(&lock_path) else {
+         return;
+     };
+-    match lock_file.try_lock() {
++    match lock_file.try_lock_compat() {
+         Ok(()) => {}
+         Err(std::fs::TryLockError::WouldBlock) => return,
+         Err(err) => {
+diff --git a/codex-rs/rmcp-client/Cargo.toml b/codex-rs/rmcp-client/Cargo.toml
+index c661aa0..6c6d865 100644
+--- a/codex-rs/rmcp-client/Cargo.toml
++++ b/codex-rs/rmcp-client/Cargo.toml
+@@ -24,6 +24,7 @@ codex-network-proxy = { workspace = true }
+ codex-otel = { workspace = true }
+ codex-protocol = { workspace = true }
+ codex-secrets = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ codex-utils-path-uri = { workspace = true }
+ codex-utils-pty = { workspace = true }
+ codex-utils-home-dir = { workspace = true }
+diff --git a/codex-rs/rmcp-client/src/oauth/refresh_lock.rs b/codex-rs/rmcp-client/src/oauth/refresh_lock.rs
+index e038dc2..22e1a01 100644
+--- a/codex-rs/rmcp-client/src/oauth/refresh_lock.rs
++++ b/codex-rs/rmcp-client/src/oauth/refresh_lock.rs
+@@ -17,6 +17,7 @@ use std::path::Path;
+ use std::time::Duration;
+ use tokio::time::sleep;
+ use tokio::time::timeout;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const REFRESH_LOCK_DIR: &str = "mcp-oauth-locks";
+ const REFRESH_LOCK_ACQUIRE_TIMEOUT: Duration = Duration::from_secs(/*secs*/ 60);
+@@ -69,7 +70,7 @@ impl RefreshCredentialLock {
+         let mut reported_contention = false;
+         timeout(acquire_timeout, async {
+             loop {
+-                match file.try_lock() {
++                match file.try_lock_compat() {
+                     Ok(()) => return Ok(()),
+                     Err(std::fs::TryLockError::WouldBlock) => {
+                         if !reported_contention {
+diff --git a/codex-rs/rmcp-client/src/oauth/store_lock.rs b/codex-rs/rmcp-client/src/oauth/store_lock.rs
+index f06b9b9..4c5c2c4 100644
+--- a/codex-rs/rmcp-client/src/oauth/store_lock.rs
++++ b/codex-rs/rmcp-client/src/oauth/store_lock.rs
+@@ -15,6 +15,7 @@ use std::time::Duration;
+ use std::time::Instant;
+ 
+ use codex_utils_home_dir::find_codex_home;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const OAUTH_LOCK_DIR: &str = "mcp-oauth-locks";
+ const STORE_LOCK_ACQUIRE_TIMEOUT: Duration = Duration::from_secs(60);
+@@ -124,8 +125,8 @@ impl OAuthStoreLock {
+ 
+         loop {
+             let result = match mode {
+-                OAuthStoreLockMode::Shared => file.try_lock_shared(),
+-                OAuthStoreLockMode::Exclusive => file.try_lock(),
++                OAuthStoreLockMode::Shared => file.try_lock_shared_compat(),
++                OAuthStoreLockMode::Exclusive => file.try_lock_compat(),
+             };
+             match result {
+                 Ok(()) => return Ok(Self { _file: file }),
+diff --git a/codex-rs/rollout/Cargo.toml b/codex-rs/rollout/Cargo.toml
+index 8981dd9..53a7ccb 100644
+--- a/codex-rs/rollout/Cargo.toml
++++ b/codex-rs/rollout/Cargo.toml
+@@ -13,6 +13,7 @@ path = "src/lib.rs"
+ workspace = true
+ 
+ [dependencies]
++codex-utils-file-lock = { workspace = true }
+ codex-utils-process = { workspace = true }
+ anyhow = { workspace = true }
+ chrono = { workspace = true, features = ["serde"] }
+diff --git a/codex-rs/rollout/src/maintenance.rs b/codex-rs/rollout/src/maintenance.rs
+index 35b7928..b4f2e68 100644
+--- a/codex-rs/rollout/src/maintenance.rs
++++ b/codex-rs/rollout/src/maintenance.rs
+@@ -12,6 +12,7 @@ use std::fs::File;
+ use std::fs::OpenOptions;
+ use std::io;
+ use std::path::Path;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const ROLLOUT_MAINTENANCE_LOCK: &str = "rollout-maintenance.lock";
+ 
+@@ -33,7 +34,7 @@ pub fn try_acquire_rollout_maintenance_lock(
+         .truncate(false)
+         .open(directory.join(ROLLOUT_MAINTENANCE_LOCK))?;
+ 
+-    match file.try_lock() {
++    match file.try_lock_compat() {
+         Ok(()) => Ok(Some(RolloutMaintenanceGuard { _file: file })),
+         Err(std::fs::TryLockError::WouldBlock) => Ok(None),
+         Err(std::fs::TryLockError::Error(error)) => Err(error),
+diff --git a/codex-rs/rollout/src/writer_lock.rs b/codex-rs/rollout/src/writer_lock.rs
+index ceae18e..5a5e18b 100644
+--- a/codex-rs/rollout/src/writer_lock.rs
++++ b/codex-rs/rollout/src/writer_lock.rs
+@@ -13,6 +13,7 @@ use std::sync::atomic::Ordering;
+ 
+ use codex_protocol::ThreadId;
+ use tracing::warn;
++use codex_utils_file_lock::FileLockExt;
+ 
+ const WRITER_LOCK_DIR: &str = "thread-writer-locks";
+ const COORDINATION_LOCK_FILE: &str = ".coordination.lock";
+@@ -62,7 +63,7 @@ impl WriterLockCoordinator {
+                 ))
+             })?;
+ 
+-        match file.try_lock() {
++        match file.try_lock_compat() {
+             Ok(()) => {}
+             Err(std::fs::TryLockError::WouldBlock) => {
+                 return Err(io::Error::new(
+@@ -95,7 +96,7 @@ impl WriterLockCoordinator {
+         let coordination_lock = self.lock_coordination()?;
+         let path = self.directory.join(format!("{thread_id}.lock"));
+         match OpenOptions::new().read(true).write(true).open(path) {
+-            Ok(file) => match file.try_lock() {
++            Ok(file) => match file.try_lock_compat() {
+                 Ok(()) => Ok(Some(coordination_lock)),
+                 Err(std::fs::TryLockError::WouldBlock) => Ok(None),
+                 Err(std::fs::TryLockError::Error(err)) => Err(err),
+@@ -113,7 +114,7 @@ impl WriterLockCoordinator {
+             .create(true)
+             .truncate(false)
+             .open(self.directory.join(COORDINATION_LOCK_FILE))?;
+-        file.lock().map_err(|err| {
++        file.lock_compat().map_err(|err| {
+             io::Error::other(format!(
+                 "failed to acquire thread writer coordination lock: {err}"
+             ))
+@@ -146,7 +147,7 @@ impl WriterLockCoordinator {
+                     continue;
+                 }
+             };
+-            match file.try_lock() {
++            match file.try_lock_compat() {
+                 Ok(()) => {
+                     drop(file);
+                     if let Err(err) = fs::remove_file(&path)
+diff --git a/codex-rs/user-verification/Cargo.toml b/codex-rs/user-verification/Cargo.toml
+index fe4d529..8e995cf 100644
+--- a/codex-rs/user-verification/Cargo.toml
++++ b/codex-rs/user-verification/Cargo.toml
+@@ -9,6 +9,7 @@ workspace = true
+ 
+ [dependencies]
+ base64 = { workspace = true }
++codex-utils-file-lock = { workspace = true }
+ p256 = { version = "0.13", default-features = false, features = ["arithmetic", "pkcs8", "std"] }
+ sha2 = { workspace = true }
+ thiserror = { workspace = true }
+diff --git a/codex-rs/user-verification/src/lifecycle_lock.rs b/codex-rs/user-verification/src/lifecycle_lock.rs
+index 69614e2..1d77027 100644
+--- a/codex-rs/user-verification/src/lifecycle_lock.rs
++++ b/codex-rs/user-verification/src/lifecycle_lock.rs
+@@ -9,6 +9,7 @@ use std::fs::OpenOptions;
+ use std::path::Path;
+ use std::time::Duration;
+ use std::time::Instant;
++use codex_utils_file_lock::FileLockExt;
+ 
+ pub(crate) struct LifecycleLock {
+     _file: File,
+@@ -53,7 +54,7 @@ impl LifecycleLock {
+         let started = Instant::now();
+         loop {
+             guard.check()?;
+-            match file.try_lock() {
++            match file.try_lock_compat() {
+                 Ok(()) => {
+                     guard.check()?;
+                     return Ok(Self { _file: file });
+diff --git a/codex-rs/utils/file-lock/Cargo.toml b/codex-rs/utils/file-lock/Cargo.toml
+new file mode 100644
+index 0000000..6a5d04a
+--- /dev/null
++++ b/codex-rs/utils/file-lock/Cargo.toml
+@@ -0,0 +1,14 @@
++[package]
++name = "codex-utils-file-lock"
++version.workspace = true
++edition.workspace = true
++license.workspace = true
++
++[lints]
++workspace = true
++
++[target.'cfg(target_os = "android")'.dependencies]
++libc = { workspace = true }
++
++[lib]
++doctest = false
+diff --git a/codex-rs/utils/file-lock/src/lib.rs b/codex-rs/utils/file-lock/src/lib.rs
+new file mode 100644
+index 0000000..90a8006
+--- /dev/null
++++ b/codex-rs/utils/file-lock/src/lib.rs
+@@ -0,0 +1,90 @@
++//! Advisory file locking that also works on Android.
++//!
++//! `std::fs::File::{lock, lock_shared, try_lock, try_lock_shared}` are not
++//! implemented by the standard library on Android and always fail with
++//! `ErrorKind::Unsupported`. Bionic does provide `flock(2)`, so on Android
++//! these helpers call it directly. On every other platform they simply
++//! forward to the standard library.
++
++use std::fs::File;
++use std::fs::TryLockError;
++use std::io;
++
++pub trait FileLockExt {
++    /// Blocks until an exclusive lock is acquired.
++    fn lock_compat(&self) -> io::Result<()>;
++    /// Blocks until a shared lock is acquired.
++    fn lock_shared_compat(&self) -> io::Result<()>;
++    /// Tries to acquire an exclusive lock without blocking.
++    fn try_lock_compat(&self) -> Result<(), TryLockError>;
++    /// Tries to acquire a shared lock without blocking.
++    fn try_lock_shared_compat(&self) -> Result<(), TryLockError>;
++}
++
++#[cfg(not(target_os = "android"))]
++impl FileLockExt for File {
++    fn lock_compat(&self) -> io::Result<()> {
++        self.lock()
++    }
++
++    fn lock_shared_compat(&self) -> io::Result<()> {
++        self.lock_shared()
++    }
++
++    fn try_lock_compat(&self) -> Result<(), TryLockError> {
++        self.try_lock()
++    }
++
++    fn try_lock_shared_compat(&self) -> Result<(), TryLockError> {
++        self.try_lock_shared()
++    }
++}
++
++#[cfg(target_os = "android")]
++mod android {
++    use super::*;
++    use std::os::fd::AsRawFd;
++
++    pub(super) fn flock(file: &File, operation: libc::c_int) -> io::Result<()> {
++        loop {
++            // SAFETY: `file` owns a valid open file descriptor for the call.
++            let result = unsafe { libc::flock(file.as_raw_fd(), operation) };
++            if result == 0 {
++                return Ok(());
++            }
++            let err = io::Error::last_os_error();
++            if err.kind() != io::ErrorKind::Interrupted {
++                return Err(err);
++            }
++        }
++    }
++
++    pub(super) fn try_flock(file: &File, operation: libc::c_int) -> Result<(), TryLockError> {
++        match flock(file, operation | libc::LOCK_NB) {
++            Ok(()) => Ok(()),
++            Err(err) if err.raw_os_error() == Some(libc::EWOULDBLOCK) => {
++                Err(TryLockError::WouldBlock)
++            }
++            Err(err) => Err(TryLockError::Error(err)),
++        }
++    }
++}
++
++#[cfg(target_os = "android")]
++impl FileLockExt for File {
++    fn lock_compat(&self) -> io::Result<()> {
++        android::flock(self, libc::LOCK_EX)
++    }
++
++    fn lock_shared_compat(&self) -> io::Result<()> {
++        android::flock(self, libc::LOCK_SH)
++    }
++
++    fn try_lock_compat(&self) -> Result<(), TryLockError> {
++        android::try_flock(self, libc::LOCK_EX)
++    }
++
++    fn try_lock_shared_compat(&self) -> Result<(), TryLockError> {
++        android::try_flock(self, libc::LOCK_SH)
++    }
++}

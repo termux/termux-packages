@@ -1,0 +1,21 @@
+diff --git a/build/config/android/config.gni b/build/config/android/config.gni
+index 573c331..87c409f 100644
+--- a/build/config/android/config.gni
++++ b/build/config/android/config.gni
+@@ -157,7 +157,15 @@ if (is_android) {
+     }
+   }
+ 
+-  android_ndk_root = "//third_party/android_toolchain/ndk"
++  declare_args() {
++    # Path to the Android NDK. Overridable so that the NDK provided by the
++    # build environment (e.g. Termux's) can be used.
++    android_ndk_root = "//third_party/android_toolchain/ndk"
++
++    # Version of the Android NDK; only used to force full rebuilds on NDK
++    # rolls (see //build/config/android:compiler).
++    android_ndk_version = "r27c"
++  }
+ 
+   public_android_sdk_root = "//third_party/android_sdk/public"
+   public_android_sdk_platform_version = "37.0"
