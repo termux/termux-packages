@@ -1,0 +1,24 @@
+--- a/dir.c
++++ b/dir.c
+@@ -33,9 +33,9 @@
+ #include <sys/param.h>
+ #include <sys/stat.h>
+ #include <errno.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
++#include <bsd/unistd.h>
+ #include <stdarg.h>
+ 
+ #include "csh.h"
+@@ -44,6 +44,8 @@
+ 
+ /* Directory management. */
+ 
++struct directory *dcwd;
++
+ static struct directory
+ 		*dfind(Char *);
+ static Char	*dfollow(Char *);
