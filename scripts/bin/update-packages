@@ -487,9 +487,10 @@ _should_update() {
 
 	# `[[ "$(<"$file")" =~ regex ]]` is bash builtin solution for `grep -q` without spawning extra process
 	# it is needed to pre-fetch and filter packages as fast as possible (it is 6.5 times faster than `grep`)
+	local build_sh=$'\n'"$(<"$pkg_dir/build.sh")"$'\n'
 	case "${PACKAGES_OPT_OUT:-}" in
-		"true") [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* ]] || return 1 ;; # Skip.
-			*) [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
+		"true") [[ "$build_sh" != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* && ( "$build_sh" != *$'\n'TERMUX_PKG_ESSENTIAL=true$'\n'* || "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ) ]] || return 1 ;; # Skip.
+			*) [[ "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
 	esac
 
 	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " == *" ${pkg_dir##*/} "* ]]; then
