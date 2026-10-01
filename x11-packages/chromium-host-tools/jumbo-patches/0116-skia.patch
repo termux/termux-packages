@@ -1238,3 +1238,24 @@ index 98a7ef0f27..1d412da2d8 100644
  }  // namespace GrBackendRenderTargets
 +
 +#undef get_and_cast_data
+diff --git a/third_party/skia/src/core/SkQuadClipper.cpp b/third_party/skia/src/core/SkQuadClipper.cpp
+index c7cf9f56f1..f91bae3051 100644
+--- a/third_party/skia/src/core/SkQuadClipper.cpp
++++ b/third_party/skia/src/core/SkQuadClipper.cpp
+@@ -11,6 +11,9 @@
+ #include <cstring>
+ #include <utility>
+ 
++#define chopMonoQuadAt chopMonoQuadAt_SkQuadClipper
++#define chopMonoQuadAtY chopMonoQuadAtY_SkQuadClipper
++
+ SkQuadClipper::SkQuadClipper() {
+     fClip.setEmpty();
+ }
+@@ -116,3 +119,6 @@ bool SkQuadClipper::clipQuad(const SkPoint srcPts[3], SkPoint dst[3]) {
+     }
+     return true;
+ }
++
++#undef chopMonoQuadAt
++#undef chopMonoQuadAtY

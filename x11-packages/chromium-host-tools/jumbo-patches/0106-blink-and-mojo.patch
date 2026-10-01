@@ -3971,9 +3971,9 @@ index 368305c6b0..969c6dcf2e 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
  import("//testing/test.gni")
  import("//third_party/blink/renderer/build/scripts/scripts.gni")
+ import("//third_party/blink/renderer/platform/blink_fuzzer_test.gni")
 @@ -189,6 +190,14 @@ blink_platform_sources("loader") {
    sources +=
        get_target_outputs(":make_platform_loader_generated_delivery_type_names")
@@ -4267,7 +4267,7 @@ index 36c923d28b..c168252f9b 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//third_party/blink/renderer/platform/blink_fuzzer_test.gni")
  import("//third_party/blink/renderer/platform/platform.gni")
  import("//third_party/protobuf/proto_library.gni")
 @@ -190,7 +191,7 @@ blink_platform_sources("scheduler") {
@@ -4812,3 +4812,86 @@ index 12a864be8e..55711b2902 100644
  
    deps = [
      "//third_party/blink/public/strings:strings_grit",
+diff --git a/third_party/blink/public/mojom/BUILD.gn b/third_party/blink/public/mojom/BUILD.gn
+index d045fffd78..440d3eef18 100644
+--- a/third_party/blink/public/mojom/BUILD.gn
++++ b/third_party/blink/public/mojom/BUILD.gn
+@@ -24,6 +24,10 @@ if (is_android) {
+ # //content/public/common has private dependencies there.
+ mojom("mojom_platform") {
+   generate_java = true
++  # Fail to compile with error
++  # error: static assertion failed due to requirement 'perfetto::internal::has_traced_value_support<const std::optional<std::string> &>::value': The provided type (passed to TRACE_EVENT argument / TracedArray::Append / TracedDictionary::Add) does not support being written in a trace format. Please see the comment in traced_value.h for more details.
++  # ./host/gen/third_party/blink/public/mojom/speculation_rules/speculation_rules.mojom.cc:156:13: note: in instantiation of function template specialization 'perfetto::WriteIntoTracedValueWithFallback<const std::vector<std::optional<std::string>> &>' requested here
++  disable_jumbo = true
+   sources = [
+     "ad_tagging/ad_evidence.mojom",
+     "aggregation_service/aggregatable_report.mojom",
+diff --git a/third_party/blink/renderer/platform/fonts/font_size_adjust.cc b/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
+index 2a6c9cec27..a6a72b96f7 100644
+--- a/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
++++ b/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
+@@ -9,7 +9,7 @@
+ 
+ namespace blink {
+ 
+-namespace {
++namespace font_size_adjust {
+ 
+ StringView ToString(FontSizeAdjust::Metric metric) {
+   switch (metric) {
+@@ -45,7 +45,7 @@ String FontSizeAdjust::ToString() const {
+   if (metric_ == Metric::kExHeight) {
+     return adjustment;
+   }
+-  return StrCat({::blink::ToString(metric_), " ", adjustment});
++  return StrCat({::blink::font_size_adjust::ToString(metric_), " ", adjustment});
+ }
+ 
+ }  // namespace blink
+diff --git a/third_party/blink/renderer/modules/webtransport/receive_stream.cc b/third_party/blink/renderer/modules/webtransport/receive_stream.cc
+index d62e98f89c..be3bf62d6e 100644
+--- a/third_party/blink/renderer/modules/webtransport/receive_stream.cc
++++ b/third_party/blink/renderer/modules/webtransport/receive_stream.cc
+@@ -12,6 +12,8 @@
+ #include "third_party/blink/renderer/platform/heap/visitor.h"
+ #include "third_party/blink/renderer/platform/wtf/functional.h"
+ 
++#define ForgetStream ForgetStream_receive_stream
++
+ namespace blink {
+ 
+ namespace {
+@@ -43,3 +45,5 @@ void ReceiveStream::Trace(Visitor* visitor) const {
+ }
+ 
+ }  // namespace blink
++
++#undef ForgetStream
+diff --git a/third_party/blink/renderer/core/BUILD.gn b/third_party/blink/renderer/core/BUILD.gn
+index 9198e3dc6a..26cb3e258d 100644
+--- a/third_party/blink/renderer/core/BUILD.gn
++++ b/third_party/blink/renderer/core/BUILD.gn
+@@ -470,7 +470,6 @@ jumbo_component("core") {
+     "//third_party/blink/renderer/core/url_pattern",
+     "//third_party/blink/renderer/core/xml:xpath_generated",
+   ]
+-  jumbo_excluded_sources += rebase_path([ "attribution_reporting_to_mojom.cc" ], "", "fetch")
+   jumbo_excluded_sources += rebase_path([ "frame_fetch_context.cc" ], "", "loader")
+   jumbo_excluded_sources += rebase_path([ "image_loader.cc" ], "", "loader")
+   jumbo_excluded_sources += rebase_path([ "create_window.cc" ], "", "page")
+diff --git a/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc b/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
+index a28243d65a..c6845ca742 100644
+--- a/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
++++ b/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
+@@ -343,8 +343,8 @@ void HTMLCanvasAccessibilityManager::SetOCRDeadline() {
+ }
+ 
+ bool HTMLCanvasAccessibilityManager::ShouldRunOCR() const {
+-  if (features::GetCanvasAccessibilityMode() !=
+-      features::CanvasAccessibilityMode::kAdvanced) {
++  if (::features::GetCanvasAccessibilityMode() !=
++      ::features::CanvasAccessibilityMode::kAdvanced) {
+     return false;
+   }
+   if (!NeedsA11ySupport()) {
