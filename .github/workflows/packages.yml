@@ -188,7 +188,9 @@ jobs:
         echo "packages: ${packages[*]}"
 
         skip_building=false
-        if [[ "${#packages[@]}" -gt 0 ]]; then
+        if grep -qx 'skip-building=true' "$GITHUB_OUTPUT"; then
+          skip_building=true
+        elif [[ "${#packages[@]}" -gt 0 ]]; then
           set +e
           DRY_RUN_OUTPUT=$(./scripts/bin/build-package-dry-run-simulation.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}" 2>&1)
           DRY_RUN_RC=$?
