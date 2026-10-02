@@ -1,0 +1,33 @@
+Apply the Linux-only IUTF8/PTY handling to Android.
+
+--- a/vendor/alacritty_terminal/src/event_loop.rs
++++ b/vendor/alacritty_terminal/src/event_loop.rs
+@@ -285,7 +285,7 @@
+                                     // just loop back round for the inevitable `Exited` event.
+                                     // This sucks, but checking the process is either racy or
+                                     // blocking.
+-                                    #[cfg(target_os = "linux")]
++                                    #[cfg(any(target_os = "linux", target_os = "android"))]
+                                     if err.raw_os_error() == Some(libc::EIO) {
+                                         continue;
+                                     }
+--- a/vendor/alacritty_terminal/src/tty/unix.rs
++++ b/vendor/alacritty_terminal/src/tty/unix.rs
+@@ -21,7 +21,7 @@
+ use polling::{Event, PollMode, Poller};
+ use rustix_openpty::openpty;
+ use rustix_openpty::rustix::termios::Winsize;
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(any(target_os = "linux", target_os = "android"), target_os = "macos"))]
+ use rustix_openpty::rustix::termios::{self, InputModes, OptionalActions};
+ use signal_hook::low_level::{pipe as signal_pipe, unregister as unregister_signal};
+ use signal_hook::{SigId, consts as sigconsts};
+@@ -245,7 +245,7 @@
+     let master_fd = master.as_raw_fd();
+     let slave_fd = slave.as_raw_fd();
+ 
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(any(target_os = "linux", target_os = "android"), target_os = "macos"))]
+     if let Ok(mut termios) = termios::tcgetattr(&master) {
+         // Set character encoding to UTF-8.
+         termios.input_modes.set(InputModes::IUTF8, true);
