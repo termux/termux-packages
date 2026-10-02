@@ -5,12 +5,12 @@ xdg-utils-xdg-open from xdg-utils must be used instead.
 
 --- a/src/gui/platform/unix/qdesktopunixservices.cpp
 +++ b/src/gui/platform/unix/qdesktopunixservices.cpp
-@@ -101,7 +101,7 @@ static inline bool detectWebBrowser(const QByteArray &desktop,
+@@ -102,7 +102,7 @@
      const char *browsers[] = {"google-chrome", "firefox", "mozilla", "opera"};
  
-     browser->clear();
+     Q_PRE(browser->isEmpty());
 -    if (checkExecutable(QStringLiteral("xdg-open"), browser))
 +    if (checkExecutable(QStringLiteral("xdg-utils-xdg-open"), browser))
          return true;
  
-     if (checkBrowserVariable) {
+     if (type == QDesktopUnixServices::LaunchType::Browser) {
