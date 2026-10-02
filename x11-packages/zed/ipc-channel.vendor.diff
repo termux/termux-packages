@@ -1,0 +1,147 @@
+Use the unix-socket backend of ipc-channel on Android instead of the in-process
+fallback (fixes the handshake between the zed CLI and the editor process).
+Bionic has no shm_open(), so shared memory is created with memfd_create.
+
+--- a/vendor/ipc-channel/Cargo.toml
++++ b/vendor/ipc-channel/Cargo.toml
+@@ -97,15 +97,15 @@
+ memfd = ["sc"]
+ win32-trace = []
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "openbsd", target_os = "freebsd"))'.dependencies.mio]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "openbsd", target_os = "freebsd"))'.dependencies.mio]
+ version = "1.0"
+ features = ["os-ext"]
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "openbsd", target_os = "freebsd"))'.dependencies.sc]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "openbsd", target_os = "freebsd"))'.dependencies.sc]
+ version = "0.2.2"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "openbsd", target_os = "freebsd"))'.dependencies.tempfile]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "openbsd", target_os = "freebsd"))'.dependencies.tempfile]
+ version = "3.4"
+ 
+ [target.'cfg(target_os = "windows")'.dependencies.windows]
+--- a/vendor/ipc-channel/src/platform/mod.rs
++++ b/vendor/ipc-channel/src/platform/mod.rs
+@@ -9,12 +9,12 @@
+ 
+ #[cfg(all(
+     not(feature = "force-inprocess"),
+-    any(target_os = "linux", target_os = "openbsd", target_os = "freebsd")
++    any(target_os = "linux", target_os = "android", target_os = "openbsd", target_os = "freebsd")
+ ))]
+ mod unix;
+ #[cfg(all(
+     not(feature = "force-inprocess"),
+-    any(target_os = "linux", target_os = "openbsd", target_os = "freebsd")
++    any(target_os = "linux", target_os = "android", target_os = "openbsd", target_os = "freebsd")
+ ))]
+ mod os {
+     pub use super::unix::*;
+@@ -36,7 +36,6 @@
+ 
+ #[cfg(any(
+     feature = "force-inprocess",
+-    target_os = "android",
+     target_os = "ios",
+     target_os = "wasi",
+     target_os = "unknown"
+@@ -44,7 +43,6 @@
+ mod inprocess;
+ #[cfg(any(
+     feature = "force-inprocess",
+-    target_os = "android",
+     target_os = "ios",
+     target_os = "wasi",
+     target_os = "unknown"
+--- a/vendor/ipc-channel/src/platform/unix/mod.rs
++++ b/vendor/ipc-channel/src/platform/unix/mod.rs
+@@ -50,24 +50,24 @@
+ // Empirically, we have to deduct 32 bytes from that.
+ const RESERVED_SIZE: usize = 32;
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ const SOCK_FLAGS: c_int = libc::SOCK_CLOEXEC;
+-#[cfg(not(target_os = "linux"))]
++#[cfg(not(any(target_os = "linux", target_os = "android")))]
+ const SOCK_FLAGS: c_int = 0;
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ const RECVMSG_FLAGS: c_int = libc::MSG_CMSG_CLOEXEC;
+-#[cfg(not(target_os = "linux"))]
++#[cfg(not(any(target_os = "linux", target_os = "android")))]
+ const RECVMSG_FLAGS: c_int = 0;
+ 
+-#[cfg(target_env = "gnu")]
++#[cfg(any(target_env = "gnu", target_os = "android"))]
+ type IovLen = usize;
+-#[cfg(target_env = "gnu")]
++#[cfg(any(target_env = "gnu", target_os = "android"))]
+ type MsgControlLen = size_t;
+ 
+-#[cfg(not(target_env = "gnu"))]
++#[cfg(not(any(target_env = "gnu", target_os = "android")))]
+ type IovLen = i32;
+-#[cfg(not(target_env = "gnu"))]
++#[cfg(not(any(target_env = "gnu", target_os = "android")))]
+ type MsgControlLen = socklen_t;
+ 
+ unsafe fn new_sockaddr_un(path: *const c_char) -> (sockaddr_un, usize) {
+@@ -1076,7 +1076,7 @@
+     msghdr
+ }
+ 
+-#[cfg(not(all(target_os = "linux", feature = "memfd")))]
++#[cfg(not(any(target_os = "android", all(target_os = "linux", feature = "memfd"))))]
+ fn create_shmem(name: CString, length: usize) -> c_int {
+     unsafe {
+         // NB: the FreeBSD man page for shm_unlink states that it requires
+@@ -1093,6 +1093,17 @@
+     }
+ }
+ 
++#[cfg(target_os = "android")]
++fn create_shmem(name: CString, length: usize) -> c_int {
++    // Bionic has no shm_open; use the memfd_create syscall directly (API < 30 has no wrapper).
++    unsafe {
++        let fd = libc::syscall(libc::SYS_memfd_create, name.as_ptr(), libc::MFD_CLOEXEC) as c_int;
++        assert!(fd >= 0);
++        assert!(libc::ftruncate(fd, length as off_t) == 0);
++        fd
++    }
++}
++
+ #[cfg(all(feature = "memfd", target_os = "linux"))]
+ fn create_shmem(name: CString, length: usize) -> c_int {
+     unsafe {
+@@ -1139,7 +1150,7 @@
+                 }
+             },
+             BlockingMode::Timeout(duration) => {
+-                #[cfg(target_os = "linux")]
++                #[cfg(any(target_os = "linux", target_os = "android"))]
+                 const POLLRDHUP: libc::c_short = libc::POLLRDHUP;
+ 
+                 // It's rather unfortunate that Rust's libc doesn't know that
+@@ -1234,7 +1245,7 @@
+     (mode & S_IFMT) == S_IFSOCK
+ }
+ 
+-#[cfg(target_env = "gnu")]
++#[cfg(any(target_env = "gnu", target_os = "android"))]
+ #[repr(C)]
+ struct cmsghdr {
+     cmsg_len: MsgControlLen,
+@@ -1242,7 +1253,7 @@
+     cmsg_type: c_int,
+ }
+ 
+-#[cfg(not(target_env = "gnu"))]
++#[cfg(not(any(target_env = "gnu", target_os = "android")))]
+ #[repr(C)]
+ struct cmsghdr {
+     #[cfg(target_endian = "big")]
