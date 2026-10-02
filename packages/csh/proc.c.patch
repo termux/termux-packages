@@ -1,48 +1,37 @@
 --- a/proc.c
 +++ b/proc.c
-@@ -75,13 +75,12 @@
-     int pid;
-     extern int insource;
-     int save_errno = errno;
--    union wait w;
--    int     jobflags;
-+    int     jobflags, w;
-     struct rusage ru;
+@@ -38,12 +38,25 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdarg.h>
++#include <time.h>
++#include <bsd/stdlib.h>
+ 
+ #include "csh.h"
+ #include "dir.h"
+ #include "proc.h"
+ #include "extern.h"
+ 
++#ifndef timespecsub
++#define timespecsub(a, b, result) do { \
++    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; \
++    (result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec; \
++    if ((result)->tv_nsec < 0) { --(result)->tv_sec; (result)->tv_nsec += 1000000000L; } \
++} while (0)
++#endif
++#ifndef timespeccmp
++#define timespeccmp(a, b, cmp) (((a)->tv_sec == (b)->tv_sec) ? ((a)->tv_nsec cmp (b)->tv_nsec) : ((a)->tv_sec cmp (b)->tv_sec))
++#endif
++
+ #define BIGINDEX	9	/* largest desirable job index */
+ 
+ struct process proclist;        /* list head of all processes */
+@@ -93,7 +106,7 @@
  
  loop:
      errno = 0;			/* reset, just in case */
--    pid = wait3(&w.w_status,
+-    pid = wait3(&w,
 +    pid = wait4((pid_t)-1, &w,
         (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
  
      if (pid <= 0) {
-@@ -103,7 +102,7 @@
-     pp->p_flags &= ~(PRUNNING | PSTOPPED | PREPORTED);
-     if (WIFSTOPPED(w)) {
- 	pp->p_flags |= PSTOPPED;
--	pp->p_reason = w.w_stopsig;
-+	pp->p_reason = w;
-     }
-     else {
- 	if (pp->p_flags & (PTIME | PPTIME) || adrof(STRtime))
-@@ -111,16 +110,16 @@
- 
- 	pp->p_rusage = ru;
- 	if (WIFSIGNALED(w)) {
--	    if (w.w_termsig == SIGINT)
-+	    if (w == SIGINT)
- 		pp->p_flags |= PINTERRUPTED;
- 	    else
- 		pp->p_flags |= PSIGNALED;
--	    if (w.w_coredump)
-+	    if (w)
- 		pp->p_flags |= PDUMPED;
--	    pp->p_reason = w.w_termsig;
-+	    pp->p_reason = w;
- 	}
- 	else {
--	    pp->p_reason = w.w_retcode;
-+	    pp->p_reason = w;
- 	    if (pp->p_reason != 0)
- 		pp->p_flags |= PAEXITED;
- 	    else
