@@ -1,0 +1,36 @@
+--- a/crates/gproxy/src/update/mod.rs
++++ b/crates/gproxy/src/update/mod.rs
+@@ -335,6 +335,9 @@
+     /// couple a network poll of a release host to the correctness of every
+     /// request's configuration.
+     pub fn start(self: &Arc<Self>) {
++        if option_env!("GPROXY_INSTALLATION_KIND") == Some("termux") {
++            return;
++        }
+         let Some(interval) = self.interval() else {
+             tracing::debug!(
+                 "scheduled update checks are switched off; `gproxy update --check` still works"
+@@ -484,6 +487,11 @@
+ 
+     /// Put the previous executable back.
+     pub async fn rollback_now(&self, restart_after: bool) -> Outcome<AppliedUpdate> {
++        if option_env!("GPROXY_INSTALLATION_KIND") == Some("termux") {
++            return Err(UpdateError::Configuration(
++                "This installation is managed by Termux; use `pkg upgrade gproxy`.".into(),
++            ));
++        }
+         swap::rollback(self.executable()?)?;
+         if restart_after {
+             schedule_restart(self.options.restart);
+@@ -551,6 +559,11 @@
+         channel: Channel,
+         source: Source,
+     ) -> Outcome<manifest::Manifest> {
++        if option_env!("GPROXY_INSTALLATION_KIND") == Some("termux") {
++            return Err(UpdateError::Configuration(
++                "This installation is managed by Termux; use `pkg upgrade gproxy`.".into(),
++            ));
++        }
+         let url = self.options.manifest_url(channel, source);
+         let manifest = download::manifest(
+             &self.client,
