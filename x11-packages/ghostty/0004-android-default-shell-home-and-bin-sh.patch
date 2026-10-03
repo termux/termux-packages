@@ -1,0 +1,88 @@
+--- a/src/config/Config.zig
++++ b/src/config/Config.zig
+@@ -3481,7 +3481,8 @@
+ ///   * `always` - Always use cgroups.
+ ///   * `single-instance` - Enable cgroups only for Ghostty instances launched
+ ///     as single-instance applications (see gtk-single-instance).
+-@"linux-cgroup": LinuxCgroup = if (builtin.os.tag == .linux)
++@"linux-cgroup": LinuxCgroup = if (builtin.os.tag == .linux and
++    !builtin.target.abi.isAndroid())
+     .@"single-instance"
+ else
+     .never,
+@@ -4523,7 +4524,8 @@
+     }
+ 
+     // The default for the working directory depends on the system.
+-    var wd: WorkingDirectory = self.@"working-directory" orelse if (probable_cli)
++    var wd: WorkingDirectory = self.@"working-directory" orelse if (probable_cli and
++        !androidLaunchedFromLauncher())
+         .inherit
+     else
+         .home;
+@@ -4535,6 +4537,33 @@
+         (comptime !builtin.is_test))
+     {
+         if (self.command == null or wd == .home) command: {
++            // Android (Termux): the passwd entry describes Android's own
++            // /system/bin/sh and /data, neither is usable here, and the
++            // "launched from desktop" heuristic ignores $SHELL and $HOME.
++            if (comptime builtin.target.abi.isAndroid()) {
++                if (self.command == null) {
++                    if (std.process.getEnvVarOwned(alloc, "SHELL")) |value| shell: {
++                        std.fs.accessAbsolute(value, .{}) catch break :shell;
++                        log.info("default shell src=env value={s}", .{value});
++                        self.command = .{ .shell = try alloc.dupeZ(u8, value) };
++                    } else |_| {}
++
++                    if (self.command == null) {
++                        log.info("default shell src=termux value=@TERMUX_PREFIX@/bin/login", .{});
++                        self.command = .{ .shell = "@TERMUX_PREFIX@/bin/login" };
++                    }
++                }
++
++                if (wd == .home) {
++                    wd = if (std.process.getEnvVarOwned(alloc, "HOME")) |home|
++                        .{ .path = home }
++                    else |_|
++                        .{ .path = "@TERMUX_HOME@" };
++                }
++
++                break :command;
++            }
++
+             // First look up the command using the SHELL env var if needed.
+             // We don't do this in flatpak because SHELL in Flatpak is always
+             // set to /bin/sh.
+@@ -5038,6 +5067,16 @@
+     }
+ };
+ 
++/// Android launchers start us with arguments and cwd "/", so "inherit"
++/// would open the terminal in "/" instead of $HOME.
++fn androidLaunchedFromLauncher() bool {
++    if (comptime !builtin.target.abi.isAndroid()) return false;
++    if (internal_os.launchedFromDesktop()) return true;
++    var buf: [std.fs.max_path_bytes]u8 = undefined;
++    const cwd = std.posix.getcwd(&buf) catch return false;
++    return std.mem.eql(u8, cwd, "/");
++}
++
+ /// This runs a heuristic to determine if we are likely running
+ /// Ghostty in a CLI environment. We need this to change some behaviors.
+ /// We should keep the set of behaviors that depend on this as small
+--- a/src/termio/Exec.zig
++++ b/src/termio/Exec.zig
+@@ -1569,7 +1569,11 @@
+                 // Additionally, some environments (NixOS, I found) use /bin/sh
+                 // to setup some environment variables that are important to
+                 // have set.
+-                try args.append(alloc, "/bin/sh");
++                if (comptime builtin.target.abi.isAndroid()) {
++                    try args.append(alloc, "@TERMUX_PREFIX@/bin/sh");
++                } else {
++                    try args.append(alloc, "/bin/sh");
++                }
+                 if (internal_os.isFlatpak()) try args.append(alloc, "-l");
+                 try args.append(alloc, "-c");
+             }

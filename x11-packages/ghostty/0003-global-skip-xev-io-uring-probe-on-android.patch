@@ -1,0 +1,16 @@
+--- a/src/global.zig
++++ b/src/global.zig
+@@ -119,8 +119,11 @@
+         // Setup our signal handlers before logging
+         initSignals();
+ 
+-        // Setup our Xev backend if we're dynamic
+-        if (comptime xev.dynamic) xev.detect() catch |err| {
++        // Setup our Xev backend if we're dynamic. Android's seccomp filter
++        // kills the process (SIGSYS) on io_uring_setup instead of returning
++        // ENOSYS, so detect() would crash while probing io_uring. Keep the
++        // default (epoll, the most compatible backend) there.
++        if (comptime xev.dynamic and !builtin.target.abi.isAndroid()) xev.detect() catch |err| {
+             std.log.warn("failed to detect xev backend, falling back to " ++
+                 "most compatible backend err={}", .{err});
+         };

@@ -1,0 +1,10 @@
+--- a/src/os/file.zig
++++ b/src/os/file.zig
+@@ -67,6 +67,7 @@
+     }
+     if (posix.getenv("TMPDIR")) |v| return v;
+     if (posix.getenv("TMP")) |v| return v;
++    if (comptime builtin.target.abi.isAndroid()) return "@TERMUX_PREFIX@/tmp";
+     return "/tmp";
+ }
+ 
