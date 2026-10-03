@@ -310,6 +310,7 @@ jobs:
     - name: Generate build artifacts
       if: always()
       run: |
+        mkdir -p ./artifacts ./debs ./output
         test -d termux-packages/output && mv termux-packages/output/* ./output/
 
         for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
@@ -322,7 +323,7 @@ jobs:
 
           # Move only debs from built_packages into debs/ folder before
           # creating an archive.
-          if [ -f "./debs/built_${repo}_packages.txt" ] && [ -d "output" ]; then
+          if [ -f "./debs/built_${repo}_packages.txt" ]; then
             while read -r pkg; do
               # Match both $pkg.deb and $pkg-static.deb.
               find output \( -name "$pkg_*.deb" -o -name "$pkg-static_*.deb" \) -type f -print0 | xargs -0r mv -t debs/
