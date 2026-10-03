@@ -1,0 +1,24 @@
+--- a/pkg/dcimgui/build.zig
++++ b/pkg/dcimgui/build.zig
+@@ -142,10 +142,20 @@
+             );
+         }
+         if (backend_opengl3) {
++            // imgui auto-selects GLES3 on __ANDROID__, which links GL
++            // functions directly instead of using the imgl3w loader that
++            // Ghostty expects (and bionic has no libGL to link against).
++            // Force the desktop GL path for this file.
++            var gl_flags: std.ArrayList([]const u8) = .empty;
++            defer gl_flags.deinit(b.allocator);
++            try gl_flags.appendSlice(b.allocator, flags.items);
++            if (target.result.abi.isAndroid()) {
++                try gl_flags.append(b.allocator, "-U__ANDROID__");
++            }
+             lib.addCSourceFiles(.{
+                 .root = upstream.path("backends"),
+                 .files = &.{"imgui_impl_opengl3.cpp"},
+-                .flags = flags.items,
++                .flags = gl_flags.items,
+             });
+             lib.installHeadersDirectory(
+                 upstream.path("backends"),
