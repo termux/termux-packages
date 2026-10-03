@@ -1,0 +1,148 @@
+--- a/SysLoad.cxx
++++ b/SysLoad.cxx
+@@ -19,7 +19,9 @@
+
+ #include <KLocalizedString>
+
++#ifndef __TERMUX__
+ #include <NetworkManagerQt/Manager>
++#endif
+
+ //--------------------------------------------------------------------------------
+
+@@ -45,20 +47,29 @@
+   timeoutTimer.start();
+   connect(&timeoutTimer, &QTimer::timeout, this, &SysLoad::fetch);
+
++#ifndef __TERMUX__
+   connect(NetworkManager::notifier(), &NetworkManager::Notifier::primaryConnectionChanged,
+           [this]() { maxScale = NET_INIT_SCALE; maxBytes = 0; });  // reset since we're changing network (which might be slower)
++#endif
+
+   // gradually decrease max network throughput to really be able to see when network traffic occurs
++#ifndef __TERMUX__
+   netLoadTimer.setInterval(NET_INTERVAL_S * 1000);
+   netLoadTimer.start();
+   connect(&netLoadTimer, &QTimer::timeout, this, [this]() { maxBytes = 0; if ( maxScale > NET_INIT_SCALE ) maxScale /= 2; });
++#endif
+
+   fetch();
+
+   const int cpuBars = cpuSummaryBar ? 1 : cpus.count();
+   const int cpuBarWidth = (cpuBars <= 4) ? BAR_WIDTH : SMALL_BAR_WIDTH;
++#ifdef __TERMUX__
++  setFixedWidth((cpuBars * cpuBarWidth) + (2 * BAR_WIDTH) +
++                contentsMargins().left() + contentsMargins().right());
++#else
+   setFixedWidth((cpuBars * cpuBarWidth) + ((2 + 1) * BAR_WIDTH) +  // 2 memory bars, 1 net - they shall be more prominent
+                 contentsMargins().left() + contentsMargins().right());
++#endif
+ }
+
+ //--------------------------------------------------------------------------------
+@@ -143,6 +154,7 @@
+     f.close();
+   }
+
++#ifndef __TERMUX__
+   f.setFileName("/proc/net/dev");
+   sumSent = sumReceived = 0;
+   if ( f.open(QIODevice::ReadOnly) )
+@@ -190,6 +202,7 @@
+
+   maxBytes = std::max(maxBytes, (sumReceived + sumSent));
+   maxScale = std::max(maxBytes, maxScale);
++#endif
+
+   update();
+
+@@ -220,11 +233,13 @@
+   tip += i18n("Swap Free: %1 MB (%2 GB)"      , swapFree  / 1024, locale().toString(swapFree  / 1024.0 / 1024.0, 'f', 2));
+
+   tip += "<hr>";
++#ifndef __TERMUX__
+   tip += i18n("Net send/receive: %1/%2 KB/sec",
+               locale().toString((sumSent / 1024.0) / (INTERVAL_MS / 1000.0), 'f', 2),
+               locale().toString((sumReceived / 1024.0) / (INTERVAL_MS / 1000.0), 'f', 2));
+   tip += "<br>";
+   tip += i18n("Net max (last %2 secs): %1 KB/sec", locale().toString((maxBytes / 1024.0) / (INTERVAL_MS / 1000.0), 'f', 2), NET_INTERVAL_S);
++#endif
+
+   if ( underMouse() )
+     QToolTip::showText(QCursor::pos(), QLatin1String("<html>") + tip + QLatin1String("</html>"), this, rect());
+@@ -291,6 +306,7 @@
+   painter.fillRect(x, y - h, BAR_WIDTH, h, memSwapColor);
+
+
++#ifndef __TERMUX__
+   // net
+   x += BAR_WIDTH;
+   y = contentsRect().y() + contentsRect().height();
+@@ -299,6 +315,7 @@
+   y -= h;
+   h = contentsRect().height() * (double(sumSent) / maxScale);
+   painter.fillRect(x, y - h, BAR_WIDTH, h, netSentColor);
++#endif
+ }
+
+ //--------------------------------------------------------------------------------
+
+--- a/SysTray.cxx
++++ b/SysTray.cxx
+@@ -9,10 +9,12 @@
+ #include <SysTray.hxx>
+ #include <DBusTypes.hxx>
+ #include <NotificationServer.hxx>
++#ifndef __TERMUX__
+ #include <Network.hxx>
++#include <Bluetooth.hxx>
++#endif
+ #include <DeviceNotifier.hxx>
+ #include <Battery.hxx>
+-#include <Bluetooth.hxx>
+
+ #ifdef WITH_PACKAGEKIT
+ #include <PkUpdates.hxx>
+@@ -111,10 +113,14 @@
+   QVector<QWidget *> internalWidgets =
+   {
+     notificationServer = new NotificationServer(this),
++#ifndef __TERMUX__
+     new Network(this),
++#endif
+     new DeviceNotifier(this),
+     new Battery(this),
++#ifndef __TERMUX__
+     new Bluetooth(this),
++#endif
+ #ifdef WITH_PACKAGEKIT
+     new PkUpdates(this)
+ #endif
+
+--- a/WeatherApplet.cxx
++++ b/WeatherApplet.cxx
+@@ -24,7 +24,9 @@
+ #include <KConfig>
+ #include <KConfigGroup>
+ #include <KLocalizedString>
++#ifndef __TERMUX__
+ #include <NetworkManagerQt/Manager>
++#endif
+
+ //--------------------------------------------------------------------------------
+
+@@ -96,12 +98,14 @@
+       hbox->addStretch();
+   }
+
++#ifndef __TERMUX__
+   connect(NetworkManager::notifier(), &NetworkManager::Notifier::connectivityChanged, this,
+           [this](NetworkManager::Connectivity connectivity)
+           {
+             if ( connectivity == NetworkManager::Full )
+               fetchData();
+           });
++#endif
+ }
+
+ //--------------------------------------------------------------------------------

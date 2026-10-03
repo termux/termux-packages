@@ -1,0 +1,26 @@
+--- a/start_liquidshell
++++ b/start_liquidshell
+@@ -8,7 +8,7 @@
+   configDir=${HOME}/.config; #this is the default, http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+ fi
+
+-if [ -f /etc/xdg/autostart/plasmashell.desktop ]
++if [ -f @TERMUX_PREFIX@/etc/xdg/autostart/plasmashell.desktop ]
+ then
+   plasmaFileName=$configDir/autostart/plasmashell.desktop
+ else
+@@ -33,11 +33,11 @@
+ Hidden=true
+ EOF
+
+-if [ -f /usr/bin/startkde ]
++if [ -f @TERMUX_PREFIX@/bin/startkde ]
+ then
+-  /usr/bin/startkde
++  @TERMUX_PREFIX@/bin/startkde
+ else
+-  /usr/bin/startplasma-x11
++  @TERMUX_PREFIX@/bin/startplasma-x11
+ fi
+
+ rm -f $plasmaFileName
