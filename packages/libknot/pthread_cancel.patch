@@ -1,8 +1,6 @@
-diff --git a/src/contrib/conn_pool.c b/src/contrib/conn_pool.c
-index 3832eff..1db5128 100644
 --- a/src/contrib/conn_pool.c
 +++ b/src/contrib/conn_pool.c
-@@ -58,10 +58,26 @@ static conn_pool_fd_t get_old(conn_pool_t *pool,
+@@ -59,10 +59,26 @@
  	return fd;
  }
  
@@ -29,7 +27,7 @@ index 3832eff..1db5128 100644
  	while (true) {
  		knot_time_t now = knot_time(), next = 0;
  		knot_timediff_t timeout = conn_pool_timeout(pool, 0);
-@@ -127,7 +143,11 @@ void conn_pool_purge(conn_pool_t *pool)
+@@ -128,7 +144,11 @@
  void conn_pool_deinit(conn_pool_t *pool)
  {
  	if (pool != NULL) {
@@ -41,11 +39,9 @@ index 3832eff..1db5128 100644
  		pthread_join(pool->closing_thread, NULL);
  		conn_pool_purge(pool);
  		pthread_mutex_destroy(&pool->mutex);
-diff --git a/src/knot/common/stats.c b/src/knot/common/stats.c
-index 0da2184..462d22d 100644
 --- a/src/knot/common/stats.c
 +++ b/src/knot/common/stats.c
-@@ -463,8 +463,24 @@ static void dumper_cleanup(_unused_ void *data)
+@@ -463,8 +463,24 @@
  	rcu_unregister_thread();
  }
  
@@ -70,7 +66,7 @@ index 0da2184..462d22d 100644
  	rcu_register_thread();
  	pthread_cleanup_push(dumper_cleanup, NULL);
  
-@@ -508,7 +524,11 @@ void stats_reconfigure(conf_t *conf, server_t *server)
+@@ -508,7 +524,11 @@
  		}
  	// Stop current dumping.
  	} else if (stats.active_dumper) {
@@ -82,7 +78,7 @@ index 0da2184..462d22d 100644
  		pthread_join(stats.dumper, NULL);
  		stats.active_dumper = false;
  	}
-@@ -517,7 +537,11 @@ void stats_reconfigure(conf_t *conf, server_t *server)
+@@ -517,7 +537,11 @@
  void stats_deinit(void)
  {
  	if (stats.active_dumper) {
