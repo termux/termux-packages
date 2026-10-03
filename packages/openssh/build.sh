@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="10.5p1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz"
 TERMUX_PKG_SHA256=494c0624ed743a4eecc1bdd83d2aab9456bdb4cabc511e00599e71493537e258
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
@@ -154,6 +155,11 @@ termux_step_create_debscripts() {
 	echo "echo \"using 'sv-enable ssh-agent'\""
 	echo "echo \"You can also enable sshd to autostart\""
 	echo "echo \"using 'sv-enable sshd'\""
+	echo "echo \"\""
+	echo "echo \"sshd can now auto default to port 22 instead of 8022\""
+	echo "echo \"on next run if your device qualify\""
+	echo "echo \"Refer link below for more information:\""
+	echo "echo \"https://github.com/termux/termux-packages/issues/30246\""
 	echo "exit 0"
 	} > postinst
 	chmod 0700 postinst
