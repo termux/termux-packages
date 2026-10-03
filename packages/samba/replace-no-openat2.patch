@@ -1,0 +1,15 @@
+The Android seccomp filter kills a process calling openat2() with SIGSYS instead
+of failing with ENOSYS, so smbd dies on the first file access. Make
+rep_openat2() fail with ENOSYS, which smbd handles by falling back.
+
+--- a/lib/replace/replace.c
++++ b/lib/replace/replace.c
+@@ -1304,7 +1304,7 @@
+ long rep_openat2(int dirfd, const char *pathname,
+ 		 struct open_how *how, size_t size)
+ {
+-#ifdef __NR_openat2
++#if 0
+ #if _FILE_OFFSET_BITS == 64 && SIZE_MAX == 0xffffffffUL && defined(O_LARGEFILE)
+ 	struct open_how __how;
+ 
