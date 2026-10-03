@@ -18,7 +18,8 @@ termux_pkg_auto_update() {
 			jq -r '.versions[] | select(.suites | index("sid")) | .version'
 	)"
 	if [[ -z "$latest_version" ]]; then
-		termux_error_exit "Unable to determine latest netcat-openbsd version."
+		echo "WARN: Unable to get the latest version." >&2
+		return
 	fi
 	termux_pkg_upgrade_version "$latest_version"
 }
