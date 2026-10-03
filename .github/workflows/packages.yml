@@ -336,7 +336,18 @@ jobs:
     - name: Checksums for built *.deb files
       if: always()
       run: |
-        find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
+        declare -a cleanup_paths
+        cleanup() {
+          rm -v -f "${cleanup_paths[@]}"
+        }
+        _files="$(mktemp .found-deb-files.XXXXXXXX)" || exit
+        cleanup_paths+=("${_files}")
+        trap cleanup EXIT
+
+        find debs -type f -name '*.deb' -print0 > "${_files}"
+        xargs < "${_files}" -0 -r -P 0 -n 10 -- bash -c 'for f; do sha256sum -b "$f" > "${f}.sha256" -- ; done'
+        xargs < "${_files}" -0 -r -I'{}' cat '{}.sha256' | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
+        unset -v _files
     - name: Store checksums for built *.deb files
       if: always()
       uses: actions/upload-artifact@v7
