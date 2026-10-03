@@ -1,0 +1,11 @@
+--- a/src/util/systemutil.cpp
++++ b/src/util/systemutil.cpp
+@@ -26,7 +26,7 @@
+     DEBG << QString("Open URL '%1'").arg(url.toString());
+ 
+     if (qApp->platformName() == "wayland")
+-        runDetachedProcess({"xdg-open", url.toString()});
++        runDetachedProcess({"xdg-utils-xdg-open", url.toString()});
+     else if (!QDesktopServices::openUrl(url))
+         WARN << "Failed to open URL" << url;
+ }
