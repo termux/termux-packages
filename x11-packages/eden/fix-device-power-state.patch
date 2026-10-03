@@ -1,0 +1,15 @@
+--- a/src/common/device_power_state.cpp
++++ b/src/common/device_power_state.cpp
+@@ -8,9 +8,9 @@
+ 
+ #elif defined(__ANDROID__)
+ #include <atomic>
+-extern std::atomic<int> g_battery_percentage;
+-extern std::atomic<bool> g_is_charging;
+-extern std::atomic<bool> g_has_battery;
++std::atomic<int> g_battery_percentage{100};
++std::atomic<bool> g_is_charging{true};
++std::atomic<bool> g_has_battery{false};
+ 
+ #elif defined(__APPLE__)
+ #include <TargetConditionals.h>
