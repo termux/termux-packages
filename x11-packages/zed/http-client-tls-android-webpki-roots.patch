@@ -1,0 +1,57 @@
+--- a/crates/http_client_tls/src/http_client_tls.rs
++++ b/crates/http_client_tls/src/http_client_tls.rs
+@@ -1,10 +1,19 @@
+ use std::sync::OnceLock;
+ 
+ use rustls::ClientConfig;
++#[cfg(not(target_os = "android"))]
+ use rustls_platform_verifier::ConfigVerifierExt;
+ 
+ static TLS_CONFIG: OnceLock<rustls::ClientConfig> = OnceLock::new();
+ 
++fn webpki_roots_config() -> ClientConfig {
++    ClientConfig::builder()
++        .with_root_certificates(rustls::RootCertStore {
++            roots: webpki_roots::TLS_SERVER_ROOTS.to_vec(),
++        })
++        .with_no_client_auth()
++}
++
+ pub fn tls_config() -> ClientConfig {
+     TLS_CONFIG
+         .get_or_init(|| {
+@@ -15,16 +24,24 @@
+                 .install_default()
+                 .ok();
+ 
+-            ClientConfig::with_platform_verifier().unwrap_or_else(|error| {
+-                log::error!(
+-                    "failed to load platform TLS certificate verifier, falling back to bundled webpki roots: {error}"
+-                );
+-                ClientConfig::builder()
+-                    .with_root_certificates(rustls::RootCertStore {
+-                        roots: webpki_roots::TLS_SERVER_ROOTS.to_vec(),
+-                    })
+-                    .with_no_client_auth()
+-            })
++            // The Android platform verifier needs a JVM, which a native
++            // process (e.g. on Termux) does not have. It also always
++            // constructs successfully and only fails on the first
++            // handshake, so the fallback below would never run.
++            #[cfg(target_os = "android")]
++            {
++                webpki_roots_config()
++            }
++
++            #[cfg(not(target_os = "android"))]
++            {
++                ClientConfig::with_platform_verifier().unwrap_or_else(|error| {
++                    log::error!(
++                        "failed to load platform TLS certificate verifier, falling back to bundled webpki roots: {error}"
++                    );
++                    webpki_roots_config()
++                })
++            }
+         })
+         .clone()
+ }

@@ -1,0 +1,43 @@
+--- a/src/freedesktop.rs	2026-10-02 10:19:33.875898141 +0000
++++ b/src/freedesktop.rs	2026-10-02 10:19:34.066029017 +0000
+@@ -924,8 +924,40 @@
+     Ok(result)
+ }
+ 
++#[cfg(target_os = "android")]
++fn get_mount_points() -> Result<Vec<MountPoint>, Error> {
++    // termux-android-mounts: the libc crate has no `getmntent` binding on
++    // Android, so parse /proc/mounts directly. Fields are whitespace separated
++    // and special characters are escaped as octal sequences (e.g. `\040`).
++    fn unescape(field: &str) -> String {
++        field.replace("\\040", " ").replace("\\011", "\t").replace("\\012", "\n").replace("\\134", "\\")
++    }
++
++    let content = std::fs::read_to_string("/proc/mounts")
++        .or_else(|_| std::fs::read_to_string("/proc/self/mounts"))
++        .map_err(|e| Error::Unknown { description: format!("Could not read '/proc/mounts': {e}") })?;
++
++    let mut result = Vec::new();
++    for line in content.lines() {
++        let mut fields = line.split_whitespace();
++        let (Some(fsname), Some(dir), Some(fstype)) = (fields.next(), fields.next(), fields.next()) else {
++            continue;
++        };
++        let dir = unescape(dir);
++        if dir.is_empty() {
++            continue;
++        }
++        result.push(MountPoint { mnt_dir: dir.into(), _mnt_fsname: unescape(fsname), _mnt_type: fstype.into() });
++    }
++    if result.is_empty() {
++        return Err(Error::Unknown { description: "'/proc/mounts' did not contain any mount points.".into() });
++    }
++    Ok(result)
++}
++
+ #[cfg(not(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "openbsd",
