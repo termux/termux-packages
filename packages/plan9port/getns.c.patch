@@ -1,0 +1,17 @@
+--- a/src/lib9/getns.c
++++ b/src/lib9/getns.c
+@@ -50,12 +50,12 @@ nsfromdisplay(void)
+ 			*p = 0;
+ 	}
+ 
+-	/* turn /tmp/launch/:0 into _tmp_launch_:0 (OS X 10.5) */
++	/* turn @TERMUX_PREFIX@/tmp/launch/:0 into _tmp_launch_:0 (OS X 10.5) */
+ 	for(p=disp; *p; p++)
+ 		if(*p == '/')
+ 			*p = '_';
+ 
+-	p = smprint("/tmp/ns.%s.%s", getuser(), disp);
++	p = smprint("@TERMUX_PREFIX@/tmp/ns.%s.%s", getuser(), disp);
+ 	free(disp);
+ 	if(p == nil){
+ 		werrstr("out of memory");

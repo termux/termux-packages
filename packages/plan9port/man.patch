@@ -1,0 +1,13 @@
+--- a/bin/man
++++ b/bin/man
+@@ -59,8 +59,8 @@ fn dohtml {
+ 	if(test -f $b.html)
+ 		web $b.html
+ 	if not{
+-		roff t $1 | troff2html >/tmp/man.$pid.$seq.html
+-		web /tmp/man.$pid.$seq.html
++		roff t $1 | troff2html >@TERMUX_PREFIX@/tmp/man.$pid.$seq.html
++		web @TERMUX_PREFIX@/tmp/man.$pid.$seq.html
+ 		seq=`{echo 1+$seq | hoc}
+ 	}
+ }

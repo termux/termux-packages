@@ -1,0 +1,11 @@
+--- a/src/cmd/devdraw/x11-screen.c
++++ b/src/cmd/devdraw/x11-screen.c
+@@ -335,7 +335,7 @@ runxevent(XEvent *xev)
+ #ifdef SHOWEVENT
+ 	static int first = 1;
+ 	if(first){
+-		dup(create("/tmp/devdraw.out", OWRITE, 0666), 1);
++		dup(create("@TERMUX_PREFIX@/tmp/devdraw.out", OWRITE, 0666), 1);
+ 		setbuf(stdout, 0);
+ 		first = 0;
+ 	}
