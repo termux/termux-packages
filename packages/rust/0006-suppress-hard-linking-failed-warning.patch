@@ -17,7 +17,7 @@
      pub path: &'a Path,
 --- a/compiler/rustc_incremental/src/persist/fs.rs
 +++ b/compiler/rustc_incremental/src/persist/fs.rs
-@@ -264,13 +264,9 @@
+@@ -263,13 +263,9 @@
          debug!("attempting to copy data from source: {}", source_directory.display());
  
          // Try copying over all files from the source directory
@@ -29,6 +29,6 @@
 -                sess.dcx().emit_warn(diagnostics::HardLinkFailed { path: &session_dir });
 -            }
 -
-             sess.init_incr_comp_session(session_dir, directory_lock);
-             return;
+             return IncrCompSession { session_directory: session_dir, _lock_file: directory_lock };
          } else {
+             debug!("copying failed - trying next directory");
