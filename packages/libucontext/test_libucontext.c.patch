@@ -1,0 +1,14 @@
+The freestanding libucontext/bits.h defines struct sigcontext, which conflicts
+with the one from Bionic's <sys/ucontext.h> included by the test.
+
+--- a/test_libucontext.c
++++ b/test_libucontext.c
+@@ -14,7 +14,7 @@
+  * the order that used to produce a hard syntax error on x86/x86_64 in
+  * freestanding mode. */
+ #if defined(__has_include)
+-# if __has_include(<sys/ucontext.h>)
++# if __has_include(<sys/ucontext.h>) && !defined(__ANDROID__)
+ #  include <sys/ucontext.h>
+ # endif
+ #endif
