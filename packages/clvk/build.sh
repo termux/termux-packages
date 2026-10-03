@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kpet/clvk
 TERMUX_PKG_DESCRIPTION="Experimental implementation of OpenCL on Vulkan"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_COMMIT=0ebfb2039152815a5b4db02d46f9313a3e7b72df
-_COMMIT_DATE=20260707
-_COMMIT_TIME=165306
-TERMUX_PKG_VERSION="0.0.20260707.165306"
+_COMMIT=5515919e12e9e82682bb20eb67e2f0269dd138d3
+_COMMIT_DATE=20260920
+_COMMIT_TIME=101658
+TERMUX_PKG_VERSION="0.0.20260920.101658"
 TERMUX_PKG_SRCURL=git+https://github.com/kpet/clvk
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="libc++, vulkan-loader"
@@ -130,30 +130,32 @@ termux_step_host_build() {
 		llvm-tblgen clang-tblgen
 
 	local _host_clang_base="$TERMUX_HOST_LLVM_BASE_DIR"
+	local _libclc_build_dir="${TERMUX_PKG_HOSTBUILD_DIR}/libclc-build"
+	local _libclc_dir="${TERMUX_PKG_HOSTBUILD_DIR}/libclc"
 	cmake \
 		-G Ninja \
-		-B "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
-		-S "${TERMUX_PKG_SRCDIR}/external/clspv/third_party/llvm/libclc" \
-		-DLLVM_DIR="$_host_clang_base/cmake" \
+		-B "${_libclc_build_dir}" \
+		-S "${TERMUX_PKG_SRCDIR}/external/clspv/third_party/llvm/llvm" \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_C_COMPILER="$_host_clang_base/bin/clang" \
 		-DCMAKE_CXX_COMPILER="$_host_clang_base/bin/clang++" \
-		-DRUNTIMES_clspv--_LLVM_ENABLE_RUNTIMES=libclc \
-		-DLLVM_DEFAULT_TARGET_TRIPLE="clspv--"
+		-DLLVM_ENABLE_PROJECTS=clang \
+		-DRUNTIMES_spirv32-unknown-vulkan_LLVM_ENABLE_RUNTIMES=libclc \
+		-DRUNTIMES_spirv64-unknown-vulkan_LLVM_ENABLE_RUNTIMES=libclc \
+		-DLLVM_TARGETS_TO_BUILD=Native \
+		-DLLVM_RUNTIME_TARGETS="spirv32-unknown-vulkan;spirv64-unknown-vulkan"
 	ninja \
-		-C "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
-		-j "${TERMUX_PKG_MAKE_PROCESSES}"
-	cmake \
-		-G Ninja \
-		-B "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
-		-S "${TERMUX_PKG_SRCDIR}/external/clspv/third_party/llvm/libclc" \
-		-DLLVM_DIR="$_host_clang_base/cmake" \
-		-DCMAKE_C_COMPILER="$_host_clang_base/bin/clang" \
-		-DCMAKE_CXX_COMPILER="$_host_clang_base/bin/clang++" \
-		-DRUNTIMES_clspv64--_LLVM_ENABLE_RUNTIMES=libclc \
-		-DLLVM_DEFAULT_TARGET_TRIPLE="clspv64--"
-	ninja \
-		-C "${TERMUX_PKG_HOSTBUILD_DIR}/libclc" \
-		-j "${TERMUX_PKG_MAKE_PROCESSES}"
+		-C "${_libclc_build_dir}" \
+		-j "${TERMUX_PKG_MAKE_PROCESSES}" \
+		libclc
+
+	mkdir -p \
+		"${_libclc_dir}/spirv32-unknown-vulkan" \
+		"${_libclc_dir}/spirv64-unknown-vulkan"
+	cp "$(find "${_libclc_build_dir}" -type f -name libclc.bc | grep '/spirv32-unknown-vulkan/' | head -n1)" \
+		"${_libclc_dir}/spirv32-unknown-vulkan/libclc.bc"
+	cp "$(find "${_libclc_build_dir}" -type f -name libclc.bc | grep '/spirv64-unknown-vulkan/' | head -n1)" \
+		"${_libclc_dir}/spirv64-unknown-vulkan/libclc.bc"
 }
 
 termux_step_pre_configure() {
