@@ -21,20 +21,36 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	# Get the SHA256 checksum from the release artifacts
+	local TERMUX_BUN_SHA256
+	TERMUX_BUN_SHA256="$(
+		curl -sL \
+			-H "X-GitHub-Api-Version: 2026-03-10" \
+			-H "Accept: application/vnd.github+json" \
+			-A "Termux update checker 1.1 (github.com/termux/termux-packages)" \
+			"https://api.github.com/repos/oven-sh/bun/releases/tags/${latest_tag}" \
+		| jq -r '.[].[]? | select(.name? == "bun-linux-x64.zip") | .digest | ltrimstr("sha256:")'
+	)"
+
+	if [[ ! "${TERMUX_BUN_SHA256:-}" =~ [0-9a-f]{64} ]]; then
+		printf '%s\n' \
+			"Could not fetch valid SHA256 sum from upstream release artifacts." \
+			"Got: '${TERMUX_BUN_SHA256:-}'" >&2
+		return
+	fi
+
+	printf '%s\n' \
+		"" \
+		"Toolchain:" \
+		"bun-linux-x64.zip  $TERMUX_BUN_SHA256" \
+		""
+
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
 		echo "INFO: package needs to be updated to ${latest_version}."
 		return
 	fi
 
 	# Update the version and checksum in termux_setup_bun
-	local TERMUX_BUN_ZIP
-	TERMUX_BUN_ZIP="$(mktemp)"
-	curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-v${latest_version}/bun-linux-x64.zip" \
-		-o "${TERMUX_BUN_ZIP}"
-	local TERMUX_BUN_SHA256
-	TERMUX_BUN_SHA256="$(sha256sum "${TERMUX_BUN_ZIP}" | cut -d" " -f1)"
-	rm -f "${TERMUX_BUN_ZIP}"
-
 	sed \
 		-e "s|local TERMUX_BUN_VERSION=.*|local TERMUX_BUN_VERSION=\"\${TERMUX_BUN_VERSION:-${latest_version}}\"|" \
 		-e "s|local TERMUX_BUN_SHA256=.*|local TERMUX_BUN_SHA256=\"${TERMUX_BUN_SHA256}\"|" \
