@@ -1,22 +1,87 @@
-diff --git a/servconf.c b/servconf.c
-index ce388f1dd..0f0be09f4 100644
 --- a/servconf.c
 +++ b/servconf.c
-@@ -324,7 +324,7 @@ fill_default_server_options(ServerOptions *options)
+@@ -40,6 +40,11 @@
+ #include <errno.h>
+ #include <util.h>
+ 
++#ifdef __ANDROID__
++#include <sys/system_properties.h>
++#include <sys/utsname.h>
++#endif
++
+ #include "xmalloc.h"
+ #include "ssh.h"
+ #include "log.h"
+@@ -265,6 +270,54 @@
+ 	free(apath);
+ }
+ 
++static inline int is_device_qualify() {
++#ifdef __ANDROID__
++	static const int minimum_sdk = 33;
++	static const int minimum_major = 5;
++	static const int minimum_minor = 15;
++	static const int minimum_patch = 0;
++	static const int minimum_year = 2026;
++	static const int minimum_month = 5;
++	static const int minimum_day = 1;
++	static int sdk = 0;
++	static int major = 0;
++	static int minor = 0;
++	static int patch = 0;
++	static int year = 0;
++	static int month = 0;
++	static int day = 0;
++	static char prop_sdk[PROP_VALUE_MAX] = {0};
++	static char prop_security_patch[PROP_VALUE_MAX] = {0};
++	static struct utsname buffer_uts = {0};
++
++	uname(&buffer_uts);
++	sscanf(buffer_uts.release, "%d.%d.%d", &major, &minor, &patch);
++
++	__system_property_get("ro.build.version.sdk", prop_sdk);
++	__system_property_get("ro.build.version.security_patch", prop_security_patch);
++
++	if (strlen(prop_sdk) > 0) {
++		sscanf(prop_sdk, "%d-%d-%d", &sdk);
++	}
++
++	// YYYY-MM-DD is length size 10
++	if (strlen(prop_security_patch) == 10) {
++		sscanf(prop_security_patch, "%d-%d-%d", &year, &month, &day);
++	}
++
++	// 0: device is not qualified
++	// 1: device is qualified
++	if (sdk < minimum_sdk) { return 0; }
++	if (major < minimum_major) { return 0; }
++	if (major == minimum_major && minor < minimum_minor) { return 0; }
++	if (major == minimum_major && minor == minimum_minor && patch < minimum_minor) { return 0; }
++	if (year < minimum_year) { return 0; }
++	if (year == minimum_year && month < minimum_month) { return 0; }
++	if (year == minimum_year && month == minimum_month && day < minimum_day) { return 0; }
++#endif
++    return 1;
++}
++
+ void
+ fill_default_server_options(ServerOptions *options)
+ {
+@@ -322,7 +375,7 @@
  	}
  	/* No certificates by default */
  	if (options->num_ports == 0)
 -		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
-+		options->ports[options->num_ports++] = 8022 /* SSH_DEFAULT_PORT */;
++		options->ports[options->num_ports++] = is_device_qualify() ? SSH_DEFAULT_PORT : 8022;
  	if (options->listen_addrs == NULL)
  		add_listen_addr(options, NULL, NULL, 0);
  	if (options->pid_file == NULL)
-@@ -724,7 +724,7 @@ process_queued_listen_addrs(ServerOptions *options)
+@@ -722,7 +775,7 @@
  	struct queued_listenaddr *qla;
  
  	if (options->num_ports == 0)
 -		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
-+		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
++		options->ports[options->num_ports++] = is_device_qualify() ? SSH_DEFAULT_PORT : 8022;
  	if (options->address_family == -1)
  		options->address_family = AF_UNSPEC;
  
