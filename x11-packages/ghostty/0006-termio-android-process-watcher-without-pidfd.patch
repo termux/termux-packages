@@ -1,0 +1,201 @@
+--- a/src/termio/Exec.zig
++++ b/src/termio/Exec.zig
+@@ -30,6 +30,169 @@
+ 
+ const log = std.log.scoped(.io_exec);
+ 
++/// The type used to watch for the subprocess exiting.
++///
++/// libxev watches children with a pidfd, which doesn't work on the old
++/// kernels many Android devices ship (4.19 here): pidfd_open rejects its
++/// PIDFD_NONBLOCK flag with EINVAL and waitid(P_PIDFD) doesn't exist before
++/// 5.4. Worse, libxev decodes the raw syscall result with `posix.errno`,
++/// which with libc linked does not understand `-EINVAL`, so it "succeeds"
++/// with fd=-22, the poll fails with EBADF and the surface is closed right
++/// after the shell starts. On Android use a plain waitid(P_PID) in a helper
++/// thread that wakes the event loop through an xev.Async instead.
++const ProcessWatcher = if (builtin.target.abi.isAndroid())
++    AndroidProcessWatcher
++else
++    xev.Process;
++
++const AndroidProcessWatcher = struct {
++    const Self = @This();
++
++    pub const WaitError = xev.Async.WaitError;
++
++    /// Phases of `State.phase`.
++    const phase_running = 0;
++    const phase_notifying = 1;
++    const phase_cancelled = 2;
++    const phase_done = 3;
++
++    const State = struct {
++        pid: posix.pid_t,
++        notifier: xev.Async,
++        exit_code: std.atomic.Value(u32) = .init(0),
++        phase: std.atomic.Value(u8) = .init(phase_running),
++    };
++
++    state: *State,
++
++    pub fn init(pid: posix.pid_t) !Self {
++        const alloc = std.heap.page_allocator;
++        const state = try alloc.create(State);
++        errdefer alloc.destroy(state);
++        state.* = .{ .pid = pid, .notifier = try xev.Async.init() };
++        errdefer state.notifier.deinit();
++
++        const thread = try std.Thread.spawn(
++            .{ .stack_size = 128 * 1024 },
++            run,
++            .{state},
++        );
++        thread.detach();
++
++        return .{ .state = state };
++    }
++
++    pub fn deinit(self: *Self) void {
++        const state = self.state;
++
++        // Copy the handle first: if the helper thread is still waiting it
++        // frees `state` as soon as it sees the cancellation.
++        var notifier = state.notifier;
++        if (state.phase.cmpxchgStrong(
++            phase_running,
++            phase_cancelled,
++            .acq_rel,
++            .acquire,
++        ) == null) {
++            notifier.deinit();
++            return;
++        }
++
++        // The helper thread is notifying or finished, wait for it.
++        while (state.phase.load(.acquire) != phase_done) std.Thread.yield() catch {};
++        notifier.deinit();
++        std.heap.page_allocator.destroy(state);
++    }
++
++    pub fn wait(
++        self: Self,
++        loop: *xev.Loop,
++        c: *xev.Completion,
++        comptime Userdata: type,
++        userdata: ?*Userdata,
++        comptime cb: *const fn (
++            ud: ?*Userdata,
++            l: *xev.Loop,
++            c: *xev.Completion,
++            r: WaitError!u32,
++        ) xev.CallbackAction,
++    ) void {
++        self.state.notifier.wait(loop, c, Userdata, userdata, (struct {
++            fn callback(
++                ud: ?*Userdata,
++                l: *xev.Loop,
++                c_inner: *xev.Completion,
++                r: xev.Async.WaitError!void,
++            ) xev.CallbackAction {
++                const code: WaitError!u32 = if (r) |_| code: {
++                    const state = ud.?.backend.exec.process.?.state;
++
++                    // The helper thread only peeked at the exit status
++                    // (WNOWAIT), reap the child here like libxev's pidfd
++                    // waitid would. If the surface is torn down before this
++                    // runs, Subprocess.stop does the reaping instead.
++                    var info: std.os.linux.siginfo_t = undefined;
++                    _ = std.os.linux.waitid(
++                        .PID,
++                        state.pid,
++                        &info,
++                        std.os.linux.W.EXITED | std.os.linux.W.NOHANG,
++                    );
++
++                    break :code state.exit_code.load(.acquire);
++                } else |err| err;
++                return cb(ud, l, c_inner, code);
++            }
++        }).callback);
++    }
++
++    fn run(state: *State) void {
++        const linux = std.os.linux;
++
++        var code: u32 = 0;
++        while (true) {
++            var info: linux.siginfo_t = undefined;
++            // WNOWAIT: only wait for the exit, never reap. Reaping happens
++            // in the wait callback or in Subprocess.stop, so we can't race
++            // with either of them.
++            const rc = linux.waitid(
++                .PID,
++                state.pid,
++                &info,
++                linux.W.EXITED | linux.W.NOWAIT,
++            );
++            // The raw syscall returns -errno, decode it ourselves.
++            switch (linux.E.init(rc)) {
++                .SUCCESS => {
++                    code = @intCast(info.fields.common.second.sigchld.status);
++                    break;
++                },
++                .INTR => continue,
++
++                // Someone else already reaped the child (e.g.
++                // Subprocess.stop); report it as exited anyway.
++                else => break,
++            }
++        }
++
++        state.exit_code.store(code, .release);
++
++        if (state.phase.cmpxchgStrong(
++            phase_running,
++            phase_notifying,
++            .acq_rel,
++            .acquire,
++        ) == null) {
++            state.notifier.notify() catch |err|
++                log.warn("failed to notify process exit err={}", .{err});
++            state.phase.store(phase_done, .release);
++        } else {
++            // Cancelled by deinit, which left the state to us.
++            std.heap.page_allocator.destroy(state);
++        }
++    }
++};
++
+ /// The termios poll rate in milliseconds.
+ const TERMIOS_POLL_MS = 200;
+ 
+@@ -102,8 +265,8 @@
+     errdefer self.subprocess.stop();
+ 
+     // Watcher to detect subprocess exit
+-    var process: ?xev.Process = if (self.subprocess.process) |v| switch (v) {
+-        .fork_exec => |cmd| try xev.Process.init(
++    var process: ?ProcessWatcher = if (self.subprocess.process) |v| switch (v) {
++        .fork_exec => |cmd| try ProcessWatcher.init(
+             cmd.pid orelse return error.ProcessNoPid,
+         ),
+ 
+@@ -296,7 +459,7 @@
+     td_: ?*termio.Termio.ThreadData,
+     _: *xev.Loop,
+     _: *xev.Completion,
+-    r: xev.Process.WaitError!u32,
++    r: ProcessWatcher.WaitError!u32,
+ ) xev.CallbackAction {
+     const exit_code = r catch unreachable;
+     processExitCommon(td_.?, exit_code);
+@@ -502,7 +665,7 @@
+     write_stream: xev.Stream,
+ 
+     /// The process watcher
+-    process: ?xev.Process,
++    process: ?ProcessWatcher,
+ 
+     /// This is the pool of available (unused) write requests. If you grab
+     /// one from the pool, you must put it back when you're done!
