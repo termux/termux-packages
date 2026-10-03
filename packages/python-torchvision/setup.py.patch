@@ -23,7 +23,7 @@
  
  package_name = os.getenv("TORCHVISION_PACKAGE_NAME", "torchvision")
  
-@@ -163,10 +162,10 @@
+@@ -169,10 +168,10 @@
              # The jpeg decode .cpp also calls these shims (incl.
              # torch_get_cuda_stream_from_pool), so cxx needs USE_CUDA too.
              extra_compile_args["cxx"].append("-DUSE_CUDA")
@@ -36,7 +36,7 @@
  
  
  _HIPIFIED = False
-@@ -213,7 +212,7 @@
+@@ -219,7 +218,7 @@
          sources += cuda_sources
      else:
          Extension = CppExtension
@@ -45,7 +45,7 @@
              sources += mps_sources
  
      define_macros, extra_compile_args = get_macros_and_flags()
-@@ -366,7 +365,7 @@
+@@ -372,7 +371,7 @@
          else:
              warnings.warn("Building torchvision without WEBP support")
  
@@ -54,7 +54,7 @@
          nvjpeg_found = CUDA_HOME is not None and (Path(CUDA_HOME) / "include/nvjpeg.h").exists()
          if nvjpeg_found:
              print("Building torchvision with NVJPEG image support")
-@@ -435,7 +434,6 @@
+@@ -441,7 +440,6 @@
          ext_modules=extensions,
          python_requires=">=3.10,!=3.14.1",
          cmdclass={
