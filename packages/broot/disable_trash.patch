@@ -1,6 +1,5 @@
-diff -uNr broot-1.50.0/src/browser/browser_state.rs broot-1.50.0.mod/src/browser/browser_state.rs
---- broot-1.50.0/src/browser/browser_state.rs	2025-09-25 22:44:21.000000000 +0530
-+++ broot-1.50.0.mod/src/browser/browser_state.rs	2025-10-05 10:48:52.887174535 +0530
+--- a/src/browser/browser_state.rs
++++ b/src/browser/browser_state.rs
 @@ -681,6 +681,15 @@
                      CmdResult::Keep
                  }
@@ -15,12 +14,11 @@ diff -uNr broot-1.50.0/src/browser/browser_state.rs broot-1.50.0.mod/src/browser
 +                )
 +            ))]
              Internal::trash => {
-                 let path = self.displayed_tree().selected_line().path.to_path_buf();
-                 info!("trash {:?}", &path);
-diff -uNr broot-1.50.0/src/stage/stage_state.rs broot-1.50.0.mod/src/stage/stage_state.rs
---- broot-1.50.0/src/stage/stage_state.rs	2025-09-25 22:44:21.000000000 +0530
-+++ broot-1.50.0.mod/src/stage/stage_state.rs	2025-10-05 10:49:19.810894909 +0530
-@@ -474,6 +474,15 @@
+                 let path = self.displayed_tree().selected_line().path.clone();
+                 info!("trash {:?}", path);
+--- a/src/stage/stage_state.rs
++++ b/src/stage/stage_state.rs
+@@ -479,6 +479,15 @@
                      CmdResult::error("you must select a path to unstage")
                  }
              }
