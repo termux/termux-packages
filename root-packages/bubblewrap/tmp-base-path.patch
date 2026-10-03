@@ -1,0 +1,14 @@
+Android has no /tmp, so the mount of the new root tmpfs on the hardcoded /tmp
+fails with ENOENT. Use the Termux tmp directory instead.
+
+--- a/bubblewrap.c
++++ b/bubblewrap.c
+@@ -3041,7 +3041,7 @@
+    * that is sure to exist, that is sure to not be a symlink controlled
+    * by someone malicious, and that we won't immediately need to
+    * access ourselves. */
+-  base_path = "/tmp";
++  base_path = "@TERMUX_PREFIX@/tmp";
+ 
+   debug ("creating new namespace");
+ 
