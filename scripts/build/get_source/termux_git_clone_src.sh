@@ -43,33 +43,51 @@ termux_git_clone_src() {
 		echo "Downloading git source ${termux_pkg_branch_flags[1]:+"with branch '${termux_pkg_branch_flags[1]}' "}from '$termux_pkg_srcurl'"
 
 		rm -rf "$TMP_CHECKOUT"
-		git clone \
-			--depth 1 \
-			"${termux_pkg_branch_flags[@]}" \
-			"$termux_pkg_srcurl" \
-			"$TMP_CHECKOUT"
 
-		# Workaround some bad server behaviour
-		# error: Server does not allow request for unadvertised object commit_no
-		# fatal: Fetched in submodule 'submodule_path', but it did not contain commit_no. Direct fetching of that commit failed.
-		if ! git -C "$TMP_CHECKOUT" submodule update --init --recursive --depth=1; then
-			local depth=10
-			local maxdepth=100
-			sleep 1
-			while :; do
-				echo "WARN: Retrying with max depth $depth"
-				if git -C "$TMP_CHECKOUT" \
-					-c 'url.https://github.com/.insteadOf=git@github.com:' \
-					submodule update --init --recursive \
-					--depth="$depth"; then
-					break
-				fi
-				if (( depth > maxdepth )); then
-					termux_error_exit "Failed to clone submodule"
-				fi
-				(( depth += 10 ))
+		local git_archive="$(basename ${termux_pkg_srcurl})_${termux_pkg_branch_flags[1]}.tar.xz"
+		if termux_download_source_mirror "${TERMUX_PKG_NAME}" \
+				"${termux_pkg_branch_flags[1]}.tar.xz" \
+				"$TERMUX_PKG_CACHEDIR/$git_archive"; then
+			mkdir -p "$TMP_CHECKOUT"
+			tar -x --xz -C "$TMP_CHECKOUT" -f "$TERMUX_PKG_CACHEDIR/$git_archive" || return 1
+		else
+			git clone \
+				--depth 1 \
+				"${termux_pkg_branch_flags[@]}" \
+				"$termux_pkg_srcurl" \
+				"$TMP_CHECKOUT"
+
+			# Workaround some bad server behaviour
+			# error: Server does not allow request for unadvertised object commit_no
+			# fatal: Fetched in submodule 'submodule_path', but it did not contain commit_no. Direct fetching of that commit failed.
+			if ! git -C "$TMP_CHECKOUT" submodule update --init --recursive --depth=1; then
+				local depth=10
+				local maxdepth=100
 				sleep 1
-			done
+				while :; do
+					echo "WARN: Retrying with max depth $depth"
+					if git -C "$TMP_CHECKOUT" \
+						-c 'url.https://github.com/.insteadOf=git@github.com:' \
+						submodule update --init --recursive \
+						--depth="$depth"; then
+						break
+					fi
+					if (( depth > maxdepth )); then
+						termux_error_exit "Failed to clone submodule"
+					fi
+					(( depth += 10 ))
+				sleep 1
+				done
+			fi
+
+			if [ "$TERMUX_COPY_TO_SOURCE_MIRROR" = "true" ]; then
+				if [ "${TERMUX_PKG_NAME}" = "aapt" ]; then
+					echo "aapt git archive is bigger than 2 gigabytes and cannot be uploaded to Github source mirror"
+				else
+					mkdir -p "$TERMUX_OUTPUT_DIR/source"
+					tar -c -C "$TMP_CHECKOUT" . | xz -T0 > "${TERMUX_OUTPUT_DIR}/source/$git_archive" || exit 1
+				fi
+			fi
 		fi
 
 		echo "$TERMUX_PKG_VERSION" > "$TMP_CHECKOUT_VERSION"
