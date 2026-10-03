@@ -1,0 +1,16 @@
+--- configure.ac
++++ configure.ac
+@@ -170,7 +170,12 @@
+ AC_CHECK_FUNC([getresuid], [XLOCALEDIR_IS_SAFE="yes"]
+ 	AC_DEFINE(HASGETRESUID,1,[Has getresuid() & getresgid() functions]))
+ # Used in Font.c
+-AC_CHECK_FUNC([shmat], AC_DEFINE(HAS_SHM,1,[Has shm*() functions]))
++AC_CHECK_HEADERS([sys/shm.h])
++AC_CHECK_FUNC([shmat])
++
++if test "$ac_cv_header_sys_shm_h" = yes && test "$ac_cv_func_shmat" = yes; then
++    AC_DEFINE(HAS_SHM,1,[Has shm*() functions])
++fi
+ 
+ # Checks for system services
+ # AC_PATH_XTRA
