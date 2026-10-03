@@ -1,0 +1,11 @@
+--- a/plugins/system/src/plugin.cpp
++++ b/plugins/system/src/plugin.cpp
+@@ -267,7 +267,7 @@
+                 {
+                     c.default_title, c.description,
+                     [this, &c](){ runDetachedProcess({
+-                        u"/bin/sh"_s, u"-c"_s,
++                        u"@TERMUX_PREFIX@/bin/sh"_s, u"-c"_s,
+                         settings()->value(c.config_key_command, defaultCommand(c.id)).toString()});
+                     }
+                 }
