@@ -1,0 +1,22 @@
+--- a/sunpro/Make/bin/make/common/Makefile.orig	2021-06-04 16:47:25 UTC
++++ b/sunpro/Make/bin/make/common/Makefile
+@@ -8,8 +8,8 @@ include		$(SRCROOT)/$(RULESDIR)/rules.top
+ ###########################################################################
+ 
+ INSDIR=		bin
+-TARGET=		make
+-HARDLINKS=	dmake svr4.make ../lib/svr4.make ../xpg4/bin/make
++TARGET=		dmake
++HARDLINKS=	svr4.make ../lib/svr4.make ../xpg4/bin/make
+ CPPOPTS +=	-I../../../../include
+ CPPOPTS +=	-I../../../include
+ #CPPOPTS +=	-compat=4
+@@ -48,7 +48,7 @@ C++FILES=	ar.cc depvar.cc dist.cc dmake.cc doname.cc dosys.cc \
+ # $(LIB_PTHREAD) WARNING: in Linux, sem_post() is in libpthread
+ #
+ #LIBS=		-lmksh  -lmksdmsi18n  -lbsd  -lvroot -lintl -lnsl  -lsocket  -lw
+-LIBS=		-lmksh  -lbsd  -lvroot $(LIB_NSL) -lgetopt -lschily $(LIB_RT) $(LIB_PTHREAD) $(LIB_INTL)
++LIBS=		-lmksh  -lsbsd  -lvroot $(LIB_NSL) -lgetopt -lschily $(LIB_RT) $(LIB_PTHREAD) $(LIB_INTL)
+ 
+ XMK_FILE=	Makefile.man svmakeman.mk dmakeman.mk Makefile.def svmakedef.mk
+ 
