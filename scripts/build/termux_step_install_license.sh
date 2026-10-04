@@ -64,9 +64,9 @@ termux_step_install_license() {
 			done
 		done
 
-		# Add Uppercase and UPPESTCASE variants of the filenames
-		for LICENSE in "${COMMON_LICENSE_FILES[@]@u}" "${COMMON_LICENSE_FILES[@]@U}"; do
-			COMMON_LICENSE_FILES+=("$LICENSE") # times 3
+		# Add lowercase, Uppercase and UPPESTCASE variants of the filenames
+		for LICENSE in "${COMMON_LICENSE_FILES[@]@L}" "${COMMON_LICENSE_FILES[@]@u}" "${COMMON_LICENSE_FILES[@]@U}"; do
+			COMMON_LICENSE_FILES+=("$LICENSE") # times 4
 		done
 
 		# Add *.md, *.MD, *.rst, *.RST, *.txt, *.TXT variants
