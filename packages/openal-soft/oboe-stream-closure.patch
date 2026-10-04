@@ -1,0 +1,71 @@
+Upstream: https://github.com/kcat/openal-soft/pull/1322
+Commit: c86ec9ea5d2c685ba03b037da3309ef2e55f6c62
+Close Oboe streams before replacing ownership or destroying callbacks.
+Remove when updating to an upstream release containing this commit.
+
+--- a/alc/backends/oboe.cpp
++++ b/alc/backends/oboe.cpp
+@@ -29,6 +29,7 @@ using namespace std::string_view_literals;
+ 
+ struct OboePlayback final : BackendBase, oboe::AudioStreamCallback {
+     explicit OboePlayback(gsl::not_null<DeviceBase*> const device) : BackendBase{device} { }
++    ~OboePlayback() override;
+ 
+     std::shared_ptr<oboe::AudioStream> mStream;
+ 
+@@ -44,6 +45,13 @@ struct OboePlayback final : BackendBase, oboe::AudioStreamCallback {
+ };
+ 
+ 
++OboePlayback::~OboePlayback()
++{
++    if(mStream)
++        mStream->close();
++}
++
++
+ auto OboePlayback::onAudioReady(oboe::AudioStream *const oboeStream, void *const audioData,
+     int32_t const numFrames) -> oboe::DataCallbackResult
+ {
+@@ -77,11 +85,19 @@ void OboePlayback::open(std::string_view name)
+         throw al::backend_exception{al::backend_error::DeviceError, "Failed to create stream: {}",
+             oboe::convertToText(result)};
+ 
++    stream->close();
++
+     mDeviceName = name;
+ }
+ 
+ auto OboePlayback::reset() -> bool
+ {
++    if(mStream)
++    {
++        mStream->close();
++        mStream.reset();
++    }
++
+     auto builder = oboe::AudioStreamBuilder{};
+     builder.setDirection(oboe::Direction::Output);
+     builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+@@ -218,6 +234,7 @@ void OboePlayback::stop()
+ 
+ struct OboeCapture final : BackendBase, oboe::AudioStreamCallback {
+     explicit OboeCapture(gsl::not_null<DeviceBase*> const device) : BackendBase{device} { }
++    ~OboeCapture() override;
+ 
+     std::shared_ptr<oboe::AudioStream> mStream;
+ 
+@@ -233,6 +250,13 @@ struct OboeCapture final : BackendBase, oboe::AudioStreamCallback {
+     auto availableSamples() -> std::size_t override;
+ };
+ 
++OboeCapture::~OboeCapture()
++{
++    if(mStream)
++        mStream->close();
++}
++
++
+ auto OboeCapture::onAudioReady(oboe::AudioStream*, void *const audioData, int32_t const numFrames)
+     -> oboe::DataCallbackResult
+ {
