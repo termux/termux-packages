@@ -1,0 +1,132 @@
+diff --git a/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller.cpp b/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller.cpp
+index c9fc1f3..106ae93 100644
+--- a/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller.cpp
++++ b/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller.cpp
+@@ -73,7 +73,7 @@ TFilePath getGlobalRoot() {
+       "./" + tver.getAppName() + ".app/Contents/Resources/configfarmroot.txt";
+ #else
+   // set path to something suitable for most linux (Unix?) systems
+-  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
++  std::string unixpath = "@TERMUX_PREFIX@/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #endif
+   TFilePath name(unixpath);
+   Tifstream is(name);
+@@ -122,7 +122,7 @@ TFilePath getLocalRoot() {
+   std::string unixpath =
+       "/usr/local/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #else
+-  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
++  std::string unixpath = "@TERMUX_PREFIX@/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #endif
+ #endif
+   TFilePath name(unixpath);
+@@ -2297,7 +2297,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
+ 
+ #ifdef __sgi
+   {
+-    std::ofstream os("/tmp/.tfarmcontroller.dat");
++    std::ofstream os("@TERMUX_PREFIX@/tmp/.tfarmcontroller.dat");
+     os << port;
+   }
+ #endif
+@@ -2346,7 +2346,7 @@ void ControllerService::onStart(int argc, char *argv[]) {
+   // std::cout << msg;
+ 
+ #ifdef __sgi
+-  { remove("/tmp/.tfarmcontroller.dat"); }
++  { remove("@TERMUX_PREFIX@/tmp/.tfarmcontroller.dat"); }
+ #endif
+ }
+ 
+diff --git a/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller_shutdown.cpp b/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller_shutdown.cpp
+index 1e7005c..2d184fa 100644
+--- a/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller_shutdown.cpp
++++ b/toonz/sources/toonzfarm/tfarmcontroller/tfarmcontroller_shutdown.cpp
+@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
+   int s;
+   int portNumber = 8000;
+   {
+-    std::ifstream is("/tmp/.tfarmcontroller.dat");
++    std::ifstream is("@TERMUX_PREFIX@/tmp/.tfarmcontroller.dat");
+     is >> portNumber;
+   }
+   //  std::cout << "shutting down " << portNumber << std::endl;
+diff --git a/toonz/sources/toonzfarm/tfarmserver/tfarmserver.cpp b/toonz/sources/toonzfarm/tfarmserver/tfarmserver.cpp
+index 33db458..0bab8fe 100644
+--- a/toonz/sources/toonzfarm/tfarmserver/tfarmserver.cpp
++++ b/toonz/sources/toonzfarm/tfarmserver/tfarmserver.cpp
+@@ -71,7 +71,7 @@ TFilePath getGlobalRoot() {
+       "./" + tver.getAppName() + ".app/Contents/Resources/configfarmroot.txt";
+ #else
+   // set path to something suitable for most linux (Unix?) systems
+-  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
++  std::string unixpath = "@TERMUX_PREFIX@/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #endif
+   TFilePath name(unixpath);
+   Tifstream is(name);
+@@ -119,7 +119,7 @@ TFilePath getLocalRoot() {
+   std::string unixpath =
+       "/usr/local/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #else
+-  std::string unixpath = "/etc/" + tver.getAppName() + "/opentoonz.conf";
++  std::string unixpath = "@TERMUX_PREFIX@/etc/" + tver.getAppName() + "/opentoonz.conf";
+ #endif
+ #endif
+   TFilePath name(unixpath);
+@@ -884,7 +884,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
+ 
+ #ifdef __sgi
+   {
+-    std::ofstream os("/tmp/.tfarmserverd.dat");
++    std::ofstream os("@TERMUX_PREFIX@/tmp/.tfarmserverd.dat");
+     os << m_port;
+   }
+ #endif
+@@ -932,7 +932,7 @@ void FarmServerService::onStart(int argc, char *argv[]) {
+   int rc = m_farmServer->getExitCode();
+ 
+ #ifdef __sgi
+-  remove("/tmp/.tfarmserver.dat");
++  remove("@TERMUX_PREFIX@/tmp/.tfarmserver.dat");
+ #endif
+ 
+   if (rc != 0) {
+diff --git a/toonz/sources/toonzfarm/tfarmserver/tfarmserver_shutdown.cpp b/toonz/sources/toonzfarm/tfarmserver/tfarmserver_shutdown.cpp
+index a3ff6fc..2ec3d69 100644
+--- a/toonz/sources/toonzfarm/tfarmserver/tfarmserver_shutdown.cpp
++++ b/toonz/sources/toonzfarm/tfarmserver/tfarmserver_shutdown.cpp
+@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
+   int s;
+   int portNumber = 8002;
+   {
+-    std::ifstream is("/tmp/.tfarmserverd.dat");
++    std::ifstream is("@TERMUX_PREFIX@/tmp/.tfarmserverd.dat");
+     is >> portNumber;
+   }
+   //  std::cout << "shutting down " << portNumber << std::endl;
+diff --git a/toonz/sources/toonzlib/thirdparty.cpp b/toonz/sources/toonzlib/thirdparty.cpp
+index ec5b9aa..e9fde05 100644
+--- a/toonz/sources/toonzlib/thirdparty.cpp
++++ b/toonz/sources/toonzlib/thirdparty.cpp
+@@ -141,9 +141,7 @@ QString autodetectFFmpeg() {
+   if (findFFmpeg("./FFmpeg/bin")) return "./FFmpeg/bin";
+ 
+ #ifndef _WIN32
+-  if (findFFmpeg("/usr/local/bin")) return "/usr/local/bin";
+-  if (findFFmpeg("/usr/bin")) return "/usr/bin";
+-  if (findFFmpeg("/bin")) return "/bin";
++  if (findFFmpeg("@TERMUX_PREFIX@/bin")) return "@TERMUX_PREFIX@/bin";
+ #endif
+ 
+   return "";
+@@ -285,9 +283,7 @@ QString autodetectRhubarb() {
+   if (findRhubarb("./Rhubarb-Lip-Sync")) return "./Rhubarb-Lip-Sync";
+ 
+ #ifndef _WIN32
+-  if (findRhubarb("/usr/local/bin")) return "/usr/local/bin";
+-  if (findRhubarb("/usr/bin")) return "/usr/bin";
+-  if (findRhubarb("/bin")) return "/bin";
++  if (findRhubarb("@TERMUX_PREFIX@/bin")) return "@TERMUX_PREFIX@/bin";
+ #endif
+ 
+   return "";
