@@ -1,0 +1,6 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+GDK_BACKEND="${GDK_BACKEND:-x11}" \
+WEBKIT_DISABLE_COMPOSITING_MODE="${WEBKIT_DISABLE_COMPOSITING_MODE:-1}" \
+ELECTRON_IS_DEV=0 \
+exec "@TERMUX_PREFIX@/bin/electron42" "@TERMUX_PREFIX@/opt/joplin-desktop/resources/app.asar" "$@"
