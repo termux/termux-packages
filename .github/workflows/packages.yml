@@ -93,6 +93,17 @@ jobs:
 
         OLD_COMMIT="$OLD_COMMIT" HEAD_COMMIT="$HEAD_COMMIT" GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" scripts/utils/termux_reuse_pr_build_artifacts.sh "${{ github.event_name }}" "${{ matrix.target_arch }}" || true
 
+        # A subpackage goes to the repository named by TERMUX_SUBPKG_REPO
+        # (main, x11 or root), or to the repository of its parent package.
+        subpkg_repo_name() {
+          local target
+          target="$(sed -nE "s/^TERMUX_SUBPKG_REPO=[\"']?([^\"']*)[\"']?\$/\\1/p" "$1")"
+          case "$target" in
+            main|x11|root) echo "termux-$target" ;;
+            *) echo "$2" ;;
+          esac
+        }
+
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # GitHub sometimes add merge commits at the end
           # To prevent user confusion, filter them with --no-merges
@@ -129,7 +140,7 @@ jobs:
                   # If there are subpackages we want to create a list of those
                   # as well
                   for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$file" "$repo")_subpackages.txt
                   done
                 else
                   echo "$pkg" >> ./deleted_${repo}_packages
@@ -150,7 +161,7 @@ jobs:
                 found=true
                 echo "$pkg" >> ./built_${repo}_packages.txt
                 for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$subpkg" "$repo")_subpackages.txt
                 done
               fi
             done
