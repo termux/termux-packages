@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://dbeaver.io/
 TERMUX_PKG_DESCRIPTION="Free universal database tool and SQL client (Community Edition)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="26.2.1"
+TERMUX_PKG_VERSION="26.2.2"
 
 # Built from four source trees: dbeaver, dbeaver-common (parent POM),
 # datadam-api (API module required by product/aggregate/pom.xml since 26.2.1)
@@ -13,8 +13,8 @@ TERMUX_PKG_VERSION="26.2.1"
 # and rewritten by termux_pkg_auto_update() at the end of this file. The
 # update fails if the dbeaver-common/datadam-api release branch or the SWT
 # tag of the new release is missing.
-_COMMON_COMMIT="d11df22413e9c48278ee22afbfa9f00f0d54e776"
-_DATADAM_COMMIT="3a5981e58e130909df93aa9b0c8b3e406d46812b"
+_COMMON_COMMIT="5658d5409f14f6d99aa76d42692960666029ede9"
+_DATADAM_COMMIT="afb5477ab9ab6f90ba8aad27fb0231c6e1727ca3"
 _SWT_TAG="R4_41"
 
 TERMUX_PKG_SRCURL=(
@@ -24,9 +24,9 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/eclipse-platform/eclipse.platform.swt/archive/refs/tags/${_SWT_TAG}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	ef422d1af682471741e3d66999eeb57a91ca2bc418103c29bc6e9e1702efc321
-	4a94fc986de5d095eed4f87e9452a039582e593582dd8d5e5a169bea6e43e1aa
-	bfda7a080263d624dd473b9005dd220ce919c5ab10ecfffe3cb52512edecf232
+	942448e9bcc541f69fc929088ebc2167e01f2541fcf441547ecdd0adbc7c223d
+	d8c2adfd5cfe04f5630fdaaea5c74bb168d36fc51da45d4bbbf8e612df7262b3
+	043b6dd35b7462b56a84a49ca351cf40008cb1412cb991b90165b4089df1d4fb
 	4dae25b05a6431d28e7bb18297a89222e2f5d8b4acb797c7ba692e4dcff5bbd9
 )
 TERMUX_PKG_AUTO_UPDATE=true
