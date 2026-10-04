@@ -132,7 +132,11 @@ jobs:
                     echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
                   done
                 else
-                  echo "$pkg" >> ./deleted_${repo}_packages
+                  # This code is necessary for deleting packages in termux-pacman, but needs to be disabled
+                  # in termux-apt because termux-apt does not currently support automatic deletion of packages
+                  #echo "$pkg" >> ./deleted_${repo}_packages.txt
+                  echo "WARNING: not adding package '$pkg' to deleted_${repo}_packages.txt"
+                  echo "because termux-apt does not currently support automatic deletion of packages!"
                 fi
               fi
             done<<<${CHANGED_FILES}
