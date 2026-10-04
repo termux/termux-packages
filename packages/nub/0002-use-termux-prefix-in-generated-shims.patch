@@ -1,0 +1,57 @@
+diff --git a/vendor/aube/crates/aube-linker/src/sys.rs b/vendor/aube/crates/aube-linker/src/sys.rs
+index 3746251..303a8c5 100644
+--- a/vendor/aube/crates/aube-linker/src/sys.rs
++++ b/vendor/aube/crates/aube-linker/src/sys.rs
+@@ -1087,7 +1087,7 @@ fn generate_posix_shim(
+         node_path_value.map_or(String::new(), |val| format!("export NODE_PATH=\"{val}\"\n"));
+     if matches!(launch, BinLaunch::Direct) {
+         return format!(
+-            "#!/bin/sh\n\
++            "#!@TERMUX_PREFIX@/bin/sh\n\
+              {POSIX_SHIM_MARKER_PREFIX}{rel_target_fwdslash}\n\
+              {POSIX_SHIM_BASEDIR}\
+              {node_path}\
+@@ -1099,7 +1099,7 @@ fn generate_posix_shim(
+     };
+     let launch_block = interpreter_launch_block(safe_prog(prog), rel_target_fwdslash);
+     format!(
+-        "#!/bin/sh\n\
++        "#!@TERMUX_PREFIX@/bin/sh\n\
+          {POSIX_SHIM_MARKER_PREFIX}{rel_target_fwdslash}\n\
+          {POSIX_SHIM_BASEDIR}\
+          {node_path}\
+diff --git a/vendor/aube/crates/aube/src/commands/activate.rs b/vendor/aube/crates/aube/src/commands/activate.rs
+index 752897f..ef64107 100644
+--- a/vendor/aube/crates/aube/src/commands/activate.rs
++++ b/vendor/aube/crates/aube/src/commands/activate.rs
+@@ -74,7 +74,7 @@ fn write_dispatcher_shim(dest: &Path, name: &str, program: &str) -> std::io::Res
+ 
+     let program = shell_double_quote(program);
+     let script = format!(
+-        "#!/bin/sh\n# aube-tool-shim v1\nexec {program} {} {name} \"$@\"\n",
++        "#!@TERMUX_PREFIX@/bin/sh\n# aube-tool-shim v1\nexec {program} {} {name} \"$@\"\n",
+         crate::tool_shims::DISPATCH_ARG
+     );
+     let (tmp, mut file) = loop {
+diff --git a/vendor/aube/crates/aube/src/commands/install/node_gyp_bootstrap.rs b/vendor/aube/crates/aube/src/commands/install/node_gyp_bootstrap.rs
+index f77e576..3f8d352 100644
+--- a/vendor/aube/crates/aube/src/commands/install/node_gyp_bootstrap.rs
++++ b/vendor/aube/crates/aube/src/commands/install/node_gyp_bootstrap.rs
+@@ -263,7 +263,7 @@ pub async fn bootstrap_node_gyp(project_dir: &Path) -> miette::Result<PathBuf> {
+ /// is deliberately no fallback to a bare `node-gyp`: this file *is* the
+ /// `node-gyp` on PATH, so resolving that name again would re-exec the shim
+ /// forever.
+-const SH_SHIM: &str = r#"#!/usr/bin/env sh
++const SH_SHIM: &str = r#"#!@TERMUX_PREFIX@/bin/sh
+ set -eu
+ if [ -z "${AUBE_NODE_GYP_EXE:-}" ]; then
+   echo "node-gyp shim invoked outside a lifecycle script (AUBE_NODE_GYP_EXE unset)" >&2
+@@ -279,7 +279,7 @@ exec "$real" "$@"
+ /// same way — via the hidden `__node-gyp-bootstrap` subcommand — then
+ /// forwards argv. Falls back to a `node-gyp` on PATH when aube's env
+ /// markers are absent (e.g. a script spawned outside aube's wrappers).
+-const JS_SHIM: &str = r#"#!/usr/bin/env node
++const JS_SHIM: &str = r#"#!@TERMUX_PREFIX@/bin/env node
+ "use strict";
+ // aube lazy node-gyp stand-in for npm_config_node_gyp. Resolves (and
+ // bootstraps on first use) aube's node-gyp, then forwards argv. Kept

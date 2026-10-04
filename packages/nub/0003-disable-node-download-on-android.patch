@@ -1,0 +1,26 @@
+diff --git a/crates/nub-core/src/version_management/download.rs b/crates/nub-core/src/version_management/download.rs
+index 3b08908..52cca55 100644
+--- a/crates/nub-core/src/version_management/download.rs
++++ b/crates/nub-core/src/version_management/download.rs
+@@ -61,6 +61,7 @@ const RETRY_BACKOFF: Duration = Duration::from_millis(400);
+ /// `fetch_text_auth` / `download_to_file_auth` attach) into cleartext. The hop
+ /// cap matches reqwest's own default (≤10) so the only behavior change is the
+ /// scheme guard.
++#[cfg(not(target_os = "android"))]
+ fn client() -> Result<reqwest::blocking::Client> {
+     reqwest::blocking::Client::builder()
+         .user_agent(concat!("nub/", env!("CARGO_PKG_VERSION")))
+@@ -81,6 +82,13 @@ fn client() -> Result<reqwest::blocking::Client> {
+         .context("building HTTP client")
+ }
+ 
++/// The Node.js builds nub downloads are linked against glibc/musl and cannot run on
++/// Android, and rustls-platform-verifier aborts without a JVM (Termux).
++#[cfg(target_os = "android")]
++fn client() -> Result<reqwest::blocking::Client> {
++    bail!("downloading Node.js is not supported on Termux; run `pkg install nodejs` instead")
++}
++
+ /// Attach the optional `Authorization` header to a request builder.
+ fn with_auth(
+     req: reqwest::blocking::RequestBuilder,

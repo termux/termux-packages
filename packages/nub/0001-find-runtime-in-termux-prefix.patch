@@ -1,0 +1,34 @@
+diff --git a/crates/nub-core/src/node/spawn.rs b/crates/nub-core/src/node/spawn.rs
+--- a/crates/nub-core/src/node/spawn.rs
++++ b/crates/nub-core/src/node/spawn.rs
+@@ -3863,6 +3863,11 @@
+     // released nub.
+     #[cfg(not(feature = "embed-runtime"))]
+     {
++        // Termux: the runtime tree is installed under the package prefix.
++        let termux_preload = "@TERMUX_PREFIX@/lib/nub/runtime/preload.mjs";
++        if Path::new(termux_preload).is_file() {
++            return Some(termux_preload.to_string());
++        }
+         if let Some(mut dir) = nub_binary.parent().map(Path::to_path_buf) {
+             for _ in 0..5 {
+                 let candidate = dir.join("runtime").join("preload.mjs");
+@@ -3876,15 +3881,9 @@
+                 }
+             }
+         }
+-        // `canonicalize` doubles as the existence check and resolves the `../..`
+-        // (and any symlink) so NODE_OPTIONS / the file:// URL carry a clean absolute
+-        // path, matching route 1's output shape.
+-        let source_preload =
+-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../runtime/preload.mjs");
+-        if let Ok(canon) = fs::canonicalize(&source_preload) {
+-            return canon.to_str().map(|s| strip_verbatim(s, cfg!(windows)));
+-        }
+-        tracing::warn!("preload not found relative to nub binary or source root");
++        // The compile-time source tree path is deliberately not consulted: the
++        // build directory does not exist on the device.
++        tracing::warn!("preload not found relative to nub binary");
+         None
+     }
+ }
