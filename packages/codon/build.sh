@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=(
 	"0.20.2"
 	"20.1.7"
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/exaloop/codon/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/exaloop/codon/releases/download/v${TERMUX_PKG_VERSION[0]}/codon-linux-x86_64.tar.gz"
@@ -14,7 +15,7 @@ TERMUX_PKG_SRCURL=(
 TERMUX_PKG_SHA256=(
 	c704392e80470a8df9144bd6d4341cb5142674f37c91a49c9857abbeea98cfc3
 	739e3c52f08bcb7ddd20277b63d72e11ae31d4e8fdae29b1c6458f8d65d7794d
-	eaf15d4367c8553ca26b3dbcf1d84c62ec7439c95f2057d11d355c84f65dcc46
+	d0f613f3e63b1f1f1c8c75822bf2b83caed48e8973c35d13bf4148d343bc8645
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
 TERMUX_PKG_NO_STATICSPLIT=true
