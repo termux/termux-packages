@@ -1,8 +1,7 @@
 https://github.com/termux/termux-packages/issues/15929
-
 --- a/awk.h
 +++ b/awk.h
-@@ -80,6 +80,11 @@
+@@ -70,6 +70,11 @@
  
  #ifdef STDC_HEADERS
  #include <stdlib.h>
@@ -14,37 +13,9 @@ https://github.com/termux/termux-packages/issues/15929
  #endif	/* not STDC_HEADERS */
  
  
---- a/support/localeinfo.c
-+++ b/support/localeinfo.c
-@@ -28,6 +28,11 @@
- #include <limits.h>
- #include <locale.h>
- #include <stdlib.h>
-+#if defined __ANDROID__ && defined __TERMUX__
-+#undef MB_CUR_MAX
-+#define MB_CUR_MAX __ctype_get_mb_cur_max()
-+size_t __ctype_get_mb_cur_max(void);
-+#endif
- #include <string.h>
- #include <wctype.h>
- 
---- a/support/regex_internal.h
-+++ b/support/regex_internal.h
-@@ -23,6 +23,11 @@
- #include <ctype.h>
- #include <stdio.h>
- #include <stdlib.h>
-+#if defined __ANDROID__ && defined __TERMUX__
-+#undef MB_CUR_MAX
-+#define MB_CUR_MAX __ctype_get_mb_cur_max()
-+size_t __ctype_get_mb_cur_max(void);
-+#endif
- #include <string.h>
- 
- #include <langinfo.h>
 --- a/main.c
 +++ b/main.c
-@@ -30,6 +30,15 @@
+@@ -29,6 +29,15 @@
  #include "awk.h"
  #include "getopt.h"
  
@@ -60,7 +31,7 @@ https://github.com/termux/termux-packages/issues/15929
  #ifdef HAVE_MCHECK_H
  #include <mcheck.h>
  #endif
-@@ -230,6 +239,19 @@
+@@ -221,6 +230,19 @@
  #if defined(LOCALEDEBUG)
  	const char *initial_locale;
  #endif
@@ -80,12 +51,40 @@ https://github.com/termux/termux-packages/issues/15929
  
  	myname = gawk_name(argv[0]);
  
-@@ -384,7 +406,7 @@
+@@ -351,7 +373,7 @@
  		else {
  			gawk_mb_cur_max = 1;	/* hands off my data! */
  #if defined(LC_ALL)
 -			setlocale(LC_ALL, "C");
 +			setlocale_(LC_ALL, "C");
  #endif
- 		}
- 	}
+ #ifdef __MINGW32__
+ 			mingw_using_utf8(UTF8_RESET);
+--- a/support/localeinfo.c
++++ b/support/localeinfo.c
+@@ -26,6 +26,11 @@
+ #include <limits.h>
+ #include <locale.h>
+ #include <stdlib.h>
++#if defined __ANDROID__ && defined __TERMUX__
++#undef MB_CUR_MAX
++#define MB_CUR_MAX __ctype_get_mb_cur_max()
++size_t __ctype_get_mb_cur_max(void);
++#endif
+ #include <string.h>
+ #include <wctype.h>
+ /* MinGW has this stuff defined in a file included by config.h above.  */
+--- a/support/regex_internal.h
++++ b/support/regex_internal.h
+@@ -23,6 +23,11 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#if defined __ANDROID__ && defined __TERMUX__
++#undef MB_CUR_MAX
++#define MB_CUR_MAX __ctype_get_mb_cur_max()
++size_t __ctype_get_mb_cur_max(void);
++#endif
+ #include <string.h>
+ 
+ #include <langinfo.h>
