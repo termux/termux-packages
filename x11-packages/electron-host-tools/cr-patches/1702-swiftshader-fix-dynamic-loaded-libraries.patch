@@ -1,0 +1,40 @@
+--- a/third_party/swiftshader/src/WSI/libWaylandClient.cpp
++++ b/third_party/swiftshader/src/WSI/libWaylandClient.cpp
+@@ -56,7 +56,11 @@
+ 		}
+ 		else
+ 		{
++#ifdef __TERMUX__
++			libwl = loadLibrary("libwayland-client.so");
++#else
+ 			libwl = loadLibrary("libwayland-client.so.0");
++#endif
+ 		}
+
+ 		return LibWaylandClientExports(libwl);
+--- a/third_party/swiftshader/src/WSI/libXCB.cpp
++++ b/third_party/swiftshader/src/WSI/libXCB.cpp
+@@ -55,7 +55,11 @@
+ 		}
+ 		else
+ 		{
++#ifdef __TERMUX__
++			libxcb = loadLibrary("libxcb.so");
++#else
+ 			libxcb = loadLibrary("libxcb.so.1");
++#endif
+ 		}
+
+ 		if(getProcAddress(RTLD_DEFAULT, "xcb_shm_query_version"))  // Search the global scope for pre-loaded XCB library.
+@@ -64,7 +68,11 @@
+ 		}
+ 		else
+ 		{
++#ifdef __TERMUX__
++			libshm = loadLibrary("libxcb-shm.so");
++#else
+ 			libshm = loadLibrary("libxcb-shm.so.0");
++#endif
+ 		}
+
+ 		return LibXcbExports(libxcb, libshm);

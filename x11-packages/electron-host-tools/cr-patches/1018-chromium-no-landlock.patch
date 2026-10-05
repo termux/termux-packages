@@ -1,0 +1,11 @@
+--- a/content/app/content_main_runner_impl.cc
++++ b/content/app/content_main_runner_impl.cc
+@@ -1059,7 +1059,7 @@
+   }
+ #endif  // BUILDFLAG(USE_ZYGOTE)
+ 
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
++#if (BUILDFLAG(IS_LINUX) && !defined(__TERMUX__)) || BUILDFLAG(IS_CHROMEOS)
+   if (process_type.empty()) {
+     // Check if Landlock is supported.
+     sandbox::policy::SandboxLinux::ReportLandlockStatus();

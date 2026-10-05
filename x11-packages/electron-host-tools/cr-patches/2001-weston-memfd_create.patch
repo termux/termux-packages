@@ -1,0 +1,14 @@
+--- a/third_party/weston/src/shared/os-compatibility.c
++++ b/third_party/weston/src/shared/os-compatibility.c
+@@ -38,6 +38,11 @@
+ 
+ #include "os-compatibility.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ #define READONLY_SEALS (F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_WRITE)
+ 
+ int

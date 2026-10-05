@@ -1,0 +1,14 @@
+--- a/components/os_crypt/sync/libsecret_util_linux.cc
++++ b/components/os_crypt/sync/libsecret_util_linux.cc
+@@ -102,7 +102,11 @@
+   if (libsecret_loaded_)
+     return true;
+ 
++#ifdef __TERMUX__
++  static void* handle = dlopen("libsecret-1.so", RTLD_NOW | RTLD_GLOBAL);
++#else
+   static void* handle = dlopen("libsecret-1.so.0", RTLD_NOW | RTLD_GLOBAL);
++#endif
+   if (!handle) {
+     // We wanted to use libsecret, but we couldn't load it. Warn, because
+     // either the user asked for this, or we autodetected it incorrectly. (Or
