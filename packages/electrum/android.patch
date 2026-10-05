@@ -7,11 +7,11 @@
 -is_android = 'ANDROID_DATA' in os.environ
 +is_android = False
  is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
  # is_local: unpacked tar.gz but not pip installed, or git clone
- is_local = (not is_pyinstaller and not is_android and not is_appimage
 --- a/electrum/logging.py
 +++ b/electrum/logging.py
-@@ -354,7 +354,7 @@
+@@ -345,7 +345,7 @@
  
  
  def describe_os_version() -> str:
@@ -22,19 +22,19 @@
          b = jnius.autoclass('android.os.Build')
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
-@@ -280,7 +280,7 @@
-     def get_backup_dir(self):
+@@ -468,7 +468,7 @@
+     def get_backup_dir(self) -> Optional[str]:
          # this is used to save wallet file backups (without active lightning channels)
          # on Android, the export backup button uses android_backup_dir()
 -        if 'ANDROID_DATA' in os.environ:
 +        if False:
              return None
          else:
-             return self.get('backup_dir')
+             return self.WALLET_BACKUP_DIRECTORY
 --- a/electrum/util.py
 +++ b/electrum/util.py
-@@ -386,7 +386,7 @@
-             self.running = False
+@@ -415,7 +415,7 @@
+             self.wake_up_event.clear()
  
      def on_stop(self):
 -        if 'ANDROID_DATA' in os.environ:
@@ -42,7 +42,7 @@
              import jnius
              jnius.detach()
              self.logger.info("jnius detach")
-@@ -519,7 +519,7 @@
+@@ -621,7 +621,7 @@
  
  
  def is_android_debug_apk() -> bool:
@@ -51,7 +51,7 @@
      if not is_android:
          return False
      from jnius import autoclass
-@@ -529,7 +529,7 @@
+@@ -631,7 +631,7 @@
  
  
  def get_android_package_name() -> str:
@@ -60,7 +60,7 @@
      assert is_android
      from jnius import autoclass
      from android.config import ACTIVITY_CLASS_NAME
-@@ -604,7 +604,7 @@
+@@ -695,7 +695,7 @@
  def user_dir():
      if "ELECTRUMDIR" in os.environ:
          return os.environ["ELECTRUMDIR"]
@@ -78,5 +78,5 @@
 -is_android = 'ANDROID_DATA' in os.environ
 +is_android = False
  is_appimage = 'APPIMAGE' in os.environ
+ is_binary_distributable = is_pyinstaller or is_android or is_appimage
  # is_local: unpacked tar.gz but not pip installed, or git clone
- is_local = (not is_pyinstaller and not is_android and not is_appimage
