@@ -1,0 +1,14 @@
+musl falls back to the stat syscall for AT_FDCWD, which Android seccomp
+blocks on x86_64 (SIGSYS). Any extra flag makes it use newfstatat.
+
+--- a/src/scan.zig
++++ b/src/scan.zig
+@@ -49,7 +49,7 @@
+ pub fn statAt(parent: std.fs.Dir, name: [:0]const u8, follow: bool, symlink: ?*bool) !sink.Stat {
+     // std.posix.fstatatZ() in Zig 0.14 is not suitable due to https://github.com/ziglang/zig/issues/23463
+     var stat: std.c.Stat = undefined;
+-    if (std.c.fstatat(parent.fd, name, &stat, if (follow) 0 else std.c.AT.SYMLINK_NOFOLLOW) != 0) {
++    if (std.c.fstatat(parent.fd, name, &stat, std.c.AT.NO_AUTOMOUNT | @as(u32, if (follow) 0 else std.c.AT.SYMLINK_NOFOLLOW)) != 0) {
+         return switch (std.c._errno().*) {
+             @intFromEnum(std.c.E.NOENT) => error.FileNotFound,
+             @intFromEnum(std.c.E.NAMETOOLONG) => error.NameTooLong,
