@@ -6,7 +6,7 @@
 -use gettextrs::gettext;
  use nom::AsChar;
  use nom::{
-     branch::alt,
+     IResult, Offset, Parser,
 @@ -126,11 +125,11 @@
  /// indicating the thing thah was expected.
  fn translate_expected(expected: Expected) -> String {
@@ -22,7 +22,7 @@
      }
  }
  
-@@ -423,18 +422,18 @@
+@@ -429,18 +428,18 @@
                  Error::TrailingCharacters(pos, tail) => fmt!(
                      // The first %s is an integer offset at which trailing characters start, the
                      // second %s is the tail itself.
