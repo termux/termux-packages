@@ -1,0 +1,37 @@
+--- a/rust/libnewsboat/src/textstyle.rs
++++ b/rust/libnewsboat/src/textstyle.rs
+@@ -1,7 +1,6 @@
+ use crate::configparser::ActionHandlerStatus;
+ use crate::utils;
+ 
+-use gettextrs::gettext;
+ use strprintf::fmt;
+ 
+ pub struct TextStyle {
+@@ -20,7 +19,7 @@
+             fgcolor.to_string()
+         } else {
+             return Err(ActionHandlerStatus::CustomErrorMessage(fmt!(
+-                &gettext("`%s' is not a valid color"),
++                "`%s' is not a valid color",
+                 fgcolor
+             )));
+         };
+@@ -29,7 +28,7 @@
+             bgcolor.to_string()
+         } else {
+             return Err(ActionHandlerStatus::CustomErrorMessage(fmt!(
+-                &gettext("`%s' is not a valid color"),
++                "`%s' is not a valid color",
+                 bgcolor
+             )));
+         };
+@@ -41,7 +40,7 @@
+                     Ok(attribute.to_string())
+                 } else {
+                     Err(ActionHandlerStatus::CustomErrorMessage(fmt!(
+-                        &gettext("`%s' is not a valid attribute"),
++                        "`%s' is not a valid attribute",
+                         *attribute
+                     )))
+                 }

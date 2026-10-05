@@ -1,0 +1,19 @@
+--- a/rust/libnewsboat/src/colormanager.rs
++++ b/rust/libnewsboat/src/colormanager.rs
+@@ -1,7 +1,6 @@
+ use std::collections::HashMap;
+ use std::sync::LazyLock;
+ 
+-use gettextrs::gettext;
+ use strprintf::fmt;
+ 
+ use crate::configparser::ActionHandlerStatus;
+@@ -94,7 +93,7 @@
+                 [element, fgcolor, bgcolor, attributes @ ..] => {
+                     if !DEFAULT_STYLES.contains_key(element) {
+                         return Err(ActionHandlerStatus::CustomErrorMessage(fmt!(
+-                            &gettext("`%s' is not a valid configuration element"),
++                            "`%s' is not a valid configuration element",
+                             *element
+                         )));
+                     }
