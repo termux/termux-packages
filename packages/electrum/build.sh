@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://electrum.org
 TERMUX_PKG_DESCRIPTION="Electrum is a lightweight Bitcoin wallet"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.7.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="4.8.2"
 TERMUX_PKG_SRCURL="https://download.electrum.org/$TERMUX_PKG_VERSION/Electrum-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=90ac633217e3175c1560388467ab7d3e00321502ee51e4beda566e944bf6051f
+TERMUX_PKG_SHA256=f38cee333c866986cdfb304428fa7487affc429c3853fc80e9822bd420bbc229
 # The python dependency list should be compared to
 # contrib/requirements/requirements.txt in upstream project on every
 # update (or at least every major update).
@@ -20,3 +19,11 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="asciinema (<< 1.4.0-1)"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_SERVICE_SCRIPT=("electrum" 'exec electrum daemon 2>&1')
+
+termux_step_create_debscripts() {
+	cat > postinst <<-EOF
+		#!${TERMUX_PREFIX}/bin/sh
+		export ELECTRUM_ECC_DONT_COMPILE=1
+	EOF
+	chmod 0755 postinst
+}
