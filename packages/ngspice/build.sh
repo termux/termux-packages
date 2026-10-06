@@ -4,12 +4,14 @@ TERMUX_PKG_LICENSE="BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="47"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/imr/ngspice/archive/refs/tags/ngspice-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=815b3dc041418fafab096295a9d12b4f4cca03538082600eb8eef2c594b1328a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-cider
+--enable-ngshared
 --enable-openmp
 --enable-xspice
 --with-x=no
