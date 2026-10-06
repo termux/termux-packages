@@ -1,0 +1,18 @@
+diff --git a/content/browser/webid/document_metadata.cc b/content/browser/webid/document_metadata.cc
+index 5d94445e34..f1073136d1 100644
+--- a/content/browser/webid/document_metadata.cc
++++ b/content/browser/webid/document_metadata.cc
+@@ -9,6 +9,13 @@
+ #include "content/public/browser/render_frame_host.h"
+ #include "services/service_manager/public/cpp/interface_provider.h"
+ 
++template <>
++struct mojo::CloneTraits<std::vector<bool>> {
++  static std::vector<bool> Clone(const std::vector<bool>& input) {
++    return input;
++  }
++};
++
+ namespace content::webid {
+ 
+ namespace {

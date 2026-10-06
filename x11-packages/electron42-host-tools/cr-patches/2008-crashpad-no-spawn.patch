@@ -1,0 +1,28 @@
+--- a/third_party/crashpad/crashpad/util/posix/spawn_subprocess.cc
++++ b/third_party/crashpad/crashpad/util/posix/spawn_subprocess.cc
+@@ -15,12 +15,15 @@
+ #include "util/posix/spawn_subprocess.h"
+ 
+ #include <errno.h>
+-#include <spawn.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
++#ifndef __TERMUX__
++#include <spawn.h>
++#endif
++
+ #include "base/check.h"
+ #include "base/check_op.h"
+ #include "base/logging.h"
+@@ -171,7 +174,7 @@
+     char* const* envp_for_spawn =
+         envp ? const_cast<char* const*>(envp_c.data()) : environ;
+ 
+-#if BUILDFLAG(IS_ANDROID) && __ANDROID_API__ < 28
++#if (BUILDFLAG(IS_ANDROID) || defined(__TERMUX__)) && __ANDROID_API__ < 28
+     pid = fork();
+     if (pid < 0) {
+       PLOG(FATAL) << "fork";

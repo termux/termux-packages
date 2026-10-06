@@ -1,0 +1,16 @@
+--- a/electron/shell/app/electron_main_delegate.cc
++++ b/electron/shell/app/electron_main_delegate.cc
+@@ -256,8 +256,13 @@
+   if (env->HasVar(kElectronEnableStackDumping))
+     base::debug::EnableInProcessStackDumping();
+ 
++#ifndef __TERMUX__
+   if (env->HasVar(kElectronDisableSandbox))
+     command_line->AppendSwitch(sandbox::policy::switches::kNoSandbox);
++#else
++  command_line->AppendSwitch(sandbox::policy::switches::kNoSandbox);
++  command_line->AppendSwitch(sandbox::policy::switches::kDisableSeccompFilterSandbox);
++#endif
+ 
+   tracing_sampler_profiler_ =
+       tracing::TracingSamplerProfiler::CreateOnMainThread();
