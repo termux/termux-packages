@@ -1,0 +1,17 @@
+diff --git a/include/json_common.h b/include/json_common.h
+index 9ad72a50..6ec50182 100644
+--- a/include/json_common.h
++++ b/include/json_common.h
+@@ -33,7 +33,11 @@
+  *
+  **********************************************************************************************************************/
+ 
+-#ifdef __APPLE__
++// libc++ does not provide std::char_traits for wxUniChar, which nlohmann/json
++// instantiates. KiCad only enabled this shim on Apple, but Termux/Android also
++// uses libc++, so the shim must be enabled there too or json parsing fails to
++// compile with "implicit instantiation of undefined template std::char_traits".
++#if defined( __APPLE__ ) || defined( __ANDROID__ )
+ #if __clang_major__ >= 17
+ 
+ #include <wx/unichar.h>

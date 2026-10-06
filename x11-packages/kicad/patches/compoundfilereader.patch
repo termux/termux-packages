@@ -1,0 +1,25 @@
+diff --git a/thirdparty/compoundfilereader/compoundfilereader.h b/thirdparty/compoundfilereader/compoundfilereader.h
+index fbab37d2..dc15d156 100644
+--- a/thirdparty/compoundfilereader/compoundfilereader.h
++++ b/thirdparty/compoundfilereader/compoundfilereader.h
+@@ -261,7 +261,10 @@ struct helper
+     }
+ };
+ 
+-typedef std::basic_string<uint16_t> utf16string;
++// char16_t, not uint16_t: on Android uint16_t is 'unsigned short', and libc++
++// has no std::char_traits specialization for that, so std::basic_string<uint16_t>
++// fails to instantiate. char16_t is the standard UTF-16 code unit type.
++typedef std::basic_string<char16_t> utf16string;
+ typedef std::function<int(const COMPOUND_FILE_ENTRY*, const utf16string& dir, int level)>
+     EnumFilesCallback;
+ 
+@@ -379,7 +382,7 @@ private:
+             utf16string newDir = dir;
+             if (dir.length() != 0)
+                 newDir.append(1, '\n');
+-            newDir.append(entry->name, entry->nameLen / 2);
++            newDir.append( reinterpret_cast<const char16_t*>( entry->name ), entry->nameLen / 2 );
+             EnumNodes(GetEntry(entry->childID), currentLevel + 1, maxLevel, newDir, callback);
+         }
+ 

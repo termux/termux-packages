@@ -1,0 +1,43 @@
+diff --git a/thirdparty/nanodbc/nanodbc/nanodbc.cpp b/thirdparty/nanodbc/nanodbc/nanodbc.cpp
+index 04f86025..2e7cc4d7 100644
+--- a/thirdparty/nanodbc/nanodbc/nanodbc.cpp
++++ b/thirdparty/nanodbc/nanodbc/nanodbc.cpp
+@@ -386,10 +386,16 @@ constexpr std::size_t size(const T (&array)[N]) noexcept
+ }
+ #endif
+ 
++// Termux's unixODBC is built with SQL_WCHART_CONVERT, so WCHAR (and therefore
++// SQLWCHAR / NANODBC_SQLCHAR) is 'unsigned short'. libc++ ships no
++// std::char_traits specialization for that type, so count the terminator by hand
++// instead of going through std::char_traits.
+ template <std::size_t N>
+ inline std::size_t size(NANODBC_SQLCHAR const (&array)[N]) noexcept
+ {
+-    auto const n = std::char_traits<NANODBC_SQLCHAR>::length(array);
++    std::size_t n = 0;
++    while (n < N && array[n] != 0)
++        ++n;
+     NANODBC_ASSERT(n < N);
+     return n < N ? n : N - 1;
+ }
+@@ -3720,9 +3726,8 @@ std::list<datasource> list_datasources()
+                 "incompatible SQLCHAR and string::value_type");
+ 
+             datasource dsn;
+-            dsn.name = string(&name[0], &name[std::char_traits<NANODBC_SQLCHAR>::length(name)]);
+-            dsn.driver =
+-                string(&driver[0], &driver[std::char_traits<NANODBC_SQLCHAR>::length(driver)]);
++            dsn.name = string(&name[0], &name[size(name)]);
++            dsn.driver = string(&driver[0], &driver[size(driver)]);
+ 
+             dsns.push_back(std::move(dsn));
+             direction = SQL_FETCH_NEXT;
+@@ -3773,7 +3778,7 @@ std::list<driver> list_drivers()
+                 "incompatible SQLCHAR and string::value_type");
+ 
+             driver drv;
+-            drv.name = string(&descr[0], &descr[std::char_traits<NANODBC_SQLCHAR>::length(descr)]);
++            drv.name = string(&descr[0], &descr[size(descr)]);
+ 
+             // Split "Key1=Value1\0Key2=Value2\0\0" into list of key-value pairs
+             auto beg = &attrs[0];
