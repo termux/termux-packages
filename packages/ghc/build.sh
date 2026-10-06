@@ -2,14 +2,21 @@ TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
-TERMUX_PKG_VERSION=9.12.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=9.14.1
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
-TERMUX_PKG_SHA256=0e49cd5dde43f348c5716e5de9a5d7a0f8d68d945dc41cf75dfdefe65084f933
+TERMUX_PKG_SHA256=2a83779c9af86554a3289f2787a38d6aa83d00d136aa9f920361dd693c101e77
 TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes, ncurses"
+TERMUX_PKG_RECOMMENDS="clang"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+case "$TERMUX_ARCH" in
+	arm) target="armv7a-linux-androideabi" ;;
+	*) target="$TERMUX_HOST_PLATFORM" ;;
+esac
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
+--target=$target
 --with-system-libffi
 --disable-ld-override"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -49,21 +56,18 @@ __setup_bootstrap_compiler() {
 termux_step_pre_configure() {
 	__setup_bootstrap_compiler && termux_setup_cabal
 
-	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
+	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS --target=${target}${TERMUX_PKG_API_LEVEL}"
 	export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
-	export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
+	export CONF_CXX_OPTS_STAGE2="$CXXFLAGS --target=${target}${TERMUX_PKG_API_LEVEL}"
 
-	export target="$TERMUX_HOST_PLATFORM"
 	export no_profiled_libs=""
 
 	if [[ "$TERMUX_ARCH" == "arm" ]]; then
-		target="armv7a-linux-androideabi"
 		# NOTE: We do not build profiled libs for arm. It exceeds the 6 hours usage
 		# limit of github CI.
 		no_profiled_libs="+no_profiled_libs"
 	fi
 
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
 	./boot.source
 }
 
@@ -128,6 +132,7 @@ termux_step_post_massage() {
 	# Remove cross-prefix from tools:
 	sed -i "s|$CC|${CC/${target}-/}|g" "$ghclibs_dir"/lib/settings
 	sed -i "s|$CXX|${CXX/${target}-/}|g" "$ghclibs_dir"/lib/settings
+	sed -i -E "s|--target=[[:alnum:]_-]+-linux-android(eabi)?[0-9]*|--target=${target}${TERMUX_PKG_API_LEVEL}|g" "$ghclibs_dir"/lib/settings
 
 	# Strip unneeded symbols:
 	find . -type f \( -name "*.so" -o -name "*.a" \) -exec "$STRIP" --strip-unneeded {} \;
