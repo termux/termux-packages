@@ -9,6 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_DEPENDS="boost, freetype, glew, glm, libc++, libcurl, libicu, libpng, libprotobuf, mesa, ngspice, occt, pybind11, python, unixodbc, wxwidgets, zlib"
+TERMUX_PKG_BUILD_DEPENDS="protobuf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKICAD_USE_PCH=OFF
 -DKICAD_IPC_API=OFF
