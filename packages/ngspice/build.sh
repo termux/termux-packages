@@ -24,7 +24,7 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --enable-xspice
 --with-x=no
 "
-TERMUX_PKG_DEPENDS="fftw, libc++, ncurses, readline"
+TERMUX_PKG_DEPENDS="fftw, libc++, libngspice, ncurses, readline"
 TERMUX_PKG_GROUPS="science"
 
 termux_step_host_build() {
