@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://learn.microsoft.com/en-us/cli/azure/"
 TERMUX_PKG_DESCRIPTION="Microsoft's command-line tool for managing Azure cloud resources"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.90.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.91.0"
 TERMUX_PKG_SRCURL="https://github.com/Azure/azure-cli/archive/refs/tags/azure-cli-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=2d7caf68257fe6a6a7811219f940aa0b1d76b9d3adddca9482236e62c5697a7d
+TERMUX_PKG_SHA256=7584dc798f43729463fbdbebedccbafd9fb77e4e3dc64f19f2d6945d4eee5fa8
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
@@ -26,6 +25,8 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
+	rm -f "$TERMUX_PREFIX"/bin/{az.bat,az.completion.sh,azps.ps1}
+
 	local _completion_dir="$TERMUX_PREFIX/share/bash-completion/completions"
 	mkdir -p "$_completion_dir"
 	cp "$TERMUX_PKG_SRCDIR/az.completion" "$_completion_dir/az"
