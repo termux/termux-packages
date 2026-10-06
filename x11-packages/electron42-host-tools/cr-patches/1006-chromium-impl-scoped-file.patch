@@ -1,0 +1,40 @@
+--- a/base/files/scoped_file_linux.cc
++++ b/base/files/scoped_file_linux.cc
+@@ -14,6 +14,26 @@
+ #include "base/logging.h"
+ #include "base/strings/string_piece.h"
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++#include <sys/syscall.h>
++static inline void termux_disable_fdsan() {
++  typedef void (*android_fdsan_error_level_ptr_t)(enum android_fdsan_error_level);
++  // For Android 11+.
++  void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++  if (lib_handle) {
++    android_fdsan_error_level_ptr_t set_fdsan_error_level = 
++      reinterpret_cast<android_fdsan_error_level_ptr_t>(
++        dlsym(lib_handle, "android_fdsan_set_error_level"));
++    if (set_fdsan_error_level != nullptr) {
++      set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++    }
++    dlclose(lib_handle);
++  }
++}
++#endif
++
+ namespace {
+ 
+ // We want to avoid any kind of allocations in our close() implementation, so we
+@@ -65,6 +85,10 @@
+ 
+ void EnableFDOwnershipEnforcement(bool enabled) {
+   g_is_ownership_enforced = enabled;
++#ifdef __TERMUX__
++  // Disable the Android native fdsan.
++  termux_disable_fdsan();
++#endif
+ }
+ 
+ void ResetFDOwnership() {
