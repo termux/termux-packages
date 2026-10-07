@@ -3,9 +3,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/pinard/Recode"
 TERMUX_PKG_DESCRIPTION="Charset converter tool and library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.7.16"
+TERMUX_PKG_VERSION="3.7.17"
 TERMUX_PKG_SRCURL=https://github.com/rrthomas/recode/releases/download/v${TERMUX_PKG_VERSION}/recode-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c3d407f54f74bae76360312096e2ed46622f01c86e50b09ef45b2d93c8fcff2d
+TERMUX_PKG_SHA256=1b0aebe7283b79ff46bc0a06ee21faf65b4d0b304632cbc855721c25583d8ea3
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libiconv"
 # recode needs to be explicitly linked to avoid:
