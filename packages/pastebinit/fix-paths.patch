@@ -1,14 +1,24 @@
-diff -uNr pastebinit-1.5.1/pastebinit pastebinit-1.5.1.mod/pastebinit
---- pastebinit-1.5.1/pastebinit	2019-08-03 08:35:53.000000000 +0300
-+++ pastebinit-1.5.1.mod/pastebinit	2020-03-09 13:41:52.506708998 +0200
-@@ -81,8 +81,8 @@
-         #  - user's overrides in ~/.pastebin.d
-         # Files found later override files found earlier.
-         pastebind = {}
--        for confdir in ['/usr/share/pastebin.d', '/etc/pastebin.d',
--                        '/usr/local/etc/pastebin.d',
-+        for confdir in ['@TERMUX_PREFIX@/share/pastebin.d', '@TERMUX_PREFIX@/etc/pastebin.d',
-+                        '@TERMUX_PREFIX@/local/etc/pastebin.d',
-                         os.path.expanduser('~/.pastebin.d'),
-                         os.path.join(
-                             os.path.dirname(
+--- a/pastebinit
++++ b/pastebinit
+@@ -76,10 +76,10 @@
+     # Files found later override files found earlier.
+     pastebind = {}
+     confdirs = []
+-    for confdir in ['/usr/share', '/usr/local/share'] \
++    for confdir in ['@TERMUX_PREFIX@/share'] \
+             + list(reversed(os.environ.get('XDG_DATA_DIRS', '').split(':'))) \
+             + list(reversed(os.environ.get('XDG_CONFIG_DIRS', '').split(':'))) \
+-            + ['/etc', '/usr/local/etc',
++            + ['@TERMUX_PREFIX@/etc',
+                os.environ.get('XDG_CONFIG_HOME',
+                    os.path.expanduser('~/.config')),
+                os.path.expanduser('~/.pastebin.d'),
+@@ -252,7 +252,7 @@
+         configfiles = []
+ 
+         for conffile in list(reversed(os.environ.get(
+-                'XDG_CONFIG_DIRS', '').split(':'))) + ['/etc', '/usr/local/etc',
++                'XDG_CONFIG_DIRS', '').split(':'))) + ['@TERMUX_PREFIX@/etc',
+                    os.environ.get('XDG_CONFIG_HOME',
+                        os.path.expanduser('~/.config')),
+                    os.path.expanduser('~/.pastebinit.xml')]:
