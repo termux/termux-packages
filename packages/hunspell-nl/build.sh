@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dutch dictionary for hunspell"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.20.23
+TERMUX_PKG_VERSION=1:2.20.23
 TERMUX_PKG_SRCURL=( https://raw.githubusercontent.com/OpenTaal/opentaal-hunspell/1c22bc3d61b2/{README.md,LICENSE.txt,nl.aff,nl.dic} )
 TERMUX_PKG_SHA256=(
 	cfaa817c61cc459bcae5fa52395b096bdf08a48419e9bf5e47d077deadb43543
