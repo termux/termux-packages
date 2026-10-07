@@ -5,7 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.90.0"
 TERMUX_PKG_SRCURL="https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f
-TERMUX_PKG_AUTO_UPDATE=true
+# https://github.com/termux/termux-packages/issues/32356
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib, python"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_BREAKS="glib-dev, glib-bin"
