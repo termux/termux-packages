@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION='Edit and paint images'
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.0.4.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/krita/${TERMUX_PKG_VERSION}/krita-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=eaff00521958503aa1d3ef1206d75e00b57ed65993e953689f0a04850427e2d8
 TERMUX_PKG_DEPENDS="exiv2, ffmpeg, fftw, fontconfig, freetype, fribidi, giflib, gsl, harfbuzz, imath, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kcoreaddons, kf6-kguiaddons, kf6-ki18n, kf6-kitemviews, kf6-kwidgetsaddons, kf6-kcrash, libjpeg-turbo, libkdcraw, libpng, libtiff, libunibreak, libwebp, libx11, libxkbcommon, littlecms, mlt, opencolorio, openexr, openjpeg, qt6-qt5compat, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, quazip, zlib"
