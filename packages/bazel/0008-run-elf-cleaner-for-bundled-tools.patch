@@ -93,19 +93,19 @@ genrule(
 #      srcs = glob(["**"]) + ["//third_party/ijar/test:srcs"],
 --- a/src/main/cpp/BUILD
 +++ b/src/main/cpp/BUILD
-@@ -88,7 +89,7 @@
+@@ -95,7 +95,7 @@
  )
-
+ 
  cc_binary(
 -    name = "client",
 +    name = "client_orig",
      srcs = [
          "blaze.cc",
          "blaze.h",
-@@ -138,6 +139,21 @@
+@@ -147,6 +147,21 @@
      ],
  )
-
+ 
 +genrule(
 +    name = "client_cleaner",
 +    srcs = [
@@ -123,7 +123,7 @@ genrule(
 +
  cc_library(
      name = "option_processor",
-     srcs = ["option_processor.cc"],
+     srcs = [
 --- a/src/main/tools/BUILD
 +++ b/src/main/tools/BUILD
 @@ -4,7 +4,7 @@
