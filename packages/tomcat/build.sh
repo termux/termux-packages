@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open source implementation of the Jakarta Servlet, Pages
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="11.0.27"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/apache/tomcat/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4f2d83c8dcc9c1924a64dbbfd06d9932dfe5b56806905e2c2dd1f30952cfe511
 TERMUX_PKG_AUTO_UPDATE=true
