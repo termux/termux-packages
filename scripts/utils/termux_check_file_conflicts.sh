@@ -66,7 +66,7 @@ while IFS=$'\t' read -r path owners; do
 			if [[ "$local_arch" == "all" ]]; then
 				local_arch=${deb_arches[b]}
 			fi
-			echo "[!] \"${deb_names[a]}\" and \"${deb_names[b]}\" (local/${local_arch}) both ship \"$path\", with no Conflicts/Replaces/Breaks declared"
+			echo "::error::\"${deb_names[a]}\" and \"${deb_names[b]}\" (local/${local_arch}) both ship \"$path\", with no Conflicts/Replaces/Breaks declared"
 			error=1
 		done
 	done
@@ -108,11 +108,24 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 			deb_arch=$(dpkg-deb -f "$deb" Architecture)
 			[[ "$deb_arch" == "$arch" || "$deb_arch" == "all" ]] || continue
 			pkg_name=$(dpkg-deb -f "$deb" Package)
+			deb_version=$(dpkg-deb -f "$deb" Version)
+
+			# Check that this .deb is newer than every published version of the package.
+			while read -r published_version; do
+				if dpkg --compare-versions "$deb_version" lt "$published_version"; then
+					echo "::error::\"$pkg_name\" ${deb_version} (${repo}/${arch}) is older than published ${published_version}"
+					error=1
+				fi
+			done < <(awk -v pkg="$pkg_name" '
+				$0 == "Package: " pkg { found=1; next }
+				found && /^Version: / { print $2; found=0 }
+				/^$/ { found=0 }
+			' "Packages-${repo}-${arch}")
 
 			# Check that this exact .deb filename isn't already published (missed revbump).
 			deb_name_escaped=$(printf '%s' "$(basename "$deb")" | sed 's/[.[\*^$]/\\&/g')
 			if grep -q "^Filename:.*/${deb_name_escaped}\$" "Packages-${repo}-${arch}"; then
-				echo "[!] \"$(basename "$deb")\" (${repo}/${arch}) already exists on the server"
+				echo "::error::\"$(basename "$deb")\" (${repo}/${arch}) already exists on the server"
 				error=1
 			fi
 
@@ -122,7 +135,6 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 				{ dpkg-deb -f "$deb" Conflicts; dpkg-deb -f "$deb" Replaces; dpkg-deb -f "$deb" Breaks; } |
 					tr ',' '\n' | sed '/^[[:space:]]*$/d'
 			)
-			deb_version=$(dpkg-deb -f "$deb" Version)
 
 			conflicts=$(dpkg-deb --fsys-tarfile "$deb" | tar -t | sed -E 's|^\./||' |
 				awk '
@@ -145,7 +157,7 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 						' "Packages-${repo}-${arch}" |
 							sed -E 's/^(Conflicts|Replaces|Breaks): *//' | tr ',' '\n' | sed '/^[[:space:]]*$/d')
 						termux_pkg_relations_match "$owner_declared" "$pkg_name" "$deb_version" && continue
-						echo "[!] \"$pkg_name\" and \"$owner\" (${repo}/${arch}) both ship \"$path\", with no Conflicts/Replaces/Breaks declared"
+						echo "::error::\"$pkg_name\" and \"$owner\" (${repo}/${arch}) both ship \"$path\", with no Conflicts/Replaces/Breaks declared"
 					done
 				done)
 			if [[ -n "$conflicts" ]]; then
@@ -157,7 +169,6 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 done
 
 if [[ "$error" != 0 ]]; then
-	echo "[!] Found conflicting files between built packages, or between built and published packages!"
-	echo "[!] Please revbump package, rebase, add Conflicts/Replaces/Breaks, or tag commit with '%ci:no-build'"
+	echo "::error::Found versions older than published, or conflicting files between built packages, or between built and published packages!%0APlease bump version or add an epoch, revbump package, rebase, add Conflicts/Replaces/Breaks, or tag commit with '%ci:no-build'"
 	exit 1
 fi
