@@ -1,0 +1,14 @@
+--- a/chrome/browser/notifications/notification_platform_bridge_linux.cc
++++ b/chrome/browser/notifications/notification_platform_bridge_linux.cc
+@@ -83,6 +83,11 @@
+ #include "ui/message_center/public/cpp/notification.h"
+ #include "url/origin.h"
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 30
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ namespace {
+ 
+ // TODO(thomasanderson): Remove this feature flag in the future.

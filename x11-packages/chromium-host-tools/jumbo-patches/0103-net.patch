@@ -884,3 +884,48 @@ index 5562515695..3c3e94150c 100644
    proto_out_dir = "net/cert/root_store_proto_full/"
    sources = [
      "duration.proto",
+diff --git a/net/socket/delayed_datagram_socket.cc b/net/socket/delayed_datagram_socket.cc
+index 8ae22f7d06..35534b94aa 100644
+--- a/net/socket/delayed_datagram_socket.cc
++++ b/net/socket/delayed_datagram_socket.cc
+@@ -17,6 +17,8 @@
+ #include "net/base/io_buffer.h"
+ #include "net/base/net_errors.h"
+ 
++#define kInnerReadBufferSize kInnerReadBufferSize_delayed_datagram_socket
++
+ namespace net {
+ 
+ namespace {
+@@ -895,3 +897,5 @@ base::TimeDelta DelayedDatagramSocket::HalfRtt() const {
+ }
+ 
+ }  // namespace net
++
++#undef kInnerReadBufferSize
+diff --git a/net/socket/tls_stream_attempt.cc b/net/socket/tls_stream_attempt.cc
+index 5641bd744d..5581b9e7c6 100644
+--- a/net/socket/tls_stream_attempt.cc
++++ b/net/socket/tls_stream_attempt.cc
+@@ -43,12 +43,14 @@ std::string_view TlsStreamAttempt::StateToString(State state) {
+ 
+ namespace {
+ 
+-bool IsEchEnabled(SSLClientContext* ssl_client_context, std::string_view host) {
++bool IsEchEnabled_tls_stream_attempt(SSLClientContext* ssl_client_context, std::string_view host) {
+   return ssl_client_context && ssl_client_context->IsEchEnabled(host);
+ }
+ 
+ }  // namespace
+ 
++#define IsEchEnabled IsEchEnabled_tls_stream_attempt
++
+ TlsStreamAttempt::TlsStreamAttempt(const StreamAttemptParams* params,
+                                    IPEndPoint ip_endpoint,
+                                    handles::NetworkHandle target_network,
+@@ -337,3 +339,5 @@ void TlsStreamAttempt::ResetStateForRestart() {
+ }
+ 
+ }  // namespace net
++
++#undef IsEchEnabled

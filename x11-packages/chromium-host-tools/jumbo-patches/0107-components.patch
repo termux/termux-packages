@@ -140,25 +140,6 @@ index 855d4ed800..cd8307ea62 100644
    deps = [
      "//base",
      "//base:i18n",
-diff --git a/components/autofill/content/renderer/form_tracker.cc b/components/autofill/content/renderer/form_tracker.cc
-index cee22fd2d2..702057affa 100644
---- a/components/autofill/content/renderer/form_tracker.cc
-+++ b/components/autofill/content/renderer/form_tracker.cc
-@@ -39,6 +39,8 @@ using blink::WebFormControlElement;
- using blink::WebFormElement;
- using blink::WebInputElement;
- 
-+#define kSubmissionSourceHistogram kSubmissionSourceHistogram_FormTracker
-+
- namespace autofill {
- 
- namespace {
-@@ -880,3 +882,5 @@ WebDocument FormTracker::GetDocument() const {
- }
- 
- }  // namespace autofill
-+
-+#undef kSubmissionSourceHistogram
 diff --git a/components/autofill/content/renderer/password_autofill_agent.cc b/components/autofill/content/renderer/password_autofill_agent.cc
 index 8cba62f2fb..4806965acc 100644
 --- a/components/autofill/content/renderer/password_autofill_agent.cc
@@ -315,25 +296,6 @@ index 97a790bd58..18696e4bb6 100644
  }  // namespace autofill
 +
 +#undef CreateUndoOrClearFormSuggestion
-diff --git a/components/autofill/core/browser/ui/autofill_resource_utils.cc b/components/autofill/core/browser/ui/autofill_resource_utils.cc
-index 93717ce822..f33ed04f5e 100644
---- a/components/autofill/core/browser/ui/autofill_resource_utils.cc
-+++ b/components/autofill/core/browser/ui/autofill_resource_utils.cc
-@@ -16,6 +16,8 @@
- #include "components/resources/android/theme_resources.h"
- #endif  // BUILDFLAG(IS_ANDROID)
- 
-+#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_AutoFillResouceUtils
-+
- namespace autofill {
- 
- namespace {
-@@ -135,3 +137,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
- }
- 
- }  // namespace autofill
-+
-+#undef ShouldUseNewFopDisplay
 diff --git a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
 index 39a6679270..211f0841c1 100644
 --- a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
@@ -776,29 +738,6 @@ index c738b787ec..7717e59ead 100644
 +
 +#undef CreateKey
 +#undef LoadKeyFromWrapped
-diff --git a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-index 0bfe80a3db..c3c0afa32e 100644
---- a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-+++ b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-@@ -31,6 +31,10 @@
- #include "services/network/public/mojom/data_pipe_getter.mojom.h"
- #include "services/network/public/mojom/url_response_head.mojom.h"
- 
-+#define kDataContentType   kDataContentType_multipart_uploader_base
-+#define kUploadContentType kUploadContentType_multipart_uploader_base
-+#define CreateFileDataPipeGetterBlocking CreateFileDataPipeGetterBlocking_multipart_uploader_base
-+
- namespace enterprise_connectors {
- 
- namespace {
-@@ -354,3 +358,7 @@ void MultipartUploadRequestBase::OnURLLoaderComplete(
- }
- 
- }  //  namespace enterprise_connectors
-+
-+#undef kDataContentType
-+#undef kUploadContentType
-+#undef CreateFileDataPipeGetterBlocking
 diff --git a/components/global_media_controls/public/views/media_item_ui_updated_view.cc b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
 index e805c62218..ba95cb566b 100644
 --- a/components/global_media_controls/public/views/media_item_ui_updated_view.cc
@@ -2446,25 +2385,6 @@ index 3ab85842d0..39cdf94050 100644
  }  // namespace policy
 +
 +#undef ValidateHost
-diff --git a/components/accessibility_annotator/core/storage/intent_table.cc b/components/accessibility_annotator/core/storage/intent_table.cc
-index 4f859ca761..e9acd45429 100644
---- a/components/accessibility_annotator/core/storage/intent_table.cc
-+++ b/components/accessibility_annotator/core/storage/intent_table.cc
-@@ -10,6 +10,8 @@
- #include "sql/database.h"
- #include "sql/table_management_helpers.h"
- 
-+#define kVisitIdColumn kVisitIdColumn_intent_table
-+
- namespace accessibility_annotator {
- 
- namespace {
-@@ -90,3 +92,5 @@ bool IntentTable::MigrateFromCleanStateToVersion1() {
- }
- 
- }  // namespace accessibility_annotator
-+
-+#undef kVisitIdColumn
 diff --git a/components/content_settings/browser/ui/cookie_controls_util.cc b/components/content_settings/browser/ui/cookie_controls_util.cc
 index cdd1363f10..578d572f8c 100644
 --- a/components/content_settings/browser/ui/cookie_controls_util.cc
@@ -2686,3 +2606,100 @@ index 4d8cb01053..f214eb97c0 100644
  
    deps = [
      "//base",
+diff --git a/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc b/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
+index c3abe9d461..61c060c9ef 100644
+--- a/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
++++ b/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
+@@ -13,6 +13,8 @@
+ #include "base/strings/strcat.h"
+ #include "base/strings/utf_string_conversions.h"
+ 
++#define kSeparator kSeparator_in_memory_entity_suppression_manager
++
+ namespace autofill {
+ 
+ namespace {
+@@ -88,3 +90,5 @@ bool InMemoryEntitySuppressionManager::IsSuppressed(
+ }
+ 
+ }  // namespace autofill
++
++#undef kSeparator
+diff --git a/components/safe_browsing/core/browser/db/v5_store.cc b/components/safe_browsing/core/browser/db/v5_store.cc
+index 3f2266fbea..9ee40eb3a8 100644
+--- a/components/safe_browsing/core/browser/db/v5_store.cc
++++ b/components/safe_browsing/core/browser/db/v5_store.cc
+@@ -35,6 +35,7 @@
+ #define kResult kResult_v5store
+ #define RecordApplyUpdateDuration RecordApplyUpdateDuration_v5store
+ #define RecordMigrationTime RecordMigrationTime_v5store
++#define RecordUpdateCategory RecordUpdateCategory_v5store
+ 
+ namespace safe_browsing {
+ 
+@@ -855,3 +856,4 @@ V5StorePtr V5StoreFactory::CreateV5Store(
+ #undef kResult
+ #undef RecordApplyUpdateDuration
+ #undef RecordMigrationTime
++#undef RecordUpdateCategory
+diff --git a/components/autofill/core/browser/ui/autofill_resource_util.cc b/components/autofill/core/browser/ui/autofill_resource_util.cc
+index 1b2bc1de53..df02f69752 100644
+--- a/components/autofill/core/browser/ui/autofill_resource_util.cc
++++ b/components/autofill/core/browser/ui/autofill_resource_util.cc
+@@ -16,6 +16,8 @@
+ #include "components/resources/android/theme_resources.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
++#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_autofill_resource_util
++
+ namespace autofill {
+ 
+ namespace {
+@@ -161,3 +163,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUseNewFopDisplay
+diff --git a/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc b/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
+index 9a766a7c00..d0ee90e64d 100644
+--- a/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
++++ b/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
+@@ -19,6 +19,8 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define OnSqlError OnSqlError_local_storage_sqlite
++
+ namespace storage {
+ namespace {
+ 
+@@ -453,3 +455,5 @@ bool LocalStorageSqlite::OnMemoryDump(
+ }
+ 
+ }  // namespace storage
++
++#undef OnSqlError
+diff --git a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
+index 61ae85a6db..a968e6a632 100644
+--- a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
++++ b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
+@@ -36,6 +36,10 @@
+ #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
+ #endif
+ 
++#define kDataContentType kDataContentType_multipart_uploader
++#define kUploadContentType kUploadContentType_multipart_uploader
++#define CreateFileDataPipeGetterBlocking CreateFileDataPipeGetterBlocking_multipart_uploader
++
+ namespace enterprise_connectors {
+ 
+ namespace {
+@@ -445,3 +449,7 @@ void MultipartUploadRequest::OnURLLoaderComplete(
+ }
+ 
+ }  // namespace enterprise_connectors
++
++#undef kDataContentType
++#undef kUploadContentType
++#undef CreateFileDataPipeGetterBlocking
