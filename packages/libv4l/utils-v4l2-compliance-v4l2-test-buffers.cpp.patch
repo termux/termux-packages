@@ -1,8 +1,8 @@
 --- a/utils/v4l2-compliance/v4l2-test-buffers.cpp
 +++ b/utils/v4l2-compliance/v4l2-test-buffers.cpp
-@@ -2493,6 +2493,14 @@
- }
- 
+@@ -2953,6 +2953,14 @@
+ /* Android does not have support for pthread_cancel */
+ #ifndef ANDROID
  
 +#ifdef __ANDROID__
 +static void
@@ -15,7 +15,7 @@
  /*
   * This class wraps a pthread in such a way that it simplifies passing
   * parameters, checking completion, gracious halting, and aggressive
-@@ -2537,7 +2545,11 @@
+@@ -2997,7 +3005,11 @@
  		 * artillery and cancel the thread.
  		 */
  		if (!done) {
@@ -27,7 +27,7 @@
  			sleep(1);
  		}
  
-@@ -2552,8 +2564,17 @@
+@@ -3012,8 +3024,17 @@
  	{
  		auto self = static_cast<BlockingThread *>(arg);
  
