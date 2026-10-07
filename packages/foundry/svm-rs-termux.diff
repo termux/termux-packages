@@ -52,7 +52,7 @@
 +
  use crate::{
      SvmError, all_releases, data_dir, platform, releases::artifact_url, setup_data_dir,
-     setup_version, version_binary,
+     setup_version, version_binary, version_path,
 @@ -26,9 +30,35 @@
  /// See <https://github.com/ethereum/solidity/releases/tag/v0.8.29>
  const NIXOS_MAX_PATCH_VERSION: Version = Version::new(0, 8, 28);
@@ -89,7 +89,7 @@
      setup_data_dir()?;
  
      let artifacts = crate::blocking_all_releases(platform::platform())?;
-@@ -73,6 +103,15 @@
+@@ -83,6 +113,15 @@
  ///
  /// Returns the path to the solc file.
  pub async fn install(version: &Version) -> Result<PathBuf, SvmError> {
