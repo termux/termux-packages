@@ -1,0 +1,41 @@
+--- a/packages/rolldown/src/binding.cjs
++++ b/packages/rolldown/src/binding.cjs
+@@ -112,6 +112,38 @@
+       } catch (e) {
+         loadErrors.push(e)
+       }
++    } else if (process.arch === 'x64') {
++      try {
++        return require('./rolldown-binding.android-x64.node')
++      } catch (e) {
++        loadErrors.push(e)
++      }
++      try {
++        const binding = require('@rolldown/binding-android-x64')
++        const bindingPackageVersion = require('@rolldown/binding-android-x64/package.json').version
++        if (bindingPackageVersion !== '1.2.13' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
++          throw new Error(`Native binding package version mismatch, expected 1.2.13 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
++        }
++        return binding
++      } catch (e) {
++        loadErrors.push(e)
++      }
++    } else if (process.arch === 'ia32') {
++      try {
++        return require('./rolldown-binding.android-ia32.node')
++      } catch (e) {
++        loadErrors.push(e)
++      }
++      try {
++        const binding = require('@rolldown/binding-android-ia32')
++        const bindingPackageVersion = require('@rolldown/binding-android-ia32/package.json').version
++        if (bindingPackageVersion !== '1.2.13' && process.env.NAPI_RS_ENFORCE_VERSION_CHECK && process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== '0') {
++          throw new Error(`Native binding package version mismatch, expected 1.2.13 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`)
++        }
++        return binding
++      } catch (e) {
++        loadErrors.push(e)
++      }
+     } else {
+       loadErrors.push(new Error(`Unsupported architecture on Android ${process.arch}`))
+     }
