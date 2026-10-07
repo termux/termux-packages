@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://pnpm.io
 TERMUX_PKG_DESCRIPTION="Fast, disk space efficient package manager for JavaScript"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="12.10.0"
+TERMUX_PKG_VERSION="12.10.1"
 TERMUX_PKG_SRCURL="https://github.com/pnpm/pnpm/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=343203edbd111712c3e951a2b1018b554229473f7ecb2566cacb8280c31996e6
+TERMUX_PKG_SHA256=397c34bc0b6b17f2aacdbd13a1264a1cd93faadce68eafa0ef9056fdfc565960
 TERMUX_PKG_DEPENDS="git, nodejs | nodejs-lts"
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,6 +20,24 @@ termux_step_pre_configure() {
 	# toolchain rustup/termux_setup_rust already configured (with the
 	# Android target already added) is used instead.
 	rm -f rust-toolchain.toml rust-toolchain
+
+	# cas-loader.mjs.inc is generated upstream by esm-loader's prepare script
+	(
+		termux_setup_nodejs
+		local _esm_loader_dir="$TERMUX_PKG_SRCDIR/pnpm/esm-loader"
+		local _deps_dir="$TERMUX_PKG_TMPDIR/esm-loader-deps"
+		rm -rf "$_deps_dir"
+		mkdir -p "$_deps_dir"
+		cd "$_deps_dir"
+		npm init -y > /dev/null
+		npm install --ignore-scripts --no-audit --no-fund --no-package-lock \
+			esbuild@0.28.2 enhanced-resolve@5.26.0
+		ln -sfn "$_deps_dir/node_modules" "$_esm_loader_dir/node_modules"
+		cd "$_esm_loader_dir"
+		node scripts/bundle-runtime.mjs
+		rm -f "$_esm_loader_dir/node_modules"
+	)
+	test -s pnpm/crates/deps-restorer/src/cas-loader.mjs.inc
 
 
 	if [[ -f .cargo/config.toml ]]; then
