@@ -1,0 +1,12 @@
+diff --git a/packages/bruno-electron/src/ipc/terminal.js b/packages/bruno-electron/src/ipc/terminal.js
+index b6d8cc1..ae59740 100644
+--- a/packages/bruno-electron/src/ipc/terminal.js
++++ b/packages/bruno-electron/src/ipc/terminal.js
+@@ -1,5 +1,6 @@
+ const { ipcMain } = require('electron');
+-const pty = require('@lydell/node-pty');
++// Use node-pty (built from source), loaded lazily so the app starts without it
++const pty = { spawn: (...args) => require('node-pty').spawn(...args) };
+ const os = require('os');
+ const path = require('path');
+ const isDev = require('electron-is-dev');
