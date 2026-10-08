@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mise.jdx.dev/
 TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.10.3"
+TERMUX_PKG_VERSION="2026.10.4"
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=c9385e0a3907b1dc3419a5f2b6f3df5629f7622e7854ed25e4a24800028c8a01
+TERMUX_PKG_SHA256=9752ea74672652903dc20a4327e031da3db389324397e04e1f8d2d10368e98c9
 TERMUX_PKG_DEPENDS="bzip2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_PROCESSES=1
@@ -14,6 +14,9 @@ TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
+
+	# jitterentropy needs -O0, which -Oz in CFLAGS overrides
+	export AWS_LC_SYS_NO_JITTER_ENTROPY=1
 
 	# Dummy CMake toolchain file to workaround build error:
 	# error: failed to run custom build command for `libz-ng-sys v1.1.29`
