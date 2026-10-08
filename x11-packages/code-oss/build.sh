@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.131.0"
+TERMUX_PKG_VERSION="1.132.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
-TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
-TERMUX_PKG_BUILD_DEPENDS="electron-headers-for-code-oss"
-TERMUX_PKG_ANTI_BUILD_DEPENDS="electron-for-code-oss"
+TERMUX_PKG_DEPENDS="electron42, libx11, libxkbfile, libsecret, ripgrep"
+TERMUX_PKG_BUILD_DEPENDS="electron42-headers"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="electron42"
+TERMUX_PKG_CONFLICTS="electron-for-code-oss (<= 42.7.0)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_NO_STRIP=true
@@ -90,7 +91,7 @@ termux_step_make() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 	export npm_config_arch=$NPM_CONFIG_ARCH
-	export npm_config_nodedir=$TERMUX_PREFIX/lib/code-oss/node_headers
+	export npm_config_nodedir=$TERMUX_PREFIX/opt/electron42-host-tools/node_headers
 
 	export CXX="$CXX -v -L$TERMUX_PREFIX/lib"
 	export CXXFLAGS="$CXXFLAGS -DSPDLOG_USE_STD_FORMAT=1"
@@ -107,6 +108,13 @@ termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/lib/code-oss/resources/
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/resources/
 	cp -r --no-preserve=ownership --preserve=mode package-build-root/VSCode-linux-$CODE_ARCH/resources/* $TERMUX_PREFIX/lib/code-oss/resources/
+
+	# Install the dummy code-oss binary
+	ln -sf $TERMUX_PREFIX/lib/electron42/electron $TERMUX_PREFIX/lib/code-oss/code-oss
+
+	# Install the code.mjs wrapper, taken from ArchLinux repo
+	cp -f $TERMUX_PKG_BUILDER_DIR/code.mjs $TERMUX_PREFIX/lib/code-oss/
+	sed "1s|.*|#!$TERMUX_PREFIX/lib/electron42/electron|" -i $TERMUX_PREFIX/lib/code-oss/code.mjs
 
 	# Install the start script
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/bin

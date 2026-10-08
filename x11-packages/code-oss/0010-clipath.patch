@@ -1,0 +1,65 @@
+https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/blob/af4c0f603f0e950a080bddb2d4550b36b5c54524/clipath.patch
+
+diff --git a/src/vs/code/node/cli.ts b/src/vs/code/node/cli.ts
+index 312df0c1f92..33d115a3f7b 100644
+--- a/src/vs/code/node/cli.ts
++++ b/src/vs/code/node/cli.ts
+@@ -44,7 +44,7 @@ export async function main(argv: string[]): Promise<any> {
+ 	let args: NativeParsedArgs;
+ 
+ 	try {
+-		args = parseCLIProcessArgv(argv);
++		args = parseCLIProcessArgv(argv.slice(Math.max(0, argv.findIndex(a => a.endsWith('/code.mjs')) - 1)));
+ 	} catch (err) {
+ 		console.error(err.message);
+ 		return;
+diff --git a/src/vs/platform/lifecycle/electron-main/lifecycleMainService.ts b/src/vs/platform/lifecycle/electron-main/lifecycleMainService.ts
+index 4912966c79c..5b75bcd5973 100644
+--- a/src/vs/platform/lifecycle/electron-main/lifecycleMainService.ts
++++ b/src/vs/platform/lifecycle/electron-main/lifecycleMainService.ts
+@@ -691,7 +691,7 @@ export class LifecycleMainService extends Disposable implements ILifecycleMainSe
+ 		const quitListener = () => {
+ 			if (!this.relaunchHandler?.handleRelaunch(options)) {
+ 				this.trace('Lifecycle#relaunch() - calling app.relaunch()');
+-				electron.app.relaunch({ args });
++				electron.app.relaunch({ args, execPath: '@TERMUX_PREFIX@/lib/code-oss/code.mjs' });
+ 			}
+ 		};
+ 		electron.app.once('quit', quitListener);
+diff --git a/src/vs/platform/native/electron-main/nativeHostMainService.ts b/src/vs/platform/native/electron-main/nativeHostMainService.ts
+index 45964bcdcc2..1ef23c64a1a 100644
+--- a/src/vs/platform/native/electron-main/nativeHostMainService.ts
++++ b/src/vs/platform/native/electron-main/nativeHostMainService.ts
+@@ -686,31 +686,7 @@ export class NativeHostMainService extends Disposable implements INativeHostMain
+ 
+ 	@memoize
+ 	private get cliPath(): string {
+-
+-		// Windows
+-		if (isWindows) {
+-			if (this.environmentMainService.isBuilt) {
+-				return join(dirname(process.execPath), 'bin', `${this.productService.applicationName}.cmd`);
+-			}
+-
+-			return join(this.environmentMainService.appRoot, 'scripts', 'code-cli.bat');
+-		}
+-
+-		// Linux
+-		if (isLinux) {
+-			if (this.environmentMainService.isBuilt) {
+-				return join(dirname(process.execPath), 'bin', `${this.productService.applicationName}`);
+-			}
+-
+-			return join(this.environmentMainService.appRoot, 'scripts', 'code-cli.sh');
+-		}
+-
+-		// macOS
+-		if (this.environmentMainService.isBuilt) {
+-			return join(this.environmentMainService.appRoot, 'bin', 'code');
+-		}
+-
+-		return join(this.environmentMainService.appRoot, 'scripts', 'code-cli.sh');
++		return '@TERMUX_PREFIX@/lib/code-oss/bin/code-oss';
+ 	}
+ 
+ 	async getOSStatistics(): Promise<IOSStatistics> {
