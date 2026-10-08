@@ -1,7 +1,6 @@
-diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
---- xorg-server-1.20.1/os/utils.c	2018-08-07 19:31:05.000000000 +0300
-+++ xorg-server-1.20.1.mod/os/utils.c	2018-10-08 21:07:16.844266287 +0300
-@@ -228,7 +228,7 @@
+--- a/os/utils.c
++++ b/os/utils.c
+@@ -234,7 +234,7 @@
   * server at a time.  This keeps the servers from stomping on each other
   * if the user forgets to give them different display numbers.
   */
@@ -10,7 +9,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
  #define LOCK_TMP_PREFIX "/.tX"
  #define LOCK_PREFIX "/.X"
  #define LOCK_SUFFIX "-lock"
-@@ -320,7 +320,7 @@
+@@ -326,7 +326,7 @@
      i = 0;
      haslock = 0;
      while ((!haslock) && (i++ < 3)) {
@@ -19,7 +18,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          if (haslock) {
              /*
               * We're done.
-@@ -1383,11 +1383,7 @@
+@@ -1394,11 +1394,7 @@
          p = -1;
          break;
      case 0:                    /* child */
@@ -32,7 +31,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          _exit(127);
      default:                   /* parent */
          do {
-@@ -1453,10 +1449,6 @@
+@@ -1464,10 +1460,6 @@
  #endif
          return NULL;
      case 0:                    /* child */
@@ -43,7 +42,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          if (*type == 'r') {
              if (pdes[1] != 1) {
                  /* stdout */
-@@ -1473,7 +1465,7 @@
+@@ -1484,7 +1476,7 @@
              }
              close(pdes[1]);
          }
@@ -52,7 +51,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          _exit(127);
      }
  
-@@ -1531,10 +1523,6 @@
+@@ -1555,10 +1547,6 @@
          free(cur);
          return NULL;
      case 0:                    /* child */
@@ -63,7 +62,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
          if (*type == 'r') {
              if (pdes[1] != 1) {
                  /* stdout */
-@@ -1577,20 +1565,7 @@
+@@ -1601,22 +1589,7 @@
  
      return iop;
  #else
@@ -78,13 +77,15 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
      iop = fopen(file, type);
 -
 -    if (seteuid(euid) == -1) {
--        fclose(iop);
+-        if (iop) {
+-            fclose(iop);
+-        }
 -        return NULL;
 -    }
      return iop;
  #endif                          /* HAS_SAVED_IDS_AND_SETEUID */
  }
-@@ -1670,7 +1645,7 @@
+@@ -1696,7 +1669,7 @@
      else if (getenv("TMP") != NULL)
          return getenv("TMP");
      else
@@ -93,7 +94,7 @@ diff -uNr xorg-server-1.20.1/os/utils.c xorg-server-1.20.1.mod/os/utils.c
  }
  
  int
-@@ -1722,64 +1697,7 @@
+@@ -1748,64 +1721,7 @@
  Bool
  PrivsElevated(void)
  {
