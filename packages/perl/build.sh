@@ -11,9 +11,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 # - vim
 # - vim-gtk
-TERMUX_PKG_VERSION=(5.42.2
+TERMUX_PKG_VERSION=(5.42.3
                     1.6.4)
-TERMUX_PKG_SHA256=(0a585eeb9e363c0f80482ddb3571625250c2c86aeb408853e8ea50805cfb14bb
+TERMUX_PKG_SHA256=(c9387e1473a1866935cb047ece7c2e0a80767a3acdecb79d4a375f8a95970ddc
 		b176522bceb1fc3533eb85e4435e5ab06f7473633979122a8f5b18a2b4fc865a)
 TERMUX_PKG_SRCURL=("https://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION[0]}.tar.xz"
                    "https://github.com/arsv/perl-cross/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz")
