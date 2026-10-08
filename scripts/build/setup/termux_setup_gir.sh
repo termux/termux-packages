@@ -65,6 +65,7 @@ termux_setup_gir() {
 
 			cat > "$scanner" <<-EOF
 				#!$(command -v sh)
+				unset LD_LIBRARY_PATH
 				export XDG_DATA_DIRS="$TERMUX_PREFIX/share"
 				exec /usr/bin/g-ir-scanner "\$@"
 			EOF
