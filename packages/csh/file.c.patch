@@ -1,26 +1,45 @@
 --- a/file.c
 +++ b/file.c
-@@ -30,6 +30,10 @@
-  * SUCH DAMAGE.
-  */
+@@ -43,6 +43,13 @@
+ #include <termios.h>
+ #include <unistd.h>
  
 +#ifdef BIONIC
 +#define MAXNAMLEN 1024
 +#endif
++#ifndef CCEQ
++#define CCEQ(val, ch) ((val) != _POSIX_VDISABLE && (val) == (ch))
++#endif
 +
- #ifdef FILEC
+ #include "csh.h"
+ #include "extern.h"
  
- #include <sys/param.h>
-@@ -82,7 +86,7 @@
- static void	 beep(void);
- static void	 print_recognized_stuff(Char *);
+@@ -109,7 +116,7 @@
+ static void	 print_by_column(Char *, Char *[], int);
+ static Char	*tilde(Char *, Char *);
  static void	 extract_dir_and_name(Char *, Char *, Char *);
 -static Char	*getentry(DIR *, int);
 +static Char	*getentry(DIR *);
  static void	 free_items(Char **, int);
  static int	 tsearch(Char *, COMMAND, int);
  static int	 recognize(Char *, Char *, int, int);
-@@ -373,16 +377,10 @@
+@@ -368,6 +375,7 @@
+ 	return 0;
+ }
+ 
++#ifdef TIOCSTAT
+ static int
+ cl_status(struct cmdline *cl, int c)
+ {
+@@ -377,6 +385,7 @@
+ 
+ 	return 0;
+ }
++#endif
+ 
+ const struct termios *
+ setup_tty(int on)
+@@ -558,16 +567,10 @@
  }
  
  static Char *
@@ -38,13 +57,13 @@
      if ((dirp = readdir(dir_fd)) != NULL)
  	return (str2short(dirp->d_name));
      return (NULL);
-@@ -416,36 +414,27 @@
+@@ -601,36 +604,27 @@
  {
      DIR *dir_fd;
      int numitems = 0, ignoring = TRUE, nignored = 0;
 -    int name_length, looking_for_lognames;
 +    int name_length;
-     Char    tilded_dir[MAXPATHLEN], dir[MAXPATHLEN];
+     Char    tilded_dir[PATH_MAX], dir[PATH_MAX];
      Char    name[MAXNAMLEN + 1], extended_name[MAXNAMLEN + 1];
      Char   *entry;
      Char   **items = NULL;
@@ -84,7 +103,7 @@
  	    continue;
  	if (command == LIST) {
  	    if (numitems >= maxitems) {
-@@ -472,25 +461,16 @@
+@@ -652,33 +646,23 @@
      if (ignoring && numitems == 0 && nignored > 0) {
  	ignoring = FALSE;
  	nignored = 0;
@@ -114,13 +133,33 @@
  	/* add extended name */
  	catn(word, extended_name, max_word_length);
  	return (numitems);
-@@ -498,8 +478,7 @@
+     }
      else {			/* LIST */
- 	qsort((ptr_t) items, numitems, sizeof(*items),
- 		(int (*)(const void *, const void *)) sortscmp);
+ 	qsort(items, numitems, sizeof(*items), sortscmp);
 -	print_by_column(looking_for_lognames ? NULL : tilded_dir,
 -			items, numitems);
 +	print_by_column(tilded_dir, items, numitems);
  	if (items != NULL)
  	    FREE_ITEMS(items);
      }
+@@ -763,7 +747,9 @@
+ 		{ cl_literal,	VLNEXT },
+ 		{ cl_recognize,	VEOL },
+ 		{ cl_reprint,	VREPRINT },
++#ifdef TIOCSTAT
+ 		{ cl_status,	VSTATUS },
++#endif
+ 		{ cl_insert,	-1 }
+ 	};
+ 	unsigned char		 buf[BUFSIZ];
+@@ -784,8 +770,10 @@
+ 	cl.size = sizeof(buf);
+ 	if (inputline_size < cl.size)
+ 		cl.size = inputline_size;
++#ifdef ALTWERASE
+ 	if (cl.istty && tio->c_lflag & ALTWERASE)
+ 		cl.flags |= CL_ALTWERASE;
++#endif
+ 	if (needprompt) {
+ 		needprompt = 0;
+ 		cl.flags |= CL_PROMPT;
