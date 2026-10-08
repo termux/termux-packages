@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://calligra.org/
 TERMUX_PKG_DESCRIPTION="Office and graphic art suite by KDE"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.08.1"
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/calligra-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=9084f93eccd3b865d638ae8cb989bcb334edea6f550ba6874a282048284fcccc
+TERMUX_PKG_SHA256=f4b9c11f5957798face6cf29834695d76506c5e28049e21abcb62884ce9cc96c
 # it could use qt6-qtwebengine, but that dependency is not available for 32-bit x86 architecture.
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gsl, imath, kf6-karchive, kf6-kcmutils, kf6-kcolorscheme, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-kguiaddons, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-kitemviews, kf6-kjobwidgets, kf6-knotifications, kf6-knotifyconfig, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, kf6-purpose, kf6-solid, kf6-sonnet, kf6-qqc2-desktop-style, kirigami-addons, libc++, libetonyek, libgit2, libodfgen, librevenge, libvisio, libwpd, libwpg, libwps, littlecms, mediainfo, mlt, okular, opengl, openssl, opentimelineio, perl, phonon-qt6, poppler, poppler-qt, qca, qt6-qtbase, qt6-qtdeclarative, qt6-qtmultimedia, qt6-qtnetworkauth, qt6-qtsvg, qtkeychain, shared-mime-info, zlib"
 TERMUX_PKG_BUILD_DEPENDS="boost, eigen, extra-cmake-modules, kf6-kconfig-cross-tools, kf6-kdoctools, kf6-kdoctools-cross-tools, qt6-qttools"
