@@ -225,25 +225,25 @@ diff --git a/chrome/browser/devtools/BUILD.gn b/chrome/browser/devtools/BUILD.gn
 index a789faeab1..184f56b7fc 100644
 --- a/chrome/browser/devtools/BUILD.gn
 +++ b/chrome/browser/devtools/BUILD.gn
-@@ -97,6 +97,7 @@ inspector_protocol_generate("protocol_generated_sources") {
- jumbo_static_library("devtools") {
-   # Note: new sources and deps should be generally added in (!is_android) below.
-   sources = []
+@@ -108,6 +108,7 @@
+     "chrome_devtools_session_base.cc",
+     "chrome_devtools_session_base.h",
+   ]
 +  jumbo_excluded_sources = []
  
    configs += [
      "//build/config/compiler:wexit_time_destructors",
-@@ -243,6 +244,10 @@ jumbo_static_library("devtools") {
-       "//chrome/browser/ui:browser_tab_strip",
-       "//chrome/browser/ui/tabs:tab_strip_model_observer",
+@@ -381,6 +382,10 @@
+       "serialize_host_descriptions.cc",
+       "serialize_host_descriptions.h",
      ]
 +    jumbo_excluded_sources += [
 +      # kCancelButtonId also exists in devtools_ui_bindings.cc
-+      "devtools_connection_dialog.cc"
++      "devtools_connection_dialog.cc",
 +    ]
-     deps += [
-       "//chrome:extra_resources",
-       "//chrome:resources",
+     if (enable_service_discovery) {
+       sources += [
+         "device/cast_device_provider.cc",
 diff --git a/chrome/browser/devtools/device/adb/adb_device_provider.cc b/chrome/browser/devtools/device/adb/adb_device_provider.cc
 index ea43268e8b..de84916937 100644
 --- a/chrome/browser/devtools/device/adb/adb_device_provider.cc
@@ -533,25 +533,6 @@ index f2d3e673bc..4663f766e1 100644
  
  namespace {
 @@ -98,3 +100,5 @@ void ContextSignalsDecorator::OnSignalsFetched(
- }
- 
- }  // namespace enterprise_connectors
-+
-+#undef kLatencyHistogramVariant
-diff --git a/chrome/browser/enterprise/connectors/device_trust/signals/signals_service_impl.cc b/chrome/browser/enterprise/connectors/device_trust/signals/signals_service_impl.cc
-index b7cd3881c4..a47436136f 100644
---- a/chrome/browser/enterprise/connectors/device_trust/signals/signals_service_impl.cc
-+++ b/chrome/browser/enterprise/connectors/device_trust/signals/signals_service_impl.cc
-@@ -16,6 +16,8 @@
- #include "chrome/browser/enterprise/connectors/device_trust/signals/decorators/common/signals_decorator.h"
- #include "chrome/browser/enterprise/connectors/device_trust/signals/signals_filterer.h"
- 
-+#define kLatencyHistogramVariant kLatencyHistogramVariant_Full
-+
- namespace enterprise_connectors {
- 
- namespace {
-@@ -66,3 +68,5 @@ void SignalsServiceImpl::OnSignalsDecorated(
  }
  
  }  // namespace enterprise_connectors
@@ -870,7 +851,7 @@ diff --git a/chrome/browser/extensions/browser_window_util.cc b/chrome/browser/e
 index 5af8b82010..13c46f4168 100644
 --- a/chrome/browser/extensions/browser_window_util.cc
 +++ b/chrome/browser/extensions/browser_window_util.cc
-@@ -59,8 +59,8 @@ bool BrowserMatchesHelper(BrowserWindowInterface& browser,
+@@ -53,8 +53,8 @@
  
  BrowserWindowInterface* GetBrowserForTabContents(
      content::WebContents& tab_contents) {
@@ -878,18 +859,9 @@ index 5af8b82010..13c46f4168 100644
 -      tabs::TabInterface::MaybeGetFromContents(&tab_contents);
 +  ::tabs::TabInterface* tab =
 +      ::tabs::TabInterface::MaybeGetFromContents(&tab_contents);
-   if (!tab) {
-     return nullptr;
-   }
-@@ -72,7 +72,7 @@ BrowserWindowInterface* GetBrowserForTabContents(
-     if (!tab_list) {
-       continue;
-     }
--    std::vector<tabs::TabInterface*> all_tabs = tab_list->GetAllTabs();
-+    std::vector<::tabs::TabInterface*> all_tabs = tab_list->GetAllTabs();
-     if (std::ranges::contains(all_tabs, tab)) {
-       return browser;  // Found it!
-     }
+   return tab ? tab->GetBrowserWindowInterface() : nullptr;
+ }
+ 
 diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/browser/extensions/extension_view_host_factory.cc
 index 01021f4f4b..557a7e6ff4 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.cc
@@ -920,18 +892,17 @@ diff --git a/chrome/browser/glic/BUILD.gn b/chrome/browser/glic/BUILD.gn
 index e8cea2242c..efae52430a 100644
 --- a/chrome/browser/glic/BUILD.gn
 +++ b/chrome/browser/glic/BUILD.gn
-@@ -285,6 +285,11 @@ jumbo_source_set("impl") {
-     "widget/browser_conditions.cc",
-     "widget/browser_conditions.h",
+@@ -285,6 +285,10 @@ jumbo_source_set("impl") {
+     "widget/glic_tab_ui.cc",
+     "widget/glic_tab_ui.h",
    ]
 +  jumbo_excluded_sources = [
 +    # Many conflictions
-+    "host/glic_ui.cc",
 +    "host/glic_cookie_synchronizer.cc",
 +  ]
  
-   if (!is_android) {
-     # TODO(b/470059315): Make these work on Android, or move them to the
+   public_deps = [
+     ":private_types",
 diff --git a/chrome/browser/glic/host/context/glic_focused_tab_manager.cc b/chrome/browser/glic/host/context/glic_focused_tab_manager.cc
 index a6bfe8e0fa..f6a9ae8f08 100644
 --- a/chrome/browser/glic/host/context/glic_focused_tab_manager.cc
@@ -1777,37 +1748,14 @@ diff --git a/chrome/browser/ui/BUILD.gn b/chrome/browser/ui/BUILD.gn
 index 4cef995ac6..2da13d8f94 100644
 --- a/chrome/browser/ui/BUILD.gn
 +++ b/chrome/browser/ui/BUILD.gn
-@@ -419,6 +419,7 @@
-     "webui/chrome_web_ui_controller_factory.cc",
-     "webui/chrome_web_ui_controller_factory.h",
+@@ -526,6 +526,7 @@
+     "tab_helpers.cc",
+     "tab_helpers.h",
    ]
 +  jumbo_excluded_sources = []
  
    defines = []
    libs = []
-@@ -3428,6 +3429,11 @@
-       "views/profiles/batch_upload_dialog_view.cc",
-       "views/profiles/batch_upload_dialog_view.h",
-     ]
-+    jumbo_excluded_sources += [
-+      # Also defined in //chrome/browser/ui/profiles:impl
-+      "profiles/batch_upload_ui_delegate.cc",
-+      "views/profiles/batch_upload_dialog_view.cc",
-+    ]
-     deps += [
-       "webui/signin:batch_upload",
-       "webui/signin/batch_upload:mojo_bindings",
-@@ -3448,6 +3454,10 @@
-       "views/passwords/biometric_authentication_for_filling_bubble_view.cc",
-       "views/passwords/biometric_authentication_for_filling_bubble_view.h",
-     ]
-+    jumbo_excluded_sources += [
-+      # Conflict with //chrome/browser/ui/webui/signin:login_impl
-+      "webui/signin/inline_login_ui.cc",
-+    ]
-   }
- 
-   if (is_win || is_mac) {
 diff --git a/chrome/browser/ui/exclusive_access/keyboard_lock_controller.cc b/chrome/browser/ui/exclusive_access/keyboard_lock_controller.cc
 index 1b380812b5..11078b4879 100644
 --- a/chrome/browser/ui/exclusive_access/keyboard_lock_controller.cc
@@ -1852,17 +1800,17 @@ diff --git a/chrome/browser/ui/lens/BUILD.gn b/chrome/browser/ui/lens/BUILD.gn
 index 7231827a3c..ceddd80a7f 100644
 --- a/chrome/browser/ui/lens/BUILD.gn
 +++ b/chrome/browser/ui/lens/BUILD.gn
-@@ -138,6 +138,10 @@ jumbo_source_set("impl") {
-     "overlay_base_controller.cc",
+@@ -40,6 +40,10 @@
      "page_content_type_conversions.cc",
+     "page_content_type_conversions.h",
    ]
 +  jumbo_excluded_sources = [
 +    # reference to overloaded function could not be resolved; did you mean to call it?
 +    "lens_overlay_query_controller.cc",
 +  ]
- 
-   deps = [
-     ":lens",
+   public_deps = [
+     ":backend_logic_public",
+     "//base",
 diff --git a/chrome/browser/ui/lens/lens_media_link_handler.cc b/chrome/browser/ui/lens/lens_media_link_handler.cc
 index d5fd7a012e..7eaa36ef38 100644
 --- a/chrome/browser/ui/lens/lens_media_link_handler.cc
@@ -3550,25 +3498,6 @@ index 82a67fdd18..304a3bb311 100644
  }
 +
 +#undef GetLoggerIfAvailable
-diff --git a/chrome/browser/ui/views/omnibox/webui_readonly_omnibox.cc b/chrome/browser/ui/views/omnibox/webui_readonly_omnibox.cc
-index 4a8c1622df..21b36d31ac 100644
---- a/chrome/browser/ui/views/omnibox/webui_readonly_omnibox.cc
-+++ b/chrome/browser/ui/views/omnibox/webui_readonly_omnibox.cc
-@@ -17,6 +17,8 @@
- #include "content/public/browser/web_contents.h"
- #include "net/cert/cert_status_flags.h"
- 
-+#define OmniboxState OmniboxState_webui_readonly_omnibox
-+
- namespace {
- 
- struct OmniboxState : public base::SupportsUserData::Data {
-@@ -291,3 +293,5 @@ WebUIReadOnlyOmnibox::ComputeMojoState() const {
- void WebUIReadOnlyOmnibox::RequestUpdateWebUI() {
-   update_propagator_->PropagateOmniboxUpdate(ComputeMojoState());
- }
-+
-+#undef OmniboxState
 diff --git a/chrome/browser/memory/BUILD.gn b/chrome/browser/memory/BUILD.gn
 index 8668c71e02..ca7aafa142 100644
 --- a/chrome/browser/memory/BUILD.gn
@@ -3585,34 +3514,6 @@ index 8668c71e02..ca7aafa142 100644
    }
  
    deps = [
-diff --git a/chrome/browser/password_manager/password_change/password_change_from_checkup_delegate.cc b/chrome/browser/password_manager/password_change/password_change_from_checkup_delegate.cc
-index 2d7eb185bf..d0d8f6c208 100644
---- a/chrome/browser/password_manager/password_change/password_change_from_checkup_delegate.cc
-+++ b/chrome/browser/password_manager/password_change/password_change_from_checkup_delegate.cc
-@@ -129,7 +129,7 @@ std::string GetPostSubmissionPrompt() {
- #endif
- }
- 
--std::u16string GeneratePassword(
-+std::u16string GeneratePassword_password_change_from_checkup_delegate(
-     const password_manager::PasswordForm& form,
-     password_manager::PasswordGenerationFrameHelper* generation_helper) {
-   auto iter = std::ranges::find(form.form_data.fields(),
-@@ -144,6 +144,8 @@ std::u16string GeneratePassword(
-       autofill::CalculateFieldSignatureForField(*iter), iter->max_length());
- }
- 
-+#define GeneratePassword GeneratePassword_password_change_from_checkup_delegate
-+
- bool IsTaskInterrupted(actor::ActorTask::State new_state) {
-   return (new_state == actor::ActorTask::State::kWaitingOnUser ||
-           new_state == actor::ActorTask::State::kPausedByActor ||
-@@ -486,3 +488,5 @@ void PasswordChangeFromCheckupDelegate::HandleMaybeSuccessfulPasswordChange() {
-     saved_form_manager_.reset();
-   }
- }
-+
-+#undef GeneratePassword
 diff --git a/chrome/browser/web_applications/model/web_app_icon_types.cc b/chrome/browser/web_applications/model/web_app_icon_types.cc
 index 13ec4c7137..a8689fd46c 100644
 --- a/chrome/browser/web_applications/model/web_app_icon_types.cc
@@ -3742,19 +3643,6 @@ index 9e4bcd5e60..ae73a87089 100644
 +#undef traffic_annotation
 +#undef RecordResponseValueCount
 +#undef RecordThrottlingWaitTime
-diff --git a/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc b/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
-index e3dd7b59f2..280aa538c2 100644
---- a/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
-+++ b/chrome/browser/performance_manager/execution_context_priority/side_panel_loading_voter.cc
-@@ -38,7 +38,7 @@ void SidePanelLoadingVoter::MarkAsSidePanel(const PageNode* page_node) {
-   // This is possible for a preloaded Side Panel. The navigation has already
-   // committed and the page is visible.
-   if (!page_node->GetMainFrameUrl().is_empty()) {
--    if (!features::IsImmersiveReadAnythingEnabled()) {
-+    if (!::features::IsImmersiveReadAnythingEnabled()) {
-       CHECK(page_node->IsVisible());
-       return;
-     }
 diff --git a/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc b/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc
 index a325a3ba8c..c8431d8ed1 100644
 --- a/chrome/browser/performance_manager/metrics/metrics_provider_desktop.cc
@@ -4406,16 +4294,16 @@ diff --git a/chrome/browser/glic/suggestions/glic_cue_tab_state.cc b/chrome/brow
 index d000528f1d..ba34f883ef 100644
 --- a/chrome/browser/glic/suggestions/glic_cue_tab_state.cc
 +++ b/chrome/browser/glic/suggestions/glic_cue_tab_state.cc
-@@ -26,7 +26,7 @@ GlicCueTabState::GlicCueTabState(content::WebContents* web_contents)
-     : content::WebContentsObserver(web_contents),
-       content::WebContentsUserData<GlicCueTabState>(*web_contents) {
+@@ -46,7 +46,7 @@
+   optimization_guide_keyed_service_ =
+       OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
    if (base::FeatureList::IsEnabled(
 -          contextual_cueing::kContextualCueingV2MultiSource)) {
 +          ::contextual_cueing::kContextualCueingV2MultiSource)) {
-     annotation_service_ = PageContentAnnotationsServiceFactory::GetForProfile(
-         Profile::FromBrowserContext(web_contents->GetBrowserContext()));
+     annotation_service_ =
+         PageContentAnnotationsServiceFactory::GetForProfile(profile);
      if (annotation_service_) {
-@@ -85,14 +85,14 @@ void GlicCueTabState::OnPageContentAnnotated(
+@@ -103,8 +103,8 @@
  }
  
  void GlicCueTabState::CheckEligibility(
@@ -4425,6 +4313,8 @@ index d000528f1d..ba34f883ef 100644
 +    ::contextual_cueing::CueTarget::EligibilityCallback callback,
      GlicCueTarget* target) {
    if (!annotation_service_) {
+     CUEING_LOG(
+@@ -112,7 +112,7 @@
      base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
          FROM_HERE,
          base::BindOnce(std::move(callback), false,
@@ -4433,7 +4323,7 @@ index d000528f1d..ba34f883ef 100644
      return;
    }
  
-@@ -101,7 +101,7 @@ void GlicCueTabState::CheckEligibility(
+@@ -124,7 +124,7 @@
      base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
          FROM_HERE,
          base::BindOnce(std::move(callback), eligible,
@@ -4442,7 +4332,7 @@ index d000528f1d..ba34f883ef 100644
      return;
    }
  
-@@ -113,7 +113,7 @@ void GlicCueTabState::CheckEligibility(
+@@ -137,7 +137,7 @@
        .target = target->GetWeakPtr(),
    };
    annotation_timeout_timer_.Start(FROM_HERE,
@@ -4451,7 +4341,7 @@ index d000528f1d..ba34f883ef 100644
                                    this, &GlicCueTabState::OnAnnotationTimeout);
  }
  
-@@ -123,7 +123,7 @@ void GlicCueTabState::CancelPendingCheck() {
+@@ -149,7 +149,7 @@
      base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
          FROM_HERE,
          base::BindOnce(std::move(pending_check_->callback), false,
@@ -4460,7 +4350,7 @@ index d000528f1d..ba34f883ef 100644
      pending_check_.reset();
    }
  }
-@@ -134,7 +134,7 @@ void GlicCueTabState::ResolvePendingCheck() {
+@@ -163,7 +163,7 @@
    }
  
    annotation_timeout_timer_.Stop();
@@ -4469,7 +4359,7 @@ index d000528f1d..ba34f883ef 100644
        std::move(pending_check_->callback);
    base::WeakPtr<GlicCueTarget> target = pending_check_->target;
    pending_check_.reset();
-@@ -145,7 +145,7 @@ void GlicCueTabState::ResolvePendingCheck() {
+@@ -178,7 +178,7 @@
    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
        FROM_HERE,
        base::BindOnce(std::move(callback), eligible,
@@ -4504,150 +4394,6 @@ index dfff13a3b1..acacd911a5 100644
      base::WeakPtr<GlicCueTarget> target;
    };
    std::optional<PendingCheck> pending_check_;
-diff --git a/chrome/browser/glic/suggestions/glic_cue_target.cc b/chrome/browser/glic/suggestions/glic_cue_target.cc
-index ac10940f83..878e3fdc7e 100644
---- a/chrome/browser/glic/suggestions/glic_cue_target.cc
-+++ b/chrome/browser/glic/suggestions/glic_cue_target.cc
-@@ -55,7 +55,7 @@ void GlicCueTarget::Register(tabs::TabInterface& tab) {
-       tab.GetTabFeatures()->contextual_cueing_controller();
-   CHECK(contextual_cueing_controller);
-   contextual_cueing_controller->RegisterCueTarget(
--      contextual_cueing::CueTargetType::kGlic,
-+      ::contextual_cueing::CueTargetType::kGlic,
-       std::make_unique<GlicCueTarget>(
-           *glic_keyed_service,
-           OptimizationGuideKeyedServiceFactory::GetForProfile(tab.GetProfile()),
-@@ -73,13 +73,13 @@ GlicCueTarget::GlicCueTarget(
- 
- GlicCueTarget::~GlicCueTarget() = default;
- 
--contextual_cueing::CueTargetType GlicCueTarget::GetType() const {
--  return contextual_cueing::CueTargetType::kGlic;
-+::contextual_cueing::CueTargetType GlicCueTarget::GetType() const {
-+  return ::contextual_cueing::CueTargetType::kGlic;
- }
- 
- void GlicCueTarget::CheckEligibility(
-     base::WeakPtr<content::WebContents> web_contents,
--    contextual_cueing::CueIntrusiveness intrusiveness,
-+    ::contextual_cueing::CueIntrusiveness intrusiveness,
-     EligibilityCallback callback) {
-   if (!web_contents) {
-     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-@@ -111,18 +111,18 @@ bool GlicCueTarget::IsPageEligible(
-        result.GetCategoryResults()) {
-     if (category.category_type ==
-             page_content_annotations::CategoryType::kEducation &&
--        category.score > contextual_cueing::kEduClassifierThreshold.Get()) {
-+        category.score > ::contextual_cueing::kEduClassifierThreshold.Get()) {
-       passes_edu = true;
-     }
-     if (category.category_type ==
-             page_content_annotations::CategoryType::kShopping &&
-         category.score >
--            contextual_cueing::kShoppingClassifierThreshold.Get()) {
-+            ::contextual_cueing::kShoppingClassifierThreshold.Get()) {
-       passes_shopping = true;
-     }
-   }
- 
--  if (contextual_cueing::kDiscardShoppingPdfs.Get() &&
-+  if (::contextual_cueing::kDiscardShoppingPdfs.Get() &&
-       active_web_contents->GetContentsMimeType() == pdf::kPDFMimeType) {
-     return passes_edu && !passes_shopping;
-   }
-@@ -144,24 +144,24 @@ bool GlicCueTarget::IsEligible() const {
-              glic::prefs::kGlicDefaultTabContextEnabled);
- }
- 
--void GlicCueTarget::OnClick(contextual_cueing::CueActionData data) {
-+void GlicCueTarget::OnClick(::contextual_cueing::CueActionData data) {
-   InvokeGlic(std::move(data), base::FeatureList::IsEnabled(
-                                   features::kGlicContextualCueingV2AutoSubmit));
- }
- 
--void GlicCueTarget::OnEditPrompt(contextual_cueing::CueActionData data) {
-+void GlicCueTarget::OnEditPrompt(::contextual_cueing::CueActionData data) {
-   InvokeGlic(std::move(data), /*should_autosubmit=*/false);
- }
- 
--void GlicCueTarget::InvokeGlic(contextual_cueing::CueActionData data,
-+void GlicCueTarget::InvokeGlic(::contextual_cueing::CueActionData data,
-                                bool should_autosubmit) {
- #if BUILDFLAG(IS_ANDROID)
-   NOTIMPLEMENTED() << "Glic contextual cue not yet implemented for Android.";
- #else
--  if (!std::holds_alternative<contextual_cueing::GlicCueActionData>(data)) {
-+  if (!std::holds_alternative<::contextual_cueing::GlicCueActionData>(data)) {
-     return;
-   }
--  auto& glic_data = std::get<contextual_cueing::GlicCueActionData>(data);
-+  auto& glic_data = std::get<::contextual_cueing::GlicCueActionData>(data);
-   Target target(*tab_, NewConversation());
-   GlicInvokeOptions options(
-       std::move(target),
-@@ -197,10 +197,10 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
-       ui::kColorSysOnSurface, 18);
- }
- 
--contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
-+::contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
-     const optimization_guide::proto::ContextualCue& cue,
-     std::vector<tabs::TabHandle> tabs_to_show) const {
--  contextual_cueing::GlicCueActionData data;
-+  ::contextual_cueing::GlicCueActionData data;
-   if (!cue.has_gemini_in_chrome_surface()) {
-     CUEING_LOG("Missing Gemini surface data.");
-     return data;
-diff --git a/chrome/browser/glic/suggestions/glic_cue_target.h b/chrome/browser/glic/suggestions/glic_cue_target.h
-index a990379a4c..f71e25caae 100644
---- a/chrome/browser/glic/suggestions/glic_cue_target.h
-+++ b/chrome/browser/glic/suggestions/glic_cue_target.h
-@@ -24,7 +24,7 @@ namespace glic {
- 
- class GlicKeyedService;
- 
--class GlicCueTarget : public contextual_cueing::CueTarget {
-+class GlicCueTarget : public ::contextual_cueing::CueTarget {
-  public:
-   static void Register(tabs::TabInterface& tab);
- 
-@@ -34,20 +34,20 @@ class GlicCueTarget : public contextual_cueing::CueTarget {
-       tabs::TabInterface& tab);
-   ~GlicCueTarget() override;
- 
--  // contextual_cueing::CueTarget:
--  contextual_cueing::CueTargetType GetType() const override;
-+  // ::contextual_cueing::CueTarget:
-+  ::contextual_cueing::CueTargetType GetType() const override;
-   bool IsEligible() const override;
-   void CheckEligibility(base::WeakPtr<content::WebContents> web_contents,
--                        contextual_cueing::CueIntrusiveness intrusiveness,
-+                        ::contextual_cueing::CueIntrusiveness intrusiveness,
-                         EligibilityCallback callback) override;
-   bool IsPageEligible(
-       const page_content_annotations::PageContentAnnotationsResult& result,
-       content::WebContents* active_web_contents) const override;
--  void OnClick(contextual_cueing::CueActionData data) override;
--  void OnEditPrompt(contextual_cueing::CueActionData data) override;
-+  void OnClick(::contextual_cueing::CueActionData data) override;
-+  void OnEditPrompt(::contextual_cueing::CueActionData data) override;
-   ui::ImageModel GetAnchoredMessageIcon() const override;
-   ui::ImageModel GetOmniboxChipIcon() const override;
--  contextual_cueing::CueActionData CueActionDataFromResponse(
-+  ::contextual_cueing::CueActionData CueActionDataFromResponse(
-       const optimization_guide::proto::ContextualCue& cue,
-       std::vector<tabs::TabHandle> tabs_to_show) const override;
-   optimization_guide::proto::ContextualCueingSurface GetSurface()
-@@ -60,7 +60,7 @@ class GlicCueTarget : public contextual_cueing::CueTarget {
-  private:
-   friend class GlicCueTargetAsyncTest;
- 
--  void InvokeGlic(contextual_cueing::CueActionData data,
-+  void InvokeGlic(::contextual_cueing::CueActionData data,
-                   bool should_autosubmit);
- 
-   // Unowned and guaranteed to outlive this.
 diff --git a/chrome/browser/renderer_context_menu/spelling_menu_observer.cc b/chrome/browser/renderer_context_menu/spelling_menu_observer.cc
 index 3c3acf21d1..0323c3c3e6 100644
 --- a/chrome/browser/renderer_context_menu/spelling_menu_observer.cc
@@ -4802,3 +4548,404 @@ index b45ca2c06a..e6383ed4bc 100644
    sources = [
      "ui_features.cc",
      "ui_features.h",
+diff --git a/chrome/browser/safe_browsing/download_protection/deep_scanning_request.cc b/chrome/browser/safe_browsing/download_protection/deep_scanning_request.cc
+index d01c43c31f..9f97458a68 100644
+--- a/chrome/browser/safe_browsing/download_protection/deep_scanning_request.cc
++++ b/chrome/browser/safe_browsing/download_protection/deep_scanning_request.cc
+@@ -113,7 +113,7 @@ TriggeredRule::CustomRuleMessage GetForceSaveToCloudCustomRuleMessage(
+ #if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
+ bool CanBypassForceSaveDialogForAutomation() {
+   return base::CommandLine::ForCurrentProcess()->HasSwitch(
+-      switches::kEnableAutomation);
++      ::switches::kEnableAutomation);
+ }
+ #endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
+ 
+diff --git a/chrome/browser/password_manager/password_change/glic_password_change_actuator.cc b/chrome/browser/password_manager/password_change/glic_password_change_actuator.cc
+index 15e2ca7123..eb51efae35 100644
+--- a/chrome/browser/password_manager/password_change/glic_password_change_actuator.cc
++++ b/chrome/browser/password_manager/password_change/glic_password_change_actuator.cc
+@@ -44,6 +44,8 @@
+ #include "ui/base/resource/resource_bundle.h"
+ #include "ui/base/window_open_disposition.h"
+ 
++#define GetLoggerIfAvailable GetLoggerIfAvailable_glic_password_change_actuator
++
+ namespace {
+ 
+ using Logger = password_manager::BrowserSavePasswordProgressLogger;
+@@ -648,3 +650,5 @@ void GlicPasswordChangeActuator::NotifyStateChanged(
+   observers_.Notify(&PasswordChangeActuator::Observer::OnActuationStateChanged,
+                     new_state);
+ }
++
++#undef GetLoggerIfAvailable
+diff --git a/chrome/browser/password_manager/password_change/script_password_change_actuator.cc b/chrome/browser/password_manager/password_change/script_password_change_actuator.cc
+index a61e8fdd86..b21138e32f 100644
+--- a/chrome/browser/password_manager/password_change/script_password_change_actuator.cc
++++ b/chrome/browser/password_manager/password_change/script_password_change_actuator.cc
+@@ -30,6 +30,8 @@
+ #include "ui/base/window_open_disposition.h"
+ #include "url/gurl.h"
+ 
++#define GetLoggerIfAvailable GetLoggerIfAvailable_script_password_change_actuator
++
+ namespace {
+ 
+ using ::password_manager::BrowserSavePasswordProgressLogger;
+@@ -390,3 +392,5 @@ void ScriptPasswordChangeActuator::ResetInternalState() {
+   submission_verifier_.reset();
+   form_manager_.reset();
+ }
++
++#undef GetLoggerIfAvailable
+diff --git a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
+index 294e5783fd..489c6c716f 100644
+--- a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
++++ b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
+@@ -22,6 +22,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define GetEndpointUrlBase GetEndpointUrlBase_remote_actor_credential_permission_client
++
+ namespace password_manager {
+ 
+ namespace {
+@@ -180,3 +182,5 @@ void RemoteActorCredentialPermissionClient::DeleteRequest(
+ }
+ 
+ }  // namespace password_manager
++
++#undef GetEndpointUrlBase
+diff --git a/chrome/browser/ui/tabs/recent_tabs_builder.cc b/chrome/browser/ui/tabs/recent_tabs_builder.cc
+index c4eb8624ab..899963491a 100644
+--- a/chrome/browser/ui/tabs/recent_tabs_builder.cc
++++ b/chrome/browser/ui/tabs/recent_tabs_builder.cc
+@@ -47,6 +47,10 @@
+ #include "ui/base/ui_base_features.h"
+ #include "ui/gfx/favicon_size.h"
+ 
++#define kMaxLocalEntries kMaxLocalEntries_recent_tabs_builder
++#define SortSessionsByRecency SortSessionsByRecency_recent_tabs_builder
++#define CreateFavicon CreateFavicon_recent_tabs_builder
++
+ namespace {
+ 
+ constexpr int kMaxLocalEntries = 8;
+@@ -453,3 +457,7 @@ std::vector<RecentTabItem> RecentTabsBuilder::BuildRemoteEntries(
+ 
+   return items;
+ }
++
++#undef kMaxLocalEntries
++#undef SortSessionsByRecency
++#undef CreateFavicon
+diff --git a/chrome/browser/ui/views/page_info/suspicious_site_bubble_view.cc b/chrome/browser/ui/views/page_info/suspicious_site_bubble_view.cc
+index 0bc8098a3c..c0734d0397 100644
+--- a/chrome/browser/ui/views/page_info/suspicious_site_bubble_view.cc
++++ b/chrome/browser/ui/views/page_info/suspicious_site_bubble_view.cc
+@@ -44,6 +44,8 @@
+ #include "ui/views/widget/widget.h"
+ #include "url/gurl.h"
+ 
++#define CreateLearnMoreLabel CreateLearnMoreLabel_suspicious_site_bubble_view
++
+ namespace {
+ 
+ // Parses description string containing <link>...</link> and attaches link
+@@ -288,3 +290,5 @@ PageInfoBubbleViewBase* CreateSuspiciousSiteBubbleForTesting(
+ 
+ BEGIN_METADATA(SuspiciousSiteBubbleView)
+ END_METADATA
++
++#undef CreateLearnMoreLabel
+diff --git a/chrome/renderer/actor/BUILD.gn b/chrome/renderer/actor/BUILD.gn
+index 5529c2fad0..dee5df2ce3 100644
+--- a/chrome/renderer/actor/BUILD.gn
++++ b/chrome/renderer/actor/BUILD.gn
+@@ -38,6 +38,10 @@ jumbo_source_set("actor") {
+     "type_tool.cc",
+     "type_tool.h",
+   ]
++  jumbo_excluded_sources = [
++    # Too many symbol conflictions on std::ostream<Type>
++    "journal.cc",
++  ]
+ 
+   public_deps = [
+     "//base",
+diff --git a/chrome/browser/ui/views/web_apps/isolated_web_apps/BUILD.gn b/chrome/browser/ui/views/web_apps/isolated_web_apps/BUILD.gn
+index b58776b3ff..7556912927 100644
+--- a/chrome/browser/ui/views/web_apps/isolated_web_apps/BUILD.gn
++++ b/chrome/browser/ui/views/web_apps/isolated_web_apps/BUILD.gn
+@@ -21,6 +21,10 @@ jumbo_source_set("installer_base") {
+     "isolated_web_app_installer_view.cc",
+     "uninstall_sub_app_identity_view.cc",
+   ]
++  jumbo_excluded_sources = [
++    # Also defined in //chrome/browser/ui:ui
++    "uninstall_sub_app_identity_view.cc",
++  ]
+ 
+   public_deps = [
+     "//base",
+diff --git a/chrome/browser/metrics/cpu_performance_metrics_provider.cc b/chrome/browser/metrics/cpu_performance_metrics_provider.cc
+index 000f0eb85c..c497beea4d 100644
+--- a/chrome/browser/metrics/cpu_performance_metrics_provider.cc
++++ b/chrome/browser/metrics/cpu_performance_metrics_provider.cc
+@@ -49,7 +49,7 @@ void CpuPerformanceMetricsProvider::ProvideCurrentSessionData(
+   }
+ 
+   const int override_val =
+-      prefs->GetInteger(prefs::kCpuPerformanceTierOverride);
++      prefs->GetInteger(::prefs::kCpuPerformanceTierOverride);
+   if (override_val <
+           static_cast<int>(content::cpu_performance::Tier::kMinValue) ||
+       override_val >
+@@ -65,7 +65,7 @@ void CpuPerformanceMetricsProvider::ProvideCurrentSessionData(
+   const auto nominal_tier = content::cpu_performance::GetTier();
+   const auto sample = EncodePair(nominal_tier, override_tier);
+ 
+-  if (prefs->IsManagedPreference(prefs::kCpuPerformanceTierOverride)) {
++  if (prefs->IsManagedPreference(::prefs::kCpuPerformanceTierOverride)) {
+     base::UmaHistogramEnumeration(
+         "PerformanceControls.CpuPerformanceTier.PolicyOverride", sample);
+   } else {
+diff --git a/chrome/browser/ui/read_anything/read_anything_contents_wrapper.h b/chrome/browser/ui/read_anything/read_anything_contents_wrapper.h
+index 8e1fa712e7..3b55757e92 100644
+--- a/chrome/browser/ui/read_anything/read_anything_contents_wrapper.h
++++ b/chrome/browser/ui/read_anything/read_anything_contents_wrapper.h
+@@ -8,11 +8,8 @@
+ #include <memory>
+ 
+ #include "base/check.h"
+-
+-class ReadAnythingUntrustedUI;
+-
+-template <typename T>
+-class WebUIContentsWrapperT;
++#include "chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_ui.h"
++#include "chrome/browser/ui/webui/top_chrome/webui_contents_wrapper.h"
+ 
+ // Allows for the passing of a `WebUIContentsWrapperT<ReadAnythingUntrustedUI>`
+ // without having to (directly or indirectly) include either class. This avoids
+diff --git a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
+index a30bfbf1a3..cbd48a0e8a 100644
+--- a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
++++ b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
+@@ -47,12 +47,14 @@ namespace {
+ constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
+ constexpr char kVoiceSearchQueryParameterValue[] = "1";
+ 
+-bool IsAimEligible(Profile* profile) {
++bool IsAimEligible_omnibox_everywhere_handler(Profile* profile) {
+   auto* aim_eligibility_service =
+       AimEligibilityServiceFactory::GetForProfile(profile);
+   return aim_eligibility_service && aim_eligibility_service->IsAimEligible();
+ }
+ 
++#define IsAimEligible IsAimEligible_omnibox_everywhere_handler
++
+ class OmniboxEverywhereClient : public ContextualOmniboxClient {
+  public:
+   OmniboxEverywhereClient(Profile* profile,
+@@ -347,3 +349,5 @@ void OmniboxEverywhereHandler::PushProfileInfo() {
+                             base::UTF16ToUTF8(display_name),
+                             base::UTF16ToUTF8(entry->GetUserName()));
+ }
++
++#undef IsAimEligible
+diff --git a/chrome/browser/actor/tools/translate_page_tool.cc b/chrome/browser/actor/tools/translate_page_tool.cc
+index 64a5257d1e..8093685c9b 100644
+--- a/chrome/browser/actor/tools/translate_page_tool.cc
++++ b/chrome/browser/actor/tools/translate_page_tool.cc
+@@ -19,6 +19,8 @@
+ #include "content/public/browser/web_contents.h"
+ #include "third_party/abseil-cpp/absl/strings/str_format.h"
+ 
++#define GetPrimaryMainFrameOfTab GetPrimaryMainFrameOfTab_translate_page_tool
++
+ namespace actor {
+ 
+ namespace {
+@@ -170,3 +172,5 @@ tabs::TabHandle TranslatePageTool::GetTargetTab() const {
+ }
+ 
+ }  // namespace actor
++
++#undef GetPrimaryMainFrameOfTab
+diff --git a/chrome/browser/glic/suggestions/glic_cue_target.cc b/chrome/browser/glic/suggestions/glic_cue_target.cc
+index 6317969cd3..48249cd2ff 100644
+--- a/chrome/browser/glic/suggestions/glic_cue_target.cc
++++ b/chrome/browser/glic/suggestions/glic_cue_target.cc
+@@ -77,7 +77,7 @@ void GlicCueTarget::Register(tabs::TabInterface& tab) {
+       tab.GetTabFeatures()->contextual_cueing_controller();
+   CHECK(contextual_cueing_controller);
+   contextual_cueing_controller->RegisterCueTarget(
+-      contextual_cueing::CueTargetType::kGlic,
++      ::contextual_cueing::CueTargetType::kGlic,
+       std::make_unique<GlicCueTarget>(
+           *glic_keyed_service,
+           OptimizationGuideKeyedServiceFactory::GetForProfile(tab.GetProfile()),
+@@ -95,8 +95,8 @@ GlicCueTarget::GlicCueTarget(
+ 
+ GlicCueTarget::~GlicCueTarget() = default;
+ 
+-contextual_cueing::CueTargetType GlicCueTarget::GetType() const {
+-  return contextual_cueing::CueTargetType::kGlic;
++::contextual_cueing::CueTargetType GlicCueTarget::GetType() const {
++  return ::contextual_cueing::CueTargetType::kGlic;
+ }
+ 
+ bool GlicCueTarget::RequiresModelExecution() const {
+@@ -105,7 +105,7 @@ bool GlicCueTarget::RequiresModelExecution() const {
+ 
+ void GlicCueTarget::CheckEligibility(
+     base::WeakPtr<content::WebContents> web_contents,
+-    contextual_cueing::CueIntrusiveness intrusiveness,
++    ::contextual_cueing::CueIntrusiveness intrusiveness,
+     EligibilityCallback callback) {
+   if (!web_contents) {
+     CUEING_LOG("GlicCueTarget::CheckEligibility failed: WebContents gone.");
+@@ -148,13 +148,13 @@ bool GlicCueTarget::IsPageEligible(
+        result.GetCategoryResults()) {
+     if (category.category_type ==
+             page_content_annotations::CategoryType::kEducation &&
+-        category.score > contextual_cueing::kEduClassifierThreshold.Get()) {
++        category.score > ::contextual_cueing::kEduClassifierThreshold.Get()) {
+       passes_edu = true;
+     }
+     if (category.category_type ==
+             page_content_annotations::CategoryType::kShopping &&
+         category.score >
+-            contextual_cueing::kShoppingClassifierThreshold.Get()) {
++            ::contextual_cueing::kShoppingClassifierThreshold.Get()) {
+       passes_shopping = true;
+     }
+   }
+@@ -163,7 +163,7 @@ bool GlicCueTarget::IsPageEligible(
+       "GlicCueTarget::IsPageEligible passes_edu=%d passes_shopping=%d",
+       passes_edu, passes_shopping));
+ 
+-  if (contextual_cueing::kDiscardShoppingPdfs.Get() &&
++  if (::contextual_cueing::kDiscardShoppingPdfs.Get() &&
+       active_web_contents->GetContentsMimeType() == pdf::kPDFMimeType) {
+     CUEING_LOG("GlicCueTarget::IsPageEligible discard shopping pdf");
+     return passes_edu && !passes_shopping;
+@@ -203,7 +203,7 @@ bool GlicCueTarget::IsEligible() const {
+ }
+ 
+ void GlicCueTarget::OnAnchoredMessageClicked(
+-    contextual_cueing::CueActionData data) {
++    ::contextual_cueing::CueActionData data) {
+   InvokeGlic(std::move(data), base::FeatureList::IsEnabled(
+                                   features::kGlicContextualCueingV2AutoSubmit));
+ }
+@@ -212,19 +212,19 @@ bool GlicCueTarget::SupportsEditPrompt() const {
+   return true;
+ }
+ 
+-void GlicCueTarget::OnEditPrompt(contextual_cueing::CueActionData data) {
++void GlicCueTarget::OnEditPrompt(::contextual_cueing::CueActionData data) {
+   InvokeGlic(std::move(data), /*should_autosubmit=*/false);
+ }
+ 
+-void GlicCueTarget::InvokeGlic(contextual_cueing::CueActionData data,
++void GlicCueTarget::InvokeGlic(::contextual_cueing::CueActionData data,
+                                bool should_autosubmit) {
+ #if BUILDFLAG(IS_ANDROID)
+   NOTIMPLEMENTED() << "Glic contextual cue not yet implemented for Android.";
+ #else
+-  if (!std::holds_alternative<contextual_cueing::GlicCueActionData>(data)) {
++  if (!std::holds_alternative<::contextual_cueing::GlicCueActionData>(data)) {
+     return;
+   }
+-  auto& glic_data = std::get<contextual_cueing::GlicCueActionData>(data);
++  auto& glic_data = std::get<::contextual_cueing::GlicCueActionData>(data);
+   Target target(*tab_, NewConversation());
+   GlicInvokeOptions options(
+       std::move(target),
+@@ -270,10 +270,10 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
+ #endif
+ }
+ 
+-contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
++::contextual_cueing::CueActionData GlicCueTarget::CueActionDataFromResponse(
+     const optimization_guide::proto::ContextualCue& cue,
+     std::vector<tabs::TabHandle> tabs_to_show) const {
+-  contextual_cueing::GlicCueActionData data;
++  ::contextual_cueing::GlicCueActionData data;
+   if (!cue.has_gemini_in_chrome_surface()) {
+     CUEING_LOG("Missing Gemini surface data.");
+     return data;
+diff --git a/chrome/browser/glic/suggestions/glic_cue_target.h b/chrome/browser/glic/suggestions/glic_cue_target.h
+index 255ee1a8f0..77f01bd498 100644
+--- a/chrome/browser/glic/suggestions/glic_cue_target.h
++++ b/chrome/browser/glic/suggestions/glic_cue_target.h
+@@ -24,7 +24,7 @@ namespace glic {
+ 
+ class GlicKeyedService;
+ 
+-class GlicCueTarget : public contextual_cueing::CueTarget {
++class GlicCueTarget : public ::contextual_cueing::CueTarget {
+  public:
+   static void Register(tabs::TabInterface& tab);
+ 
+@@ -34,22 +34,22 @@ class GlicCueTarget : public contextual_cueing::CueTarget {
+       tabs::TabInterface& tab);
+   ~GlicCueTarget() override;
+ 
+-  // contextual_cueing::CueTarget:
+-  contextual_cueing::CueTargetType GetType() const override;
++  // ::contextual_cueing::CueTarget:
++  ::contextual_cueing::CueTargetType GetType() const override;
+   bool RequiresModelExecution() const override;
+   bool IsEligible() const override;
+   void CheckEligibility(base::WeakPtr<content::WebContents> web_contents,
+-                        contextual_cueing::CueIntrusiveness intrusiveness,
++                        ::contextual_cueing::CueIntrusiveness intrusiveness,
+                         EligibilityCallback callback) override;
+   bool IsPageEligible(
+       const page_content_annotations::PageContentAnnotationsResult& result,
+       content::WebContents* active_web_contents) const override;
+-  void OnAnchoredMessageClicked(contextual_cueing::CueActionData data) override;
++  void OnAnchoredMessageClicked(::contextual_cueing::CueActionData data) override;
+   bool SupportsEditPrompt() const override;
+-  void OnEditPrompt(contextual_cueing::CueActionData data) override;
++  void OnEditPrompt(::contextual_cueing::CueActionData data) override;
+   ui::ImageModel GetAnchoredMessageIcon() const override;
+   ui::ImageModel GetOmniboxChipIcon() const override;
+-  contextual_cueing::CueActionData CueActionDataFromResponse(
++  ::contextual_cueing::CueActionData CueActionDataFromResponse(
+       const optimization_guide::proto::ContextualCue& cue,
+       std::vector<tabs::TabHandle> tabs_to_show) const override;
+   optimization_guide::proto::ContextualCueingSurface GetSurface()
+@@ -62,7 +62,7 @@ class GlicCueTarget : public contextual_cueing::CueTarget {
+  private:
+   friend class GlicCueTargetAsyncTest;
+ 
+-  void InvokeGlic(contextual_cueing::CueActionData data,
++  void InvokeGlic(::contextual_cueing::CueActionData data,
+                   bool should_autosubmit);
+ 
+   // Unowned and guaranteed to outlive this.
+diff --git a/chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_page_handler.cc b/chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_page_handler.cc
+index 9fc77e09a7..b41fa76422 100644
+--- a/chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_page_handler.cc
++++ b/chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_page_handler.cc
+@@ -48,6 +48,8 @@
+ #include "ui/menus/simple_menu_model.h"
+ #endif
+ 
++#define GetActiveWebContentsFromBrowser GetActiveWebContentsFromBrowser_ai_overlay_dialog_page_handler
++
+ namespace {
+ 
+ content::WebContents* GetActiveWebContentsFromBrowser(
+@@ -469,3 +471,5 @@ void AiOverlayDialogPageHandler::GetImageBytes(
+ }
+ 
+ }  // namespace ttc
++
++#undef GetActiveWebContentsFromBrowser

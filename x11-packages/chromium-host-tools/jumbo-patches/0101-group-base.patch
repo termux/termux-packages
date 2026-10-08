@@ -97,7 +97,7 @@ diff --git a/base/sampling_heap_profiler/poisson_allocation_sampler.cc b/base/sa
 index c093e98ee2..2f5a25fb44 100644
 --- a/base/sampling_heap_profiler/poisson_allocation_sampler.cc
 +++ b/base/sampling_heap_profiler/poisson_allocation_sampler.cc
-@@ -20,6 +20,8 @@
+@@ -19,6 +19,8 @@
  #include "base/rand_util.h"
  #include "build/build_config.h"
  
@@ -106,7 +106,7 @@ index c093e98ee2..2f5a25fb44 100644
  namespace base {
  
  namespace {
-@@ -65,7 +67,7 @@ struct ThreadLocalData {
+@@ -59,7 +61,7 @@
  // Returns an object storing thread-local state. This does NOT use
  // base::ThreadLocalStorage, so it's safe to call from hooks in the
  // base::ThreadLocalStorage implementation.
@@ -115,16 +115,16 @@ index c093e98ee2..2f5a25fb44 100644
  #if USE_LOCAL_TLS_EMULATION()
    // If available, use ThreadLocalStorage to bypass dependencies introduced by
    // Clang's implementation of thread_local.
-@@ -101,6 +103,8 @@ ThreadLocalData* GetThreadLocalData() {
+@@ -95,6 +97,8 @@
  
  }  // namespace
  
 +#define GetThreadLocalData GetThreadLocalData_PoissonAllocationSampler
 +
- PoissonAllocationSamplerStats::PoissonAllocationSamplerStats(
-     size_t address_cache_hits,
-     size_t address_cache_misses,
-@@ -505,3 +509,6 @@ void PoissonAllocationSampler::RemoveSamplesObserver(
+ PoissonAllocationSampler::ScopedMuteThreadSamples::ScopedMuteThreadSamples() {
+   ThreadLocalData* const thread_local_data = GetThreadLocalData();
+ 
+@@ -463,3 +467,6 @@
  }
  
  }  // namespace base

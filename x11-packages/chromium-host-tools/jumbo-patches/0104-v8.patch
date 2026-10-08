@@ -373,7 +373,7 @@ diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compi
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 +++ b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
-@@ -11,12 +11,12 @@
+@@ -12,12 +12,12 @@
  #include "src/compiler/turboshaft/loop-finder.h"
  
  #ifdef DEBUG
@@ -388,15 +388,15 @@ index cc5b406f1b..9fac217286 100644
  #endif
  
  namespace v8::internal::compiler::turboshaft {
-@@ -27,7 +27,7 @@ using BinOp = StaticCanonicalForLoopMatcher::BinOp;
+@@ -28,7 +28,7 @@
  void LoopUnrollingAnalyzer::DetectUnrollableLoops() {
    for (const auto& [start, info] : loop_finder_.LoopHeaders()) {
      IterationCount iter_count = GetLoopIterationCount(info);
 -    TRACE("LoopUnrollingAnalyzer: loop at "
 +    TRACE_IN_LOOP_UNROLLING_REDUCER("LoopUnrollingAnalyzer: loop at "
-           << start->index() << " ==> iter_count=" << iter_count);
-     loop_iteration_count_.insert({start, iter_count});
- 
+           << start->index() << " ==> iter_count=" << iter_count
+           << " op_count=" << loop_finder_.GetLoopInfo(start).op_count
+           << " has_any_call=" << loop_finder_.GetLoopInfo(start).has_any_call);
 diff --git a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
 index 580cc321a0..29c3f8e648 100644
 --- a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h

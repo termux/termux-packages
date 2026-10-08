@@ -393,25 +393,6 @@ index 7b194eabd7..6fc6c1ae2e 100644
        "devtools/protocol/native_profiling_handler.cc",
        "devtools/protocol/native_profiling_handler.h",
        "profiling_utils.cc",
-diff --git a/content/browser/aggregation_service/aggregation_service_storage_sql.cc b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
-index 72d0e0f7ed..bc3ef419d5 100644
---- a/content/browser/aggregation_service/aggregation_service_storage_sql.cc
-+++ b/content/browser/aggregation_service/aggregation_service_storage_sql.cc
-@@ -45,6 +45,8 @@
- #include "url/gurl.h"
- #include "url/origin.h"
- 
-+#define kDatabasePath kDatabasePath_AggregationServiceStorageSql
-+
- namespace content {
- 
- // Version number of the database.
-@@ -1157,3 +1159,5 @@ void AggregationServiceStorageSql::DatabaseErrorCallback(int extended_error,
- }
- 
- }  // namespace content
-+
-+#undef kDatabasePath
 diff --git a/content/browser/devtools/BUILD.gn b/content/browser/devtools/BUILD.gn
 index 28c88bf4c1..08bb273221 100644
 --- a/content/browser/devtools/BUILD.gn
@@ -874,23 +855,6 @@ index 703d0f5845..1d587ee139 100644
      return kBackForwardCacheTimeout;
    } else {
      return base::TimeDelta::Max();
-@@ -151,14 +151,14 @@ void PageLifecycleStateManager::SetIsInBackForwardCache(
-               ->controller()
-               .GetBrowserContext(),
-           *navigation_request_url) &&
--      !features::kSkipPagehideInCommitForDSENavigationDelay.Get().is_zero()) {
-+      !::features::kSkipPagehideInCommitForDSENavigationDelay.Get().is_zero()) {
-     base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-         FROM_HERE,
-         base::BindOnce(
-             &PageLifecycleStateManager::SendUpdatesToRendererIfNeeded,
-             weak_ptr_factory_.GetWeakPtr(), std::move(page_restore_params),
-             base::NullCallback()),
--        features::kSkipPagehideInCommitForDSENavigationDelay.Get());
-+        ::features::kSkipPagehideInCommitForDSENavigationDelay.Get());
-   } else {
-     SendUpdatesToRendererIfNeeded(std::move(page_restore_params),
-                                   base::NullCallback());
 diff --git a/content/browser/renderer_host/randomized_confidence_utils.cc b/content/browser/renderer_host/randomized_confidence_utils.cc
 index 361c21251d..1bff3e4b3a 100644
 --- a/content/browser/renderer_host/randomized_confidence_utils.cc
@@ -969,15 +933,6 @@ index a08ebce1d2..5a2906643d 100644
          GetContentClient()
              ->browser()
              ->IsClearWindowNameForNewBrowsingContextGroupAllowed(context)));
-@@ -5298,7 +5298,7 @@ void RenderFrameHostImpl::DidNavigate(
-   SetLastCommittedUrl(params.url);
-   // The origin is only updated for cross-document navigations.
-   if (!was_within_same_document ||
--      !features::IsEnforceSameDocumentOriginInvariantsEnabled()) {
-+      !::features::IsEnforceSameDocumentOriginInvariantsEnabled()) {
-     SetLastCommittedOrigin(params.origin,
-                            params.has_potentially_trustworthy_unique_origin);
-   }
 @@ -6207,7 +6207,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
    // TODO(crbug.com/40274134): We will later badmessage the renderer, but, for
    // now, we will dump without crashing to monitor if any legitimate cases are
@@ -1117,11 +1072,11 @@ index a08ebce1d2..5a2906643d 100644
      if (is_synchronous_about_blank_commit &&
          params->origin.scheme() != url::kFileScheme &&
          (!frame_tree_->is_guest() ||
--         !base::FeatureList::IsEnabled(features::kGuestViewMPArch)) &&
-+         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) &&
-         !params->origin.opaque() &&
-         !params->origin.CanBeDerivedFrom(last_committed_origin_.GetURL())) {
-       bad_message::ReceivedBadMessage(
+-         !base::FeatureList::IsEnabled(features::kGuestViewMPArch))) {
++         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch))) {
+       bool origin_matches = false;
+       if (last_committed_origin_.opaque()) {
+         // When the browser-derived origin is opaque, the renderer-reported
 @@ -17473,7 +17473,7 @@ void RenderFrameHostImpl::DidCommitNavigation(
    }
  
@@ -1479,17 +1434,6 @@ index c905e5535e..dbfc837c16 100644
  }
  
  class SiteProcessCountTracker : public base::SupportsUserData::Data,
-@@ -1512,8 +1512,8 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
-   // processes remains reasonable, and on Android the OS takes care of that.
-   // This has shown to have adversarial effects, so we fall back to desktop
-   // behavior for desktop-like form factors.
--  if (base::FeatureList::IsEnabled(features::kRendererProcessLimitOnAndroid)) {
--    return features::kRendererProcessLimitOnAndroidCount.Get();
-+  if (base::FeatureList::IsEnabled(::features::kRendererProcessLimitOnAndroid)) {
-+    return ::features::kRendererProcessLimitOnAndroidCount.Get();
-   } else {
-     return std::numeric_limits<size_t>::max();
-   }
 @@ -1839,7 +1839,7 @@ RenderProcessHostImpl::~RenderProcessHostImpl() {
    UnregisterHost(GetID());
  
@@ -1517,29 +1461,6 @@ index c905e5535e..dbfc837c16 100644
            base::CommandLine::ForCurrentProcess())) {
      if (auto* cache_factory = GetGpuDiskCacheFactorySingleton()) {
        for (const gpu::GpuDiskCacheType type : gpu::kGpuDiskCacheTypes) {
-@@ -3539,19 +3539,19 @@ bool RenderProcessHostImpl::IsSpareProcessKeptAtAllTimes() {
-   // inaccuracies or off-by-one errors.
-   if (base::SysInfo::AmountOfTotalPhysicalMemory() <=
-       base::MiBU(base::saturated_cast<uint64_t>(
--          features::kAndroidSpareRendererMemoryThreshold.Get()))) {
-+          ::features::kAndroidSpareRendererMemoryThreshold.Get()))) {
-     return false;
-   }
- 
-   bool android_spare_process_override = base::FeatureList::IsEnabled(
--      features::kAndroidWarmUpSpareRendererWithTimeout);
-+      ::features::kAndroidWarmUpSpareRendererWithTimeout);
-   if (!SiteIsolationPolicy::UseDedicatedProcessesForAllSites() &&
-       !android_spare_process_override) {
-     return false;
-   }
- 
-   if (!base::FeatureList::IsEnabled(
--          features::kSpareRendererForSitePerProcess) &&
-+          ::features::kSpareRendererForSitePerProcess) &&
-       !android_spare_process_override) {
-     return false;
-   }
 @@ -3650,8 +3650,8 @@ bool RenderProcessHostImpl::IsForTopChromeWebUI() const {
  }
  
@@ -1598,24 +1519,6 @@ index c905e5535e..dbfc837c16 100644
        render_process_host->Init();
      }
    }
-@@ -6007,7 +6007,7 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
-     }
- #if BUILDFLAG(IS_MAC)
-     if (base::FeatureList::IsEnabled(
--            features::kMacAllowBackgroundingRenderProcesses)) {
-+            ::features::kMacAllowBackgroundingRenderProcesses)) {
-       child_process_launcher_->SetProcessPriority(process_priority);
-     }
- #else   // !BUILDFLAG(IS_MAC)
-@@ -6234,7 +6234,7 @@ bool RenderProcessHostImpl::CanUseWarmUpConnection() {
-   // TODO(crbug.com/455620851): Remove the function after finishing the
-   // holdback experiment.
-   return base::FeatureList::IsEnabled(
--             features::kSpareRendererUseWarmupConnection) ||
-+             ::features::kSpareRendererUseWarmupConnection) ||
-          !HasSpareRendererPriority();
- }
- 
 diff --git a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc b/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
 index 490eed63f5..149bc6de77 100644
 --- a/content/browser/renderer_host/render_process_host_impl_receiver_bindings.cc
@@ -2265,3 +2168,41 @@ index ff11e0d050..4bb49944ad 100644
    # Only the public target should depend on this. All other targets (even
    # internal content ones other than test) should depend on the public one.
    visibility = [
+diff --git a/content/browser/devtools/protocol/media_recorder.cc b/content/browser/devtools/protocol/media_recorder.cc
+index 44ebbcbab6..eb9cdb8700 100644
+--- a/content/browser/devtools/protocol/media_recorder.cc
++++ b/content/browser/devtools/protocol/media_recorder.cc
+@@ -30,6 +30,8 @@
+ #include "media/mojo/mojom/audio_input_stream.mojom.h"
+ #include "media/mojo/mojom/audio_stream_factory.mojom.h"
+ 
++#define DetermineSnapshotSize DetermineSnapshotSize_media_recorder
++
+ namespace content::protocol {
+ 
+ namespace {
+@@ -526,3 +528,5 @@ void MediaRecorder::OnClosed() {
+ }
+ 
+ }  // namespace content::protocol
++
++#undef DetermineSnapshotSize
+diff --git a/content/browser/webrtc/webrtc_diagnostics_impl.cc b/content/browser/webrtc/webrtc_diagnostics_impl.cc
+index 1af82fe37a..e31805ab25 100644
+--- a/content/browser/webrtc/webrtc_diagnostics_impl.cc
++++ b/content/browser/webrtc/webrtc_diagnostics_impl.cc
+@@ -24,6 +24,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kMaxMediaEntries kMaxMediaEntries_webrtc_diagnostics_impl
++
+ namespace content {
+ 
+ namespace {
+@@ -848,3 +850,5 @@ void WebRtcDiagnosticsImpl::ResetForTesting() {
+ }
+ 
+ }  // namespace content
++
++#undef kMaxMediaEntries

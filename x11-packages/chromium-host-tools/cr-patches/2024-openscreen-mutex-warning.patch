@@ -1,0 +1,17 @@
+--- a/third_party/openscreen/src/util/scoped_wake_lock_linux.cc
++++ b/third_party/openscreen/src/util/scoped_wake_lock_linux.cc
+@@ -32,7 +32,14 @@
+ // This mutex guards the reference count to ensure atomic transitions between
+ // 0 and 1 references, which correspond to acquiring and releasing the physical
+ // wake lock.
++#ifdef __ANDROID__
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wexit-time-destructors"
++#endif
+ std::mutex g_wake_lock_mutex;
++#ifdef __ANDROID__
++#pragma clang diagnostic pop
++#endif
+ 
+ // Use atomic pointers to allow thread-safe overriding in tests without
+ // needing to lock the mutex just to read the paths or clock.

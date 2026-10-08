@@ -46,20 +46,20 @@
  #endif
 --- a/chrome/app/chrome_main_delegate.cc
 +++ b/chrome/app/chrome_main_delegate.cc
-@@ -226,6 +226,10 @@
- #include "ui/ozone/public/ozone_platform.h"
- #endif  // BUILDFLAG(IS_OZONE)
+@@ -240,6 +240,10 @@
+ #include "chrome/browser/chrome_for_testing/config.h"  // nogncheck
+ #endif
  
 +#ifdef __TERMUX__
 +#include "sandbox/policy/switches.h"
 +#endif
 +
+ #if !defined(BUILDING_CHROME_RENDERER)
  base::LazyInstance<ChromeContentGpuClient>::DestructorAtExit
      g_chrome_content_gpu_client = LAZY_INSTANCE_INITIALIZER;
- base::LazyInstance<ChromeContentRendererClient>::DestructorAtExit
-@@ -1061,6 +1065,14 @@
-   const base::CommandLine& command_line =
+@@ -1110,6 +1114,14 @@
        *base::CommandLine::ForCurrentProcess();
+ #endif  // !defined(BUILDING_CHROME_RENDERER)
  
 +// Disable sandbox on Termux.
 +#ifdef __TERMUX__
