@@ -1,0 +1,22 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -33,5 +33,5 @@
+ version = "0.3"
+ 
+ [features]
+-default = []
++default = ["force_system_lib"]
+ force_system_lib = []
+--- a/build.rs
++++ b/build.rs
+@@ -10,7 +10,9 @@
+ fn main() {
+     let target = env::var("TARGET").unwrap();
+ 
+-    if !target.contains("android") {
++    // Termux: always use the system fontconfig (bundled 2.11 can not parse
++    // the config files of current fontconfig)
++    if true {
+         // If the system version of fontconfig is at least 2.11.1, use it.
+         #[allow(clippy::single_match)]
+         match pkg_config::Config::new()

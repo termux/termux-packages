@@ -1,0 +1,263 @@
+diff -ruN '--exclude=Cargo.lock' wry-0.55.1-orig/Cargo.toml wry-0.55.1/Cargo.toml
+--- wry-0.55.1-orig/Cargo.toml	2026-09-26 12:47:31.242654135 +0000
++++ wry-0.55.1/Cargo.toml	2026-09-26 17:12:43.130033615 +0000
+@@ -200,43 +200,43 @@
+ [dev-dependencies.winit]
+ version = "0.30"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dirs]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dirs]
+ version = "6"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkx11]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkx11]
+ version = "0.18"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gtk]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gtk]
+ version = "0.18"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.javascriptcore-rs]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.javascriptcore-rs]
+ version = "=1.1.2"
+ features = ["v2_28"]
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.percent-encoding]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.percent-encoding]
+ version = "2.3"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.soup3]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.soup3]
+ version = "0.5"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.webkit2gtk]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.webkit2gtk]
+ version = "=2.0.2"
+ features = ["v2_38"]
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.webkit2gtk-sys]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.webkit2gtk-sys]
+ version = "=2.0.2"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.x11-dl]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.x11-dl]
+ version = "2.21"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dev-dependencies.x11-dl]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dev-dependencies.x11-dl]
+ version = "2.21"
+ 
+ [target.'cfg(target_os = "android")'.dependencies.base64]
+diff -ruN '--exclude=Cargo.lock' wry-0.55.1-orig/Cargo.toml.orig wry-0.55.1/Cargo.toml.orig
+--- wry-0.55.1-orig/Cargo.toml.orig	2026-09-26 12:47:31.242710599 +0000
++++ wry-0.55.1/Cargo.toml.orig	2026-09-26 17:12:54.135511344 +0000
+@@ -51,7 +51,7 @@
+ dpi = "0.1"
+ cookie = "0.18"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
++[target."cfg(any(target_os = \"linux\", target_os = \"android\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+ javascriptcore-rs = { version = "=1.1.2", features = [
+   "v2_28",
+ ], optional = true }
+@@ -64,7 +64,7 @@
+ percent-encoding = "2.3"
+ dirs = "6"
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dev-dependencies]
++[target."cfg(any(target_os = \"linux\", target_os = \"android\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dev-dependencies]
+ x11-dl = { version = "2.21" }
+ 
+ [target."cfg(target_os = \"windows\")".dependencies]
+diff -ruN '--exclude=Cargo.lock' wry-0.55.1-orig/build.rs wry-0.55.1/build.rs
+--- wry-0.55.1-orig/build.rs	2026-09-26 12:47:31.243005250 +0000
++++ wry-0.55.1/build.rs	2026-09-26 12:47:36.255553636 +0000
+@@ -100,13 +100,16 @@
+   }
+ 
+   let target = std::env::var("TARGET").unwrap_or_default();
+-  let android = target.contains("android");
+-  let linux = !android
+-    && (target.contains("linux")
+-      || target.contains("freebsd")
+-      || target.contains("dragonfly")
+-      || target.contains("netbsd")
+-      || target.contains("openbsd"));
++  // Termux/Termux-X11 builds compile against an android target triple but
++  // actually run as a normal process with real GTK3/webkit2gtk available
++  // (see the yaak Termux package); use the GTK/Linux webview backend
++  // instead of wry's real Android/JNI WebView backend.
++  let linux = target.contains("android")
++    || target.contains("linux")
++    || target.contains("freebsd")
++    || target.contains("dragonfly")
++    || target.contains("netbsd")
++    || target.contains("openbsd");
+   alias("linux", linux);
+   alias("gtk", cfg!(feature = "os-webview") && linux);
+ }
+diff -ruN '--exclude=Cargo.lock' wry-0.55.1-orig/src/lib.rs wry-0.55.1/src/lib.rs
+--- wry-0.55.1-orig/src/lib.rs	2026-09-26 12:47:31.244638844 +0000
++++ wry-0.55.1/src/lib.rs	2026-09-26 12:48:34.514644364 +0000
+@@ -347,28 +347,31 @@
+ // #[macro_use]
+ // extern crate objc;
+ 
+-#[cfg(any(target_os = "windows", target_os = "android"))]
++#[cfg(all(target_os = "windows"))]
+ mod custom_protocol_workaround;
+ mod error;
+-#[cfg(any(target_os = "android", test))]
++#[cfg(test)]
+ mod inject_initialization_scripts;
+ mod proxy;
+-#[cfg(any(target_os = "macos", target_os = "android", target_os = "ios"))]
++#[cfg(any(target_os = "macos", target_os = "ios"))]
+ mod util;
+ mod web_context;
+ 
+-#[cfg(target_os = "android")]
++// Disabled: android target is routed to the gtk/webkitgtk backend below
++// (Termux X11 build) instead of wry's real NativeActivity/JNI backend,
++// which needs a genuine Android app (Kotlin glue, JNI) to drive it.
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub(crate) mod android;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub use crate::android::android_setup;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub mod prelude {
+   pub use crate::android::{binding::*, dispatch, find_class, Context};
+   pub use tao_macros::{android_fn, generate_package_name};
+ }
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub use android::JniHandle;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ use android::*;
+ 
+ #[cfg(gtk)]
+@@ -469,10 +472,11 @@
+   /// **Linux**: The webview must be related to the caller webview. See [`WebViewBuilderExtUnix::with_related_view`].
+   /// **Windows**: The webview must use the same environment as the caller webview. See [`WebViewBuilderExtWindows::with_environment`].
+   /// **macOS**: The webview must use the same configuration as the caller webview. See [`WebViewBuilderExtMacos::with_webview_configuration`].
+-  #[cfg(not(any(target_os = "android", target_os = "ios")))]
++  #[cfg(not(target_os = "ios"))]
+   Create {
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -496,6 +500,7 @@
+   /// This must be set as the related view of the new webview. See [`WebViewBuilderExtUnix::with_related_view`].
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
+@@ -1041,6 +1046,7 @@
+   {
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -1106,6 +1112,7 @@
+   {
+     #[cfg(any(
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -1826,7 +1833,7 @@
+   }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ #[derive(Default)]
+ pub(crate) struct PlatformSpecificWebViewAttributes {
+   on_webview_created: Option<
+@@ -1842,7 +1849,7 @@
+   https_scheme: bool,
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub trait WebViewBuilderExtAndroid {
+   fn on_webview_created<
+     F: Fn(prelude::Context<'_, '_>) -> std::result::Result<(), jni::errors::Error>
+@@ -1872,7 +1879,7 @@
+   fn with_https_scheme(self, enabled: bool) -> Self;
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ impl WebViewBuilderExtAndroid for WebViewBuilder<'_> {
+   fn on_webview_created<
+     F: Fn(prelude::Context<'_, '_>) -> std::result::Result<(), jni::errors::Error>
+@@ -1911,6 +1918,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1924,6 +1932,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -1954,6 +1963,7 @@
+ 
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -2431,13 +2441,13 @@
+   }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ /// Additional methods on `WebView` that are specific to Android
+ pub trait WebViewExtAndroid {
+   fn handle(&self) -> JniHandle;
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ impl WebViewExtAndroid for WebView {
+   fn handle(&self) -> JniHandle {
+     JniHandle {
+diff -ruN '--exclude=Cargo.lock' wry-0.55.1-orig/src/web_context.rs wry-0.55.1/src/web_context.rs
+--- wry-0.55.1-orig/src/web_context.rs	2026-09-26 12:47:31.244683226 +0000
++++ wry-0.55.1/src/web_context.rs	2026-09-26 17:13:02.888244759 +0000
+@@ -66,6 +66,7 @@
+ 
+   #[cfg(any(
+     target_os = "linux",
++    target_os = "android",
+     target_os = "dragonfly",
+     target_os = "freebsd",
+     target_os = "netbsd",
