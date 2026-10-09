@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/apache/arrow
 TERMUX_PKG_DESCRIPTION="C++ libraries for Apache Arrow"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.0.1"
+TERMUX_PKG_VERSION="26.0.0"
 TERMUX_PKG_SRCURL="https://github.com/apache/arrow/archive/refs/tags/apache-arrow-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=01ee19d023775e70692cf52e0efa2b8cc7b9b7257d17983b5f6c36a06288ce02
+TERMUX_PKG_SHA256=d895810bdeb84b1fa3491c5b6985c190fd02b8ecfaa0952cd68125b4d2e70902
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="abseil-cpp, apache-orc, libandroid-execinfo, libc++, liblz4, libprotobuf, libre2, libsnappy, thrift, utf8proc, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, rapidjson"
@@ -30,7 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _EXPECTED_SOVERSION=2500
+	local _EXPECTED_SOVERSION=2600
 
 	# From cpp/CMakeLists.txt: ARROW_SO_VERSION = "${ARROW_VERSION_MAJOR} * 100 + ${ARROW_VERSION_MINOR}"
 	local _ACTUAL_SOVERSION=$(echo "$TERMUX_PKG_VERSION" | awk -F'.' '{print $1 * 100 + $2}')
