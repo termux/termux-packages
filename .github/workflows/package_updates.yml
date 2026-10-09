@@ -66,8 +66,8 @@ jobs:
             echo "Processing pull request #${{ github.event.pull_request.number }}: ${BASE_COMMIT}..HEAD"
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
           fi
-          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-            repo=$(jq --raw-output '.["'${repo_path}'"].name' repo.json)
+          for repo_path in $(jq --raw-output 'del(.pkg_format) | keys | .[]' scripts/repo.json); do
+            repo=$(jq --raw-output '.["'${repo_path}'"].name' scripts/repo.json)
             # Parse changed files and identify new packages and modified packages.
             # Create lists of those packages that will be passed for
             # further processing.
