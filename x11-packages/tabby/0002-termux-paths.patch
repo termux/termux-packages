@@ -1,0 +1,97 @@
+diff --git a/tabby-electron/src/shells/linuxDefault.ts b/tabby-electron/src/shells/linuxDefault.ts
+index 08cb6c5..62a80fd 100644
+--- a/tabby-electron/src/shells/linuxDefault.ts
++++ b/tabby-electron/src/shells/linuxDefault.ts
+@@ -22,14 +22,23 @@ export class LinuxDefaultShellProvider extends ShellProvider {
+         if (this.hostApp.platform !== Platform.Linux) {
+             return []
+         }
+-        const line = (await fs.readFile('/etc/passwd', { encoding: 'utf-8' }))
+-            .split('\n').find(x => x.startsWith(`${process.env.LOGNAME}:`))
+-        if (!line) {
++        // Termux has no /etc/passwd, use $SHELL and fall back to the shells in $PREFIX/bin
++        let command = process.env.SHELL
++        if (!command) {
++            for (const candidate of ['@TERMUX_PREFIX@/bin/bash', '@TERMUX_PREFIX@/bin/sh']) {
++                try {
++                    await fs.stat(candidate)
++                    command = candidate
++                    break
++                } catch { }
++            }
++        }
++        if (!command) {
+             this.logger.warn('Could not detect user shell')
+             return [{
+                 id: 'default',
+                 name: this.translate.instant('User default'),
+-                command: '/bin/sh',
++                command: '@TERMUX_PREFIX@/bin/sh',
+                 env: {},
+                 shellType: 'unix',
+             }]
+@@ -37,8 +46,8 @@ export class LinuxDefaultShellProvider extends ShellProvider {
+             return [{
+                 id: 'default',
+                 name: this.translate.instant('User default'),
+-                command: line.split(':')[6],
+-                args: ['--login'],
++                command,
++                args: ['-l'],
+                 hidden: true,
+                 env: {},
+                 shellType: 'unix',
+diff --git a/tabby-electron/src/shells/posix.ts b/tabby-electron/src/shells/posix.ts
+index 3bb044c..5cabef8 100644
+--- a/tabby-electron/src/shells/posix.ts
++++ b/tabby-electron/src/shells/posix.ts
+@@ -18,20 +18,27 @@ export class POSIXShellsProvider extends ShellProvider {
+         if (this.hostApp.platform === Platform.Windows) {
+             return []
+         }
+-        let shellListPath = '/etc/shells'
++        let shells: string[] = []
+         try {
+-            await fs.stat(shellListPath)
++            // Termux has no /etc/shells
++            shells = (await fs.readFile('@TERMUX_PREFIX@/etc/shells', { encoding: 'utf-8' }))
++                .split('\n')
++                .map(x => x.trim())
++                .filter(x => x && !x.startsWith('#'))
+         } catch {
+-            // Solus Linux
+-            shellListPath = '/usr/share/defaults/etc/shells'
++            // No shell list available, look for well-known shells in $PREFIX/bin instead
++            for (const name of ['bash', 'zsh', 'fish', 'dash', 'sh', 'nu', 'tcsh', 'ksh', 'elvish', 'xonsh']) {
++                const shellPath = `@TERMUX_PREFIX@/bin/${name}`
++                try {
++                    await fs.stat(shellPath)
++                    shells.push(shellPath)
++                } catch { }
++            }
+         }
+-        return (await fs.readFile(shellListPath, { encoding: 'utf-8' }))
+-            .split('\n')
+-            .map(x => x.trim())
+-            .filter(x => x && !x.startsWith('#'))
++        return shells
+             .map(x => ({
+                 id: slugify(x),
+-                name: x.split('/').pop(),
++                name: x.split('/').pop() ?? x,
+                 icon: 'fas fa-terminal',
+                 command: x,
+                 args: ['-l'],
+diff --git a/tabby-ssh/src/session/x11.ts b/tabby-ssh/src/session/x11.ts
+index ed7a051..67049e8 100644
+--- a/tabby-ssh/src/session/x11.ts
++++ b/tabby-ssh/src/session/x11.ts
+@@ -22,7 +22,7 @@ export class X11Socket {
+         const port = display < 100 ? display + 6000 : display
+ 
+         if (xHost === 'unix') {
+-            xHost = `/tmp/.X11-unix/X${display}`
++            xHost = `@TERMUX_PREFIX@/tmp/.X11-unix/X${display}`
+         }
+ 
+         if (xHost.startsWith('/')) {
