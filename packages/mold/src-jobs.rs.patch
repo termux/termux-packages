@@ -1,0 +1,11 @@
+--- a/src/jobs.rs
++++ b/src/jobs.rs
+@@ -43,7 +43,7 @@
+             CStr::from_ptr((*pwd).pw_name).to_bytes().to_vec()
+         };
+         let name = String::from_utf8_lossy(&name);
+-        std::path::PathBuf::from(format!("/tmp/mold-lock-{name}"))
++        std::path::PathBuf::from(format!("@TERMUX_PREFIX@/tmp/mold-lock-{name}"))
+     };
+     let Ok(file) =
+         OpenOptions::new().write(true).create(true).truncate(false).mode(0o600).open(path)
