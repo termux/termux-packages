@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Platform Theme integration plugins for the Plasma wor
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/plasma-integration-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=0786c49f2f357744e0f4cfda49f55284faa1a97da85a667ca6cf1d8ab07aff89
 TERMUX_PKG_AUTO_UPDATE=true
