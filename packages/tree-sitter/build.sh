@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://tree-sitter.github.io/
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.27.0"
+TERMUX_PKG_VERSION="0.27.1"
 TERMUX_PKG_SRCURL="https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=d35c96e68736bd9569d2757c3cc71052485f33082c3825f1aed9d0e86013a159
+TERMUX_PKG_SHA256=982cd3d4d9eb7be18c243240a622423fd2e4ecb4bec2cd98832c2f3fa1f0f333
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -71,7 +71,9 @@ termux_step_pre_configure() {
 
 	# error: function-like macro '__GLIBC_USE' is not defined
 	# solution borrowed from packages/oma/build.sh
-	export BINDGEN_EXTRA_CLANG_ARGS_"${CARGO_TARGET_NAME//-/_}"="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}"
+	# error: Unversioned target triples are not supported!
+	# `rquickjs-sys` >= 0.12.2 rejects ${TERMUX_ARCH}-linux-android targets without a ${TERMUX_PKG_API_LEVEL}
+	export BINDGEN_EXTRA_CLANG_ARGS_"${CARGO_TARGET_NAME//-/_}"="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}${TERMUX_PKG_API_LEVEL}"
 }
 
 termux_step_post_make_install() {
