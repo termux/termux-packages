@@ -1,0 +1,25 @@
+From 1918b51d77f7ba059796449e0623421ab84bbd3f Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Fri, 24 Apr 2026 15:44:01 +0900
+Subject: [PATCH 10/10] disable browser submodule check
+
+---
+ plugins/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/CMakeLists.txt b/plugins/CMakeLists.txt
+index 5f540bd77..52a1f30a7 100644
+--- a/plugins/CMakeLists.txt
++++ b/plugins/CMakeLists.txt
+@@ -10,7 +10,7 @@ endif()
+ set_property(GLOBAL APPEND PROPERTY OBS_FEATURES_ENABLED "Plugin Support")
+ 
+ macro(check_obs_browser)
+-  if((OS_WINDOWS AND CMAKE_VS_PLATFORM_NAME MATCHES "(ARM64|x64)") OR OS_MACOS OR OS_LINUX)
++  if(((OS_WINDOWS AND CMAKE_VS_PLATFORM_NAME MATCHES "(ARM64|x64)") OR OS_MACOS OR OS_LINUX) AND NOT OS_ANDROID)
+     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/obs-browser/CMakeLists.txt")
+       message(FATAL_ERROR "Required submodule 'obs-browser' not available.")
+     else()
+-- 
+2.54.0
+
