@@ -11,6 +11,7 @@ TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
 TERMUX_PKG_VERSION="9.2.1150"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=07a1e2d0e4a5c07cd2ee5d484306f53ded69407fa4beb886d71bd93674692c08
 TERMUX_PKG_BUILD_IN_SRC=true
