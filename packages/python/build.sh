@@ -4,15 +4,14 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION="3.14.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.15.0"
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 	https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	143b1dddefaec3bd2e21e3b839b34a2b7fb9842272883c576420d605e9f30c63
+	ba4bed1ba346b916890b76d9e320451420aa69f6408997d33c66482eeae3d575
 	3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0
 )
 TERMUX_PKG_AUTO_UPDATE=false
@@ -159,7 +158,6 @@ termux_step_post_massage() {
 }
 
 termux_step_create_debscripts() {
-	# This is a temporary script and will therefore be removed when python is updated to 3.12
 	cat <<- POSTINST_EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/bash
 
@@ -180,9 +178,10 @@ termux_step_create_debscripts() {
 		echo
 	fi
 
-	if [[ -d $TERMUX_PREFIX/lib/python3.11/site-packages || -d $TERMUX_PREFIX/lib/python3.12/site-packages ]]; then
+	if [[ -d $TERMUX_PREFIX/lib/python3.11/site-packages || -d $TERMUX_PREFIX/lib/python3.12/site-packages ||
+	      -d $TERMUX_PREFIX/lib/python3.13/site-packages || -d $TERMUX_PREFIX/lib/python3.14/site-packages ]]; then
 		echo
-		echo "NOTE: The system python package has been updated to 3.13."
+		echo "NOTE: The system python package has been updated to ${_MAJOR_VERSION}."
 		echo "NOTE: Run 'pkg upgrade' to update system python packages."
 		echo "NOTE: Packages installed using pip needs to be re-installed."
 		echo
