@@ -26,6 +26,8 @@ termux_step_make() {
 	python makepanda/makepanda.py \
 		--arch "$PANDA_ARCH" \
 		--nothing \
+		--use-python \
+		--use-direct \
 		--threads "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
