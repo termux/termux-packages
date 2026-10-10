@@ -1,9 +1,9 @@
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
-@@ -2169,7 +2169,10 @@ pub mod linux {
+@@ -2130,7 +2130,10 @@
+         // Linux ABI.
          #[cfg(any(target_env = "musl", target_os = "android"))]
          mod raw {
-             #![allow(non_camel_case_types)]
 -            use core::ffi::{c_char, c_int, c_uint};
 +            use core::ffi::c_uint;
 +            // Only the (non-Android) raw `statx()` wrapper below uses these.
@@ -12,7 +12,7 @@
  
              // Kernel UAPI `<linux/stat.h>` — same on every arch/libc.
              pub(crate) const STATX_TYPE: c_uint = 0x0001;
-@@ -2227,9 +2230,14 @@ pub mod linux {
+@@ -2188,9 +2191,14 @@
              /// `errno` set, matching the libc wrapper's contract so callers
              /// don't need to know which path they got.
              ///
@@ -27,7 +27,7 @@
              pub(crate) unsafe fn statx(
                  dirfd: c_int,
                  path: *const c_char,
-@@ -2269,7 +2277,9 @@ pub mod linux {
+@@ -2230,7 +2238,9 @@
          | lx::STATX_BLOCKS;
  
      /// Linux kernel makedev encoding (glibc sys/sysmacros.h / <linux/kdev_t.h>).
@@ -38,7 +38,7 @@
      #[inline]
      const fn statx_makedev(major: u32, minor: u32) -> u64 {
          let maj: u64 = (major & 0xFFF) as u64;
-@@ -2294,7 +2304,25 @@ pub mod linux {
+@@ -2255,7 +2265,25 @@
      // `syscall` is the JS-facing `err.syscall` tag (`stat`/`lstat`/`fstat`):
      // node reports the operation name, never the `statx(2)` implementation
      // detail, and the non-statx fallback below already uses those same tags.
