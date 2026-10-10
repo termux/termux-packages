@@ -22,12 +22,14 @@ index c5135330f..0f0c3d5ed 100644
  endif
  
  # Symbols
-@@ -440,6 +436,8 @@ endif
+@@ -440,6 +436,10 @@ endif
  # Core Dependencies
  
  libm_dep = cc.find_library('m', required : true)
 +sles_dep = cc.find_library('OpenSLES', required : true)
 +aaudio_dep = cc.find_library('aaudio', required : true)
++oboe_dep = dependency('oboe', required : true)
++add_languages('cpp', required : true)
  
  thread_dep = dependency('threads')
  foreach f : [
@@ -35,16 +37,23 @@ diff --git a/src/modules/meson.build b/src/modules/meson.build
 index 1e12569dc..6112480e2 100644
 --- a/src/modules/meson.build
 +++ b/src/modules/meson.build
-@@ -61,6 +61,9 @@ all_modules = [
+@@ -61,6 +61,11 @@ all_modules = [
    [ 'module-virtual-sink', 'module-virtual-sink.c' ],
    [ 'module-virtual-source', 'module-virtual-source.c' ],
    [ 'module-volume-restore', 'module-volume-restore.c' ],
 +  [ 'module-sles-sink', 'sles/module-sles-sink.c', [], [], [sles_dep] ],
 +  [ 'module-sles-source', 'sles/module-sles-source.c', [], [], [sles_dep] ],
 +  [ 'module-aaudio-sink', 'aaudio/module-aaudio-sink.c', [], [], [aaudio_dep] ],
++  [ 'module-oboe-sink', 'oboe/module-oboe-sink.cpp', [], [], [oboe_dep] ],
++  [ 'module-oboe-source', 'oboe/module-oboe-source.cpp', [], [], [oboe_dep] ],
  ]
  
  if host_machine.system() == 'windows'
+@@ -331,3 +335,4 @@ foreach m : all_modules
+     include_directories : [configinc, topinc, include_directories('.')],
+     c_args : [pa_c_args, server_c_args, '-DPA_MODULE_NAME=' + name.underscorify()] + extra_flags,
++    cpp_args : [pa_c_args, server_c_args, '-DPA_MODULE_NAME=' + name.underscorify()] + extra_flags,
+     install : true,
 diff --git a/src/pulsecore/meson.build b/src/pulsecore/meson.build
 index b37fec499..2cdac04e9 100644
 --- a/src/pulsecore/meson.build

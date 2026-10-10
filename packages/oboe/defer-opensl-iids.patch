@@ -1,0 +1,69 @@
+The Termux OpenSL namespace wrapper populates its exported IID pointers lazily
+when the first wrapped function is called. Defer Oboe's IID lookup until after
+slCreateEngine so the wrapper has initialized them. Native system-library
+behavior is unchanged because none of the IIDs are used before this point.
+
+--- a/src/opensles/EngineOpenSLES.cpp
++++ b/src/opensles/EngineOpenSLES.cpp
+@@ -78,25 +78,6 @@ bool EngineOpenSLES::linkOpenSLES() {
+                 LOGE("%s(): dlsym(slCreateEngine) returned null, %s", __func__, getSafeDlerror());
+                 return false;
+             }
+-
+-            // Load IID interfaces.
+-            LOCAL_SL_IID_ENGINE = getIidPointer("SL_IID_ENGINE");
+-            if (LOCAL_SL_IID_ENGINE == nullptr) return false;
+-            LOCAL_SL_IID_ANDROIDSIMPLEBUFFERQUEUE = getIidPointer(
+-                    "SL_IID_ANDROIDSIMPLEBUFFERQUEUE");
+-            if (LOCAL_SL_IID_ANDROIDSIMPLEBUFFERQUEUE == nullptr) return false;
+-            LOCAL_SL_IID_ANDROIDCONFIGURATION = getIidPointer(
+-                    "SL_IID_ANDROIDCONFIGURATION");
+-            if (LOCAL_SL_IID_ANDROIDCONFIGURATION == nullptr) return false;
+-            LOCAL_SL_IID_RECORD = getIidPointer("SL_IID_RECORD");
+-            if (LOCAL_SL_IID_RECORD == nullptr) return false;
+-            LOCAL_SL_IID_BUFFERQUEUE = getIidPointer("SL_IID_BUFFERQUEUE");
+-            if (LOCAL_SL_IID_BUFFERQUEUE == nullptr) return false;
+-            LOCAL_SL_IID_VOLUME = getIidPointer("SL_IID_VOLUME");
+-            if (LOCAL_SL_IID_VOLUME == nullptr) return false;
+-            LOCAL_SL_IID_PLAY = getIidPointer("SL_IID_PLAY");
+-            if (LOCAL_SL_IID_PLAY == nullptr) return false;
+-
+             mDynamicLinkState = kLinkStateGood;
+         }
+     }
+@@ -135,6 +116,25 @@ SLresult EngineOpenSLES::open() {
+             goto error;
+         }
+
++        // Load IID interfaces after the first OpenSL function call. Some
++        // namespace shims initialize their exported IID pointers lazily.
++        LOCAL_SL_IID_ENGINE = getIidPointer("SL_IID_ENGINE");
++        if (LOCAL_SL_IID_ENGINE == nullptr) goto iid_error;
++        LOCAL_SL_IID_ANDROIDSIMPLEBUFFERQUEUE = getIidPointer(
++                "SL_IID_ANDROIDSIMPLEBUFFERQUEUE");
++        if (LOCAL_SL_IID_ANDROIDSIMPLEBUFFERQUEUE == nullptr) goto iid_error;
++        LOCAL_SL_IID_ANDROIDCONFIGURATION = getIidPointer(
++                "SL_IID_ANDROIDCONFIGURATION");
++        if (LOCAL_SL_IID_ANDROIDCONFIGURATION == nullptr) goto iid_error;
++        LOCAL_SL_IID_RECORD = getIidPointer("SL_IID_RECORD");
++        if (LOCAL_SL_IID_RECORD == nullptr) goto iid_error;
++        LOCAL_SL_IID_BUFFERQUEUE = getIidPointer("SL_IID_BUFFERQUEUE");
++        if (LOCAL_SL_IID_BUFFERQUEUE == nullptr) goto iid_error;
++        LOCAL_SL_IID_VOLUME = getIidPointer("SL_IID_VOLUME");
++        if (LOCAL_SL_IID_VOLUME == nullptr) goto iid_error;
++        LOCAL_SL_IID_PLAY = getIidPointer("SL_IID_PLAY");
++        if (LOCAL_SL_IID_PLAY == nullptr) goto iid_error;
++
+         // realize the engine
+         result = (*mEngineObject)->Realize(mEngineObject, SL_BOOLEAN_FALSE);
+         if (SL_RESULT_SUCCESS != result) {
+@@ -154,6 +154,9 @@ SLresult EngineOpenSLES::open() {
+
+     return result;
+
++iid_error:
++    result = SL_RESULT_FEATURE_UNSUPPORTED;
++
+ error:
+     close_l();
+     return result;

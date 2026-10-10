@@ -1,0 +1,492 @@
+diff -uNr a/alc/alc.cpp b/alc/alc.cpp
+--- a/alc/alc.cpp
++++ b/alc/alc.cpp
+@@ -1106,9 +1106,46 @@
+ }
+ 
+ /**
+- * Updates device parameters according to the attribute list (caller is
+- * responsible for holding the list lock).
++ * Clears disconnected voice state after the previous backend generation has
++ * stopped and its error callbacks have completed. The caller holds the list lock.
+  */
++void ResetDeviceConnection(gsl::not_null<al::Device*> const device)
++{
++    /* If the device was disconnected, reset it since we're opened anew. */
++    if(!device->Connected.load(std::memory_order_relaxed))
++    {
++        /* Make sure disconnection is finished before continuing on. */
++        std::ignore = device->waitForMix();
++
++        std::ranges::for_each(*device->mContexts.load(std::memory_order_acquire),
++            [](ContextBase *ctxbase)
++        {
++            /* NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast) */
++            auto const ctx = gsl::make_not_null(static_cast<al::Context*>(ctxbase));
++            if(!ctx->mStopVoicesOnDisconnect.load(std::memory_order_acquire))
++                return;
++
++            /* Clear any pending voice changes and reallocate voices to get a
++             * clean restart.
++             */
++            auto srclock = std::lock_guard{ctx->mSourceLock};
++            auto *vchg = ctx->mCurrentVoiceChange.load(std::memory_order_acquire);
++            while(auto *next = vchg->mNext.load(std::memory_order_acquire))
++                vchg = next;
++            ctx->mCurrentVoiceChange.store(vchg, std::memory_order_release);
++
++            ctx->mVoicePropClusters.clear();
++            ctx->mFreeVoiceProps.store(nullptr, std::memory_order_relaxed);
++
++            ctx->mVoiceClusters.clear();
++            ctx->allocVoices(std::max(256_uz,
++                ctx->mActiveVoiceCount.load(std::memory_order_relaxed)));
++        });
++
++        device->Connected.store(true);
++    }
++}
++
+ auto UpdateDeviceParams(gsl::not_null<al::Device*> device,
+     std::span<AttributePair const> const attrList) -> ALCenum
+ {
+@@ -1488,6 +1525,9 @@
+     if(device->mDeviceState == DeviceState::Playing)
+         return ALC_NO_ERROR;
+ 
++    device->Backend->prepareReset();
++    ResetDeviceConnection(device);
++
+     device->mDeviceState = DeviceState::Unprepared;
+     device->AvgSpeakerDist = 0.0f;
+     device->mNFCtrlFilter = NfcFilter{};
+@@ -1888,67 +1928,33 @@
+     mixer_mode.leave();
+ 
+     device->mDeviceState = DeviceState::Configured;
+-    if(!device->mFlags.test(DeviceFlag::DevicePaused))
+-    {
+-        try {
+-            auto backend = device->Backend.get();
++    try {
++        auto backend = device->Backend.get();
++        backend->resetComplete();
++        if(!device->mFlags.test(DeviceFlag::DevicePaused))
++        {
+             backend->start();
+             device->mDeviceState = DeviceState::Playing;
+-        }
+-        catch(al::backend_exception& e) {
+-            ERR("{}", e.what());
+-            device->handleDisconnect("{}", e.what());
+-            return ALC_INVALID_DEVICE;
+-        }
+-        TRACE("Post-start: {}, {}, {}hz, {} / {} buffer",
+-            DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
+-            device->mSampleRate, device->mUpdateSize, device->mBufferSize);
++            TRACE("Post-start: {}, {}, {}hz, {} / {} buffer",
++                DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
++                device->mSampleRate, device->mUpdateSize, device->mBufferSize);
++        }
++    }
++    catch(al::backend_exception& e) {
++        ERR("{}", e.what());
++        device->handleDisconnect("{}", e.what());
++        return ALC_INVALID_DEVICE;
+     }
+ 
+     return ALC_NO_ERROR;
+ }
+ 
+ /**
+- * Updates device parameters as above, and also first clears the disconnected
+- * status, if set.
++ * Updates device parameters and reports any error to the caller.
+  */
+ auto ResetDeviceParams(gsl::not_null<al::Device*> device,
+     const std::span<const AttributePair> attrList) -> bool
+ {
+-    /* If the device was disconnected, reset it since we're opened anew. */
+-    if(!device->Connected.load(std::memory_order_relaxed))
+-    {
+-        /* Make sure disconnection is finished before continuing on. */
+-        std::ignore = device->waitForMix();
+-
+-        std::ranges::for_each(*device->mContexts.load(std::memory_order_acquire),
+-            [](ContextBase *ctxbase)
+-        {
+-            /* NOLINTNEXTLINE(cppcoreguidelines-pro-type-static-cast-downcast) */
+-            auto const ctx = gsl::make_not_null(static_cast<al::Context*>(ctxbase));
+-            if(!ctx->mStopVoicesOnDisconnect.load(std::memory_order_acquire))
+-                return;
+-
+-            /* Clear any pending voice changes and reallocate voices to get a
+-             * clean restart.
+-             */
+-            auto srclock = std::lock_guard{ctx->mSourceLock};
+-            auto *vchg = ctx->mCurrentVoiceChange.load(std::memory_order_acquire);
+-            while(auto *next = vchg->mNext.load(std::memory_order_acquire))
+-                vchg = next;
+-            ctx->mCurrentVoiceChange.store(vchg, std::memory_order_release);
+-
+-            ctx->mVoicePropClusters.clear();
+-            ctx->mFreeVoiceProps.store(nullptr, std::memory_order_relaxed);
+-
+-            ctx->mVoiceClusters.clear();
+-            ctx->allocVoices(std::max(256_uz,
+-                ctx->mActiveVoiceCount.load(std::memory_order_relaxed)));
+-        });
+-
+-        device->Connected.store(true);
+-    }
+-
+     auto const err = UpdateDeviceParams(device, attrList);
+     if(err == ALC_NO_ERROR) [[likely]]
+         return ALC_TRUE;
+diff -uNr a/alc/backends/base.h b/alc/backends/base.h
+--- a/alc/backends/base.h
++++ b/alc/backends/base.h
+@@ -25,7 +25,11 @@
+ struct BackendBase {
+     virtual void open(std::string_view name) = 0;
+ 
++    /** Quiesce the old generation before core connection recovery. */
++    virtual void prepareReset() { }
+     virtual auto reset() -> bool;
++    /** Publish asynchronous errors after core reset preparation is complete. */
++    virtual void resetComplete() { }
+     virtual void start() = 0;
+     virtual void stop() = 0;
+ 
+diff -uNr a/alc/backends/oboe.cpp b/alc/backends/oboe.cpp
+--- a/alc/backends/oboe.cpp
++++ b/alc/backends/oboe.cpp
+@@ -4,6 +4,11 @@
+ #include "oboe.h"
+ 
+ #include <cstring>
++#include <atomic>
++#include <chrono>
++#include <mutex>
++#include <thread>
++#include <utility>
+ 
+ #include "alnumeric.h"
+ #include "alstring.h"
+@@ -27,19 +32,122 @@
+ [[nodiscard]] constexpr auto GetDeviceName() noexcept { return "Oboe Default"sv; }
+ 
+ 
+-struct OboePlayback final : BackendBase, oboe::AudioStreamCallback {
++class OboeErrorCallback final : public oboe::AudioStreamErrorCallback {
++    std::mutex mMutex;
++    DeviceBase *mDevice;
++    bool mActive{false};
++    bool mPendingDisconnect{false};
++
++public:
++    explicit OboeErrorCallback(gsl::not_null<DeviceBase*> const device) : mDevice{device} { }
++
++    void invalidate()
++    {
++        const auto lock = std::lock_guard{mMutex};
++        mDevice = nullptr;
++    }
++
++    auto activate() -> bool
++    {
++        const auto lock = std::lock_guard{mMutex};
++        mActive = true;
++        if(mDevice && std::exchange(mPendingDisconnect, false))
++        {
++            mDevice->handleDisconnect("Oboe AudioStream was disconnected during preparation");
++            return false;
++        }
++        return true;
++    }
++
++    void onErrorAfterClose(oboe::AudioStream*, oboe::Result const error) override
++    {
++        {
++            const auto lock = std::lock_guard{mMutex};
++            if(mDevice && error == oboe::Result::ErrorDisconnected)
++            {
++                if(mActive)
++                    mDevice->handleDisconnect("Oboe AudioStream was disconnected: {}",
++                        oboe::convertToText(error));
++                else
++                    mPendingDisconnect = true;
++            }
++        }
++        // Logging here can synchronously invoke an application callback and
++        // make teardown wait for a lock held by that application.
++    }
++};
++
++
++struct DataCallbackGate {
++    static_assert(std::atomic<bool>::is_always_lock_free);
++    static_assert(std::atomic<unsigned>::is_always_lock_free);
++    std::atomic<bool> mEnabled{false};
++    std::atomic<unsigned> mUsers{0};
++
++    auto admit() noexcept -> bool
++    {
++        // The sequentially consistent count-before-check protocol orders
++        // every admission against stop's disabled gate and final count check.
++        mUsers.fetch_add(1);
++        if(mEnabled.load())
++            return true;
++        mUsers.fetch_sub(1);
++        return false;
++    }
++    void release() noexcept { mUsers.fetch_sub(1); }
++    void start() noexcept { mEnabled.store(true); }
++    void stop()
++    {
++        mEnabled.store(false);
++        while(mUsers.load() != 0)
++            std::this_thread::sleep_for(std::chrono::milliseconds{1});
++    }
++};
++
++
++void CloseStream(std::shared_ptr<oboe::AudioStream> &stream,
++    std::shared_ptr<OboeErrorCallback> &callback)
++{
++    // Invalidate without holding the callback lock across native close.
++    if(callback)
++        callback->invalidate();
++    auto waitForProxy = false;
++    if(stream)
++    {
++        if(stream->closeAndWaitForCallbacks() == oboe::Result::ErrorInvalidState)
++        {
++            // Completion cannot join from another Oboe worker. Native close
++            // still gates dispatch; the private proxy invokes no application
++            // callbacks, so its remaining owners can safely drain below.
++            stream->close();
++            waitForProxy = true;
++        }
++    }
++    stream.reset();
++    if(waitForProxy && callback)
++    {
++        while(callback.use_count() > 1)
++            std::this_thread::sleep_for(std::chrono::milliseconds{1});
++    }
++    callback.reset();
++}
++
++
++struct OboePlayback final : BackendBase, oboe::AudioStreamDataCallback {
+     explicit OboePlayback(gsl::not_null<DeviceBase*> const device) : BackendBase{device} { }
+     ~OboePlayback() override;
+ 
+     std::shared_ptr<oboe::AudioStream> mStream;
++    std::shared_ptr<OboeErrorCallback> mErrorCallback;
++    DataCallbackGate mDataGate;
+ 
+     auto onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames)
+         -> oboe::DataCallbackResult override;
+ 
+-    void onErrorAfterClose(oboe::AudioStream* /* audioStream */, oboe::Result /* error */) override;
+-
+     void open(std::string_view name) override;
++    void prepareReset() override;
+     auto reset() -> bool override;
++    void resetComplete() override;
+     void start() override;
+     void stop() override;
+ };
+@@ -47,25 +155,25 @@
+ 
+ OboePlayback::~OboePlayback()
+ {
+-    if(mStream)
+-        mStream->close();
++    // Detached error workers retain the callback, never the backend. Release
++    // its device reference before close, without holding its lock during close.
++    CloseStream(mStream, mErrorCallback);
+ }
+ 
+ 
+ auto OboePlayback::onAudioReady(oboe::AudioStream *const oboeStream, void *const audioData,
+     int32_t const numFrames) -> oboe::DataCallbackResult
+ {
++    if(!mDataGate.admit())
++    {
++        std::memset(audioData, 0, gsl::narrow_cast<std::size_t>(numFrames)
++            * gsl::narrow_cast<unsigned>(oboeStream->getBytesPerFrame()));
++        return oboe::DataCallbackResult::Continue;
++    }
++    const auto onReturn = gsl::finally([this] { mDataGate.release(); });
+     mDevice->renderSamples(audioData, gsl::narrow_cast<uint32_t>(numFrames),
+         gsl::narrow_cast<uint32_t>(oboeStream->getChannelCount()));
+     return oboe::DataCallbackResult::Continue;
+-}
+-
+-void OboePlayback::onErrorAfterClose(oboe::AudioStream*, oboe::Result const error)
+-{
+-    if(error == oboe::Result::ErrorDisconnected)
+-        mDevice->handleDisconnect("Oboe AudioStream was disconnected: {}",
+-            oboe::convertToText(error));
+-    TRACE("Error was {}", oboe::convertToText(error));
+ }
+ 
+ void OboePlayback::open(std::string_view name)
+@@ -90,13 +198,28 @@
+     mDeviceName = name;
+ }
+ 
++void OboePlayback::prepareReset()
++{
++    mDataGate.stop();
++    CloseStream(mStream, mErrorCallback);
++}
++
++void OboePlayback::resetComplete()
++{
++    if(!mErrorCallback->activate())
++        throw al::backend_exception{al::backend_error::DeviceError,
++            "Stream disconnected during reset preparation"};
++}
++
+ auto OboePlayback::reset() -> bool
+ {
+-    if(mStream)
+-    {
+-        mStream->close();
+-        mStream.reset();
+-    }
++    CloseStream(mStream, mErrorCallback);
++    auto initialized = false;
++    const auto onFailure = gsl::finally([this, &initialized]
++    {
++        if(!initialized)
++            CloseStream(mStream, mErrorCallback);
++    });
+ 
+     auto builder = oboe::AudioStreamBuilder{};
+     builder.setDirection(oboe::Direction::Output);
+@@ -108,7 +231,9 @@
+     builder.setSampleRateConversionQuality(oboe::SampleRateConversionQuality::None);
+     builder.setChannelConversionAllowed(false);
+     builder.setFormatConversionAllowed(false);
+-    builder.setCallback(this);
++    mErrorCallback = std::make_shared<OboeErrorCallback>(mDevice);
++    builder.setDataCallback(this);
++    builder.setErrorCallback(mErrorCallback);
+ 
+     if(mDevice->mFlags.test(DeviceFlag::FrequencyRequest))
+     {
+@@ -200,6 +325,7 @@
+ #endif
+     case oboe::AudioFormat::Unspecified:
+     case oboe::AudioFormat::Invalid:
++    default:
+         throw al::backend_exception{al::backend_error::DeviceError,
+             "Got unhandled sample type: {}", oboe::convertToText(mStream->getFormat())};
+     }
+@@ -215,28 +341,37 @@
+     mDevice->mBufferSize = std::max(mDevice->mUpdateSize*2u,
+         gsl::narrow_cast<unsigned>(mStream->getBufferSizeInFrames()));
+ 
++    initialized = true;
+     return true;
+ }
+ 
+ void OboePlayback::start()
+ {
++    mDataGate.start();
+     if(const auto result = mStream->start(); result != oboe::Result::OK)
++    {
++        mDataGate.stop();
++        CloseStream(mStream, mErrorCallback);
+         throw al::backend_exception{al::backend_error::DeviceError, "Failed to start stream: {}",
+             oboe::convertToText(result)};
++    }
+ }
+ 
+ void OboePlayback::stop()
+ {
++    mDataGate.stop();
+     if(const auto result = mStream->stop(); result != oboe::Result::OK)
+         ERR("Failed to stop stream: {}", oboe::convertToText(result));
+ }
+ 
+ 
+-struct OboeCapture final : BackendBase, oboe::AudioStreamCallback {
++struct OboeCapture final : BackendBase, oboe::AudioStreamDataCallback {
+     explicit OboeCapture(gsl::not_null<DeviceBase*> const device) : BackendBase{device} { }
+     ~OboeCapture() override;
+ 
+     std::shared_ptr<oboe::AudioStream> mStream;
++    std::shared_ptr<OboeErrorCallback> mErrorCallback;
++    DataCallbackGate mDataGate;
+ 
+     RingBufferPtr<std::byte> mRing;
+ 
+@@ -252,14 +387,16 @@
+ 
+ OboeCapture::~OboeCapture()
+ {
+-    if(mStream)
+-        mStream->close();
++    CloseStream(mStream, mErrorCallback);
+ }
+ 
+ 
+ auto OboeCapture::onAudioReady(oboe::AudioStream*, void *const audioData, int32_t const numFrames)
+     -> oboe::DataCallbackResult
+ {
++    if(!mDataGate.admit())
++        return oboe::DataCallbackResult::Continue;
++    const auto onReturn = gsl::finally([this] { mDataGate.release(); });
+     std::ignore = mRing->write(std::span{static_cast<const std::byte*>(audioData),
+         gsl::narrow_cast<uint32_t>(numFrames)*mRing->getElemSize()});
+     return oboe::DataCallbackResult::Continue;
+@@ -275,13 +412,15 @@
+             name};
+ 
+     auto builder = oboe::AudioStreamBuilder{};
++    mErrorCallback = std::make_shared<OboeErrorCallback>(mDevice);
+     builder.setDirection(oboe::Direction::Input)
+         ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
+         ->setSampleRateConversionQuality(oboe::SampleRateConversionQuality::High)
+         ->setChannelConversionAllowed(true)
+         ->setFormatConversionAllowed(true)
+         ->setSampleRate(gsl::narrow_cast<int32_t>(mDevice->mSampleRate))
+-        ->setCallback(this);
++        ->setDataCallback(this)
++        ->setErrorCallback(mErrorCallback);
+     /* Only use mono or stereo at user request. There's no telling what
+      * other counts may be inferred as.
+      */
+@@ -341,17 +480,26 @@
+         gsl::narrow_cast<unsigned>(mStream->getBytesPerFrame()), false);
+ 
+     mDeviceName = name;
++    if(!mErrorCallback->activate())
++        throw al::backend_exception{al::backend_error::DeviceError,
++            "Stream disconnected during capture preparation"};
+ }
+ 
+ void OboeCapture::start()
+ {
++    mDataGate.start();
+     if(const auto result = mStream->start(); result != oboe::Result::OK)
++    {
++        mDataGate.stop();
++        CloseStream(mStream, mErrorCallback);
+         throw al::backend_exception{al::backend_error::DeviceError, "Failed to start stream: {}",
+             oboe::convertToText(result)};
++    }
+ }
+ 
+ void OboeCapture::stop()
+ {
++    mDataGate.stop();
+     if(const auto result = mStream->stop(); result != oboe::Result::OK)
+         ERR("Failed to stop stream: {}", oboe::convertToText(result));
+ }
