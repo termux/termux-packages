@@ -1,0 +1,55 @@
+Use memfd only: rustix::shm is unavailable on Android (bionic has no shm_open).
+
+--- a/vendor/wayland-cursor/src/lib.rs
++++ b/vendor/wayland-cursor/src/lib.rs
+@@ -53,13 +53,10 @@
+ use std::ops::{Deref, Index};
+ use std::os::unix::io::{AsFd, OwnedFd};
+ use std::sync::Arc;
+-use std::time::{SystemTime, UNIX_EPOCH};
+ 
+-use rustix::fs::Mode;
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ use rustix::fs::{memfd_create, MemfdFlags};
+ use rustix::io::Errno;
+-use rustix::shm;
+ #[cfg(any(target_os = "linux", target_os = "android"))]
+ use std::ffi::CStr;
+ 
+@@ -450,34 +447,8 @@
+         }
+     }
+ 
+-    // Fallback to using shm_open.
+-    let sys_time = SystemTime::now();
+-    let mut mem_file_handle = format!(
+-        "/wayland-cursor-rs-{}",
+-        sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-    );
+-    loop {
+-        match shm::open(
+-            mem_file_handle.as_str(),
+-            shm::OFlags::CREATE | shm::OFlags::EXCL | shm::OFlags::RDWR,
+-            Mode::RUSR | Mode::WUSR,
+-        ) {
+-            Ok(fd) => match shm::unlink(mem_file_handle.as_str()) {
+-                Ok(_) => return Ok(fd),
+-                Err(errno) => return Err(IoError::from(errno)),
+-            },
+-            Err(Errno::EXIST) => {
+-                // If a file with that handle exists then change the handle
+-                mem_file_handle = format!(
+-                    "/wayland-cursor-rs-{}",
+-                    sys_time.duration_since(UNIX_EPOCH).unwrap().subsec_nanos()
+-                );
+-                continue;
+-            }
+-            Err(Errno::INTR) => continue,
+-            Err(errno) => return Err(IoError::from(errno)),
+-        }
+-    }
++    // termux-android-no-shm: bionic has no shm_open, memfd is the only path.
++    Err(IoError::from(Errno::NOSYS))
+ }
+ 
+ struct IgnoreObjectData;

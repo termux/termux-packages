@@ -1,0 +1,31 @@
+Point the workspace to the patched vendored crates.
+
+This can not be part of android-support.patch: that one is applied before
+`cargo vendor`, which fails if the vendor/ paths do not exist yet.
+The crates.io entries are added to the already existing [patch.crates-io]
+table, redefining the table would be a TOML error.
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1019,6 +1019,21 @@
+ # per-crate scratch dirs are sufficient. Upstream issue:
+ # https://github.com/dtolnay/cxx/issues/1752
+ scratch = { path = "corgi-patches/scratch" }
++x11rb-protocol = { path = "vendor/x11rb-protocol" }
++ipc-channel = { path = "vendor/ipc-channel" }
++wayland-cursor = { path = "vendor/wayland-cursor" }
++rustls-platform-verifier = { path = "vendor/rustls-platform-verifier" }
++wasmtime-internal-jit-icache-coherence = { path = "vendor/wasmtime-internal-jit-icache-coherence" }
++cpal = { path = "vendor/cpal" }
++
++[patch."https://github.com/zed-industries/scap"]
++zed-scap = { path = "vendor/zed-scap" }
++
++[patch."https://github.com/zed-industries/trash-rs"]
++trash = { path = "vendor/trash" }
++
++[patch."https://github.com/zed-industries/alacritty"]
++alacritty_terminal = { path = "vendor/alacritty_terminal" }
+ 
+ [profile.dev]
+ split-debuginfo = "unpacked"

@@ -1,0 +1,31 @@
+Android 9 and older block the membarrier syscall in the app seccomp filter,
+so calling it kills the process with SIGSYS (seen when Zed loads wasm
+extensions). Do not use membarrier on Android and fall back to the no-op
+pipeline flush.
+
+--- a/vendor/wasmtime-internal-jit-icache-coherence/src/libc.rs
++++ b/vendor/wasmtime-internal-jit-icache-coherence/src/libc.rs
+@@ -6,10 +6,7 @@
+ #[cfg(not(any(target_os = "linux", target_os = "android")))]
+ pub use wasmtime_core::error::Result;
+ 
+-#[cfg(all(
+-    target_arch = "aarch64",
+-    any(target_os = "linux", target_os = "android")
+-))]
++#[cfg(all(target_arch = "aarch64", target_os = "linux"))]
+ mod details {
+ 
+     use super::*;
+@@ -88,10 +85,7 @@
+     }
+ }
+ 
+-#[cfg(not(all(
+-    target_arch = "aarch64",
+-    any(target_os = "linux", target_os = "android")
+-)))]
++#[cfg(not(all(target_arch = "aarch64", target_os = "linux")))]
+ mod details {
+     // NB: this uses `wasmtime_environ::error::Result` instead of `std::io::Result` to compile on
+     // `no_std`.
