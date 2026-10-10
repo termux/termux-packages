@@ -7,9 +7,9 @@ LICENSES/CC0-1.0.txt
 LICENSES/MIT.txt
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.30.0"
+TERMUX_PKG_VERSION="6.31.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/prison-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=2cdb0a2689ab45b907c76c9a01c1dc14855b8e5329ad0a9cf65c1ad64e5fed1b
+TERMUX_PKG_SHA256=30cdb5564ef76c4c2a6fe509234095c1329f30165243b81008312a1182d326bc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libdmtx, libqrencode, qt6-qtbase, qt6-qtmultimedia, libzxing-cpp"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qtdeclarative, qt6-qttools"
