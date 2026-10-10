@@ -1,12 +1,20 @@
 --- a/third_party/pdfium/BUILD.gn
 +++ b/third_party/pdfium/BUILD.gn
-@@ -219,7 +219,23 @@
+@@ -231,7 +231,31 @@
    ]
  }
  
 -component("pdfium") {
 +group("pdfium") {
 +  public_deps = [ ":pdfium_public_headers" ]
++
++  # XXX: It doesn't get included in libpdfium.a, possibly a bug of GN
++  if (pdf_enable_rust_png) {
++    public_deps += [
++      "//third_party/pdfium/core/fxcodec:pdfium_rust_png_ffi",
++    ]
++  }
++
 +  public_configs = [
 +    ":pdfium_public_config",
 +    ":pdfium_prebuilt",
