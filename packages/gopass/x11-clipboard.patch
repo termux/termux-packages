@@ -27,26 +27,18 @@
  // Written by Changkun Ou <changkun.de>
  
 -//go:build linux && !android
-+//go:build android
++//go:build linux
  
  package clipboard
  
---- a/vendor/golang.design/x/clipboard/clipboard_nocgo.go
-+++ b/vendor/golang.design/x/clipboard/clipboard_nocgo.go
-@@ -1,4 +1,4 @@
--//go:build !darwin && !windows && !linux && !freebsd && !openbsd && !netbsd && !cgo
-+//go:build !darwin && !windows && !freebsd && !openbsd && !netbsd && !cgo
- 
- package clipboard
- 
---- a/vendor/golang.design/x/clipboard/clipboard_wayland_linux.go
-+++ b/vendor/golang.design/x/clipboard/clipboard_wayland_linux.go
+--- a/vendor/golang.design/x/clipboard/clipboard_wayland.go
++++ b/vendor/golang.design/x/clipboard/clipboard_wayland.go
 @@ -4,7 +4,7 @@
  //
  // Written by Changkun Ou <changkun.de>
  
--//go:build linux && !android
-+//go:build android
+-//go:build (linux || freebsd || openbsd || netbsd) && !android
++//go:build linux || freebsd || openbsd || netbsd
  
  package clipboard
  
@@ -57,7 +49,7 @@
  // Written by Changkun Ou <changkun.de>
  
 -//go:build (linux || freebsd || openbsd || netbsd) && !android
-+//go:build (android || freebsd || openbsd || netbsd)
++//go:build linux || freebsd || openbsd || netbsd
  
  package clipboard
  
