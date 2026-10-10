@@ -158,9 +158,22 @@ https://github.com/termux-user-repository/tur
 
 ## Submitting pull requests
 
-Contributors take the all responsibility for their submissions. Maintainers may
-provide some help with fixing your pull request or give some recommendations,
-but that DOES NOT mean they will do all work instead of you.
+Contributors take full responsibility for their submissions.
+Maintainers may provide some help with fixing your pull request
+or give some procedural recommendations, that DOES NOT mean they will do all of the work for you.
+
+> [!IMPORTANT]
+> - If you have used or reused the work of another person for substantial parts of your contribution that should be disclosed,
+> and the person(s) whose work your contribution is based on should be credited with a [`Co-authored-by: Name <email@provider.tld>`](https://docs.github.com/en/pull-requests/how-tos/commit-changes/creating-a-commit-with-multiple-authors#creating-co-authored-commits-on-the-command-line) commit message trailer.
+>
+> - If you have used LLM/AI assistance in your submission it is ***mandatory*** that this be disclosed as part of your contribution.
+> We do not make use of `Co-Authored-by: <LLM>` commit trailers in this repository.
+> AI/LLM assistance should instead be attributed with a `Assisted-by: <LLM> [TOOL1] [TOOL2]` commit message trailer.
+> Where `<LLM>` is either just *LLM*, or the generic name of the model/agent used,
+> and `[TOOL1] [TOOL2]` are optional specialized tools used.
+> Basic development tools (git, editors, harnesses, [utility scripts from the repo](/scripts/bin/)) should not be listed.
+> This requirement is based on the [Linux Kernel's coding assistance policy](https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/coding-assistants.rst?h=v7.3-rc6#n50).
+
 
 **Minimal requirements:**
 
