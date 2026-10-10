@@ -1,0 +1,38 @@
+--- a/subprojects/muon.wrap
++++ b/subprojects/muon.wrap
+@@ -1,3 +1,5 @@
+ [wrap-git]
+ url = https://github.com/JCWasmx86/muon
+-revision = HEAD
+\ No newline at end of file
++revision = HEAD
++
++diff_files = patches/muon-keyword-new.patch
+--- /dev/null
++++ b/subprojects/packagefiles/patches/muon-keyword-new.patch
+@@ -0,0 +1,25 @@
++--- a/include/compilers.h
+++++ b/include/compilers.h
++@@ -176,7 +176,7 @@
++ bool s_to_compiler_language(const char *s, enum compiler_language *l);
++ bool filename_to_compiler_language(const char *str, enum compiler_language *l);
++ const char *compiler_language_extension(enum compiler_language l);
++-enum compiler_language coalesce_link_languages(enum compiler_language cur, enum compiler_language new);
+++enum compiler_language coalesce_link_languages(enum compiler_language cur, enum compiler_language new_);
++ 
++ bool toolchain_detect(struct workspace *wk, obj *comp, enum compiler_language lang);
++ void compilers_init(void);
++--- a/src/compilers.c
+++++ b/src/compilers.c
++@@ -148,9 +148,9 @@
++ }
++ 
++ enum compiler_language
++-coalesce_link_languages(enum compiler_language cur, enum compiler_language new)
+++coalesce_link_languages(enum compiler_language cur, enum compiler_language new_)
++ {
++-	switch (new) {
+++	switch (new_) {
++ 	case compiler_language_null:
++ 	case compiler_language_c_hdr:
++ 	case compiler_language_cpp_hdr:
