@@ -1,0 +1,14 @@
+--- a/src/terminal/kitty/graphics_image.zig
++++ b/src/terminal/kitty/graphics_image.zig
+@@ -116,6 +116,11 @@
+             return error.UnsupportedMedium;
+         }
+ 
++        // bionic (Android) does not provide shm_open/shm_unlink
++        if (comptime builtin.target.abi.isAndroid()) {
++            return error.UnsupportedMedium;
++        }
++
+         // libc is required for shm_open
+         if (comptime !builtin.link_libc) {
+             return error.UnsupportedMedium;
