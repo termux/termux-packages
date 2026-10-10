@@ -139,10 +139,11 @@ met these conditions:
   purposes, including but not limited to pentesting, phishing, bruteforce,
   sms/call bombing, DDoS attaks, OSINT.
 
-**Important**: standalone library packages are of interest mostly for developers
-and we will not package them unless required as dependency for another package.
-This is not a strong rule, but needed to ensure that repository is clean and
-provides content useful for average Termux user.
+> [!NOTE]
+> Standalone library packages are of interest mostly for developers
+> and we prefer not package them unless required as a dependency for another package.
+> This is not a strong rule, but is  needed to ensure that repository is clean and
+> provides content useful for average Termux user.
 
 Packages that require root permission to get working or rely on features that
 are available only with SELinux permissive mode or require custom firmware
@@ -158,33 +159,55 @@ https://github.com/termux-user-repository/tur
 
 ## Submitting pull requests
 
-Contributors take the all responsibility for their submissions. Maintainers may
-provide some help with fixing your pull request or give some recommendations,
-but that DOES NOT mean they will do all work instead of you.
+Contributors take full responsibility for their submissions.
+Maintainers may provide some help with fixing your pull request
+or give some procedural recommendations, that DOES NOT mean they will do all of the work for you.
 
-**Minimal requirements:**
+> [!IMPORTANT]
+> - If you have used or reused the work of another person for substantial parts of your contribution that should be disclosed,
+> and the person(s) whose work your contribution is based on should be credited with a [`Co-authored-by: Name <email@provider.tld>`](https://docs.github.com/en/pull-requests/how-tos/commit-changes/creating-a-commit-with-multiple-authors#creating-co-authored-commits-on-the-command-line) commit message trailer.
+>
+> - If you have used LLM/AI assistance in your submission it is ***mandatory*** that this be disclosed as part of your contribution.
+> We do not make use of `Co-Authored-by: <LLM>` commit trailers in this repository.
+> AI/LLM assistance should instead be attributed with a `Assisted-by: <LLM> [TOOL1] [TOOL2]` commit message trailer.
+> Where `<LLM>` is either just *LLM*, or the generic name of the model/agent used,
+> and `[TOOL1] [TOOL2]` are optional specialized tools used.
+> Basic development tools (git, editors, harnesses, [utility scripts from the repo](/scripts/bin/)) should not be listed.
+> This requirement is based on the [Linux Kernel's coding assistance policy](https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/process/coding-assistants.rst?h=v7.3-rc6#n50).
 
-- Experience with Linux distribution like Debian (preferred), Arch, Fedora, etc.
+**Useful prerequisites:**
+
+- Experience with Linux distribution like Debian, Arch, Fedora, etc.
 - Experience with compiling software from source.
 - Good shell scripting skills.
 - You have read https://github.com/termux/termux-packages/wiki.
 
-If you never used Linux distribution or Termux was your first experience with
-Linux environment, we strongly recommending to NOT send pull requests since
-we will reject low quality work.
+If you never used a Linux distribution or Termux was your first experience with a
+Linux environment,<br>
+we recommend to NOT sending pull requests.<br>
+If you have an issue with a package but are unsure how to submit a fix for it<br>
+feel free to open a [new issue](https://github.com/termux/termux-packages/issues/new/choose) or comment on an existing one about the problem.
 
-Do not forget about [packaging policy](#packaging-policy) when submitting a
-new package, as your pull request will be closed without merge.
+Make sure to read the [packaging policy](#packaging-policy) when submitting new packages.
 
-Do not send disruptive changes, like without reason reverting commits or
-deleting files, creating spam content, etc. Authors of such pull requests may
+We will reject low quality submissions.<br>
+We are happy to help out with questions about submission procedures,<br>
+the Termux build system and using Git if you aren't 100% sure about your submission.<br>
+The most important thing when making contributions is a willingness to work with reviewer feedback.
+
+Please also remember that Termux is a project run by volunteers.<br>
+We try to review PRs and respond to issues in a timely manner,<br>
+and we ask that the time and effort of our maintainers, contributors and reviewers is respected in turn.
+
+Do not send disruptive changes, like reverting commits without reason or<br>
+deleting files, creating spam content, etc. Authors of such pull requests may<br>
 be blocked from contributing to [Termux](https://github.com/termux) project.
 
 ### Submitting new packages: checklist
 
-Besides violation of [packaging policy](#packaging-policy), there is a
-number of typical mistakes that could be made when submittung a pull
-request with new package. Pay attention to things listed below.
+Besides violations of the [packaging policy](#packaging-policy), there is a
+number of typical mistakes that could be made when submitting a pull request with new packages.<br>
+Pay attention to things listed below.
 
 1. **Versioning: format**
 
@@ -243,19 +266,25 @@ request with new package. Pay attention to things listed below.
 
 6. **Patches: format**
 
-   Patches are standard diff output generated by GNU diff or Git. Please
+   Patches are standard diff output generated by Git or GNU diff. Please
    avoid editing patches by hand, especially if you don't understand
    format internals.
 
-   Patch is usually created by
+   Patches are usually created by
 
+   ```
+   git diff > filename.patch
+   ```
+   or
    ```
    diff -uNr sourcedir sourcedir.mod > filename.patch
    ```
 
+   See: [*Creating patch files*](#creating-patch-files) for further details.
+
 7. **Patches: hardcoded path references**
 
-   Software often relies on paths defined by Filesystem Hierarchy Standard:
+   Software often relies on paths defined by the [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard):
 
    - `/bin`
    - `/etc`
@@ -267,37 +296,41 @@ request with new package. Pay attention to things listed below.
    - `/var`
 
    These paths do not exist in Termux and have been replaced by prefixed
-   equivalents. Termux installation prefix is
+   equivalents. Termux's standard installation prefix is
 
    ```
    /data/data/com.termux/files/usr
    ```
 
-   and can be considered as virtual rootfs.
+   which can be considered a virtual root directory.
 
-   Home directory is stored outside of prefix:
+   The home directory is stored outside of the prefix at:
 
    ```
    /data/data/com.termux/files/home
    ```
 
-   Don't hardcode home and prefix, use shortcuts `@TERMUX_HOME@` and
+   Don't hardcode home and prefix, use the placeholders `@TERMUX_HOME@` and
    `@TERMUX_PREFIX@` respectively. Patch files are preprocessed before
    being applied.
 
    Directories `/run` and `/sbin` should be replaced by
    `@TERMUX_PREFIX@/var/run` and `@TERMUX_PREFIX@/bin` respectively.
 
+   `/usr` is already part of the `@TERMUX_PREFIX@`
+   so paths like `/usr/share` or `/usr/bin` should be replaced by
+   `@TERMUX_PREFIX@/share` and `@TERMUX_PREFIX@/bin` respectively.
+
 8. **Build configuration: compiler flags**
 
-   You should not touch `CFLAGS`, `CXXFLAGS`, `CPPFLAGS` or `LDFLAGS`
-   variables unless this is necessary to make build working.
+   You should not touch variables such as `CFLAGS`, `CXXFLAGS`, `CPPFLAGS`
+   or `LDFLAGS` unless this is necessary to make the build work.
 
-9. **Build configuration: autotools**
+9. **Build configuration: build system flags**
 
-   The `build-package.sh` does pretty much work to properly configure
-   package builds using GNU Autotools. Therefore you do not need to
-   specify flags like
+   The `build-package.sh` script does most of the work to properly configure
+   package builds using common build systems such as GNU Autotools, CMake or Meson .
+   Therefore you do not need to specify flags like
 
    - `--prefix`
    - `--host`
@@ -307,17 +340,23 @@ request with new package. Pay attention to things listed below.
 
    and some others.
 
-   Additional options to `./configure` can be passed through variable
+   Additional options to `./configure` (or the build system's equivalent) can be passed through
    `TERMUX_PKG_EXTRA_CONFIGURE_ARGS`.
 
 ---
 
 # Working with packages
 
-All software available in Termux repositories aims to be compatible with Android
-OS and is built by Android NDK. This often introduces compatibility issues as
+All software available in Termux repositories aims to be compatible with Android OS
+and is built against the Android NDK. This often introduces compatibility issues as
 Android (specifically Termux) is not a standard platform. Do not expect there
-are exist package recipes available out-of-box.
+to exist package recipes available out-of-box.
+
+Existing packaging scripts can be a very helpful starting point for compiling packages for Termux.
+[repology.org](https://repology.org/projects/) is a very helpful resource for finding information on existing project packaging.
+
+[Arch Linux](https://archlinux.org/packages/?q=)'s, [Fedora Linux](https://src.fedoraproject.org/projects/rpms/%2A)'s and [Alpine Linux](https://pkgs.alpinelinux.org/packages)'s build scripts for example tend to be of notably high quality
+and are well suited for use as reference material when packaging for Termux.
 
 ## Commit guidelines
 
@@ -366,17 +405,17 @@ Any line in the commit **should not exceed 80 characters**. In case it does, con
 Examples of good commit messages:
 
 1. ```
-   bump(main/nodejs): v18.2.0
+   bump(main/nodejs): 26.4.0
    ```
 
 2. ```
-   dwnpkg(main/htop): v2.2.0
+   dwnpkg(main/htop): 2.2.0
 
    v3.x needs access to /proc/stat which is now restricted by Android
    ```
 
 3. ```
-   enhance,bump(main/nodejs): v18.2.0 and use shared libuv
+   enhance,bump(main/nodejs): 26.4.0 and use shared libuv
 
    # Describe the technical reasons of how using shared libuv is beneficial
    ```
@@ -405,11 +444,11 @@ Examples of good commit messages:
    same repository, and have same initials as well as are very similar in
    nature.
 
-   The same can also be used for liblua as main/liblua{51,52,53,54}
+   The same can also be used for e.g. lua as main/lua{51,52,53,54,55,jit}
    ```
 
 8. ```
-   fix(main/vim{,-python},x11/vim-gtk): cursor flickering under certain rare conditions
+   fix(main/{neo,}vim,x11/vim-gtk): cursor flickering under certain rare conditions
 
    Although the above commit message is quite long and also exceeds the
    recommended length of a line in commit message. Such commits may be accepted
