@@ -3,12 +3,13 @@ TERMUX_PKG_DESCRIPTION="Comprehensive Python Bindings for Qt v6"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/source/p/pyqt6/pyqt6-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=45dd60aa69976de1918b5ced6b4e7b6a25abd2a919ecef5fd5826ecc76718889
-TERMUX_PKG_DEPENDS="libc++, libglvnd-dev, python, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, qt6-qttools, qt6-qtwebchannel, qt6-qtwebsockets, python-pip"
+TERMUX_PKG_DEPENDS="libc++, libglvnd-dev, python, python-pyqt6-sip, qt6-qtbase, qt6-qtdeclarative, qt6-qtsvg, qt6-qttools, qt6-qtwebchannel, qt6-qtwebsockets"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools, qt6-qttools-cross-tools"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, sip, PyQt-builder"
-TERMUX_PKG_PYTHON_TARGET_DEPS="PyQt6-sip"
+TERMUX_PKG_PYTHON_RUNTIME_DEPS=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 --verbose
@@ -68,4 +69,9 @@ termux_step_make_install() {
 	sed -e 's|@TERMUX_PREFIX@|'"${TERMUX_PREFIX}"'|g' \
 		"$TERMUX_PKG_BUILDER_DIR/pyuic6.in" > "${t}"
 	chmod 0700 "${t}"
+}
+
+termux_step_post_make_install() {
+	find $TERMUX_PREFIX/lib/python${TERMUX_PYTHON_VERSION}/site-packages/ -name "METADATA" \
+		-exec sed -i '/^Requires-Dist:/d' {} +
 }
