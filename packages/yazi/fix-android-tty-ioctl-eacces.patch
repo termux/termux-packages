@@ -1,0 +1,30 @@
+diff --git a/yazi-tty/src/handle.rs b/yazi-tty/src/handle.rs
+--- a/yazi-tty/src/handle.rs
++++ b/yazi-tty/src/handle.rs
+@@ -132,6 +132,17 @@
+ 	}
+ }
+ 
++// On some Android devices SELinux denies the termios ioctls on the inherited
++// stdio pty, so probe them before trusting stdin/stdout.
++#[cfg(all(unix, target_os = "android"))]
++fn tty_ioctls_allowed(fd: libc::c_int) -> bool {
++	let mut t = [0u8; 64];
++	unsafe { libc::ioctl(fd, libc::TCGETS2, t.as_mut_ptr()) == 0 && libc::ioctl(fd, libc::TCSETS2, t.as_ptr()) == 0 }
++}
++
++#[cfg(all(unix, not(target_os = "android")))]
++fn tty_ioctls_allowed(_fd: libc::c_int) -> bool { true }
++
+ #[cfg(unix)]
+ impl Handle {
+ 	pub(crate) fn new(out: bool) -> Self {
+@@ -140,7 +151,7 @@
+ 		use libc::{STDIN_FILENO, STDOUT_FILENO};
+ 
+ 		let resort = Self { inner: if out { STDOUT_FILENO } else { STDIN_FILENO }, close: false };
+-		if unsafe { libc::isatty(resort.inner) } == 1 {
++		if unsafe { libc::isatty(resort.inner) } == 1 && tty_ioctls_allowed(resort.inner) {
+ 			return resort;
+ 		}
+ 

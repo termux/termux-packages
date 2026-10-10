@@ -1,8 +1,6 @@
-diff --git a/vendor/logging/liblog/include/android/log.h b/vendor/logging/liblog/include/android/log.h
-index 12de595..6742aa9 100644
---- a/vendor/logging/liblog/include/android/log.h
-+++ b/vendor/logging/liblog/include/android/log.h
-@@ -229,7 +229,7 @@ typedef void (*__android_aborter_function)(const char* abort_message);
+--- a/vendor/logging/liblog/include/android/log.h	2026-08-01 08:20:11.000000000 +0300
++++ b/vendor/logging/liblog/include/android/log.h	2026-09-18 12:09:42.933702804 +0300
+@@ -266,7 +266,7 @@
   *
   * Available since API level 30.
   */
@@ -11,7 +9,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Sets a user defined logger function.  All log messages sent to liblog will be set to the
-@@ -241,7 +241,7 @@ void __android_log_write_log_message(struct __android_log_message* log_message)
+@@ -278,7 +278,7 @@
   *
   * Available since API level 30.
   */
@@ -19,8 +17,8 @@ index 12de595..6742aa9 100644
 +void __android_log_set_logger(__android_logger_function logger) __INTRODUCED_IN(24);
  
  /**
-  * Writes the log message to logd.  This is an __android_logger_function and can be provided to
-@@ -251,7 +251,7 @@ void __android_log_set_logger(__android_logger_function logger) __INTRODUCED_IN(
+  * Writes the log message to logd.  This is an {@link __android_logger_function} and can be provided to
+@@ -288,7 +288,7 @@
   *
   * Available since API level 30.
   */
@@ -28,8 +26,17 @@ index 12de595..6742aa9 100644
 +void __android_log_logd_logger(const struct __android_log_message* log_message) __INTRODUCED_IN(24);
  
  /**
-  * Writes the log message to stderr.  This is an __android_logger_function and can be provided to
-@@ -262,7 +262,7 @@ void __android_log_logd_logger(const struct __android_log_message* log_message)
+  * Writes the log message to logd using the passed in timestamp.  The messages are stored
+@@ -304,7 +304,7 @@
+  * Available since API level 37.
+  */
+ void __android_log_logd_logger_with_timestamp(const struct __android_log_message* log_message,
+-                                              const struct timespec* timestamp) __INTRODUCED_IN(37);
++                                              const struct timespec* timestamp) __INTRODUCED_IN(24);
+ 
+ /**
+  * Writes the log message to stderr.  This is an {@link __android_logger_function} and can be provided to
+@@ -315,7 +315,7 @@
   * Available since API level 30.
   */
  void __android_log_stderr_logger(const struct __android_log_message* log_message)
@@ -38,7 +45,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Sets a user defined aborter function that is called for __android_log_assert() failures.  This
-@@ -273,7 +273,7 @@ void __android_log_stderr_logger(const struct __android_log_message* log_message
+@@ -326,7 +326,7 @@
   *
   * Available since API level 30.
   */
@@ -47,7 +54,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Calls the stored aborter function.  This allows for other logging libraries to use the same
-@@ -284,7 +284,7 @@ void __android_log_set_aborter(__android_aborter_function aborter) __INTRODUCED_
+@@ -337,7 +337,7 @@
   *
   * Available since API level 30.
   */
@@ -56,7 +63,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Sets android_set_abort_message() on device then aborts().  This is the default aborter.
-@@ -295,7 +295,7 @@ void __android_log_call_aborter(const char* abort_message) __INTRODUCED_IN(30);
+@@ -348,7 +348,7 @@
   * Available since API level 30.
   */
  void __android_log_default_aborter(const char* abort_message) __attribute__((noreturn))
@@ -65,7 +72,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Use the per-tag properties "log.tag.<tagname>" along with the minimum priority from
-@@ -314,7 +314,7 @@ __INTRODUCED_IN(30);
+@@ -367,7 +367,7 @@
   *
   * Available since API level 30.
   */
@@ -74,7 +81,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Use the per-tag properties "log.tag.<tagname>" along with the minimum priority from
-@@ -335,7 +335,7 @@ int __android_log_is_loggable(int prio, const char* tag, int default_prio) __INT
+@@ -388,7 +388,7 @@
   * Available since API level 30.
   */
  int __android_log_is_loggable_len(int prio, const char* tag, size_t len, int default_prio)
@@ -83,7 +90,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Sets the minimum priority that will be logged for this process.
-@@ -346,7 +346,7 @@ int __android_log_is_loggable_len(int prio, const char* tag, size_t len, int def
+@@ -398,7 +398,7 @@
   *
   * Available since API level 30.
   */
@@ -91,8 +98,8 @@ index 12de595..6742aa9 100644
 +int32_t __android_log_set_minimum_priority(int32_t priority) __INTRODUCED_IN(24);
  
  /**
-  * Gets the minimum priority that will be logged for this process.  If none has been set by a
-@@ -357,7 +357,7 @@ int32_t __android_log_set_minimum_priority(int32_t priority) __INTRODUCED_IN(30)
+  * Gets the minimum priority that will be logged for this process.
+@@ -407,7 +407,7 @@
   *
   * Available since API level 30.
   */
@@ -101,7 +108,7 @@ index 12de595..6742aa9 100644
  
  /**
   * Sets the default tag if no tag is provided when writing a log message.  Defaults to
-@@ -368,7 +368,7 @@ int32_t __android_log_get_minimum_priority(void) __INTRODUCED_IN(30);
+@@ -418,7 +418,7 @@
   *
   * Available since API level 30.
   */

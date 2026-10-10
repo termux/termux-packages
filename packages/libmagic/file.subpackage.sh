@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_DESCRIPTION="Command-line tool that tells you in words what kind of data a file contains"
+TERMUX_SUBPKG_INCLUDE="bin/file share/man/man1/file.1.gz"
+TERMUX_SUBPKG_BREAKS="file-dev"
+TERMUX_SUBPKG_REPLACES="file-dev"
+TERMUX_SUBPKG_GROUPS="base-devel"

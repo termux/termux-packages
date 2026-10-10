@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/fcitx/libime
 TERMUX_PKG_DESCRIPTION="A library to support generic input method implementation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.1.15"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.1.17"
 TERMUX_PKG_SRCURL=git+https://github.com/fcitx/libime
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="boost, fcitx5, libc++, libime-data, zstd"
@@ -30,7 +29,7 @@ termux_step_post_make_install() {
 	# from add_custom_commands in data/CMakeLists.txt
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		pushd data
-		termux-proot-run ../bin/libime_slm_build_binary -s -a 22 -q 8 trie lm_sc.arpa sc.lm
+		termux-proot-run ../bin/libime_slm_build_binary -s -a 22 -q 4 trie lm_sc.arpa sc.lm
 		termux-proot-run ../bin/libime_prediction sc.lm lm_sc.arpa sc.lm.predict
 		termux-proot-run ../bin/libime_pinyindict dict_sc.txt sc.dict
 		termux-proot-run ../bin/libime_pinyindict dict_extb.txt extb.dict

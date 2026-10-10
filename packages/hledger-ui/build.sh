@@ -2,37 +2,29 @@ TERMUX_PKG_HOMEPAGE=https://hledger.org/
 TERMUX_PKG_DESCRIPTION="hledger-ui - terminal interface (TUI) for hledger, a robust, friendly plain text accounting app."
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="Andriy Mykhaylyk <erp.lsf@gmail.com>"
-TERMUX_PKG_VERSION="1.52.1"
+TERMUX_PKG_VERSION="1.52.4"
 TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/hledger-ui-${TERMUX_PKG_VERSION}/hledger-ui-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=61bf2eb30e7ebb49aa2a4bb2bfd547810b5aedd481861025a3986d61f9ead8fd
+TERMUX_PKG_SHA256=3cb3a7ffb3370a9e66a9fb585aaa561dc83eae07fff1a3d4e837c69be7f4eb23
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses, asciinema"
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-utimes, libffi, libiconv, libgmp, zlib, ncurses, asciinema"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-c entropy+donotgetentropy"
 
 termux_step_post_configure() {
-	cabal get splitmix-0.1.3.1
+	cabal get splitmix-0.1.3.2
 	mv splitmix{-*,}
 
 	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
-		patch --silent -p1 -d splitmix < "$f"
+		patch --silent -p1 -d splitmix <"$f"
 	done
 
 	cabal get entropy-0.4.1.11
 	mv entropy{-*,}
 	sed -i -E 's|(build-type:\s*)Custom|\1Simple|' entropy/entropy.cabal
 
-	cat <<-EOF >>cabal.project.local
-		packages: splitmix entropy
-
-		package splitmix
-			benchmarks: False
-			tests: False
-
-		package entropy
-			flags: +donotgetentropy
-	EOF
+	echo "packages: splitmix entropy" >>cabal.project.local
 
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == false ]]; then # We do not need iserv for on device builds.
 		termux_setup_ghc_iserv

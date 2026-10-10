@@ -7,13 +7,13 @@ kmountpoint.cpp:375:56: error: cannot initialize a member subobject of type '__u
 
 --- a/src/core/kmountpoint.cpp
 +++ b/src/core/kmountpoint.cpp
-@@ -450,13 +450,13 @@ KMountPoint::List KMountPoint::currentMountPoints(DetailsNeededFlags infoNeeded)
-                 mask_mnt_id = STATX_MNT_ID;
+@@ -456,13 +456,13 @@ KMountPoint::List KMountPoint::currentMountPoints(DetailsNeededFlags infoNeeded)
+                 mask_mnt_id = STATX_MNT_ID_UNIQUE;
  #endif
  
 -                if (struct statx buff; statx(AT_FDCWD, target, AT_STATX_DONT_SYNC | AT_NO_AUTOMOUNT, STATX_INO | mask_mnt_id, &buff) == 0) {
 -                    mp->d->m_deviceId = makedev(buff.stx_dev_major, buff.stx_dev_minor);
--#if HAVE_STATX_MNT_ID
+-#if HAVE_STATX_MNT_ID_UNIQUE
 -                    if (buff.stx_mask & mask_mnt_id) {
 -                        mp->d->m_mountId = (quint64)buff.stx_mnt_id;
 +                // handle bind mounts

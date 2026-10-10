@@ -1,18 +1,6 @@
-diff -uNr oma-1.26.0/apt-auth-config/src/lib.rs oma-1.26.0.mod/apt-auth-config/src/lib.rs
---- oma-1.26.0/apt-auth-config/src/lib.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/apt-auth-config/src/lib.rs	2026-05-12 20:39:16.712839283 +0800
-@@ -94,7 +94,7 @@
- pub struct AuthConfig(pub Vec<(AuthUrl, Authenticator)>);
- 
- impl AuthConfig {
--    /// Read system auth.conf.d config (/etc/apt/auth.conf.d)
-+    /// Read system auth.conf.d config (@TERMUX_PREFIX@/etc/apt/auth.conf.d)
-     pub fn system(sysroot: impl AsRef<Path>) -> Result<Self, AuthConfigError> {
-         Self::from_path(sysroot.as_ref().join("etc/apt"))
-     }
-diff -uNr oma-1.26.0/i18n/en-US/oma.ftl oma-1.26.0.mod/i18n/en-US/oma.ftl
---- oma-1.26.0/i18n/en-US/oma.ftl	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/i18n/en-US/oma.ftl	2026-05-12 20:54:43.700838929 +0800
+diff -uNr oma-1.27.3/i18n/en-US/oma.ftl oma-1.27.3.mod/i18n/en-US/oma.ftl
+--- oma-1.27.3/i18n/en-US/oma.ftl	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/i18n/en-US/oma.ftl	2026-08-15 11:22:02.490976840 +0800
 @@ -73,7 +73,7 @@
  battery = You seem to be on battery power. oma may deplete the battery rather quickly during the transaction. It is recommended to plug in your power supply to prevent accidental power loss.
  continue = Do you still wish to continue?
@@ -49,9 +37,9 @@ diff -uNr oma-1.26.0/i18n/en-US/oma.ftl oma-1.26.0.mod/i18n/en-US/oma.ftl
  success = The operation was completed successfully.
  topics-unchanged = oma was unable complete topic opt-out operation(s) and has kept the topic status unchanged.
  status-pending = Pending
-diff -uNr oma-1.26.0/i18n/zh-CN/oma.ftl oma-1.26.0.mod/i18n/zh-CN/oma.ftl
---- oma-1.26.0/i18n/zh-CN/oma.ftl	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/i18n/zh-CN/oma.ftl	2026-05-12 20:53:47.492838951 +0800
+diff -uNr oma-1.27.3/i18n/zh-CN/oma.ftl oma-1.27.3.mod/i18n/zh-CN/oma.ftl
+--- oma-1.27.3/i18n/zh-CN/oma.ftl	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/i18n/zh-CN/oma.ftl	2026-08-15 11:21:55.146976842 +0800
 @@ -72,7 +72,7 @@
  battery = 您的电脑目前似乎正在使用电池供电。oma 在执行任务时可能消耗大量电量，推荐您接入交流电源以防突然断电导致数据损坏。
  continue = 您确定要继续吗？
@@ -88,9 +76,9 @@ diff -uNr oma-1.26.0/i18n/zh-CN/oma.ftl oma-1.26.0.mod/i18n/zh-CN/oma.ftl
  success = 操作已成功完成。
  topics-unchanged = oma 在退出测试源时遇到错误，因此未保存测试源配置状态。
  status-pending = 等待操作中
-diff -uNr oma-1.26.0/i18n/zh-TW/oma.ftl oma-1.26.0.mod/i18n/zh-TW/oma.ftl
---- oma-1.26.0/i18n/zh-TW/oma.ftl	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/i18n/zh-TW/oma.ftl	2026-05-12 20:43:31.888839185 +0800
+diff -uNr oma-1.27.3/i18n/zh-TW/oma.ftl oma-1.27.3.mod/i18n/zh-TW/oma.ftl
+--- oma-1.27.3/i18n/zh-TW/oma.ftl	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/i18n/zh-TW/oma.ftl	2026-08-15 11:21:58.038976841 +0800
 @@ -66,7 +66,7 @@
  battery = 您的電腦目前似乎正在使用電池供電。oma 在執行任務時可能消耗大量電量，建議插電以防意外斷電導致資料損壞。
  continue = 您確定要繼續嗎？
@@ -127,9 +115,9 @@ diff -uNr oma-1.26.0/i18n/zh-TW/oma.ftl oma-1.26.0.mod/i18n/zh-TW/oma.ftl
  tui-autoremove = 清理軟體套件
  tui-no-system-update = 目前沒有系統更新。
  tui-continue-tips = 請按 [c] 繼續。
-diff -uNr oma-1.26.0/oma-contents/examples/list_files.rs oma-1.26.0.mod/oma-contents/examples/list_files.rs
---- oma-1.26.0/oma-contents/examples/list_files.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-contents/examples/list_files.rs	2026-05-12 20:39:16.712839283 +0800
+diff -uNr oma-1.27.3/oma-contents/examples/list_files.rs oma-1.27.3.mod/oma-contents/examples/list_files.rs
+--- oma-1.27.3/oma-contents/examples/list_files.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-contents/examples/list_files.rs	2026-08-15 11:24:27.266976784 +0800
 @@ -1,7 +1,7 @@
  use oma_contents::searcher::{Mode, pure_search};
  
@@ -139,9 +127,9 @@ diff -uNr oma-1.26.0/oma-contents/examples/list_files.rs oma-1.26.0.mod/oma-cont
          println!("{pkg}: {file}")
      })
      .unwrap();
-diff -uNr oma-1.26.0/oma-contents/examples/list_files_rg.rs oma-1.26.0.mod/oma-contents/examples/list_files_rg.rs
---- oma-1.26.0/oma-contents/examples/list_files_rg.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-contents/examples/list_files_rg.rs	2026-05-12 20:39:16.712839283 +0800
+diff -uNr oma-1.27.3/oma-contents/examples/list_files_rg.rs oma-1.27.3.mod/oma-contents/examples/list_files_rg.rs
+--- oma-1.27.3/oma-contents/examples/list_files_rg.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-contents/examples/list_files_rg.rs	2026-08-15 11:24:07.758976792 +0800
 @@ -1,7 +1,7 @@
  use oma_contents::searcher::{Mode, ripgrep_search};
  
@@ -151,26 +139,9 @@ diff -uNr oma-1.26.0/oma-contents/examples/list_files_rg.rs oma-1.26.0.mod/oma-c
          println!("{pkg}: {file}")
      })
      .unwrap();
-diff -uNr oma-1.26.0/oma-contents/src/parser.rs oma-1.26.0.mod/oma-contents/src/parser.rs
---- oma-1.26.0/oma-contents/src/parser.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-contents/src/parser.rs	2026-05-12 20:39:16.716839283 +0800
-@@ -77,11 +77,11 @@
- 
- #[test]
- fn test_single_line_file_multi_space() {
--    let s = "/etc/i have multi space foo/bar/abc\n";
-+    let s = "@TERMUX_PREFIX@/etc/i have multi space foo/bar/abc\n";
-     let res = parse_contents_single_line(s);
- 
-     assert_eq!(
-         res.unwrap(),
--        ("/etc/i have multi space", vec!["foo/bar/abc"])
-+        ("@TERMUX_PREFIX@/etc/i have multi space", vec!["foo/bar/abc"])
-     )
- }
-diff -uNr oma-1.26.0/oma-history/examples/last_upgrade_date.rs oma-1.26.0.mod/oma-history/examples/last_upgrade_date.rs
---- oma-1.26.0/oma-history/examples/last_upgrade_date.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-history/examples/last_upgrade_date.rs	2026-05-12 20:39:39.324839274 +0800
+diff -uNr oma-1.27.3/oma-history/examples/last_upgrade_date.rs oma-1.27.3.mod/oma-history/examples/last_upgrade_date.rs
+--- oma-1.27.3/oma-history/examples/last_upgrade_date.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-history/examples/last_upgrade_date.rs	2026-08-15 11:23:45.674976800 +0800
 @@ -1,7 +1,7 @@
  use oma_history::History;
  
@@ -180,9 +151,9 @@ diff -uNr oma-1.26.0/oma-history/examples/last_upgrade_date.rs oma-1.26.0.mod/om
      let n = conn.last_upgrade_timestamp().unwrap();
  
      println!(
-diff -uNr oma-1.26.0/oma-history/src/migrations.rs oma-1.26.0.mod/oma-history/src/migrations.rs
---- oma-1.26.0/oma-history/src/migrations.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-history/src/migrations.rs	2026-05-12 20:39:16.716839283 +0800
+diff -uNr oma-1.27.3/oma-history/src/migrations.rs oma-1.27.3.mod/oma-history/src/migrations.rs
+--- oma-1.27.3/oma-history/src/migrations.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-history/src/migrations.rs	2026-08-15 11:22:33.274976828 +0800
 @@ -334,7 +334,7 @@
          println!(
              r#"oma ran into unexpected issues whilst migrating the history database, some entries were not migrated. Please consider sharing your oma history database file at:
@@ -192,22 +163,45 @@ diff -uNr oma-1.26.0/oma-history/src/migrations.rs oma-1.26.0.mod/oma-history/sr
  
  with us to help with debugging."#
          );
-diff -uNr oma-1.26.0/oma-refresh/src/db.rs oma-1.26.0.mod/oma-refresh/src/db.rs
---- oma-1.26.0/oma-refresh/src/db.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/oma-refresh/src/db.rs	2026-05-12 20:39:16.716839283 +0800
-@@ -499,7 +499,7 @@
+diff -uNr oma-1.27.3/oma-refresh/src/db.rs oma-1.27.3.mod/oma-refresh/src/db.rs
+--- oma-1.27.3/oma-refresh/src/db.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-refresh/src/db.rs	2026-08-15 11:21:05.210976861 +0800
+@@ -520,7 +520,7 @@
          let index_target_config =
              IndexTargetConfig::new(self.manifest_config.clone(), vec![], &self.arch);
  
--        let archs_from_file = fs::read_to_string("/var/lib/dpkg/arch").await;
-+        let archs_from_file = fs::read_to_string("@TERMUX_PREFIX@/var/lib/dpkg/arch").await;
+-        let archs_from_file = std::fs::read_to_string("/var/lib/dpkg/arch")
++        let archs_from_file = std::fs::read_to_string("@TERMUX_PREFIX@/var/lib/dpkg/arch")
+             .ok()
+             .map(|file| file.lines().map(|x| x.to_string()).collect::<Vec<_>>())
+             .filter(|res| !res.is_empty());
+diff -uNr oma-1.27.3/oma-repo-verify/src/lib.rs oma-1.27.3.mod/oma-repo-verify/src/lib.rs
+--- oma-1.27.3/oma-repo-verify/src/lib.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/oma-repo-verify/src/lib.rs	2026-08-15 11:12:06.382977067 +0800
+@@ -39,7 +39,7 @@
+     CertParseFileError(String, anyhow::Error),
+     #[error("Cert file is bad: {0}")]
+     BadCertFile(String, anyhow::Error),
+-    #[error("Does not exist: /etc/apt/trusted.gpg.d")]
++    #[error("Does not exist: @TERMUX_PREFIX@/etc/apt/trusted.gpg.d")]
+     TrustedDirNotExist,
+     #[error("Failed to read decoded InRelease file: {0}")]
+     FailedToReadInRelease(std::io::Error),
+@@ -173,8 +173,8 @@
  
-         let archs_from_file = if let Ok(file) = archs_from_file {
-             let res = file.lines().map(|x| x.to_string()).collect::<Vec<_>>();
-diff -uNr oma-1.26.0/src/config_file.rs oma-1.26.0.mod/src/config_file.rs
---- oma-1.26.0/src/config_file.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/src/config_file.rs	2026-05-12 20:39:16.716839283 +0800
-@@ -155,7 +155,7 @@
+ fn policy() -> StandardPolicy<'static> {
+     let mut p = ConfiguredStandardPolicy::new();
+-    let default_configure_path = Path::new("/usr/share/apt/default-sequoia.config");
+-    let custom_configure_path = Path::new("/etc/crypto-policies/back-ends/apt-sequoia.config");
++    let default_configure_path = Path::new("@TERMUX_PREFIX@/share/apt/default-sequoia.config");
++    let custom_configure_path = Path::new("@TERMUX_PREFIX@/etc/crypto-policies/back-ends/apt-sequoia.config");
+ 
+     for path in [custom_configure_path, default_configure_path] {
+         match p.parse_config_file(path) {
+diff -uNr oma-1.27.3/src/config_file.rs oma-1.27.3.mod/src/config_file.rs
+--- oma-1.27.3/src/config_file.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/src/config_file.rs	2026-08-15 11:18:01.566976931 +0800
+@@ -162,7 +162,7 @@
  
  impl ConfigFile {
      pub fn read() -> Self {
@@ -216,10 +210,10 @@ diff -uNr oma-1.26.0/src/config_file.rs oma-1.26.0.mod/src/config_file.rs
              warn!("{}", fl!("config-invalid"));
              return Self::default();
          };
-diff -uNr oma-1.26.0/src/main.rs oma-1.26.0.mod/src/main.rs
---- oma-1.26.0/src/main.rs	2026-05-09 15:27:30.000000000 +0800
-+++ oma-1.26.0.mod/src/main.rs	2026-05-12 20:52:21.636838983 +0800
-@@ -433,7 +433,7 @@
+diff -uNr oma-1.27.3/src/main.rs oma-1.27.3.mod/src/main.rs
+--- oma-1.27.3/src/main.rs	2026-08-03 18:23:33.000000000 +0800
++++ oma-1.27.3.mod/src/main.rs	2026-08-15 12:17:41.846975566 +0800
+@@ -437,7 +437,7 @@
  
  #[inline]
  pub fn get_lock(sysroot: &Path) -> &Path {

@@ -2,7 +2,7 @@ diff --git a/src/glew.c b/src/glew.c
 index c9bf3f7..703f8da 100644
 --- a/src/glew.c
 +++ b/src/glew.c
-@@ -36,11 +36,13 @@
+@@ -36,6 +36,10 @@
  #  include GLEW_INCLUDE
  #endif
  
@@ -12,7 +12,11 @@ index c9bf3f7..703f8da 100644
 +
  #if defined(GLEW_OSMESA)
  #  define GLAPI extern
- #  include <GL/osmesa.h>
+ #  ifndef APIENTRY
+@@ -47,8 +51,6 @@
+ #    undef APIENTRY
+ #    undef GLEW_APIENTRY_DEFINED
+ #  endif
 -#elif defined(GLEW_EGL)
 -#  include <GL/eglew.h>
  #elif defined(_WIN32)

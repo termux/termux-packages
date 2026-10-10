@@ -373,7 +373,7 @@ diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compi
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 +++ b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
-@@ -11,12 +11,12 @@
+@@ -12,12 +12,12 @@
  #include "src/compiler/turboshaft/loop-finder.h"
  
  #ifdef DEBUG
@@ -388,15 +388,15 @@ index cc5b406f1b..9fac217286 100644
  #endif
  
  namespace v8::internal::compiler::turboshaft {
-@@ -27,7 +27,7 @@ using BinOp = StaticCanonicalForLoopMatcher::BinOp;
+@@ -28,7 +28,7 @@
  void LoopUnrollingAnalyzer::DetectUnrollableLoops() {
    for (const auto& [start, info] : loop_finder_.LoopHeaders()) {
      IterationCount iter_count = GetLoopIterationCount(info);
 -    TRACE("LoopUnrollingAnalyzer: loop at "
 +    TRACE_IN_LOOP_UNROLLING_REDUCER("LoopUnrollingAnalyzer: loop at "
-           << start->index() << " ==> iter_count=" << iter_count);
-     loop_iteration_count_.insert({start, iter_count});
- 
+           << start->index() << " ==> iter_count=" << iter_count
+           << " op_count=" << loop_finder_.GetLoopInfo(start).op_count
+           << " has_any_call=" << loop_finder_.GetLoopInfo(start).has_any_call);
 diff --git a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
 index 580cc321a0..29c3f8e648 100644
 --- a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
@@ -548,44 +548,6 @@ index 246dd07b86..8b6170db92 100644
        excluded_allocatable_area_size = kPageSize;
        CHECK(page_allocator_->AllocatePagesAt(page_allocator_->begin(),
                                               excluded_allocatable_area_size,
-diff --git a/v8/src/heap/cppgc/concurrent-marker.cc b/v8/src/heap/cppgc/concurrent-marker.cc
-index 5b16920d22..e1e5199d27 100644
---- a/v8/src/heap/cppgc/concurrent-marker.cc
-+++ b/v8/src/heap/cppgc/concurrent-marker.cc
-@@ -19,6 +19,8 @@ namespace {
- static constexpr double kMarkingScheduleRatioBeforeConcurrentPriorityIncrease =
-     0.5;
- 
-+#define kDefaultDeadlineCheckInterval kDefaultDeadlineCheckInterval_ConcurrentMarker
-+
- static constexpr size_t kDefaultDeadlineCheckInterval = 750u;
- 
- template <StatsCollector::ConcurrentScopeId scope_id,
-@@ -272,3 +274,5 @@ std::unique_ptr<Visitor> ConcurrentMarker::CreateConcurrentMarkingVisitor(
- 
- }  // namespace internal
- }  // namespace cppgc
-+
-+#undef kDefaultDeadlineCheckInterval
-diff --git a/v8/src/heap/cppgc/marker.cc b/v8/src/heap/cppgc/marker.cc
-index 7966799bc8..a613b69033 100644
---- a/v8/src/heap/cppgc/marker.cc
-+++ b/v8/src/heap/cppgc/marker.cc
-@@ -57,6 +57,8 @@ bool ExitIncrementalMarkingIfNeeded(MarkingConfig config, HeapBase& heap) {
-   return false;
- }
- 
-+#define kDefaultDeadlineCheckInterval kDefaultDeadlineCheckInterval_Marker
-+
- static constexpr size_t kDefaultDeadlineCheckInterval = 150u;
- 
- template <StatsCollector::ScopeId scope_id,
-@@ -807,3 +809,5 @@ Marker::Marker(HeapBase& heap, cppgc::Platform* platform, MarkingConfig config)
- 
- }  // namespace internal
- }  // namespace cppgc
-+
-+#undef kDefaultDeadlineCheckInterval
 diff --git a/v8/src/heap/minor-mark-sweep.cc b/v8/src/heap/minor-mark-sweep.cc
 index 7dfcaa336c..278397237f 100644
 --- a/v8/src/heap/minor-mark-sweep.cc
@@ -1042,3 +1004,36 @@ index a962ce78f0..5d0cf0fa43 100644
  }  // namespace v8
 +
 +#undef Is64
+diff --git a/v8/src/heap/cppgc-internal/concurrent-marker.cc b/v8/src/heap/cppgc-internal/concurrent-marker.cc
+index 4106b61983..861ba29bec 100644
+--- a/v8/src/heap/cppgc-internal/concurrent-marker.cc
++++ b/v8/src/heap/cppgc-internal/concurrent-marker.cc
+@@ -11,6 +11,8 @@
+ #include "src/heap/cppgc-internal/marking-visitor.h"
+ #include "src/heap/cppgc-internal/stats-collector.h"
+ 
++#define kDefaultDeadlineCheckInterval kDefaultDeadlineCheckInterval_concurrent_marker
++
+ namespace cppgc {
+ namespace internal {
+ 
+@@ -280,3 +282,5 @@ std::unique_ptr<Visitor> ConcurrentMarker::CreateConcurrentMarkingVisitor(
+ 
+ }  // namespace internal
+ }  // namespace cppgc
++
++#undef kDefaultDeadlineCheckInterval
+diff --git a/v8/BUILD.gn b/v8/BUILD.gn
+index a02a5ef742..fa5e8f8795 100644
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -6657,9 +6657,6 @@ v8_cluster_source_set("v8_base_without_compiler") {
+       "src/wasm/well-known-imports.cc",
+     ]
+     jumbo_excluded_sources += [
+-      "src/asmjs/asm-js.cc",
+-      "src/asmjs/asm-parser.cc",
+-      "src/asmjs/asm-scanner.cc",
+       "src/wasm/wasm-module.cc",
+ 
+       # Too many marco conflictions

@@ -1,0 +1,20 @@
+--- a/third_party/perfetto/include/perfetto/ext/base/thread_utils.h
++++ b/third_party/perfetto/include/perfetto/ext/base/thread_utils.h
+@@ -31,7 +31,7 @@
+ #include <algorithm>
+ #endif
+ 
+-#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
++#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID) || defined(__ANDROID__)
+ #include <sys/prctl.h>
+ #endif
+ 
+@@ -59,7 +59,7 @@
+ 
+ inline bool GetThreadName(std::string& out_result) {
+   char buf[16] = {};
+-#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
++#if PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID) || defined(__ANDROID__)
+   if (prctl(PR_GET_NAME, buf) != 0)
+     return false;
+ #else

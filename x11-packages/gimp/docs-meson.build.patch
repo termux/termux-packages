@@ -1,0 +1,47 @@
+--- a/docs/meson.build
++++ b/docs/meson.build
+@@ -10,6 +10,7 @@
+ manconf.set('gimpsysconfdir', prefix / gimpsysconfdir)
+ manconf.set('mypaint_brushes_dir', mypaint_brushes_dir)
+ 
++if not meson.is_cross_build()
+ gimprc_man = custom_target('gimprc-' + gimp_app_version + '.5',
+                            output: 'gimprc-' + gimp_app_version + '.5',
+                            depends: [ gimp_exe_depends ],
+@@ -20,6 +21,7 @@
+                            env: gimp_run_env,
+                            install: true,
+                            install_dir: get_option('mandir') / 'man5')
++endif
+ 
+ gimptool_man = configure_file(input : 'gimptool.1.in',
+                               output: 'gimptool-' + gimp_app_version + '.1',
+@@ -48,12 +50,14 @@
+                   pointing_to: 'gimptool-' + gimp_app_version + '.1',
+                   install_dir: get_option('mandir') + '/man1')
+ 
++  if not meson.is_cross_build()
+   install_symlink('gimprc.5',
+                   pointing_to: 'gimprc-' + gimp_app_version + '.5',
+                   install_dir: get_option('mandir') + '/man5')
+   install_symlink('gimprc-@0@.5'.format(api_version_major),
+                   pointing_to: 'gimprc-' + gimp_app_version + '.5',
+                   install_dir: get_option('mandir') + '/man5')
++  endif
+ 
+   if enable_console_bin
+     install_symlink('gimp-console.1',
+@@ -79,11 +83,13 @@
+               output: 'gimp.md',
+               command: [ '../tools/man2md.py', '@INPUT@', '@OUTPUT@', prefix ],
+               build_by_default: false)
++if not meson.is_cross_build()
+ custom_target('Markdown gimprc man page',
+               input: [ gimprc_man ],
+               output: 'gimprc.md',
+               command: [ '../tools/man2md.py', '@INPUT@', '@OUTPUT@', prefix ],
+               build_by_default: false)
++endif
+ custom_target('Markdown gimptool man page',
+               input: [ gimptool_man ],
+               output: 'gimptool.md',

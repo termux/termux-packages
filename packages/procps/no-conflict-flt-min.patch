@@ -1,0 +1,137 @@
+Prevents conflct with libc++ header:
+/home/builder/.termux-build/procps/src/src/ps/common.h:101:1:
+error: pasting formed 'rel_1.17549435e-38F', an invalid preprocessing token
+
+--- a/library/include/pids.h
++++ b/library/include/pids.h
+@@ -55,9 +55,9 @@ enum pids_item {
+     PIDS_FLT_MAJ,           //   ul_int        stat: maj_flt
+     PIDS_FLT_MAJ_C,         //   ul_int        derived from stat: maj_flt + cmaj_flt
+     PIDS_FLT_MAJ_DELTA,     //    s_int        derived from FLT_MAJ
+-    PIDS_FLT_MIN,           //   ul_int        stat: min_flt
+-    PIDS_FLT_MIN_C,         //   ul_int        derived from stat: min_flt + cmin_flt
+-    PIDS_FLT_MIN_DELTA,     //    s_int        derived from FLT_MIN
++    PIDS_PROCPS_FLT_MIN,           //   ul_int        stat: min_flt
++    PIDS_PROCPS_FLT_MIN_C,         //   ul_int        derived from stat: min_flt + cmin_flt
++    PIDS_PROCPS_FLT_MIN_DELTA,     //    s_int        derived from PROCPS_FLT_MIN
+     PIDS_ID_EGID,           //    u_int        status: Gid
+     PIDS_ID_EGROUP,         //      str        derived from EGID, see getgrgid(3)
+     PIDS_ID_EUID,           //    u_int        status: Uid
+--- a/library/pids.c
++++ b/library/pids.c
+@@ -200,9 +200,9 @@ REG_set(FLAGS,            ul_int,  flags)
+ REG_set(FLT_MAJ,          ul_int,  maj_flt)
+ setDECL(FLT_MAJ_C)      { (void)I; R->result.ul_int = P->maj_flt + P->cmaj_flt; }
+ REG_set(FLT_MAJ_DELTA,    s_int,   maj_delta)
+-REG_set(FLT_MIN,          ul_int,  min_flt)
+-setDECL(FLT_MIN_C)      { (void)I; R->result.ul_int = P->min_flt + P->cmin_flt; }
+-REG_set(FLT_MIN_DELTA,    s_int,   min_delta)
++REG_set(PROCPS_FLT_MIN,          ul_int,  min_flt)
++setDECL(PROCPS_FLT_MIN_C)      { (void)I; R->result.ul_int = P->min_flt + P->cmin_flt; }
++REG_set(PROCPS_FLT_MIN_DELTA,    s_int,   min_delta)
+ REG_set(ID_EGID,          u_int,   egid)
+ REG_set(ID_EGROUP,        str,     egroup)
+ REG_set(ID_EUID,          u_int,   euid)
+@@ -497,9 +497,9 @@ static struct {
+     { RS(FLT_MAJ),           f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
+     { RS(FLT_MAJ_C),         f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
+     { RS(FLT_MAJ_DELTA),     f_stat,     NULL,      QS(s_int),     +1,       TS(s_int)   },
+-    { RS(FLT_MIN),           f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
+-    { RS(FLT_MIN_C),         f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
+-    { RS(FLT_MIN_DELTA),     f_stat,     NULL,      QS(s_int),     +1,       TS(s_int)   },
++    { RS(PROCPS_FLT_MIN),           f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
++    { RS(PROCPS_FLT_MIN_C),         f_stat,     NULL,      QS(ul_int),    0,        TS(ul_int)  },
++    { RS(PROCPS_FLT_MIN_DELTA),     f_stat,     NULL,      QS(s_int),     +1,       TS(s_int)   },
+     { RS(ID_EGID),           0,          NULL,      QS(u_int),     0,        TS(u_int)   }, // oldflags: free w/ simple_read
+     { RS(ID_EGROUP),         f_grp,      NULL,      QS(str),       0,        TS(str)     },
+     { RS(ID_EUID),           0,          NULL,      QS(u_int),     0,        TS(u_int)   }, // oldflags: free w/ simple_read
+--- a/src/ps/common.h
++++ b/src/ps/common.h
+@@ -98,8 +98,8 @@ makEXT(EXE)
+ makEXT(FLAGS)
+ makEXT(FLT_MAJ)
+ makEXT(FLT_MAJ_C)
+-makEXT(FLT_MIN)
+-makEXT(FLT_MIN_C)
++makEXT(PROCPS_FLT_MIN)
++makEXT(PROCPS_FLT_MIN_C)
+ makEXT(ID_EGID)
+ makEXT(ID_EGROUP)
+ makEXT(ID_EUID)
+--- a/src/ps/global.c
++++ b/src/ps/global.c
+@@ -76,8 +76,8 @@ makREL(EXE)
+ makREL(FLAGS)
+ makREL(FLT_MAJ)
+ makREL(FLT_MAJ_C)
+-makREL(FLT_MIN)
+-makREL(FLT_MIN_C)
++makREL(PROCPS_FLT_MIN)
++makREL(PROCPS_FLT_MIN_C)
+ makREL(ID_EGID)
+ makREL(ID_EGROUP)
+ makREL(ID_EUID)
+--- a/src/ps/output.c
++++ b/src/ps/output.c
+@@ -993,9 +993,9 @@ setREL1(VSIZE_BYTES)
+ }
+ 
+ static int pr_minflt(char *restrict const outbuf, const proc_t *restrict const pp){
+-setREL2(FLT_MIN,FLT_MIN_C)
+-    unsigned long flt = rSv(FLT_MIN, ul_int, pp);
+-    if(include_dead_children) flt = rSv(FLT_MIN_C, ul_int, pp);
++setREL2(PROCPS_FLT_MIN,PROCPS_FLT_MIN_C)
++    unsigned long flt = rSv(PROCPS_FLT_MIN, ul_int, pp);
++    if(include_dead_children) flt = rSv(PROCPS_FLT_MIN_C, ul_int, pp);
+     return snprintf(outbuf, COLWID, "%lu", flt);
+ }
+ 
+@@ -1772,8 +1772,8 @@ static const format_struct format_array[] = { /*
+ {"machine",   "MACHINE", pr_sd_machine,    PIDS_SD_MACH,            31,    LNX,  ET|LEFT},
+ {"maj_flt",   "MAJFL",   pr_majflt,        PIDS_FLT_MAJ,             6,    LNX,  AN|RIGHT},
+ {"majflt",    "MAJFLT",  pr_majflt,        PIDS_FLT_MAJ,             6,    XXX,  AN|RIGHT},
+-{"min_flt",   "MINFL",   pr_minflt,        PIDS_FLT_MIN,             6,    LNX,  AN|RIGHT},
+-{"minflt",    "MINFLT",  pr_minflt,        PIDS_FLT_MIN,             6,    XXX,  AN|RIGHT},
++{"min_flt",   "MINFL",   pr_minflt,        PIDS_PROCPS_FLT_MIN,             6,    LNX,  AN|RIGHT},
++{"minflt",    "MINFLT",  pr_minflt,        PIDS_PROCPS_FLT_MIN,             6,    XXX,  AN|RIGHT},
+ {"mntns",     "MNTNS",   pr_mntns,         PIDS_NS_MNT,             10,    LNX,  ET|RIGHT},
+ {"msgrcv",    "MSGRCV",  pr_nop,           PIDS_noop,                6,    XXX,  AN|RIGHT},
+ {"msgsnd",    "MSGSND",  pr_nop,           PIDS_noop,                6,    XXX,  AN|RIGHT},
+--- a/src/top/top.c
++++ b/src/top/top.c
+@@ -1971,7 +1971,7 @@ static struct {
+    {     7,  SK_Kb,  A_right,  PIDS_MEM_DATA       },  // ul_int   EU_DAT
+    {     6,  SK_Kb,  A_right,  PIDS_MEM_SHR        },  // ul_int   EU_SHR
+    {     4,     -1,  A_right,  PIDS_FLT_MAJ        },  // ul_int   EU_FL1
+-   {     4,     -1,  A_right,  PIDS_FLT_MIN        },  // ul_int   EU_FL2
++   {     4,     -1,  A_right,  PIDS_PROCPS_FLT_MIN        },  // ul_int   EU_FL2
+    {     4,     -1,  A_right,  PIDS_noop           },  // ul_int   EU_DRT ( always 0 w/ since 2.6 )
+    {     1,     -1,  A_right,  PIDS_STATE          },  // s_ch     EU_STA
+    {    -1,     -1,  A_left,   PIDS_CMD            },  // str      EU_CMD
+@@ -1985,7 +1985,7 @@ static struct {
+    {     4,     -1,  A_right,  PIDS_OOM_SCORE      },  // s_int    EU_OOM
+    {    -1,     -1,  A_left,   PIDS_ENVIRON        },  // str      EU_ENV
+    {     3,     -1,  A_right,  PIDS_FLT_MAJ_DELTA  },  // s_int    EU_FV1
+-   {     3,     -1,  A_right,  PIDS_FLT_MIN_DELTA  },  // s_int    EU_FV2
++   {     3,     -1,  A_right,  PIDS_PROCPS_FLT_MIN_DELTA  },  // s_int    EU_FV2
+    {     6,  SK_Kb,  A_right,  PIDS_VM_USED        },  // ul_int   EU_USE
+    {    10,     -1,  A_right,  PIDS_NS_IPC         },  // ul_int   EU_NS1
+    {    10,     -1,  A_right,  PIDS_NS_MNT         },  // ul_int   EU_NS2
+@@ -7177,7 +7177,7 @@ static const char *task_show (const WIN_t *q, int idx) {
+             break;
+    /* s_int, scale_num */
+          case EU_FV1:        // PIDS_FLT_MAJ_DELTA
+-         case EU_FV2:        // PIDS_FLT_MIN_DELTA
++         case EU_FV2:        // PIDS_PROCPS_FLT_MIN_DELTA
+          case EU_FDS:        // PIDS_OPEN_FILES
+             cp = scale_num(rSv(i, s_int), W, Jn);
+             break;
+@@ -7257,7 +7257,7 @@ static const char *task_show (const WIN_t *q, int idx) {
+             break;
+    /* ul_int, scale_num */
+          case EU_FL1:        // PIDS_FLT_MAJ
+-         case EU_FL2:        // PIDS_FLT_MIN
++         case EU_FL2:        // PIDS_PROCPS_FLT_MIN
+          case EU_IRB:        // PIDS_IO_READ_BYTES
+          case EU_IRO:        // PIDS_IO_READ_OPS
+          case EU_IWB:        // PIDS_IO_WRITE_BYTES

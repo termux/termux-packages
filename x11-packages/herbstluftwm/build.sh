@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Manual tiling window manager for X"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.9.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://herbstluftwm.org/tarballs/herbstluftwm-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e38c9721cd5c835ec1d461ab55c9dabcacea8c42eb37aeb782be7b138c91c6eb
 TERMUX_PKG_DEPENDS="freetype, libx11, libxext, libxfixes, libxft, libxinerama, libxrandr"

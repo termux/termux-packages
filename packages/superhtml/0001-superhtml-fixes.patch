@@ -1,0 +1,261 @@
+diff --git a/build.zig b/build.zig
+index d74efdd..0cb6647 100644
+--- a/build.zig
++++ b/build.zig
+@@ -58,20 +58,29 @@ pub fn build(b: *std.Build) !void {
+         superhtml.link_libcpp = true;
+     }
+ 
+-    const options = b.addOptions();
+     const verbose_logging = b.option(bool, "log", "Enable verbose logging also in release modes") orelse false;
+     const scopes = b.option([]const []const u8, "scope", "Enable this scope (all scopes are enabled when none is specified through this option), can be used multiple times") orelse &[0][]const u8{};
+-    options.addOption(bool, "verbose_logging", verbose_logging);
+-    options.addOption([]const []const u8, "enabled_scopes", scopes);
+-    options.addOption([]const u8, "version", version);
++    _ = scopes;
++    const wf = b.addWriteFiles();
++    const options_file = wf.add("options.zig", b.fmt(
++        \\pub const verbose_logging: bool = {};
++        \\pub const enabled_scopes: []const []const u8 = &.{{}};
++        \\pub const version: []const u8 = "{s}";
++        ,
++        .{ verbose_logging, version },
++    ));
++
++    const options_mod = b.createModule(.{
++        .root_source_file = options_file,
++    });
+ 
+     const folders = b.dependency("known_folders", .{});
+     const lsp = b.dependency("lsp_kit", .{});
+ 
+-    const check = setupCheckStep(b, target, optimize, options, superhtml, folders, lsp);
++    const check = setupCheckStep(b, target, optimize, options_mod, superhtml, folders, lsp);
+     const test_step = setupTestStep(b, superhtml, check);
+-    setupCliTool(b, target, optimize, options, superhtml, folders, lsp);
+-    setupWasmStep(b, optimize, options, superhtml, lsp);
++    setupCliTool(b, target, optimize, options_mod, superhtml, folders, lsp);
++    setupWasmStep(b, optimize, options_mod, superhtml, lsp);
+     setupFetchLanguageSubtagRegistryStep(b, target);
+     setupFuzzStep(b, target, test_step, superhtml);
+ 
+@@ -81,7 +90,7 @@ pub fn build(b: *std.Build) !void {
+         if (std.mem.eql(u8, version, git_version.tag[1..])) {
+             setupReleaseStep(
+                 b,
+-                options,
++                options_mod,
+                 superhtml,
+                 folders,
+                 lsp,
+@@ -156,7 +165,7 @@ fn setupCheckStep(
+     b: *std.Build,
+     target: std.Build.ResolvedTarget,
+     optimize: std.builtin.OptimizeMode,
+-    options: *std.Build.Step.Options,
++    options_mod: *std.Build.Module,
+     superhtml: *std.Build.Module,
+     folders: *std.Build.Dependency,
+     lsp: *std.Build.Dependency,
+@@ -177,7 +186,7 @@ fn setupCheckStep(
+         folders.module("known-folders"),
+     );
+     super_cli_check.root_module.addImport("lsp", lsp.module("lsp"));
+-    super_cli_check.root_module.addOptions("build_options", options);
++    super_cli_check.root_module.addImport("build_options", options_mod);
+ 
+     check.dependOn(&super_cli_check.step);
+     return check;
+@@ -204,7 +213,7 @@ fn setupCliTool(
+     b: *std.Build,
+     target: std.Build.ResolvedTarget,
+     optimize: std.builtin.OptimizeMode,
+-    options: *std.Build.Step.Options,
++    options_mod: *std.Build.Module,
+     superhtml: *std.Build.Module,
+     folders: *std.Build.Dependency,
+     lsp: *std.Build.Dependency,
+@@ -225,10 +234,12 @@ fn setupCliTool(
+         folders.module("known-folders"),
+     );
+     super_cli.root_module.addImport("lsp", lsp.module("lsp"));
+-    super_cli.root_module.addOptions("build_options", options);
++    super_cli.root_module.addImport("build_options", options_mod);
+ 
+     const run_exe = b.addRunArtifact(super_cli);
+-    run_exe.addPassthruArgs();
++    if (b.args) |args| {
++        run_exe.addArgs(args);
++    }
+     const run_exe_step = b.step("run", "Run the SuperHTML CLI");
+     run_exe_step.dependOn(&run_exe.step);
+ 
+@@ -238,7 +249,7 @@ fn setupCliTool(
+ fn setupWasmStep(
+     b: *std.Build,
+     optimize: std.builtin.OptimizeMode,
+-    options: *std.Build.Step.Options,
++    options_mod: *std.Build.Module,
+     superhtml: *std.Build.Module,
+     lsp: *std.Build.Dependency,
+ ) void {
+@@ -259,7 +270,7 @@ fn setupWasmStep(
+ 
+     super_wasm_lsp.root_module.addImport("superhtml", superhtml);
+     super_wasm_lsp.root_module.addImport("lsp", lsp.module("lsp"));
+-    super_wasm_lsp.root_module.addOptions("build_options", options);
++    super_wasm_lsp.root_module.addImport("build_options", options_mod);
+ 
+     const target_output = b.addInstallArtifact(super_wasm_lsp, .{
+         .dest_dir = .{ .override = .{ .custom = "" } },
+@@ -290,7 +301,7 @@ fn setupFetchLanguageSubtagRegistryStep(
+ 
+ fn setupReleaseStep(
+     b: *std.Build,
+-    options: *std.Build.Step.Options,
++    options_mod: *std.Build.Module,
+     superhtml: *std.Build.Module,
+     folders: *std.Build.Dependency,
+     lsp: *std.Build.Dependency,
+@@ -323,7 +334,7 @@ fn setupReleaseStep(
+             folders.module("known-folders"),
+         );
+         super_exe_release.root_module.addImport("lsp", lsp.module("lsp"));
+-        super_exe_release.root_module.addOptions("build_options", options);
++        super_exe_release.root_module.addImport("build_options", options_mod);
+ 
+         switch (t.os_tag.?) {
+             .macos, .windows => {
+@@ -392,7 +403,7 @@ fn setupReleaseStep(
+ 
+         super_wasm_lsp.root_module.addImport("superhtml", superhtml);
+         super_wasm_lsp.root_module.addImport("lsp", lsp.module("lsp"));
+-        super_wasm_lsp.root_module.addOptions("build_options", options);
++        super_wasm_lsp.root_module.addImport("build_options", options_mod);
+ 
+         const archive_name = "wasm32-wasi-lsponly.tar.xz";
+         const tar = b.addSystemCommand(&.{
+@@ -429,13 +440,13 @@ const Version = union(Kind) {
+ };
+ 
+ fn getGitVersion(b: *std.Build) Version {
+-    const git_path = b.findProgram(.{ .names = &.{"git"} }) orelse return .unknown;
++    const git_path = b.findProgram(&.{"git"}, &.{}) catch return .unknown;
+     var out: u8 = undefined;
+     const git_describe = std.mem.trim(
+         u8,
+         b.runAllowFail(&[_][]const u8{
+             git_path,               "-C",
+-            b.root.root_dir.path.?, "describe",
++            b.build_root.path.?, "describe",
+             "--match",              "*.*.*",
+             "--tags",
+         }, &out, .ignore) catch return .unknown,
+diff --git a/build.zig.zon b/build.zig.zon
+index e24100b..d022aa3 100644
+--- a/build.zig.zon
++++ b/build.zig.zon
+@@ -2,7 +2,7 @@
+     .name = .superhtml,
+     .version = "0.7.0",
+     .fingerprint = 0xc5e9aede3c1db363,
+-    .minimum_zig_version = "0.17.0-dev.1471+ff10b90bc",
++    .minimum_zig_version = "0.16.0",
+     .dependencies = .{
+         .known_folders = .{
+             .url = "git+https://github.com/ziglibs/known-folders#207c34a16e4365edc20d92c7892f962b3bed46e8",
+@@ -13,8 +13,8 @@
+             .hash = "tracy-0.0.0-4Xw-1pwwAABTfMgoDP1unCbZDZhJEfict7XCBGF6IdIn",
+         },
+         .lsp_kit = .{
+-            .url = "git+https://github.com/zigtools/lsp-kit#d148676ace1eaecf3c703ce7d350d0e94e502ed7",
+-            .hash = "lsp_kit-0.1.0-bi_PLwc2DACoR7VTz_qKFXUvtx7veHvWcTQvP9pDFLpk",
++            .url = "git+https://github.com/zigtools/lsp-kit#e61d6fdf0e498a7aa71c5946c3052e5be9f16343",
++            .hash = "lsp_kit-0.1.0-bi_PL84xDAB33s_-DZPmYwprEqgi-dEjp1qAs36F96TA",
+         },
+         .scripty = .{
+             .url = "git+https://github.com/kristoff-it/scripty#51a03222e9a125a65888a5df6e2a41e36c86ccd5",
+diff --git a/src/cli/logging.zig b/src/cli/logging.zig
+index 2a40cd4..334d8fb 100644
+--- a/src/cli/logging.zig
++++ b/src/cli/logging.zig
+@@ -23,7 +23,7 @@ pub fn logFn(
+     comptime format: []const u8,
+     args: anytype,
+ ) void {
+-    if (builtin.mode == .debug) switch (scope) {
++    if (builtin.mode == .Debug) switch (scope) {
+         // if (true) switch (scope) {
+         .root, .element, .super_lsp, .@"html/ast" => {},
+         else => return,
+diff --git a/src/cli/lsp.zig b/src/cli/lsp.zig
+index 0173983..4f52b0e 100644
+--- a/src/cli/lsp.zig
++++ b/src/cli/lsp.zig
+@@ -143,7 +143,7 @@ pub fn initialize(
+         .documentFormattingProvider = .{ .bool = true },
+     };
+ 
+-    if (@import("builtin").mode == .debug) {
++    if (@import("builtin").mode == .Debug) {
+         lsp.basic_server.validateServerCapabilities(Handler, capabilities);
+     }
+ 
+diff --git a/src/cli/lsp/logic.zig b/src/cli/lsp/logic.zig
+index a115e0f..8265a45 100644
+--- a/src/cli/lsp/logic.zig
++++ b/src/cli/lsp/logic.zig
+@@ -52,12 +52,7 @@ pub fn loadFile(
+                     .unsupported_doctype, .duplicate_class => .Warning,
+                     else => .Error,
+                 },
+-                .message = .{
+-                    .markup_content = .{
+-                        .kind = .markdown,
+-                        .value = try std.fmt.allocPrint(arena, "{f}", .{err.tag.fmt(doc.src)}),
+-                    },
+-                },
++                .message = try std.fmt.allocPrint(arena, "{f}", .{err.tag.fmt(doc.src)}),
+                 .code = .{ .string = @tagName(err.tag) },
+                 .source = if (err.tag == .token) "html tokenizer" else "html parser",
+                 .relatedInformation = switch (err.tag) {
+@@ -137,12 +132,7 @@ pub fn loadFile(
+                 d.* = .{
+                     .range = range,
+                     .severity = .Error,
+-                    .message = .{
+-                        .markup_content = .{
+-                            .kind = .markdown,
+-                            .value = err.kind.message(),
+-                        },
+-                    },
++                    .message = err.kind.message(),
+                 };
+             }
+             res.diagnostics = diags;
+diff --git a/src/main.zig b/src/main.zig
+index 7f507a2..71b8d94 100644
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -55,7 +55,7 @@ pub fn panic(
+         }
+     }
+ 
+-    if (builtin.mode == .debug) @breakpoint();
++    if (builtin.mode == .Debug) @breakpoint();
+     std.process.exit(1);
+ }
+ 
+diff --git a/src/root.zig b/src/root.zig
+index b19b460..a0f97bd 100644
+--- a/src/root.zig
++++ b/src/root.zig
+@@ -92,7 +92,7 @@ pub const Language = enum {
+         };
+     }
+ };
+-pub const max_size = 4 * 1024 * 1024 * 1024;
++pub const max_size: usize = if (@sizeOf(usize) > 4) 4 * 1024 * 1024 * 1024 else std.math.maxInt(usize);
+ 
+ pub const Range = struct {
+     start: Pos,

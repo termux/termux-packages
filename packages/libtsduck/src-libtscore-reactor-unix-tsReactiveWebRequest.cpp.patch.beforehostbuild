@@ -1,0 +1,16 @@
+diff --git a/src/libtscore/reactor/unix/tsReactiveWebRequest.cpp b/src/libtscore/reactor/unix/tsReactiveWebRequest.cpp
+--- a/src/libtscore/reactor/unix/tsReactiveWebRequest.cpp
++++ b/src/libtscore/reactor/unix/tsReactiveWebRequest.cpp
+@@ -53,9 +53,9 @@
+ 
+ ts::ReactiveWebRequest::ReactiveWebRequest(Reactor& reactor) : ReactiveBase(reactor) {}
+ ts::ReactiveWebRequest::~ReactiveWebRequest() {}
+-bool ts::ReactiveWebRequest::startOpen(ReactiveWebHandlerInterface*, const UString&, const ObjectPtr&) TS_NOT_IMPLEMENTED
+-bool ts::ReactiveWebRequest::startReceive(ReactiveWebHandlerInterface*, void*, size_t, const ObjectPtr&) TS_NOT_IMPLEMENTED
+-bool ts::ReactiveWebRequest::startClose(ReactiveWebHandlerInterface*, bool, const ObjectPtr&) TS_NOT_IMPLEMENTED
++bool ts::ReactiveWebRequest::start(ReactiveWebHandlerInterface*, const UString&, size_t, const ObjectPtr&) TS_NOT_IMPLEMENTED
++bool ts::ReactiveWebRequest::isOpen() const { return false; }
++bool ts::ReactiveWebRequest::abort(bool) TS_NOT_IMPLEMENTED
+ ts::UString ts::ReactiveWebRequest::GetLibraryVersion() { return TS_NO_CURL_MESSAGE; }
+ 
+ #else

@@ -1,0 +1,16 @@
+diff --git a/Makefile.in b/Makefile.in
+index 5bdf5198c..ae0c2fad7 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -312,9 +312,9 @@ help showmodules gbuildtojson pocheck:
+ cross-toolset: bootstrap fetch install-gdb-printers
+ # fetch again in case there are externals only needed on build platform
+ ifneq ($(OS),iOS)
+-	$(MAKE) gb_Side=build $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(BUILDDIR)/Makefile fetch
++	$(MAKE) gb_Side=build CPPFLAGS= CFLAGS= CXXFLAGS= LDFLAGS=-Wl,--undefined-version $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(BUILDDIR)/Makefile fetch
+ endif
+-	$(MAKE) gb_Side=build $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(SRCDIR)/Makefile.gbuild build-tools
++	$(MAKE) gb_Side=build CPPFLAGS= CFLAGS= CXXFLAGS= LDFLAGS=-Wl,--undefined-version $(PARALLELISM_OPTION) $(GMAKE_OPTIONS) -f $(SRCDIR)/Makefile.gbuild build-tools
+ 
+ install-gdb-printers:
+ ifneq ($(filter-out WNT MACOSX iOS,$(OS)),)

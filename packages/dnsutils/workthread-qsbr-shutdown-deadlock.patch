@@ -1,0 +1,12 @@
+dig/host/nslookup hang after printing output when built with the qsbr liburcu flavor: a shutting-down worker reaches the stopping barrier while still RCU-online, so a sibling's synchronize_rcu() never returns and the barrier deadlocks. Go RCU-offline before the barrier, like the other blocking paths already do.
+
+--- a/lib/isc/work.c
++++ b/lib/isc/work.c
+@@ -276,6 +276,7 @@ workthread_thread(void *arg) {
+ 		work_run(work);
+ 	}
+
++	rcu_thread_offline();
+ 	isc__loopmgr_stopping(thread->loop);
+
+ 	return NULL;

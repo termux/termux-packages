@@ -1,0 +1,247 @@
+diff -urNw a/config/ax_info.m4 b/config/ax_info.m4
+--- a/config/ax_info.m4	2026-06-15 10:40:52.000000000 +0200
++++ b/config/ax_info.m4	2026-08-10 10:06:39.652545283 +0200
+@@ -47,18 +47,16 @@
+ 
+ AC_DEFUN([AX_INFO_ENABLED],
+ [
+-    fmt=""
+     if $($2); then
+-        printf "|  %-45.45s %-21.21s  |\n" "$1" "$(tput setaf 2 ${fmt})ENABLED$(tput sgr0)"
++        printf "|  %-45.45s %-21.21s  |\n" "$1" "ENABLED"
+     else
+-        printf "|  %-45.45s %-21.21s  |\n" "$1" "$(tput setaf 8 ${fmt})DISABLED$(tput sgr0)"
++        printf "|  %-45.45s %-21.21s  |\n" "$1" "DISABLED"
+     fi
+ ])
+ 
+ AC_DEFUN([AX_INFO_VAR],
+ [
+-    fmt=""
+-    printf "|  %-45.45s %-21.21s  |\n" "$1" "$(tput setaf 3 ${fmt})$2$(tput sgr0)"
++    printf "|  %-45.45s %-21.21s  |\n" "$1" "$2"
+ ])
+ 
+ AC_DEFUN([AX_INFO_SEPARATOR],
+@@ -71,4 +69,3 @@
+ [
+     printf "+%60s+\n" | tr " " "-"
+ ])
+-
+diff -urNw a/libmonit/src/system/Command.c b/libmonit/src/system/Command.c
+--- a/libmonit/src/system/Command.c	2026-06-15 10:40:52.000000000 +0200
++++ b/libmonit/src/system/Command.c	2026-08-10 10:06:39.656545219 +0200
+@@ -53,6 +53,10 @@
+ #include "system/Time.h"
+ #include "system/Command.h"
+ 
++/* Bionic libc has not */
++#ifdef __BIONIC__
++#define pthread_setcancelstate(state, oldstate) (0)
++#endif
+ 
+ /**
+  * Implementation of the Command and Process interfaces.
+@@ -62,8 +66,6 @@
+  * @file
+  */
+ 
+-
+-
+ // MARK: - Definitions
+ 
+ 
+diff -urNw a/libmonit/src/system/System.c b/libmonit/src/system/System.c
+--- a/libmonit/src/system/System.c	2026-06-15 10:40:52.000000000 +0200
++++ b/libmonit/src/system/System.c	2026-08-10 10:06:39.656545219 +0200
+@@ -108,8 +108,6 @@
+ 
+ int System_descriptors(int guard) {
+         int fileDescriptors = (int)sysconf(_SC_OPEN_MAX);
+-        if (fileDescriptors < 2)
+-                fileDescriptors = getdtablesize();
+         assert(fileDescriptors > 2);
+         if (guard > 0) {
+                 if (fileDescriptors > guard)
+diff -urNw a/monitrc b/monitrc
+--- a/monitrc	2026-06-15 10:40:52.000000000 +0200
++++ b/monitrc	2026-08-10 10:06:39.656545219 +0200
+@@ -24,20 +24,21 @@
+ ## Set syslog logging. If you want to log to a standalone log file instead,
+ ## specify the full path to the log file
+ #
+-set log syslog
++#set log syslog
++set log /dev/stdout
+ 
+ #
+ #
+ ## Set the location of the Monit lock file which stores the process id of the
+ ## running Monit instance. By default this file is stored in $HOME/.monit.pid
+ #
+-# set pidfile /var/run/monit.pid
++# set pidfile @TERMUX_PREFIX@/var/run/monit.pid
+ #
+ ## Set the location of the Monit id file which stores the unique id for the
+ ## Monit instance. The id is generated and stored on first Monit start. By
+ ## default the file is placed in $HOME/.monit.id.
+ #
+-# set idfile /var/.monit.id
++# set idfile @TERMUX_PREFIX@/var/lib/monit/.monit.id
+ #
+ ## Set the location of the Monit state file which saves monitoring states
+ ## on each cycle. By default the file is placed in $HOME/.monit.state. If
+@@ -45,7 +46,7 @@
+ ## the monitoring state across reboots. If it is on temporary filesystem, the
+ ## state will be lost on reboot which may be convenient in some situations.
+ #
+-# set statefile /var/.monit.state
++# set statefile @TERMUX_PREFIX@/var/lib/monit/.monit.state
+ #
+ #
+ 
+@@ -91,7 +92,7 @@
+ ## available in the back end filesystem).
+ #
+ # set eventqueue
+-#     basedir /var/monit  # set the base directory where events will be stored
++#     basedir @TERMUX_PREFIX@/var/lib/monit/events  # set the base directory where events will be stored
+ #     slots 100           # optionally limit the queue size
+ #
+ #
+@@ -162,7 +163,7 @@
+     allow localhost        # allow localhost to connect to the server and
+     allow admin:monit      # require user 'admin' with password 'monit'
+     #with ssl {            # enable SSL/TLS and set path to server certificate
+-    #    pemfile: /etc/ssl/certs/monit.pem
++    #    pemfile: @TERMUX_PREFIX@/etc/tls/monit.pem
+     #}
+ #
+ ## Monit can perform act differently regarding services previous state when
+@@ -194,7 +195,7 @@
+ ## be grouped using the GROUP option. More than one group can be specified by
+ ## repeating the 'group name' statement.
+ #
+-#  check file apache_bin with path /usr/local/apache/bin/httpd
++#  check file apache_bin with path @TERMUX_PREFIX@/bin/httpd
+ #    if failed checksum and
+ #       expect the sum 8f7f419955cefa0b33a2ba316cba3659 then unmonitor
+ #    if failed permission 755 then unmonitor
+@@ -214,9 +215,9 @@
+ ## statement. This service depends on another service (apache_bin) which
+ ## is defined above.
+ #
+-#  check process apache with pidfile /usr/local/apache/logs/httpd.pid
+-#    start program = "/etc/init.d/httpd start" with timeout 60 seconds
+-#    stop program  = "/etc/init.d/httpd stop"
++#  check process apache with pidfile /data/data/com.termux/files/usr/var/run/httpd.pid
++#    start program = "@TERMUX_PREFIX@/bin/sv start httpd" with timeout 60 seconds
++#    stop program  = "@TERMUX_PREFIX@/bin/sv stop httpd"
+ #    if cpu > 60% for 2 cycles then alert
+ #    if cpu > 80% for 5 cycles then restart
+ #    if totalmem > 200.0 MB for 5 cycles then restart
+@@ -235,9 +236,9 @@
+ ## graceful stop may be cascaded to them before the filesystem will become full and data
+ ## lost.
+ #
+-#  check filesystem datafs with path /dev/sdb1
+-#    start program  = "/bin/mount /data"
+-#    stop program  = "/bin/umount /data"
++#  check filesystem datafs with path /dev/block/mmcblk0p35
++#    start program  = "/system/bin/mount @TERMUX_PREFIX@/mnt/monit/data"
++#    stop program  = "/system/bin/umount @TERMUX_PREFIX@/mnt/monit/data"
+ #    if failed permission 660 then unmonitor
+ #    if failed uid "root" then unmonitor
+ #    if failed gid "disk" then unmonitor
+@@ -257,7 +258,7 @@
+ ## than 15 minutes and assume something is wrong if its not updated. Also,
+ ## if the file size exceed a given limit, execute a script
+ #
+-#  check file database with path /data/mydatabase.db
++#  check file database with path @TERMUX_HOME@/mydatabase.db
+ #    if failed permission 700 then alert
+ #    if failed uid "data" then alert
+ #    if failed gid "data" then alert
+@@ -300,7 +301,7 @@
+ #
+ ## Check custom program status output.
+ #
+-#  check program myscript with path /usr/local/bin/myscript.sh
++#  check program myscript with path @TERMUX_PREFIX@/bin/myscript.sh
+ #    if status != 0 then alert
+ #    if content changed then alert
+ #
+@@ -312,5 +313,5 @@
+ ## It is possible to include additional configuration parts from other files or
+ ## directories.
+ #
+-#  include /etc/monit.d/*
++#  include /data/data/com.termux/files/usr/etc/monit.d/*
+ #
+diff -urNw a/src/http/cervlet.c b/src/http/cervlet.c
+--- a/src/http/cervlet.c	2026-06-15 10:40:52.000000000 +0200
++++ b/src/http/cervlet.c	2026-08-10 10:08:12.919062730 +0200
+@@ -875,9 +875,8 @@
+                             "<body><div id='wrap'><div id='main'>" \
+                             "<table id='nav' width='100%%'>"\
+                             "  <tr>"\
+-                            "    <td width='20%%'><a href='.'>Home</a>&nbsp;&gt;&nbsp;<a href='%s'>%s</a></td>"\
+-                            "    <td width='60%%' style='text-align:center;'>Use <a href='https://mmonit.com/'>M/Monit</a> to manage all your Monit instances</td>"\
+-                            "    <td width='20%%'><p class='right'><a href='_about'>Monit %s</a></td>"\
++                            "    <td><a href='.'>Home</a>&nbsp;&gt;&nbsp;<a href='%s'>%s</a></td>"\
++                            "    <td><p class='right'><a href='_about'>Monit %s</a></td>"\
+                             "  </tr>"\
+                             "</table>"\
+                             "<center>",
+diff -urNw a/src/process/sysdep_LINUX.c b/src/process/sysdep_LINUX.c
+--- a/src/process/sysdep_LINUX.c	2026-06-15 10:40:52.000000000 +0200
++++ b/src/process/sysdep_LINUX.c	2026-08-10 10:06:39.660545155 +0200
+@@ -98,6 +98,48 @@
+ #include "system/Time.h"
+ #include "io/File.h"
+ 
++#ifdef __ANDROID__
++/*
++ * Copyright (C) 2018 The Android Open Source Project
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *  * Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
++ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
++ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++#include <stdlib.h>
++#include <sys/sysinfo.h>
++int getloadavg(double averages[], int n) {
++        if (n < 0) return -1;
++        if (n > 3) n = 3;
++        struct sysinfo si;
++        if (sysinfo(&si) == -1) return -1;
++        for (int i = 0; i < n; ++i) {
++                averages[i] = 1.0 * si.loads[i] / (1 << SI_LOAD_SHIFT);
++        }
++        return n;
++}
++#endif
++
+ /**
+  *  System dependent resource data collection code for Linux.
+  *

@@ -1,0 +1,14 @@
+Origin: https://github.com/termux/termux-packages/blob/b6a1362cec0f5432629b433b389a70357059f79b/packages/unrar/os.hpp.patch
+
+diff -u -r ../unrar/os.hpp ./os.hpp
+--- a/third_party/unrar/src/os.hpp	2017-06-10 13:59:52.000000000 +0000
++++ b/third_party/unrar/src/os.hpp	2017-06-12 00:11:04.591100580 +0000
+@@ -154,7 +154,7 @@
+ #define SAVE_LINKS
+ #endif
+ 
+-#if defined(__linux) || defined(__FreeBSD__)
++#if (defined(__linux) && !defined(__ANDROID__)) || defined(__FreeBSD__)
+ #include <sys/time.h>
+ #define USE_LUTIMES
+ #endif

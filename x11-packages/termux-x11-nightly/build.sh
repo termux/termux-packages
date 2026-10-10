@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Termux X11 add-on."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
 TERMUX_PKG_VERSION="1.03.01"
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/archive/25c8dbc3e8cbf08c9dd233b29adbe1e3a1df52f4.tar.gz
-TERMUX_PKG_SHA256=8626aab0900d208f2ca484b5053ae5b952eff55537a4424042a35d6e935c8c04
+TERMUX_PKG_REVISION=6
+# Downloading full JDK to compile 7kb apk seems excessive, let's download a prebuilt.
+TERMUX_PKG_SRCURL=https://github.com/termux/termux-x11/releases/download/nightly/termux-x11-nightly-1.03.01-0-any.pkg.tar.xz
+TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,11 +22,11 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	# Downloading full JDK to compile 7kb apk seems excessive, let's download a prebuilt.
-	local LOADER_URL="https://github.com/termux/termux-x11/releases/download/nightly/termux-x11-nightly-1.03.01-0-any.pkg.tar.xz"
-	install -t "$TERMUX_PREFIX/bin" -m 755 termux-x11 termux-x11-preference
+	local DATA
+	DATA="$(find . -type d -path '*/files/usr')"
+	install -t "$TERMUX_PREFIX/bin" -m 755 "$DATA/bin/termux-x11" "$DATA/bin/termux-x11-preference"
 	mkdir -p "$TERMUX_PREFIX/libexec/termux-x11"
-	wget -qO- "$LOADER_URL" | tar -OJxf - --wildcards "*loader.apk" > "$TERMUX_PREFIX/libexec/termux-x11/loader.apk"
+	install -m 644 "$DATA/libexec/termux-x11/loader.apk" "$TERMUX_PREFIX/libexec/termux-x11/loader.apk"
 }
 
 termux_step_post_make_install() {

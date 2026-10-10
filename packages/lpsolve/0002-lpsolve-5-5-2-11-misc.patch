@@ -1,0 +1,359 @@
+diff --git a/bfp/bfp_LUSOL/ccc b/bfp/bfp_LUSOL/ccc
+index 754738b..df67c1b 100644
+--- a/bfp/bfp_LUSOL/ccc
++++ b/bfp/bfp_LUSOL/ccc
+@@ -1,13 +1,13 @@
+ :
+ src='../../shared/commonlib.c ../../colamd/colamd.c lp_LUSOL.c ../../lp_utils.c ../../shared/myblas.c LUSOL/lusol.c'
+ 
+-c=cc
++c=${CC:-cc}
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+diff --git a/bfp/bfp_LUSOL/ccc.osx b/bfp/bfp_LUSOL/ccc.osx
+index 0328f8a..6cd840e 100644
+--- a/bfp/bfp_LUSOL/ccc.osx
++++ b/bfp/bfp_LUSOL/ccc.osx
+@@ -1,13 +1,13 @@
+ :
+ src='../../shared/commonlib.c ../../colamd/colamd.c lp_LUSOL.c ../../lp_utils.c ../../shared/myblas.c LUSOL/lusol.c'
+ 
+-c=cc
++c=${CC:-cc}
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+diff --git a/demo/ccc b/demo/ccc
+index 38713a1..cbbff4c 100644
+--- a/demo/ccc
++++ b/demo/ccc
+@@ -1,6 +1,5 @@
+ src='../lp_MDO.c ../shared/commonlib.c ../colamd/colamd.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
+-
++c=${CC:-cc}
+ math=-lm
+ 
+ def=
+diff --git a/demo/ccc.osx b/demo/ccc.osx
+index cd6c2b4..de3f808 100644
+--- a/demo/ccc.osx
++++ b/demo/ccc.osx
+@@ -1,5 +1,5 @@
+ src='../bfp/lp_MDO.c ../commonlib.c ../myblas.c ../colamd/colamd.c ../ini.c ../fortify.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_etaPFI/lp_etaPFI.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c demo.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ math=-lm
+ 
+diff --git a/lp_solve/ccc b/lp_solve/ccc
+index bd5a938..cc56063 100644
+--- a/lp_solve/ccc
++++ b/lp_solve/ccc
+@@ -1,6 +1,6 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../colamd/colamd.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c lp_solve.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ 
+@@ -8,7 +8,7 @@ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ >"$MYTMP"/platform.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/platform.c
+ echo '#include <stdio.h>'>>"$MYTMP"/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
+ $c "$MYTMP"/platform.c -o "$MYTMP"/platform
+ PLATFORM=`"$MYTMP"/platform`
+ rm "$MYTMP"/platform "$MYTMP"/platform.c >/dev/null 2>&1
+@@ -22,7 +22,7 @@ math=-lm
+ echo '#include <stdio.h>'>>"$MYTMP"/isnan.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/isnan.c
+ echo '#include <math.h>'>>"$MYTMP"/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
+ $c "$MYTMP"/isnan.c -o "$MYTMP"/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -42,4 +42,4 @@ then opts='-O0'
+ else dl=-ldl
+ fi
+ 
+-$c -I.. -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I../shared $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src -o bin/$PLATFORM/lp_solve $math $dl
++$c $CFLAGS $LDFLAGS -I.. -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I../shared $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src -o bin/$PLATFORM/lp_solve $math $dl
+diff --git a/lp_solve/ccc.osx b/lp_solve/ccc.osx
+index 138bc3d..c95d3d2 100644
+--- a/lp_solve/ccc.osx
++++ b/lp_solve/ccc.osx
+@@ -1,6 +1,6 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../colamd/colamd.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c lp_solve.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ 
+@@ -8,7 +8,7 @@ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ >"$MYTMP"/platform.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/platform.c
+ echo '#include <stdio.h>'>>"$MYTMP"/platform.c
+-echo 'main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
++echo 'int main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
+ $c "$MYTMP"/platform.c -o "$MYTMP"/platform
+ PLATFORM=`"$MYTMP"/platform`
+ rm "$MYTMP"/platform "$MYTMP"/platform.c >/dev/null 2>&1
+@@ -22,7 +22,7 @@ math=-lm
+ echo '#include <stdio.h>'>>"$MYTMP"/isnan.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/isnan.c
+ echo '#include <math.h>'>>"$MYTMP"/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
+ $c "$MYTMP"/isnan.c -o "$MYTMP"/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -37,4 +37,4 @@ dl=-ldl
+ 
+ opts='-idirafter /usr/include/sys -O3 -DINTEGERTIME -Wno-long-double'
+ 
+-$c -I.. -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I../shared $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src -o bin/$PLATFORM/lp_solve $math $dl
++$c $CFLAGS $LDFLAGS -I.. -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I../shared $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src -o bin/$PLATFORM/lp_solve $math $dl
+diff --git a/lpsolve55/ccc b/lpsolve55/ccc
+index 999f5f6..d298d50 100644
+--- a/lpsolve55/ccc
++++ b/lpsolve55/ccc
+@@ -1,6 +1,6 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../colamd/colamd.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ 
+@@ -8,7 +8,7 @@ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ >"$MYTMP"/platform.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/platform.c
+ echo '#include <stdio.h>'>>"$MYTMP"/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
+ $c "$MYTMP"/platform.c -o "$MYTMP"/platform
+ PLATFORM=`"$MYTMP"/platform`
+ rm "$MYTMP"/platform "$MYTMP"/platform.c >/dev/null 2>&1
+@@ -20,7 +20,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>"$MYTMP"/isnan.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/isnan.c
+ echo '#include <math.h>'>>"$MYTMP"/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
+ $c "$MYTMP"/isnan.c -o "$MYTMP"/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -42,13 +42,13 @@ fi
+ opts='-O3'
+ 
+ $c -s -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
+-ar rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
+-ranlib bin/$PLATFORM/liblpsolve55.a
++${AR:-ar} rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
++${RANLIB:-ranlib} bin/$PLATFORM/liblpsolve55.a
+ 
+ if [ "$so" != "" ]
+ then
+-  $c -fpic -s -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I. $opts $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
+-  $c -shared -Wl,-Bsymbolic -Wl,-soname,liblpsolve55.so -o bin/$PLATFORM/liblpsolve55.so `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'` -lc -lm -ldl
++  $c $CFLAGS $LDFLAGS -fpic -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd -I. $opts $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
++  $c $CFLAGS $LDFLAGS -shared -Wl,-Bsymbolic -Wl,-soname,liblpsolve55.so -o bin/$PLATFORM/liblpsolve55.so `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'` -lc -lm -ldl
+ fi
+ 
+ rm *.o 2>/dev/null
+diff --git a/lpsolve55/ccc.aix b/lpsolve55/ccc.aix
+index d07cee5..9ae3148 100644
+--- a/lpsolve55/ccc.aix
++++ b/lpsolve55/ccc.aix
+@@ -4,14 +4,14 @@ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../in
+ type xlc >/dev/null 2>&1
+ if [ $? = 0 ]
+ then c=xlc
+-else c=cc
++else c=${CC:-cc}
+ fi
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+@@ -23,7 +23,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>/tmp/isnan.c
+ echo '#include <stdlib.h>'>>/tmp/isnan.c
+ echo '#include <math.h>'>>/tmp/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
+ $c /tmp/isnan.c -o /tmp/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -38,8 +38,8 @@ so=y
+ opts='-O2'
+ 
+ $c -s -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
+-ar rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
+-ranlib bin/$PLATFORM/liblpsolve55.a
++${AR:-ar} rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
++${RANLIB:-ranlib}  bin/$PLATFORM/liblpsolve55.a
+ 
+ if [ "$so" != "" ]
+ then
+diff --git a/lpsolve55/ccc.hp-ux b/lpsolve55/ccc.hp-ux
+index 0d161c6..243197b 100644
+--- a/lpsolve55/ccc.hp-ux
++++ b/lpsolve55/ccc.hp-ux
+@@ -1,12 +1,12 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../colamd/colamd.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+@@ -18,7 +18,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>/tmp/isnan.c
+ echo '#include <stdlib.h>'>>/tmp/isnan.c
+ echo '#include <math.h>'>>/tmp/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
+ $c /tmp/isnan.c -o /tmp/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -33,8 +33,8 @@ so=y
+ opts='-O3'
+ 
+ $c -s -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
+-ar rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
+-ranlib bin/$PLATFORM/liblpsolve55.a
++${AR:-ar} rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
++${RANLIB:-ranlib} bin/$PLATFORM/liblpsolve55.a
+ 
+ if [ "$so" != "" ]
+ then
+diff --git a/lpsolve55/ccc.osx b/lpsolve55/ccc.osx
+index 0ef403e..f74aaa2 100644
+--- a/lpsolve55/ccc.osx
++++ b/lpsolve55/ccc.osx
+@@ -1,6 +1,6 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../colamd/colamd.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ 
+@@ -8,7 +8,7 @@ MYTMP=`mktemp -d "${TMPDIR:-/tmp}"/lp_solve_XXXXXX`
+ >"$MYTMP"/platform.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/platform.c
+ echo '#include <stdio.h>'>>"$MYTMP"/platform.c
+-echo 'main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
++echo 'int main(){printf("osx%d", (int) (sizeof(void *)*8));}'>>"$MYTMP"/platform.c
+ $c "$MYTMP"/platform.c -o "$MYTMP"/platform
+ PLATFORM=`"$MYTMP"/platform`
+ rm "$MYTMP"/platform "$MYTMP"/platform.c >/dev/null 2>&1
+@@ -20,7 +20,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>"$MYTMP"/isnan.c
+ echo '#include <stdlib.h>'>>"$MYTMP"/isnan.c
+ echo '#include <math.h>'>>"$MYTMP"/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>"$MYTMP"/isnan.c
+ $c "$MYTMP"/isnan.c -o "$MYTMP"/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+diff --git a/lpsolve55/ccc.solaris b/lpsolve55/ccc.solaris
+index e262693..82a9a81 100644
+--- a/lpsolve55/ccc.solaris
++++ b/lpsolve55/ccc.solaris
+@@ -1,12 +1,12 @@
+ :
+ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../colamd/colamd.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c'
+-c=cc
++c=${CC:-cc}
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+@@ -18,7 +18,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>/tmp/isnan.c
+ echo '#include <stdlib.h>'>>/tmp/isnan.c
+ echo '#include <math.h>'>>/tmp/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
+ $c /tmp/isnan.c -o /tmp/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=
+@@ -33,8 +33,8 @@ so=y
+ opts='-O3'
+ 
+ $c -s -c -I.. -I../shared -I../bfp -I../bfp/bfp_LUSOL -I../bfp/bfp_LUSOL/LUSOL -I../colamd $opts $def $NOISNAN -DYY_NEVER_INTERACTIVE -DPARSER_LP -DINVERSE_ACTIVE=INVERSE_LUSOL -DRoleIsExternalInvEngine $src
+-ar rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
+-ranlib bin/$PLATFORM/liblpsolve55.a
++${AR:-ar} rv bin/$PLATFORM/liblpsolve55.a `echo $src|sed s/[.]c/.o/g|sed 's/[^ ]*\///g'`
++${RANLIB:-ranlib} bin/$PLATFORM/liblpsolve55.a
+ 
+ if [ "$so" != "" ]
+ then
+diff --git a/lpsolve55/cccLUSOL.osx b/lpsolve55/cccLUSOL.osx
+index 52f8c74..e33c58f 100644
+--- a/lpsolve55/cccLUSOL.osx
++++ b/lpsolve55/cccLUSOL.osx
+@@ -1,11 +1,11 @@
+ src='../lp_MDO.c ../shared/commonlib.c ../shared/mmio.c ../shared/myblas.c ../ini.c ../fortify.c ../colamd/colamd.c ../lp_rlp.c ../lp_crash.c ../bfp/bfp_LUSOL/lp_LUSOL.c ../bfp/bfp_LUSOL/LUSOL/lusol.c ../lp_Hash.c ../lp_lib.c ../lp_wlp.c ../lp_matrix.c ../lp_mipbb.c ../lp_MPS.c ../lp_params.c ../lp_presolve.c ../lp_price.c ../lp_pricePSE.c ../lp_report.c ../lp_scale.c ../lp_simplex.c ../lp_SOS.c ../lp_utils.c ../yacc_read.c ../bfp/bfp_LUSOL/lusol.c'
+-c=cc
++c=${CC:-cc}
+ 
+ #determine platform (32/64 bit)
+ >/tmp/platform.c
+ echo '#include <stdlib.h>'>>/tmp/platform.c
+ echo '#include <stdio.h>'>>/tmp/platform.c
+-echo 'main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
++echo 'int main(){printf("ux%d", (int) (sizeof(void *)*8));}'>>/tmp/platform.c
+ $c /tmp/platform.c -o /tmp/platform
+ PLATFORM=`/tmp/platform`
+ rm /tmp/platform /tmp/platform.c >/dev/null 2>&1
+@@ -17,7 +17,7 @@ mkdir bin bin/$PLATFORM >/dev/null 2>&1
+ echo '#include <stdio.h>'>>/tmp/isnan.c
+ echo '#include <stdlib.h>'>>/tmp/isnan.c
+ echo '#include <math.h>'>>/tmp/isnan.c
+-echo 'main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
++echo 'int main(){isnan(0.0);return 0;}'>>/tmp/isnan.c
+ $c /tmp/isnan.c -o /tmp/isnan $math >/dev/null 2>&1
+ if [ $? = 0 ]
+ then NOISNAN=

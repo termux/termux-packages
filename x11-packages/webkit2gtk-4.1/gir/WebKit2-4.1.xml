@@ -159,6 +159,7 @@
     <member name="WEBKIT_INPUT_PURPOSE_URL" nick="url" value="4"/>
     <member name="WEBKIT_INPUT_PURPOSE_EMAIL" nick="email" value="5"/>
     <member name="WEBKIT_INPUT_PURPOSE_PASSWORD" nick="password" value="6"/>
+    <member name="WEBKIT_INPUT_PURPOSE_SEARCH" nick="search" value="7"/>
   </enum>  <flags name="WebKitInputHints" get-type="webkit_input_hints_get_type">
     <member name="WEBKIT_INPUT_HINT_NONE" nick="none" value="0"/>
     <member name="WEBKIT_INPUT_HINT_SPELLCHECK" nick="spellcheck" value="1"/>
@@ -437,6 +438,7 @@
   <boxed name="WebKitNavigationAction" get-type="webkit_navigation_action_get_type"/>
   <class name="WebKitWebsitePolicies" get-type="webkit_website_policies_get_type" parents="GObject">
     <property name="autoplay" type="WebKitAutoplayPolicy" flags="235" default-value="WEBKIT_AUTOPLAY_ALLOW_WITHOUT_SOUND"/>
+    <property name="custom-user-agent" type="gchararray" flags="235" default-value="NULL"/>
   </class>
   <class name="WebKitPolicyDecision" get-type="webkit_policy_decision_get_type" parents="GObject" abstract="1">
   </class>
@@ -470,6 +472,9 @@
   <interface name="WebKitPermissionRequest" get-type="webkit_permission_request_get_type">
   </interface>
   <boxed name="WebKitPermissionStateQuery" get-type="webkit_permission_state_query_get_type"/>
+  <class name="WebKitPointerLockPermissionRequest" get-type="webkit_pointer_lock_permission_request_get_type" parents="GObject">
+    <implements name="WebKitPermissionRequest"/>
+  </class>
   <class name="WebKitResponsePolicyDecision" get-type="webkit_response_policy_decision_get_type" parents="WebKitPolicyDecision,GObject">
     <property name="request" type="WebKitURIRequest" flags="225"/>
     <property name="response" type="WebKitURIResponse" flags="225"/>
@@ -683,6 +688,7 @@
     <property name="favicon" type="gpointer" flags="225"/>
     <property name="uri" type="gchararray" flags="225" default-value="NULL"/>
     <property name="zoom-level" type="gdouble" flags="227" default-value="1.000000"/>
+    <property name="magnification" type="gdouble" flags="227" default-value="1.000000"/>
     <property name="is-loading" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="is-playing-audio" type="gboolean" flags="225" default-value="FALSE"/>
     <property name="is-ephemeral" type="gboolean" flags="235" default-value="FALSE"/>
@@ -793,9 +799,6 @@
     <implements name="WebKitPermissionRequest"/>
   </class>
   <class name="WebKitXRPermissionRequest" get-type="webkit_xr_permission_request_get_type" parents="GObject">
-    <implements name="WebKitPermissionRequest"/>
-  </class>
-  <class name="WebKitPointerLockPermissionRequest" get-type="webkit_pointer_lock_permission_request_get_type" parents="GObject">
     <implements name="WebKitPermissionRequest"/>
   </class>
   <class name="WebKitPrintOperation" get-type="webkit_print_operation_get_type" parents="GObject">

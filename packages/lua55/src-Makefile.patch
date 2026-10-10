@@ -1,6 +1,7 @@
-diff -uNr lua-5.5.0/src/Makefile lua-5.5.0.mod/src/Makefile
---- lua-5.5.0/src/Makefile	2025-07-07 05:49:14.000000000 +0530
-+++ lua-5.5.0.mod/src/Makefile	2026-01-09 11:17:44.198077128 +0530
+diff --git a/src/Makefile b/src/Makefile
+index 317cb85..ecb2f0f 100644
+--- a/src/Makefile
++++ b/src/Makefile
 @@ -6,25 +6,16 @@
  # Your platform. See PLATS for possible values.
  PLAT= guess
@@ -9,7 +10,7 @@ diff -uNr lua-5.5.0/src/Makefile lua-5.5.0.mod/src/Makefile
 -CFLAGS= -O2 -Wall -Wextra $(SYSCFLAGS) $(MYCFLAGS)
 -LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 +CC ?= gcc -std=gnu99
-+CFLAGS += $(SYSCFLAGS)
++CFLAGS += $(SYSCFLAGS) $(MYCFLAGS)
 +LDFLAGS += $(SYSLDFLAGS) $(MYLDFLAGS)
  LIBS= -lm $(SYSLIBS) $(MYLIBS)
  
@@ -32,23 +33,21 @@ diff -uNr lua-5.5.0/src/Makefile lua-5.5.0.mod/src/Makefile
  # Special flags for compiler modules; -Os reduces code size.
  CMCFLAGS= 
  
-@@ -32,19 +23,20 @@
+@@ -33,18 +24,19 @@ CMCFLAGS=
+ PLATS= guess aix bsd c89 freebsd generic ios linux linux-readline macosx mingw posix solaris
  
- PLATS= guess aix bsd c89 freebsd generic ios linux macosx mingw posix solaris
- 
--LUA_A=	liblua.a
-+LUA_A=	liblua5.5.a
-+LUA_SO= liblua5.5.so
+ LUA_A=	liblua.a
++LUA_SO=	liblua.so
  CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
  LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loadlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o linit.o
  BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
  
 -LUA_T=	lua
-+LUA_T=	lua5.5
++LUA_T=	lua$(V)
  LUA_O=	lua.o
  
 -LUAC_T=	luac
-+LUAC_T=	luac5.5
++LUAC_T=	luac$(V)
  LUAC_O=	luac.o
  
  ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
@@ -57,7 +56,7 @@ diff -uNr lua-5.5.0/src/Makefile lua-5.5.0.mod/src/Makefile
  ALL_A= $(LUA_A)
  
  # Targets start here.
-@@ -60,6 +52,11 @@
+@@ -60,6 +52,11 @@ $(LUA_A): $(BASE_O)
  	$(AR) $@ $(BASE_O)
  	$(RANLIB) $@
  

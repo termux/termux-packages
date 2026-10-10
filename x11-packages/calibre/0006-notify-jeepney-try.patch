@@ -1,0 +1,19 @@
+diff --git a/src/calibre/gui2/notify.py b/src/calibre/gui2/notify.py
+index 0b87a60a1d..7ce7125802 100644
+--- a/src/calibre/gui2/notify.py
++++ b/src/calibre/gui2/notify.py
+@@ -33,13 +33,12 @@ def __init__(self):
+         self.initialized = False
+ 
+     def initialize(self):
+-        from jeepney.io.blocking import open_dbus_connection
+-
+         if self.initialized:
+             return
+         self.initialized = True
+         self.ok = False
+         try:
++            from jeepney.io.blocking import open_dbus_connection
+             self.connection = open_dbus_connection(bus='SESSION')
+         except Exception:
+             return

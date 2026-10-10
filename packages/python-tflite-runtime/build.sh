@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.tensorflow.org/lite
 TERMUX_PKG_DESCRIPTION="TensorFlow Lite Python bindings"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.20.0"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="2.21.0"
 TERMUX_PKG_SRCURL=git+https://github.com/tensorflow/tensorflow
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="python, python-numpy, python-pip"
@@ -13,12 +12,15 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DTFLITE_HOST_TOOLS_DIR=$TERMUX_PKG_HOSTBUILD_DIR
+-DTENSORFLOW_SOURCE_DIR=$TERMUX_PKG_SRCDIR
 "
 
 termux_step_host_build() {
 	termux_setup_cmake
 
-	cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "$TERMUX_PKG_SRCDIR"/tensorflow/lite
+	cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+		-DTENSORFLOW_SOURCE_DIR="$TERMUX_PKG_SRCDIR" \
+		"$TERMUX_PKG_SRCDIR"/tensorflow/lite
 	cmake --build . --verbose -j $TERMUX_PKG_MAKE_PROCESSES -t flatbuffers-flatc
 }
 

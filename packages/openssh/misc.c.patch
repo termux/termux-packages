@@ -1,7 +1,8 @@
-diff -uNr openssh-portable-V_9_5_P1/misc.c openssh-portable-V_9_5_P1.mod/misc.c
---- openssh-portable-V_9_5_P1/misc.c	2023-10-04 07:34:10.000000000 +0300
-+++ openssh-portable-V_9_5_P1.mod/misc.c	2023-11-23 16:29:34.264542664 +0200
-@@ -1818,7 +1818,7 @@
+diff --git a/misc.c b/misc.c
+index 866f7b8e2..656b48fdb 100644
+--- a/misc.c
++++ b/misc.c
+@@ -1930,7 +1930,7 @@ mktemp_proto(char *s, size_t len)
  		if (r > 0 && (size_t)r < len)
  			return;
  	}
@@ -10,7 +11,7 @@ diff -uNr openssh-portable-V_9_5_P1/misc.c openssh-portable-V_9_5_P1.mod/misc.c
  	if (r < 0 || (size_t)r >= len)
  		fatal_f("template string too short");
  }
-@@ -2777,6 +2777,7 @@
+@@ -2961,6 +2961,7 @@ subprocess(const char *tag, const char *command,
  			    pw->pw_name, (u_int)pw->pw_gid, strerror(errno));
  			_exit(1);
  		}
@@ -18,7 +19,7 @@ diff -uNr openssh-portable-V_9_5_P1/misc.c openssh-portable-V_9_5_P1.mod/misc.c
  		if (setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) == -1) {
  			error("%s: setresgid %u: %s", tag, (u_int)pw->pw_gid,
  			    strerror(errno));
-@@ -2787,6 +2788,7 @@
+@@ -2971,6 +2972,7 @@ subprocess(const char *tag, const char *command,
  			    strerror(errno));
  			_exit(1);
  		}
@@ -26,3 +27,14 @@ diff -uNr openssh-portable-V_9_5_P1/misc.c openssh-portable-V_9_5_P1.mod/misc.c
  		/* stdin is pointed to /dev/null at this point */
  		if ((flags & SSH_SUBPROCESS_STDOUT_DISCARD) != 0 &&
  		    dup2(STDIN_FILENO, STDERR_FILENO) == -1) {
+@@ -3275,8 +3277,8 @@ mkdir_path(const char *target, mode_t mode)
+ 	dir = odir = xstrdup(target);
+ 
+ 	if (*dir == '/' &&
+-	    (fd = open("/", O_RDONLY|O_DIRECTORY)) == -1) {
+-		error_f("open(\"/\"): %s", strerror(errno));
++	    (fd = open("@TERMUX_PREFIX@/", O_RDONLY|O_DIRECTORY)) == -1) {
++		error_f("open(\"@TERMUX_PREFIX@/\"): %s", strerror(errno));
+ 		free(odir);
+ 		return -1;
+ 	}

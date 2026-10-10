@@ -1,0 +1,34 @@
+--- a/src/sys/linux_syscall.rs
++++ b/src/sys/linux_syscall.rs
+@@ -481,25 +481,17 @@ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
+     let flags = rustix::process::PidfdFlags::from_bits_retain(flags);
+     once(rustix::process::pidfd_open(pid, flags)).map(own_fd)
+ }
+-/// Android: rustix 0.38 gates `process::pidfd_open` behind
+-/// `cfg(target_os = "linux")`, but the kernel ABI is identical (same generic
+-/// syscall number 434 since Linux 5.3, before any Android NDK target shipped).
+-/// Raw-syscall it like the other shims here.
++/// Android: many devices seccomp-kill (SIGSYS) instead of returning an
++/// errno for syscalls outside the app sandbox allowlist, and `pidfd_open`
++/// is one of them - unlike a normal ENOSYS/EPERM, that cannot be caught
++/// here. Every caller already treats `Err` as "pidfd unavailable" and
++/// falls back to the waiter-thread/signalfd path, so just skip the
++/// syscall entirely on Android instead of crashing the whole process.
+ #[inline]
+ #[cfg(target_os = "android")]
+ pub(crate) fn pidfd_open(pid: i32, flags: u32) -> Result<Fd, i32> {
+-    if pid <= 0 {
+-        return Err(libc::EINVAL);
+-    }
+-    // libc 0.2.x doesn't expose `SYS_pidfd_open` for Android either, so use
+-    // the kernel constant. `pidfd_open` has the same number on every arch.
+-    const SYS_PIDFD_OPEN: libc::c_long = 434;
+-    // SAFETY: raw `pidfd_open(2)`; kernel validates pid/flags.
+-    let rc = unsafe { libc::syscall(SYS_PIDFD_OPEN, pid, flags) };
+-    if rc < 0 {
+-        return Err(errno());
+-    }
+-    Ok(Fd::from_native(rc as i32))
++    let _ = (pid, flags);
++    Err(libc::ENOSYS)
+ }

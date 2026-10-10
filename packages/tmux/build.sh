@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://tmux.github.io/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="3.7b"
+TERMUX_PKG_VERSION="3.8"
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=156dc43dcbc7f06e35e1fae3118c44d77a370c46676b34b82bbafc4e608d8130
+TERMUX_PKG_SHA256=f873f9379c9cf30d3d66b642a955118c4fbb0019d046d13e6012340811e5dcb7
 TERMUX_PKG_AUTO_UPDATE=true
 # Link against libandroid-support for wcwidth(), see https://github.com/termux/termux-packages/issues/224
-TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob"
+TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob, utf8proc"
 # Set default TERM to screen-256color, see: https://raw.githubusercontent.com/tmux/tmux/3.3/CHANGES
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --with-TERM=screen-256color --enable-sixel"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --with-TERM=screen-256color --enable-sixel --enable-utf8proc"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_CONFFILES="etc/tmux.conf etc/profile.d/tmux.sh"

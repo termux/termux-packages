@@ -1,0 +1,20 @@
+--- perl-5.42.2/ext/Errno/Errno_pm.PL	2026-01-18 16:32:29.000000000 +0000
++++ perl-5.42.2/ext/Errno/Errno_pm.PL.patch	2026-08-03 11:51:30.483734816 +0000
+@@ -111,7 +111,7 @@
+     # When cross-compiling we may store a path for gcc's "sysroot" option:
+     my $sysroot = $Config{sysroot} || '';
+     my $linux_errno_h;
+-    if ($^O eq 'linux') {
++    if ($^O eq 'linux' || $^O eq 'android') {
+ 	# Some Linuxes have weird errno.hs which generate
+ 	# no #file or #line directives
+ 	($linux_errno_h) = grep { -e $_ } map { "$_/errno.h" }
+@@ -135,7 +135,7 @@
+ 	if ($dep =~ /(\S+errno\.h)/) {
+ 	     push(@file, $1);
+ 	}
+-    } elsif ($^O eq 'linux' &&
++    } elsif (($^O eq 'linux' || $^O eq 'android') &&
+ 	      $Config{gccversion} ne '' && 
+ 	      $Config{gccversion} !~ /intel/i &&
+ 	      # might be using, say, Intel's icc

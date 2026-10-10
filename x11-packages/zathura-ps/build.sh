@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://pwmt.org/projects/zathura-ps/"
+TERMUX_PKG_DESCRIPTION="PostScript support for zathura"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2026.07.18"
+TERMUX_PKG_SRCURL="https://github.com/pwmt/zathura-ps/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=a1dda58b46dc15677c6861430e72900ec160ad8655e0059c9942d235b3b22b60
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="girara, glib, libcairo, libspectre, zathura"

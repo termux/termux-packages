@@ -1,7 +1,6 @@
-diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
---- ../gawk-4.1.0/extension/stack.c	2013-05-02 21:51:30.000000000 +0200
-+++ ./extension/stack.c	2014-02-12 16:54:08.000000000 +0100
-@@ -31,14 +31,14 @@
+--- a/extension/stack.c
++++ b/extension/stack.c
+@@ -30,14 +30,14 @@
  
  static size_t size;
  static void **stack;
@@ -18,7 +17,7 @@ diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
  }
  
  /* stack_top --- return top object on the stack */
-@@ -49,7 +49,7 @@
+@@ -48,7 +48,7 @@
  	if (stack_empty() || stack == NULL)
  		return NULL;
  
@@ -27,7 +26,7 @@ diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
  }
  
  /* stack_pop --- pop top object and return it */
-@@ -60,7 +60,7 @@
+@@ -59,7 +59,7 @@
  	if (stack_empty() || stack == NULL)
  		return NULL;
  
@@ -36,7 +35,7 @@ diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
  }
  
  /* stack_push --- push an object onto the stack */
-@@ -75,7 +75,7 @@
+@@ -74,7 +74,7 @@
  		if (stack == NULL)
  			return 0;
  		size = INITIAL_STACK;
@@ -45,7 +44,7 @@ diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
  		if (new_size < size)
  			return 0;
  		new_stack = realloc(stack, new_size * sizeof(void *));
-@@ -85,6 +85,6 @@
+@@ -84,6 +84,6 @@
  		stack = new_stack;
  	}
  

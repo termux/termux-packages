@@ -1,9 +1,9 @@
 --- a/src/corelib/io/qstorageinfo_linux.cpp
 +++ b/src/corelib/io/qstorageinfo_linux.cpp
-@@ -32,12 +32,11 @@
+@@ -33,12 +33,11 @@
  #  define ST_RDONLY             0x0001  /* mount read-only */
  #endif
-
+ 
 -#if defined(Q_OS_ANDROID)
 +#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
  // statx() is disabled on Android because quite a few systems
@@ -12,10 +12,10 @@
  #  undef STATX_BASIC_STATS
 -#include <private/qjnihelpers_p.h>
  #endif
-
+ 
  QT_BEGIN_NAMESPACE
 @@ -432,7 +431,7 @@
-
+ 
  void QStorageInfoPrivate::doStat()
  {
 -#ifdef Q_OS_ANDROID

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://zen-browser.app
 TERMUX_PKG_DESCRIPTION="Zen is a firefox-based browser with the aim of pushing your productivity to a new level!"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@sabamdarif"
-TERMUX_PKG_VERSION="1.21.8b"
+TERMUX_PKG_VERSION="1.23.2b"
 TERMUX_PKG_SRCURL="https://github.com/zen-browser/desktop/releases/download/${TERMUX_PKG_VERSION}/zen.source.tar.zst"
-TERMUX_PKG_SHA256=974bd9d4773bbb0896f08ad888eb439af294639b192727b123c704730dc245ad
+TERMUX_PKG_SHA256=a62662ed05061c9570ad8c96e085862f94d02db840b7e094cb03096977618720
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
@@ -15,14 +15,6 @@ termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
 	echo "Applying sed substitution to ${f}"
 	sed -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' -i ${f}
-
-	# Update Cargo.toml to use the patched cc
-	sed -i 's|^\(\[patch\.crates-io\]\)$|\1\ncc = { path = "third_party/rust/cc" }|g' \
-		Cargo.toml
-	(
-		termux_setup_rust
-		cargo update -p cc
-	)
 }
 
 termux_step_pre_configure() {

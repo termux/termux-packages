@@ -1,0 +1,14 @@
+--- a/components/exo/wayland/zwp_text_input_manager.cc
++++ b/components/exo/wayland/zwp_text_input_manager.cc
+@@ -33,6 +33,11 @@
+ #include "ui/events/keycodes/dom/keycode_converter.h"
+ #include "ui/events/ozone/layout/xkb/xkb_modifier_converter.h"
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 30
++#include <sys/syscall.h>
++#define memfd_create(name,flags) syscall(SYS_memfd_create,name,flags)
++#endif
++
+ namespace exo {
+ namespace wayland {
+ 

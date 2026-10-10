@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/network/ktorrent"
 TERMUX_PKG_DESCRIPTION="A powerful BitTorrent client for KDE"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/ktorrent-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=5d3c143e2b157a7b11b214fa95d67c4e2d3d366580a62f965c7f10b9f1523fc9
+TERMUX_PKG_SHA256=5b85388c87ae6173cf8744ce43a34b1d04f3e0c21e0af413f270c927de3a19fb
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="kf6-karchive, kf6-kcmutils, kf6-kcompletion, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-kglobalaccel, kf6-ki18n, kf6-kiconthemes, kf6-kio, kf6-knotifications, kf6-knotifyconfig, kf6-kparts, kf6-kstatusnotifieritem, kf6-ktextwidgets, kf6-kwidgetsaddons, kf6-kwindowsystem, kf6-kxmlgui, libc++, libktorrent, libmaxminddb, phonon-qt6, qt6-qt5compat, qt6-qtbase, qt6-qtwebengine"
 TERMUX_PKG_BUILD_DEPENDS="boost, extra-cmake-modules, kf6-kdnssd, kf6-kdoctools, kf6-kplotting, kf6-syndication, taglib"
@@ -17,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	CXXFLAGS+=" -Wno-error=narrowing"
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DKF6_HOST_TOOLING=$TERMUX_PREFIX/opt/kf6/cross/lib/cmake/"
 	fi

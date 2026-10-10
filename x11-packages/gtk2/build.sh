@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit (legacy)"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=2.24
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.33
+TERMUX_PKG_VERSION=2.24.33
 TERMUX_PKG_REVISION=8
-TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gtk+/${_MAJOR_VERSION}/gtk+-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL="https://download.gnome.org/sources/gtk+/${TERMUX_PKG_VERSION%.*}/gtk+-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ac2ac757f5942d318a311a54b0c80b5ef295f299c2a73c632f6bfb1ff49cc6da
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, fontconfig, freetype, glib, gtk-update-icon-cache, harfbuzz, libandroid-shmem, libcairo, librsvg, libx11, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxrandr, libxrender, pango, shared-mime-info, ttf-dejavu"
@@ -50,8 +49,8 @@ termux_step_create_debscripts() {
 	for i in $(test "$TERMUX_PACKAGE_FORMAT" != "pacman" && echo postinst) prerm triggers; do
 		sed \
 			"s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-			"${TERMUX_PKG_BUILDER_DIR}/hooks/${i}.in" > ./${i}
-		chmod 755 ./${i}
+			"${TERMUX_PKG_BUILDER_DIR}/hooks/${i}.in" > ./"${i}"
+		chmod 755 ./"${i}"
 	done
 	unset i
 	chmod 644 ./triggers

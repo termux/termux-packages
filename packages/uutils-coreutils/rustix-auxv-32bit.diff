@@ -1,0 +1,83 @@
+--- a/src/backend/libc/param/auxv.rs
++++ b/src/backend/libc/param/auxv.rs
+@@ -1,13 +1,13 @@
+ use crate::backend::c;
+ #[cfg(any(
+-    all(target_os = "android", target_pointer_width = "64"),
++    all(target_os = "android"),
+     target_os = "linux",
+ ))]
+ use crate::ffi::CStr;
+ 
+ // `getauxval` wasn't supported in glibc until 2.16.
+ #[cfg(any(
+-    all(target_os = "android", target_pointer_width = "64"),
++    all(target_os = "android"),
+     target_os = "linux",
+ ))]
+ weak!(fn getauxval(c::c_ulong) -> *mut c::c_void);
+@@ -24,7 +24,7 @@
+ }
+ 
+ #[cfg(any(
+-    all(target_os = "android", target_pointer_width = "64"),
++    all(target_os = "android"),
+     target_os = "linux",
+ ))]
+ #[inline]
+@@ -41,7 +41,7 @@
+ }
+ 
+ #[cfg(any(
+-    all(target_os = "android", target_pointer_width = "64"),
++    all(target_os = "android"),
+     target_os = "linux",
+ ))]
+ #[inline]
+@@ -54,7 +54,7 @@
+ }
+ 
+ #[cfg(any(
+-    all(target_os = "android", target_pointer_width = "64"),
++    all(target_os = "android"),
+     target_os = "linux",
+ ))]
+ #[inline]
+--- a/src/param/auxv.rs
++++ b/src/param/auxv.rs
+@@ -2,7 +2,7 @@
+ #[cfg(any(
+     linux_raw,
+     any(
+-        all(target_os = "android", target_pointer_width = "64"),
++        all(target_os = "android"),
+         target_os = "linux",
+     )
+ ))]
+@@ -58,7 +58,7 @@
+ #[cfg(any(
+     linux_raw,
+     any(
+-        all(target_os = "android", target_pointer_width = "64"),
++        all(target_os = "android"),
+         target_os = "linux",
+     )
+ ))]
+@@ -79,7 +79,7 @@
+ #[cfg(any(
+     linux_raw,
+     any(
+-        all(target_os = "android", target_pointer_width = "64"),
++        all(target_os = "android"),
+         target_os = "linux",
+     )
+ ))]
+@@ -100,7 +100,7 @@
+ #[cfg(any(
+     linux_raw,
+     any(
+-        all(target_os = "android", target_pointer_width = "64"),
++        all(target_os = "android"),
+         target_os = "linux",
+     )
+ ))]

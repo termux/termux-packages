@@ -10,10 +10,9 @@ TERMUX_PKG_LICENSE_FILE="
 	Documentation/licenses/COPYING.ISC
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.42.1"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION="2.42.4"
 TERMUX_PKG_SRCURL="https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=82e9158eb12a9b0b569d84e1687fed9dd18fe89ccd8ef5ac3427218a7c0d7f7f
+TERMUX_PKG_SHA256=fbd62a100ab7bb8746ba0661255c3c48185b1e9021507c624da01fbc696330ec
 # <dependency>: <binaries linking to that dependency>
 # libandroid-glob: lsclocks
 # libandroid-posix-semaphore: lsipc, lsns and the lib{blkid,smartcols,uuid} subpackages

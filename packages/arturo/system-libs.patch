@@ -1,0 +1,46 @@
+--- a/config.nims
++++ b/config.nims
+@@ -97,8 +97,7 @@ proc configWinSSL() =
+     --dynlibOverride:"crypto-"
+ 
+ proc configUnixSSL() =
+-    --dynlibOverride:ssl
+-    --dynlibOverride:crypto
++    --define:"useOpenssl3"
+ 
+ proc main() =
+     defaultConfig()
+--- a/src/library/Net.nim
++++ b/src/library/Net.nim
+@@ -21,16 +21,7 @@
+ 
+ when defined(ssl):
+     when defined(linux):
+-        when defined(LEGACYUNIX):
+-            when defined(arm64):
+-                {.passL: "-Bstatic -Lsrc/deps/openssl/linux/arm64/legacy -lssl -lcrypto -Bdynamic".}
+-            else:
+-                {.passL: "-Bstatic -Lsrc/deps/openssl/linux/amd64/legacy -lssl -lcrypto -Bdynamic".}
+-        else:
+-            when defined(arm64):
+-                {.passL: "-Bstatic -Lsrc/deps/openssl/linux/arm64 -lssl -lcrypto -Bdynamic".}
+-            else:
+-                {.passL: "-Bstatic -Lsrc/deps/openssl/linux/amd64 -lssl -lcrypto -Bdynamic".}
++        {.passL: "-lssl -lcrypto".}
+     elif defined(freebsd):
+         {.passL: "-Bstatic -Lsrc/deps/openssl/freebsd/amd64 -lssl -lcrypto -Bdynamic".}
+     elif defined(macosx):
+--- a/src/vm/values/custom/vregex.nim
++++ b/src/vm/values/custom/vregex.nim
+@@ -13,10 +13,7 @@
+ #=======================================
+ 
+ when defined(linux):
+-    when defined(arm64):
+-        {.passL: "-Bstatic -Lsrc/deps/pcre/linux/arm64 -lpcre -Bdynamic".}
+-    else:   
+-        {.passL: "-Bstatic -Lsrc/deps/pcre/linux/amd64 -lpcre -Bdynamic".}
++    {.passL: "-lpcre".}
+ elif defined(freebsd):
+     {.passL: "-Bstatic -Lsrc/deps/pcre/freebsd/amd64 -lpcre -Bdynamic".}
+ elif defined(macosx):

@@ -2,28 +2,39 @@ TERMUX_PKG_HOMEPAGE=http://www.nethack.org/
 TERMUX_PKG_DESCRIPTION="Dungeon crawl game"
 TERMUX_PKG_LICENSE="Nethack"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.6.7
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://www.nethack.org/download/${TERMUX_PKG_VERSION}/nethack-${TERMUX_PKG_VERSION//./}-src.tgz
-TERMUX_PKG_SHA256=98cf67df6debf9668a61745aa84c09bcab362e5d33f5b944ec5155d44d2aacb2
+TERMUX_PKG_VERSION=5.0.0
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_SRCURL=(
+	"https://www.nethack.org/download/${TERMUX_PKG_VERSION}/nethack-${TERMUX_PKG_VERSION//./}-src.tgz"
+	"https://www.lua.org/ftp/lua-5.4.8.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	2959b7886aac76185b90aea0c9f80d14343f604de0ae96b3dd2a760f7ab3bde9
+	4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae
+)
 TERMUX_PKG_DEPENDS="gzip, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_GROUPS="games"
 
+termux_step_post_get_source() {
+	mkdir -p lib
+	if [ -d lua-5.4.8 ]; then
+		mv lua-5.4.8 lib/
+	fi
+}
+
 termux_step_host_build() {
 	cp -r $TERMUX_PKG_SRCDIR/* .
 	pushd sys/unix
-	sh setup.sh hints/linux
+	sh setup.sh hints/linux-minimal
 	popd && cd util
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		HOST_CC="gcc -m32"
 	else
 		HOST_CC="gcc"
 	fi
-	CFLAGS="" CC="$HOST_CC" LD="ld" make makedefs
-	CFLAGS="" CC="$HOST_CC" LD="ld" make lev_comp
-	CFLAGS="" CC="$HOST_CC" LD="ld" make dgn_comp dlb recover
+	CFLAGS="" CC="$HOST_CC" LD="ld" make makedefs dlb
 }
 
 termux_step_pre_configure() {
@@ -31,13 +42,12 @@ termux_step_pre_configure() {
 	export LFLAGS="$LDFLAGS"
 	export CFLAGS="$CPPFLAGS $CFLAGS"
 	cd sys/unix
-	sh setup.sh hints/linux
+	sh setup.sh hints/linux-minimal
 }
 
 termux_step_post_configure() {
 	# cp hostbuilt tools from hostbuild dir
-	cp $TERMUX_PKG_HOSTBUILD_DIR/util/{makedefs,lev_comp,dgn_comp,dlb} \
-		util/
+	cp $TERMUX_PKG_HOSTBUILD_DIR/util/{makedefs,dlb} util/
 	touch -d "next hour" util/*
 }
 

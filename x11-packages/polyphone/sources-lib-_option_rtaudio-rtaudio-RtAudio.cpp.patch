@@ -1,0 +1,18 @@
+--- a/sources/lib/_option_rtaudio/rtaudio/RtAudio.cpp
++++ b/sources/lib/_option_rtaudio/rtaudio/RtAudio.cpp
+@@ -9363,7 +9363,6 @@
+ #endif
+   
+   while ( *isRunning ) {
+-    pthread_testcancel();
+     context->callbackEvent();
+   }
+ 
+@@ -9598,7 +9597,6 @@
+       pthread_attr_setschedpolicy(&attr, SCHED_RR);
+       pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
+       // This is definitely required. Otherwise it fails.
+-      pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+       pthread_attr_setschedparam(&attr, &param);
+     }
+     else

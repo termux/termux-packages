@@ -1,0 +1,22 @@
+--- a/pnpm/crates/crypto-hash/Cargo.toml
++++ b/pnpm/crates/crypto-hash/Cargo.toml
+@@ -18,7 +18,7 @@
+ # Match pnpm-store-dir's Windows-aware feature gate so this crate
+ # inherits the `asm` backend on every target where it compiles.
+ [target.'cfg(not(windows))'.dependencies]
+-sha2 = { workspace = true, features = ["asm"] }
++sha2 = { workspace = true }
+ 
+ [dev-dependencies]
+ tempfile = { workspace = true }
+--- a/pnpm/crates/store-dir/Cargo.toml
++++ b/pnpm/crates/store-dir/Cargo.toml
+@@ -41,7 +41,7 @@
+ # files (`LNK1181: cannot open input file ...sha512_x64.o`), and the
+ # MinGW build under MSYS2 fails too.
+ [target.'cfg(not(windows))'.dependencies]
+-sha2 = { workspace = true, features = ["asm"] }
++sha2 = { workspace = true }
+ 
+ [target.'cfg(windows)'.dependencies]
+ windows-sys = { workspace = true, features = ["Win32_Storage_FileSystem"] }

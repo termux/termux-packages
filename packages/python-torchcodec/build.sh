@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/pytorch/torchcodec
 TERMUX_PKG_DESCRIPTION="PyTorch media decoding and encoding"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.11.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="0.17.0"
 TERMUX_PKG_SRCURL="https://github.com/pytorch/torchcodec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=86d2b65634a31fc64caf0c6492c392e16296aae2e9f41c2d4be33bf267c088d4
-TERMUX_PKG_DEPENDS="ffmpeg, fmt, google-glog, libc++, python, python-pip, python-torch"
+TERMUX_PKG_SHA256=095b45702643875516d79c20005bdd05fb998368b4e4cd63e97e01e133c8a34d
+TERMUX_PKG_DEPENDS="ffmpeg, fmt, google-glog, libc++, libavif, libheif, libjpeg-turbo, libpng, libwebp, python, python-pip, python-torch, zlib"
 TERMUX_PKG_BUILD_DEPENDS="pybind11"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, scikit-build-core, pybind11"
 
 termux_step_pre_configure() {
 	termux_setup_cmake
@@ -22,6 +21,7 @@ termux_step_pre_configure() {
 
 	export TORCH_CMAKE_DIR="$TERMUX_PYTHON_HOME/site-packages/torch/share/cmake/Torch"
 	export PYTHON_EXECUTABLE="$(command -v python)"
+	export CMAKE_ARGS="-DTorch_DIR=$TORCH_CMAKE_DIR -DCMAKE_PREFIX_PATH=$TERMUX_PREFIX -DPython_EXECUTABLE=$PYTHON_EXECUTABLE"
 }
 
 termux_step_configure() {

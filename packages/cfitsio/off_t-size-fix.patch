@@ -1,0 +1,16 @@
+preprocessor condition falls back to `#define OFF_T long`
+which is an incorrect assumption on 32-bit Android 7+
+when `-D_FILE_OFFSET_BITS=64` set.
+32bit builds of `gdal` fail if we do not add this patch.
+Upstream issue: https://github.com/heasarc/cfitsio/issues/151
+--- a/fitsio.h
++++ b/fitsio.h
+@@ -91,7 +91,7 @@ SERVICES PROVIDED HEREUNDER."
+ #if defined(_OFF_T) \
+     || (defined(__GLIBC__) && defined(__off_t_defined)) \
+     || (defined(__MINGW32__) && defined(_OFF_T_DEFINED)) \
+-    || defined(_MIPS_SZLONG) || defined(__APPLE__) || defined(_AIX)
++    || defined(_MIPS_SZLONG) || defined(__APPLE__) || defined(_AIX) || defined(__ANDROID__)
+ #    define OFF_T off_t
+ #elif defined(__BORLANDC__) || (defined(_MSC_VER) && (_MSC_VER>= 1400))
+ #    define OFF_T long long

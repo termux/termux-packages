@@ -2,18 +2,31 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt6 SVG Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.11.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.12.0"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtsvg-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=7f3cf02f4824bf03c2c5859ea6db173bf1482a1daf24e6cdf7bc78cfa26a8a94
+TERMUX_PKG_SHA256=e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), zlib"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
 -DCMAKE_SYSTEM_NAME=Linux
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_host_build() {
 	termux_setup_cmake

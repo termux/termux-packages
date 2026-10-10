@@ -2,24 +2,24 @@ TERMUX_PKG_HOMEPAGE=https://www.leocad.org/
 TERMUX_PKG_DESCRIPTION="CAD application for creating virtual LEGO models "
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="25.09"
+TERMUX_PKG_VERSION="26.09"
 TERMUX_PKG_SRCURL="https://github.com/leozide/leocad/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=db9e129ac35fde3c184510a23fd57c61d1bc5d19d3eac2a4a23f6b73b9f87bd5
+TERMUX_PKG_SHA256=01c78e274cb2e3d496d6e904333f1cff88afb94929b5c9c7eb42bc018f3a530b
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="hicolor-icon-theme, libc++, opengl, qt6-qtbase, zlib"
 TERMUX_PKG_RECOMMENDS="povray"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qttools"
 
-termux_step_host_build() {
+termux_step_post_get_source() {
 	# get a needed component in a similar way to Arch Linux
 	# https://gitlab.archlinux.org/archlinux/packaging/packages/leocad/-/blob/05be871130139255863e1c1426c0dafa6f4b2659/PKGBUILD#L28
-	LIB_VER="25.08"
+	LIB_VER="26.08"
 	LIB_URL="https://github.com/leozide/leocad/releases/download/v$TERMUX_PKG_VERSION/Library-$LIB_VER.zip"
 	LIB_ARCHIVE="${TERMUX_PKG_CACHEDIR}/Library-$LIB_VER.zip"
-	LIB_SHA256=848404645811b00128eb20203b3706a6f2fb8ee68a214debc820f4384dab76ed
+	LIB_SHA256=7cddc89e0437555c317a0e663df73b0e73da2297939eebf8a199308ddad5ed76
 	termux_download "$LIB_URL" "$LIB_ARCHIVE" "$LIB_SHA256"
-	unzip -q "$LIB_ARCHIVE" -d "$TERMUX_PKG_HOSTBUILD_DIR"
+	unzip -q "$LIB_ARCHIVE" -d "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_configure() {
@@ -45,5 +45,5 @@ termux_step_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm644 "$TERMUX_PKG_HOSTBUILD_DIR/library.bin" -t "$TERMUX_PREFIX/share/leocad"
+	install -Dm644 "$TERMUX_PKG_SRCDIR/library.bin" -t "$TERMUX_PREFIX/share/leocad"
 }

@@ -1,0 +1,38 @@
+From 7c7905c9bf166652d1114e389297582e4bae815a Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Fri, 17 Jul 2026 21:23:45 +0530
+Subject: [PATCH] coinmp: link compiler-rt builtins on 32-bit arches, as -Wl,
+ flag
+
+This patch links the libgcc/compiler-rt builtins archive
+($(TERMUX_32BIT_BUILTINS), exported by build.sh on arm/i686) into the
+CoinMP libraries, otherwise the 32-bit link fails with undefined
+__aeabi_* (ARM) / __divdi3-family (i686) symbols flagged by the Termux
+symbol checker.
+
+The archive must be passed as -Wl,<path>, not a bare .a path: CoinMP's
+old libtool treats a bare path in LDFLAGS as a library input and
+ar-inserts the archive file itself into noinst convenience archives
+(e.g. libCglAllDifferent.a), otherwise the later libCgl.la shared link
+fails with 'not an ELF file'.
+---
+ external/coinmp/ExternalProject_coinmp.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/external/coinmp/ExternalProject_coinmp.mk b/external/coinmp/ExternalProject_coinmp.mk
+index 3e5fac720..c167d893b 100644
+--- a/external/coinmp/ExternalProject_coinmp.mk
++++ b/external/coinmp/ExternalProject_coinmp.mk
+@@ -39,7 +39,8 @@ $(call gb_ExternalProject_get_state_target,coinmp,build) :
+ 			--enable-dependency-linking F77=unavailable \
+ 			$(if $(filter LINUX,$(OS)), \
+ 				'LDFLAGS=-Wl$(COMMA)-z$(COMMA)origin \
+-					-Wl$(COMMA)-rpath$(COMMA)\$$$$ORIGIN') \
++					-Wl$(COMMA)-rpath$(COMMA)\$$$$ORIGIN \
++					$(if $(filter ARM INTEL,$(CPUNAME)),-Wl$(COMMA)$(TERMUX_32BIT_BUILTINS))') \
+ 		&& $(MAKE) \
+ 		$(if $(filter MACOSX,$(OS)),&& $(PERL) \
+ 			$(SRCDIR)/solenv/bin/macosx-change-install-names.pl shl OOO \
+-- 
+2.55.0
+

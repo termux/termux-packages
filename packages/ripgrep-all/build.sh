@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/phiresky/ripgrep-all
 TERMUX_PKG_DESCRIPTION="Search tool able to locate in PDFs, E-Books, zip, tar.gz, etc"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:0.10.10"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="fzf, ripgrep, xz-utils"
 TERMUX_PKG_RECOMMENDS="ffmpeg, graphicsmagick, pandoc, poppler, tesseract"
 TERMUX_PKG_SRCURL="https://github.com/phiresky/ripgrep-all/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz"
@@ -12,8 +13,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
-	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
-	export CARGO_TARGET_${env_host}_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
+	local -u env_host="${CARGO_TARGET_NAME//-/_}"
+	export CARGO_TARGET_"${env_host}"_RUSTFLAGS+=" -C link-arg=$($CC -print-libgcc-file-name)"
 }
 
 termux_step_make() {

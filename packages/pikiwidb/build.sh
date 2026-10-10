@@ -4,12 +4,13 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(3.5.6
 					1.0.7)
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=("https://github.com/OpenAtomFoundation/pikiwidb/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 					"https://github.com/pikiwidb/rediscache/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz")
 TERMUX_PKG_SHA256=(b8081375426d1769ecc4a5fe70c5109589ef374f5d9030ea0adc4ea5a1dab9fa
 					6d09b5699030e74914da085a10fd6010336572b30894d93e4f024fa67d36f2a8)
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_DEPENDS="abseil-cpp, fmt, gflags, google-glog, libc++, libprotobuf, librocksdb, zlib"
 # required during build, but binary does not become linked to them
 TERMUX_PKG_BUILD_DEPENDS="googletest, liblz4, libsnappy, zstd"

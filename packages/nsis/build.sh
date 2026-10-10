@@ -4,10 +4,11 @@ TERMUX_PKG_DESCRIPTION="A professional open source system to create Windows inst
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.12"
+TERMUX_PKG_VERSION="3.13"
 TERMUX_PKG_SRCURL=https://prdownloads.sourceforge.net/nsis/nsis-${TERMUX_PKG_VERSION}-src.tar.bz2
-TERMUX_PKG_SHA256=f3ed7a8e4aa2cf4e8cf47d3b563a02559e0cb4934db2662b2f9661b824e2b186
+TERMUX_PKG_SHA256=a8ffe024602d46b6d766f9e1ce30c324ad2a24daeacd3efc2642d436a0c157ac
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_SED_REGEXP='s/\.0$//'
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libiconv, nsis-stubs, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 

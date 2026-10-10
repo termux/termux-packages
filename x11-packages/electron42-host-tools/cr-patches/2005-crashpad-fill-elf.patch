@@ -1,0 +1,18 @@
+--- a/third_party/crashpad/crashpad/snapshot/elf/elf_symbol_table_reader.cc
++++ b/third_party/crashpad/crashpad/snapshot/elf/elf_symbol_table_reader.cc
+@@ -17,6 +17,15 @@
+ #include <elf.h>
+ 
+ #include "snapshot/elf/elf_image_reader.h"
++ 
++#ifndef ELF32_ST_VISIBILITY
++#define ELF32_ST_VISIBILITY(o)	((o) & 0x03)
++#endif
++ 
++/* For ELF64 the definitions are the same.  */
++#ifndef ELF64_ST_VISIBILITY
++#define ELF64_ST_VISIBILITY(o)	ELF32_ST_VISIBILITY (o)
++#endif
+ 
+ namespace crashpad {
+ 

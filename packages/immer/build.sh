@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://sinusoid.es/immer"
+TERMUX_PKG_DESCRIPTION="Postmodern immutable and persistent data structures for C++"
+TERMUX_PKG_LICENSE="BSL-1.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=0.9.1
+TERMUX_PKG_SRCURL="https://github.com/arximboldi/immer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=b18b92ba60ec3186dc36ef671d3c2ae542cbb63eb6dc0e258476c6111a67c971
+TERMUX_PKG_DEPENDS="catch2, cmake"
+TERMUX_PKG_BUILD_DEPENDS="catch2, cmake"
+TERMUX_PKG_AUTO_UPDATE=true

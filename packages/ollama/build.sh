@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://ollama.com/
 TERMUX_PKG_DESCRIPTION="Get up and running with large language models"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.31.1"
+TERMUX_PKG_VERSION="0.35.1"
 TERMUX_PKG_SRCURL=git+https://github.com/ollama/ollama
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++"
 TERMUX_PKG_BUILD_DEPENDS="spirv-headers, vulkan-headers"
@@ -19,6 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLAMA_BUILD_TESTS=OFF
 -DOLLAMA_LLAMA_BACKENDS=vulkan
 -DOLLAMA_VERSION=$TERMUX_PKG_VERSION
+-DOLLAMA_BUILD_PARALLEL=${TERMUX_PKG_MAKE_PROCESSES:-4}
 "
 
 termux_step_post_get_source() {
@@ -80,7 +81,7 @@ termux_step_configure() {
 
 	termux_step_configure_cmake
 
-	export CMAKE_BUILD_PARALLEL_LEVEL="$TERMUX_PKG_MAKE_PROCESSES"
+	export CMAKE_BUILD_PARALLEL_LEVEL="${TERMUX_PKG_MAKE_PROCESSES:-4}"
 }
 
 termux_step_make_install() {

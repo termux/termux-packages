@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/Vulkan-Tools
 TERMUX_PKG_DESCRIPTION="Vulkan Tools and Utilities"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.4.357"
+TERMUX_PKG_VERSION="1.4.365"
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7dc4dba3b834e3f23ff34feeb10a8f71f7ee2bed467f208ec21f380e1696110b
+TERMUX_PKG_SHA256=c55db29b4b2a4d222053ddcc7f925b8cad7f16f5640a05d4ee16d44a9dc02aac
 TERMUX_PKG_DEPENDS="libc++, libwayland, libx11, libxcb, vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, vulkan-headers (=${TERMUX_PKG_VERSION}), vulkan-volk"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"

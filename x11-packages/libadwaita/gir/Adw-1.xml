@@ -194,14 +194,15 @@
     <property name="issue-url" type="gchararray" flags="1073742051" default-value=""/>
     <property name="debug-info" type="gchararray" flags="1073742051" default-value=""/>
     <property name="debug-info-filename" type="gchararray" flags="1073742051" default-value=""/>
-    <property name="developers" type="GStrv" flags="1073741827"/>
-    <property name="designers" type="GStrv" flags="1073741827"/>
-    <property name="artists" type="GStrv" flags="1073741827"/>
+    <property name="developers" type="GStrv" flags="1073742051"/>
+    <property name="designers" type="GStrv" flags="1073742051"/>
+    <property name="artists" type="GStrv" flags="1073742051"/>
     <property name="documenters" type="GStrv" flags="1073742051"/>
     <property name="translator-credits" type="gchararray" flags="1073742051" default-value=""/>
     <property name="copyright" type="gchararray" flags="1073742051" default-value=""/>
     <property name="license-type" type="GtkLicense" flags="1073742051" default-value="GTK_LICENSE_UNKNOWN"/>
     <property name="license" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="other-apps-title" type="gchararray" flags="1073742051" default-value=""/>
     <signal name="activate-link" return="gboolean" when="last">
       <param type="gchararray"/>
     </signal>
@@ -238,9 +239,9 @@
     <property name="issue-url" type="gchararray" flags="1073742051" default-value=""/>
     <property name="debug-info" type="gchararray" flags="1073742051" default-value=""/>
     <property name="debug-info-filename" type="gchararray" flags="1073742051" default-value=""/>
-    <property name="developers" type="GStrv" flags="1073741827"/>
-    <property name="designers" type="GStrv" flags="1073741827"/>
-    <property name="artists" type="GStrv" flags="1073741827"/>
+    <property name="developers" type="GStrv" flags="1073742051"/>
+    <property name="designers" type="GStrv" flags="1073742051"/>
+    <property name="artists" type="GStrv" flags="1073742051"/>
     <property name="documenters" type="GStrv" flags="1073742051"/>
     <property name="translator-credits" type="gchararray" flags="1073742051" default-value=""/>
     <property name="copyright" type="gchararray" flags="1073742051" default-value=""/>
@@ -495,6 +496,13 @@
     <property name="enable-search" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="search-match-mode" type="GtkStringFilterMatchMode" flags="1073742051" default-value="GTK_STRING_FILTER_MATCH_MODE_PREFIX"/>
   </class>
+  <class name="AdwCssClassBinding" get-type="adw_css_class_binding_get_type" parents="GObject" final="1">
+    <property name="source" type="GObject" flags="235"/>
+    <property name="source-property" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="target" type="GtkWidget" flags="235"/>
+    <property name="target-css-class" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="flags" type="GBindingFlags" flags="235" default-value="G_BINDING_DEFAULT"/>
+  </class>
   <class name="AdwEntryRow" get-type="adw_entry_row_get_type" parents="AdwPreferencesRow,GtkListBoxRow,GtkWidget,GInitiallyUnowned,GObject">
     <implements name="GtkAccessible"/>
     <implements name="GtkBuildable"/>
@@ -507,8 +515,8 @@
     <property name="attributes" type="PangoAttrList" flags="1073742051"/>
     <property name="enable-emoji-completion" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="activates-default" type="gboolean" flags="1073742051" default-value="FALSE"/>
-    <property name="text-length" type="guint" flags="1" default-value="0"/>
-    <property name="max-length" type="gint" flags="1073741827" default-value="0"/>
+    <property name="text-length" type="guint" flags="225" default-value="0"/>
+    <property name="max-length" type="gint" flags="1073742051" default-value="0"/>
     <signal name="apply" return="void" when="last">
     </signal>
     <signal name="entry-activated" return="void" when="last">
@@ -846,6 +854,7 @@
     <property name="icon-name" type="gchararray" flags="1073742051" default-value="NULL"/>
     <property name="icon-paintable" type="GdkPaintable" flags="1073742051"/>
     <property name="tooltip" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="prefix" type="GtkWidget" flags="1073742051"/>
     <property name="suffix" type="GtkWidget" flags="1073742051"/>
     <property name="visible" type="gboolean" flags="1073742051" default-value="TRUE"/>
     <property name="enabled" type="gboolean" flags="1073742051" default-value="TRUE"/>
@@ -855,6 +864,7 @@
   <class name="AdwSidebarSection" get-type="adw_sidebar_section_get_type" parents="GObject" final="1">
     <implements name="GtkBuildable"/>
     <property name="title" type="gchararray" flags="1073742051" default-value=""/>
+    <property name="suffix" type="GtkWidget" flags="1073742051"/>
     <property name="menu-model" type="GMenuModel" flags="1073742051"/>
     <property name="items" type="GListModel" flags="225"/>
     <property name="sidebar" type="AdwSidebar" flags="225"/>
@@ -872,6 +882,8 @@
     <property name="placeholder" type="GtkWidget" flags="1073742051"/>
     <property name="drop-preload" type="gboolean" flags="1073742051" default-value="FALSE"/>
     <property name="menu-model" type="GMenuModel" flags="1073742051"/>
+    <property name="prefix" type="GtkWidget" flags="1073742051"/>
+    <property name="suffix" type="GtkWidget" flags="1073742051"/>
     <signal name="activated" return="void" when="last">
       <param type="guint"/>
     </signal>
@@ -1099,7 +1111,7 @@
     <implements name="GtkBuildable"/>
     <implements name="GtkConstraintTarget"/>
     <implements name="GtkActionable"/>
-    <property name="view" type="AdwTabView" flags="1073741827"/>
+    <property name="view" type="AdwTabView" flags="1073742051"/>
     <signal name="activate" return="void" when="first" action="1">
     </signal>
     <signal name="clicked" return="void" when="first" action="1">
@@ -1205,6 +1217,8 @@
     <property name="mode" type="AdwSidebarMode" flags="1073742051" default-value="ADW_SIDEBAR_MODE_SIDEBAR"/>
     <property name="filter" type="GtkFilter" flags="1073742051"/>
     <property name="placeholder" type="GtkWidget" flags="1073742051"/>
+    <property name="prefix" type="GtkWidget" flags="1073742051"/>
+    <property name="suffix" type="GtkWidget" flags="1073742051"/>
     <signal name="activated" return="void" when="last">
     </signal>
   </class>

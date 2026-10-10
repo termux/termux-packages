@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION="7.360.1"
 TERMUX_PKG_SRCURL="https://code.videolan.org/videolan/libplacebo/-/archive/v${TERMUX_PKG_VERSION}/libplacebo-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=14c0a99f4b01557ec9826ce6b1d52f6de21be274ba03fd5aab7307f18766dc39
 TERMUX_PKG_DEPENDS="littlecms, glslang, python, vulkan-icd"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=^v)\d+\.\d+\.\d+$'
 TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, vulkan-headers"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="glad2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -26,4 +28,21 @@ termux_step_post_get_source() {
 	local _FASTFLOAT_DEST="$TERMUX_PKG_SRCDIR/src/include/fast_float/fast_float.h"
 	termux_download "$_FASTFLOAT_URL" "$_FASTFLOAT_CACHE" "$_FASTFLOAT_SHA256"
 	install -D "$_FASTFLOAT_CACHE" "$_FASTFLOAT_DEST"
+}
+
+termux_step_pre_configure() {
+	export TERMUX_MESON_ENABLE_SOVERSION=1
+}
+
+termux_step_post_massage() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	if [ ! -e "lib/libplacebo.so.360" ]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+
+	# Check if SONAME is properly set:
+	if ! readelf -d lib/libplacebo.so | grep -q '(SONAME).*\[libplacebo\.so\.'; then
+		termux_error_exit "SONAME for libplacebo.so is not properly set."
+	fi
 }

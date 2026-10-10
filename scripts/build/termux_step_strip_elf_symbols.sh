@@ -8,6 +8,8 @@ termux_step_strip_elf_symbols__from_paths() {
 		set +e +o pipefail && \
 		find "$@" -type f -print0 | xargs -r -0 \
 			file | grep -E "ELF .+ (executable|shared object)" | cut -f 1 -d : |
-			xargs -r "$STRIP" --strip-unneeded --preserve-dates
+			xargs -r -d '\n' \
+				-n "$(( TERMUX_PKG_MAKE_PROCESSES * 2 ))" -P "$TERMUX_PKG_MAKE_PROCESSES" \
+				"$STRIP" --strip-unneeded --preserve-dates
 	)
 }

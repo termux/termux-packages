@@ -1,0 +1,22 @@
+--- a/libcli/dns/dns.c
++++ b/libcli/dns/dns.c
+@@ -841,7 +841,7 @@
+ 	for (i = 0; i < num_ips; i++) {
+ 		struct dns_res_rec *rec = &recs[num_recs + i];
+ 		const struct samba_sockaddr *ip = &ips[i];
+-		struct ssaddr_buf buf;
++		char buf[INET6_ADDRSTRLEN];
+ 		char *addrstr = NULL;
+ 
+ 		*rec = (struct dns_res_rec){
+@@ -854,7 +854,9 @@
+ 			return false;
+ 		}
+ 
+-		addrstr = talloc_strdup(parent, ssaddr_str_buf(ip, &buf));
++		addrstr = talloc_strdup(
++			parent,
++			print_sockaddr_len(buf, sizeof(buf), &ip->u.sa, ip->sa_socklen));
+ 		if (addrstr == NULL) {
+ 			return false;
+ 		}

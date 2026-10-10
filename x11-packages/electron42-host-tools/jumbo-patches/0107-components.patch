@@ -1,0 +1,2543 @@
+From 6ab5f33ab36ecfaa07724b22df8ea9bc3c70fdf1 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Fri, 18 Apr 2025 05:46:01 +0800
+Subject: [PATCH] reland jumbo 7
+
+Enable jumbo build for almost every target in //components
+
+---
+ .../aggregatable_trigger_data.cc              |  4 ++++
+ components/autofill/content/renderer/BUILD.gn |  4 ++++
+ .../autofill/content/renderer/form_tracker.cc |  4 ++++
+ .../renderer/password_autofill_agent.cc       |  4 ++++
+ .../autofill_ai/entity_instance_cleaner.cc    |  4 ++++
+ .../addresses/autofill_profile_comparator.cc  |  4 ++++
+ .../autofill_structured_address_name.cc       |  3 ++-
+ ...request_payments_network_interface_base.cc |  8 +++++++
+ .../payments_network_interface_base.cc        |  8 +++++++
+ .../addresses/address_suggestion_generator.cc |  4 ++++
+ .../valuable_suggestion_generator.cc          |  4 ++++
+ .../browser/ui/autofill_resource_utils.cc     |  4 ++++
+ .../addresses/address_autofill_table.cc       | 14 ++++++++++++
+ .../addresses/autofill_profile_sync_util.cc   |  6 +++++
+ .../addresses/contact_info_sync_util.cc       |  6 +++++
+ .../autocomplete/autocomplete_table.cc        |  6 +++++
+ .../autocomplete_table_label_sensitive.cc     | 22 +++++++++++++++++++
+ .../webdata/autofill_ai/entity_table.cc       |  4 ++++
+ .../webdata/autofill_sync_metadata_table.cc   |  6 +++++
+ .../valuable_metadata_sync_bridge.cc          |  4 ++++
+ .../webdata/valuables/valuable_sync_bridge.cc |  4 ++++
+ .../webdata/valuables/valuables_table.cc      | 10 +++++++++
+ .../crash_reporter_breadcrumb_observer.cc     |  4 ++++
+ ...s_address_blocklist_component_installer.cc |  4 ++++
+ .../content_settings_default_provider.cc      |  4 ++++
+ .../browser/content_settings_pref_provider.cc |  4 ++++
+ .../browser/permission_settings_registry.cc   |  4 ++--
+ .../contextual_search/input_state_model.cc    |  2 +-
+ .../internal/gemini_thread_sync_bridge.cc     |  6 +++++
+ .../data_sharing_network_loader_impl.cc       |  4 ++++
+ .../core/browser/browser_utils.cc             |  8 +++----
+ components/enterprise/BUILD.gn                |  5 +++++
+ .../core/prefs_certificate_store.cc           |  4 ++++
+ .../core/unexportable_private_key_factory.cc  |  6 +++++
+ .../multipart_uploader_base.cc                |  8 +++++++
+ .../views/media_item_ui_updated_view.cc       | 14 ++++++++++++
+ .../core/on_device_clustering_backend.cc      |  4 ++++
+ components/input/input_router_impl.cc         |  4 ++--
+ .../internal/proto_leveldb_wrapper.cc         |  6 +++++
+ .../local_presentation_manager_factory.cc     |  4 ++++
+ components/metrics/install_date_provider.cc   |  6 +++++
+ .../mirroring/service/mirroring_logger.cc     |  4 ++++
+ .../browser/no_state_prefetch_contents.cc     |  6 +++++
+ .../offline_pages/core/snapshot_controller.cc |  4 ++++
+ .../browser/autocomplete_grouper_groups.cc    |  4 ++++
+ .../browser/autocomplete_grouper_sections.cc  |  4 ++++
+ .../omnibox/browser/autocomplete_match.cc     |  4 ++++
+ .../omnibox/browser/autocomplete_result.cc    |  6 +++++
+ .../omnibox/browser/base_search_provider.cc   |  6 +++++
+ .../omnibox/browser/history_url_provider.cc   |  5 ++++-
+ .../browser/omnibox_popup_selection.cc        |  4 ++++
+ .../omnibox/browser/open_tab_provider.cc      |  4 ++++
+ .../omnibox/browser/shortcuts_provider.cc     |  4 ++++
+ .../prediction_model_download_manager.cc      |  2 +-
+ .../on_device_model_classifier_controller.cc  |  4 ++++
+ ...ctor_login_password_credentials_fetcher.cc |  6 +++++
+ .../core/browser/sync_credentials_filter.cc   |  2 +-
+ components/performance_manager/BUILD.gn       |  5 +++++
+ .../decorators/page_aggregator.cc             |  4 ++++
+ .../decorators/page_live_state_decorator.cc   |  4 ++++
+ .../decorators/page_load_tracker_decorator.cc |  4 ++++
+ .../decorators/process_priority_aggregator.cc |  4 ++++
+ .../decorators/site_data_recorder.cc          |  4 ++++
+ .../decorators/tab_page_decorator.cc          |  2 +-
+ .../frame_audible_voter.cc                    |  6 +++++
+ .../frame_capturing_media_stream_voter.cc     |  6 +++++
+ .../frame_visibility_voter.cc                 |  4 ++++
+ .../inherit_client_priority_voter.cc          |  4 ++++
+ .../inherit_parent_priority_voter.cc          |  6 +++++
+ .../loading_page_voter.cc                     |  4 ++++
+ .../freezing/frozen_frame_aggregator.cc       |  4 ++++
+ .../graph/frame_node_impl_describer.cc        |  4 ++++
+ .../graph/process_node_impl_describer.cc      |  4 ++++
+ .../graph/worker_node_impl_describer.cc       |  4 ++++
+ .../performance_manager_registry_impl.cc      |  4 ++++
+ .../site_data/site_data_cache_factory.cc      |  4 ++++
+ .../cpu_measurement_monitor.cc                |  4 ++++
+ .../memory_measurement_provider.cc            |  4 ++++
+ .../persistent_cache_collection.cc            |  4 ++++
+ .../incognito_mode_policy_handler.cc          |  4 ++++
+ .../url_list/url_blocklist_policy_handler.cc  |  4 ++++
+ .../common/cloud/cloud_policy_client_types.cc |  4 ++++
+ .../machine_level_user_cloud_policy_store.cc  |  4 ++++
+ .../cloud/profile_cloud_policy_manager.cc     |  4 ++++
+ .../cloud/profile_cloud_policy_store.cc       |  4 ++++
+ .../common/cloud/user_cloud_policy_store.cc   |  4 ++++
+ .../core/common/policy_proto_decoders.cc      |  4 ++++
+ .../core/https_only_mode_allowlist.cc         |  4 ++++
+ .../selection/result_refresh_manager.cc       |  4 ++++
+ .../send_tab_to_self_entry.cc                 |  4 ++++
+ .../app_service/public/cpp/permission.cc      |  4 ++++
+ .../sqlite/session_storage_sqlite.cc          | 13 ++++++++++-
+ components/sessions/BUILD.gn                  |  4 ++++
+ .../profile_oauth2_token_service_delegate.cc  |  4 ++++
+ ...ds_chrome_management_url_checker_client.cc |  4 ++++
+ .../browser/supervised_user_preferences.cc    |  4 ++++
+ components/sync/nigori/nigori_state.cc        |  4 ++++
+ .../sync/service/device_statistics_tracker.cc |  4 ++++
+ ...sync_session_durations_metrics_recorder.cc |  6 +++++
+ ...sync_session_durations_metrics_recorder.cc |  6 +++++
+ .../bookmark_remote_updates_handler.cc        |  4 ++++
+ .../initial_account_bookmark_deduplicator.cc  |  4 ++++
+ .../parent_guid_preprocessing.cc              |  8 +++++++
+ .../synced_bookmark_tracker_entity.cc         |  4 ++++
+ .../sync_sessions/session_sync_bridge.cc      |  4 ++++
+ components/update_client/op_zucchini.cc       | 10 +++++++++
+ .../child_process_field_trial_syncer.cc       |  4 ++++
+ .../variations/variations_ids_provider.cc     |  4 ++++
+ components/webcrypto/algorithms/aes.cc        |  4 ++++
+ components/webcrypto/algorithms/aes_cbc.cc    |  4 ++++
+ .../webcrypto/algorithms/chacha20_poly1305.cc |  4 ++++
+ components/webcrypto/algorithms/ed25519.cc    |  6 +++++
+ components/webcrypto/algorithms/pbkdf2.cc     |  4 ++++
+ components/webcrypto/algorithms/rsa.cc        |  4 ++++
+ components/webcrypto/algorithms/x25519.cc     |  4 ++++
+ .../protoc_plugins/util/writer.py             |  3 +++
+ .../test_sample_json_converter.h.golden       |  3 +++
+ 117 files changed, 560 insertions(+), 15 deletions(-)
+
+diff --git a/components/attribution_reporting/aggregatable_trigger_data.cc b/components/attribution_reporting/aggregatable_trigger_data.cc
+index d207fed5dc..b8ec126455 100644
+--- a/components/attribution_reporting/aggregatable_trigger_data.cc
++++ b/components/attribution_reporting/aggregatable_trigger_data.cc
+@@ -20,6 +20,8 @@
+ #include "components/attribution_reporting/trigger_registration_error.mojom.h"
+ #include "third_party/abseil-cpp/absl/numeric/int128.h"
+ 
++#define ParseKeyPiece ParseKeyPiece_AggregatableTriggerData
++
+ namespace attribution_reporting {
+ 
+ namespace {
+@@ -129,3 +131,5 @@ base::DictValue AggregatableTriggerData::ToJson() const {
+ }
+ 
+ }  // namespace attribution_reporting
++
++#undef ParseKeyPiece
+diff --git a/components/autofill/content/renderer/BUILD.gn b/components/autofill/content/renderer/BUILD.gn
+index 855d4ed800..cd8307ea62 100644
+--- a/components/autofill/content/renderer/BUILD.gn
++++ b/components/autofill/content/renderer/BUILD.gn
+@@ -43,6 +43,10 @@ jumbo_static_library("renderer") {
+     "timing.h",
+   ]
+ 
++  jumbo_excluded_sources = [
++    "form_cache.cc",
++  ]
++
+   deps = [
+     "//base",
+     "//base:i18n",
+diff --git a/components/autofill/content/renderer/form_tracker.cc b/components/autofill/content/renderer/form_tracker.cc
+index cee22fd2d2..702057affa 100644
+--- a/components/autofill/content/renderer/form_tracker.cc
++++ b/components/autofill/content/renderer/form_tracker.cc
+@@ -39,6 +39,8 @@ using blink::WebFormControlElement;
+ using blink::WebFormElement;
+ using blink::WebInputElement;
+ 
++#define kSubmissionSourceHistogram kSubmissionSourceHistogram_FormTracker
++
+ namespace autofill {
+ 
+ namespace {
+@@ -880,3 +882,5 @@ WebDocument FormTracker::GetDocument() const {
+ }
+ 
+ }  // namespace autofill
++
++#undef kSubmissionSourceHistogram
+diff --git a/components/autofill/content/renderer/password_autofill_agent.cc b/components/autofill/content/renderer/password_autofill_agent.cc
+index 8cba62f2fb..4806965acc 100644
+--- a/components/autofill/content/renderer/password_autofill_agent.cc
++++ b/components/autofill/content/renderer/password_autofill_agent.cc
+@@ -98,6 +98,8 @@ using blink::WebView;
+ 
+ using password_manager::util::IsRendererRecognizedCredentialForm;
+ 
++#define kSubmissionSourceHistogram kSubmissionSourceHistogram_PasswordAutofillAgent
++
+ namespace autofill {
+ 
+ namespace {
+@@ -2397,3 +2399,5 @@ void PasswordAutofillAgent::MaybeTriggerSuggestionsOnFocusedElement(
+ }
+ 
+ }  // namespace autofill
++
++#undef kSubmissionSourceHistogram
+diff --git a/components/autofill/core/browser/data_manager/autofill_ai/entity_instance_cleaner.cc b/components/autofill/core/browser/data_manager/autofill_ai/entity_instance_cleaner.cc
+index fe9fb53551..3fbac8dde7 100644
+--- a/components/autofill/core/browser/data_manager/autofill_ai/entity_instance_cleaner.cc
++++ b/components/autofill/core/browser/data_manager/autofill_ai/entity_instance_cleaner.cc
+@@ -19,6 +19,8 @@
+ #include "components/sync/service/sync_service.h"
+ #include "components/sync/service/sync_user_settings.h"
+ 
++#define ShouldWaitForSync ShouldWaitForSync_EntityInstanceCleaner
++
+ namespace autofill {
+ 
+ namespace {
+@@ -130,3 +132,5 @@ void EntityInstanceCleaner::OnSyncShutdown(syncer::SyncService* sync_service) {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldWaitForSync
+diff --git a/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc b/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
+index 1a4188d2ed..06da720770 100644
+--- a/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
++++ b/components/autofill/core/browser/data_model/addresses/autofill_profile_comparator.cc
+@@ -33,6 +33,8 @@
+ 
+ using i18n::phonenumbers::PhoneNumberUtil;
+ 
++#define kSpace kSpace_AutofillProfileComparator
++
+ namespace autofill {
+ namespace {
+ 
+@@ -583,3 +585,5 @@ bool AutofillProfileComparator::HaveMergeableAddresses(
+ }
+ 
+ }  // namespace autofill
++
++#undef kSpace
+diff --git a/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc b/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
+index 5ca75c5f55..cbed7ffb6b 100644
+--- a/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
++++ b/components/autofill/core/browser/data_model/addresses/autofill_structured_address_name.cc
+@@ -32,8 +32,9 @@
+     return std::u16string();
+   }
+ 
++  const char16_t *name_seperators = kNameSeparators;
+   std::vector<std::u16string> middle_name_tokens =
+-      base::SplitString(value, kNameSeparators,
++      base::SplitString(value, name_seperators,
+                         base::WhitespaceHandling::TRIM_WHITESPACE,
+                         base::SplitResult::SPLIT_WANT_NONEMPTY);
+ 
+diff --git a/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc b/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
+index 9688c0d7e4..430de8d326 100644
+--- a/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
++++ b/components/autofill/core/browser/payments/multiple_request_payments_network_interface_base.cc
+@@ -34,6 +34,10 @@
+ #include "services/network/public/cpp/simple_url_loader.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kTokenFetchId        kTokenFetchId_MultipleRequestPaymentsNetworkInterfaceBase
++#define kPaymentsOAuth2Scope kPaymentsOAuth2Scope_MultipleRequestPaymentsNetworkInterfaceBase
++#define GetRequestUrl        GetRequestUrl_MultipleRequestPaymentsNetworkInterfaceBase
++
+ namespace autofill::payments {
+ 
+ namespace {
+@@ -392,3 +396,7 @@ void MultipleRequestPaymentsNetworkInterfaceBase::OnRequestFinished(
+ }
+ 
+ }  // namespace autofill::payments
++
++#undef kTokenFetchId
++#undef kPaymentsOAuth2Scope
++#undef GetRequestUrl
+diff --git a/components/autofill/core/browser/payments/payments_network_interface_base.cc b/components/autofill/core/browser/payments/payments_network_interface_base.cc
+index ed547e71e1..9a2fae21c8 100644
+--- a/components/autofill/core/browser/payments/payments_network_interface_base.cc
++++ b/components/autofill/core/browser/payments/payments_network_interface_base.cc
+@@ -31,6 +31,10 @@
+ #include "services/network/public/cpp/simple_url_loader.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kTokenFetchId        kTokenFetchId_PaymentsNetworkInterfaceBase
++#define kPaymentsOAuth2Scope kPaymentsOAuth2Scope_PaymentsNetworkInterfaceBase
++#define GetRequestUrl        GetRequestUrl_PaymentsNetworkInterfaceBase
++
+ namespace autofill::payments {
+ namespace {
+ 
+@@ -387,3 +391,7 @@ void PaymentsNetworkInterfaceBase::SetOAuth2TokenAndStartRequest() {
+ }
+ 
+ }  // namespace autofill::payments
++
++#undef kTokenFetchId
++#undef kPaymentsOAuth2Scope
++#undef GetRequestUrl
+diff --git a/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc b/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
+index 5da7f0b8d5..90f943b6d9 100644
+--- a/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
++++ b/components/autofill/core/browser/suggestions/addresses/address_suggestion_generator.cc
+@@ -74,6 +74,8 @@
+ #include "ui/native_theme/native_theme.h"  // nogncheck
+ #endif
+ 
++#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_AddressSuggestionGenerator
++
+ namespace autofill {
+ 
+ namespace {
+@@ -1204,3 +1206,5 @@ std::vector<Suggestion> AddressSuggestionGenerator::GenerateAddressSuggestions(
+ }
+ 
+ }  // namespace autofill
++
++#undef CreateUndoOrClearFormSuggestion
+diff --git a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
+index 97a790bd58..18696e4bb6 100644
+--- a/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
++++ b/components/autofill/core/browser/suggestions/valuables/valuable_suggestion_generator.cc
+@@ -25,6 +25,8 @@
+ #include "ui/gfx/image/image.h"
+ #include "url/gurl.h"
+ 
++#define CreateUndoOrClearFormSuggestion CreateUndoOrClearFormSuggestion_ValuableSuggestionGenerator
++
+ namespace autofill {
+ namespace {
+ 
+@@ -454,3 +456,5 @@ void LoyaltyCardSuggestionGenerator::GenerateSuggestions(
+ }
+ 
+ }  // namespace autofill
++
++#undef CreateUndoOrClearFormSuggestion
+diff --git a/components/autofill/core/browser/ui/autofill_resource_utils.cc b/components/autofill/core/browser/ui/autofill_resource_utils.cc
+index 93717ce822..f33ed04f5e 100644
+--- a/components/autofill/core/browser/ui/autofill_resource_utils.cc
++++ b/components/autofill/core/browser/ui/autofill_resource_utils.cc
+@@ -16,6 +16,8 @@
+ #include "components/resources/android/theme_resources.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
++#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_AutoFillResouceUtils
++
+ namespace autofill {
+ 
+ namespace {
+@@ -135,3 +137,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUseNewFopDisplay
+diff --git a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
+index 39a6679270..211f0841c1 100644
+--- a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
++++ b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
+@@ -30,6 +30,13 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define kValue kValue_AddressAutofillTable
++#define GetKey GetKey_AddressAutofillTable
++#define kGuid         kGuid_AddressAutofillTable
++#define kUseCount     kUseCount_AddressAutofillTable
++#define kUseDate      kUseDate_AddressAutofillTable
++#define kDateModified kDateModified_AddressAutofillTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -1210,3 +1217,10 @@ bool AddressAutofillTable::InitAddressTypeTokensTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef kValue
++#undef GetKey
++#undef kGuid
++#undef kUseCount
++#undef kUseDate
++#undef kDateModified
+diff --git a/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc b/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
+index 99d27923c1..56ffb9187e 100644
+--- a/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
++++ b/components/autofill/core/browser/webdata/addresses/autofill_profile_sync_util.cc
+@@ -20,6 +20,9 @@
+ using sync_pb::AutofillProfileSpecifics;
+ using syncer::EntityData;
+ 
++#define ConvertSpecificsToProfileVerificationStatus ConvertSpecificsToProfileVerificationStatus_AutofillProfileSyncUtil
++#define ConvertProfileToSpecificsVerificationStatus ConvertProfileToSpecificsVerificationStatus_AutofillProfileSyncUtil
++
+ namespace autofill {
+ 
+ namespace {
+@@ -699,3 +702,6 @@ std::string GetStorageKeyFromAutofillProfileSpecifics(
+ }
+ 
+ }  // namespace autofill
++
++#undef ConvertSpecificsToProfileVerificationStatus
++#undef ConvertProfileToSpecificsVerificationStatus
+diff --git a/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc b/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
+index 05b3a532ab..e5abf42251 100644
+--- a/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
++++ b/components/autofill/core/browser/webdata/addresses/contact_info_sync_util.cc
+@@ -16,6 +16,9 @@
+ #include "components/autofill/core/browser/geo/country_names.h"
+ #include "components/autofill/core/common/autofill_features.h"
+ 
++#define ConvertSpecificsToProfileVerificationStatus ConvertSpecificsToProfileVerificationStatus_ContactInfoSyncUtil
++#define ConvertProfileToSpecificsVerificationStatus ConvertProfileToSpecificsVerificationStatus_ContactInfoSyncUtil
++
+ namespace autofill {
+ 
+ namespace {
+@@ -600,3 +603,6 @@ sync_pb::ContactInfoSpecifics TrimContactInfoSpecificsDataForCaching(
+ // LINT.ThenChange(//components/sync/protocol/contact_info_specifics.proto:ContactInfoSpecifics)
+ 
+ }  // namespace autofill
++
++#undef ConvertSpecificsToProfileVerificationStatus
++#undef ConvertProfileToSpecificsVerificationStatus
+diff --git a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
+index 7b08ce8b1d..17869aa9e4 100644
+--- a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
++++ b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table.cc
+@@ -25,6 +25,9 @@
+ #include "sql/transaction.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
++#define kValue kValue_AutocompleteTable
++#define GetKey GetKey_AutocompleteTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -449,3 +452,6 @@ bool AutocompleteTable::InitMainTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef kValue
++#undef GetKey
+diff --git a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
+index d6da9573f7..db932aa862 100644
+--- a/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
++++ b/components/autofill/core/browser/webdata/autocomplete/autocomplete_table_label_sensitive.cc
+@@ -33,6 +33,17 @@
+ #include "third_party/icu/source/common/unicode/utypes.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
++#define kName              kName_AutocompleteTableLabelSensitive
++#define kLabel             kLabel_AutocompleteTableLabelSensitive
++#define kValue             kValue_AutocompleteTableLabelSensitive
++#define kValueLower        kValueLower_AutocompleteTableLabelSensitive
++#define kDateCreated       kDateCreated_AutocompleteTableLabelSensitive
++#define kDateLastUsed      kDateLastUsed_AutocompleteTableLabelSensitive
++#define kCount             kCount_AutocompleteTableLabelSensitive
++#define AutocompleteUpdate AutocompleteUpdate_AutocompleteTableLabelSensitive
++#define GetEndTime         GetEndTime_AutocompleteTableLabelSensitive
++#define GetKey             GetKey_AutocompleteTableLabelSensitive
++
+ namespace autofill {
+ 
+ namespace {
+@@ -516,3 +527,14 @@ bool AutocompleteTableLabelSensitive::InitMainTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef kName
++#undef kLabel
++#undef kValue
++#undef kValueLower
++#undef kDateCreated
++#undef kDateLastUsed
++#undef kCount
++#undef AutocompleteUpdate
++#undef GetEndTime
++#undef GetKey
+diff --git a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
+index e46fe2b715..3d68b4fecc 100644
+--- a/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
++++ b/components/autofill/core/browser/webdata/autofill_ai/entity_table.cc
+@@ -36,6 +36,8 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define GetKey GetKey_EntityTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -768,3 +770,5 @@ std::optional<EntityInstance> EntityTable::ValidateInstance(
+ }
+ 
+ }  // namespace autofill
++
++#undef GetKey
+diff --git a/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc b/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
+index f309eac2e3..1cdd430eaa 100644
+--- a/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
++++ b/components/autofill/core/browser/webdata/autofill_sync_metadata_table.cc
+@@ -13,6 +13,9 @@
+ #include "components/webdata/common/web_database.h"
+ #include "sql/statement.h"
+ 
++#define kValue kValue_AutofillSyncMetadataTable
++#define GetKey GetKey_AutofillSyncMetadataTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -233,3 +236,6 @@ bool AutofillSyncMetadataTable::InitDataTypeStateTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef kValue
++#undef GetKey
+diff --git a/components/autofill/core/browser/webdata/valuables/valuable_metadata_sync_bridge.cc b/components/autofill/core/browser/webdata/valuables/valuable_metadata_sync_bridge.cc
+index 3797bb2448..47ee4a9753 100644
+--- a/components/autofill/core/browser/webdata/valuables/valuable_metadata_sync_bridge.cc
++++ b/components/autofill/core/browser/webdata/valuables/valuable_metadata_sync_bridge.cc
+@@ -27,6 +27,8 @@
+ #include "components/sync/protocol/entity_data.h"
+ #include "components/webdata/common/web_database.h"
+ 
++#define ShouldUploadEntityChange ShouldUploadEntityChange_ValuableMetadataSyncBridge
++
+ namespace autofill {
+ namespace {
+ // The address of this variable is used as the user data key.
+@@ -577,3 +579,5 @@ ValuablesTable* ValuableMetadataSyncBridge::GetValuablesTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUploadEntityChange
+diff --git a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
+index 00dd1ff986..1a715da5f6 100644
+--- a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
++++ b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
+@@ -27,6 +27,8 @@
+ #include "components/sync/protocol/entity_data.h"
+ #include "components/webdata/common/web_database.h"
+ 
++#define AreAnyItemsDifferent AreAnyItemsDifferent_ValuableSyncBridge
++
+ namespace autofill {
+ namespace {
+ 
+@@ -675,3 +677,5 @@ EntityTable* ValuableSyncBridge::GetEntityTable() {
+ }
+ 
+ }  // namespace autofill
++
++#undef AreAnyItemsDifferent
+diff --git a/components/autofill/core/browser/webdata/valuables/valuables_table.cc b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
+index 9282851e03..5739cd6418 100644
+--- a/components/autofill/core/browser/webdata/valuables/valuables_table.cc
++++ b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
+@@ -18,6 +18,11 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define GetKey GetKey_WebDatabaseTable
++#define kMerchantDomain kMerchantDomain_WebDatabaseTable
++#define kUseCount kUseCount_WebDatabaseTable
++#define kUseDate kUseDate_WebDatabaseTable
++
+ namespace autofill {
+ 
+ namespace {
+@@ -397,3 +402,8 @@ bool ValuablesTable::AddValuableMetadata(
+ }
+ 
+ }  // namespace autofill
++
++#undef GetKey
++#undef kMerchantDomain
++#undef kUseCount
++#undef kUseDate
+diff --git a/components/breadcrumbs/core/crash_reporter_breadcrumb_observer.cc b/components/breadcrumbs/core/crash_reporter_breadcrumb_observer.cc
+index 1594e73546..7de1802d74 100644
+--- a/components/breadcrumbs/core/crash_reporter_breadcrumb_observer.cc
++++ b/components/breadcrumbs/core/crash_reporter_breadcrumb_observer.cc
+@@ -13,6 +13,8 @@
+ #include "components/breadcrumbs/core/crash_reporter_breadcrumb_constants.h"
+ #include "components/crash/core/common/crash_key.h"
+ 
++#define kEventSeparator kEventSeparator_crash_reporter_breadcrumb_observer
++
+ namespace breadcrumbs {
+ 
+ namespace {
+@@ -72,3 +74,5 @@ void CrashReporterBreadcrumbObserver::UpdateBreadcrumbEventsCrashKey() {
+ }
+ 
+ }  // namespace breadcrumbs
++
++#undef kEventSeparator
+diff --git a/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc b/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
+index cc99993b21..5fbba765c6 100644
+--- a/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
++++ b/components/component_updater/installer_policies/plus_address_blocklist_component_installer.cc
+@@ -17,6 +17,8 @@
+ #include "components/plus_addresses/core/browser/plus_address_blocklist_data.h"
+ #include "components/plus_addresses/core/common/features.h"
+ 
++#define GetInstalledPath GetInstalledPath_plus_address_blocklist_component_installer
++
+ namespace component_updater {
+ namespace {
+ 
+@@ -137,3 +139,5 @@ void RegisterPlusAddressBlocklistComponent(ComponentUpdateService* cus) {
+ }
+ 
+ }  // namespace component_updater
++
++#undef GetInstalledPath
+diff --git a/components/content_settings/core/browser/content_settings_default_provider.cc b/components/content_settings/core/browser/content_settings_default_provider.cc
+index 8a82bc5d45..de32b7710f 100644
+--- a/components/content_settings/core/browser/content_settings_default_provider.cc
++++ b/components/content_settings/core/browser/content_settings_default_provider.cc
+@@ -43,6 +43,8 @@
+ #include "services/device/public/cpp/device_features.h"
+ #endif  // !BUILDFLAG(IS_IOS)
+ 
++#define kBug364820109AlreadyWorkedAroundPref kBug364820109AlreadyWorkedAroundPref_DefaultProvider
++
+ namespace content_settings {
+ 
+ namespace {
+@@ -663,3 +665,5 @@ void DefaultProvider::RecordHistogramMetrics() {
+ }
+ 
+ }  // namespace content_settings
++
++#undef kBug364820109AlreadyWorkedAroundPref
+diff --git a/components/content_settings/core/browser/content_settings_pref_provider.cc b/components/content_settings/core/browser/content_settings_pref_provider.cc
+index 6fe8fa1237..009ad3ce99 100644
+--- a/components/content_settings/core/browser/content_settings_pref_provider.cc
++++ b/components/content_settings/core/browser/content_settings_pref_provider.cc
+@@ -40,6 +40,8 @@
+ #include "services/tracing/public/cpp/perfetto/macros.h"
+ #include "third_party/perfetto/protos/perfetto/trace/track_event/chrome_content_settings_event_info.pbzero.h"
+ 
++#define kBug364820109AlreadyWorkedAroundPref kBug364820109AlreadyWorkedAroundPref_PrefProvider
++
+ namespace content_settings {
+ 
+ namespace {
+@@ -584,3 +586,5 @@ void PrefProvider::SetClockForTesting(const base::Clock* clock) {
+ }
+ 
+ }  // namespace content_settings
++
++#undef kBug364820109AlreadyWorkedAroundPref
+diff --git a/components/content_settings/core/browser/permission_settings_registry.cc b/components/content_settings/core/browser/permission_settings_registry.cc
+index be746d6503..a878920ad6 100644
+--- a/components/content_settings/core/browser/permission_settings_registry.cc
++++ b/components/content_settings/core/browser/permission_settings_registry.cc
+@@ -20,13 +20,13 @@ namespace content_settings {
+ namespace {
+ 
+ base::LazyInstance<PermissionSettingsRegistry>::DestructorAtExit
+-    g_content_settings_registry_instance = LAZY_INSTANCE_INITIALIZER;
++    g_permission_settings_registry_instance = LAZY_INSTANCE_INITIALIZER;
+ 
+ }  // namespace
+ 
+ // static
+ PermissionSettingsRegistry* PermissionSettingsRegistry::GetInstance() {
+-  return g_content_settings_registry_instance.Pointer();
++  return g_permission_settings_registry_instance.Pointer();
+ }
+ 
+ PermissionSettingsRegistry::PermissionSettingsRegistry()
+diff --git a/components/contextual_tasks/internal/gemini_thread_sync_bridge.cc b/components/contextual_tasks/internal/gemini_thread_sync_bridge.cc
+index 26385eccc7..dc6dee5d88 100644
+--- a/components/contextual_tasks/internal/gemini_thread_sync_bridge.cc
++++ b/components/contextual_tasks/internal/gemini_thread_sync_bridge.cc
+@@ -13,6 +13,9 @@
+ #include "components/sync/model/mutable_data_batch.h"
+ #include "components/sync/protocol/gemini_thread_specifics.pb.h"
+ 
++#define CreateEntityDataFromSpecifics      CreateEntityDataFromSpecifics_gemini_thread_sync_bridge
++#define ApplyEntityProtoToTrimmedSpecifics ApplyEntityProtoToTrimmedSpecifics_gemini_thread_sync_bridge
++
+ namespace {
+ 
+ std::unique_ptr<syncer::EntityData> CreateEntityDataFromSpecifics(
+@@ -263,3 +266,6 @@ void GeminiThreadSyncBridge::RemoveObserver(Observer* observer) {
+ }
+ 
+ }  // namespace contextual_tasks
++
++#undef ApplyEntityProtoToTrimmedSpecifics
++#undef CreateEntityDataFromSpecifics
+diff --git a/components/data_sharing/internal/data_sharing_network_loader_impl.cc b/components/data_sharing/internal/data_sharing_network_loader_impl.cc
+index e4cbed20c3..b5448b2452 100644
+--- a/components/data_sharing/internal/data_sharing_network_loader_impl.cc
++++ b/components/data_sharing/internal/data_sharing_network_loader_impl.cc
+@@ -15,6 +15,8 @@
+ using endpoint_fetcher::EndpointFetcher;
+ using endpoint_fetcher::EndpointResponse;
+ 
++#define kTimeout kTimeout_DataSharingNetworkLoaderImpl
++
+ namespace data_sharing {
+ 
+ namespace {
+@@ -113,3 +115,5 @@ DataSharingNetworkLoaderImpl::GetNetworkTrafficAnnotationTag(
+ }
+ 
+ }  // namespace data_sharing
++
++#undef kTimeout
+diff --git a/components/device_signals/core/browser/browser_utils.cc b/components/device_signals/core/browser/browser_utils.cc
+index 5d5c4264c8..0af587aa20 100644
+--- a/components/device_signals/core/browser/browser_utils.cc
++++ b/components/device_signals/core/browser/browser_utils.cc
+@@ -33,9 +33,9 @@ safe_browsing::SafeBrowsingState GetSafeBrowsingProtectionLevel(
+     PrefService* profile_prefs) {
+   DCHECK(profile_prefs);
+   bool safe_browsing_enabled =
+-      profile_prefs->GetBoolean(prefs::kSafeBrowsingEnabled);
++      profile_prefs->GetBoolean(::prefs::kSafeBrowsingEnabled);
+   bool safe_browsing_enhanced_enabled =
+-      profile_prefs->GetBoolean(prefs::kSafeBrowsingEnhanced);
++      profile_prefs->GetBoolean(::prefs::kSafeBrowsingEnhanced);
+ 
+   if (safe_browsing_enabled) {
+     if (safe_browsing_enhanced_enabled) {
+@@ -51,11 +51,11 @@ safe_browsing::SafeBrowsingState GetSafeBrowsingProtectionLevel(
+ std::optional<safe_browsing::PasswordProtectionTrigger>
+ GetPasswordProtectionWarningTrigger(PrefService* profile_prefs) {
+   DCHECK(profile_prefs);
+-  if (!profile_prefs->HasPrefPath(prefs::kPasswordProtectionWarningTrigger)) {
++  if (!profile_prefs->HasPrefPath(::prefs::kPasswordProtectionWarningTrigger)) {
+     return std::nullopt;
+   }
+   return static_cast<safe_browsing::PasswordProtectionTrigger>(
+-      profile_prefs->GetInteger(prefs::kPasswordProtectionWarningTrigger));
++      profile_prefs->GetInteger(::prefs::kPasswordProtectionWarningTrigger));
+ }
+ 
+ bool GetChromeRemoteDesktopAppBlocked(PolicyBlocklistService* service) {
+diff --git a/components/enterprise/BUILD.gn b/components/enterprise/BUILD.gn
+index 260e356e40..c72e44fbc5 100644
+--- a/components/enterprise/BUILD.gn
++++ b/components/enterprise/BUILD.gn
+@@ -66,6 +66,7 @@ jumbo_static_library("enterprise") {
+     "browser/reporting/user_security_signals_service.cc",
+     "browser/reporting/user_security_signals_service.h",
+   ]
++  jumbo_excluded_sources = []
+ 
+   if (!is_chromeos) {
+     sources += [
+@@ -83,6 +84,10 @@ jumbo_static_library("enterprise") {
+       "browser/promotion/promotion_eligibility_checker.cc",
+       "browser/promotion/promotion_eligibility_checker.h",
+     ]
++    jumbo_excluded_sources += [
++      # Conflict with //components/enterprise/browser/promotion:promotion
++      "browser/promotion/promotion_eligibility_checker.cc",
++    ]
+   }
+ 
+   configs += [
+diff --git a/components/enterprise/client_certificates/core/prefs_certificate_store.cc b/components/enterprise/client_certificates/core/prefs_certificate_store.cc
+index 6e75490483..b6ff9f411d 100644
+--- a/components/enterprise/client_certificates/core/prefs_certificate_store.cc
++++ b/components/enterprise/client_certificates/core/prefs_certificate_store.cc
+@@ -16,6 +16,8 @@
+ #include "components/prefs/pref_service.h"
+ #include "net/cert/x509_certificate.h"
+ 
++#define OnKeyLoaded OnKeyLoaded_prefs_certificate_store
++
+ namespace client_certificates {
+ 
+ namespace {
+@@ -223,3 +225,5 @@ void PrefsCertificateStore::DeleteIdentities(
+ }
+ 
+ }  // namespace client_certificates
++
++#undef OnKeyLoaded
+diff --git a/components/enterprise/client_certificates/core/unexportable_private_key_factory.cc b/components/enterprise/client_certificates/core/unexportable_private_key_factory.cc
+index c738b787ec..7717e59ead 100644
+--- a/components/enterprise/client_certificates/core/unexportable_private_key_factory.cc
++++ b/components/enterprise/client_certificates/core/unexportable_private_key_factory.cc
+@@ -24,6 +24,9 @@
+ #include "crypto/unexportable_key.h"
+ #include "net/ssl/ssl_private_key.h"
+ 
++#define CreateKey          CreateKey_unexportable_private_key_factory
++#define LoadKeyFromWrapped LoadKeyFromWrapped_unexportable_private_key_factory
++
+ namespace client_certificates {
+ 
+ namespace {
+@@ -151,3 +154,6 @@ void UnexportablePrivateKeyFactory::LoadPrivateKeyFromDict(
+ }
+ 
+ }  // namespace client_certificates
++
++#undef CreateKey
++#undef LoadKeyFromWrapped
+diff --git a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
+index 0bfe80a3db..c3c0afa32e 100644
+--- a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
++++ b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
+@@ -31,6 +31,10 @@
+ #include "services/network/public/mojom/data_pipe_getter.mojom.h"
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ 
++#define kDataContentType   kDataContentType_multipart_uploader_base
++#define kUploadContentType kUploadContentType_multipart_uploader_base
++#define CreateFileDataPipeGetterBlocking CreateFileDataPipeGetterBlocking_multipart_uploader_base
++
+ namespace enterprise_connectors {
+ 
+ namespace {
+@@ -354,3 +358,7 @@ void MultipartUploadRequestBase::OnURLLoaderComplete(
+ }
+ 
+ }  //  namespace enterprise_connectors
++
++#undef kDataContentType
++#undef kUploadContentType
++#undef CreateFileDataPipeGetterBlocking
+diff --git a/components/global_media_controls/public/views/media_item_ui_updated_view.cc b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
+index e805c62218..ba95cb566b 100644
+--- a/components/global_media_controls/public/views/media_item_ui_updated_view.cc
++++ b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
+@@ -25,6 +25,13 @@
+ #include "ui/views/controls/label.h"
+ #include "ui/views/layout/box_layout_view.h"
+ 
++#define kBackgroundInsets          kBackgroundInsets_MediaItemUIUpdatedView
++#define kBackgroundCornerRadius    kBackgroundCornerRadius_MediaItemUIUpdatedView
++#define kMediaActionButtonIconSize kMediaActionButtonIconSize_MediaItemUIUpdatedView
++#define kFocusRingHaloInset        kFocusRingHaloInset_MediaItemUIUpdatedView
++#define kArtworkSize               kArtworkSize_MediaItemUIUpdatedView
++#define kPlayPauseButtonSize       kPlayPauseButtonSize_MediaItemUIUpdatedView
++
+ namespace global_media_controls {
+ 
+ using media_session::mojom::MediaSessionAction;
+@@ -820,3 +827,10 @@ BEGIN_METADATA(MediaItemUIUpdatedView)
+ END_METADATA
+ 
+ }  // namespace global_media_controls
++
++#undef kBackgroundInsets
++#undef kBackgroundCornerRadius
++#undef kMediaActionButtonIconSize
++#undef kFocusRingHaloInset
++#undef kArtworkSize
++#undef kPlayPauseButtonSize
+diff --git a/components/history_clusters/core/on_device_clustering_backend.cc b/components/history_clusters/core/on_device_clustering_backend.cc
+index a9999a9e5a..2452272f4c 100644
+--- a/components/history_clusters/core/on_device_clustering_backend.cc
++++ b/components/history_clusters/core/on_device_clustering_backend.cc
+@@ -38,6 +38,8 @@
+ #include "components/site_engagement/core/site_engagement_score_provider.h"
+ #include "components/url_formatter/url_formatter.h"
+ 
++#define kEngagementScoreCacheSize kEngagementScoreCacheSize_OnDeviceClusteringBackend
++
+ namespace history_clusters {
+ 
+ namespace {
+@@ -396,3 +398,5 @@ OnDeviceClusteringBackend::GetClusterTriggerabilityOnBackgroundThread(
+ }
+ 
+ }  // namespace history_clusters
++
++#undef kEngagementScoreCacheSize
+diff --git a/components/input/input_router_impl.cc b/components/input/input_router_impl.cc
+index 090e959d40..2b88e656d9 100644
+--- a/components/input/input_router_impl.cc
++++ b/components/input/input_router_impl.cc
+@@ -689,7 +689,7 @@ void InputRouterImpl::FilterAndSendWebInputEvent(
+           });
+       bool send_touch_event =
+           base::FeatureList::IsEnabled(
+-              features::kSendEmptyGestureScrollUpdate) &&
++              ::features::kSendEmptyGestureScrollUpdate) &&
+           event->Event().GetType() ==
+               blink::WebInputEvent::Type::kGestureScrollUpdate &&
+           last_touch_move_event_.has_value();
+@@ -703,7 +703,7 @@ void InputRouterImpl::FilterAndSendWebInputEvent(
+     }
+   } else {
+     bool store_touch_move_event =
+-        base::FeatureList::IsEnabled(features::kSendEmptyGestureScrollUpdate) &&
++        base::FeatureList::IsEnabled(::features::kSendEmptyGestureScrollUpdate) &&
+         event->Event().GetType() == blink::WebInputEvent::Type::kTouchMove;
+     bool dispatch_last_event =
+         store_touch_move_event && last_touch_move_event_.has_value();
+diff --git a/components/leveldb_proto/internal/proto_leveldb_wrapper.cc b/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
+index 17509c12ec..96426a0faa 100644
+--- a/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
++++ b/components/leveldb_proto/internal/proto_leveldb_wrapper.cc
+@@ -14,6 +14,9 @@
+ #include "components/leveldb_proto/internal/proto_leveldb_wrapper_metrics.h"
+ #include "components/leveldb_proto/public/proto_database.h"
+ 
++#define UpdateEntriesFromTaskRunner                 UpdateEntriesFromTaskRunner_Wrapper
++#define UpdateEntriesWithRemoveFilterFromTaskRunner UpdateEntriesWithRemoveFilterFromTaskRunner_Wrapper
++
+ namespace leveldb_proto {
+ 
+ namespace {
+@@ -423,3 +426,6 @@ ProtoLevelDBWrapper::task_runner() {
+ }
+ 
+ }  // namespace leveldb_proto
++
++#undef UpdateEntriesFromTaskRunner
++#undef UpdateEntriesWithRemoveFilterFromTaskRunner
+diff --git a/components/media_router/browser/presentation/local_presentation_manager_factory.cc b/components/media_router/browser/presentation/local_presentation_manager_factory.cc
+index 1f3459484c..db5fea2334 100644
+--- a/components/media_router/browser/presentation/local_presentation_manager_factory.cc
++++ b/components/media_router/browser/presentation/local_presentation_manager_factory.cc
+@@ -8,6 +8,8 @@
+ #include "components/media_router/browser/presentation/local_presentation_manager.h"
+ #include "content/public/browser/web_contents.h"
+ 
++#define g_instance g_instance_local_presentation_manager_factory
++
+ namespace media_router {
+ 
+ namespace {
+@@ -53,3 +55,5 @@ LocalPresentationManagerFactory::BuildServiceInstanceForBrowserContext(
+ }
+ 
+ }  // namespace media_router
++
++#undef g_instance
+diff --git a/components/metrics/install_date_provider.cc b/components/metrics/install_date_provider.cc
+index 925da2a15e..56d3e83490 100644
+--- a/components/metrics/install_date_provider.cc
++++ b/components/metrics/install_date_provider.cc
+@@ -8,6 +8,9 @@
+ #include "components/metrics/metrics_pref_names.h"
+ #include "components/prefs/pref_service.h"
+ 
++#define ReadInstallDate    ReadInstallDate_InstallDateProvider
++#define RoundSecondsToHour RoundSecondsToHour_InstallDateProvider
++
+ namespace metrics {
+ 
+ namespace {
+@@ -34,3 +37,6 @@ void InstallDateProvider::ProvideSystemProfileMetrics(
+ }
+ 
+ }  // namespace metrics
++
++#undef ReadInstallDate
++#undef RoundSecondsToHour
+diff --git a/components/mirroring/service/mirroring_logger.cc b/components/mirroring/service/mirroring_logger.cc
+index c0a89b6206..8bfcbc4e2a 100644
+--- a/components/mirroring/service/mirroring_logger.cc
++++ b/components/mirroring/service/mirroring_logger.cc
+@@ -12,6 +12,8 @@
+ #include "base/strings/stringprintf.h"
+ #include "components/mirroring/mojom/session_observer.mojom.h"
+ 
++#define kLogPrefix kLogPrefix_MirroringLogger
++
+ namespace mirroring {
+ 
+ constexpr char kLogPrefix[] = "mirroring.";
+@@ -78,3 +80,5 @@ void MirroringLogger::LogErrorInternal(const std::string& message) {
+ }
+ 
+ }  // namespace mirroring
++
++#undef kLogPrefix
+diff --git a/components/no_state_prefetch/browser/no_state_prefetch_contents.cc b/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
+index ecbcc8aaea..ba6b54a865 100644
+--- a/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
++++ b/components/no_state_prefetch/browser/no_state_prefetch_contents.cc
+@@ -50,6 +50,9 @@ using content::RenderFrameHost;
+ using content::SessionStorageNamespace;
+ using content::WebContents;
+ 
++#define ToPreloadingFailureReason      ToPreloadingFailureReason_NoStatePrefetchContents
++#define SetPreloadingTriggeringOutcome SetPreloadingTriggeringOutcome_NoStatePrefetchContents
++
+ namespace prerender {
+ 
+ class NoStatePrefetchContentsFactoryImpl
+@@ -632,3 +635,6 @@ void NoStatePrefetchContents::AddNoStatePrefetchCancelerReceiver(
+ }
+ 
+ }  // namespace prerender
++
++#undef ToPreloadingFailureReason
++#undef SetPreloadingTriggeringOutcome
+diff --git a/components/offline_pages/core/snapshot_controller.cc b/components/offline_pages/core/snapshot_controller.cc
+index e3163383fd..768aada6a2 100644
+--- a/components/offline_pages/core/snapshot_controller.cc
++++ b/components/offline_pages/core/snapshot_controller.cc
+@@ -11,6 +11,8 @@
+ #include "base/time/time.h"
+ #include "components/offline_pages/core/offline_page_feature.h"
+ 
++#define kDelayForTests kDelayForTests_SnapshotController
++
+ namespace {
+ // Default delay, in milliseconds, between the main document parsed event and
+ // snapshot. Note: this snapshot might not occur if the OnLoad event and
+@@ -119,3 +121,5 @@ int64_t SnapshotController::GetDelayAfterDocumentOnLoadCompletedForTest() {
+ }
+ 
+ }  // namespace offline_pages
++
++#undef kDelayForTests
+diff --git a/components/omnibox/browser/autocomplete_grouper_groups.cc b/components/omnibox/browser/autocomplete_grouper_groups.cc
+index f0b167a06e..12b4421010 100644
+--- a/components/omnibox/browser/autocomplete_grouper_groups.cc
++++ b/components/omnibox/browser/autocomplete_grouper_groups.cc
+@@ -12,6 +12,8 @@
+ #include "components/omnibox/browser/autocomplete_match.h"
+ #include "third_party/omnibox_proto/groups.pb.h"
+ 
++#define is_android is_android_autocomplete_grouper_groups
++
+ namespace {
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+ }  // namespace
+@@ -86,3 +88,5 @@ void Group::GroupMatchesByGroupId() {
+                group_id_position[rhs->suggestion_group_id.value()];
+       });
+ }
++
++#undef is_android
+diff --git a/components/omnibox/browser/autocomplete_grouper_sections.cc b/components/omnibox/browser/autocomplete_grouper_sections.cc
+index 5437b02df3..89e847c933 100644
+--- a/components/omnibox/browser/autocomplete_grouper_sections.cc
++++ b/components/omnibox/browser/autocomplete_grouper_sections.cc
+@@ -20,6 +20,8 @@
+ #include "components/omnibox/common/omnibox_feature_configs.h"
+ #include "third_party/omnibox_proto/groups.pb.h"
+ 
++#define is_android is_android_autocomplete_grouper_sections
++
+ namespace {
+ constexpr size_t kMobileMostVisitedTilesLimit = 10;
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+@@ -893,3 +895,5 @@ IOSLensMultimodalZpsSection::IOSLensMultimodalZpsSection(
+                            }),
+                  },
+                  group_configs) {}
++
++#undef is_android
+diff --git a/components/omnibox/browser/autocomplete_match.cc b/components/omnibox/browser/autocomplete_match.cc
+index 5ffaeadc59..70117ff916 100644
+--- a/components/omnibox/browser/autocomplete_match.cc
++++ b/components/omnibox/browser/autocomplete_match.cc
+@@ -62,6 +62,8 @@
+ #include "components/vector_icons/vector_icons.h"     // nogncheck
+ #endif
+ 
++#define kIsDesktop kIsDesktop_AutoCompleteMatch
++
+ constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
+ constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
+ 
+@@ -2425,3 +2427,5 @@ void AutocompleteMatch::ValidateClassifications(
+   }
+ #endif  // DCHECK_IS_ON()
+ }
++
++#undef kIsDesktop
+diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
+index 91140083d5..0b2296cb23 100644
+--- a/components/omnibox/browser/autocomplete_result.cc
++++ b/components/omnibox/browser/autocomplete_result.cc
+@@ -74,6 +74,9 @@ using metrics::OmniboxEventProto;
+ 
+ typedef AutocompleteMatchType ACMatchType;
+ 
++#define is_android is_android_autocomplete_result
++#define is_ios     is_ios_autocomplete_result
++
+ namespace {
+ 
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+@@ -1750,3 +1753,6 @@ std::ostream& operator<<(std::ostream& os, const AutocompleteResult& result) {
+   os << "}" << std::endl;
+   return os;
+ }
++
++#undef is_android
++#undef is_ios
+diff --git a/components/omnibox/browser/base_search_provider.cc b/components/omnibox/browser/base_search_provider.cc
+index 9d18439be6..4878424e81 100644
+--- a/components/omnibox/browser/base_search_provider.cc
++++ b/components/omnibox/browser/base_search_provider.cc
+@@ -47,6 +47,9 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define is_android is_android_base_search_provider
++#define is_ios     is_ios_base_search_provider
++
+ namespace {
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+ constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
+@@ -775,3 +778,6 @@ void BaseSearchProvider::OnDeletionComplete(
+         return loader.get() == source;
+       });
+ }
++
++#undef is_android
++#undef is_ios
+diff --git a/components/omnibox/browser/history_url_provider.cc b/components/omnibox/browser/history_url_provider.cc
+index 3a024adea3..51974f6359 100644
+--- a/components/omnibox/browser/history_url_provider.cc
++++ b/components/omnibox/browser/history_url_provider.cc
+@@ -57,7 +57,8 @@
+ 
+ namespace {
+ 
+-using ScoringSignals = ::metrics::OmniboxScoringSignals;
++using OmniboxScoringSignals = ::metrics::OmniboxScoringSignals;
++#define ScoringSignals OmniboxScoringSignals
+ 
+ // Acts like the > operator for URLInfo classes.
+ bool CompareHistoryMatch(const history::HistoryMatch& a,
+@@ -1202,3 +1203,5 @@ AutocompleteMatch HistoryURLProvider::HistoryMatchToACMatch(
+ 
+   return match;
+ }
++
++#undef ScoringSignals
+diff --git a/components/omnibox/browser/omnibox_popup_selection.cc b/components/omnibox/browser/omnibox_popup_selection.cc
+index d77569fbf1..5401a1b6f1 100644
+--- a/components/omnibox/browser/omnibox_popup_selection.cc
++++ b/components/omnibox/browser/omnibox_popup_selection.cc
+@@ -14,6 +14,8 @@
+ #include "components/omnibox/common/omnibox_features.h"
+ #include "components/search_engines/template_url_service.h"
+ 
++#define kIsDesktop kIsDesktop_OmniboxPopupSelection
++
+ constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
+ 
+ constexpr size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
+@@ -274,3 +276,5 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
+       << "This algorithm depends on a sorted list of available selections.";
+   return available_selections;
+ }
++
++#undef kIsDesktop
+diff --git a/components/omnibox/browser/open_tab_provider.cc b/components/omnibox/browser/open_tab_provider.cc
+index 6ffb6d1e65..eb7142a286 100644
+--- a/components/omnibox/browser/open_tab_provider.cc
++++ b/components/omnibox/browser/open_tab_provider.cc
+@@ -32,6 +32,8 @@
+ #include "ui/base/l10n/l10n_util.h"
+ #include "url/gurl.h"
+ 
++#define is_android is_android_open_tab_provider
++
+ namespace {
+ 
+ constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
+@@ -271,3 +273,5 @@ AutocompleteMatch OpenTabProvider::CreateNullResultMessageMatch(
+ 
+   return match;
+ }
++
++#undef is_android
+diff --git a/components/omnibox/browser/shortcuts_provider.cc b/components/omnibox/browser/shortcuts_provider.cc
+index 0a5934d76a..754b43b0c3 100644
+--- a/components/omnibox/browser/shortcuts_provider.cc
++++ b/components/omnibox/browser/shortcuts_provider.cc
+@@ -54,6 +54,8 @@
+ #include "components/history_clusters/core/config.h"  // nogncheck
+ #endif                                                // !BUILDFLAG(IS_IOS)
+ 
++#define kIsDesktop kIsDesktop_ShortcutsProvider
++
+ constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
+ 
+ namespace {
+@@ -610,3 +612,5 @@ ShortcutsBackend::ShortcutMap::const_iterator ShortcutsProvider::FindFirstMatch(
+              ? it
+              : backend->shortcuts_map().end();
+ }
++
++#undef kIsDesktop
+diff --git a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
+index 8926ab1615..a6eb773ab7 100644
+--- a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
++++ b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
+@@ -206,7 +206,7 @@ bool PredictionModelDownloadManager::ShouldFetchModels() const {
+   }
+   return (switches::ShouldSkipGoogleApiKeyConfigurationCheck() ||
+           google_apis::HasAPIKeyConfigured()) &&
+-         local_state_->GetBoolean(prefs::kComponentUpdatesEnabled);
++         local_state_->GetBoolean(::prefs::kComponentUpdatesEnabled);
+ }
+ 
+ void PredictionModelDownloadManager::AddObserver(
+diff --git a/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc b/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
+index 46aa0ad97f..580a189cac 100644
+--- a/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
++++ b/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
+@@ -27,6 +27,8 @@
+ #include "mojo/public/cpp/base/proto_wrapper.h"
+ #include "services/on_device_model/public/mojom/on_device_model.mojom.h"
+ 
++#define CloseFilesInBackground CloseFilesInBackground_on_device_model_classifier_controller
++
+ namespace optimization_guide {
+ 
+ namespace {
+@@ -273,3 +275,5 @@ OnDeviceModelClassifierController::GetSolution() {
+ }
+ 
+ }  // namespace optimization_guide
++
++#undef CloseFilesInBackground
+diff --git a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc b/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
+index 3baefef84c..6bc630e266 100644
+--- a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
++++ b/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
+@@ -27,6 +27,9 @@
+ #include "services/metrics/public/cpp/metrics_utils.h"
+ #include "url/origin.h"
+ 
++#define GetLogger GetLogger_actor_login_password_credentials_fetcher
++#define LogStatus LogStatus_actor_login_password_credentials_fetcher
++
+ namespace actor_login {
+ 
+ namespace {
+@@ -290,3 +293,6 @@ void ActorLoginPasswordCredentialsFetcher::BuildGetCredentialsOutcome(
+ }
+ 
+ }  // namespace actor_login
++
++#undef GetLogger
++#undef LogStatus
+diff --git a/components/password_manager/core/browser/sync_credentials_filter.cc b/components/password_manager/core/browser/sync_credentials_filter.cc
+index 10303e9673..e6c387a93b 100644
+--- a/components/password_manager/core/browser/sync_credentials_filter.cc
++++ b/components/password_manager/core/browser/sync_credentials_filter.cc
+@@ -62,7 +62,7 @@ bool SyncCredentialsFilter::ShouldSave(const PasswordForm& form) const {
+ #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+   // On desktop, this normally leads to immediate browser sign-in, in which case
+   // we shouldn't offer saving. One exception is if browser sign-in is disabled.
+-  return !client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed);
++  return !client_->GetPrefs()->GetBoolean(::prefs::kSigninAllowed);
+ #else
+   // On mobile, sign-in via the web page doesn't lead to browser sign-in, so
+   // offer saving.
+diff --git a/components/performance_manager/BUILD.gn b/components/performance_manager/BUILD.gn
+index ad77dd6edc..4be9701827 100644
+--- a/components/performance_manager/BUILD.gn
++++ b/components/performance_manager/BUILD.gn
+@@ -309,6 +309,10 @@ jumbo_static_library("performance_manager") {
+     "worker_watcher.cc",
+     "worker_watcher.h",
+   ]
++  jumbo_excluded_sources = [
++    # explicit specialization of 'GetObservers<performance_manager::FrameNodeObserver>' after instantiation
++    "graph/graph_impl.cc",
++  ]
+ 
+   deps = [
+     "//components/content_settings/core/common",
+@@ -352,6 +356,7 @@ jumbo_static_library("performance_manager") {
+       "//chromeos/dbus/power",
+       "//chromeos/dbus/power:power_manager_proto",
+     ]
++    jumbo_excluded_sources += [ "decorators/site_data_recorder.cc" ]
+ 
+     sources += [
+       "power/battery_level_provider_chromeos.cc",
+diff --git a/components/performance_manager/decorators/page_aggregator.cc b/components/performance_manager/decorators/page_aggregator.cc
+index ed70c23bc3..a641c573ba 100644
+--- a/components/performance_manager/decorators/page_aggregator.cc
++++ b/components/performance_manager/decorators/page_aggregator.cc
+@@ -11,6 +11,8 @@
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ #include "components/performance_manager/public/mojom/coordination_unit.mojom.h"
+ 
++#define kDescriberName kDescriberName_PageAggregator
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -195,3 +197,5 @@ base::DictValue PageAggregator::DescribePageNodeData(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/decorators/page_live_state_decorator.cc b/components/performance_manager/decorators/page_live_state_decorator.cc
+index 54a8166bbd..15abca416b 100644
+--- a/components/performance_manager/decorators/page_live_state_decorator.cc
++++ b/components/performance_manager/decorators/page_live_state_decorator.cc
+@@ -23,6 +23,8 @@
+ #include "content/public/browser/browser_thread.h"
+ #include "content/public/browser/web_contents.h"
+ 
++#define kDescriberName kDescriberName_PageLiveStateDecorator
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -688,3 +690,5 @@ PageLiveStateObserver::PageLiveStateObserver() = default;
+ PageLiveStateObserver::~PageLiveStateObserver() = default;
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/decorators/page_load_tracker_decorator.cc b/components/performance_manager/decorators/page_load_tracker_decorator.cc
+index 38265d18c9..92f5241aa3 100644
+--- a/components/performance_manager/decorators/page_load_tracker_decorator.cc
++++ b/components/performance_manager/decorators/page_load_tracker_decorator.cc
+@@ -14,6 +14,8 @@
+ #include "components/performance_manager/graph/process_node_impl.h"
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ 
++#define kDescriberName kDescriberName_PageLoadTrackerDecorator
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -332,3 +334,5 @@ bool PageLoadTrackerDecorator::IsIdling(const PageNodeImpl* page_node) {
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/decorators/process_priority_aggregator.cc b/components/performance_manager/decorators/process_priority_aggregator.cc
+index baf45d0b05..18cdb02e3c 100644
+--- a/components/performance_manager/decorators/process_priority_aggregator.cc
++++ b/components/performance_manager/decorators/process_priority_aggregator.cc
+@@ -8,6 +8,8 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ 
++#define kDescriberName kDescriberName_ProcessPriorityAggregator
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -99,3 +101,5 @@ void ProcessPriorityAggregator::OnPriorityAndReasonChanged(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/decorators/site_data_recorder.cc b/components/performance_manager/decorators/site_data_recorder.cc
+index 64ae5fb9ca..2c67830b0e 100644
+--- a/components/performance_manager/decorators/site_data_recorder.cc
++++ b/components/performance_manager/decorators/site_data_recorder.cc
+@@ -23,6 +23,8 @@
+ #include "components/performance_manager/public/graph/graph.h"
+ #include "components/performance_manager/public/persistence/site_data/site_data_reader.h"
+ 
++#define GetPageNodeVisibility GetPageNodeVisibility_SiteDataRecorder
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -356,3 +358,5 @@ void WaitForSiteDataReader(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef GetPageNodeVisibility
+diff --git a/components/performance_manager/decorators/tab_page_decorator.cc b/components/performance_manager/decorators/tab_page_decorator.cc
+index 1fcbfe5283..6a0288ec12 100644
+--- a/components/performance_manager/decorators/tab_page_decorator.cc
++++ b/components/performance_manager/decorators/tab_page_decorator.cc
+@@ -111,7 +111,7 @@ void TabPageDecorator::OnAboutToBeDiscarded(const PageNode* page_node,
+ 
+   // When kWebContentsDiscard is disabled new_page_node will be different from
+   // page node and needs handling to transfer data from the old node.
+-  if (base::FeatureList::IsEnabled(features::kWebContentsDiscard)) {
++  if (base::FeatureList::IsEnabled(::features::kWebContentsDiscard)) {
+     CHECK_EQ(page_node, new_page_node);
+   } else {
+     CHECK_EQ(new_page_node->GetType(), performance_manager::PageType::kUnknown);
+diff --git a/components/performance_manager/execution_context_priority/frame_audible_voter.cc b/components/performance_manager/execution_context_priority/frame_audible_voter.cc
+index f892dbf9d5..bebd18be00 100644
+--- a/components/performance_manager/execution_context_priority/frame_audible_voter.cc
++++ b/components/performance_manager/execution_context_priority/frame_audible_voter.cc
+@@ -9,6 +9,9 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_FrameAudibleVoter
++#define GetVote             GetVote_FrameAudibleVoter
++
+ namespace performance_manager {
+ namespace execution_context_priority {
+ 
+@@ -73,3 +76,6 @@ void FrameAudibleVoter::OnIsAudibleChanged(const FrameNode* frame_node) {
+ 
+ }  // namespace execution_context_priority
+ }  // namespace performance_manager
++
++#undef GetExecutionContext
++#undef GetVote
+diff --git a/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc b/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
+index 0f8a1fc664..9c4654e844 100644
+--- a/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
++++ b/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
+@@ -9,6 +9,9 @@
+ #include "components/performance_manager/public/execution_context/execution_context.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_FrameCapturingMediaStreamVoter
++#define GetVote             GetVote_FrameCapturingMediaStreamVoter
++
+ namespace performance_manager::execution_context_priority {
+ 
+ namespace {
+@@ -74,3 +77,6 @@ void FrameCapturingMediaStreamVoter::OnIsCapturingMediaStreamChanged(
+ }
+ 
+ }  // namespace performance_manager::execution_context_priority
++
++#undef GetExecutionContext
++#undef GetVote
+diff --git a/components/performance_manager/execution_context_priority/frame_visibility_voter.cc b/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
+index 19dc5063f8..ee3d2771f4 100644
+--- a/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
++++ b/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
+@@ -11,6 +11,8 @@
+ #include "components/performance_manager/public/graph/graph.h"
+ #include "url/gurl.h"
+ 
++#define GetExecutionContext GetExecutionContext_FrameVisibilityVoter
++
+ namespace performance_manager {
+ namespace execution_context_priority {
+ 
+@@ -113,3 +115,5 @@ void FrameVisibilityVoter::OnIsImportantChanged(const FrameNode* frame_node) {
+ 
+ }  // namespace execution_context_priority
+ }  // namespace performance_manager
++
++#undef GetExecutionContext
+diff --git a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
+index dbacdb2f63..5cf232cfc6 100644
+--- a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
++++ b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
+@@ -12,6 +12,8 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_InheritClientPriorityVoter
++
+ namespace performance_manager {
+ namespace execution_context_priority {
+ 
+@@ -227,3 +229,5 @@ void InheritClientPriorityVoter::OnPriorityAndReasonChanged(
+ 
+ }  // namespace execution_context_priority
+ }  // namespace performance_manager
++
++#undef GetExecutionContext
+diff --git a/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc b/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
+index 5033d78ced..2431ff679a 100644
+--- a/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
++++ b/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
+@@ -11,6 +11,9 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_InheritParentPriorityVoter
++#define GetVote             GetVote_InheritParentPriorityVoter
++
+ namespace performance_manager::execution_context_priority {
+ 
+ namespace {
+@@ -127,3 +130,6 @@ void InheritParentPriorityVoter::OnPriorityAndReasonChanged(
+ }
+ 
+ }  // namespace performance_manager::execution_context_priority
++
++#undef GetExecutionContext
++#undef GetVote
+diff --git a/components/performance_manager/execution_context_priority/loading_page_voter.cc b/components/performance_manager/execution_context_priority/loading_page_voter.cc
+index d3f9c5d902..1ef7aa6865 100644
+--- a/components/performance_manager/execution_context_priority/loading_page_voter.cc
++++ b/components/performance_manager/execution_context_priority/loading_page_voter.cc
+@@ -9,6 +9,8 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_LoadingPageVoter
++
+ namespace performance_manager::execution_context_priority {
+ 
+ namespace {
+@@ -136,3 +138,5 @@ void LoadingPageVoter::InvalidateVoteForSubtree(const FrameNode* frame_node) {
+ }
+ 
+ }  // namespace performance_manager::execution_context_priority
++
++#undef GetExecutionContext
+diff --git a/components/performance_manager/freezing/frozen_frame_aggregator.cc b/components/performance_manager/freezing/frozen_frame_aggregator.cc
+index 2c123b112a..49595e3b98 100644
+--- a/components/performance_manager/freezing/frozen_frame_aggregator.cc
++++ b/components/performance_manager/freezing/frozen_frame_aggregator.cc
+@@ -11,6 +11,8 @@
+ #include "components/performance_manager/graph/process_node_impl.h"
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ 
++#define kDescriberName kDescriberName_FrozenFrameAggregator
++
+ namespace performance_manager {
+ 
+ using LifecycleState = performance_manager::mojom::LifecycleState;
+@@ -162,3 +164,5 @@ void FrozenFrameAggregator::UpdateFrameCounts(FrameNodeImpl* frame_node,
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/graph/frame_node_impl_describer.cc b/components/performance_manager/graph/frame_node_impl_describer.cc
+index 2f6e0860a8..7d465159bb 100644
+--- a/components/performance_manager/graph/frame_node_impl_describer.cc
++++ b/components/performance_manager/graph/frame_node_impl_describer.cc
+@@ -14,6 +14,8 @@
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ #include "components/performance_manager/public/graph/node_data_describer_util.h"
+ 
++#define kDescriberName kDescriberName_FrameNodeImpl
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -103,3 +105,5 @@ base::DictValue FrameNodeImplDescriber::DescribeFrameNodeData(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/graph/process_node_impl_describer.cc b/components/performance_manager/graph/process_node_impl_describer.cc
+index 78164e94a3..68d16a8923 100644
+--- a/components/performance_manager/graph/process_node_impl_describer.cc
++++ b/components/performance_manager/graph/process_node_impl_describer.cc
+@@ -23,6 +23,8 @@
+ #include "base/win/win_util.h"
+ #endif
+ 
++#define kDescriberName kDescriberName_ProcessNodeImpl
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -196,3 +198,5 @@ base::DictValue ProcessNodeImplDescriber::DescribeProcessNodeData(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/graph/worker_node_impl_describer.cc b/components/performance_manager/graph/worker_node_impl_describer.cc
+index 9008c839f8..1040fb2b29 100644
+--- a/components/performance_manager/graph/worker_node_impl_describer.cc
++++ b/components/performance_manager/graph/worker_node_impl_describer.cc
+@@ -12,6 +12,8 @@
+ #include "components/performance_manager/public/graph/node_data_describer_registry.h"
+ #include "components/performance_manager/public/graph/node_data_describer_util.h"
+ 
++#define kDescriberName kDescriberName_WorkerNodeImplDescriber
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -67,3 +69,5 @@ base::DictValue WorkerNodeImplDescriber::DescribeWorkerNodeData(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef kDescriberName
+diff --git a/components/performance_manager/performance_manager_registry_impl.cc b/components/performance_manager/performance_manager_registry_impl.cc
+index 3ea5dc359f..0787d9876e 100644
+--- a/components/performance_manager/performance_manager_registry_impl.cc
++++ b/components/performance_manager/performance_manager_registry_impl.cc
+@@ -20,6 +20,8 @@
+ #include "content/public/browser/render_process_host.h"
+ #include "content/public/browser/storage_partition.h"
+ 
++#define g_instance g_instance_performance_manager_registry_impl
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -277,3 +279,5 @@ void PerformanceManagerRegistryImpl::OnRenderProcessLaunched(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef g_instance
+diff --git a/components/performance_manager/persistence/site_data/site_data_cache_factory.cc b/components/performance_manager/persistence/site_data/site_data_cache_factory.cc
+index 3813e46e04..3dd851f91c 100644
+--- a/components/performance_manager/persistence/site_data/site_data_cache_factory.cc
++++ b/components/performance_manager/persistence/site_data/site_data_cache_factory.cc
+@@ -16,6 +16,8 @@
+ #include "content/public/browser/browser_context.h"
+ #include "content/public/browser/browser_thread.h"
+ 
++#define g_instance g_instance_site_data_cache_factory
++
+ namespace performance_manager {
+ 
+ namespace {
+@@ -135,3 +137,5 @@ void SiteDataCacheFactory::OnBrowserContextDestroyed(
+ }
+ 
+ }  // namespace performance_manager
++
++#undef g_instance
+diff --git a/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc b/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
+index f841cc287b..be36da3904 100644
+--- a/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
++++ b/components/performance_manager/resource_attribution/cpu_measurement_monitor.cc
+@@ -45,6 +45,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define OriginInBrowsingInstanceContextForNode OriginInBrowsingInstanceContextForNode_CPUMeasurementMonitor
++
+ namespace resource_attribution {
+ 
+ namespace {
+@@ -944,3 +946,5 @@ ScopedCPUTimeResult::~ScopedCPUTimeResult() {
+ }
+ 
+ }  // namespace resource_attribution
++
++#undef OriginInBrowsingInstanceContextForNode
+diff --git a/components/performance_manager/resource_attribution/memory_measurement_provider.cc b/components/performance_manager/resource_attribution/memory_measurement_provider.cc
+index 5558b2446c..f8919c50d2 100644
+--- a/components/performance_manager/resource_attribution/memory_measurement_provider.cc
++++ b/components/performance_manager/resource_attribution/memory_measurement_provider.cc
+@@ -27,6 +27,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define OriginInBrowsingInstanceContextForNode OriginInBrowsingInstanceContextForNode_MemoryMeasurementProvider
++
+ namespace resource_attribution {
+ 
+ namespace {
+@@ -207,3 +209,5 @@ base::DictValue MemoryMeasurementProvider::DescribeContextData(
+ }
+ 
+ }  // namespace resource_attribution
++
++#undef OriginInBrowsingInstanceContextForNode
+diff --git a/components/persistent_cache/persistent_cache_collection.cc b/components/persistent_cache/persistent_cache_collection.cc
+index 218f61da75..5a22a5537a 100644
+--- a/components/persistent_cache/persistent_cache_collection.cc
++++ b/components/persistent_cache/persistent_cache_collection.cc
+@@ -254,6 +254,8 @@ void PersistentCacheCollection::Clear() {
+   persistent_caches_.Clear();
+ }
+ 
++#define kLruCacheCapacity kLruCacheCapacity_PersistentCacheCollection
++
+ namespace {
+ 
+ // All characters allowed in filenames.
+@@ -357,3 +359,5 @@ std::string PersistentCacheCollection::GetAllAllowedCharactersInCacheIds() {
+ }
+ 
+ }  // namespace persistent_cache
++
++#undef kLruCacheCapacity
+diff --git a/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc b/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
+index 63df4e3d62..d2e12ef245 100644
+--- a/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
++++ b/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
+@@ -18,6 +18,8 @@
+ #include "components/strings/grit/components_strings.h"
+ #include "components/url_matcher/url_util.h"
+ 
++#define ValidateHost ValidateHost_incognito_mode_policy_handler
++
+ namespace {
+ bool IsValidAvailabilityInt(int in_value) {
+   return in_value >= 0 &&
+@@ -233,3 +235,5 @@ IncognitoModePolicyHandler::GetFilteredUrlListPolicyValue(
+ }
+ 
+ }  // namespace policy
++
++#undef ValidateHost
+diff --git a/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc b/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc
+index a9aca680c3..0735d53dfa 100644
+--- a/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc
++++ b/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc
+@@ -25,6 +25,8 @@
+ #include "components/strings/grit/components_strings.h"
+ #include "components/url_matcher/url_util.h"
+ 
++#define ValidateHost ValidateHost_URLBlocklistPolicyHandler
++
+ namespace {
+ 
+ // Checks if the host contains an * (asterik) that would have no effect on the
+@@ -165,3 +167,5 @@ bool URLBlocklistPolicyHandler::ValidatePolicy(const std::string& url_pattern) {
+ }
+ 
+ }  // namespace policy
++
++#undef ValidateHost
+diff --git a/components/policy/core/common/cloud/cloud_policy_client_types.cc b/components/policy/core/common/cloud/cloud_policy_client_types.cc
+index a76e20bbfc..df3dc9f2aa 100644
+--- a/components/policy/core/common/cloud/cloud_policy_client_types.cc
++++ b/components/policy/core/common/cloud/cloud_policy_client_types.cc
+@@ -8,6 +8,8 @@
+ #include "base/strings/stringprintf.h"
+ #include "components/policy/core/common/cloud/cloud_policy_constants.h"
+ 
++#define IsExtensionInstallPolicyType IsExtensionInstallPolicyType_cloud_policy_client_types
++
+ namespace policy {
+ 
+ namespace {
+@@ -90,3 +92,5 @@ std::set<ExtensionIdAndVersion> PolicyTypeToFetch::extension_ids_and_version()
+ }
+ 
+ }  // namespace policy
++
++#undef IsExtensionInstallPolicyType
+diff --git a/components/policy/core/common/cloud/machine_level_user_cloud_policy_store.cc b/components/policy/core/common/cloud/machine_level_user_cloud_policy_store.cc
+index 302b1cb35c..117d32ff0b 100644
+--- a/components/policy/core/common/cloud/machine_level_user_cloud_policy_store.cc
++++ b/components/policy/core/common/cloud/machine_level_user_cloud_policy_store.cc
+@@ -18,6 +18,8 @@
+ #include "components/policy/core/common/policy_logger.h"
+ #include "components/policy/proto/device_management_backend.pb.h"
+ 
++#define kExtensionInstallPolicyCacheFile kExtensionInstallPolicyCacheFile_MachineLevelUserCloudPolicyStore
++
+ namespace em = enterprise_management;
+ 
+ namespace policy {
+@@ -342,3 +344,5 @@ MachineLevelUserCloudPolicyStore::CreateValidatorImpl(
+ }
+ 
+ }  // namespace policy
++
++#undef kExtensionInstallPolicyCacheFile
+diff --git a/components/policy/core/common/cloud/profile_cloud_policy_manager.cc b/components/policy/core/common/cloud/profile_cloud_policy_manager.cc
+index e580e78fe3..d3ee3a1378 100644
+--- a/components/policy/core/common/cloud/profile_cloud_policy_manager.cc
++++ b/components/policy/core/common/cloud/profile_cloud_policy_manager.cc
+@@ -23,6 +23,8 @@
+ #include "components/prefs/pref_service.h"
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ 
++#define kPolicy kPolicy_ProfileCloudPolicyManager
++
+ namespace policy {
+ namespace {
+ 
+@@ -170,3 +172,5 @@ void ProfileCloudPolicyManager::Shutdown() {
+ }
+ 
+ }  // namespace policy
++
++#undef kPolicy
+diff --git a/components/policy/core/common/cloud/profile_cloud_policy_store.cc b/components/policy/core/common/cloud/profile_cloud_policy_store.cc
+index 3d89fae15d..c75357f4b1 100644
+--- a/components/policy/core/common/cloud/profile_cloud_policy_store.cc
++++ b/components/policy/core/common/cloud/profile_cloud_policy_store.cc
+@@ -17,6 +17,8 @@
+ #include "components/policy/proto/device_management_backend.pb.h"
+ #include "components/policy/proto/policy_signing_key.pb.h"
+ 
++#define kPolicy kPolicy_ProfileCloudPolicyStore
++
+ namespace em = enterprise_management;
+ 
+ namespace policy {
+@@ -179,3 +181,5 @@ void ProfileCloudPolicyStore::ValidateImpl(
+ }
+ 
+ }  // namespace policy
++
++#undef kPolicy
+diff --git a/components/policy/core/common/cloud/user_cloud_policy_store.cc b/components/policy/core/common/cloud/user_cloud_policy_store.cc
+index 19c12769fe..1d13789e98 100644
+--- a/components/policy/core/common/cloud/user_cloud_policy_store.cc
++++ b/components/policy/core/common/cloud/user_cloud_policy_store.cc
+@@ -24,6 +24,8 @@
+ #include "components/policy/proto/policy_signing_key.pb.h"
+ #include "google_apis/gaia/gaia_auth_util.h"
+ 
++#define kExtensionInstallKeyCacheFile kExtensionInstallKeyCacheFile_user_cloud_policy_store
++
+ namespace em = enterprise_management;
+ 
+ namespace policy {
+@@ -588,3 +590,5 @@ void UserCloudPolicyStore::ValidateImpl(
+ }
+ 
+ }  // namespace policy
++
++#undef kExtensionInstallKeyCacheFile
+diff --git a/components/policy/core/common/policy_proto_decoders.cc b/components/policy/core/common/policy_proto_decoders.cc
+index 457e0d8d02..0d948515b8 100644
+--- a/components/policy/core/common/policy_proto_decoders.cc
++++ b/components/policy/core/common/policy_proto_decoders.cc
+@@ -25,6 +25,8 @@
+ #include "components/policy/proto/device_management_backend.pb.h"
+ #include "components/strings/grit/components_strings.h"
+ 
++#define kRecommended kRecommended_PolicyProtoDecoders
++
+ namespace policy {
+ 
+ namespace em = enterprise_management;
+@@ -374,3 +376,5 @@ bool ParseComponentPolicy(base::DictValue json_dict,
+ }
+ 
+ }  // namespace policy
++
++#undef kRecommended
+diff --git a/components/security_interstitials/core/https_only_mode_allowlist.cc b/components/security_interstitials/core/https_only_mode_allowlist.cc
+index 0f60bdece2..cd636ff5e5 100644
+--- a/components/security_interstitials/core/https_only_mode_allowlist.cc
++++ b/components/security_interstitials/core/https_only_mode_allowlist.cc
+@@ -11,6 +11,8 @@
+ #include "components/content_settings/core/browser/content_settings_pref_provider.h"
+ #include "url/gurl.h"
+ 
++#define GetSecureGURLForHost GetSecureGURLForHost_HttpsOnlyModeEnforcelist
++
+ namespace {
+ 
+ // Key for the expiration time of a decision in the per-site HTTP allowlist
+@@ -132,3 +134,5 @@ void HttpsOnlyModeAllowlist::SetClockForTesting(base::Clock* clock) {
+ }
+ 
+ }  // namespace security_interstitials
++
++#undef GetSecureGURLForHost
+diff --git a/components/segmentation_platform/internal/selection/result_refresh_manager.cc b/components/segmentation_platform/internal/selection/result_refresh_manager.cc
+index b6450ad13c..f022df1c3b 100644
+--- a/components/segmentation_platform/internal/selection/result_refresh_manager.cc
++++ b/components/segmentation_platform/internal/selection/result_refresh_manager.cc
+@@ -12,6 +12,8 @@
+ #include "components/segmentation_platform/public/constants.h"
+ #include "components/segmentation_platform/public/features.h"
+ 
++#define kModelInitializationTimeoutMs kModelInitializationTimeoutMs_ResultRefreshManager
++
+ namespace segmentation_platform {
+ 
+ namespace {
+@@ -161,3 +163,5 @@ void ResultRefreshManager::OnGetCachedResultOrRunModel(
+ }
+ 
+ }  // namespace segmentation_platform
++
++#undef kModelInitializationTimeoutMs
+diff --git a/components/send_tab_to_self/send_tab_to_self_entry.cc b/components/send_tab_to_self/send_tab_to_self_entry.cc
+index 608d2867ec..2b5ec1233d 100644
+--- a/components/send_tab_to_self/send_tab_to_self_entry.cc
++++ b/components/send_tab_to_self/send_tab_to_self_entry.cc
+@@ -15,6 +15,8 @@
+ #include "components/send_tab_to_self/proto_conversions.h"
+ #include "components/sync/protocol/send_tab_to_self_specifics.pb.h"
+ 
++#define ProtoTimeToTime ProtoTimeToTime_send_tab_to_self
++
+ namespace send_tab_to_self {
+ 
+ namespace {
+@@ -184,3 +186,5 @@ std::unique_ptr<SendTabToSelfEntry> SendTabToSelfEntry::FromRequiredFields(
+ }
+ 
+ }  // namespace send_tab_to_self
++
++#undef ProtoTimeToTime
+diff --git a/components/services/app_service/public/cpp/permission.cc b/components/services/app_service/public/cpp/permission.cc
+index 7fd89d43e7..9d274c4d76 100644
+--- a/components/services/app_service/public/cpp/permission.cc
++++ b/components/services/app_service/public/cpp/permission.cc
+@@ -10,6 +10,8 @@
+ #include "base/containers/to_value_list.h"
+ #include "base/strings/to_string.h"
+ 
++#define kIsManagedKey kIsManagedKey_Permission
++
+ namespace apps {
+ 
+ namespace {
+@@ -179,3 +181,5 @@ Permissions ConvertListToPermissions(const base::ListValue* list) {
+ }
+ 
+ }  // namespace apps
++
++#undef kIsManagedKey
+diff --git a/components/services/storage/dom_storage/sqlite/session_storage_sqlite.cc b/components/services/storage/dom_storage/sqlite/session_storage_sqlite.cc
+index c4dc5af61c..e2ec315796 100644
+--- a/components/services/storage/dom_storage/sqlite/session_storage_sqlite.cc
++++ b/components/services/storage/dom_storage/sqlite/session_storage_sqlite.cc
+@@ -14,6 +14,10 @@
+ #include "sql/transaction.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
+ 
++#define kCurrentSchemaVersion    kCurrentSchemaVersion_session_storage_sqlite
++#define kCompatibleSchemaVersion kCompatibleSchemaVersion_session_storage_sqlite
++#define kNextMapIdKey            kNextMapIdKey_session_storage_sqlite
++
+ namespace storage {
+ namespace {
+ 
+@@ -26,7 +30,7 @@ constexpr sql::Database::Tag kSessionStorageTagInMemory =
+ 
+ inline constexpr const char kNextMapIdKey[] = "next_map_id";
+ 
+-DbStatus CreateSchema(sql::Database& database) {
++DbStatus CreateSchema_session_storage_sqlite(sql::Database& database) {
+   constexpr const char kCreateSessionMetadataTable[] =
+       // clang-format off
+       "CREATE TABLE session_metadata("
+@@ -42,6 +46,8 @@ DbStatus CreateSchema(sql::Database& database) {
+   return MapEntriesTable::CreateSchema(database);
+ }
+ 
++#define CreateSchema CreateSchema_session_storage_sqlite
++
+ // Parses a single row from the `session_metadata` table into a `MapMetadata`
+ // struct. The statement must have columns in order: `session_id` (TEXT),
+ // `storage_key` (BLOB), `map_id` (INTEGER). Returns an error if the
+@@ -333,3 +339,8 @@ SessionStorageSqlite::ReadAllMapMetadata() const {
+ }
+ 
+ }  // namespace storage
++
++#undef kCurrentSchemaVersion
++#undef kCompatibleSchemaVersion
++#undef kNextMapIdKey
++#undef CreateSchema
+diff --git a/components/sessions/BUILD.gn b/components/sessions/BUILD.gn
+index a9c1909950..5bb0201451 100644
+--- a/components/sessions/BUILD.gn
++++ b/components/sessions/BUILD.gn
+@@ -132,6 +132,10 @@ jumbo_source_set("shared") {
+     "core/tab_restore_types.cc",
+     "core/tab_restore_types.h",
+   ]
++  jumbo_excluded_sources = [
++    # Too many symbol conflicts with `core/tab_restore_service_impl.cc`
++    "core/session_service_commands.cc",
++  ]
+ 
+   configs += [ ":implementation" ]
+ 
+diff --git a/components/signin/internal/identity_manager/profile_oauth2_token_service_delegate.cc b/components/signin/internal/identity_manager/profile_oauth2_token_service_delegate.cc
+index 4bbaf4f625..2066104b3c 100644
+--- a/components/signin/internal/identity_manager/profile_oauth2_token_service_delegate.cc
++++ b/components/signin/internal/identity_manager/profile_oauth2_token_service_delegate.cc
+@@ -13,6 +13,8 @@
+ 
+ using signin_metrics::SourceForRefreshTokenOperation;
+ 
++#define kBackoffPolicy kBackoffPolicy_profile_oauth2_token_service_delegate
++
+ namespace {
+ 
+ const net::BackoffEntry::Policy kBackoffPolicy = {
+@@ -432,3 +434,5 @@ void ProfileOAuth2TokenServiceDelegate::SetOnRefreshTokenRevokedNotified(
+   CHECK(!on_refresh_token_revoked_notified_callback_);
+   on_refresh_token_revoked_notified_callback_ = std::move(callback);
+ }
++
++#undef kBackoffPolicy
+diff --git a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
+index 60d2e00d65..93cb927c67 100644
+--- a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
++++ b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
+@@ -26,6 +26,8 @@
+ #include "third_party/protobuf/src/google/protobuf/message_lite.h"
+ #include "url/gurl.h"
+ 
++#define OnResponse OnResponse_KidsChromeManagementURLCheckerClient
++
+ namespace supervised_user {
+ namespace {
+ 
+@@ -153,3 +155,5 @@ void KidsChromeManagementURLCheckerClient::CheckURL(
+                        base::BindOnce(&OnResponse, url, std::move(callback)));
+ }
+ }  // namespace supervised_user
++
++#undef OnResponse
+diff --git a/components/supervised_user/core/browser/supervised_user_preferences.cc b/components/supervised_user/core/browser/supervised_user_preferences.cc
+index 9ce64a100a..0cf88de8cd 100644
+--- a/components/supervised_user/core/browser/supervised_user_preferences.cc
++++ b/components/supervised_user/core/browser/supervised_user_preferences.cc
+@@ -17,6 +17,8 @@
+ #include "components/supervised_user/core/common/pref_names.h"
+ #include "components/supervised_user/core/common/supervised_user_constants.h"
+ 
++#define Custodian Custodian_SupervisedUserPreferences
++
+ namespace supervised_user {
+ 
+ namespace {
+@@ -199,3 +201,5 @@ void SetGoogleSafeSearch(PrefService& pref_service,
+                           static_cast<bool>(status));
+ }
+ }  // namespace supervised_user
++
++#undef Custodian
+diff --git a/components/sync/nigori/nigori_state.cc b/components/sync/nigori/nigori_state.cc
+index 47b8381bb9..7d5c0e6c9b 100644
+--- a/components/sync/nigori/nigori_state.cc
++++ b/components/sync/nigori/nigori_state.cc
+@@ -24,6 +24,8 @@
+ #include "components/sync/protocol/nigori_local_data.pb.h"
+ #include "components/sync/protocol/nigori_specifics.pb.h"
+ 
++#define PublicKeyFromProto PublicKeyFromProto_NigoriState
++
+ namespace syncer {
+ 
+ namespace {
+@@ -401,3 +403,5 @@ bool NigoriState::NeedsGenerateCrossUserSharingKeyPair() const {
+ }
+ 
+ }  // namespace syncer
++
++#undef PublicKeyFromProto
+diff --git a/components/sync/service/device_statistics_tracker.cc b/components/sync/service/device_statistics_tracker.cc
+index 4b9c43262f..0b940026ad 100644
+--- a/components/sync/service/device_statistics_tracker.cc
++++ b/components/sync/service/device_statistics_tracker.cc
+@@ -23,6 +23,8 @@
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
+ 
++#define GenerateCacheGUID GenerateCacheGUID_DeviceStatisticsTracker
++
+ namespace syncer {
+ 
+ namespace {
+@@ -481,3 +483,5 @@ DeviceStatisticsTracker::DeduplicateEntities(
+ }
+ 
+ }  // namespace syncer
++
++#undef GenerateCacheGUID
+diff --git a/components/sync/service/history_sync_session_durations_metrics_recorder.cc b/components/sync/service/history_sync_session_durations_metrics_recorder.cc
+index 4e9f835055..6929888261 100644
+--- a/components/sync/service/history_sync_session_durations_metrics_recorder.cc
++++ b/components/sync/service/history_sync_session_durations_metrics_recorder.cc
+@@ -14,6 +14,9 @@
+ #include "components/sync/base/features.h"
+ #include "components/sync/service/sync_user_settings.h"
+ 
++#define SubtractInactiveTime SubtractInactiveTime_HistorySyncSessionDurationsMetricsRecorder
++#define LogDuration          LogDuration_HistorySyncSessionDurationsMetricsRecorder
++
+ namespace syncer {
+ 
+ namespace {
+@@ -152,3 +155,6 @@ void HistorySyncSessionDurationsMetricsRecorder::LogHistorySyncDuration(
+ }
+ 
+ }  // namespace syncer
++
++#undef SubtractInactiveTime
++#undef LogDuration
+diff --git a/components/sync/service/sync_session_durations_metrics_recorder.cc b/components/sync/service/sync_session_durations_metrics_recorder.cc
+index 8f1cbf70f9..a9c29fe231 100644
+--- a/components/sync/service/sync_session_durations_metrics_recorder.cc
++++ b/components/sync/service/sync_session_durations_metrics_recorder.cc
+@@ -12,6 +12,9 @@
+ #include "base/time/time.h"
+ #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
+ 
++#define SubtractInactiveTime SubtractInactiveTime_SyncSessionDurationsMetricsRecorder
++#define LogDuration          LogDuration_SyncSessionDurationsMetricsRecorder
++
+ namespace syncer {
+ 
+ namespace {
+@@ -359,3 +362,6 @@ SyncSessionDurationsMetricsRecorder::DetermineSyncStatus() const {
+ }
+ 
+ }  // namespace syncer
++
++#undef SubtractInactiveTime
++#undef LogDuration
+diff --git a/components/sync_bookmarks/bookmark_remote_updates_handler.cc b/components/sync_bookmarks/bookmark_remote_updates_handler.cc
+index 99600855f3..4d68a12b75 100644
+--- a/components/sync_bookmarks/bookmark_remote_updates_handler.cc
++++ b/components/sync_bookmarks/bookmark_remote_updates_handler.cc
+@@ -30,6 +30,8 @@
+ #include "components/sync_bookmarks/synced_bookmark_tracker_entity.h"
+ #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
+ 
++#define RemoteBookmarkUpdateError RemoteBookmarkUpdateError_bookmark_remote_updates_handler
++
+ namespace sync_bookmarks {
+ 
+ namespace {
+@@ -832,3 +834,5 @@ void BookmarkRemoteUpdatesHandler::ReuploadEntityIfNeeded(
+ }
+ 
+ }  // namespace sync_bookmarks
++
++#undef RemoteBookmarkUpdateError
+diff --git a/components/sync_bookmarks/initial_account_bookmark_deduplicator.cc b/components/sync_bookmarks/initial_account_bookmark_deduplicator.cc
+index 70042f630c..c66d13f065 100644
+--- a/components/sync_bookmarks/initial_account_bookmark_deduplicator.cc
++++ b/components/sync_bookmarks/initial_account_bookmark_deduplicator.cc
+@@ -14,6 +14,8 @@
+ #include "components/bookmarks/browser/bookmark_node.h"
+ #include "components/bookmarks/common/bookmark_metrics.h"
+ 
++#define GetLocalAndAccountPermanentNodePairs GetLocalAndAccountPermanentNodePairs_initial_account_bookmark_deduplicator
++
+ namespace sync_bookmarks {
+ 
+ namespace {
+@@ -123,3 +125,5 @@ void InitialAccountBookmarkDeduplicator::RemoveChildrenAt(
+ }
+ 
+ }  // namespace sync_bookmarks
++
++#undef GetLocalAndAccountPermanentNodePairs
+diff --git a/components/sync_bookmarks/parent_guid_preprocessing.cc b/components/sync_bookmarks/parent_guid_preprocessing.cc
+index 33bc98a9cf..64179c2708 100644
+--- a/components/sync_bookmarks/parent_guid_preprocessing.cc
++++ b/components/sync_bookmarks/parent_guid_preprocessing.cc
+@@ -22,6 +22,10 @@
+ #include "components/sync_bookmarks/synced_bookmark_tracker.h"
+ #include "components/sync_bookmarks/synced_bookmark_tracker_entity.h"
+ 
++#define kBookmarkBarTag     kBookmarkBarTag_parent_guid_preprocessing
++#define kMobileBookmarksTag kMobileBookmarksTag_parent_guid_preprocessing
++#define kOtherBookmarksTag  kOtherBookmarksTag_parent_guid_preprocessing
++
+ namespace sync_bookmarks {
+ 
+ namespace {
+@@ -246,3 +250,7 @@ std::string GetGuidForSyncIdInUpdatesForTesting(  // IN-TEST
+ }
+ 
+ }  // namespace sync_bookmarks
++
++#undef kBookmarkBarTag
++#undef kMobileBookmarksTag
++#undef kOtherBookmarksTag
+diff --git a/components/sync_bookmarks/synced_bookmark_tracker_entity.cc b/components/sync_bookmarks/synced_bookmark_tracker_entity.cc
+index 2666ba589d..7934b3d4e3 100644
+--- a/components/sync_bookmarks/synced_bookmark_tracker_entity.cc
++++ b/components/sync_bookmarks/synced_bookmark_tracker_entity.cc
+@@ -21,6 +21,8 @@
+ #include "components/sync/protocol/proto_memory_estimations.h"
+ #include "components/sync/protocol/unique_position.pb.h"
+ 
++#define HashSpecifics HashSpecifics_synced_bookmark_tracker_entity
++
+ namespace sync_bookmarks {
+ 
+ namespace {
+@@ -97,3 +99,5 @@ size_t SyncedBookmarkTrackerEntity::EstimateMemoryUsage() const {
+ }
+ 
+ }  // namespace sync_bookmarks
++
++#undef HashSpecifics
+diff --git a/components/sync_sessions/session_sync_bridge.cc b/components/sync_sessions/session_sync_bridge.cc
+index fa96b86cfc..9617a56c9f 100644
+--- a/components/sync_sessions/session_sync_bridge.cc
++++ b/components/sync_sessions/session_sync_bridge.cc
+@@ -31,6 +31,8 @@
+ #include "components/sync_sessions/synced_window_delegate.h"
+ #include "components/sync_sessions/synced_window_delegates_getter.h"
+ 
++#define MoveToEntityData MoveToEntityData_SessionSyncBridge
++
+ namespace sync_sessions {
+ namespace {
+ 
+@@ -514,3 +516,5 @@ SessionSyncBridge::SyncingState::SyncingState() = default;
+ SessionSyncBridge::SyncingState::~SyncingState() = default;
+ 
+ }  // namespace sync_sessions
++
++#undef MoveToEntityData
+diff --git a/components/update_client/op_zucchini.cc b/components/update_client/op_zucchini.cc
+index 10b25ba53a..041ff167c9 100644
+--- a/components/update_client/op_zucchini.cc
++++ b/components/update_client/op_zucchini.cc
+@@ -21,6 +21,11 @@
+ #include "components/update_client/update_client.h"
+ #include "components/update_client/update_client_errors.h"
+ 
++#define Patch            Patch_OpZucchini
++#define PatchDone        PatchDone_OpZucchini
++#define VerifyAndCleanUp VerifyAndCleanUp_OpZucchini
++#define CacheLookupDone  CacheLookupDone_OpZucchini
++
+ namespace update_client {
+ 
+ base::OnceClosure ZucchiniOperation(
+@@ -46,3 +51,8 @@ base::OnceClosure ZucchiniOperation(
+ }
+ 
+ }  // namespace update_client
++
++#undef Patch
++#undef PatchDone
++#undef VerifyAndCleanUp
++#undef CacheLookupDone
+diff --git a/components/variations/child_process_field_trial_syncer.cc b/components/variations/child_process_field_trial_syncer.cc
+index 2e09785c24..3709503f4d 100644
+--- a/components/variations/child_process_field_trial_syncer.cc
++++ b/components/variations/child_process_field_trial_syncer.cc
+@@ -13,6 +13,8 @@
+ #include "base/metrics/field_trial_list_including_low_anonymity.h"
+ #include "components/variations/variations_crash_keys.h"
+ 
++#define g_instance g_instance_child_process_field_trial_syncer
++
+ namespace variations {
+ 
+ namespace {
+@@ -107,3 +109,5 @@ void ChildProcessFieldTrialSyncer::OnFieldTrialGroupFinalized(
+ }
+ 
+ }  // namespace variations
++
++#undef g_instance
+diff --git a/components/variations/variations_ids_provider.cc b/components/variations/variations_ids_provider.cc
+index 5704d23a44..1c79ddd218 100644
+--- a/components/variations/variations_ids_provider.cc
++++ b/components/variations/variations_ids_provider.cc
+@@ -21,6 +21,8 @@
+ #include "components/variations/variations_client.h"
+ #include "components/variations/variations_features.h"
+ 
++#define g_instance g_instance_variations_ids_provider
++
+ namespace variations {
+ namespace {
+ 
+@@ -667,3 +669,5 @@ bool VariationsIdsProvider::UpdateIsNeeded(base::Time current_time) const {
+ }
+ 
+ }  // namespace variations
++
++#undef g_instance
+diff --git a/components/webcrypto/algorithms/aes.cc b/components/webcrypto/algorithms/aes.cc
+index f5a54cf455..f38e851673 100644
+--- a/components/webcrypto/algorithms/aes.cc
++++ b/components/webcrypto/algorithms/aes.cc
+@@ -15,6 +15,8 @@
+ #include "third_party/blink/public/platform/web_crypto_algorithm_params.h"
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Aes
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -223,3 +225,5 @@ Status AesAlgorithm::GetKeyLength(
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/aes_cbc.cc b/components/webcrypto/algorithms/aes_cbc.cc
+index 877684296c..089d18ab22 100644
+--- a/components/webcrypto/algorithms/aes_cbc.cc
++++ b/components/webcrypto/algorithms/aes_cbc.cc
+@@ -19,6 +19,8 @@
+ #include "third_party/boringssl/src/include/openssl/aes.h"
+ #include "third_party/boringssl/src/include/openssl/cipher.h"
+ 
++#define GetAESCipherByKeyLength GetAESCipherByKeyLength_AesCbc
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -112,3 +114,5 @@ std::unique_ptr<AlgorithmImplementation> CreateAesCbcImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef GetAESCipherByKeyLength
+diff --git a/components/webcrypto/algorithms/chacha20_poly1305.cc b/components/webcrypto/algorithms/chacha20_poly1305.cc
+index 6c1432cafe..d091edc442 100644
+--- a/components/webcrypto/algorithms/chacha20_poly1305.cc
++++ b/components/webcrypto/algorithms/chacha20_poly1305.cc
+@@ -20,6 +20,8 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_chacha20_poly1305
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -229,3 +231,5 @@ CreateChaCha20Poly1305Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/ed25519.cc b/components/webcrypto/algorithms/ed25519.cc
+index d32fd28c44..51bdc994a6 100644
+--- a/components/webcrypto/algorithms/ed25519.cc
++++ b/components/webcrypto/algorithms/ed25519.cc
+@@ -22,6 +22,9 @@
+ #include "third_party/boringssl/src/include/openssl/curve25519.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define ReadBytes                         ReadBytes_Ed25519
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Ed25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -515,3 +518,6 @@ std::unique_ptr<AlgorithmImplementation> CreateEd25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef ReadBytes
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/pbkdf2.cc b/components/webcrypto/algorithms/pbkdf2.cc
+index 359b8a3beb..0ba8e81619 100644
+--- a/components/webcrypto/algorithms/pbkdf2.cc
++++ b/components/webcrypto/algorithms/pbkdf2.cc
+@@ -17,6 +17,8 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define kAllKeyUsages kAllKeyUsages_Pbkdf2
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -136,3 +138,5 @@ std::unique_ptr<AlgorithmImplementation> CreatePbkdf2Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef kAllKeyUsages
+diff --git a/components/webcrypto/algorithms/rsa.cc b/components/webcrypto/algorithms/rsa.cc
+index 8c8547acf7..e2c868b42d 100644
+--- a/components/webcrypto/algorithms/rsa.cc
++++ b/components/webcrypto/algorithms/rsa.cc
+@@ -25,6 +25,8 @@
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ #include "third_party/boringssl/src/include/openssl/rsa.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_Rsa
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -588,3 +590,5 @@ Status RsaHashedAlgorithm::DeserializeKeyForClone(
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/webcrypto/algorithms/x25519.cc b/components/webcrypto/algorithms/x25519.cc
+index 1543cdb33c..f7675f4c09 100644
+--- a/components/webcrypto/algorithms/x25519.cc
++++ b/components/webcrypto/algorithms/x25519.cc
+@@ -20,6 +20,8 @@
+ #include "third_party/boringssl/src/include/openssl/curve25519.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_X25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -538,3 +540,5 @@ std::unique_ptr<AlgorithmImplementation> CreateX25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/third_party/dom_distiller_js/protoc_plugins/util/writer.py b/third_party/dom_distiller_js/protoc_plugins/util/writer.py
+index 9ee673abd6..8f80074b5c 100644
+--- a/third_party/dom_distiller_js/protoc_plugins/util/writer.py
++++ b/third_party/dom_distiller_js/protoc_plugins/util/writer.py
+@@ -43,3 +43,6 @@ class CodeWriter(object):
+   def WriteCStyleHeader(self):
+     self.Output("// GENERATED FILE")
+     self.Output("// This file generated by DomDistillerJs protoc plugin.")
++    self.Output("")
++    self.Output("#pragma once")
++    self.Output("")
+diff --git a/third_party/dom_distiller_js/test_sample_json_converter.h.golden b/third_party/dom_distiller_js/test_sample_json_converter.h.golden
+index 4c54404c61..482574b839 100644
+--- a/third_party/dom_distiller_js/test_sample_json_converter.h.golden
++++ b/third_party/dom_distiller_js/test_sample_json_converter.h.golden
+@@ -1,5 +1,8 @@
+ // GENERATED FILE
+ // This file generated by DomDistillerJs protoc plugin.
++
++#pragma once
++
+ #include "test_sample.pb.h"
+ 
+ // base dependencies
+diff --git a/components/metrics/metrics_log.cc b/components/metrics/metrics_log.cc
+index 164e37e056..f112995a2f 100644
+--- a/components/metrics/metrics_log.cc
++++ b/components/metrics/metrics_log.cc
+@@ -382,8 +382,8 @@ void MetricsLog::RecordCoreSystemProfile(MetricsServiceClient* client,
+   // Exclude these switches which are very frequently on the command line but
+   // serve no meaningful purpose.
+   static const char* const kSwitchesToFilter[] = {
+-      switches::kFlagSwitchesBegin,
+-      switches::kFlagSwitchesEnd,
++      ::switches::kFlagSwitchesBegin,
++      ::switches::kFlagSwitchesEnd,
+   };
+ 
+   for (const char* filter_switch : kSwitchesToFilter)
+diff --git a/components/omnibox/browser/BUILD.gn b/components/omnibox/browser/BUILD.gn
+index ef72313073..a277e8bdbc 100644
+--- a/components/omnibox/browser/BUILD.gn
++++ b/components/omnibox/browser/BUILD.gn
+@@ -316,6 +316,9 @@ jumbo_source_set("browser") {
+     "zero_suggest_verbatim_match_provider.cc",
+     "zero_suggest_verbatim_match_provider.h",
+   ]
++  jumbo_excluded_sources = [
++    "omnibox_metrics_provider.cc",
++  ]
+ 
+   public_deps = [
+     ":aim_eligibility_service_features",
+diff --git a/components/omnibox/browser/remote_suggestions_service.cc b/components/omnibox/browser/remote_suggestions_service.cc
+index c6a07cdf91..c6bdfb59ae 100644
+--- a/components/omnibox/browser/remote_suggestions_service.cc
++++ b/components/omnibox/browser/remote_suggestions_service.cc
+@@ -36,6 +36,9 @@
+ #include "services/network/public/mojom/url_response_head.mojom.h"
+ #include "third_party/metrics_proto/omnibox_event.pb.h"
+ 
++#define kMaxPageTitleLength kMaxPageTitleLength_remote_suggestions_service
++#define TruncateUTF16       TruncateUTF16_remote_suggestions_service
++
+ namespace {
+ 
+ // Maximum length of page title sent to Suggest via `pageTitle` CGI param,
+@@ -833,3 +836,6 @@ void RemoteSuggestionsService::OnIndexedRequestCompleted(
+         .Run(request_index, source, response_code, std::move(response_body));
+   }
+ }
++
++#undef kMaxPageTitleLength
++#undef TruncateUTF16
+diff --git a/components/bookmarks/browser/bookmark_storage.cc b/components/bookmarks/browser/bookmark_storage.cc
+index 9b3cfc1dbc..8283c9bcf0 100644
+--- a/components/bookmarks/browser/bookmark_storage.cc
++++ b/components/bookmarks/browser/bookmark_storage.cc
+@@ -30,6 +30,8 @@
+ #include "components/bookmarks/common/storage_file_encryption_type.h"
+ #include "components/os_crypt/async/common/encryptor.h"
+ 
++#define kBackupExtension kBackupExtension_bookmark_storage
++
+ namespace bookmarks {
+ 
+ namespace {
+@@ -362,3 +364,5 @@ base::FilePath BookmarkStorage::GetSecondaryFilePath() const {
+ }
+ 
+ }  // namespace bookmarks
++
++#undef kBackupExtension
+diff --git a/components/autofill/core/browser/data_model/payments/credit_card.cc b/components/autofill/core/browser/data_model/payments/credit_card.cc
+index 945168d4fc..2cadcba209 100644
+--- a/components/autofill/core/browser/data_model/payments/credit_card.cc
++++ b/components/autofill/core/browser/data_model/payments/credit_card.cc
+@@ -46,6 +46,8 @@
+ #include "components/strings/grit/components_strings.h"
+ #include "ui/base/l10n/l10n_util.h"
+ 
++#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_credit_card
++
+ namespace autofill {
+ 
+ namespace {
+@@ -1354,3 +1356,5 @@ const UsageHistoryInformation& CreditCard::usage_history() const {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUseNewFopDisplay
+diff --git a/components/webcrypto/algorithms/ml_dsa.cc b/components/webcrypto/algorithms/ml_dsa.cc
+index a7b1875915..c84c06c5e8 100644
+--- a/components/webcrypto/algorithms/ml_dsa.cc
++++ b/components/webcrypto/algorithms/ml_dsa.cc
+@@ -17,6 +17,8 @@
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ #include "third_party/boringssl/src/include/openssl/mldsa.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_MlDsa
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -544,3 +546,5 @@ std::unique_ptr<AlgorithmImplementation> CreateMlDsaImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone

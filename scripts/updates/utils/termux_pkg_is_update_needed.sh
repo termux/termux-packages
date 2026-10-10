@@ -39,6 +39,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 				<second-version> - second version to compare
 				[version-regex] - optional regular expression to filter version numbers from given versions
 		EOF
+		exit 0
 	fi
 
 	# Print in human readable format.

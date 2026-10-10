@@ -1,0 +1,38 @@
+--- libbsd-0.12.2/configure.ac	2024-03-18 05:16:31.000000000 +0300
++++ libbsd-0.12.2/configure.ac.patch	2026-09-08 00:01:17.284105320 +0300
+@@ -87,7 +87,7 @@
+ abi_wcsl=unknown
+ 
+ AS_CASE([$host_os],
+-  [*-gnu* | gnu*], [
++  [*-gnu* | gnu* | *-android*], [
+     api_time_macros=no
+ 
+     abi_accmode=yes
+@@ -111,7 +111,7 @@
+     abi_fmtcheck=yes
+     abi_fpurge=yes
+     abi_freezero=yes
+-    abi_funopen=yes
++    abi_funopen=no
+     abi_getbsize=yes
+     abi_getpeereid=yes
+     abi_humanize_number=yes
+@@ -121,7 +121,7 @@
+     abi_inet_net_pton=yes
+     # DROP: On libmd.
+     #abi_md5=no
+-    abi_md5=yes
++    abi_md5=no
+     abi_name_from_id=yes
+     abi_nlist=yes
+     abi_pidfile=yes
+@@ -144,7 +144,7 @@
+     abi_strtox=yes
+     abi_timeconv=yes
+     # DROP: On libmd.
+-    abi_transparent_libmd=yes
++    abi_transparent_libmd=no
+     abi_vis=yes
+     abi_wcsl=yes
+   ],

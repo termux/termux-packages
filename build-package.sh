@@ -124,11 +124,6 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc_iserv.sh"
 # shellcheck source=scripts/build/setup/termux_setup_cabal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_cabal.sh"
 
-# Utility function to setup jailbreak-cabal. It is used to remove version constraints
-# from Cabal packages.
-# shellcheck source=scripts/build/setup/termux_setup_jailbreak_cabal.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_jailbreak_cabal.sh"
-
 # Utility function for setting up GObject Introspection cross environment.
 # shellcheck source=scripts/build/setup/termux_setup_gir.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gir.sh"
@@ -144,6 +139,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 # Utility function for setting up LDC cross environment.
 # shellcheck source=scripts/build/setup/termux_setup_ldc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ldc.sh"
+
+# Utility function for nim-using packages to setup a nim toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_nim.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nim.sh"
 
 # Utility function for setting up no-integrated (GNU Binutils) as.
 # shellcheck source=scripts/build/setup/termux_setup_no_integrated_as.sh
@@ -180,6 +179,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
 # Utility function to setup Node.js JavaScript Runtime
 # shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
+
+# Utility function to setup Bun JavaScript runtime/package manager
+# shellcheck source=scripts/build/setup/termux_setup_bun.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_bun.sh"
 
 # Utility function to setup a current meson build system.
 # shellcheck source=scripts/build/setup/termux_setup_meson.sh
@@ -281,8 +284,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_host_build.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_host_build.sh"
 
 # Setup a standalone Android NDK toolchain. Called from termux_step_setup_toolchain.
-# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_29.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_29.sh"
+# shellcheck source=scripts/build/toolchain/termux_setup_toolchain_30.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/toolchain/termux_setup_toolchain_30.sh"
 
 # Setup a standalone Android NDK 23c toolchain. Called from termux_step_setup_toolchain.
 # shellcheck source=scripts/build/toolchain/termux_setup_toolchain_23c.sh
@@ -538,6 +541,7 @@ _show_usage() {
 	echo "  -o Specify directory where to put built packages. Default: output/"
 	echo "  --format Specify package output format (debian, pacman)."
 	echo "  --library Specify library of package (bionic, glibc)."
+	echo "  --reuse-built-packages Reuse built packages when unavailable from repositories."
 	exit 1
 }
 
@@ -562,6 +566,7 @@ while (( $# )); do
 			shift 1
 			export TERMUX_PACKAGE_LIBRARY="$1"
 		;;
+		--reuse-built-packages) export TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES=true;;
 		-a)
 			if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
@@ -690,6 +695,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 			[[ "${TERMUX_INSTALL_DEPS:-}" == "true" && "${TERMUX_PKGS__BUILD__RM_ALL_PKGS_BUILT_MARKER_AND_INSTALL_FILES:-}" == "false" ]] && _SELF_ARGS+=("-I")
 			[[ "${TERMUX_GLOBAL_LIBRARY:-}" == "true" ]] && _SELF_ARGS+=("-L")
 			[[ -n "${TERMUX_OUTPUT_DIR:-}" ]] && _SELF_ARGS+=("-o" "$TERMUX_OUTPUT_DIR")
+			[[ "${TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES:-}" == "true" ]] && _SELF_ARGS+=("--reuse-built-packages")
 			[[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS:-}" == "true" ]] && _SELF_ARGS+=("-r")
 			[[ "${TERMUX_WITHOUT_DEPVERSION_BINDING:-}" == "true" ]] && _SELF_ARGS+=("-w")
 			[[ -n "${TERMUX_PACKAGE_FORMAT:-}" ]] && _SELF_ARGS+=("--format" "$TERMUX_PACKAGE_FORMAT")
@@ -711,8 +717,7 @@ for (( i=0; i < ${#PACKAGE_LIST[@]}; i++ )); do
 			TERMUX_PKG_BUILDER_DIR="$(realpath "${PACKAGE_LIST[i]}")"
 		else
 			# Package name:
-			# FIXME: TERMUX_PACKAGES_DIRECTORIES should be made into an array.
-			for package_directory in $TERMUX_PACKAGES_DIRECTORIES; do
+			for package_directory in "${TERMUX_PACKAGES_DIRECTORIES[@]}"; do
 				if [[ -d "${TERMUX_SCRIPTDIR}/${package_directory}/${TERMUX_PKG_NAME}" ]]; then
 					export TERMUX_PKG_BUILDER_DIR="${TERMUX_SCRIPTDIR}/$package_directory/$TERMUX_PKG_NAME"
 					break

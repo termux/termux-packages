@@ -1,0 +1,17 @@
+--- a/src/app/qtpluginprovider.cpp
++++ b/src/app/qtpluginprovider.cpp
+@@ -27,13 +27,7 @@
+         install_paths << "/app/lib/";
+     install_paths << QDir::home().filePath(".local/lib/");
+     install_paths << QDir::home().filePath(".local/lib64/");
+-    install_paths << "/usr/local/lib/";
+-    install_paths << "/usr/local/lib64/";
+-#if defined MULTIARCH_TUPLE
+-    install_paths << "/usr/lib/" MULTIARCH_TUPLE;
+-#endif
+-    install_paths << "/usr/lib/";
+-    install_paths << "/usr/lib64/";
++    install_paths << "@TERMUX_PREFIX@/lib/";
+ #endif
+     for (const QString& p : as_const(install_paths))
+         paths << QDir(p).filePath("albert");

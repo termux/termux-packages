@@ -20,16 +20,17 @@ termux_setup_ghc() {
 		[[ -d "$TERMUX_GHC_RUNTIME_FOLDER" ]] && return
 
 		declare -A checksums=(
-			["aarch64"]="efd05af38dbfd37706dcfe457aae99725c33b91223490582bdde172f6383668d"
-			["arm"]="6caa502e8694b1098fb93cdc291baf75cfd52e4851100a2d482e014b37e4db39"
-			["i686"]="5596d519c5353c7559e841660df4a80ad57decd49ffa66a6b7eaec12c2facb8c"
-			["x86_64"]="3700423505d40fb2563b0a417a5a3f60aed12c8655cde6b242a75175d0b51ea3"
+			["aarch64"]="941c2d8d8da87bba8e71d562bd6e42205cea87012cfd47cb6de939a465faa04e"
+			["arm"]="451cd4f6c32a31ae650683e4b24487fbfd5cd5a8b7220acdc948cff42c166cd0"
+			["i686"]="c6ac25a9a8ac1578378d2c002deed122d251bc63b40bc564c173d6ca3c60476d"
+			["x86_64"]="c494ac4f4c9eb68cea4e6a474e8416da423f7cc6107f31eb8324a5652953734d"
 		)
 
 		local target="$TERMUX_HOST_PLATFORM"
 		[[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
-		termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v$TERMUX_GHC_VERSION/ghc-$TERMUX_GHC_VERSION-$target.tar.xz" \
+		local release_tag="$TERMUX_GHC_VERSION"+patch1
+		termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v$release_tag/ghc-$TERMUX_GHC_VERSION-$target.tar.xz" \
 			"$TERMUX_GHC_TAR" \
 			"${checksums[$TERMUX_ARCH]}"
 

@@ -1,0 +1,26 @@
+--- a/components/permissions/permission_request_manager.cc
++++ b/components/permissions/permission_request_manager.cc
+@@ -437,7 +438,9 @@
+ bool PermissionRequestManager::
+     HasActiveSourceFrameOrDisallowActivationOtherwise(
+         const PermissionRequest& request) const {
+-  const auto iter = request_sources_map_.find(request);
++  const auto iter = request_sources_map_.find(
++      base::raw_ref<PermissionRequest>::from_ptr(
++          const_cast<PermissionRequest*>(&request)));
+   if (iter != request_sources_map_.end()) {
+     return !iter->second.IsSourceFrameInactiveAndDisallowActivation();
+   }
+--- a/chrome/browser/ui/startup/profile_launch_observer.cc
++++ b/chrome/browser/ui/startup/profile_launch_observer.cc
+@@ -73,8 +73,8 @@
+ 
+ bool ProfileLaunchObserver::HasBeenLaunchedAndBrowserOpenInternal(
+     const Profile* profile) const {
+-  return opened_profiles_.contains(profile) &&
+-         launched_profiles_.contains(profile);
++  return opened_profiles_.contains(const_cast<Profile*>(profile)) &&
++         launched_profiles_.contains(const_cast<Profile*>(profile));
+ }
+ 
+ void ProfileLaunchObserver::AddLaunchedInternal(Profile* profile) {

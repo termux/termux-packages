@@ -1,0 +1,23 @@
+--- a/third_party/dawn/include/dawn/native/VulkanBackend.h
++++ b/third_party/dawn/include/dawn/native/VulkanBackend.h
+@@ -126,7 +126,7 @@
+     ExternalImageExportInfoDmaBuf();
+ };
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ 
+ // Descriptor for AHardwareBuffer image import
+ struct DAWN_NATIVE_EXPORT ExternalImageDescriptorAHardwareBuffer : ExternalImageDescriptorVk {
+--- a/third_party/dawn/src/dawn/common/Platform.h
++++ b/third_party/dawn/src/dawn/common/Platform.h
+@@ -62,7 +62,8 @@
+ #elif defined(__linux__)
+ #define DAWN_PLATFORM_IS_LINUX 1
+ #define DAWN_PLATFORM_IS_POSIX 1
+-#if defined(__ANDROID__)
++#include <sys/types.h>
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #define DAWN_PLATFORM_IS_ANDROID 1
+ #elif defined(DAWN_OS_CHROMEOS)
+ #define DAWN_PLATFORM_IS_CHROMEOS 1

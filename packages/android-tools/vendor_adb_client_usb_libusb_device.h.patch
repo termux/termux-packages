@@ -1,0 +1,11 @@
+--- a/vendor/adb/client/usb_libusb_device.h
++++ b/vendor/adb/client/usb_libusb_device.h
+@@ -48,7 +48,7 @@
+ // Abstraction layer simplifying libusb_device management
+ struct LibUsbDevice {
+   public:
+-    explicit LibUsbDevice(libusb_device* device);
++    explicit LibUsbDevice(libusb_device* device, libusb_device_handle* handle = nullptr);
+     ~LibUsbDevice();
+ 
+     // Device must have been Opened prior to calling this method.

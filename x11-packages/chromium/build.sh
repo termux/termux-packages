@@ -2,14 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.chromium.org/Home
 TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION=149.0.7827.155
-TERMUX_PKG_SRCURL=https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz
-TERMUX_PKG_SHA256=4e39fd0ae3ad64fd4bff6a523d94fe5e2917ad51a7f46a73c84a5736d9dda862
+TERMUX_PKG_VERSION="152.0.7977.82"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://commondatastorage.googleapis.com/chromium-browser-official/chromium-$TERMUX_PKG_VERSION-lite.tar.xz"
+TERMUX_PKG_SHA256=67ac37f365dfdac763c428862e5e460e5948940b3d6f856374da2ce219981417
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
-# TODO: Split chromium-common and chromium-headless
-# TERMUX_PKG_DEPENDS+=", chromium-common"
-# TERMUX_PKG_SUGGESTS="chromium-headless, chromium-driver"
 # Chromium doesn't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_AUTO_UPDATE=false
@@ -63,13 +61,6 @@ termux_step_post_get_source() {
 		termux_error_exit "Version mismatch between chromium-host-tools and chromium."
 	fi
 
-	# Apply patches related to c++23
-	local f
-	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/cxx-patches" -maxdepth 1 -type f -name *.patch | sort); do
-		echo "Applying patch: $(basename $f)"
-		patch -p1 --silent < "$f"
-	done
-
 	# Apply patches related to chromium
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/../chromium-host-tools/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
@@ -110,6 +101,7 @@ termux_step_pre_configure() {
 termux_step_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	termux_setup_ninja
+	termux_setup_golang
 
 	# Fetch depot_tools
 	export DEPOT_TOOLS_UPDATE=0
@@ -149,7 +141,10 @@ EOF
 	./tools/clang/scripts/update.py
 
 	# Link to system tools required by the build
+	mkdir -p third_party/jdk/current/bin/
 	ln -sf $(command -v java) third_party/jdk/current/bin/
+	mkdir -p third_party/dawn/tools/golang/linux-amd64/bin/
+	ln -sf $(command -v go) third_party/dawn/tools/golang/linux-amd64/bin/
 
 	# Install nodejs
 	if [ ! -f "third_party/node/linux/node-linux-x64/bin/node" ]; then
@@ -224,6 +219,9 @@ print(deps['src/third_party/node/node_modules']['objects'][0]['sha256sum'])
 		# This is needed to build cups
 		cp -Rf $TERMUX_PREFIX/bin/cups-config usr/bin/
 		chmod +x usr/bin/cups-config
+		# Temporarily disable check
+		# Will be enabled after investigating how to correctly append android build target flags to `bindgen`
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/9999-sysroot-disable-target-check.diff
 		popd
 		mv $TERMUX_PKG_TMPDIR/sysroot $TERMUX_PKG_CACHEDIR/sysroot-$TERMUX_ARCH
 	fi
@@ -330,9 +328,6 @@ exclude_unwind_tables = false
 use_jumbo_build = true
 # Compile pdfium as a static library
 pdf_is_complete_lib = true
-# NDK r29 can't compile chromium with cxx23, see
-# https://github.com/termux/termux-packages/issues/28459#issuecomment-3991943697
-use_cxx23 = false
 " > $_common_args_file
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
@@ -514,9 +509,6 @@ termux_step_post_make_install() {
 	# Remove the dummy files
 	rm $TERMUX_PREFIX/lib/lib{{pthread,resolv,ffi_pic}.a,rt.so}
 }
-
-# TODO:
-# (2) Split packages
 
 # ######################### About system libraries ############################
 # We only pick up a few libraries to let chromium link against. Others may

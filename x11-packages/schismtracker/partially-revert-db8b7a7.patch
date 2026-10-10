@@ -3,11 +3,12 @@ which introduces a change that doesn't work on Android.
 
 --- a/schism/loadso.c
 +++ b/schism/loadso.c
-@@ -224,7 +224,7 @@ static const char *loadso_lib_fmts[] = {
- #elif defined(SCHISM_MACOSX)
- 	"lib%s.dylib",
+@@ -270,8 +270,7 @@
+ #elif defined(SCHISM_WIIU)
+ 	"%s.rpl",
  #else
--	//"lib%s.so",
+-	/* NOTE: this is apparently required for Android; see issue #767
+-	 * "lib%s.so", */
 +	"lib%s.so",
  #endif
  	NULL,

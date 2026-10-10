@@ -1,0 +1,33 @@
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Sat, 18 Jul 2026 21:30:00 +0530
+Subject: [PATCH] register postprocess_fontconfig also when USE_HEADLESS_CODE
+
+Upstream commit 8f9d54f22f0c ("We seem to need postprocess_fontconfig
+also for CODA-W, for make check",
+https://github.com/LibreOffice/core/commit/8f9d54f22f0c346fe08d0727ebf0b3a6ca8e9e11,
+https://gerrit.libreoffice.org/c/core/+/197101) added USE_HEADLESS_CODE to the
+condition guarding Package_fontconfig in
+postprocess/Module_postprocess.mk, but not to the matching
+registration in Repository.mk. On a Linux build side configured with
+--without-x (the CONF-FOR-BUILD cross-toolset), USE_HEADLESS_CODE is
+TRUE while USING_X11, DISABLE_GUI and the ANDROID/EMSCRIPTEN/
+FONTCONFIG terms are all empty, so the package is built but never
+registered and gbuild aborts with "Package postprocess_fontconfig
+must be registered in Repository.mk or RepositoryExternal.mk".
+Mirror the module condition in the registration.
+---
+ Repository.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Repository.mk b/Repository.mk
+--- a/Repository.mk
++++ b/Repository.mk
+@@ -1051,7 +1051,7 @@ $(eval $(call gb_Helper_register_packages_for_install,ooo_images,\
+
+ $(eval $(call gb_Helper_register_packages_for_install,ooo_fonts,\
+ 	extras_fonts \
+-	$(if $(USING_X11)$(DISABLE_GUI)$(filter FONTCONFIG,$(BUILD_TYPE))$(filter ANDROID EMSCRIPTEN,$(OS)), \
++	$(if $(USE_HEADLESS_CODE)$(USING_X11)$(DISABLE_GUI)$(filter FONTCONFIG,$(BUILD_TYPE))$(filter ANDROID EMSCRIPTEN,$(OS)), \
+ 		postprocess_fontconfig) \
+ 	$(call gb_Helper_optional,MORE_FONTS,\
+ 		fonts_alef \

@@ -356,25 +356,6 @@ index ee8324d..a1b6fc3 100644
    sources = [
      "ipc_message.cc",
      "ipc_message.h",
-diff --git a/ipc/ipc_sync_channel.cc b/ipc/ipc_sync_channel.cc
-index 5fc172d..264a8b7 100644
---- a/ipc/ipc_sync_channel.cc
-+++ b/ipc/ipc_sync_channel.cc
-@@ -30,6 +30,8 @@
- 
- using base::WaitableEvent;
- 
-+#define OnEventReady OnEventReadySyncChannel
-+
- namespace IPC {
- 
- namespace {
-@@ -593,3 +595,5 @@ void SyncChannel::StartWatching() {
- void SyncChannel::OnChannelInit() {}
- 
- }  // namespace IPC
-+
-+#undef OnEventReady
 diff --git a/sql/BUILD.gn b/sql/BUILD.gn
 index 4684b58..b822b18 100644
 --- a/sql/BUILD.gn

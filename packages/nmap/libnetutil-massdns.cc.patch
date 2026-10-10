@@ -1,0 +1,23 @@
+--- a/libnetutil/massdns.cc
++++ b/libnetutil/massdns.cc
+@@ -1508,9 +1508,9 @@
+   char ipaddr[INET6_ADDRSTRLEN+1];
+   static bool firstrun = true;
+ 
+-  fp = fopen("/etc/resolv.conf", "r");
++  fp = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+   if (fp == NULL) {
+-    if (firstrun) perror("mass_dns: warning: Unable to open /etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
++    if (firstrun) perror("mass_dns: warning: Unable to open @TERMUX_PREFIX@/etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
+     firstrun = false;
+     return;
+   }
+@@ -1615,7 +1615,7 @@
+   DNS::ResolverImpl::parse_etchosts(tpbuf);
+ 
+ #else
+-  DNS::ResolverImpl::parse_etchosts("/etc/hosts");
++  DNS::ResolverImpl::parse_etchosts("@TERMUX_PREFIX@/etc/hosts");
+ #endif // WIN32
+ }
+ 

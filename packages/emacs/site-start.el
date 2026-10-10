@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 ;; Enable terminal mouse events:
 (xterm-mouse-mode 1)
 (global-set-key [wheel-up] 'scroll-down-line)

@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.povray.org/
 TERMUX_PKG_DESCRIPTION="The Persistence of Vision Raytracer"
-TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.8.0-beta.2"
-TERMUX_PKG_REVISION=19
+TERMUX_PKG_REVISION=20
 TERMUX_PKG_SRCURL="https://github.com/POV-Ray/povray/releases/download/v${TERMUX_PKG_VERSION}/povunix-v${TERMUX_PKG_VERSION}-src.tar.gz"
 TERMUX_PKG_SHA256=4717c9bed114deec47cf04a8175cc4060dafc159f26e7896480a60f4411ca5ad
 TERMUX_PKG_DEPENDS="boost, imath, libc++, libjpeg-turbo, libpng, libtiff, openexr, povray-data, zlib"
@@ -40,14 +40,16 @@ termux_step_pre_configure() {
 termux_step_create_debscripts() {
 	local _POVRAY_VERSION_BASE="${TERMUX_PKG_VERSION%-*}"
 	_POVRAY_VERSION_BASE="${_POVRAY_VERSION_BASE%.*}"
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "povconfuser=\$HOME/.povray/${_POVRAY_VERSION_BASE}" >> postinst
-	echo "mkdir -p \$povconfuser/" >> postinst
-	echo "for f in povray.conf povray.ini; do" >> postinst
-	echo "    if [ ! -f \$povconfuser/\$f ]; then" >> postinst
-	echo "        cp $TERMUX_PREFIX/etc/povray/${_POVRAY_VERSION_BASE}/\$f \$povconfuser/" >> postinst
-	echo "    fi" >> postinst
-	echo "done" >> postinst
-	echo "exit 0" >> postinst
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "povconfuser=\$HOME/.povray/${_POVRAY_VERSION_BASE}"
+		echo "mkdir -p \$povconfuser/"
+		echo "for f in povray.conf povray.ini; do"
+		echo "    if [ ! -f \$povconfuser/\$f ]; then"
+		echo "        cp $TERMUX_PREFIX/etc/povray/${_POVRAY_VERSION_BASE}/\$f \$povconfuser/"
+		echo "    fi"
+		echo "done"
+		echo "exit 0"
+	} > postinst
 	chmod 0755 postinst
 }

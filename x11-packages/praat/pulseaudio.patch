@@ -1,0 +1,12 @@
+--- a/Makefile
++++ b/Makefile
+@@ -288,6 +288,9 @@ else ifeq ($(OS_IS_LINUX),1)
+   ifeq ($(PRAAT_AUDIO),none)
+     AUDIO_COMPILER_FLAGS :=
+     AUDIO_LINKER_FLAGS :=
++  else ifeq ($(PRAAT_AUDIO),pulseaudio)
++    AUDIO_COMPILER_FLAGS := -DHAVE_PULSEAUDIO
++    AUDIO_LINKER_FLAGS := -lpulse
+   else ifeq ($(PRAAT_AUDIO),jack)
+     AUDIO_COMPILER_FLAGS := -DJACK
+     AUDIO_LINKER_FLAGS := `$(PKG_CONFIG) --libs jack`

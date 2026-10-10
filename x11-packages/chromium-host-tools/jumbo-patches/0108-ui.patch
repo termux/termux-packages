@@ -176,9 +176,9 @@ index 629618620d..d15cd2ba37 100644
  import("//build/config/ui.gni")
  import("//extensions/buildflags/buildflags.gni")
 @@ -43,7 +44,7 @@ mojom_component("ax_features_mojo") {
- # included by Blink. The rule of thumb (for now) is that it's
- # anything platform-neutral (no platform/ directory) that
- # relates to data structs (actions, nodes, trees, etc) and interfaces. No heavy weight logic yet.
+ # The rule of thumb (for now) is that it's anything platform-neutral (no
+ # platform/ directory) that relates to data structs (actions, nodes, trees, etc)
+ # and interfaces. No heavy weight logic yet.
 -component("ax_base") {
 +jumbo_component("ax_base") {
    defines = [ "AX_BASE_IMPLEMENTATION" ]
@@ -650,7 +650,7 @@ index 64a92227ea..d8a6912b30 100644
 @@ -31,7 +32,7 @@ source_set("color_headers") {
  }
  
- # Keep the deps on this target to a minimum so that chromeos/crosapi can depend on it.
+ # Keep the deps on this target to a minimum so that chromeos can depend on it.
 -component("color_provider_key") {
 +jumbo_component("color_provider_key") {
    sources = [
@@ -1338,8 +1338,8 @@ index 795c5b51db..4292c46627 100644
  import("//build/config/linux/pkg_config.gni")
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
-@@ -55,7 +56,7 @@ source_set("gl_headers") {
-   public_deps = [ "//third_party/angle:includes" ]
+@@ -84,7 +85,7 @@
+   }
  }
  
 -component("gl") {
@@ -1347,26 +1347,28 @@ index 795c5b51db..4292c46627 100644
    output_name = "gl_wrapper"  # Avoid colliding with OS X"s libGL.dylib.
  
    sources = [
-@@ -356,6 +357,10 @@ component("gl") {
-     defines += [ "GL_SILENCE_DEPRECATION" ]
-   }
+@@ -188,6 +188,10 @@
+     "trace_util.h",
+   ]
  
 +  jumbo_excluded_sources = [
 +    "presenter.cc",
 +  ]
 +
-   if (is_android) {
-     sources += [
-       "android/egl_fence_utils.cc",
-@@ -437,11 +442,15 @@ if (is_mac) {
-         "//third_party/swiftshader/src/Vulkan:icd_file",
-         "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
-       ]
-+
-+      jumbo_excluded_sources += [
-+        "gl_angle_util_vulkan.cc",
-+      ]
-     }
+   configs += [
+     "//build/config/compiler:wexit_time_destructors",
+     "//build/config/compiler:wglobal_constructors",
+@@ -234,6 +235,9 @@
+       "gl_angle_util_vulkan.cc",
+       "gl_angle_util_vulkan.h",
+     ]
++    jumbo_excluded_sources += [
++      "gl_angle_util_vulkan.cc",
++    ]
+   }
+ 
+   if (use_ozone) {
+@@ -493,7 +501,7 @@
    }
  }
  
@@ -1375,7 +1377,7 @@ index 795c5b51db..4292c46627 100644
    testonly = true
    sources = [
      "egl_bindings_autogen_mock.cc",
-@@ -466,7 +475,7 @@ static_library("gl_unittest_utils") {
+@@ -525,7 +533,7 @@
    ]
  }
  
@@ -1432,18 +1434,15 @@ index 967f63763b..08bcd53160 100644
  import("//build/config/linux/gtk/gtk.gni")
  import("//build/config/linux/pkg_config.gni")
  import("//build/config/ozone.gni")
-@@ -67,10 +68,9 @@ generate_stubs("gtk_stubs") {
+@@ -70,7 +71,7 @@ generate_stubs("gtk_stubs") {
    logging_include = "ui/gtk/log_noop.h"
  }
  
 -component("gtk") {
 +jumbo_component("gtk") {
-   visibility = [ "//ui/linux:linux_ui_factory" ]
-   public = [ "gtk_ui_factory.h" ]
--
-   sources = [
-     "gtk_color_mixers.cc",
-     "gtk_color_mixers.h",
+   visibility = [
+     ":gtk_unittests",
+     "//ui/linux:linux_ui_factory",
 @@ -102,6 +102,7 @@ component("gtk") {
      "window_frame_provider_gtk.cc",
      "window_frame_provider_gtk.h",
@@ -1531,13 +1530,17 @@ diff --git a/ui/native_theme/BUILD.gn b/ui/native_theme/BUILD.gn
 index 0f0cfc2920..539b257111 100644
 --- a/ui/native_theme/BUILD.gn
 +++ b/ui/native_theme/BUILD.gn
-@@ -2,10 +2,11 @@
+@@ -2,6 +2,7 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
  import("//build/config/ui.gni")
  import("//testing/test.gni")
+ 
+@@ -10,7 +11,7 @@
+   import("//third_party/jni_zero/jni_zero.gni")
+ }
  
 -component("native_theme") {
 +jumbo_component("native_theme") {
@@ -1731,10 +1734,10 @@ diff --git a/ui/views/BUILD.gn b/ui/views/BUILD.gn
 index dd2fcedc84..bde01f73a8 100644
 --- a/ui/views/BUILD.gn
 +++ b/ui/views/BUILD.gn
-@@ -3,6 +3,7 @@
- # found in the LICENSE file.
+@@ -4,6 +4,7 @@
  
  import("//build/buildflag_header.gni")
+ import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
@@ -1878,21 +1881,6 @@ index a4564d98d6..bcd069a3e0 100644
    testonly = true
    sources = [
      "examples_window_with_content.cc",
-diff --git a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-index 47adf1b694..518d77e164 100644
---- a/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-+++ b/ui/views/widget/desktop_aura/desktop_native_widget_aura.cc
-@@ -634,8 +634,8 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
-           std::unique_ptr<wm::NativeCursorManager>(native_cursor_manager_));
-       cursor_manager_->SetDisplay(
-           display::Screen::Get()->GetDisplayNearestWindow(host_->window()));
--      if (features::IsSystemCursorSizeSupported() ||
--          features::ShouldUseCursorEventHook()) {
-+      if (::features::IsSystemCursorSizeSupported() ||
-+          ::features::ShouldUseCursorEventHook()) {
-         native_cursor_manager_->InitSystemCursorObservers(cursor_manager_);
-       }
-     }
 diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 index 13fd65bff1..e2b4bc7afc 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
@@ -2002,3 +1990,86 @@ index 23c7f4df7a..6b98d5dc5d 100644
    output_name = "wm_public"
  
    public = [
+diff --git a/ui/views/bubble/bubble_frame_view.cc b/ui/views/bubble/bubble_frame_view.cc
+index a541e749d8..610cd4ec82 100644
+--- a/ui/views/bubble/bubble_frame_view.cc
++++ b/ui/views/bubble/bubble_frame_view.cc
+@@ -178,7 +178,7 @@ std::unique_ptr<Label> BubbleFrameView::CreateDefaultTitleLabel(
+ std::unique_ptr<Button> BubbleFrameView::CreateCloseButton(
+     Button::PressedCallback callback) {
+   auto close_button = CreateVectorImageButtonWithNativeTheme(
+-      std::move(callback), features::IsRoundedIconsEnabled()
++      std::move(callback), ::features::IsRoundedIconsEnabled()
+                                ? vector_icons::kCloseIcon
+                                : vector_icons::kCloseChromeRefreshOldIcon);
+   close_button->SetTooltipText(l10n_util::GetStringUTF16(IDS_APP_CLOSE));
+@@ -195,7 +195,7 @@ std::unique_ptr<Button> BubbleFrameView::CreateCloseButton(
+ std::unique_ptr<Button> BubbleFrameView::CreateMinimizeButton(
+     Button::PressedCallback callback) {
+   auto minimize_button = CreateVectorImageButtonWithNativeTheme(
+-      std::move(callback), features::IsRoundedIconsEnabled()
++      std::move(callback), ::features::IsRoundedIconsEnabled()
+                                ? kChromeMinimizeIcon
+                                : kWindowControlMinimizeOldIcon);
+   minimize_button->SetTooltipText(
+diff --git a/ui/views/bubble/tooltip_icon.cc b/ui/views/bubble/tooltip_icon.cc
+index 4054f728ca..a283c2c8a5 100644
+--- a/ui/views/bubble/tooltip_icon.cc
++++ b/ui/views/bubble/tooltip_icon.cc
+@@ -127,7 +127,7 @@ void TooltipIcon::RemoveObserver(Observer* observer) {
+ 
+ void TooltipIcon::SetDrawAsHovered(bool hovered) {
+   SetImage(ui::ImageModel::FromVectorIcon(
+-      features::IsRoundedIconsEnabled() ? vector_icons::kInfoIcon
++      ::features::IsRoundedIconsEnabled() ? vector_icons::kInfoIcon
+                                         : vector_icons::kInfoOutlineOldIcon,
+       GetColorProvider()->GetColor(hovered ? ui::kColorHelpIconActive
+                                            : ui::kColorHelpIconInactive),
+diff --git a/ui/views/controls/button/checkbox.cc b/ui/views/controls/button/checkbox.cc
+index c761eb0141..6288d13bcf 100644
+--- a/ui/views/controls/button/checkbox.cc
++++ b/ui/views/controls/button/checkbox.cc
+@@ -262,7 +262,7 @@ SkColor Checkbox::GetIconCheckColor(int icon_state) const {
+ }
+ 
+ const gfx::VectorIcon& Checkbox::GetVectorIcon() const {
+-  return GetChecked() ? features::IsRoundedIconsEnabled()
++  return GetChecked() ? ::features::IsRoundedIconsEnabled()
+                             ? kCheckIcon
+                             : kCheckboxCheckCr2023OldIcon
+                       : kCheckboxCustomIcon;
+diff --git a/ui/views/controls/throbber.cc b/ui/views/controls/throbber.cc
+index cdf863b75a..8aa62ea115 100644
+--- a/ui/views/controls/throbber.cc
++++ b/ui/views/controls/throbber.cc
+@@ -93,7 +93,7 @@ void Throbber::OnPaint(gfx::Canvas* canvas) {
+       canvas->Translate(gfx::Vector2d((width() - kCheckmarkDipSize) / 2,
+                                       (height() - kCheckmarkDipSize) / 2));
+       gfx::PaintVectorIcon(canvas,
+-                           features::IsRoundedIconsEnabled()
++                           ::features::IsRoundedIconsEnabled()
+                                ? vector_icons::kCheckCircleFilledIcon
+                                : vector_icons::kCheckCircleOldIcon,
+                            kCheckmarkDipSize, color);
+diff --git a/ui/views/controls/tree/tree_view.cc b/ui/views/controls/tree/tree_view.cc
+index d6274d19a8..8c8df95282 100644
+--- a/ui/views/controls/tree/tree_view.cc
++++ b/ui/views/controls/tree/tree_view.cc
+@@ -110,7 +110,7 @@ TreeView::TreeView()
+   SetFocusBehavior(FocusBehavior::ALWAYS);
+ 
+   folder_icon_ = ui::ImageModel::FromVectorIcon(
+-      features::IsRoundedIconsEnabled()
++      ::features::IsRoundedIconsEnabled()
+           ? vector_icons::kFolderFlippableIcon
+           : vector_icons::kFolderChromeRefreshOldIcon,
+       ui::kColorIcon);
+@@ -1252,7 +1252,7 @@ void TreeView::PaintExpandControl(gfx::Canvas* canvas,
+                                   const gfx::Rect& node_bounds,
+                                   bool expanded) {
+   gfx::ImageSkia arrow = gfx::CreateVectorIcon(
+-      features::IsRoundedIconsEnabled() ? vector_icons::kArrowRightFlippableIcon
++      ::features::IsRoundedIconsEnabled() ? vector_icons::kArrowRightFlippableIcon
+                                         : vector_icons::kSubmenuArrowOldIcon,
+       color_utils::DeriveDefaultIconColor(
+           drawing_provider()->GetTextColorForNode(this, nullptr)));

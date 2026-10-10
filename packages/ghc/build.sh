@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=9.12.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
 TERMUX_PKG_SHA256=0e49cd5dde43f348c5716e5de9a5d7a0f8d68d945dc41cf75dfdefe65084f933
-TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, ncurses"
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
@@ -71,10 +71,30 @@ termux_step_make() {
 	(
 		unset CFLAGS LDFLAGS CPPFLAGS # For hadrian compilation
 
+		# NOTE: libandroid-utimes is required for `futimes`, `lutimes` used by `unix` package.
+
+		# NOTE: Why -z,global for rts?
+		# Standard gnu/Linux behaviour is to load the main executable dependencies to
+		# global scope. This behaviour is assumed by ghc dynamic linker. But it is
+		# not true on Android. In API 23 Android changed the behaviour and
+		# introduced stricter separation. ONLY main executable, LD_PRELOAD and
+		# dependencies marked with DF_1_GLOBAL is loaded into global scope. Others
+		# go to local scope. Any library further opened via dlopen(3) can't see
+		# the symbols from the dependencies of the main executable. Thus, the
+		# compatibility problem.
+		#
+		# See:
+		#   - https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#changes-to-library-search-order
+		#   - https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#rtld_local-available-in-api-level-23
+		#   - https://github.com/android/ndk/issues/201
+
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
 			--flavour="release$no_profiled_libs" --docs=none \
-			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore"
+			"stage1.rts.ghc.link.opts += -optl-Wl,-z,global" \
+			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_futimes=yes" \
+			"stage1.unix.cabal.configure.opts += --configure-option=ac_cv_func_lutimes=yes" \
+			"stage1.unix.cabal.configure.opts += -f+android-libs"
 	)
 }
 

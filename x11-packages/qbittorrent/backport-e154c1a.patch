@@ -1,0 +1,348 @@
+From e154c1a811021ab0bd6e6f9595c2b3c6518aaea3 Mon Sep 17 00:00:00 2001
+From: Arvid Norberg <arvid@libtorrent.org>
+Date: Sat, 28 Mar 2026 10:36:47 +0100
+Subject: [PATCH] Support build against latest version of libtorrent
+
+PR #23953.
+
+---------
+
+Co-authored-by: Vladimir Golovnev <glassez@yandex.ru>
+---
+ src/base/bittorrent/customstorage.cpp     | 31 +++++++++++++++++
+ src/base/bittorrent/customstorage.h       |  8 +++++
+ src/base/bittorrent/session.h             |  7 +++-
+ src/base/bittorrent/sessionimpl.cpp       | 10 ++++++
+ src/base/bittorrent/torrentdescriptor.cpp |  7 ++++
+ src/base/bittorrent/torrentimpl.cpp       | 42 ++++++++++++++++++-----
+ src/gui/advancedsettings.cpp              |  5 +++
+ 7 files changed, 100 insertions(+), 10 deletions(-)
+
+diff --git a/src/base/bittorrent/customstorage.cpp b/src/base/bittorrent/customstorage.cpp
+index 9134b1507d23..00b314fb0ce0 100644
+--- a/src/base/bittorrent/customstorage.cpp
++++ b/src/base/bittorrent/customstorage.cpp
+@@ -36,6 +36,9 @@
+ #ifdef QBT_USES_LIBTORRENT2
+ #include <libtorrent/mmap_disk_io.hpp>
+ #include <libtorrent/posix_disk_io.hpp>
++#if LIBTORRENT_VERSION_NUM >= 20100
++#include <libtorrent/pread_disk_io.hpp>
++#endif
+ #include <libtorrent/session.hpp>
+ 
+ std::unique_ptr<lt::disk_interface> customDiskIOConstructor(
+@@ -56,6 +59,14 @@ std::unique_ptr<lt::disk_interface> customMMapDiskIOConstructor(
+     return std::make_unique<CustomDiskIOThread>(lt::mmap_disk_io_constructor(ioContext, settings, counters));
+ }
+ 
++#if LIBTORRENT_VERSION_NUM >= 20100
++std::unique_ptr<lt::disk_interface> customPreadDiskIOConstructor(
++        lt::io_context &ioContext, const lt::settings_interface &settings, lt::counters &counters)
++{
++    return std::make_unique<CustomDiskIOThread>(lt::pread_disk_io_constructor(ioContext, settings, counters));
++}
++#endif
++
+ CustomDiskIOThread::CustomDiskIOThread(std::unique_ptr<libtorrent::disk_interface> nativeDiskIOThread)
+     : m_nativeDiskIO {std::move(nativeDiskIOThread)}
+ {
+@@ -65,6 +76,16 @@ lt::storage_holder CustomDiskIOThread::new_torrent(const lt::storage_params &sto
+ {
+     lt::storage_holder storageHolder = m_nativeDiskIO->new_torrent(storageParams, torrent);
+ 
++#if LIBTORRENT_VERSION_NUM >= 20100
++    const Path savePath {std::string(storageParams.path)};
++    m_storageData[storageHolder] =
++    {
++        savePath,
++        storageParams.files,
++        storageParams.renamed_files,
++        storageParams.priorities
++    };
++#else
+     const Path savePath {storageParams.path};
+     m_storageData[storageHolder] =
+     {
+@@ -72,6 +93,7 @@ lt::storage_holder CustomDiskIOThread::new_torrent(const lt::storage_params &sto
+         storageParams.mapped_files ? *storageParams.mapped_files : storageParams.files,
+         storageParams.priorities
+     };
++#endif
+ 
+     return storageHolder;
+ }
+@@ -156,7 +178,11 @@ void CustomDiskIOThread::async_rename_file(lt::storage_index_t storage, lt::file
+             , [=, this, handler = std::move(handler)](const std::string &name, lt::file_index_t index, const lt::storage_error &error)
+     {
+         if (!error)
++#if LIBTORRENT_VERSION_NUM >= 20100
++            m_storageData[storage].renamedFiles.rename_file(m_storageData[storage].files, index, name);
++#else
+             m_storageData[storage].files.rename_file(index, name);
++#endif
+         handler(name, index, error);
+     });
+ }
+@@ -212,7 +238,12 @@ void CustomDiskIOThread::settings_updated()
+ void CustomDiskIOThread::handleCompleteFiles(lt::storage_index_t storage, const Path &savePath)
+ {
+     const StorageData storageData = m_storageData[storage];
++#if LIBTORRENT_VERSION_NUM >= 20100
++    const lt::filenames fileNames {storageData.files, storageData.renamedFiles};
++    const auto &fileStorage = fileNames;
++#else
+     const lt::file_storage &fileStorage = storageData.files;
++#endif
+     for (const lt::file_index_t fileIndex : fileStorage.file_range())
+     {
+         // ignore files that have priority 0
+diff --git a/src/base/bittorrent/customstorage.h b/src/base/bittorrent/customstorage.h
+index ad91b7cf797b..8d61362ee5ba 100644
+--- a/src/base/bittorrent/customstorage.h
++++ b/src/base/bittorrent/customstorage.h
+@@ -39,6 +39,7 @@
+ #include <libtorrent/disk_interface.hpp>
+ #include <libtorrent/file_storage.hpp>
+ #include <libtorrent/io_context.hpp>
++#include <libtorrent/version.hpp>
+ 
+ #include <QHash>
+ #else
+@@ -52,6 +53,10 @@ std::unique_ptr<lt::disk_interface> customPosixDiskIOConstructor(
+         lt::io_context &ioContext, lt::settings_interface const &settings, lt::counters &counters);
+ std::unique_ptr<lt::disk_interface> customMMapDiskIOConstructor(
+         lt::io_context &ioContext, lt::settings_interface const &settings, lt::counters &counters);
++#if LIBTORRENT_VERSION_NUM >= 20100
++std::unique_ptr<lt::disk_interface> customPreadDiskIOConstructor(
++        lt::io_context &ioContext, lt::settings_interface const &settings, lt::counters &counters);
++#endif
+ 
+ class CustomDiskIOThread final : public lt::disk_interface
+ {
+@@ -98,6 +103,9 @@ class CustomDiskIOThread final : public lt::disk_interface
+     {
+         Path savePath;
+         lt::file_storage files;
++#if LIBTORRENT_VERSION_NUM >= 20100
++        lt::renamed_files renamedFiles;
++#endif
+         lt::aux::vector<lt::download_priority_t, lt::file_index_t> filePriorities;
+     };
+     QHash<lt::storage_index_t, StorageData> m_storageData;
+diff --git a/src/base/bittorrent/session.h b/src/base/bittorrent/session.h
+index 1bec98aca510..5cac4aefb5b3 100644
+--- a/src/base/bittorrent/session.h
++++ b/src/base/bittorrent/session.h
+@@ -29,6 +29,8 @@
+ 
+ #pragma once
+ 
++#include <libtorrent/version.hpp>
++
+ #include <QtContainerFwd>
+ #include <QObject>
+ 
+@@ -94,7 +96,10 @@ namespace BitTorrent
+             Default = 0,
+             MMap = 1,
+             Posix = 2,
+-            SimplePreadPwrite = 3
++            SimplePreadPwrite = 3,
++#if LIBTORRENT_VERSION_NUM >= 20100
++            PreadPwrite = 4
++#endif
+         };
+         Q_ENUM_NS(DiskIOType)
+ 
+diff --git a/src/base/bittorrent/sessionimpl.cpp b/src/base/bittorrent/sessionimpl.cpp
+index bf8b4d808ee7..5c055a685b95 100644
+--- a/src/base/bittorrent/sessionimpl.cpp
++++ b/src/base/bittorrent/sessionimpl.cpp
+@@ -57,6 +57,7 @@
+ #include <libtorrent/session_stats.hpp>
+ #include <libtorrent/session_status.hpp>
+ #include <libtorrent/torrent_info.hpp>
++#include <libtorrent/version.hpp>
+ 
+ #include <QDateTime>
+ #include <QDeadlineTimer>
+@@ -224,6 +225,10 @@ namespace
+ #endif
+         case lt::socket_type_t::utp_ssl:
+             return u"UTP_SSL"_s;
++#if LIBTORRENT_VERSION_NUM >= 20100
++        case lt::socket_type_t::rtc:
++            return u"WebRTC"_s;
++#endif
+         }
+         return u"INVALID"_s;
+     }
+@@ -1755,6 +1760,11 @@ void SessionImpl::initializeNativeSession()
+     case DiskIOType::SimplePreadPwrite:
+         sessionParams.disk_io_constructor = customMMapDiskIOConstructor;
+         break;
++#if LIBTORRENT_VERSION_NUM >= 20100
++    case DiskIOType::PreadPwrite:
++        sessionParams.disk_io_constructor = customPreadDiskIOConstructor;
++        break;
++#endif
+     default:
+         sessionParams.disk_io_constructor = customDiskIOConstructor;
+         break;
+diff --git a/src/base/bittorrent/torrentdescriptor.cpp b/src/base/bittorrent/torrentdescriptor.cpp
+index a79fa75d7c80..1166c880416b 100644
+--- a/src/base/bittorrent/torrentdescriptor.cpp
++++ b/src/base/bittorrent/torrentdescriptor.cpp
+@@ -164,10 +164,17 @@ BitTorrent::TorrentDescriptor::TorrentDescriptor(lt::add_torrent_params ltAddTor
+     if (m_ltAddTorrentParams.ti && m_ltAddTorrentParams.ti->is_valid())
+     {
+         m_info.emplace(*m_ltAddTorrentParams.ti);
++#if LIBTORRENT_VERSION_NUM >= 20100
++        if (m_ltAddTorrentParams.creation_date > 0)
++            m_creationDate = QDateTime::fromSecsSinceEpoch(m_ltAddTorrentParams.creation_date);
++        m_creator = QString::fromStdString(m_ltAddTorrentParams.created_by);
++        m_comment = QString::fromStdString(m_ltAddTorrentParams.comment);
++#else
+         if (m_ltAddTorrentParams.ti->creation_date() > 0)
+             m_creationDate = QDateTime::fromSecsSinceEpoch(m_ltAddTorrentParams.ti->creation_date());
+         m_creator = QString::fromStdString(m_ltAddTorrentParams.ti->creator());
+         m_comment = QString::fromStdString(m_ltAddTorrentParams.ti->comment());
++#endif
+     }
+ }
+ 
+diff --git a/src/base/bittorrent/torrentimpl.cpp b/src/base/bittorrent/torrentimpl.cpp
+index 0cf6c1c26c98..3c19ed8964eb 100644
+--- a/src/base/bittorrent/torrentimpl.cpp
++++ b/src/base/bittorrent/torrentimpl.cpp
+@@ -40,6 +40,7 @@
+ #include <libtorrent/session.hpp>
+ #include <libtorrent/storage_defs.hpp>
+ #include <libtorrent/time.hpp>
++#include <libtorrent/version.hpp>
+ #include <libtorrent/write_resume_data.hpp>
+ 
+ #ifdef QBT_USES_LIBTORRENT2
+@@ -330,10 +331,17 @@ TorrentImpl::TorrentImpl(SessionImpl *session, const lt::torrent_handle &nativeH
+ {
+     if (m_ltAddTorrentParams.ti)
+     {
++#if LIBTORRENT_VERSION_NUM >= 20100
++        if (m_ltAddTorrentParams.creation_date > 0)
++            m_creationDate = QDateTime::fromSecsSinceEpoch(m_ltAddTorrentParams.creation_date);
++        m_creator = QString::fromStdString(m_ltAddTorrentParams.created_by);
++        m_comment = QString::fromStdString(m_ltAddTorrentParams.comment);
++#else
+         if (const std::time_t creationDate = m_ltAddTorrentParams.ti->creation_date(); creationDate > 0)
+             m_creationDate = QDateTime::fromSecsSinceEpoch(creationDate);
+         m_creator = QString::fromStdString(m_ltAddTorrentParams.ti->creator());
+         m_comment = QString::fromStdString(m_ltAddTorrentParams.ti->comment());
++#endif
+ 
+         // Initialize it only if torrent is added with metadata.
+         // Otherwise it should be initialized in "Metadata received" handler.
+@@ -861,7 +869,17 @@ bool TorrentImpl::connectPeer(const PeerAddress &peerAddress)
+ 
+ bool TorrentImpl::needSaveResumeData() const
+ {
++#if LIBTORRENT_VERSION_NUM >= 20100
++    return static_cast<bool>(m_nativeStatus.need_save_resume_data
++        & (lt::torrent_handle::if_download_progress
++            | lt::torrent_handle::if_config_changed
++            | lt::torrent_handle::if_state_changed
++            | lt::torrent_handle::if_metadata_changed
++            // TODO: if_counters_changed can probably safely be removed
++            | lt::torrent_handle::if_counters_changed));
++#else
+     return m_nativeStatus.need_save_resume;
++#endif
+ }
+ 
+ void TorrentImpl::requestResumeData(const lt::resume_data_flags_t flags)
+@@ -1066,7 +1084,13 @@ Path TorrentImpl::actualFilePath(const int index) const
+     if ((index < 0) || (index >= nativeIndexes.size()))
+         return {};
+ 
+-    return Path(nativeTorrentInfo()->files().file_path(nativeIndexes[index]));
++#if LIBTORRENT_VERSION_NUM >= 20100
++    const lt::file_storage &fs = nativeTorrentInfo()->files();
++    const lt::filenames files {fs, m_nativeStatus.renamed_files};
++#else
++    const lt::file_storage &files = nativeTorrentInfo()->files();
++#endif
++    return Path(files.file_path(nativeIndexes[index]));
+ }
+ 
+ qlonglong TorrentImpl::fileSize(const int index) const
+@@ -1087,7 +1111,12 @@ PathList TorrentImpl::actualFilePaths() const
+     PathList paths;
+     paths.reserve(filesCount());
+ 
+-    const lt::file_storage files = nativeTorrentInfo()->files();
++#if LIBTORRENT_VERSION_NUM >= 20100
++    const lt::file_storage &fs = nativeTorrentInfo()->files();
++    const lt::filenames files {fs, m_nativeStatus.renamed_files};
++#else
++    const lt::file_storage &files = nativeTorrentInfo()->files();
++#endif
+     for (const lt::file_index_t &nativeIndex : asConst(m_torrentInfo.nativeIndexes()))
+         paths.emplaceBack(files.file_path(nativeIndex));
+ 
+@@ -2105,7 +2134,7 @@ void TorrentImpl::handleTorrentChecked()
+             }
+         }
+ 
+-        if (m_nativeStatus.need_save_resume)
++        if (needSaveResumeData())
+             deferredRequestResumeData();
+ 
+         m_session->handleTorrentChecked(this);
+@@ -2368,7 +2397,6 @@ void TorrentImpl::handleFileCompleted(const lt::file_index_t nativeFileIndex)
+     m_completedFiles.setBit(fileIndex);
+ 
+     const Path actualPath = actualFilePath(fileIndex);
+-
+ #if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
+     // only apply Mark-of-the-Web to new download files
+     if (Preferences::instance()->isMarkOfTheWebEnabled()
+@@ -2432,15 +2460,11 @@ void TorrentImpl::handleUnwantedFolderToggled()
+ 
+ void TorrentImpl::manageActualFilePaths()
+ {
+-    const std::shared_ptr<const lt::torrent_info> nativeInfo = nativeTorrentInfo();
+-    const lt::file_storage &nativeFiles = nativeInfo->files();
+-
+     for (int i = 0; i < filesCount(); ++i)
+     {
+         const Path path = filePath(i);
+ 
+-        const auto nativeIndex = m_torrentInfo.nativeIndexes().at(i);
+-        const Path actualPath {nativeFiles.file_path(nativeIndex)};
++        const Path actualPath = actualFilePath(i);
+         const Path targetActualPath = makeActualPath(i, path);
+         if (actualPath != targetActualPath)
+         {
+diff --git a/src/gui/advancedsettings.cpp b/src/gui/advancedsettings.cpp
+index 218afce89e3c..7a4705258217 100644
+--- a/src/gui/advancedsettings.cpp
++++ b/src/gui/advancedsettings.cpp
+@@ -36,6 +36,8 @@
+ #include <QLabel>
+ #include <QNetworkInterface>
+ 
++#include <libtorrent/version.hpp>
++
+ #include "base/bittorrent/session.h"
+ #include "base/global.h"
+ #include "base/preferences.h"
+@@ -599,6 +601,9 @@ void AdvancedSettings::loadAdvancedSettings()
+     m_comboBoxDiskIOType.addItem(tr("Memory mapped files"), QVariant::fromValue(BitTorrent::DiskIOType::MMap));
+     m_comboBoxDiskIOType.addItem(tr("POSIX-compliant"), QVariant::fromValue(BitTorrent::DiskIOType::Posix));
+     m_comboBoxDiskIOType.addItem(tr("Simple pread/pwrite"), QVariant::fromValue(BitTorrent::DiskIOType::SimplePreadPwrite));
++#if LIBTORRENT_VERSION_NUM >= 20100
++    m_comboBoxDiskIOType.addItem(tr("Pread/pwrite"), QVariant::fromValue(BitTorrent::DiskIOType::PreadPwrite));
++#endif
+     m_comboBoxDiskIOType.setCurrentIndex(m_comboBoxDiskIOType.findData(QVariant::fromValue(session->diskIOType())));
+     addRow(DISK_IO_TYPE, tr("Disk IO type (requires restart)") + u' ' + makeLink(u"https://www.libtorrent.org/single-page-ref.html#default-disk-io-constructor", u"(?)")
+            , &m_comboBoxDiskIOType);

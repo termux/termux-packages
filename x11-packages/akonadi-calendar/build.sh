@@ -2,16 +2,17 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/pim/akonadi-calendar"
 TERMUX_PKG_DESCRIPTION="Akonadi calendar integration"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/akonadi-calendar-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="9769bb77600f4228cd3d2a74b4ed486bbc820e36d8edb3b203df9afd4805c779"
+TERMUX_PKG_SHA256=efe0c094908a4febe939ff5c96fb191cf251d3821314108b5ebcfdd488c0346b
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-mime, gpgmepp, kcalutils, kf6-kcalendarcore, kf6-kcodecs, kf6-kconfig, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kio, kf6-kitemmodels, kf6-knotifications, kf6-kservice, kf6-kwidgetsaddons, kf6-kxmlgui, kidentitymanagement, kmailtransport, kmime, libc++, libkleo, messagelib, qgpgme, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-contacts, akonadi-mime, gpgmepp, kcalutils, kf6-kcalendarcore, kf6-kcodecs, kf6-kconfig, kf6-kcontacts, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kio, kf6-kitemmodels, kf6-knotifications, kf6-kservice, kf6-kwidgetsaddons, kf6-kxmlgui, kidentitymanagement, kmailtransport, kf6-kmime, libc++, libkleo, messagelib, qgpgme, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
 # akonadi, akonadi-contacts, akonadi-mime, messagelib depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_PYTHON_BINDINGS=OFF
 -DCMAKE_SYSTEM_NAME=Linux
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins

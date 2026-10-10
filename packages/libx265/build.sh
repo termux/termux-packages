@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://x265.org/
+TERMUX_PKG_HOMEPAGE=https://www.x265.org/
 TERMUX_PKG_DESCRIPTION="H.265/HEVC video stream encoder library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.2"
-TERMUX_PKG_SRCURL=https://bitbucket.org/multicoreware/x265_git/downloads/x265_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=40b1ea0453e0309f0eba934e0ddf533f8f6295966679e8894e8f1c1c8d5e1210
+TERMUX_PKG_VERSION="4.3"
+TERMUX_PKG_SRCURL="https://github.com/Multicorewareinc/x265/releases/download/${TERMUX_PKG_VERSION}/x265_${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=83c53e4c8bbb8f1e33ed59e10a7d621d1d7801ca853910c3eb41f038b8ffb121
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libc++"
 TERMUX_PKG_BREAKS="libx265-dev"
@@ -13,12 +13,12 @@ TERMUX_PKG_REPLACES="libx265-dev"
 termux_step_pre_configure() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=216
+	local _SOVERSION=217
 
 	local v=$(sed -En 's/^.*set\(X265_BUILD ([0-9]+).*$/\1/p' \
 			source/CMakeLists.txt)
 	if [ "${v}" != "${_SOVERSION}" ]; then
-		termux_error_exit "SOVERSION guard check failed."
+		termux_error_exit "SOVERSION guard check failed. Expected ${_SOVERSION}, got ${v}."
 	fi
 
 	local _TERMUX_CLANG_TARGET=
@@ -60,7 +60,6 @@ termux_step_configure() {
 	local original_options=(
 	"$TERMUX_PKG_EXTRA_CONFIGURE_ARGS"
 	-DENABLE_HDR10_PLUS=ON
-	-DCMAKE_POLICY_VERSION_MINIMUM=3.5
 	)
 	local tenbit_options=(
 	"${original_options[@]}"

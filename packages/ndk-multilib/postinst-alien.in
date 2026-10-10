@@ -5,9 +5,10 @@ for triple in aarch64-linux-android arm-linux-androideabi i686-linux-android x86
 	   { [ x"$native_triple" = x"x86_64-linux-android" ] && [ "$triple" = "i686-linux-android" ]; }; then
 		continue
 	fi
-	for so in libc.so libdl.so liblog.so libm.so libc.a libdl.a libm.a; do
-		@COMMAND@
-	done
+
+    for so in @NDK_MULTILIB_SHARED_LIBS@ @NDK_MULTILIB_STATIC_LIBS@; do
+        @COMMAND@
+    done
 done
 
 exit 0

@@ -83,7 +83,7 @@ termux_step_get_dependencies() {
 			fi
 			termux_run_build-package
 		fi
-	done < <(./scripts/buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
+	done < <(./scripts/buildorder.py $([[ "${TERMUX_INSTALL_DEPS}" == "true" ]] && echo "-i") "$TERMUX_PKG_BUILDER_DIR" "${TERMUX_PACKAGES_DIRECTORIES[@]}" || echo "ERROR")
 }
 
 termux_force_check_package_dependency() {
@@ -109,6 +109,7 @@ termux_run_build-package() {
 		$([[ "${TERMUX_FORCE_BUILD}" == "true" && "${TERMUX_FORCE_BUILD_DEPENDENCIES}" == "true" ]] && echo "-F") \
 		$([[ "${TERMUX_PKGS__BUILD__RM_ALL_PKG_BUILD_DEPENDENT_DIRS}" == "true" ]] && echo "-r") \
 		$([[ "${TERMUX_WITHOUT_DEPVERSION_BINDING}" = "true" ]] && echo "-w") \
+		$([[ "${TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES}" == "true" ]] && echo "--reuse-built-packages") \
 			--format $TERMUX_PACKAGE_FORMAT --library $set_library "${PKG_DIR}"
 }
 

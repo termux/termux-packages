@@ -1,0 +1,11 @@
+--- a/src/install/lib.rs
++++ b/src/install/lib.rs
+@@ -423,7 +423,7 @@ impl RunCommand {
+         const TMP: &str = if cfg!(target_os = "macos") {
+             "/private/tmp"
+         } else if cfg!(target_os = "android") {
+-            "/data/local/tmp"
++            "@TERMUX_PREFIX@/tmp"
+         } else {
+             "/tmp"
+         };

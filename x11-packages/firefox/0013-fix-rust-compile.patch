@@ -1,6 +1,6 @@
 --- a/toolkit/components/extensions/storage/moz.build
 +++ b/toolkit/components/extensions/storage/moz.build
-@@ -11,7 +11,7 @@
+@@ -9,7 +9,7 @@
  # a delegate for consumers to use instead. Android Components can then provide
  # an implementation of the delegate that's backed by the Rust component. For
  # details, please see bug 1626506, comment 4.
@@ -11,9 +11,9 @@
      ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -113,10 +113,10 @@
+@@ -133,10 +133,10 @@
  
- libz-rs-sys = { version = "0.4.1", features = ["custom-prefix"], optional = true }
+ sitecategories = { path = "../../../components/sitecategories" }
  
 -[target.'cfg(any(target_os = "android", target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
 +[target.'cfg(any(target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
@@ -21,12 +21,12 @@
  
 -[target.'cfg(not(target_os = "android"))'.dependencies]
 +[target.'cfg(target_os = "android")'.dependencies]
- gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom"] }
+ gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom", "mozbuild"] }
  uniffi-bindgen-gecko-js-test-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/test-fixtures/", optional = true }
  viaduct = "0.1"
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -95,22 +95,18 @@
+@@ -100,22 +100,18 @@
  extern crate trust_anchors;
  
  #[cfg(any(
@@ -50,7 +50,7 @@
  extern crate viaduct_necko;
  
  extern crate gecko_logger;
-@@ -170,7 +166,6 @@
+@@ -183,7 +179,6 @@
      let _ = GeckoLogger::init();
      // Initialize tracing.
      gecko_tracing::initialize_tracing();

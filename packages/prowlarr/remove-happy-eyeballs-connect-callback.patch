@@ -1,13 +1,14 @@
 --- a/src/NzbDrone.Common/Http/Dispatchers/ManagedHttpDispatcher.cs
 +++ b/src/NzbDrone.Common/Http/Dispatchers/ManagedHttpDispatcher.cs
-@@ -190,7 +190,6 @@
+@@ -183,7 +183,6 @@
                  Credentials = GetCredentialCache(),
                  PreAuthenticate = true,
                  MaxConnectionsPerServer = 12,
--                ConnectCallback = onConnect,
+-                ConnectCallback = Socket.OSSupportsIPv6 ? _httpHappyEyeballs.OnConnect : null,
                  PooledConnectionLifetime = TimeSpan.FromMinutes(10),
                  SslOptions = new SslClientAuthenticationOptions
                  {
                      RemoteCertificateValidationCallback = _certificateValidationService.ShouldByPassValidationError
                  }
              };
+

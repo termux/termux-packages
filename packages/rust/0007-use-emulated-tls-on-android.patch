@@ -11,12 +11,13 @@
      // for context. (At that time, there was no `-C force-unwind-tables`, so the only solution
 --- a/src/bootstrap/src/core/builder/cargo.rs
 +++ b/src/bootstrap/src/core/builder/cargo.rs
-@@ -1058,10 +1058,11 @@
+@@ -1058,10 +1058,13 @@
          // so we can't use it by default in general, but we can use it for tools
          // and our own internal libraries.
          //
--        // Cygwin only supports emutls.
-+        // Cygwin and Android only supports emutls.
+         // Cygwin only supports emutls.
++        // Android has an issue building some specific projects unless emutls is forced.
++        // https://github.com/rust-lang/rust/issues/155758
          if !mode.must_support_dlopen()
              && !target.triple.starts_with("powerpc-")
              && !target.triple.contains("cygwin")

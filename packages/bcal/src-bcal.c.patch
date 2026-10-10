@@ -1,0 +1,30 @@
+--- a/src/bcal.c
++++ b/src/bcal.c
+@@ -2405,7 +2405,8 @@
+ static int infix2postfix(char *exp, queue **resf, queue **resr)
+ {
+ 	stack *op = NULL;  /* Operator Stack */
+-	char *token = strtok(exp, " ");
++	char *saveptr = NULL;
++	char *token = strtok_r(exp, " ", &saveptr);
+ 	static Data tokenData, ct;
+ 	int balanced = 0;
+ 	bool tokenize = true;
+@@ -2478,7 +2479,7 @@
+ 			 * Check if unit is specified
+ 			 * This also guards against a case of 0xn b
+ 			 */
+-			token = strtok(NULL, " ");
++			token = strtok_r(NULL, " ", &saveptr);
+ 			if (token) {
+ 				int unit_idx = ARRAY_SIZE(units);
+ 
+@@ -2518,7 +2519,7 @@
+ 		}
+ 
+ 		if (tokenize)
+-			token = strtok(NULL, " ");
++			token = strtok_r(NULL, " ", &saveptr);
+ 		else
+ 			tokenize = true;
+ 

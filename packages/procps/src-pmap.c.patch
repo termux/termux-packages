@@ -1,0 +1,28 @@
+--- a/src/pmap.c
++++ b/src/pmap.c
+@@ -25,7 +25,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/ipc.h>
++#ifndef __ANDROID__
+ #include <sys/shm.h>
++#endif
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+@@ -149,6 +151,7 @@
+ 
+ static void discover_shm_minor(void)
+ {
++#ifndef __ANDROID__
+ 	void *addr;
+ 	int shmid;
+ 	char mapbuf_b[256];
+@@ -205,6 +208,7 @@
+ 		perror(_("shared memory remove"));
+ 
+ 	return;
++#endif
+ }
+ 
+ static char *mapping_name(proc_t * p, unsigned KLONG addr,

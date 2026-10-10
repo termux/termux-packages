@@ -1,8 +1,8 @@
 diff --git a/sshd.c b/sshd.c
-index 4a93e29e4..8e389f7c6 100644
+index da2aba936..f67d80a8e 100644
 --- a/sshd.c
 +++ b/sshd.c
-@@ -1324,7 +1324,8 @@ main(int ac, char **av)
+@@ -1341,7 +1341,8 @@ main(int ac, char **av)
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -12,7 +12,7 @@ index 4a93e29e4..8e389f7c6 100644
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1333,10 +1334,10 @@ main(int ac, char **av)
+@@ -1350,10 +1351,10 @@ main(int ac, char **av)
  	compat_init_setproctitle(ac, av);
  	av = saved_argv;
  #endif
@@ -25,19 +25,19 @@ index 4a93e29e4..8e389f7c6 100644
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
-@@ -1458,9 +1459,10 @@ main(int ac, char **av)
- 			break;
+@@ -1484,9 +1485,10 @@ main(int ac, char **av)
+ 			exit(1);
  		}
  	}
 +#ifndef __ANDROID__
- 	if (!test_flag && !inetd_flag && !do_dump_cfg && !path_absolute(av[0]))
+ 	if (!test_flag && !inetd_flag && !do_dump_cfg && !path_absolute(execpath))
  		fatal("sshd requires execution with an absolute path");
 -
 +#endif
  	closefrom(STDERR_FILENO + 1);
  
  	/* Reserve fds we'll need later for reexec things */
-@@ -1727,17 +1729,19 @@ main(int ac, char **av)
+@@ -1753,17 +1755,19 @@ main(int ac, char **av)
  	/* Ensure privsep directory is correctly configured. */
  	need_chroot = ((getuid() == 0 || geteuid() == 0) ||
  	    options.kerberos_authentication);
@@ -58,7 +58,7 @@ index 4a93e29e4..8e389f7c6 100644
  #ifdef HAVE_CYGWIN
  		if (check_ntsec(_PATH_PRIVSEP_CHROOT_DIR) &&
  		    (sb.st_uid != getuid () ||
-@@ -1747,6 +1751,7 @@ main(int ac, char **av)
+@@ -1773,6 +1777,7 @@ main(int ac, char **av)
  #endif
  			fatal("%s must be owned by root and not group or "
  			    "world-writable.", _PATH_PRIVSEP_CHROOT_DIR);
@@ -66,7 +66,7 @@ index 4a93e29e4..8e389f7c6 100644
  	}
  
  	if (test_flag > 1)
-@@ -1763,9 +1768,10 @@ main(int ac, char **av)
+@@ -1795,9 +1800,10 @@ main(int ac, char **av)
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
@@ -78,7 +78,7 @@ index 4a93e29e4..8e389f7c6 100644
  	/* Prepare arguments for sshd-session */
  	if (rexec_argc < 0)
  		fatal("rexec_argc %d < 0", rexec_argc);
-@@ -1811,7 +1817,7 @@ main(int ac, char **av)
+@@ -1843,7 +1849,7 @@ main(int ac, char **av)
  	already_daemon = daemonized();
  	if (!(debug_flag || inetd_flag || no_daemon_flag || already_daemon)) {
  
@@ -87,7 +87,7 @@ index 4a93e29e4..8e389f7c6 100644
  			fatal("daemon() failed: %.200s", strerror(errno));
  
  		disconnect_controlling_tty();
-@@ -1823,9 +1829,10 @@ main(int ac, char **av)
+@@ -1855,9 +1861,10 @@ main(int ac, char **av)
  	 * Chdir to the root directory so that the current disk can be
  	 * unmounted if desired.
  	 */

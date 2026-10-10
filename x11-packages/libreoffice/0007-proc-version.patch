@@ -1,0 +1,26 @@
+diff --git a/desktop/unx/source/start.c b/desktop/unx/source/start.c
+index 2529e214f..e9cf4c547 100644
+--- a/desktop/unx/source/start.c
++++ b/desktop/unx/source/start.c
+@@ -554,7 +554,7 @@ static ProgressStatus read_percent(ChildInfo const *info, int *pPercent)
+ /* Simple system check. */
+ static void system_checks(void)
+ {
+-#ifdef LINUX
++#if defined LINUX && !defined __ANDROID__
+     struct stat buf;
+ 
+     /* check proc is mounted - lots of things fail otherwise */
+diff --git a/vcl/unx/generic/app/geninst.cxx b/vcl/unx/generic/app/geninst.cxx
+index 28eb33141..c6554e380 100644
+--- a/vcl/unx/generic/app/geninst.cxx
++++ b/vcl/unx/generic/app/geninst.cxx
+@@ -56,7 +56,7 @@ SalGenericInstance::~SalGenericInstance()
+ OUString SalGenericInstance::getOSVersion()
+ {
+     OUString aKernelVer = u"unknown"_ustr;
+-#if defined(LINUX)
++#if defined(LINUX) && !defined(__ANDROID__)
+     FILE* pVersion = fopen( "/proc/version", "r" );
+     if ( pVersion )
+     {

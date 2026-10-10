@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/pim/kmail-account-wizard"
 TERMUX_PKG_DESCRIPTION="KMail account wizard"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kmail-account-wizard-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="6bc54db7057e5fd4e83f71d6817a81bd36377a41cc734e079f55df3619e70461"
+TERMUX_PKG_SHA256=12c80011c79bd9df7a452d911086fe63164e4a51fdc2749c366b51404b21a980
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kirigami, kidentitymanagement, kirigami-addons, kmailtransport, kmime, libc++, qt6-qtbase, qt6-qtdeclarative"
+TERMUX_PKG_DEPENDS="akonadi, kf6-kconfig, kf6-kconfigwidgets, kf6-kcoreaddons, kf6-kcrash, kf6-kdbusaddons, kf6-ki18n, kf6-kiconthemes, kf6-kirigami, kidentitymanagement, kirigami-addons, kmailtransport, kf6-kmime, libc++, qt6-qtbase, qt6-qtdeclarative"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, kf6-kdoctools"
 # akonadi depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

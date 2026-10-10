@@ -125,25 +125,6 @@ Enable jumbo build for almost every target in //components
  .../test_sample_json_converter.h.golden       |  3 +++
  117 files changed, 560 insertions(+), 15 deletions(-)
 
-diff --git a/components/attribution_reporting/aggregatable_trigger_data.cc b/components/attribution_reporting/aggregatable_trigger_data.cc
-index d207fed5dc..b8ec126455 100644
---- a/components/attribution_reporting/aggregatable_trigger_data.cc
-+++ b/components/attribution_reporting/aggregatable_trigger_data.cc
-@@ -20,6 +20,8 @@
- #include "components/attribution_reporting/trigger_registration_error.mojom.h"
- #include "third_party/abseil-cpp/absl/numeric/int128.h"
- 
-+#define ParseKeyPiece ParseKeyPiece_AggregatableTriggerData
-+
- namespace attribution_reporting {
- 
- namespace {
-@@ -129,3 +131,5 @@ base::DictValue AggregatableTriggerData::ToJson() const {
- }
- 
- }  // namespace attribution_reporting
-+
-+#undef ParseKeyPiece
 diff --git a/components/autofill/content/renderer/BUILD.gn b/components/autofill/content/renderer/BUILD.gn
 index 855d4ed800..cd8307ea62 100644
 --- a/components/autofill/content/renderer/BUILD.gn
@@ -159,25 +140,6 @@ index 855d4ed800..cd8307ea62 100644
    deps = [
      "//base",
      "//base:i18n",
-diff --git a/components/autofill/content/renderer/form_tracker.cc b/components/autofill/content/renderer/form_tracker.cc
-index cee22fd2d2..702057affa 100644
---- a/components/autofill/content/renderer/form_tracker.cc
-+++ b/components/autofill/content/renderer/form_tracker.cc
-@@ -39,6 +39,8 @@ using blink::WebFormControlElement;
- using blink::WebFormElement;
- using blink::WebInputElement;
- 
-+#define kSubmissionSourceHistogram kSubmissionSourceHistogram_FormTracker
-+
- namespace autofill {
- 
- namespace {
-@@ -880,3 +882,5 @@ WebDocument FormTracker::GetDocument() const {
- }
- 
- }  // namespace autofill
-+
-+#undef kSubmissionSourceHistogram
 diff --git a/components/autofill/content/renderer/password_autofill_agent.cc b/components/autofill/content/renderer/password_autofill_agent.cc
 index 8cba62f2fb..4806965acc 100644
 --- a/components/autofill/content/renderer/password_autofill_agent.cc
@@ -334,25 +296,6 @@ index 97a790bd58..18696e4bb6 100644
  }  // namespace autofill
 +
 +#undef CreateUndoOrClearFormSuggestion
-diff --git a/components/autofill/core/browser/ui/autofill_resource_utils.cc b/components/autofill/core/browser/ui/autofill_resource_utils.cc
-index 93717ce822..f33ed04f5e 100644
---- a/components/autofill/core/browser/ui/autofill_resource_utils.cc
-+++ b/components/autofill/core/browser/ui/autofill_resource_utils.cc
-@@ -16,6 +16,8 @@
- #include "components/resources/android/theme_resources.h"
- #endif  // BUILDFLAG(IS_ANDROID)
- 
-+#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_AutoFillResouceUtils
-+
- namespace autofill {
- 
- namespace {
-@@ -135,3 +137,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
- }
- 
- }  // namespace autofill
-+
-+#undef ShouldUseNewFopDisplay
 diff --git a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc b/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
 index 39a6679270..211f0841c1 100644
 --- a/components/autofill/core/browser/webdata/addresses/address_autofill_table.cc
@@ -795,29 +738,6 @@ index c738b787ec..7717e59ead 100644
 +
 +#undef CreateKey
 +#undef LoadKeyFromWrapped
-diff --git a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-index 0bfe80a3db..c3c0afa32e 100644
---- a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-+++ b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader_base.cc
-@@ -31,6 +31,10 @@
- #include "services/network/public/mojom/data_pipe_getter.mojom.h"
- #include "services/network/public/mojom/url_response_head.mojom.h"
- 
-+#define kDataContentType   kDataContentType_multipart_uploader_base
-+#define kUploadContentType kUploadContentType_multipart_uploader_base
-+#define CreateFileDataPipeGetterBlocking CreateFileDataPipeGetterBlocking_multipart_uploader_base
-+
- namespace enterprise_connectors {
- 
- namespace {
-@@ -354,3 +358,7 @@ void MultipartUploadRequestBase::OnURLLoaderComplete(
- }
- 
- }  //  namespace enterprise_connectors
-+
-+#undef kDataContentType
-+#undef kUploadContentType
-+#undef CreateFileDataPipeGetterBlocking
 diff --git a/components/global_media_controls/public/views/media_item_ui_updated_view.cc b/components/global_media_controls/public/views/media_item_ui_updated_view.cc
 index e805c62218..ba95cb566b 100644
 --- a/components/global_media_controls/public/views/media_item_ui_updated_view.cc
@@ -1046,25 +966,6 @@ index 5437b02df3..89e847c933 100644
                   group_configs) {}
 +
 +#undef is_android
-diff --git a/components/omnibox/browser/autocomplete_match.cc b/components/omnibox/browser/autocomplete_match.cc
-index 5ffaeadc59..70117ff916 100644
---- a/components/omnibox/browser/autocomplete_match.cc
-+++ b/components/omnibox/browser/autocomplete_match.cc
-@@ -62,6 +62,8 @@
- #include "components/vector_icons/vector_icons.h"     // nogncheck
- #endif
- 
-+#define kIsDesktop kIsDesktop_AutoCompleteMatch
-+
- constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
- constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
- 
-@@ -2425,3 +2427,5 @@ void AutocompleteMatch::ValidateClassifications(
-   }
- #endif  // DCHECK_IS_ON()
- }
-+
-+#undef kIsDesktop
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
 index 91140083d5..0b2296cb23 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
@@ -1197,25 +1098,6 @@ index 8926ab1615..a6eb773ab7 100644
  }
  
  void PredictionModelDownloadManager::AddObserver(
-diff --git a/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc b/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
-index 46aa0ad97f..580a189cac 100644
---- a/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
-+++ b/components/optimization_guide/core/model_execution/on_device_model_classifier_controller.cc
-@@ -27,6 +27,8 @@
- #include "mojo/public/cpp/base/proto_wrapper.h"
- #include "services/on_device_model/public/mojom/on_device_model.mojom.h"
- 
-+#define CloseFilesInBackground CloseFilesInBackground_on_device_model_classifier_controller
-+
- namespace optimization_guide {
- 
- namespace {
-@@ -273,3 +275,5 @@ OnDeviceModelClassifierController::GetSolution() {
- }
- 
- }  // namespace optimization_guide
-+
-+#undef CloseFilesInBackground
 diff --git a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc b/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
 index 3baefef84c..6bc630e266 100644
 --- a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
@@ -1672,25 +1554,6 @@ index 218f61da75..5a22a5537a 100644
  }  // namespace persistent_cache
 +
 +#undef kLruCacheCapacity
-diff --git a/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc b/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
-index 63df4e3d62..d2e12ef245 100644
---- a/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
-+++ b/components/policy/core/browser/incognito/incognito_mode_policy_handler.cc
-@@ -18,6 +18,8 @@
- #include "components/strings/grit/components_strings.h"
- #include "components/url_matcher/url_util.h"
- 
-+#define ValidateHost ValidateHost_incognito_mode_policy_handler
-+
- namespace {
- bool IsValidAvailabilityInt(int in_value) {
-   return in_value >= 0 &&
-@@ -233,3 +235,5 @@ IncognitoModePolicyHandler::GetFilteredUrlListPolicyValue(
- }
- 
- }  // namespace policy
-+
-+#undef ValidateHost
 diff --git a/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc b/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc
 index a9aca680c3..0735d53dfa 100644
 --- a/components/policy/core/browser/url_list/url_blocklist_policy_handler.cc
@@ -1976,25 +1839,6 @@ index 4bbaf4f625..2066104b3c 100644
  }
 +
 +#undef kBackoffPolicy
-diff --git a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
-index 60d2e00d65..93cb927c67 100644
---- a/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
-+++ b/components/supervised_user/core/browser/kids_chrome_management_url_checker_client.cc
-@@ -26,6 +26,8 @@
- #include "third_party/protobuf/src/google/protobuf/message_lite.h"
- #include "url/gurl.h"
- 
-+#define OnResponse OnResponse_KidsChromeManagementURLCheckerClient
-+
- namespace supervised_user {
- namespace {
- 
-@@ -153,3 +155,5 @@ void KidsChromeManagementURLCheckerClient::CheckURL(
-                        base::BindOnce(&OnResponse, url, std::move(callback)));
- }
- }  // namespace supervised_user
-+
-+#undef OnResponse
 diff --git a/components/supervised_user/core/browser/supervised_user_preferences.cc b/components/supervised_user/core/browser/supervised_user_preferences.cc
 index 9ce64a100a..0cf88de8cd 100644
 --- a/components/supervised_user/core/browser/supervised_user_preferences.cc
@@ -2132,29 +1976,6 @@ index 70042f630c..c66d13f065 100644
  }  // namespace sync_bookmarks
 +
 +#undef GetLocalAndAccountPermanentNodePairs
-diff --git a/components/sync_bookmarks/parent_guid_preprocessing.cc b/components/sync_bookmarks/parent_guid_preprocessing.cc
-index 33bc98a9cf..64179c2708 100644
---- a/components/sync_bookmarks/parent_guid_preprocessing.cc
-+++ b/components/sync_bookmarks/parent_guid_preprocessing.cc
-@@ -22,6 +22,10 @@
- #include "components/sync_bookmarks/synced_bookmark_tracker.h"
- #include "components/sync_bookmarks/synced_bookmark_tracker_entity.h"
- 
-+#define kBookmarkBarTag     kBookmarkBarTag_parent_guid_preprocessing
-+#define kMobileBookmarksTag kMobileBookmarksTag_parent_guid_preprocessing
-+#define kOtherBookmarksTag  kOtherBookmarksTag_parent_guid_preprocessing
-+
- namespace sync_bookmarks {
- 
- namespace {
-@@ -246,3 +250,7 @@ std::string GetGuidForSyncIdInUpdatesForTesting(  // IN-TEST
- }
- 
- }  // namespace sync_bookmarks
-+
-+#undef kBookmarkBarTag
-+#undef kMobileBookmarksTag
-+#undef kOtherBookmarksTag
 diff --git a/components/sync_bookmarks/synced_bookmark_tracker_entity.cc b/components/sync_bookmarks/synced_bookmark_tracker_entity.cc
 index 2666ba589d..7934b3d4e3 100644
 --- a/components/sync_bookmarks/synced_bookmark_tracker_entity.cc
@@ -2545,3 +2366,340 @@ index b0dbe94e97..13dae915a3 100644
 +#undef GetEvpKem
 +#undef GetJwkAlg
 +#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/policy/core/browser/url_list/incognito_mode_policy_handler.cc b/components/policy/core/browser/url_list/incognito_mode_policy_handler.cc
+index 3ab85842d0..39cdf94050 100644
+--- a/components/policy/core/browser/url_list/incognito_mode_policy_handler.cc
++++ b/components/policy/core/browser/url_list/incognito_mode_policy_handler.cc
+@@ -19,6 +19,8 @@
+ #include "components/strings/grit/components_strings.h"
+ #include "components/url_matcher/url_util.h"
+ 
++#define ValidateHost ValidateHost_incognito_mode_policy_handler
++
+ namespace {
+ bool IsValidAvailabilityInt(int in_value) {
+   return in_value >= 0 &&
+@@ -234,3 +236,5 @@ IncognitoModePolicyHandler::GetFilteredUrlListPolicyValue(
+ }
+ 
+ }  // namespace policy
++
++#undef ValidateHost
+diff --git a/components/content_settings/browser/ui/cookie_controls_util.cc b/components/content_settings/browser/ui/cookie_controls_util.cc
+index cdd1363f10..578d572f8c 100644
+--- a/components/content_settings/browser/ui/cookie_controls_util.cc
++++ b/components/content_settings/browser/ui/cookie_controls_util.cc
+@@ -49,15 +49,15 @@ const gfx::VectorIcon& CookieControlsUtil::GetEnforcedIcon(
+     CookieControlsEnforcement enforcement) {
+   switch (enforcement) {
+     case CookieControlsEnforcement::kEnforcedByExtension:
+-      return features::IsRoundedIconsEnabled()
++      return ::features::IsRoundedIconsEnabled()
+                  ? vector_icons::kChromeExtensionIcon
+                  : vector_icons::kExtensionChromeRefreshOldIcon;
+     case CookieControlsEnforcement::kEnforcedByPolicy:
+-      return features::IsRoundedIconsEnabled()
++      return ::features::IsRoundedIconsEnabled()
+                  ? vector_icons::kDomainIcon
+                  : vector_icons::kBusinessChromeRefreshOldIcon;
+     case CookieControlsEnforcement::kEnforcedByCookieSetting:
+-      return features::IsRoundedIconsEnabled()
++      return ::features::IsRoundedIconsEnabled()
+                  ? vector_icons::kSettingsIcon
+                  : vector_icons::kSettingsChromeRefreshOldIcon;
+     case CookieControlsEnforcement::kNoEnforcement:
+diff --git a/components/page_load_metrics/browser/BUILD.gn b/components/page_load_metrics/browser/BUILD.gn
+index fc705624c5..240fd7d298 100644
+--- a/components/page_load_metrics/browser/BUILD.gn
++++ b/components/page_load_metrics/browser/BUILD.gn
+@@ -95,6 +95,11 @@ jumbo_source_set("browser") {
+     "soft_navigation_tracker.cc",
+     "soft_navigation_tracker.h",
+   ]
++  jumbo_excluded_sources = [
++    # `PageLoadType` conflicts
++    "observers/use_counter_page_load_metrics_observer.cc",
++    "observers/soft_navigation_page_load_metrics_observer.cc",
++  ]
+   configs += [
+     "//build/config/compiler:wexit_time_destructors",
+     "//build/config/compiler:wglobal_constructors",
+diff --git a/components/sessions/core/tab_restore_service_helper.cc b/components/sessions/core/tab_restore_service_helper.cc
+index 14a14d2f9c..9f674da33a 100644
+--- a/components/sessions/core/tab_restore_service_helper.cc
++++ b/components/sessions/core/tab_restore_service_helper.cc
+@@ -47,6 +47,8 @@
+ #include "ui/base/mojom/window_show_state.mojom.h"
+ #include "ui/base/window_open_disposition.h"
+ 
++#define MaybeAddSplitToGroup MaybeAddSplitToGroup_tab_restore_service_helper
++
+ namespace sessions {
+ namespace {
+ 
+@@ -1733,3 +1735,5 @@ base::Time TabRestoreServiceHelper::TimeNow() const {
+ }
+ 
+ }  // namespace sessions
++
++#undef MaybeAddSplitToGroup
+diff --git a/components/user_education/common/tutorial/tutorial.cc b/components/user_education/common/tutorial/tutorial.cc
+index 0e1dec67eb..3edfd4c031 100644
+--- a/components/user_education/common/tutorial/tutorial.cc
++++ b/components/user_education/common/tutorial/tutorial.cc
+@@ -226,7 +226,7 @@ TutorialStepBuilder::BuildMaybeShowBubbleCallback(
+             base::Unretained(tutorial_service));
+ 
+         if (is_last_step) {
+-          params.body_icon = &(features::IsRoundedIconsEnabled()
++          params.body_icon = &(::features::IsRoundedIconsEnabled()
+                                    ? vector_icons::kCelebrationIcon
+                                    : vector_icons::kCelebrationOldIcon);
+           params.body_icon_alt_text =
+diff --git a/components/webcrypto/algorithms/mlkem768_x25519.cc b/components/webcrypto/algorithms/mlkem768_x25519.cc
+index f87b14d162..d784273910 100644
+--- a/components/webcrypto/algorithms/mlkem768_x25519.cc
++++ b/components/webcrypto/algorithms/mlkem768_x25519.cc
+@@ -14,6 +14,8 @@
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ #include "third_party/boringssl/src/include/openssl/evp.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_mlkem768_x25519
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -309,3 +311,5 @@ std::unique_ptr<AlgorithmImplementation> CreateMlKem768X25519Implementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/performance_manager/execution_context_priority/closing_page_voter.cc b/components/performance_manager/execution_context_priority/closing_page_voter.cc
+index 1b2f363b04..13f12f952f 100644
+--- a/components/performance_manager/execution_context_priority/closing_page_voter.cc
++++ b/components/performance_manager/execution_context_priority/closing_page_voter.cc
+@@ -10,6 +10,8 @@
+ #include "components/performance_manager/public/execution_context/execution_context_registry.h"
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetExecutionContext GetExecutionContext_closing_page_voter
++
+ namespace performance_manager::execution_context_priority {
+ 
+ namespace {
+@@ -105,3 +107,5 @@ void ClosingPageVoter::AdjustVotesForSubtree(const FrameNode* frame_node,
+ }
+ 
+ }  // namespace performance_manager::execution_context_priority
++
++#undef GetExecutionContext
+diff --git a/components/safe_browsing/core/browser/db/v5_store.cc b/components/safe_browsing/core/browser/db/v5_store.cc
+index 895ed53013..dedbddf469 100644
+--- a/components/safe_browsing/core/browser/db/v5_store.cc
++++ b/components/safe_browsing/core/browser/db/v5_store.cc
+@@ -15,6 +15,9 @@
+ #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
+ #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
+ 
++#define kApplyUpdate kApplyUpdate_v5store
++#define kResult kResult_v5store
++
+ namespace safe_browsing {
+ 
+ namespace {
+@@ -272,3 +275,6 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
+ }
+ 
+ }  // namespace safe_browsing
++
++#undef kApplyUpdate
++#undef kResult
+diff --git a/components/webcrypto/algorithms/hmac.cc b/components/webcrypto/algorithms/hmac.cc
+index 2a3bf60935..7808253ab7 100644
+--- a/components/webcrypto/algorithms/hmac.cc
++++ b/components/webcrypto/algorithms/hmac.cc
+@@ -24,6 +24,8 @@
+ #include "third_party/blink/public/platform/web_crypto_algorithm_params.h"
+ #include "third_party/blink/public/platform/web_crypto_key_algorithm.h"
+ 
++#define SynthesizeImportAlgorithmForClone SynthesizeImportAlgorithmForClone_hmac
++
+ namespace webcrypto {
+ 
+ namespace {
+@@ -368,3 +370,5 @@ std::unique_ptr<AlgorithmImplementation> CreateHmacImplementation() {
+ }
+ 
+ }  // namespace webcrypto
++
++#undef SynthesizeImportAlgorithmForClone
+diff --git a/components/supervised_user/core/browser/supervised_user_url_checker_client.cc b/components/supervised_user/core/browser/supervised_user_url_checker_client.cc
+index 67862126f1..5868a239d5 100644
+--- a/components/supervised_user/core/browser/supervised_user_url_checker_client.cc
++++ b/components/supervised_user/core/browser/supervised_user_url_checker_client.cc
+@@ -26,6 +26,8 @@
+ #include "third_party/protobuf/src/google/protobuf/message_lite.h"
+ #include "url/gurl.h"
+ 
++#define OnResponse OnResponse_supervised_user_url_checker_client
++
+ namespace supervised_user {
+ namespace {
+ 
+@@ -152,3 +154,5 @@ void SupervisedUserUrlCheckerClient::CheckURL(
+                        base::BindOnce(&OnResponse, url, std::move(callback)));
+ }
+ }  // namespace supervised_user
++
++#undef OnResponse
+diff --git a/components/omnibox/browser/autocomplete_match.cc b/components/omnibox/browser/autocomplete_match.cc
+index e7f30b541b..19f0d1bd3d 100644
+--- a/components/omnibox/browser/autocomplete_match.cc
++++ b/components/omnibox/browser/autocomplete_match.cc
+@@ -66,6 +66,8 @@
+ #include "components/vector_icons/vector_icons.h"     // nogncheck
+ #endif
+ 
++#define kIsDesktop kIsDesktop_autocomplete_match
++
+ constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
+ constexpr bool kIsDesktopAndroid = BUILDFLAG(IS_DESKTOP_ANDROID);
+ constexpr bool kIsDesktop =
+@@ -2541,3 +2543,5 @@ void AutocompleteMatch::ValidateClassifications(
+   }
+ #endif  // DCHECK_IS_ON()
+ }
++
++#undef kIsDesktop
+diff --git a/components/safe_browsing/core/browser/db/v5_store.cc b/components/safe_browsing/core/browser/db/v5_store.cc
+index c1266afc95..a9555227b3 100644
+--- a/components/safe_browsing/core/browser/db/v5_store.cc
++++ b/components/safe_browsing/core/browser/db/v5_store.cc
+@@ -33,6 +33,8 @@
+ 
+ #define kApplyUpdate kApplyUpdate_v5store
+ #define kResult kResult_v5store
++#define RecordApplyUpdateDuration RecordApplyUpdateDuration_v5store
++#define RecordMigrationTime RecordMigrationTime_v5store
+ 
+ namespace safe_browsing {
+ 
+@@ -806,3 +808,5 @@ V5StorePtr V5StoreFactory::CreateV5Store(
+ 
+ #undef kApplyUpdate
+ #undef kResult
++#undef RecordApplyUpdateDuration
++#undef RecordMigrationTime
+diff --git a/components/eye_dropper/BUILD.gn b/components/eye_dropper/BUILD.gn
+index 4d8cb01053..f214eb97c0 100644
+--- a/components/eye_dropper/BUILD.gn
++++ b/components/eye_dropper/BUILD.gn
+@@ -13,6 +13,10 @@ jumbo_static_library("eye_dropper") {
+     "features.cc",
+     "features.h",
+   ]
++  jumbo_excluded_sources = [
++    # Conflicts with //chrome/browser/ui:ui
++    "features.cc",
++  ]
+ 
+   deps = [
+     "//base",
+diff --git a/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc b/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
+index c3abe9d461..61c060c9ef 100644
+--- a/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
++++ b/components/autofill/core/browser/data_manager/autofill_ai/in_memory_entity_suppression_manager.cc
+@@ -13,6 +13,8 @@
+ #include "base/strings/strcat.h"
+ #include "base/strings/utf_string_conversions.h"
+ 
++#define kSeparator kSeparator_in_memory_entity_suppression_manager
++
+ namespace autofill {
+ 
+ namespace {
+@@ -88,3 +90,5 @@ bool InMemoryEntitySuppressionManager::IsSuppressed(
+ }
+ 
+ }  // namespace autofill
++
++#undef kSeparator
+diff --git a/components/safe_browsing/core/browser/db/v5_store.cc b/components/safe_browsing/core/browser/db/v5_store.cc
+index 3f2266fbea..9ee40eb3a8 100644
+--- a/components/safe_browsing/core/browser/db/v5_store.cc
++++ b/components/safe_browsing/core/browser/db/v5_store.cc
+@@ -35,6 +35,7 @@
+ #define kResult kResult_v5store
+ #define RecordApplyUpdateDuration RecordApplyUpdateDuration_v5store
+ #define RecordMigrationTime RecordMigrationTime_v5store
++#define RecordUpdateCategory RecordUpdateCategory_v5store
+ 
+ namespace safe_browsing {
+ 
+@@ -855,3 +856,4 @@ V5StorePtr V5StoreFactory::CreateV5Store(
+ #undef kResult
+ #undef RecordApplyUpdateDuration
+ #undef RecordMigrationTime
++#undef RecordUpdateCategory
+diff --git a/components/autofill/core/browser/ui/autofill_resource_util.cc b/components/autofill/core/browser/ui/autofill_resource_util.cc
+index 1b2bc1de53..df02f69752 100644
+--- a/components/autofill/core/browser/ui/autofill_resource_util.cc
++++ b/components/autofill/core/browser/ui/autofill_resource_util.cc
+@@ -16,6 +16,8 @@
+ #include "components/resources/android/theme_resources.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
++#define ShouldUseNewFopDisplay ShouldUseNewFopDisplay_autofill_resource_util
++
+ namespace autofill {
+ 
+ namespace {
+@@ -161,3 +163,5 @@ int GetIconResourceID(Suggestion::Icon resource_name) {
+ }
+ 
+ }  // namespace autofill
++
++#undef ShouldUseNewFopDisplay
+diff --git a/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc b/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
+index 9a766a7c00..d0ee90e64d 100644
+--- a/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
++++ b/components/services/storage/dom_storage/sqlite/local_storage_sqlite.cc
+@@ -19,6 +19,8 @@
+ #include "sql/statement.h"
+ #include "sql/transaction.h"
+ 
++#define OnSqlError OnSqlError_local_storage_sqlite
++
+ namespace storage {
+ namespace {
+ 
+@@ -453,3 +455,5 @@ bool LocalStorageSqlite::OnMemoryDump(
+ }
+ 
+ }  // namespace storage
++
++#undef OnSqlError
+diff --git a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
+index 61ae85a6db..a968e6a632 100644
+--- a/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
++++ b/components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.cc
+@@ -36,6 +36,10 @@
+ #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
+ #endif
+ 
++#define kDataContentType kDataContentType_multipart_uploader
++#define kUploadContentType kUploadContentType_multipart_uploader
++#define CreateFileDataPipeGetterBlocking CreateFileDataPipeGetterBlocking_multipart_uploader
++
+ namespace enterprise_connectors {
+ 
+ namespace {
+@@ -445,3 +449,7 @@ void MultipartUploadRequest::OnURLLoaderComplete(
+ }
+ 
+ }  // namespace enterprise_connectors
++
++#undef kDataContentType
++#undef kUploadContentType
++#undef CreateFileDataPipeGetterBlocking

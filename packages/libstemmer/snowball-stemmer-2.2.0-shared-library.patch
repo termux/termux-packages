@@ -17,20 +17,20 @@ index 98eb1fa..9b539ec 100644
 +++ b/GNUmakefile
 @@ -4,6 +4,8 @@
  # which hard-code it.
- SNOWBALL_VERSION = 2.2.0
+ SNOWBALL_VERSION = 3.1.1
  
 +MAJOR_VERSION := $(shell echo $(SNOWBALL_VERSION) | cut -d. -f1)
 +
  ifeq ($(OS),Windows_NT)
  EXEEXT = .exe
  endif
-@@ -192,12 +192,17 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
+@@ -311,12 +313,17 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
  JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
- JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
+ JAVA_RUNTIME_CLASSES=$(JAVA_RUNTIME_SOURCES:.java=.class)
  
--CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
+-CFLAGS=-g -O2 -W -Wall -Wcast-qual -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 -CPPFLAGS=
-+CFLAGS=-fPIC -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
++CFLAGS=-fPIC -W -Wall -Wcast-qual -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
 +CPPFLAGS+=
  
  INCLUDES=-Iinclude
@@ -43,8 +43,8 @@ index 98eb1fa..9b539ec 100644
 +	ln -s $@.$(SNOWBALL_VERSION) $@.$(MAJOR_VERSION)
 +	ln -s $@.$(SNOWBALL_VERSION) $@
  
- algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
- 	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
+ algorithms.mk: GNUmakefile libstemmer/mkalgorithms.pl $(MODULES)
+	libstemmer/mkalgorithms.pl algorithms.mk $(MODULES)
 diff --git a/libstemmer/symbol.map b/libstemmer/symbol.map
 new file mode 100644
 index 0000000..7a3d423

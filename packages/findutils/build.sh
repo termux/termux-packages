@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/findutils/
 TERMUX_PKG_DESCRIPTION="Utilities to find files meeting specified criteria and perform various actions on the files which are found"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.10.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.11.0
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/findutils/findutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5
+TERMUX_PKG_SHA256=bfd19cb06cc71f3352d567e90284d8cdac02ac89774bbeadf0b533b0c11432fd
 TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_GROUPS="base-devel"
@@ -20,9 +19,9 @@ SORT=$TERMUX_PREFIX/bin/sort
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/locate
 bin/updatedb
-share/man/man1/locate.1
-share/man/man1/updatedb.1
-share/man/man5/locatedb.5
+share/man/man1/locate.1.gz
+share/man/man1/updatedb.1.gz
+share/man/man5/locatedb.5.gz
 "
 
 termux_step_pre_configure() {

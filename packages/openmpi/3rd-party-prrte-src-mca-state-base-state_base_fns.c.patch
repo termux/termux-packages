@@ -1,0 +1,11 @@
+--- a/3rd-party/prrte/src/mca/state/base/state_base_fns.c
++++ b/3rd-party/prrte/src/mca/state/base/state_base_fns.c
+@@ -878,7 +878,7 @@
+ 
+     /* get the number of available file descriptors
+      * for this daemon */
+-    nfds = getdtablesize();
++    nfds = sysconf(_SC_OPEN_MAX);
+     result = NULL;
+     /* loop over them and get their info */
+     for (i = 0; i < nfds; i++) {

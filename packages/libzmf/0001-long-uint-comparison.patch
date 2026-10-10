@@ -1,0 +1,35 @@
+diff --git a/src/lib/BMIParser.cpp b/src/lib/BMIParser.cpp
+index f7bc946..9ccb7bd 100644
+--- a/src/lib/BMIParser.cpp
++++ b/src/lib/BMIParser.cpp
+@@ -518,7 +518,7 @@ std::vector<uint8_t> BMIParser::readData(unsigned endOffset)
+ {
+   std::vector<uint8_t> data;
+ 
+-  while (m_input->tell() < endOffset)
++  while (m_input->tell() < static_cast<long>(endOffset))
+   {
+     auto blockSize = readU16(m_input);
+ 
+diff --git a/src/lib/ZMF4Parser.cpp b/src/lib/ZMF4Parser.cpp
+index 6e4905d..fd0ba39 100644
+--- a/src/lib/ZMF4Parser.cpp
++++ b/src/lib/ZMF4Parser.cpp
+@@ -204,7 +204,7 @@ std::vector<ZMF4Parser::ObjectRef> ZMF4Parser::readObjectRefs()
+   long maxRefObjCount = long(static_cast<unsigned long>(m_currentObjectHeader.nextObjectOffset)) - m_input->tell() / 8;
+   if (maxRefObjCount < 0)
+     maxRefObjCount = 0;
+-  if (refObjCount > maxRefObjCount)
++  if (static_cast<long>(refObjCount) > maxRefObjCount)
+     refObjCount = uint32_t(static_cast<unsigned long>(maxRefObjCount));
+ 
+   std::vector<ZMF4Parser::ObjectRef> refs;
+@@ -1296,7 +1296,7 @@ void ZMF4Parser::readPolygon()
+                              ? m_currentObjectHeader.nextObjectOffset
+                              : m_currentObjectHeader.refListStartOffset
+                              ;
+-  if (pointsCount == 0 || m_input->tell() + 8 >= endOffset || pointsCount > (endOffset - m_input->tell() - 8) / 12)
++  if (pointsCount == 0 || m_input->tell() + 8 >= static_cast<long>(endOffset) || pointsCount > (endOffset - m_input->tell() - 8) / 12)
+   {
+     ZMF_DEBUG_MSG(("Incorrect peak point count, offset %ld\n", m_input->tell()));
+     return;

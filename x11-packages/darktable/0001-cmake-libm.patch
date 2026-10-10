@@ -1,0 +1,13 @@
+--- a/src/external/LibRaw-cmake/CMakeLists.txt
++++ b/src/external/LibRaw-cmake/CMakeLists.txt
+@@ -121,7 +121,9 @@
+ 
+ # Math library check
+ 
+-if(NOT WIN32)
++if(CMAKE_SYSTEM_NAME STREQUAL "Android")
++    set(MATH_LIBRARY m)
++elseif(NOT WIN32)
+     FIND_LIBRARY(MATH_LIBRARY m)
+ endif()
+ 

@@ -1,0 +1,96 @@
+--- a/content/shell/app/shell_main_delegate.cc
++++ b/content/shell/app/shell_main_delegate.cc
+@@ -92,6 +92,10 @@
+ #include "content/shell/app/ios/shell_application_ios.h"
+ #endif
+ 
++#ifdef __TERMUX__
++#include "sandbox/policy/switches.h"
++#endif
++
+ namespace {
+ 
+ enum class LoggingDest {
+@@ -256,6 +260,15 @@
+ }
+ 
+ void ShellMainDelegate::PreSandboxStartup() {
++// Disable sandbox on Termux.
++#ifdef __TERMUX__
++  if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
++          sandbox::policy::switches::kNoSandbox)) {
++    base::CommandLine::ForCurrentProcess()->AppendSwitch(
++          sandbox::policy::switches::kNoSandbox);
++  }
++#endif
++
+ // Disable platform crash handling and initialize the crash reporter, if
+ // requested.
+ // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
+--- a/chrome/browser/ui/startup/bad_flags_prompt.cc
++++ b/chrome/browser/ui/startup/bad_flags_prompt.cc
+@@ -74,11 +74,13 @@
+     switches::kHostRules,
+ 
+     // These flags disable sandbox-related security.
++#ifndef __TERMUX__
+     sandbox::policy::switches::kDisableGpuSandbox,
+     sandbox::policy::switches::kDisableLandlockSandbox,
+     sandbox::policy::switches::kDisableSeccompFilterSandbox,
+     sandbox::policy::switches::kDisableSetuidSandbox,
+     sandbox::policy::switches::kNoSandbox,
++#endif
+ #if BUILDFLAG(IS_WIN)
+     sandbox::policy::switches::kAllowThirdPartyModules,
+ #endif
+--- a/chrome/app/chrome_main_delegate.cc
++++ b/chrome/app/chrome_main_delegate.cc
+@@ -226,6 +226,10 @@
+ #include "ui/ozone/public/ozone_platform.h"
+ #endif  // BUILDFLAG(IS_OZONE)
+ 
++#ifdef __TERMUX__
++#include "sandbox/policy/switches.h"
++#endif
++
+ base::LazyInstance<ChromeContentGpuClient>::DestructorAtExit
+     g_chrome_content_gpu_client = LAZY_INSTANCE_INITIALIZER;
+ base::LazyInstance<ChromeContentRendererClient>::DestructorAtExit
+@@ -1061,6 +1065,14 @@
+   const base::CommandLine& command_line =
+       *base::CommandLine::ForCurrentProcess();
+ 
++// Disable sandbox on Termux.
++#ifdef __TERMUX__
++  if (!command_line.HasSwitch(sandbox::policy::switches::kNoSandbox)) {
++    base::CommandLine::ForCurrentProcess()->AppendSwitch(
++        sandbox::policy::switches::kNoSandbox);
++  }
++#endif
++
+   // Only allow disabling web security via the command-line flag if the user has
+   // specified a distinct profile directory. This still enables tests to disable
+   // web security by setting the kWebKitWebSecurityEnabled pref directly.
+--- a/content/shell/browser/shell_content_browser_client.cc
++++ b/content/shell/browser/shell_content_browser_client.cc
+@@ -141,6 +141,10 @@
+ #include "media/mojo/services/media_foundation_preferences.h"
+ #endif  // BUILDFLAG(IS_WIN)
+ 
++#ifdef __TERMUX__
++#include "sandbox/policy/switches.h"
++#endif
++
+ namespace content {
+ 
+ namespace {
+@@ -451,6 +455,9 @@
+       // to shell_main.cc that it's a browser test.
+       switches::kBrowserTest,
+ #endif
++#ifdef __TERMUX__
++      sandbox::policy::switches::kNoSandbox
++#endif
+       switches::kCrashDumpsDir,
+       switches::kEnableCrashReporter,
+       switches::kExposeInternalsForTesting,

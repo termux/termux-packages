@@ -29,7 +29,7 @@ permissions: {} # none
 
 concurrency:
   # if this is a PR event, group = "pr-<number>", otherwise group = run_id so it never collides with other runs
-  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+  group: ${{ case(github.event_name == 'pull_request', format('pr-{0}', github.event.pull_request.number), github.run_id) }}
   # only cancel in-progress when it’s a PR
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
@@ -93,6 +93,17 @@ jobs:
 
         OLD_COMMIT="$OLD_COMMIT" HEAD_COMMIT="$HEAD_COMMIT" GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" scripts/utils/termux_reuse_pr_build_artifacts.sh "${{ github.event_name }}" "${{ matrix.target_arch }}" || true
 
+        # A subpackage goes to the repository named by TERMUX_SUBPKG_REPO
+        # (main, x11 or root), or to the repository of its parent package.
+        subpkg_repo_name() {
+          local target
+          target="$(sed -nE "s/^TERMUX_SUBPKG_REPO=[\"']?([^\"']*)[\"']?\$/\\1/p" "$1")"
+          case "$target" in
+            main|x11|root) echo "termux-$target" ;;
+            *) echo "$2" ;;
+          esac
+        }
+
         if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
           # GitHub sometimes add merge commits at the end
           # To prevent user confusion, filter them with --no-merges
@@ -129,7 +140,7 @@ jobs:
                   # If there are subpackages we want to create a list of those
                   # as well
                   for file in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                    echo "$(basename "${file%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$file" "$repo")_subpackages.txt
                   done
                 else
                   echo "$pkg" >> ./deleted_${repo}_packages
@@ -150,7 +161,7 @@ jobs:
                 found=true
                 echo "$pkg" >> ./built_${repo}_packages.txt
                 for subpkg in $(find "${repo_path}/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_${repo}_subpackages.txt
+                  echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$subpkg" "$repo")_subpackages.txt
                 done
               fi
             done
@@ -186,6 +197,21 @@ jobs:
         done
 
         echo "packages: ${packages[*]}"
+
+        skip_building=false
+        if grep -qx 'skip-building=true' "$GITHUB_OUTPUT"; then
+          skip_building=true
+        elif [[ "${#packages[@]}" -gt 0 ]]; then
+          set +e
+          DRY_RUN_OUTPUT=$(./scripts/bin/build-package-dry-run-simulation.sh -I -C -a "${{ matrix.target_arch }}" "${packages[@]}" 2>&1)
+          DRY_RUN_RC=$?
+          set -e
+          echo "$DRY_RUN_OUTPUT"
+          if [ "$DRY_RUN_RC" -eq 85 ]; then
+            skip_building=true
+          fi
+        fi
+        echo "skip-building=$skip_building" >> $GITHUB_OUTPUT
 
         free_space='false'
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
@@ -324,13 +350,13 @@ jobs:
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2 | tee checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
     - name: Store checksums for built *.deb files
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: checksum-${{ matrix.target_arch }}-${{ github.sha }}
         path: checksum-${{ matrix.target_arch }}-${{ github.sha }}.txt
     - name: Store *.deb files
       if: always()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
@@ -375,7 +401,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v7
     - name: Get *.deb files
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         path: ./
     - name: Check packages using Packages.bz2
@@ -395,44 +421,13 @@ jobs:
           tar xf "$archive"
         done
 
-        error=0
-        for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
-          name=$(jq --raw-output '.["'${repo}'"].name' repo.json)
-          distribution=$(jq --raw-output '.["'${repo}'"].distribution' repo.json)
-          component=$(jq --raw-output '.["'${repo}'"].component' repo.json)
-          url=$(jq --raw-output '.["'${repo}'"].url' repo.json)
-
-          if [ ! -f debs/built_${name}_packages.txt ]; then
-            continue
-          fi
-          if [ -z "$(cat debs/built_${name}_packages.txt)" ]; then
-            continue
-          fi
-
-          for arch in aarch64 arm i686 x86_64; do
-            if [ ! -f "Packages-${repo}-${arch}" ]; then
-              echo "[*] Downloading ${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2"
-              curl -s \
-                --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' \
-                "${url}/dists/${distribution}/${component}/binary-${arch}/Packages.bz2" \
-                -o "Packages-${repo}-${arch}.bz2"
-              7z x "Packages-${repo}-${arch}.bz2" > /dev/null
-            fi
-            result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
-            if [ -n "$result" ]; then
-              echo "$result" | grep -E "${arch}|all" || true
-              error=1
-            fi
-          done
-        done
-        if [ "$error" != 0 ]; then
-          echo "[!] Found local files same name with server files!"
-          echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
-          exit 1
-        fi
+        ./scripts/utils/termux_check_file_conflicts.sh debs
 
   upload:
-    concurrency: ${{ github.workflow }}
+    concurrency:
+      group: ${{ github.workflow }}-upload
+      cancel-in-progress: false
+      queue: max
     permissions:
       contents: read
     if: github.repository == 'termux/termux-packages' && github.ref == 'refs/heads/master'
@@ -442,7 +437,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v7
     - name: Get *.deb files
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         path: ./
     - name: Upload to packages.termux.dev

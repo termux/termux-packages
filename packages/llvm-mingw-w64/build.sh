@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/mstorsjo/llvm-mingw
 TERMUX_PKG_DESCRIPTION="MinGW-w64 toolchain based on LLVM"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="20251007"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="20251216"
 TERMUX_PKG_SRCURL=https://github.com/mstorsjo/llvm-mingw/releases/download/${TERMUX_PKG_VERSION}/llvm-mingw-${TERMUX_PKG_VERSION}-ucrt-ubuntu-22.04-x86_64.tar.xz
-TERMUX_PKG_SHA256=ee1c1f3e4a584f231b1d664eb1f4b9d9f7cae133b64b55dae749f50969cef958
+TERMUX_PKG_SHA256=db561734a05eb4a0695d5e901aadd6c1cda74bba4c9e102b677f81c6fd59849a
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="clang (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), llvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), llvm-tools (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION)"
 TERMUX_PKG_RECOMMENDS="llvm-mingw-w64-tools"
@@ -27,8 +26,13 @@ termux_step_make_install() {
 
 	# Install ucrt libraries
 	mkdir -p "$TERMUX_PREFIX/opt/llvm-mingw-w64"
-	rm -rf "$TERMUX_PREFIX/opt/llvm-mingw-w64"/{aarch64,armv7,i686,x86_64,generic}-w64-mingw32
-	mv "$TERMUX_PKG_SRCDIR"/{aarch64,armv7,i686,x86_64,generic}-w64-mingw32 "$TERMUX_PREFIX/opt/llvm-mingw-w64"
+	rm -rf "$TERMUX_PREFIX/opt/llvm-mingw-w64"/{aarch64,arm64ec,armv7,i686,x86_64,generic}-w64-mingw32
+	mv "$TERMUX_PKG_SRCDIR"/{aarch64,arm64ec,armv7,i686,x86_64,generic}-w64-mingw32 "$TERMUX_PREFIX/opt/llvm-mingw-w64"
+
+	# Install libc++ modules
+	rm -rf "$TERMUX_PREFIX/opt/llvm-mingw-w64/share/libc++"
+	mkdir -p "$TERMUX_PREFIX/opt/llvm-mingw-w64/share"
+	mv "$TERMUX_PKG_SRCDIR"/share/libc++ "$TERMUX_PREFIX/opt/llvm-mingw-w64/share/libc++"
 
 	# Install the toolchain binaries
 	rm -rf "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
@@ -48,10 +52,10 @@ termux_step_make_install() {
 
 	# Install config files
 	mv ./mingw32-common.cfg "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
-	mv ./{aarch64,armv7,i686,x86_64}*.cfg "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
+	mv ./{aarch64,arm64ec,armv7,i686,x86_64}*.cfg "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
 
 	# Install prefixed scripts
-	mv ./{aarch64,armv7,i686,x86_64}* "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
+	mv ./{aarch64,arm64ec,armv7,i686,x86_64}* "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
 	mv ./*wrapper.sh "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"
 
 	# Symlinks clang, lld and llvm tools
@@ -62,7 +66,7 @@ termux_step_make_install() {
 	done
 
 	# Symlinks prefixed scripts to $PREFIX/bin
-	for _tool in "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"/{aarch64,armv7,i686,x86_64}-w64-mingw32*; do
+	for _tool in "$TERMUX_PREFIX/opt/llvm-mingw-w64/bin"/{aarch64,arm64ec,armv7,i686,x86_64}-w64-mingw32*; do
 		if [[ ! -e "$TERMUX_PREFIX/bin/$(basename "$_tool")" ]]; then
 			ln -sfr "$_tool" "$TERMUX_PREFIX/bin/$(basename "$_tool")"
 		fi

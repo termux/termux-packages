@@ -1,0 +1,61 @@
+--- a/v8/src/codegen/external-reference-table.cc
++++ b/v8/src/codegen/external-reference-table.cc
+@@ -12,7 +12,9 @@
+ 
+ #if defined(DEBUG) && defined(V8_OS_LINUX) && !defined(V8_OS_ANDROID)
+ #define SYMBOLIZE_FUNCTION
++#if defined(__GLIBC__)
+ #include <execinfo.h>
++#endif
+ 
+ #include <vector>
+ 
+@@ -118,7 +120,7 @@
+ }
+ 
+ const char* ExternalReferenceTable::ResolveSymbol(void* address) {
+-#ifdef SYMBOLIZE_FUNCTION
++#if defined(SYMBOLIZE_FUNCTION) && defined(__GLIBC__)
+   char** names = backtrace_symbols(&address, 1);
+   const char* name = names[0];
+   // The array of names is malloc'ed. However, each name string is static
+--- a/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ b/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -58,7 +58,7 @@
+ #define HAVE_ERRNO_H 1
+ 
+ /* Define to 1 if you have the <execinfo.h> header file. */
+-#define HAVE_EXECINFO_H 1
++// #define HAVE_EXECINFO_H 1
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+ #define HAVE_FCNTL_H 1
+--- a/base/debug/stack_trace.cc
++++ b/base/debug/stack_trace.cc
+@@ -249,7 +249,7 @@
+   // Symbols are not expected to be reliable when gn args specifies
+   // symbol_level=0.
+   return false;
+-#elif defined(__UCLIBC__) || defined(_AIX)
++#elif defined(__UCLIBC__) || defined(_AIX) || defined(__TERMUX__)
+   // StackTrace::OutputToStream() is not implemented under uclibc, nor AIX.
+   // See https://crbug.com/706728
+   return false;
+@@ -311,7 +311,7 @@
+ 
+ std::string StackTrace::ToStringWithPrefix(cstring_view prefix_string) const {
+   std::stringstream stream;
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if !defined(__UCLIBC__) && !defined(_AIX) && !defined(__TERMUX__)
+   OutputToStreamWithPrefix(&stream, prefix_string);
+ #endif
+   return stream.str();
+@@ -335,7 +335,7 @@
+ }
+ 
+ std::ostream& operator<<(std::ostream& os, const StackTrace& s) {
+-#if !defined(__UCLIBC__) && !defined(_AIX)
++#if !defined(__UCLIBC__) && !defined(_AIX) && !defined(__TERMUX__)
+   s.OutputToStream(&os);
+ #else
+   os << "StackTrace::OutputToStream not implemented.";

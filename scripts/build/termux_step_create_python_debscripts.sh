@@ -3,10 +3,12 @@ termux_step_create_python_debscripts() {
 		local _package_name="$SUB_PKG_NAME"
 		local _package_python_home="$SUB_PKG_DIR/massage$TERMUX_PREFIX/lib/python$TERMUX_PYTHON_VERSION"
 		local _package_python_deps="${TERMUX_SUBPKG_PYTHON_RUNTIME_DEPS//, / }"
+		local _package_dependency_variable_name='TERMUX_SUBPKG_DEPENDS'
 	else
 		local _package_name="$TERMUX_PKG_NAME"
 		local _package_python_home="$TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/lib/python$TERMUX_PYTHON_VERSION"
 		local _package_python_deps="${TERMUX_PKG_PYTHON_RUNTIME_DEPS//, / }"
+		local _package_dependency_variable_name='TERMUX_PKG_DEPENDS'
 	fi
 
 	local py_file_in_lib_python="" pip_metadata_file=""
@@ -27,10 +29,11 @@ termux_step_create_python_debscripts() {
 
 	# add the internal 'pip'-facing name of the package to the 'pip install' dependencies if it exists
 	# in the 'METADATA' file and the 'METADATA' file also marks the package as depending
-	# on any other 'pip'-facing packages, which will install all the 'pip'-facing dependencies
+	# on any other non-optional 'pip'-facing packages, which will install all the non-optional 'pip'-facing dependencies
 	# the software marks itself as depending on from PyPi that are not already installed from other Termux packages.
 	# if more than one 'METADATA' file is detected, this condition will evaluate false so nothing will happen.
-	if [[ -f "$pip_metadata_file" ]] && grep -q '^Requires-Dist' "$pip_metadata_file"; then
+	if [[ -f "$pip_metadata_file" ]] && \
+		grep '^Requires-Dist:' "$pip_metadata_file" | grep -E -v -q ';[[:space:]]*.*\<extra[[:space:]]*=='; then
 		local package_pip_name="$(grep 'Name:' "$pip_metadata_file" | cut -d' ' -f2)"
 		_package_python_deps+=" $package_pip_name"
 	fi
@@ -89,7 +92,7 @@ termux_step_create_python_debscripts() {
 		# ensure that pip is added as a dependency to all
 		# packages that run the 'pip' command during installation.
 		if ([[ "$TERMUX_PACKAGE_FORMAT" == "debian" ]] && ! grep -q -E "Depends.*$pip_package_name(,|$)" control) || ([[ "$TERMUX_PACKAGE_FORMAT" == "pacman" ]] && ! grep -q "depend = $pip_package_name" .PKGINFO); then
-			termux_error_exit "'$_package_name' must depend on '$pip_package_name' because it needs to run 'pip' during installation!"
+			termux_error_exit "'$_package_name' must have '$pip_package_name' marked in its '$_package_dependency_variable_name' variable because it needs to run 'pip' during installation!"
 		fi
 	fi
 

@@ -1,0 +1,13 @@
+--- a/lib/fprint.cc
++++ b/lib/fprint.cc
+@@ -169,8 +169,8 @@
+ 	} else if (!stat(rpmstrPoolStr(cache->pool, fpId), &sb)) {
+ 	    struct fprintCacheEntry_s newEntry = {
+ 		.dirId = fpId,
+-		.dev = sb.st_dev,
+-		.ino = sb.st_ino,
++		.dev = static_cast<dev_t>(sb.st_dev),
++		.ino = static_cast<ino_t>(sb.st_ino),
+ 	    };
+ 	    auto ret = cache->ht.insert({fpId, newEntry});
+ 	    fp->entry = &ret->second;

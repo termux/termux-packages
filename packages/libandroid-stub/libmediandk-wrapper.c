@@ -1,4 +1,7 @@
 #include <dlfcn.h>
+#include <pthread.h>
+
+#include "platform-ns.h"
 #include <media/NdkImage.h>
 #include <media/NdkImageReader.h>
 #include <media/NdkMediaCodec.h>
@@ -226,8 +229,11 @@ static struct {
 } stubs;
 #undef STUB
 
-__attribute__((constructor)) static void init() {
-    void* handle = dlopen(LIB, RTLD_LOCAL);
+static pthread_once_t loaded_once = PTHREAD_ONCE_INIT;
+
+static void load_stubs(void) {
+
+    void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     // Nothing bad happened, normal case for termux-docker.
     if (!handle)
         return;
@@ -236,7 +242,11 @@ __attribute__((constructor)) static void init() {
 #undef LOAD
 }
 
-#define CALL(f, def, ...) if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
+static inline void ensure_loaded(void) {
+    pthread_once(&loaded_once, load_stubs);
+}
+
+#define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
 
 void AImage_delete(AImage* image) {
     CALL(AImage_delete,, image);

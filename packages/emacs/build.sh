@@ -3,33 +3,33 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Update both emacs and emacs-x to the same version in one PR.
-TERMUX_PKG_VERSION="30.2"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="31.1"
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=b3f36f18a6dd2715713370166257de2fae01f9d38cfe878ced9b1e6ded5befd9
+TERMUX_PKG_SHA256=1da5790d9580c81932b5bf700633114468da7b3412d69faa767daebf974f4586
 TERMUX_PKG_DEPENDS="libacl, libgmp, libgnutls, libsqlite, libxml2, ncurses, tree-sitter, zlib"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
---with-dumping=none
---with-gif=no
---with-gnutls
---with-jpeg=no
---with-modules
---with-pdumper=yes
---with-png=no
---with-tiff=no
---with-xml2
---with-xpm=no
---with-tree-sitter
 --without-dbus
 --without-gconf
+--without-gif
 --without-gsettings
+--without-jpeg
 --without-lcms2
+--without-png
 --without-selinux
+--without-tiff
 --without-x
+--without-xpm
+--with-dumping=none
+--with-gnutls
+--with-modules
+--with-pdumper=yes
+--with-tree-sitter
+--with-xml2
 "
 
 if [[ "$TERMUX_DEBUG_BUILD" == "true" ]]; then

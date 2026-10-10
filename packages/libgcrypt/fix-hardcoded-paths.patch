@@ -1,19 +1,21 @@
-diff -uNr libgcrypt-1.8.5/random/random.c libgcrypt-1.8.5.mod/random/random.c
---- libgcrypt-1.8.5/random/random.c	2017-11-23 20:16:58.000000000 +0200
-+++ libgcrypt-1.8.5.mod/random/random.c	2020-07-09 01:38:34.654910933 +0300
-@@ -40,7 +40,7 @@
- #include "cipher.h"         /* For _gcry_sha1_hash_buffer().  */
+diff --git a/random/random.c b/random/random.c
+index d714c3c..45e1d67 100644
+--- a/random/random.c
++++ b/random/random.c
+@@ -105,7 +105,7 @@ get_random_conf_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" RANDOM_CONF_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" RANDOM_CONF_FILE;
+ #endif
+ }
  
- /* The name of a file used to globally configure the RNG. */
--#define RANDOM_CONF_FILE "/etc/gcrypt/random.conf"
-+#define RANDOM_CONF_FILE "@TERMUX_PREFIX@/etc/gcrypt/random.conf"
- 
- 
- /* If not NULL a progress function called from certain places and the
-diff -uNr libgcrypt-1.8.5/random/rndunix.c libgcrypt-1.8.5.mod/random/rndunix.c
---- libgcrypt-1.8.5/random/rndunix.c	2017-11-23 20:16:58.000000000 +0200
-+++ libgcrypt-1.8.5.mod/random/rndunix.c	2020-07-09 01:39:42.815220008 +0300
-@@ -226,6 +226,34 @@
+diff --git a/random/rndunix.c b/random/rndunix.c
+index aff2f85..53d414c 100644
+--- a/random/rndunix.c
++++ b/random/rndunix.c
+@@ -226,6 +226,34 @@ static struct RI {
      const int hasAlternative;	    /* Whether source has alt.location */
  } dataSources[] = {
  
@@ -48,27 +50,37 @@ diff -uNr libgcrypt-1.8.5/random/rndunix.c libgcrypt-1.8.5.mod/random/rndunix.c
      {	"/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 1    },
      {	"/usr/bin/vmstat", "-s", SC(-3), NULL, 0, 0, 0, 0},
      {	"/bin/vmstat", "-c", SC(-3), NULL, 0, 0, 0, 1     },
-diff -uNr libgcrypt-1.8.5/src/fips.c libgcrypt-1.8.5.mod/src/fips.c
---- libgcrypt-1.8.5/src/fips.c	2017-11-23 20:16:58.000000000 +0200
-+++ libgcrypt-1.8.5.mod/src/fips.c	2020-07-09 01:38:34.658910952 +0300
-@@ -36,7 +36,7 @@
+diff --git a/src/fips.c b/src/fips.c
+index d1aff8a..19ddba8 100644
+--- a/src/fips.c
++++ b/src/fips.c
+@@ -137,7 +137,7 @@ get_fips_force_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" FIPS_FORCE_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" FIPS_FORCE_FILE;
+ #endif
+ }
  
+diff --git a/src/hwfeatures.c b/src/hwfeatures.c
+index 1b107e6..fe4a691 100644
+--- a/src/hwfeatures.c
++++ b/src/hwfeatures.c
+@@ -153,7 +153,7 @@ get_hwf_deny_file (void)
+     }
+   return fname;
+ #else
+-  return "/etc/gcrypt/" HWF_DENY_FILE;
++  return "@TERMUX_PREFIX@/etc/gcrypt/" HWF_DENY_FILE;
+ #endif
+ }
  
- /* The name of the file used to force libgcrypt into fips mode. */
--#define FIPS_FORCE_FILE "/etc/gcrypt/fips_enabled"
-+#define FIPS_FORCE_FILE "@TERMUX_PREFIX@/etc/gcrypt/fips_enabled"
+@@ -344,6 +344,6 @@ _gcry_get_sysconfdir (void)
  
- 
- /* The states of the finite state machine used in fips mode.  */
-diff -uNr libgcrypt-1.8.5/src/hwfeatures.c libgcrypt-1.8.5.mod/src/hwfeatures.c
---- libgcrypt-1.8.5/src/hwfeatures.c	2017-11-23 20:16:58.000000000 +0200
-+++ libgcrypt-1.8.5.mod/src/hwfeatures.c	2020-07-09 01:38:34.658910952 +0300
-@@ -33,7 +33,7 @@
- #include "hwf-common.h"
- 
- /* The name of a file used to globally disable selected features. */
--#define HWF_DENY_FILE "/etc/gcrypt/hwf.deny"
-+#define HWF_DENY_FILE "@TERMUX_PREFIX@/etc/gcrypt/hwf.deny"
- 
- /* A table to map hardware features to a string.  */
- static struct
+   return appdata;
+ #else  /*!HAVE_W32_SYSTEM*/
+-  return "/etc/gcrypt/";
++  return "@TERMUX_PREFIX@/etc/gcrypt/";
+ #endif /*!HAVE_W32_SYSTEM*/
+ }

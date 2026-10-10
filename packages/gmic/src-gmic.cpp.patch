@@ -1,0 +1,15 @@
+get_tid() calls syscall(SYS_gettid) when cimg_use_pthread!=1, but gmic.h
+includes <sys/syscall.h> only when cimg_use_pthread is not defined.
+
+--- a/src/gmic.cpp
++++ b/src/gmic.cpp
+@@ -1737,6 +1737,9 @@
+ #else // #if defined(cimg_plugin) .. #elif defined(cimglist_plugin)
+ 
+ #include "gmic.h"
++#if cimg_OS==1 && !defined(__NetBSD__) && cimg_use_pthread!=1
++#include <sys/syscall.h>
++#endif
+ #include "gmic_stdlib_community.h"
+ using namespace gmic_library;
+ 

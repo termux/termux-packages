@@ -2,38 +2,59 @@ TERMUX_PKG_HOMEPAGE=https://webkitgtk.org
 TERMUX_PKG_DESCRIPTION="A full-featured port of the WebKit rendering engine"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.52.1"
+TERMUX_PKG_VERSION="2.54.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://webkitgtk.org/releases/webkitgtk-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=238e7d53205b14004add7eeb4293c94d6fbf7097b3efef7cee5519e5c121a904
+TERMUX_PKG_SHA256=846fd19ccedbae1dbfe904f26dbf2d68a800a33a50caf2ad5222c8dcb3f25682
 TERMUX_PKG_DEPENDS="atk, enchant, fontconfig, freetype, glib, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gstreamer, gtk3, harfbuzz, harfbuzz-icu, libavif, libc++, libcairo, libdrm, libgcrypt, libhyphen, libicu, libjpeg-turbo, libpng, libsoup3, libtasn1, libwebp, libxml2, libx11, libxcomposite, libxdamage, libxslt, libxt, littlecms, openjpeg, pango, woff2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, xorgproto"
 TERMUX_PKG_VERSIONED_GIR=false
 TERMUX_PKG_DISABLE_GIR=false
 
-# USE_OPENGL_OR_ES causes crashes when enabled.
+# -DUSE_SYSTEM_MALLOC=ON causes MiniBrowser and all reverse
+# dependencies to crash when launched only on some devices
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DPORT=GTK
--DENABLE_GAMEPAD=OFF
--DUSE_SYSTEMD=OFF
--DUSE_LIBSECRET=OFF
--DENABLE_INTROSPECTION=ON
--DENABLE_DOCUMENTATION=OFF
--DENABLE_WAYLAND_TARGET=OFF
--DUSE_WPE_RENDERER=OFF
 -DENABLE_BUBBLEWRAP_SANDBOX=OFF
--DUSE_LD_GOLD=OFF
--DUSE_OPENGL_OR_ES=OFF
--DUSE_GSTREAMER_GL=OFF
--DENABLE_USER_MESSAGE_HANDLERS=OFF
+-DENABLE_DOCUMENTATION=OFF
+-DENABLE_DRAG_SUPPORT=ON
+-DENABLE_GAMEPAD=OFF
+-DENABLE_INTROSPECTION=ON
 -DENABLE_JOURNALD_LOG=OFF
--DUSE_SOUP2=OFF
--DUSE_GTK4=OFF
--DUSE_AVIF=ON
--DUSE_GBM=OFF
+-DENABLE_MINIBROWSER=ON
+-DENABLE_PDFJS=ON
+-DENABLE_QUARTZ_TARGET=OFF
 -DENABLE_SPEECH_SYNTHESIS=OFF
+-DENABLE_SPELLCHECK=ON
+-DENABLE_TOUCH_EVENTS=ON
+-DENABLE_USER_MESSAGE_HANDLERS=ON
+-DENABLE_VIDEO=ON
+-DENABLE_WAYLAND_TARGET=OFF
+-DENABLE_WEB_AUDIO=ON
+-DENABLE_WEBDRIVER=ON
+-DENABLE_X11_TARGET=ON
+-DPORT=GTK
+-DUSE_AVIF=ON
+-DUSE_FLITE=OFF
+-DUSE_GBM=OFF
+-DUSE_GSTREAMER_GL=OFF
+-DUSE_GSTREAMER_WEBRTC=OFF
+-DUSE_GSTREAMER=ON
+-DUSE_GTK4=OFF
+-DUSE_JPEGXL=ON
+-DUSE_LCMS=ON
 -DUSE_LIBBACKTRACE=OFF
+-DUSE_LIBDRM=ON
+-DUSE_LIBHYPHEN=ON
+-DUSE_LIBSECRET=OFF
+-DUSE_SKIA_OPENTYPE_SVG=ON
+-DUSE_SYSTEM_MALLOC=OFF
 -DUSE_SYSTEM_SYSPROF_CAPTURE=OFF
+-DUSE_WOFF2=OFF
 "
+
+if [[ "$TERMUX_ARCH" == "arm" || "$TERMUX_ARCH" == "i686" ]]; then
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DUSE_MIMALLOC=ON"
+fi
 
 termux_step_post_get_source() {
 	# Version guard
@@ -61,6 +82,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_massage() {
+	# Do not package bundled mimalloc development files.
+	rm -rf include/mimalloc-* lib/cmake/mimalloc-* lib/mimalloc-*
+	rm -f lib/pkgconfig/mimalloc.pc
+
 	local _GUARD_FILE="lib/lib${TERMUX_PKG_NAME}.so"
 	if [ ! -e "${_GUARD_FILE}" ]; then
 		termux_error_exit "file ${_GUARD_FILE} not found."

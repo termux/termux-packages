@@ -1,11 +1,11 @@
---- runc-1.2.4/Makefile	2025-01-07 04:50:22.000000000 +0530
-+++ runc-1.2.4.mod/Makefile	2025-01-17 02:46:37.087174408 +0530
+--- runc-1.4.1/Makefile
++++ runc-1.4.1.mod/Makefile
 @@ -30,28 +30,12 @@
  TRIMPATH := -trimpath
  
  GO_BUILDMODE :=
 -# Enable dynamic PIE executables on supported platforms.
--ifneq (,$(filter $(GOARCH),386 amd64 arm arm64 ppc64le riscv64 s390x))
+-ifneq (,$(filter $(GOARCH),386 amd64 arm arm64 loong64 ppc64le riscv64 s390x))
 -	ifeq (,$(findstring -race,$(EXTRA_FLAGS)))
 -		GO_BUILDMODE := "-buildmode=pie"
 -	endif

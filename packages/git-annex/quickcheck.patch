@@ -1,0 +1,15 @@
+# This is shadowed by the imported `QuickCheck` library which has this as built-in now.
+# https://github.com/nick8325/quickcheck/blob/936ba88a4dfcb4000a084004b1f562104eb42910/src/Test/QuickCheck/Arbitrary.hs#L536
+
+--- a/Utility/QuickCheck.hs	2026-07-20 22:35:02.000000000 +0530
++++ b/Utility/QuickCheck.hs	2026-08-26 16:03:08.182549103 +0530
+@@ -78,9 +78,6 @@
+ instance Arbitrary FileOffset where
+ 	arbitrary = nonNegative arbitrarySizedIntegral
+ 
+-instance Arbitrary l => Arbitrary (NonEmpty l) where
+-	arbitrary = (:|) <$> arbitrary <*> arbitrary
+-
+ nonNegative :: (Num a, Ord a) => Gen a -> Gen a
+ nonNegative g = g `suchThat` (>= 0)
+ 

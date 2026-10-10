@@ -73,6 +73,7 @@
     <member name="PANGO_ATTR_SENTENCE" nick="sentence" value="35"/>
     <member name="PANGO_ATTR_BASELINE_SHIFT" nick="baseline-shift" value="36"/>
     <member name="PANGO_ATTR_FONT_SCALE" nick="font-scale" value="37"/>
+    <member name="PANGO_ATTR_WIDTH" nick="width" value="38"/>
   </enum>  <enum name="PangoUnderline" get-type="pango_underline_get_type">
     <member name="PANGO_UNDERLINE_NONE" nick="none" value="0"/>
     <member name="PANGO_UNDERLINE_SINGLE" nick="single" value="1"/>
@@ -177,18 +178,34 @@
     <member name="PANGO_STRETCH_EXPANDED" nick="expanded" value="6"/>
     <member name="PANGO_STRETCH_EXTRA_EXPANDED" nick="extra-expanded" value="7"/>
     <member name="PANGO_STRETCH_ULTRA_EXPANDED" nick="ultra-expanded" value="8"/>
+  </enum>  <enum name="PangoWidth" get-type="pango_width_get_type">
+    <member name="PANGO_WIDTH_ULTRA_CONDENSED" nick="ultra-condensed" value="500"/>
+    <member name="PANGO_WIDTH_EXTRA_CONDENSED" nick="extra-condensed" value="625"/>
+    <member name="PANGO_WIDTH_CONDENSED" nick="condensed" value="750"/>
+    <member name="PANGO_WIDTH_SEMI_CONDENSED" nick="semi-condensed" value="875"/>
+    <member name="PANGO_WIDTH_NORMAL" nick="normal" value="1000"/>
+    <member name="PANGO_WIDTH_SEMI_EXPANDED" nick="semi-expanded" value="1125"/>
+    <member name="PANGO_WIDTH_EXPANDED" nick="expanded" value="1250"/>
+    <member name="PANGO_WIDTH_EXTRA_EXPANDED" nick="extra-expanded" value="1500"/>
+    <member name="PANGO_WIDTH_ULTRA_EXPANDED" nick="ultra-expanded" value="2000"/>
   </enum>  <flags name="PangoFontMask" get-type="pango_font_mask_get_type">
     <member name="PANGO_FONT_MASK_FAMILY" nick="family" value="1"/>
     <member name="PANGO_FONT_MASK_STYLE" nick="style" value="2"/>
     <member name="PANGO_FONT_MASK_VARIANT" nick="variant" value="4"/>
     <member name="PANGO_FONT_MASK_WEIGHT" nick="weight" value="8"/>
+    <member name="PANGO_FONT_MASK_WIDTH" nick="width" value="16"/>
     <member name="PANGO_FONT_MASK_STRETCH" nick="stretch" value="16"/>
     <member name="PANGO_FONT_MASK_SIZE" nick="size" value="32"/>
     <member name="PANGO_FONT_MASK_GRAVITY" nick="gravity" value="64"/>
     <member name="PANGO_FONT_MASK_VARIATIONS" nick="variations" value="128"/>
     <member name="PANGO_FONT_MASK_FEATURES" nick="features" value="256"/>
+    <member name="PANGO_FONT_MASK_COLOR" nick="color" value="512"/>
   </flags>
-  <flags name="PangoShapeFlags" get-type="pango_shape_flags_get_type">
+  <enum name="PangoFontColor" get-type="pango_font_color_get_type">
+    <member name="PANGO_FONT_COLOR_FORBIDDEN" nick="forbidden" value="0"/>
+    <member name="PANGO_FONT_COLOR_REQUIRED" nick="required" value="1"/>
+    <member name="PANGO_FONT_COLOR_DONT_CARE" nick="dont-care" value="2"/>
+  </enum>  <flags name="PangoShapeFlags" get-type="pango_shape_flags_get_type">
     <member name="PANGO_SHAPE_NONE" nick="none" value="0"/>
     <member name="PANGO_SHAPE_ROUND_POSITIONS" nick="round-positions" value="1"/>
   </flags>
@@ -235,7 +252,16 @@
     <member name="PANGO_RENDER_PART_UNDERLINE" nick="underline" value="2"/>
     <member name="PANGO_RENDER_PART_STRIKETHROUGH" nick="strikethrough" value="3"/>
     <member name="PANGO_RENDER_PART_OVERLINE" nick="overline" value="4"/>
-  </enum>  <enum name="PangoScript" get-type="pango_script_get_type">
+  </enum>  <flags name="PangoRenderComponent" get-type="pango_render_component_get_type">
+    <member name="PANGO_RENDER_COMPONENT_NONE" nick="none" value="0"/>
+    <member name="PANGO_RENDER_COMPONENT_PLAIN_GLYPH" nick="plain-glyph" value="2"/>
+    <member name="PANGO_RENDER_COMPONENT_COLOR_GLYPH" nick="color-glyph" value="4"/>
+    <member name="PANGO_RENDER_COMPONENT_BACKGROUND" nick="background" value="8"/>
+    <member name="PANGO_RENDER_COMPONENT_UNDERLINE" nick="underline" value="8"/>
+    <member name="PANGO_RENDER_COMPONENT_STRIKETHROUGH" nick="strikethrough" value="16"/>
+    <member name="PANGO_RENDER_COMPONENT_OVERLINE" nick="overline" value="32"/>
+  </flags>
+  <enum name="PangoScript" get-type="pango_script_get_type">
     <member name="PANGO_SCRIPT_INVALID_CODE" nick="invalid-code" value="-1"/>
     <member name="PANGO_SCRIPT_COMMON" nick="common" value="0"/>
     <member name="PANGO_SCRIPT_INHERITED" nick="inherited" value="1"/>

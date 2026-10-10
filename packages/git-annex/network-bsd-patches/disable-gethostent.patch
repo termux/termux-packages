@@ -1,0 +1,20 @@
+--- a/network-bsd/Network/BSD.hsc	2026-08-08 01:06:21.295474757 +0530
++++ b/network-bsd/Network/BSD.hsc	2026-08-08 01:09:26.188858803 +0530
+@@ -47,7 +47,7 @@
+     , getHostByAddr
+     , hostAddress
+ 
+-#if defined(HAVE_GETHOSTENT) && !defined(mingw32_HOST_OS)
++#if 0 && !defined(mingw32_HOST_OS)
+     , getHostEntries
+ 
+     -- ** Low level functionality
+@@ -458,7 +458,7 @@
+ foreign import CALLCONV safe "gethostbyaddr"
+    c_gethostbyaddr :: Ptr N.HostAddress -> CInt -> CInt -> IO (Ptr HostEntry)
+ 
+-#if defined(HAVE_GETHOSTENT) && !defined(mingw32_HOST_OS)
++#if 0 && !defined(mingw32_HOST_OS)
+ -- | @gethostent(3)@.
+ getHostEntry :: IO HostEntry
+ getHostEntry = withLock getHostEntry

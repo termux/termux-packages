@@ -1,0 +1,29 @@
+--- a/build.rs	2026-09-13 01:59:12.501899246 +0000
++++ b/build.rs	2026-09-13 01:59:12.503137434 +0000
+@@ -9,7 +9,7 @@
+     experimental_sha256: bool,
+ ) -> Result<pkg_config::Library, Box<dyn std::error::Error>> {
+     let mut cfg = pkg_config::Config::new();
+-    let range_version = "1.9.7".."1.10.0";
++    let range_version = "1.9.7";
+ 
+     let lib = if experimental_sha256 {
+         // Determine whether experimental SHA256 object support is enabled.
+@@ -24,7 +24,7 @@
+         // See how libgit2 handles experimental features:
+         // https://github.com/libgit2/libgit2/blob/3ac4c0adb1064bad16a7f980d87e7261753fd07e/cmake/ExperimentalFeatures.cmake
+         match cfg
+-            .range_version(range_version.clone())
++            .atleast_version(range_version.clone())
+             .probe("libgit2-experimental")
+         {
+             Ok(lib) => {
+@@ -59,7 +59,7 @@
+             }
+         }
+     } else {
+-        match cfg.range_version(range_version).probe("libgit2") {
++        match cfg.atleast_version(range_version).probe("libgit2") {
+             Ok(lib) => lib,
+             Err(e) => {
+                 println!("cargo:warning=failed to probe system libgit2: {e}");

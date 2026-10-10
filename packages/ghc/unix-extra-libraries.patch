@@ -1,0 +1,22 @@
+--- ghc-9.12.2/libraries/unix/unix.cabal	2025-03-13 00:55:48.000000000 +0530
++++ ghc-9.12.2.mod/libraries/unix/unix.cabal	2026-08-05 14:27:08.866697701 +0530
+@@ -50,11 +50,19 @@
+   default: False
+   manual: False
+ 
++flag android-libs
++  description: Termux specific android-libs
++  default: False
++  manual: True
++
+ source-repository head
+     type:     git
+     location: https://github.com/haskell/unix.git
+ 
+ library
++    if flag(android-libs)
++      extra-libraries: android-posix-semaphore android-utimes
++
+     default-language: Haskell2010
+     other-extensions:
+         CApiFFI

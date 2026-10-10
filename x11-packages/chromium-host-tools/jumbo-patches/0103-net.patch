@@ -185,21 +185,23 @@ diff --git a/net/dns/host_resolver_cache.cc b/net/dns/host_resolver_cache.cc
 index 93032e14bb..a8e8ce6f22 100644
 --- a/net/dns/host_resolver_cache.cc
 +++ b/net/dns/host_resolver_cache.cc
-@@ -24,6 +24,8 @@
+@@ -26,6 +26,9 @@
  #include "url/url_canon.h"
  #include "url/url_canon_stdstring.h"
  
 +#define kSecureKey kSecureKey_HostResolverCache
++#define kTargetNetworkKey kTargetNetworkKey_HostResolverCache
 +
  namespace net {
  
  namespace {
-@@ -453,3 +455,5 @@ base::Value HostResolverCache::SerializeEntries(
+@@ -469,3 +472,6 @@
  }
  
  }  // namespace net
 +
 +#undef kSecureKey
++#undef kTargetNetworkKey
 diff --git a/net/dns/host_resolver_dns_task.cc b/net/dns/host_resolver_dns_task.cc
 index bec87c2963..c7c3f522b3 100644
 --- a/net/dns/host_resolver_dns_task.cc
@@ -871,3 +873,59 @@ index 5562515695..3c3e94150c 100644
  }  // namespace net
 +
 +#undef ToLegacyDestinationEndpoint
+--- a/net/cert/BUILD.gn
++++ b/net/cert/BUILD.gn
+@@ -5,6 +5,8 @@
+ import("//third_party/protobuf/proto_library.gni")
+ 
+ proto_library("root_store_proto_full") {
++  disable_jumbo = true
++
+   proto_out_dir = "net/cert/root_store_proto_full/"
+   sources = [
+     "duration.proto",
+diff --git a/net/socket/delayed_datagram_socket.cc b/net/socket/delayed_datagram_socket.cc
+index 8ae22f7d06..35534b94aa 100644
+--- a/net/socket/delayed_datagram_socket.cc
++++ b/net/socket/delayed_datagram_socket.cc
+@@ -17,6 +17,8 @@
+ #include "net/base/io_buffer.h"
+ #include "net/base/net_errors.h"
+ 
++#define kInnerReadBufferSize kInnerReadBufferSize_delayed_datagram_socket
++
+ namespace net {
+ 
+ namespace {
+@@ -895,3 +897,5 @@ base::TimeDelta DelayedDatagramSocket::HalfRtt() const {
+ }
+ 
+ }  // namespace net
++
++#undef kInnerReadBufferSize
+diff --git a/net/socket/tls_stream_attempt.cc b/net/socket/tls_stream_attempt.cc
+index 5641bd744d..5581b9e7c6 100644
+--- a/net/socket/tls_stream_attempt.cc
++++ b/net/socket/tls_stream_attempt.cc
+@@ -43,12 +43,14 @@ std::string_view TlsStreamAttempt::StateToString(State state) {
+ 
+ namespace {
+ 
+-bool IsEchEnabled(SSLClientContext* ssl_client_context, std::string_view host) {
++bool IsEchEnabled_tls_stream_attempt(SSLClientContext* ssl_client_context, std::string_view host) {
+   return ssl_client_context && ssl_client_context->IsEchEnabled(host);
+ }
+ 
+ }  // namespace
+ 
++#define IsEchEnabled IsEchEnabled_tls_stream_attempt
++
+ TlsStreamAttempt::TlsStreamAttempt(const StreamAttemptParams* params,
+                                    IPEndPoint ip_endpoint,
+                                    handles::NetworkHandle target_network,
+@@ -337,3 +339,5 @@ void TlsStreamAttempt::ResetStateForRestart() {
+ }
+ 
+ }  // namespace net
++
++#undef IsEchEnabled

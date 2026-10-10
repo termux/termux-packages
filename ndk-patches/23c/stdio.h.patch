@@ -39,10 +39,10 @@
 +#define __sferror(p)    (((p)->_flags & __SERR) != 0)
  
 +/* Used by perl, fish, and others. */
-+static __inline__ char* ctermid(char* s) {
-+	if (s == 0) return (char*) "/dev/tty";
-+	strcpy(s, "/dev/tty");
-+	return s;
++static __inline__ char* ctermid(char* __termux_s) {
++	if (__termux_s == 0) return (char*) "/dev/tty";
++	strcpy(__termux_s, "/dev/tty");
++	return __termux_s;
 +}
  
  FILE* fdopen(int __fd, const char* __mode);
@@ -54,23 +54,23 @@
 +int open(const char*, int, ...);
 +extern pid_t getpid();
 +extern int unlink(const char*);
-+void free(void* p);
++void free(void*);
 +uint32_t arc4random(void);
 +static __inline__ FILE* tmpfile() {
-+	int p = getpid();
-+	char* path;
-+	int i;
-+	for (i = 0; i < 100; i++) {
-+		unsigned int r = arc4random();
-+		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
-+		int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE, 0600);
-+		if (fd >= 0) {
-+			FILE* result = fdopen(fd, "w+");
-+			unlink(path);
-+			free(path);
-+			return result;
++	int __termux_pid = getpid();
++	char* __termux_path;
++	int __termux_i;
++	for (__termux_i = 0; __termux_i < 100; __termux_i++) {
++		unsigned int __termux_random = arc4random();
++		if (asprintf(&__termux_path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", __termux_pid, __termux_random) == -1) return NULL;
++		int __termux_fd = open(__termux_path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE, 0600);
++		if (__termux_fd >= 0) {
++			FILE* __termux_result = fdopen(__termux_fd, "w+");
++			unlink(__termux_path);
++			free(__termux_path);
++			return __termux_result;
 +		}
-+		free(path);
++		free(__termux_path);
 +	}
 +	return NULL;
 +}

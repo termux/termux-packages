@@ -1,0 +1,11 @@
+--- a/plugins/ssh/src/plugin.cpp
++++ b/plugins/ssh/src/plugin.cpp
+@@ -65,7 +65,7 @@
+     ssh_commandline_ = s->value(ck_ssh_commandline, default_ssh_commandline).value<QString>();
+     ssh_remote_commandline_ = s->value(ck_ssh_remote_commandline, default_ssh_remote_commandline).value<QString>();
+ 
+-    hosts.unite(parseConfigFile(u"/etc/ssh/config"_s));
++    hosts.unite(parseConfigFile(u"@TERMUX_PREFIX@/etc/ssh/config"_s));
+     hosts.unite(parseConfigFile(QDir::home().filePath(u".ssh/config"_s)));
+     INFO << u"Found %1 ssh hosts."_s.arg(hosts.size());
+ }

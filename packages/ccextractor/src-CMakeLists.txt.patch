@@ -1,31 +1,28 @@
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -58,71 +58,8 @@
+@@ -49,9 +49,6 @@
  include_directories(${PROJECT_SOURCE_DIR})
  include_directories(${PROJECT_SOURCE_DIR}/lib_ccx)
  include_directories(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi)
 -include_directories(${PROJECT_SOURCE_DIR}/thirdparty)
--include_directories(${PROJECT_SOURCE_DIR}/thirdparty/gpacmp4)
--include_directories(${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c)
 -include_directories(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash)
 -include_directories(${PROJECT_SOURCE_DIR}/thirdparty/libpng)
--
--if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "arm64")
--  include_directories(${PROJECT_SOURCE_DIR}/thirdparty/libpng/arm)
--  aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/libpng/arm SOURCEFILE)
--endif ()
--
+ 
+ # Check if the operating system is macOS (Darwin)
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+@@ -65,58 +62,9 @@
+   endif()
+ endif()
+ 
 -include_directories(${PROJECT_SOURCE_DIR}/thirdparty/zlib)
 -include_directories(${PROJECT_SOURCE_DIR}/thirdparty/freetype/include)
--aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/gpacmp4/ SOURCEFILE)
 -aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/lib_hash/ SOURCEFILE)
 -aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/libpng/ SOURCEFILE)
--aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/ SOURCEFILE)
 -aux_source_directory(${PROJECT_SOURCE_DIR}/thirdparty/zlib/ SOURCEFILE)
  aux_source_directory(${PROJECT_SOURCE_DIR}/lib_ccx/zvbi/ SOURCEFILE)
  
 -set(UTF8PROC_SOURCE ${PROJECT_SOURCE_DIR}/thirdparty/utf8proc/utf8proc.c)
--
+ 
 -set(FREETYPE_SOURCE
 -        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/autofit/autofit.c
 -        ${PROJECT_SOURCE_DIR}/thirdparty/freetype/base/ftbase.c
@@ -71,53 +68,18 @@
 -        )
  #Windows specific libraries and linker flags
  if(WIN32)
-     include_directories ("${PROJECT_SOURCE_DIR}/thirdparty/win_spec_incld/")
-@@ -153,8 +90,32 @@
- 
+     if(NOT MINGW)
+@@ -159,7 +107,7 @@
  
  set (EXTRA_LIBS ${EXTRA_LIBS} -lm -lpthread -ldl)
-+
-+find_package (PkgConfig REQUIRED)
  
 -find_package (PkgConfig)
-+pkg_check_modules (GPAC REQUIRED gpac)
-+pkg_check_modules (PROTOBUF_C REQUIRED libprotobuf-c)
-+pkg_check_modules (LIBMD REQUIRED libmd)
-+pkg_check_modules (LIBPNG REQUIRED libpng)
-+pkg_check_modules (ZLIB REQUIRED zlib)
-+pkg_check_modules (FREETYPE REQUIRED freetype2)
-+pkg_check_modules (UTF8PROC REQUIRED libutf8proc)
-+
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${GPAC_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${PROTOBUF_C_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBMD_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${LIBPNG_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${ZLIB_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${FREETYPE_LIBRARIES})
-+set (EXTRA_LIBS ${EXTRA_LIBS} ${UTF8PROC_LIBRARIES})
-+
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${GPAC_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${PROTOBUF_C_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBMD_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LIBPNG_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${ZLIB_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${FREETYPE_INCLUDE_DIRS})
-+set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${UTF8PROC_INCLUDE_DIRS})
++find_package (PkgConfig REQUIRED)
  
  ########################################################
  # Build using FFmpeg libraries
-@@ -209,9 +170,6 @@
-   pkg_check_modules (NANOMSG REQUIRED libnanomsg)
-   set (EXTRA_LIBS ${EXTRA_LIBS} ${NANOMSG_STATIC_LIBRARIES})
- 
--  include_directories ("${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/")
--  aux_source_directory ("${PROJECT_SOURCE_DIR}/thirdparty/protobuf-c/" SOURCEFILE)
--
-   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_SHARING")
- endif (PKG_CONFIG_FOUND AND WITH_SHARING)
- 
-@@ -240,7 +198,7 @@
-   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DENABLE_HARDSUBX")
+@@ -240,7 +188,7 @@
+   set (EXTRA_INCLUDES ${EXTRA_INCLUDES} ${LEPTONICA_INCLUDE_DIRS})
  endif (PKG_CONFIG_FOUND AND WITH_HARDSUBX)
  
 -add_executable (ccextractor ${SOURCEFILE} ${FREETYPE_SOURCE} ${UTF8PROC_SOURCE})

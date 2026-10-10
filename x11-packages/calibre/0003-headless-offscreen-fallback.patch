@@ -1,0 +1,48 @@
+diff --git a/src/calibre/constants.py b/src/calibre/constants.py
+index 1b920db0bf..b6495273f6 100644
+--- a/src/calibre/constants.py
++++ b/src/calibre/constants.py
+@@ -44,6 +44,7 @@
+ isworker = hasenv('CALIBRE_WORKER') or hasenv('CALIBRE_SIMPLE_WORKER')
+ if isworker:
+     os.environ.pop(environ_item('CALIBRE_FORCE_ANSI'), None)
++os.environ.setdefault('CALIBRE_HEADLESS_PLATFORM', 'offscreen')
+ FAKE_PROTOCOL, FAKE_HOST = 'clbr', 'internal.invalid'
+ SPECIAL_TITLE_FOR_WEBENGINE_COMMS = '__webengine_messages_pending__'
+ VIEWER_APP_UID = 'com.calibre-ebook.viewer'
+diff --git a/src/calibre/gui2/__init__.py b/src/calibre/gui2/__init__.py
+index 5a81f3afee..c6dd24419f 100644
+--- a/src/calibre/gui2/__init__.py
++++ b/src/calibre/gui2/__init__.py
+@@ -1433,11 +1433,14 @@ def __init__(
+             args = [override_program_name] + args[1:]
+         self.palette_manager = PaletteManager(force_calibre_style, headless)
+         if headless:
++            headless_platform = os.environ.get('CALIBRE_HEADLESS_PLATFORM')
++            if not headless_platform:
++                headless_platform = 'headless' if os.path.exists(os.path.join(plugins_loc, 'libheadless.so')) else 'offscreen'
+             args.extend((
+                 '-platformpluginpath',
+                 plugins_loc,
+                 '-platform',
+-                os.environ.get('CALIBRE_HEADLESS_PLATFORM', 'headless'),
++                headless_platform,
+             ))
+         else:
+             args.extend(self.palette_manager.args_to_qt)
+@@ -1851,11 +1854,14 @@ def ensure_app(headless=True) -> QApplication:
+                     return _store_app
+                 has_headless = ismacos or islinux or isbsd
+                 if headless and has_headless:
++                    headless_platform = os.environ.get('CALIBRE_HEADLESS_PLATFORM')
++                    if not headless_platform:
++                        headless_platform = 'headless' if os.path.exists(os.path.join(plugins_loc, 'libheadless.so')) else 'offscreen'
+                     args += [
+                         '-platformpluginpath',
+                         plugins_loc,
+                         '-platform',
+-                        os.environ.get('CALIBRE_HEADLESS_PLATFORM', 'headless'),
++                        headless_platform,
+                     ]
+                     # WebEngine GPU not needed in headless mode
+                     args += ['--webEngineArgs', '--disable-gpu']

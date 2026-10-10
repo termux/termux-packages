@@ -1,0 +1,11 @@
+--- a/chrome/browser/download/download_status_updater_linux.cc
++++ b/chrome/browser/download/download_status_updater_linux.cc
+@@ -77,6 +77,8 @@
+   if (!unity_lib)
+     unity_lib = dlopen("libunity.so.9", RTLD_LAZY);
+   if (!unity_lib)
++    unity_lib = dlopen("libunity.so", RTLD_LAZY);
++  if (!unity_lib)
+     return;
+ 
+   unity_inspector_get_default_func inspector_get_default =

@@ -1,0 +1,39 @@
+--- a/library/sysinfo.c
++++ b/library/sysinfo.c
+@@ -37,6 +37,10 @@
+ #include "misc.h"
+ #include "procps-private.h"
+ 
++#ifdef __ANDROID__
++#include <sys/sysinfo.h>
++#endif
++
+ 
+ #define LOADAVG_FILE "/proc/loadavg"
+ 
+@@ -99,6 +99,17 @@ PROCPS_EXPORT int procps_loadavg(
+     double avg_1=0, avg_5=0, avg_15=0;
+     locale_t tmplocale;
+     int retval=0;
++#ifdef __ANDROID__
++#define LOAD_INT(x)  (unsigned)((x) >> 16)
++#define LOAD_FRAC(x) (LOAD_INT(((x) & 65535) * 100) / 100.0f)
++
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        avg_1 = LOAD_INT(system_information.loads[0]) + LOAD_FRAC(system_information.loads[0]);
++        avg_5 = LOAD_INT(system_information.loads[1]) + LOAD_FRAC(system_information.loads[1]);
++        avg_15 = LOAD_INT(system_information.loads[2]) + LOAD_FRAC(system_information.loads[2]);
++    }
++#else
+     FILE *fp;
+ 
+     if ((fp = fopen(LOADAVG_FILE, "r")) == NULL)
+@@ -108,6 +123,7 @@ PROCPS_EXPORT int procps_loadavg(
+     fclose(fp);
+     uselocale(LC_GLOBAL_LOCALE);
+     freelocale(tmplocale);
++#endif
+     SET_IF_DESIRED(av1,  avg_1);
+     SET_IF_DESIRED(av5,  avg_5);
+     SET_IF_DESIRED(av15, avg_15);

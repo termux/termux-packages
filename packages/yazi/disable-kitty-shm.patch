@@ -1,0 +1,42 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 8a6aaa2..2a0515d 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -71,7 +71,7 @@ regex                 = "1.13.1"
+ regex-syntax          = "0.8.11"
+ reqwest               = { version = "0.13.4", default-features = false, features = [ "rustls-no-provider", "stream" ] }
+ rustls                = { version = "0.23.43", default-features = false, features = [ "ring", "std" ] }
+-rustix                = { version = "1.1.4", default-features = false, features = [ "std", "fs", "mm", "shm", "stdio", "termios", "event" ] }
++rustix                = { version = "1.1.4", default-features = false, features = [ "std", "fs", "mm", "stdio", "termios", "event" ] }
+ russh                 = { version = "0.63.1", default-features = false, features = [ "ring", "rsa" ] }
+ scopeguard            = "1.2.0"
+ serde                 = { version = "1.0.229", features = [ "derive" ] }
+diff --git a/yazi-ffi/src/shm/mod.rs b/yazi-ffi/src/shm/mod.rs
+index 7ea6ccd..04d99f3 100644
+--- a/yazi-ffi/src/shm/mod.rs
++++ b/yazi-ffi/src/shm/mod.rs
+@@ -1,10 +1,7 @@
+ yazi_macro::mod_flat!(common);
+ 
+-#[cfg(unix)]
+-yazi_macro::mod_flat!(unix);
+-
+ #[cfg(windows)]
+ yazi_macro::mod_flat!(windows);
+ 
+-#[cfg(not(any(unix, windows)))]
++#[cfg(target_os = "android")]
+ yazi_macro::mod_flat!(unsupported);
+diff --git a/yazi-tty/src/sequence/query.rs b/yazi-tty/src/sequence/query.rs
+index ac5d321..d5edccf 100644
+--- a/yazi-tty/src/sequence/query.rs
++++ b/yazi-tty/src/sequence/query.rs
+@@ -53,7 +53,7 @@ pub struct RequestKgpShm {
+ }
+ 
+ impl RequestKgpShm {
+-	pub fn new() -> Self { Self { shm: NamedSharedMemory::new(&[0; 3]).ok() } }
++	pub fn new() -> Self { Self { shm: None } }
+ }
+ 
+ impl Display for RequestKgpShm {

@@ -1,0 +1,13 @@
+diff --git a/bridges/source/cpp_uno/gcc3_linux_aarch64/cpp2uno.cxx b/bridges/source/cpp_uno/gcc3_linux_aarch64/cpp2uno.cxx
+index 2856b65b2..c6f0abb74 100644
+--- a/bridges/source/cpp_uno/gcc3_linux_aarch64/cpp2uno.cxx
++++ b/bridges/source/cpp_uno/gcc3_linux_aarch64/cpp2uno.cxx
+@@ -601,7 +601,7 @@ void bridges::cpp_uno::shared::VtableFactory::flushCode(
+         reinterpret_cast<char *>(const_cast<unsigned char *>(begin)),
+         reinterpret_cast<char *>(const_cast<unsigned char *>(end)));
+ #else
+-    __builtin___clear_cache(const_cast<unsigned char *>(begin), const_cast<unsigned char *>(end));
++    __builtin___clear_cache(reinterpret_cast<char *>(const_cast<unsigned char *>(begin)), reinterpret_cast<char *>(const_cast<unsigned char *>(end)));
+ #endif
+ }
+ 

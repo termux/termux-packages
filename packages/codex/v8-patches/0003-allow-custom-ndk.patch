@@ -1,0 +1,40 @@
+This reverts https://github.com/chromium/chromium/commit/8e3c5a8ae87e6834670e4777876e77ecba0046a1
+
+diff --git a/build/config/android/config.gni b/build/config/android/config.gni
+index c91ad3143a2c91..c4b0a6a235a599 100644
+--- a/build/config/android/config.gni
++++ b/build/config/android/config.gni
+@@ -157,7 +157,12 @@
+     }
+   }
+ 
+-  android_ndk_root = "//third_party/android_toolchain/ndk"
++  if (!defined(default_android_ndk_root)) {
++    default_android_ndk_root = "//third_party/android_toolchain/ndk"
++    default_android_ndk_version = "r28"
++  } else {
++    assert(defined(default_android_ndk_version))
++  }
+ 
+   public_android_sdk_root = "//third_party/android_sdk/public"
+   public_android_sdk_platform_version = "37.0"
+@@ -231,6 +236,9 @@
+          "SDK release " + android_sdk_release + " not recognized.")
+ 
+   declare_args() {
++    android_ndk_root = default_android_ndk_root
++    android_ndk_version = default_android_ndk_version
++
+     android_ndk_api_level = default_min_sdk_version
+ 
+     if (current_cpu == "riscv64" && default_min_sdk_version < 35) {
+--- a/build/config/android/BUILD.gn
++++ b/build/config/android/BUILD.gn
+@@ -2,6 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
++import("//build/config/android/config.gni")
+ import("//build/config/android/rules.gni")
+ import("//build/config/c++/c++.gni")
+ import("//build/config/compiler/compiler.gni")

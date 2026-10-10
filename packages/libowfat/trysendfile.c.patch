@@ -1,12 +1,11 @@
 --- a/trysendfile.c
 +++ b/trysendfile.c
-@@ -62,7 +62,8 @@
- #define _FILE_OFFSET_BITS 64
+@@ -63,7 +63,7 @@
  #include <sys/types.h>
  #include <unistd.h>
--#if defined(__GLIBC__)
-+#include <fcntl.h>
-+#if defined(__GLIBC__) || defined(__ANDROID__)
+ #include <fcntl.h>
+-#if defined(__GLIBC__) || defined(__dietlibc__)
++#if defined(__GLIBC__) || defined(__dietlibc__) || defined(__ANDROID__)
  #include <sys/sendfile.h>
- #elif defined(__dietlibc__)
- #include <sys/sendfile.h>
+ #else
+ #include <linux/unistd.h>

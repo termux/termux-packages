@@ -3,11 +3,15 @@ TERMUX_PKG_DESCRIPTION="A library of general-purpose, non-graphical Objective C 
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.31.1"
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://github.com/gnustep/libs-base/releases/download/base-${TERMUX_PKG_VERSION//./_}/gnustep-base-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e7546f1c978a7c75b676953a360194a61e921cb45a4804497b4f346a460545cd
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gnustep-make, libcurl, libc++, libffi, libgmp, libgnutls, libiconv, libicu, libxml2, libxslt, zlib"
+# Avoid file conflict with swift which also ships plutil (favoring swift's plutil per #31671)
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/plutil
+"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-default-config=$TERMUX_PREFIX/etc/GNUstep/GNUstep.conf

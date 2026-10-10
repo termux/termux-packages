@@ -1,0 +1,42 @@
+diff -NaurpBb clucene-core-2.3.3.4/CMakeLists.txt clucene-core-2.3.3.4-mod/CMakeLists.txt
+--- clucene-core-2.3.3.4/CMakeLists.txt	2011-03-17 03:21:07.000000000 +0300
++++ clucene-core-2.3.3.4-mod/CMakeLists.txt	2011-08-16 16:56:55.968268152 +0400
+@@ -163,7 +163,7 @@ IF ( BUILD_CONTRIBS )
+   SET(BUILD_CONTRIBS_LIB 1)
+ ENDIF ( BUILD_CONTRIBS )
+ IF ( BUILD_CONTRIBS_LIB )
+-  ADD_SUBDIRECTORY (src/contribs-lib EXCLUDE_FROM_ALL)
++  ADD_SUBDIRECTORY (src/contribs-lib)
+ ENDIF ( BUILD_CONTRIBS_LIB )
+ 
+ 
+diff -NaurpBb clucene-core-2.3.3.4/src/contribs-lib/CMakeLists.txt clucene-core-2.3.3.4-mod/src/contribs-lib/CMakeLists.txt
+--- clucene-core-2.3.3.4/src/contribs-lib/CMakeLists.txt	2011-03-17 03:21:07.000000000 +0300
++++ clucene-core-2.3.3.4-mod/src/contribs-lib/CMakeLists.txt	2011-08-16 17:14:13.499275499 +0400
+@@ -106,9 +106,26 @@ add_library(clucene-contribs-lib SHARED
+ )
+ TARGET_LINK_LIBRARIES(clucene-contribs-lib ${clucene_contrib_extra_libs})
+ 
++#install public headers.
++FOREACH(file ${HEADERS})
++	get_filename_component(apath ${file} PATH)
++	get_filename_component(aname ${file} NAME)
++	file(RELATIVE_PATH relpath ${CMAKE_SOURCE_DIR}/src/contribs-lib ${apath})
++	IF ( NOT aname MATCHES "^_.*" )
++		install(FILES ${file} 
++		        DESTINATION include/${relpath}
++		        COMPONENT development)
++	ENDIF ( NOT aname MATCHES "^_.*" )
++ENDFOREACH(file)
++
+ #set properties on the libraries
+ SET_TARGET_PROPERTIES(clucene-contribs-lib PROPERTIES
+     VERSION ${CLUCENE_VERSION}
+     SOVERSION ${CLUCENE_SOVERSION}
+     COMPILE_DEFINITIONS_DEBUG _DEBUG
+ )
++
++#and install library
++install(TARGETS clucene-contribs-lib 
++        DESTINATION ${LIB_DESTINATION}  
++        COMPONENT runtime )

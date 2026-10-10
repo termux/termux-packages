@@ -1,0 +1,17 @@
+Fix SIGBUS error on Arm
+
+https://github.com/termux/termux-packages/issues/29024
+https://bugzilla.mozilla.org/show_bug.cgi?id=1844117
+
+--- a/extensions/spellcheck/hunspell/src/hashmgr.cxx
++++ b/extensions/spellcheck/hunspell/src/hashmgr.cxx
+@@ -1435,6 +1435,9 @@ const std::vector<replentry>& HashMgr::get_reptable() const {
+ }
+ 
+ void* HashMgr::arena_alloc(size_t num_bytes, size_t alignment) const {
++#if defined(__arm__)
++  num_bytes = (((num_bytes + 7) >> 3) << 3);
++#endif
+   // Fixed-size 64KB chunks: small enough to avoid significant waste on small
+   // dictionaries, large enough to amortize per-chunk malloc overhead on large
+   // ones. make_unique throws std::bad_alloc on OOM.

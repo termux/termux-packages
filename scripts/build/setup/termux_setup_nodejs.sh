@@ -5,7 +5,7 @@ termux_setup_nodejs() {
 	# Ref: https://github.com/nodejs/node/commit/506b79e888
 	NODE_OPTIONS+=" --network-family-autoselection-attempt-timeout=500"
 	# Use LTS version for now
-	local NODEJS_VERSION=24.17.0
+	local NODEJS_VERSION=24.18.0
 	local NODEJS_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -20,7 +20,7 @@ termux_setup_nodejs() {
 			local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 			termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 				"$NODEJS_TAR_FILE" \
-				ab343a1b747c7cbf3630dfd7dbf818c5423fab2eb4f5ad1afc896f6bd121a917
+				55aa7153f9d88f28d765fcdad5ae6945b5c0f98a36881703817e4c450fa76742
 			tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 		fi
 		export PATH=$NODEJS_FOLDER/bin:$PATH
@@ -28,9 +28,9 @@ termux_setup_nodejs() {
 		local NODEJS_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/nodejs/build.sh; echo \$TERMUX_PKG_VERSION")
 		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/nodejs" ] ||
 		    [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/nodejs")" != "$NODEJS_PKG_VERSION" ]) &&
-		   ([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' nodejs 2>/dev/null)" != "installed" ]] ||
-		    [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q nodejs 2>/dev/null)" ]]); then
-			echo "Package 'nodejs' is not installed."
+		   ([[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' nodejs 2>/dev/null)" != "installed" && "$(dpkg-query -W -f '${db:Status-Status}\n' nodejs-lts 2>/dev/null)" != "installed" ]] ||
+		    [[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q nodejs 2>/dev/null)" && ! "$(pacman -Q nodejs-lts 2>/dev/null)" ]]); then
+			echo "Package 'nodejs' or 'nodejs-lts' is not installed."
 			echo "You can install it with"
 			echo
 			echo "  pkg install nodejs"

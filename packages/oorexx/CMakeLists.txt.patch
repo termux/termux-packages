@@ -1,0 +1,44 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -977,6 +977,8 @@
+ install(TARGETS rexx_exe RUNTIME COMPONENT Core DESTINATION ${INSTALL_EXECUTABLE_DIR})
+ 
+ #################### rexximage (bin file) ##########################
++set(ORX_PREBUILT_IMAGE "" CACHE FILEPATH "Prebuilt rexx.img for cross compilation")
++
+ # These are the core classes built into the .img file.
+ set (core_classes ${build_rexx_classes_dir}/CoreClasses.orx
+             ${build_rexx_classes_dir}/StreamClasses.orx)
+@@ -985,6 +987,7 @@
+    set (platform_rexximage_sources ${build_platform_dir}/verinfo.rc)
+ endif ()
+ # Sources for rexximg
++if (NOT ORX_PREBUILT_IMAGE)
+ add_executable(rexximage ${build_utilities_rexximage_dir}/rexximage.cpp
+             ${core_classes}
+             ${platform_rexximage_sources})
+@@ -995,6 +998,7 @@
+             ${build_api_platform_dir})
+ # Extra link library definitions
+ target_link_libraries(rexximage rexx rexxapi ${CMAKE_REQUIRED_LIBRARIES})
++endif ()
+ 
+ # handy macro for copying files from the source into the build directory.
+ macro (copy_build_file name source)
+@@ -1039,10 +1043,16 @@
+ endif ()
+ 
+ # Build the rexx.img file
++if (ORX_PREBUILT_IMAGE)
++add_custom_command(OUTPUT ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img
++           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ORX_PREBUILT_IMAGE} ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img
++           DEPENDS ${ORX_PREBUILT_IMAGE})
++else ()
+ add_custom_command(OUTPUT ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img
+            COMMAND $<TARGET_FILE:rexximage> ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img
+            DEPENDS rexximage rxapi ${image_class_files} ${platform_rexx_img_depends}
+            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
++endif ()
+ 
+ add_custom_target(rexx_img ALL DEPENDS ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img)
+ install(PROGRAMS ${ORX_IMAGE_OUTPUT_LOCATION}/rexx.img COMPONENT Core DESTINATION ${INSTALL_LIB_DIR} PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)

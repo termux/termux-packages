@@ -1,0 +1,197 @@
+diff --git a/crates/mise-util/src/file.rs b/crates/mise-util/src/file.rs
+--- a/crates/mise-util/src/file.rs
++++ b/crates/mise-util/src/file.rs
+@@ -201,7 +201,10 @@
+         };
+     // Compare the whole type field: sockets and block devices share the
+     // directory bit.
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode & nix::libc::S_IFMT);
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = nix::sys::stat::SFlag::from_bits_truncate((stat.st_mode as u16) & nix::libc::S_IFMT);
+     if kind == nix::sys::stat::SFlag::S_IFDIR {
+         let fd = nix::fcntl::openat(
+             &parent,
+diff --git a/src/system/files.rs b/src/system/files.rs
+--- a/src/system/files.rs
++++ b/src/system/files.rs
+@@ -5514,7 +5514,10 @@
+         Mode::empty(),
+     )
+     .wrap_err_with(|| format!("failed to open {}", path.display_user()))?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = SFlag::from_bits_truncate(fstat(&fd)?.st_mode) & SFlag::S_IFMT;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = SFlag::from_bits_truncate(fstat(&fd)?.st_mode as u16) & SFlag::S_IFMT;
+     if kind == SFlag::S_IFLNK {
+         bail!(
+             "{} is a symlink, which is never followed",
+diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
+--- a/src/system/managed_files.rs
++++ b/src/system/managed_files.rs
+@@ -1985,7 +1985,14 @@
+     fn from_stat(stat: &nix::sys::stat::FileStat) -> Self {
+         use nix::sys::stat::SFlag;
+ 
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let file_type = SFlag::from_bits_truncate(stat.st_mode) & SFlag::S_IFMT;
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let file_type = SFlag::from_bits_truncate(stat.st_mode as u16) & SFlag::S_IFMT;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++        let mode = mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode));
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let mode = mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode as u16));
+         Self {
+             kind: if file_type == SFlag::S_IFREG {
+                 ManagedPathKind::File
+@@ -1996,7 +2003,7 @@
+             } else {
+                 ManagedPathKind::Other
+             },
+-            mode: mode_bits(nix::sys::stat::Mode::from_bits_truncate(stat.st_mode)),
++            mode,
+             uid: stat.st_uid,
+             gid: stat.st_gid,
+         }
+@@ -2518,9 +2525,15 @@
+             Ok(directory) => directory,
+             Err(open_error) => {
+                 let metadata = fstatat(&directory, name.as_os_str(), AtFlags::AT_SYMLINK_NOFOLLOW);
+-                if metadata.is_ok_and(|metadata| {
++                #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++                let metadataIsOk = metadata.is_ok_and(|metadata| {
+                     SFlag::from_bits_truncate(metadata.st_mode).contains(SFlag::S_IFLNK)
+-                }) {
++                });
++                #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++                let metadataIsOk = metadata.is_ok_and(|metadata| {
++                    SFlag::from_bits_truncate(metadata.st_mode as u16).contains(SFlag::S_IFLNK)
++                });
++                if metadataIsOk {
+                     let parent = fstat(&directory)?;
+                     if parent.st_uid != 0 || parent.st_mode & 0o022 != 0 {
+                         return Err(UntrustedSymlink(component_path).into());
+@@ -2741,7 +2754,11 @@
+     use nix::sys::stat::{SFlag, fstat};
+ 
+     let stat = fstat(file)?;
+-    if stat.st_mode & SFlag::S_IFMT.bits() != SFlag::S_IFREG.bits() {
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++    let file_type = stat.st_mode & SFlag::S_IFMT.bits();
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let file_type = (stat.st_mode as u16) & SFlag::S_IFMT.bits();
++    if file_type != SFlag::S_IFREG.bits() {
+         bail!(
+             "refusing to set permissions on non-file path: {}",
+             path.display()
+diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/brew/cask/app_version.rs
+--- a/src/system/packages/brew/cask/app_version.rs
++++ b/src/system/packages/brew/cask/app_version.rs
+@@ -56,7 +56,11 @@
+         OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_NONBLOCK,
+         Mode::empty(),
+     )?;
+-    if SFlag::from_bits_truncate(fstat(&fd)?.st_mode) & SFlag::S_IFMT != SFlag::S_IFREG {
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
++    let st_mode = fstat(&fd)?.st_mode;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let st_mode = fstat(&fd)?.st_mode as u16;
++    if SFlag::from_bits_truncate(st_mode) & SFlag::S_IFMT != SFlag::S_IFREG {
+         bail!("app Info.plist must be a regular file");
+     }
+     let plist = plist::Value::from_reader(std::fs::File::from(fd))?;
+diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cask/mod.rs
+--- a/src/system/packages/brew/cask/mod.rs
++++ b/src/system/packages/brew/cask/mod.rs
+@@ -2592,9 +2592,14 @@
+     use std::os::unix::fs::PermissionsExt;
+ 
+     let metadata = from.symlink_metadata()?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let mode = nix::sys::stat::Mode::from_bits_truncate(
+         metadata.permissions().mode() as nix::libc::mode_t
+     );
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let mode = nix::sys::stat::Mode::from_bits_truncate(
++        metadata.permissions().mode() as u16
++    );
+     if metadata.file_type().is_symlink() {
+         nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
+     } else if metadata.is_dir() {
+@@ -2831,6 +2836,7 @@
+             || current_groups.contains(&stat.st_gid);
+         let writable_by_untrusted = stat.st_mode & 0o002 != 0
+             || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
+             || !trusted_owner
+             || writable_by_untrusted
+@@ -2840,6 +2846,17 @@
+                 directory.display()
+             );
+         }
++
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        if !SFlag::from_bits_truncate(stat.st_mode as u16).contains(SFlag::S_IFDIR)
++            || !trusted_owner
++            || writable_by_untrusted
++        {
++            bail!(
++                "brew-cask: refusing operation through untrusted directory {}",
++                directory.display()
++            );
++        }
+         Ok(())
+     };
+     let mut directory = resolved_root.to_path_buf();
+@@ -3270,9 +3287,14 @@
+     // Restore the bundle's own permissions, which the private staging mode hid.
+     if let Ok(metadata) = from.symlink_metadata() {
+         use std::os::unix::fs::PermissionsExt;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let mode = nix::sys::stat::Mode::from_bits_truncate(
+             metadata.permissions().mode() as nix::libc::mode_t
+         );
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let mode = nix::sys::stat::Mode::from_bits_truncate(
++            metadata.permissions().mode() as u16
++        );
+         nix::sys::stat::fchmod(&destination, mode)?;
+     }
+     Ok(())
+diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/cask/state.rs
+--- a/src/system/packages/brew/cask/state.rs
++++ b/src/system/packages/brew/cask/state.rs
+@@ -670,7 +670,10 @@
+ ) -> Result<CaskTargetFingerprint> {
+     let stat = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)
+         .wrap_err_with(|| format!("failed to fingerprint {}", Path::new(name).display()))?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
+     if kind.contains(nix::sys::stat::SFlag::S_IFLNK) {
+         let target = read_link_verified_at(&parent, name, &stat)?;
+         return Ok(CaskTargetFingerprint {
+@@ -757,7 +760,10 @@
+ ) -> Result<Vec<u8>> {
+     let target = nix::fcntl::readlinkat(&parent, name)?;
+     let after = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
++    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+     let kind = nix::sys::stat::SFlag::from_bits_truncate;
++    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++    let kind = |mode| nix::sys::stat::SFlag::from_bits_truncate(mode as u16);
+     if after.st_dev != classified.st_dev
+         || after.st_ino != classified.st_ino
+         || kind(after.st_mode) != kind(classified.st_mode)
+@@ -815,7 +821,10 @@
+         let name = std::ffi::OsStr::from_bytes(name.to_bytes());
+         let relative = prefix.join(name);
+         let stat = nix::sys::stat::fstatat(&dir, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
++        #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
+         let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode);
++        #[cfg(all(target_os = "android", target_pointer_width = "32"))]
++        let kind = nix::sys::stat::SFlag::from_bits_truncate(stat.st_mode as u16);
+         if kind.contains(nix::sys::stat::SFlag::S_IFLNK) {
+             out.push((
+                 relative,

@@ -186,11 +186,14 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	echo "Packages updated since PR divergence: ${PR_BASE_TO_HEAD_CHANGED_PACKAGES[*]:-none}"
 
 	# obtain the set of all dependencies of packages changed by this PR
-	readarray -t PR_CHANGED_PACKAGES_DEPS < <(
-		for dep in "${PR_CHANGED_PACKAGES[@]:-}"; do
-			./scripts/buildorder.py "$dep" "${TERMUX_PACKAGE_DIRECTORIES[@]}" 2>/dev/null | awk '{print $NF}'
-		done | sort -u
-	) || :
+	PR_CHANGED_PACKAGES_DEPS=()
+	if (( ${#PR_CHANGED_PACKAGES[@]} )); then
+		readarray -t PR_CHANGED_PACKAGES_DEPS < <(
+			for dep in "${PR_CHANGED_PACKAGES[@]}"; do
+				./scripts/buildorder.py "$dep" "${TERMUX_PACKAGE_DIRECTORIES[@]}" 2>/dev/null | awk '{print $NF}'
+			done | sort -u
+		) || :
+	fi
 	echo "Dependencies changed by this PR: ${PR_CHANGED_PACKAGES_DEPS[*]:-none}"
 
 	# obtain the set of all build dependencies changed since this PR diverged

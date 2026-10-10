@@ -3,8 +3,12 @@ TERMUX_PKG_DESCRIPTION="A medium-level constraint modelling language"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.9.7"
+TERMUX_PKG_VERSION="2.10.1"
 TERMUX_PKG_SRCURL="https://github.com/MiniZinc/libminizinc/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=bb04d783dda4bba58de4004afd51d65b1fa4e8d9714c88c129cac312e267152e
+TERMUX_PKG_SHA256=089ea94698cea94ed8396be77559b82d828437a808f5e37d10bccc9f1d39dd33
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, zlib, gecode"
+TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, zlib, gecode"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-spawn"
+}

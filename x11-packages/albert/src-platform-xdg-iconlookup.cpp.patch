@@ -1,0 +1,15 @@
+--- a/src/platform/xdg/iconlookup.cpp
++++ b/src/platform/xdg/iconlookup.cpp
+@@ -36,10 +36,10 @@
+             iconDirs_.append(path);
+ 
+     // Not in spec, but for tolerance
+-    if (path = QStringLiteral("/usr/local/share/pixmaps"); QFile::exists(path))
++    if (path = QStringLiteral("@TERMUX_PREFIX@/local/share/pixmaps"); QFile::exists(path))
+         iconDirs_.append(path);
+ 
+-    if (path = QStringLiteral("/usr/share/pixmaps"); QFile::exists(path))
++    if (path = QStringLiteral("@TERMUX_PREFIX@/share/pixmaps"); QFile::exists(path))
+         iconDirs_.append(path);
+ }
+ 

@@ -1,0 +1,67 @@
+From a94a2888f84a8ff550cbd96d07e918c93b4caac4 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Wed, 16 Apr 2025 01:01:04 +0800
+Subject: [PATCH] reland jumbo 16
+
+Enable jumbo build for component(s)/source_set(s):
+
+- //third_party/dawn/src/dawn/native:sources
+
+---
+ third_party/dawn/src/dawn/native/BUILD.gn         | 8 +++++++-
+ third_party/dawn/src/dawn/native/EventManager.cpp | 2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/third_party/dawn/src/dawn/native/BUILD.gn b/third_party/dawn/src/dawn/native/BUILD.gn
+index c5a86792dc..86c8c2fa45 100644
+--- a/third_party/dawn/src/dawn/native/BUILD.gn
++++ b/third_party/dawn/src/dawn/native/BUILD.gn
+@@ -30,6 +30,7 @@ import("../../../scripts/dawn_overrides_with_defaults.gni")
+ # Import ANGLE after overrides to ensure dawn_angle_dir is defined.
+ import("${dawn_angle_dir}/gni/angle.gni")
+ 
++import("//build/config/jumbo.gni")
+ import("//build_overrides/build.gni")
+ import("${dawn_root}/generator/dawn_generator.gni")
+ import("${dawn_root}/scripts/dawn_component.gni")
+@@ -209,7 +210,7 @@ if (dawn_enable_d3d12 && dawn_use_agility_sdk) {
+ # The meat of the compilation for dawn native so that we can cheaply have
+ # shared_library / static_library versions of it. It compiles all the files
+ # except those that define exported symbols.
+-source_set("sources") {
++jumbo_source_set("sources") {
+   deps = [
+     ":headers",
+     ":utils_gen",
+@@ -250,6 +251,7 @@ source_set("sources") {
+   }
+ 
+   sources = get_target_outputs(":utils_gen")
++  jumbo_excluded_sources = []
+   sources += [
+     "Adapter.cpp",
+     "Adapter.h",
+@@ -1020,6 +1022,10 @@ source_set("sources") {
+       "vulkan/external_semaphore/SemaphoreServiceImplementation.cpp",
+       "vulkan/external_semaphore/SemaphoreServiceImplementation.h",
+     ]
++    jumbo_excluded_sources += [
++      # explicit specialization of 'Write' after instantiation
++      "vulkan/StreamImplVk.cpp",
++    ]
+ 
+     if (is_android || is_linux || is_chromeos) {
+       sources += [
+diff --git a/third_party/dawn/src/dawn/native/EventManager.cpp b/third_party/dawn/src/dawn/native/EventManager.cpp
+index 1144460f03..4a34923c52 100644
+--- a/third_party/dawn/src/dawn/native/EventManager.cpp
++++ b/third_party/dawn/src/dawn/native/EventManager.cpp
+@@ -145,7 +145,7 @@ EventManager::~EventManager() {
+ }
+ 
+ FutureID EventManager::TrackEvent(Ref<TrackedEvent>&& event) {
+-    if (!ValidateCallbackMode(ToAPI(event->mCallbackMode))) {
++    if (!dawn::ValidateCallbackMode(ToAPI(event->mCallbackMode))) {
+         mInstance->EmitLog(WGPULoggingType_Error,
+                            absl::StrFormat("Invalid callback mode: %d",
+                                            static_cast<uint32_t>(event->mCallbackMode)));

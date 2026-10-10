@@ -12,11 +12,9 @@ Subject: [PATCH 3/6] smbpasswd: remove root-related restrictions
  source3/utils/smbpasswd.c      |  4 ----
  2 files changed, 26 deletions(-)
 
-diff --git a/source3/passdb/pdb_interface.c b/source3/passdb/pdb_interface.c
-index 03aa4ff..b1a7fb1 100644
 --- a/source3/passdb/pdb_interface.c
 +++ b/source3/passdb/pdb_interface.c
-@@ -619,23 +619,12 @@ static NTSTATUS pdb_default_delete_user(struct pdb_methods *methods,
+@@ -628,23 +628,12 @@
  NTSTATUS pdb_delete_user(TALLOC_CTX *mem_ctx, struct samu *sam_acct)
  {
  	struct pdb_methods *pdb = pdb_get_methods();
@@ -40,7 +38,7 @@ index 03aa4ff..b1a7fb1 100644
  	memcache_delete(NULL,
  			PDB_GETPWSID_CACHE,
  			data_blob_const(user_sid, sizeof(*user_sid)));
-@@ -691,21 +680,10 @@ NTSTATUS pdb_delete_sam_account(struct samu *sam_acct)
+@@ -700,21 +689,10 @@
  NTSTATUS pdb_rename_sam_account(struct samu *oldname, const char *newname)
  {
  	struct pdb_methods *pdb = pdb_get_methods();
@@ -62,11 +60,9 @@ index 03aa4ff..b1a7fb1 100644
  	status = pdb->rename_sam_account(pdb, oldname, newname);
  
  	/* always flush the cache here just to be safe */
-diff --git a/source3/utils/smbpasswd.c b/source3/utils/smbpasswd.c
-index 4013120..4688257 100644
 --- a/source3/utils/smbpasswd.c
 +++ b/source3/utils/smbpasswd.c
-@@ -100,10 +100,6 @@ static int process_options(int argc, char **argv, int local_flags)
+@@ -104,10 +104,6 @@
  	while ((ch = getopt(argc, argv, "c:axdehminjr:sw:R:D:U:LWS:")) != EOF) {
  		switch(ch) {
  		case 'L':
@@ -77,6 +73,3 @@ index 4013120..4688257 100644
  			local_flags |= LOCAL_AM_ROOT;
  			break;
  		case 'c':
--- 
-2.25.1
-

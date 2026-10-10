@@ -1,6 +1,6 @@
 --- a/lib/fuse.c
 +++ b/lib/fuse.c
-@@ -39,6 +39,7 @@
+@@ -41,6 +41,7 @@
  #include <sys/time.h>
  #include <sys/mman.h>
  #include <sys/file.h>
@@ -8,7 +8,7 @@
  
  #define FUSE_NODE_SLAB 1
  
-@@ -127,6 +128,7 @@ struct fuse {
+@@ -123,6 +124,7 @@
  	struct list_head partial_slabs;
  	struct list_head full_slabs;
  	pthread_t prune_thread;
@@ -16,7 +16,7 @@
  };
  
  struct lock {
-@@ -4881,6 +4883,7 @@ static void *fuse_prune_nodes(void *fuse
+@@ -4965,6 +4967,7 @@
  
  	while(1) {
  		sleep_time = fuse_clean_cache(f);
@@ -24,7 +24,7 @@
  		sleep(sleep_time);
  	}
  	return NULL;
-@@ -4888,8 +4891,10 @@ static void *fuse_prune_nodes(void *fuse
+@@ -4972,8 +4975,10 @@
  
  int fuse_start_cleanup_thread(struct fuse *f)
  {
@@ -36,7 +36,7 @@
  
  	return 0;
  }
-@@ -4898,7 +4903,7 @@ void fuse_stop_cleanup_thread(struct fus
+@@ -4982,7 +4987,7 @@
  {
  	if (lru_enabled(f)) {
  		pthread_mutex_lock(&f->lock);

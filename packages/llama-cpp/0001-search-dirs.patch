@@ -1,9 +1,9 @@
 --- a/ggml/src/ggml-backend-reg.cpp
 +++ b/ggml/src/ggml-backend-reg.cpp
-@@ -496,6 +496,7 @@
-         // default search paths: executable directory, current directory
-         search_paths.push_back(get_executable_path());
-         search_paths.push_back(fs::current_path());
+@@ -497,6 +497,7 @@
+         } else {
+             search_paths.push_back(cwd);
+         }
 +        search_paths.push_back(get_executable_path() / ".." / "lib");
      } else {
          search_paths.push_back(fs::u8path(user_search_path));

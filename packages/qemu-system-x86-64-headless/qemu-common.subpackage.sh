@@ -9,13 +9,11 @@ bin/qemu-pr-helper
 bin/qemu-storage-daemon
 include
 libexec/qemu-bridge-helper
-libexec/virtfs-proxy-helper
 share/applications
 share/doc
 share/icons
 share/man/man1/qemu-storage-daemon.1.gz
 share/man/man1/qemu.1.gz
-share/man/man1/virtfs-proxy-helper.1.gz
 share/man/man7
 share/man/man8
 share/qemu

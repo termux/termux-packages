@@ -1,0 +1,24 @@
+--- a/src/torchcodec/_core/CMakeLists.txt
++++ b/src/torchcodec/_core/CMakeLists.txt
+@@ -139,9 +139,9 @@
+ 
+     resolve_image_codec("${TORCHCODEC_BUILD_AVIF}" want_avif)
+     if(want_avif)
+-        include(${CMAKE_CURRENT_SOURCE_DIR}/fetch_avif_from_s3.cmake)
+-        set(libavif_FOUND TRUE)
+-        message(STATUS "Building torchcodec with AVIF image decoding support (libavif from S3).")
++        find_package(PkgConfig REQUIRED)
++        pkg_check_modules(AVIF REQUIRED IMPORTED_TARGET libavif)
++        message(STATUS "Building torchcodec with AVIF image decoding support (system libavif).")
+     else()
+         message(STATUS "Not building torchcodec with AVIF image decoding support (disabled via TORCHCODEC_BUILD_AVIF/TORCHCODEC_BUILD_IMAGE): decode_avif will raise at runtime.")
+     endif()
+@@ -519,7 +519,7 @@
+     endif()
+     if(want_avif)
+         target_compile_definitions(${image_library_name} PRIVATE TORCHCODEC_ENABLE_AVIF=1)
+-        target_link_libraries(${image_library_name} PRIVATE avif)
++        target_link_libraries(${image_library_name} PRIVATE PkgConfig::AVIF)
+     endif()
+     if(want_gif)
+         target_compile_definitions(${image_library_name} PRIVATE TORCHCODEC_ENABLE_GIF=1)

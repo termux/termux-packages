@@ -1,0 +1,29 @@
+--- a/net/cookies/cookie_util.cc
++++ b/net/cookies/cookie_util.cc
+@@ -841,7 +841,7 @@
+ 
+ void ParseRequestCookieLine(std::string_view header_value,
+                             ParsedRequestCookies* parsed_cookies) {
+-  std::string::const_iterator i = header_value.begin();
++  std::string_view::const_iterator i = header_value.begin();
+   while (i != header_value.end()) {
+     // Here we are at the beginning of a cookie.
+ 
+@@ -850,7 +850,7 @@
+     if (i == header_value.end()) return;
+ 
+     // Find cookie name.
+-    std::string::const_iterator cookie_name_beginning = i;
++    std::string_view::const_iterator cookie_name_beginning = i;
+     while (i != header_value.end() && *i != '=') ++i;
+     auto cookie_name = std::string_view(cookie_name_beginning, i);
+ 
+@@ -859,7 +859,7 @@
+     // Cookies may have no value, in this case '=' may or may not be there.
+     if (i != header_value.end() && i + 1 != header_value.end()) {
+       ++i;  // Skip '='.
+-      std::string::const_iterator cookie_value_beginning = i;
++      std::string_view::const_iterator cookie_value_beginning = i;
+       if (*i == '"') {
+         ++i;  // Skip '"'.
+         while (i != header_value.end() && *i != '"') ++i;

@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://cmake.org/
 TERMUX_PKG_DESCRIPTION="Family of tools designed to build, test and package software"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_LICENSE_FILE="LICENSE.rst"
 TERMUX_PKG_MAINTAINER="@termux"
 # When updating version here, please update termux_setup_cmake.sh as well.
-TERMUX_PKG_VERSION="4.4.0"
+TERMUX_PKG_VERSION="4.4.4"
 TERMUX_PKG_SRCURL="https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:3}/cmake-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=65757f442fdd242e27f1728fc26dc0cba4164f7a0791a5c788631c00080369bc
+TERMUX_PKG_SHA256=bd24c30d80a7744ae84b845ff080cc8453b06c622ef01066564108e9cefc44cf
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libarchive, libc++, libcurl, libexpat, jsoncpp, libuv, rhash, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make"

@@ -1,0 +1,93 @@
+--- a/src/shared/cmake/CheckAtomicFunctions.cmake
++++ b/src/shared/cmake/CheckAtomicFunctions.cmake
+@@ -1,9 +1,9 @@
+-INCLUDE(CheckCXXSourceRuns)
++INCLUDE(CheckCXXSourceCompiles)
+ 
+ MACRO ( CHECK_HAVE_GCC_ATOMIC_FUNCTIONS result )
+ 
+ # Do step by step checking,
+-CHECK_CXX_SOURCE_RUNS("
++CHECK_CXX_SOURCE_COMPILES("
+ #include <cstdlib>
+ int main()
+ {
+--- a/src/shared/cmake/CheckErrorHandling.cmake
++++ b/src/shared/cmake/CheckErrorHandling.cmake
+@@ -1,9 +1,10 @@
+ #check if we can do try and catch.
+ #bit useless, since we don't have any alternatives to try and catch currently
++INCLUDE(CheckCXXSourceCompiles)
+ 
+ MACRO ( CHECK_HAVE_FUNCTION_TRY_BLOCKS result )
+     #check for try/catch blocks
+-    CHECK_CXX_SOURCE_RUNS("
++    CHECK_CXX_SOURCE_COMPILES("
+     	void foo() { try{ return; } catch( ... ){} }
+     	int main(){ foo(); return 0; }" ${result})
+     IF ( NOT ${result} )
+--- a/src/shared/cmake/CheckNamespace.cmake
++++ b/src/shared/cmake/CheckNamespace.cmake
+@@ -1,7 +1,9 @@
++INCLUDE(CheckCXXSourceCompiles)
++
+ #check if we support namespaces
+ MACRO ( CHECK_NAMESPACE haveNamespace )
+     #Check if namespaces work in the compiler
+-    CHECK_CXX_SOURCE_RUNS("
++    CHECK_CXX_SOURCE_COMPILES("
+     	namespace Outer { namespace Inner { int i = 0; }}
+     	int main(){ using namespace Outer::Inner; return i; }" 
+     	${haveNamespace} )
+--- a/src/shared/cmake/CheckPthread.cmake
++++ b/src/shared/cmake/CheckPthread.cmake
+@@ -5,6 +5,7 @@
+ IF ( ${ifpthread} )
+ 	SET ( CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+ 
++    IF (NOT CMAKE_CROSSCOMPILING)
+     CHECK_CXX_SOURCE_RUNS("
+         #include <sys/types.h>
+         #include <pthread.h>
+@@ -20,7 +21,9 @@
+         }
+     " ${result} )
+     #NOTE: pthread_mutexattr_setkind_np is the deprecated name for pthread_mutexattr_settype. old compilers might need it
+-
++    ELSE()
++    SET (result 0)
++    ENDIF()
+ 	
+ 	SET ( CMAKE_REQUIRED_FLAGS)
+ ENDIF ( ${ifpthread} )
+--- a/src/shared/cmake/CheckSnprintf.cmake
++++ b/src/shared/cmake/CheckSnprintf.cmake
+@@ -1,6 +1,7 @@
+ #checks if snprintf have bugs
+ 
+ MACRO ( CHECK_SNPRINTF )
++	IF (NOT CMAKE_CROSSCOMPILING)
+     #check that our snprintf works correctly...
+     IF ( _CL_HAVE_FUNCTION_SNPRINTF )
+     CHECK_CXX_SOURCE_RUNS("
+@@ -39,4 +40,5 @@
+     		SET ( _CL_HAVE_SNWPRINTF_BUG 1 )
+     	ENDIF ( NOT _CL_HAVE_NO_SNWPRINTF_BUG )
+     ENDIF ( _CL_HAVE_FUNCTION_SNWPRINTF )
++	ENDIF()
+ ENDMACRO ( CHECK_SNPRINTF )
+--- a/src/shared/cmake/DefineStaticSyntax.cmake
++++ b/src/shared/cmake/DefineStaticSyntax.cmake
+@@ -2,8 +2,12 @@
+ 
+ MACRO ( DEFINE_STATIC_SYNTAX ) 
+ 
++	IF (NOT CMAKE_CROSSCOMPILING)
+     #check which syntax of static const to use
+     CHECK_CXX_SOURCE_RUNS("class x{public: static const int SCI=55; }; int main(){ x a; if ( a.SCI!=55 ) throw \"err\"; return 0; }" LUCENE_STATIC_CONSTANT_SYNTAX)
++    ELSE()
++    SET (LUCENE_STATIC_CONSTANT_SYNTAX 0)
++    ENDIF()
+     IF ( LUCENE_STATIC_CONSTANT_SYNTAX )
+         SET ( LUCENE_STATIC_CONSTANT_SYNTAX "static const type assignment")
+     ELSE ( LUCENE_STATIC_CONSTANT_SYNTAX )

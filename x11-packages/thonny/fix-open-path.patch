@@ -1,0 +1,45 @@
+diff --git a/thonny/misc_utils.py b/thonny/misc_utils.py
+index f70224f..f172933 100644
+--- a/thonny/misc_utils.py
++++ b/thonny/misc_utils.py
+@@ -44,18 +44,15 @@ def running_on_mac_os() -> bool:
+ 
+ 
+ def running_on_linux() -> bool:
+-    return sys.platform == "linux"
++    # Termux ships this build only for Android; treat it as the "Linux" target
++    # since Termux is otherwise a standard X11/Linux userland.
++    return sys.platform == "android"
+ 
+ 
+ def running_on_rpi() -> bool:
+-    machine_lower = platform.uname().machine.lower()
+-    return running_on_linux() and (
+-        # not great heuristics, I know
+-        machine_lower.startswith("arm")
+-        or machine_lower.startswith("aarch64")
+-        or os.environ.get("DESKTOP_SESSION") == "LXDE-pi"
+-        or os.environ.get("DESKTOP_SESSION") == "LXDE-pi-wayfire"
+-    )
++    # Always False on Termux/Android: the removed ARM/aarch64 heuristic that
++    # used to live here would have false-positived on virtually every phone.
++    return False
+ 
+ 
+ def get_user_site_packages_dir_for_base(userbase: str) -> str:
+diff --git a/thonny/ui_utils.py b/thonny/ui_utils.py
+index cd90de9..dbed918 100644
+--- a/thonny/ui_utils.py
++++ b/thonny/ui_utils.py
+@@ -1973,7 +1973,10 @@ def open_path_in_system_file_manager(path):
+         # -R doesn't allow showing hidden folders
+         subprocess.Popen(["open", path])
+     elif running_on_linux():
+-        subprocess.Popen(["xdg-open", path])
++        try:
++            subprocess.Popen(["xdg-utils-xdg-open", path])
++        except Exception as e:
++            logger.warning("Could not open path %s: %s", path, e)
+     else:
+         assert running_on_windows()
+         subprocess.Popen(["explorer", path])

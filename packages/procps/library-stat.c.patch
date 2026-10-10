@@ -1,0 +1,12 @@
+--- a/library/stat.c
++++ b/library/stat.c
+@@ -768,7 +768,8 @@ static int stat_read_failed (
+     }
+ 
+     if (!info->stat_fp
+-    && (!(info->stat_fp = fopen(STAT_FILE, "r"))))
++    && (!(info->stat_fp = fopen(STAT_FILE, "r")) &&
++        !(info->stat_fp = fopen(MOCK_STAT_FILE, "r"))))
+         return 1;
+     else {
+         fflush(info->stat_fp);

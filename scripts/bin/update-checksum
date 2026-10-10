@@ -27,6 +27,7 @@ set -e
 
 REPO_ROOT="$(realpath "$(dirname "$0")/../../")"
 IS_GIT_REPOSITORY=false
+error=false
 
 if git status >/dev/null 2>&1; then
 	IS_GIT_REPOSITORY=true
@@ -86,8 +87,8 @@ for package_dir in "$@"; do
 	(( ${#new_checksum[@]} )) || {
 		echo
 		echo "${package_dir}: failed to calculate the new checksum"
+		error=true
 		continue
-		exit 1
 	}
 
 	# Replace old SHA-256.
@@ -140,3 +141,7 @@ for package_dir in "$@"; do
 		echo
 	fi
 done
+
+if [[ "${error}" == "true" ]]; then
+	exit 1
+fi

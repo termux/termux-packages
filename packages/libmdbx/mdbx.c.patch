@@ -1,0 +1,11 @@
+--- src/mdbx.c	2026-10-01 14:43:35.334005351 +0300
++++ src/mdbx.c.patch	2026-10-01 14:45:52.650005351 +0300
+@@ -31495,7 +31495,7 @@
+   mounted = setmntent("/proc/mounts", "r");
+ #endif /* Linux */
+   if (!mounted)
+-    mounted = setmntent("/etc/mtab", "r");
++    mounted = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+   if (mounted) {
+     const struct mntent *ent;
+ #if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__BIONIC__) ||                                            \

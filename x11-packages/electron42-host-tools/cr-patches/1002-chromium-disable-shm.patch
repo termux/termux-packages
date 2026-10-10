@@ -1,0 +1,11 @@
+--- a/base/files/file_util_posix.cc
++++ b/base/files/file_util_posix.cc
+@@ -1111,7 +1111,7 @@
+ #if !BUILDFLAG(IS_ANDROID)
+ // This is implemented in file_util_android.cc for that platform.
+ bool GetShmemTempDir(bool executable, FilePath* path) {
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)
++#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)) && !defined(__TERMUX__)
+   bool disable_dev_shm = false;
+ #if !BUILDFLAG(IS_CHROMEOS)
+   disable_dev_shm = CommandLine::ForCurrentProcess()->HasSwitch(

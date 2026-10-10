@@ -1,0 +1,9 @@
+--- a/gdb/top.c
++++ b/gdb/top.c
+@@ -1485,1 +1485,5 @@
+-  gdb_assert ((escape - message.c_str () - n_escape_chars) < width);
++  if ((escape - message.c_str () - n_escape_chars) >= width)
++    {
++      gdb_printf (stream, "%s\n", message.c_str ());
++      return;
++    }

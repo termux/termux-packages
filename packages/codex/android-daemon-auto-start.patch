@@ -1,0 +1,15 @@
+diff --git a/codex-rs/features/src/lib.rs b/codex-rs/features/src/lib.rs
+index ebd6d89..bcfa9e2 100644
+--- a/codex-rs/features/src/lib.rs
++++ b/codex-rs/features/src/lib.rs
+@@ -944,7 +944,9 @@ pub const FEATURES: &[FeatureSpec] = &[
+         id: Feature::DaemonAutoStart,
+         key: "daemon_auto_start",
+         stage: Stage::Stable,
+-        default_enabled: true,
++        // The managed daemon needs a packaged CLI layout, which Android builds
++        // (e.g. Termux) do not ship.
++        default_enabled: !cfg!(target_os = "android"),
+     },
+     FeatureSpec {
+         id: Feature::TranscriptV2,

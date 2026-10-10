@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://pwmt.org/projects/zathura-pdf-mupdf/"
+TERMUX_PKG_DESCRIPTION="PDF support for zathura (mupdf backend)"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2026.07.18"
+TERMUX_PKG_SRCURL="https://github.com/pwmt/zathura-pdf-mupdf/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=90a120edcc2533167597d26b24b5e4b6b5208379dd2ff74ce94ce2df514a0371
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="girara, glib, gumbo-parser, jbig2dec, libcairo, mupdf, zathura"

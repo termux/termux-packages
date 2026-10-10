@@ -9,16 +9,16 @@
  if (is_android) {
    import("//build/config/android/config.gni")
  }
-@@ -121,6 +123,8 @@
-   # `fail_hard=False` when invoking `build_crubit.py` from
-   # `tools/rust/build_rust.py`).
-   enable_cpp_api_from_rust = false
+@@ -109,6 +111,8 @@
+   # but nothing depends on tham and therefore Clippy will only be invoked
+   # in a full build (i.e. when building all targets).
+   enable_rust_clippy_eager = true
 +
 +  custom_target_rust_abi_target = ""
  }
  
  declare_args() {
-@@ -155,7 +159,7 @@
+@@ -174,7 +178,7 @@
  # TODO(crbug.com/40809974): To build unit tests for Android we need to build
  # them as a dylib and put them into an APK. We should reuse all the same logic
  # for gtests from the `//testing/test:test` template.
@@ -27,7 +27,7 @@
  
  # We want to store rust_sysroot as a source-relative variable for ninja
  # portability. In practice if an external toolchain was specified, it might
-@@ -373,6 +377,12 @@
+@@ -343,6 +347,12 @@
    }
  }
  

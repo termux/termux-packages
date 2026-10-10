@@ -2,13 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Qt 6 WebEngine Library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="6.11.1"
+TERMUX_PKG_VERSION="6.11.2"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtwebengine-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=679c66ccc6c158fc215e9c58ef160331ecd29974232e345c05161889f8667083
+TERMUX_PKG_SHA256=6101c1aa00ff933d1b65ee5d167f76e8d71b9ac5b378b0111277723ebda7c163
 TERMUX_PKG_DEPENDS="dbus, fontconfig, libc++, libexpat, libjpeg-turbo, libminizip, libnspr, libnss, libopus, libpng, libsnappy, libvpx, libwebp, libx11, libxkbfile, mesa, pulseaudio, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION}), qt6-qtwebchannel (>= ${TERMUX_PKG_VERSION}), zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # Qt6-Webengine doesn't support cross-compile for i386.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
@@ -21,6 +23,19 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DQT_FEATURE_webengine_system_pulseaudio=ON
 -DQT_FEATURE_webengine_proprietary_codecs=ON
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_post_get_source() {
 	# Enable jumbo build for //components and //chrome

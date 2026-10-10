@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE="https://kristaps.bsd.lv/lowdown"
 TERMUX_PKG_DESCRIPTION="Markdown utilities and library (fork of hoedown -> sundown -> libsoldout)"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@flosnvjx"
-TERMUX_PKG_VERSION="3.1.1"
+TERMUX_PKG_VERSION="3.2.1"
 TERMUX_PKG_SRCURL="https://kristaps.bsd.lv/lowdown/snapshots/lowdown-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=59b2cf35bf32fe602c92f33ae917a71e0b2ea76a67bbe48fbae901a8efc6fef3
+TERMUX_PKG_SHA256=664afc7c00aadbaf16cdcf7dc464e64b529f432eba9dffc950acb0d55d1be90d
 #TERMUX_PKG_BUILD_DEPENDS="libseccomp" ## it is merely a checkdepends for now and we dont run check during build
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_INSTALL_TARGET="install install_libs" ## add "regress" target if one wanna run check
@@ -17,7 +16,7 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=4
+	local _SOVERSION=5
 
 	local v=$(sed -n 's/^LIBVER[[:space:]]*=[[:space:]]*\([0-9]*\)$/\1/p' Makefile)
 	if [ "${v}" != "${_SOVERSION}" ]; then

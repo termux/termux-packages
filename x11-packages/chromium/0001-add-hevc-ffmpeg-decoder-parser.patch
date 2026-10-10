@@ -1,0 +1,1831 @@
+https://github.com/termux/termux-packages/issues/29625
+https://github.com/StaZhu/enable-chromium-hevc-hardware-decoding/blob/027325135a14413f54cbd8bdbfcfbc2ce3ba3eb2/add-hevc-ffmpeg-decoder-parser.patch
+
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sta Zhu <zhusidayoyo@hotmail.com>
+Date: Mon, 17 Aug 2026 22:33:20 +0800
+Subject: [PATCH] Video: Add HEVC ffmpeg decoder & parser
+
+Add ffmpeg software decoder and parser for HEVC, this will make
+sure those users using macOS version < 11 or Windows < 8 or those
+users who disabled gpu acceleration or hardware not supported
+profiles to have software HEVC decoding ability.
+
+---
+ .../config/Chrome/android/arm64/config.h      |  8 +-
+ .../Chrome/android/arm64/config_components.h  |  4 +-
+ .../android/arm64/libavcodec/codec_list.c     |  1 +
+ .../android/arm64/libavcodec/parser_list.c    |  1 +
+ .../config/Chrome/android/ia32/config.h       |  8 +-
+ .../Chrome/android/ia32/config_components.h   |  4 +-
+ .../android/ia32/libavcodec/codec_list.c      |  1 +
+ .../android/ia32/libavcodec/parser_list.c     |  1 +
+ .../config/Chrome/android/x64/config.h        |  8 +-
+ .../Chrome/android/x64/config_components.h    |  4 +-
+ .../android/x64/libavcodec/codec_list.c       |  1 +
+ .../android/x64/libavcodec/parser_list.c      |  1 +
+ .../chromium/config/Chrome/ios/arm64/config.h |  8 +-
+ .../Chrome/ios/arm64/config_components.h      |  4 +-
+ .../Chrome/ios/arm64/libavcodec/codec_list.c  |  1 +
+ .../Chrome/ios/arm64/libavcodec/parser_list.c |  1 +
+ .../chromium/config/Chrome/ios/x64/config.h   |  8 +-
+ .../config/Chrome/ios/x64/config_components.h |  4 +-
+ .../Chrome/ios/x64/libavcodec/codec_list.c    |  1 +
+ .../Chrome/ios/x64/libavcodec/parser_list.c   |  1 +
+ .../config/Chrome/linux-noasm/x64/config.h    |  8 +-
+ .../linux-noasm/x64/config_components.h       |  4 +-
+ .../linux-noasm/x64/libavcodec/codec_list.c   |  1 +
+ .../linux-noasm/x64/libavcodec/parser_list.c  |  1 +
+ .../config/Chrome/linux/arm-neon/config.h     |  8 +-
+ .../Chrome/linux/arm-neon/config_components.h |  4 +-
+ .../linux/arm-neon/libavcodec/codec_list.c    |  1 +
+ .../linux/arm-neon/libavcodec/parser_list.c   |  1 +
+ .../chromium/config/Chrome/linux/arm/config.h | 10 +--
+ .../Chrome/linux/arm/config_components.h      |  4 +-
+ .../Chrome/linux/arm/libavcodec/codec_list.c  |  1 +
+ .../Chrome/linux/arm/libavcodec/parser_list.c |  1 +
+ .../config/Chrome/linux/arm64/config.h        |  8 +-
+ .../Chrome/linux/arm64/config_components.h    |  4 +-
+ .../linux/arm64/libavcodec/codec_list.c       |  1 +
+ .../linux/arm64/libavcodec/parser_list.c      |  1 +
+ .../config/Chrome/linux/ia32/config.h         |  8 +-
+ .../Chrome/linux/ia32/config_components.h     |  4 +-
+ .../Chrome/linux/ia32/libavcodec/codec_list.c |  1 +
+ .../linux/ia32/libavcodec/parser_list.c       |  1 +
+ .../config/Chrome/linux/riscv64/config.h      |  8 +-
+ .../Chrome/linux/riscv64/config_components.h  |  4 +-
+ .../linux/riscv64/libavcodec/codec_list.c     |  1 +
+ .../linux/riscv64/libavcodec/parser_list.c    |  1 +
+ .../chromium/config/Chrome/linux/x64/config.h |  8 +-
+ .../Chrome/linux/x64/config_components.h      |  4 +-
+ .../Chrome/linux/x64/libavcodec/codec_list.c  |  1 +
+ .../Chrome/linux/x64/libavcodec/parser_list.c |  1 +
+ .../chromium/config/Chrome/mac/arm64/config.h |  8 +-
+ .../Chrome/mac/arm64/config_components.h      |  4 +-
+ .../Chrome/mac/arm64/libavcodec/codec_list.c  |  1 +
+ .../Chrome/mac/arm64/libavcodec/parser_list.c |  1 +
+ .../chromium/config/Chrome/mac/x64/config.asm |  6 +-
+ .../chromium/config/Chrome/mac/x64/config.h   |  8 +-
+ .../config/Chrome/mac/x64/config_components.h |  4 +-
+ .../Chrome/mac/x64/libavcodec/codec_list.c    |  1 +
+ .../Chrome/mac/x64/libavcodec/parser_list.c   |  1 +
+ .../config/Chrome/win-msvc/ia32/config.asm    |  8 +-
+ .../config/Chrome/win-msvc/ia32/config.h      | 10 +--
+ .../win-msvc/ia32/libavcodec/codec_list.c     |  1 +
+ .../win-msvc/ia32/libavcodec/parser_list.c    |  1 +
+ .../config/Chrome/win-msvc/x64/config.asm     |  8 +-
+ .../config/Chrome/win-msvc/x64/config.h       | 10 +--
+ .../win-msvc/x64/libavcodec/codec_list.c      |  1 +
+ .../win-msvc/x64/libavcodec/parser_list.c     |  1 +
+ .../chromium/config/Chrome/win/arm64/config.h |  8 +-
+ .../Chrome/win/arm64/config_components.h      |  4 +-
+ .../Chrome/win/arm64/libavcodec/codec_list.c  |  1 +
+ .../Chrome/win/arm64/libavcodec/parser_list.c |  1 +
+ .../config/Chrome/win/ia32/config.asm         |  6 +-
+ .../chromium/config/Chrome/win/ia32/config.h  |  8 +-
+ .../Chrome/win/ia32/config_components.h       |  4 +-
+ .../Chrome/win/ia32/libavcodec/codec_list.c   |  1 +
+ .../Chrome/win/ia32/libavcodec/parser_list.c  |  1 +
+ .../chromium/config/Chrome/win/x64/config.asm |  6 +-
+ .../chromium/config/Chrome/win/x64/config.h   |  8 +-
+ .../config/Chrome/win/x64/config_components.h |  4 +-
+ .../Chrome/win/x64/libavcodec/codec_list.c    |  1 +
+ .../Chrome/win/x64/libavcodec/parser_list.c   |  1 +
+ third_party/ffmpeg/ffmpeg_generated.gni       | 78 +++++++++++++++++++
+ ...ame_libavcodec_aarch64_hevcdsp_idct_neon.S |  2 +
+ .../hevc/autorename_libavcodec_hevc_cabac.c   |  2 +
+ .../hevc/autorename_libavcodec_hevc_parse.c   |  2 +
+ .../hevc/autorename_libavcodec_hevc_parser.c  |  2 +
+ 84 files changed, 254 insertions(+), 130 deletions(-)
+ create mode 100644 third_party/ffmpeg/libavcodec/aarch64/autorename_libavcodec_aarch64_hevcdsp_idct_neon.S
+ create mode 100644 third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_cabac.c
+ create mode 100644 third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parse.c
+ create mode 100644 third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parser.c
+
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config.h b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config.h
+index 1b5bac373d..ce91de9b9f 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android --extra-cflags='--target=aarch64-linux-android29' --extra-ldflags='--target=aarch64-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=aarch64 --enable-armv8 --extra-cflags='-march=armv8-a' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android --extra-cflags='--target=aarch64-linux-android29' --extra-ldflags='--target=aarch64-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=aarch64 --enable-armv8 --extra-cflags='-march=armv8-a' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -735,7 +735,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -778,8 +778,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/arm64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config.h b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config.h
+index 6c9427d5a3..e37e9c5822 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/i686-linux-android --extra-cflags='--target=i686-linux-android29' --extra-ldflags='--target=i686-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/i686-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=i686 --extra-cflags='\"-m32\"' --extra-ldflags='\"-m32\"' --disable-x86asm --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/i686-linux-android --extra-cflags='--target=i686-linux-android29' --extra-ldflags='--target=i686-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/i686-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=i686 --extra-cflags='\"-m32\"' --extra-ldflags='\"-m32\"' --disable-x86asm --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/ia32/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/android/x64/config.h
+index 163002c3cf..b54c7f7601 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/x86_64-linux-android --extra-cflags='--target=x86_64-linux-android29' --extra-ldflags='--target=x86_64-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/x86_64-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=x86_64 --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --enable-small --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/x86_64-linux-android --extra-cflags='--target=x86_64-linux-android29' --extra-ldflags='--target=x86_64-linux-android29' --extra-ldflags=-L/tmp/fakelinkerscripts --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/x86_64-linux-android --extra-ldflags='--gcc-toolchain=/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/android_toolchain/ndk/toolchains/llvm/prebuilt/linux-x86_64/' --target-os=android --arch=x86_64 --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/android/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/android/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config.h b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config.h
+index c059e0b2d6..3c56c480dd 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=arm64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=arm64 --extra-cflags='-arch arm64' --extra-ldflags='-arch arm64' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=arm64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=arm64 --extra-cflags='-arch arm64' --extra-ldflags='-arch arm64' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -735,7 +735,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -778,8 +778,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/arm64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config.h
+index 1ab7612834..1cf2699b8a 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=x86_64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=x86_64 --extra-cflags=-m64 --extra-ldflags='-arch x86_64' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=x86_64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=x86_64 --extra-cflags=-m64 --extra-ldflags='-arch x86_64' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/ios/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config.h
+index 67448738f1..e834c5a9d1 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-lto --arch=x86_64 --target-os=linux --disable-asm --disable-inline-asm --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-lto --arch=x86_64 --target-os=linux --disable-asm --disable-inline-asm --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux-noasm/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config.h
+index 5f7f6d4fd6..bf1e480830 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=arm --enable-armv6 --enable-armv6t2 --enable-vfp --enable-thumb --extra-cflags='-march=armv7-a' --enable-cross-compile --target-os=linux --extra-cflags='--target=arm-linux-gnueabihf' --extra-ldflags='--target=arm-linux-gnueabihf' --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_bullseye_armhf-sysroot --extra-cflags='-mtune=cortex-a8' --extra-cflags='-mfloat-abi=hard' --extra-cflags=-O2 --enable-neon --extra-cflags='-mfpu=neon' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=arm --enable-armv6 --enable-armv6t2 --enable-vfp --enable-thumb --extra-cflags='-march=armv7-a' --enable-cross-compile --target-os=linux --extra-cflags='--target=arm-linux-gnueabihf' --extra-ldflags='--target=arm-linux-gnueabihf' --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_bullseye_armhf-sysroot --extra-cflags='-mtune=cortex-a8' --extra-cflags='-mfloat-abi=hard' --extra-cflags=-O2 --enable-neon --extra-cflags='-mfpu=neon' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm-neon/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config.h
+index 8c14096b96..2ad90329fa 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/tguilbert/Code/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=arm --enable-armv6 --enable-armv6t2 --enable-vfp --enable-thumb --extra-cflags='-march=armv7-a' --enable-cross-compile --target-os=linux --extra-cflags='--target=arm-linux-gnueabihf' --extra-ldflags='--target=arm-linux-gnueabihf' --sysroot=/usr/local/google/home/tguilbert/Code/chromium/src/build/linux/debian_bullseye_armhf-sysroot --extra-cflags='-mtune=cortex-a8' --extra-cflags='-mfloat-abi=hard' --extra-cflags=-O2 --disable-neon --extra-cflags='-mfpu=vfpv3-d16' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/tguilbert/Code/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=arm --enable-armv6 --enable-armv6t2 --enable-vfp --enable-thumb --extra-cflags='-march=armv7-a' --enable-cross-compile --target-os=linux --extra-cflags='--target=arm-linux-gnueabihf' --extra-ldflags='--target=arm-linux-gnueabihf' --sysroot=/usr/local/google/home/tguilbert/Code/chromium/src/build/linux/debian_bullseye_armhf-sysroot --extra-cflags='-mtune=cortex-a8' --extra-cflags='-mfloat-abi=hard' --extra-cflags=-O2 --disable-neon --extra-cflags='-mfpu=vfpv3-d16' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -729,7 +729,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -751,7 +751,7 @@
+ #define CONFIG_DEFLATE_WRAPPER 0
+ #define CONFIG_DIRAC_PARSE 1
+ #define CONFIG_DNN 0
+-#define CONFIG_DOVI_RPUDEC 0
++#define CONFIG_DOVI_RPUDEC 1
+ #define CONFIG_DOVI_RPUENC 0
+ #define CONFIG_DVPROFILE 0
+ #define CONFIG_EVCPARSE 0
+@@ -770,8 +770,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
+index e05905e756..cde19e86df 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
+@@ -142,7 +142,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1045,7 +1045,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config.h
+index e3252cb887..e1f5b92994 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-cross-compile --cross-prefix=/usr/bin/aarch64-linux-gnu- --extra-cflags='--target=aarch64-linux-gnu' --extra-ldflags='--target=aarch64-linux-gnu' --target-os=linux --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_bullseye_arm64-sysroot --disable-dotprod --disable-i8mm --arch=aarch64 --enable-armv8 --extra-cflags='-march=armv8-a' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-cross-compile --cross-prefix=/usr/bin/aarch64-linux-gnu- --extra-cflags='--target=aarch64-linux-gnu' --extra-ldflags='--target=aarch64-linux-gnu' --target-os=linux --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_bullseye_arm64-sysroot --disable-dotprod --disable-i8mm --arch=aarch64 --enable-armv8 --extra-cflags='-march=armv8-a' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -735,7 +735,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -778,8 +778,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config.h
+index 050e6f3cb5..21387ebdb4 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=i686 --extra-cflags='\"-m32\"' --extra-ldflags='\"-m32\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=i686 --extra-cflags='\"-m32\"' --extra-ldflags='\"-m32\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/ia32/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config.h
+index 8b6c2958f4..b77b99e9d3 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=riscv64 --extra-cflags='-march=rv64gc' --enable-cross-compile --target-os=linux --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_trixie_riscv64-sysroot --extra-cflags='--target=riscv64-linux-gnu' --extra-ldflags='--target=riscv64-linux-gnu' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --arch=riscv64 --extra-cflags='-march=rv64gc' --enable-cross-compile --target-os=linux --sysroot=/usr/local/google/home/ezemtsov/projects/chrome/src/build/linux/debian_trixie_riscv64-sysroot --extra-cflags='--target=riscv64-linux-gnu' --extra-ldflags='--target=riscv64-linux-gnu' --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/riscv64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config.h
+index 02f902422a..ca8dc1b8a0 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-lto --arch=x86_64 --target-os=linux --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-lto --arch=x86_64 --target-os=linux --enable-pic --cc=clang --cxx=clang++ --ld=clang --extra-ldflags='-fuse-ld=lld' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config.h b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config.h
+index c059e0b2d6..3c56c480dd 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=arm64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=arm64 --extra-cflags='-arch arm64' --extra-ldflags='-arch arm64' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=arm64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=arm64 --extra-cflags='-arch arm64' --extra-ldflags='-arch arm64' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -735,7 +735,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -778,8 +778,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/arm64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.asm b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.asm
+index 8deeb4e4b9..29ccf95439 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.asm
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.asm
+@@ -720,7 +720,7 @@
+ %define CONFIG_AUDIO_FRAME_QUEUE 0
+ %define CONFIG_AUDIODSP 0
+ %define CONFIG_BLOCKDSP 0
+-%define CONFIG_BSWAPDSP 0
++%define CONFIG_BSWAPDSP 1
+ %define CONFIG_CABAC 1
+ %define CONFIG_CBS 0
+ %define CONFIG_CBS_APV 0
+@@ -763,8 +763,8 @@
+ %define CONFIG_H264PRED 1
+ %define CONFIG_H264QPEL 1
+ %define CONFIG_H264_SEI 1
+-%define CONFIG_HEVCPARSE 0
+-%define CONFIG_HEVC_SEI 0
++%define CONFIG_HEVCPARSE 1
++%define CONFIG_HEVC_SEI 1
+ %define CONFIG_HPELDSP 0
+ %define CONFIG_HUFFMAN 0
+ %define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.h
+index 1ab7612834..1cf2699b8a 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=x86_64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=x86_64 --extra-cflags=-m64 --extra-ldflags='-arch x86_64' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --enable-pic --cc=clang --cxx=clang++ --ld=clang --enable-cross-compile --cc=clang --ld=ld64.lld --nm=llvm-nm --ar=llvm-ar --target-os=darwin --extra-cflags='--target=x86_64-apple-macosx' --extra-cflags=-F/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks --extra-cflags='-mmacosx-version-min=12.0' --extra-cflags=-fblocks --extra-cflags=-nostdinc --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include --extra-cflags=-isystem/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/llvm-build/Release+Asserts/lib/clang/23/include --extra-ldflags=-syslibroot --extra-ldflags=/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk --extra-ldflags=-L/usr/local/google/home/ezemtsov/projects/chrome/src/build/mac_files/xcode_binaries/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib --extra-ldflags=-lSystem --extra-ldflags=-macosx_version_min --extra-ldflags=12.0 --extra-ldflags=-sdk_version --extra-ldflags=12.0 --extra-ldflags=-platform_version --extra-ldflags=macos --extra-ldflags=12.0 --extra-ldflags=12.0 --arch=x86_64 --extra-cflags=-m64 --extra-ldflags='-arch x86_64' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/mac/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.asm b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.asm
+index ac13ddabdd..1305cdb704 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.asm
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.asm
+@@ -563,7 +563,7 @@
+ %define CONFIG_AUDIO_FRAME_QUEUE 0
+ %define CONFIG_AUDIODSP 0
+ %define CONFIG_BLOCKDSP 0
+-%define CONFIG_BSWAPDSP 0
++%define CONFIG_BSWAPDSP 1
+ %define CONFIG_CABAC 1
+ %define CONFIG_CBS 0
+ %define CONFIG_CBS_H264 0
+@@ -587,7 +587,7 @@
+ %define CONFIG_H264PARSE 1
+ %define CONFIG_H264PRED 1
+ %define CONFIG_H264QPEL 1
+-%define CONFIG_HEVCPARSE 0
++%define CONFIG_HEVCPARSE 1
+ %define CONFIG_HPELDSP 1
+ %define CONFIG_HUFFMAN 0
+ %define CONFIG_HUFFYUVDSP 0
+@@ -752,7 +752,7 @@
+ %define CONFIG_H264_QSV_DECODER 0
+ %define CONFIG_H264_RKMPP_DECODER 0
+ %define CONFIG_HAP_DECODER 0
+-%define CONFIG_HEVC_DECODER 0
++%define CONFIG_HEVC_DECODER 1
+ %define CONFIG_HEVC_QSV_DECODER 0
+ %define CONFIG_HEVC_RKMPP_DECODER 0
+ %define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1450,7 +1450,7 @@
+ %define CONFIG_H261_PARSER 0
+ %define CONFIG_H263_PARSER 0
+ %define CONFIG_H264_PARSER 1
+-%define CONFIG_HEVC_PARSER 0
++%define CONFIG_HEVC_PARSER 1
+ %define CONFIG_MJPEG_PARSER 0
+ %define CONFIG_MLP_PARSER 0
+ %define CONFIG_MPEG4VIDEO_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.h b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.h
+index 90497d03b1..6af10413d6 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-fft --enable-rdft --enable-static --enable-libopus --disable-bzlib --disable-error-resilience --disable-iconv --disable-lzo --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio' --extra-cflags=-I/cygdrive/d/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=yasm --optflags='\"-O2\"' --enable-decoder='theora,vp8' --enable-parser='vp3,vp8' --toolchain=msvc --extra-cflags=-I/cygdrive/d/chromium/src/third_party/ffmpeg/chromium/include/win --cc='cygwin-wrapper cl' --ld='cygwin-wrapper link' --nm='cygwin-wrapper dumpbin -symbols' --ar='cygwin-wrapper lib' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-fft --enable-rdft --enable-static --enable-libopus --disable-bzlib --disable-error-resilience --disable-iconv --disable-lzo --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio' --extra-cflags=-I/cygdrive/d/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=yasm --optflags='\"-O2\"' --enable-decoder='theora,vp8' --enable-parser='vp3,vp8' --toolchain=msvc --extra-cflags=-I/cygdrive/d/chromium/src/third_party/ffmpeg/chromium/include/win --cc='cygwin-wrapper cl' --ld='cygwin-wrapper link' --nm='cygwin-wrapper dumpbin -symbols' --ar='cygwin-wrapper lib' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2018
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -578,7 +578,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_H264 0
+@@ -602,7 +602,7 @@
+ #define CONFIG_H264PARSE 1
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+-#define CONFIG_HEVCPARSE 0
++#define CONFIG_HEVCPARSE 1
+ #define CONFIG_HPELDSP 1
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+@@ -767,7 +767,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1465,7 +1465,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_MJPEG_PARSER 0
+ #define CONFIG_MLP_PARSER 0
+ #define CONFIG_MPEG4VIDEO_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/codec_list.c
+index 49f757b2d8..5ca1e9958c 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/codec_list.c
+@@ -17,4 +17,5 @@ static const AVCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/parser_list.c
+index 19d670aa24..f55c2ca459 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/ia32/libavcodec/parser_list.c
+@@ -7,4 +7,5 @@ static const AVCodecParser * const parser_list[] = {
+     &ff_vorbis_parser,
+     &ff_vp3_parser,
+     &ff_vp8_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.asm b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.asm
+index 49d66ac57d..c3e7f4de28 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.asm
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.asm
+@@ -563,7 +563,7 @@
+ %define CONFIG_AUDIO_FRAME_QUEUE 0
+ %define CONFIG_AUDIODSP 0
+ %define CONFIG_BLOCKDSP 0
+-%define CONFIG_BSWAPDSP 0
++%define CONFIG_BSWAPDSP 1
+ %define CONFIG_CABAC 1
+ %define CONFIG_CBS 0
+ %define CONFIG_CBS_H264 0
+@@ -587,7 +587,7 @@
+ %define CONFIG_H264PARSE 1
+ %define CONFIG_H264PRED 1
+ %define CONFIG_H264QPEL 1
+-%define CONFIG_HEVCPARSE 0
++%define CONFIG_HEVCPARSE 1
+ %define CONFIG_HPELDSP 1
+ %define CONFIG_HUFFMAN 0
+ %define CONFIG_HUFFYUVDSP 0
+@@ -752,7 +752,7 @@
+ %define CONFIG_H264_QSV_DECODER 0
+ %define CONFIG_H264_RKMPP_DECODER 0
+ %define CONFIG_HAP_DECODER 0
+-%define CONFIG_HEVC_DECODER 0
++%define CONFIG_HEVC_DECODER 1
+ %define CONFIG_HEVC_QSV_DECODER 0
+ %define CONFIG_HEVC_RKMPP_DECODER 0
+ %define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1450,7 +1450,7 @@
+ %define CONFIG_H261_PARSER 0
+ %define CONFIG_H263_PARSER 0
+ %define CONFIG_H264_PARSER 1
+-%define CONFIG_HEVC_PARSER 0
++%define CONFIG_HEVC_PARSER 1
+ %define CONFIG_MJPEG_PARSER 0
+ %define CONFIG_MLP_PARSER 0
+ %define CONFIG_MPEG4VIDEO_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.h
+index 359682176a..95e5b1bde2 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-fft --enable-rdft --enable-static --enable-libopus --disable-bzlib --disable-error-resilience --disable-iconv --disable-lzo --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio' --extra-cflags=-I/cygdrive/d/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=yasm --optflags='\"-O2\"' --enable-decoder='theora,vp8' --enable-parser='vp3,vp8' --toolchain=msvc --extra-cflags=-I/cygdrive/d/chromium/src/third_party/ffmpeg/chromium/include/win --cc='cygwin-wrapper cl' --ld='cygwin-wrapper link' --nm='cygwin-wrapper dumpbin -symbols' --ar='cygwin-wrapper lib' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-fft --enable-rdft --enable-static --enable-libopus --disable-bzlib --disable-error-resilience --disable-iconv --disable-lzo --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio' --extra-cflags=-I/cygdrive/d/chromium/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=yasm --optflags='\"-O2\"' --enable-decoder='theora,vp8' --enable-parser='vp3,vp8' --toolchain=msvc --extra-cflags=-I/cygdrive/d/chromium/src/third_party/ffmpeg/chromium/include/win --cc='cygwin-wrapper cl' --ld='cygwin-wrapper link' --nm='cygwin-wrapper dumpbin -symbols' --ar='cygwin-wrapper lib' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2018
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -578,7 +578,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_H264 0
+@@ -602,7 +602,7 @@
+ #define CONFIG_H264PARSE 1
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+-#define CONFIG_HEVCPARSE 0
++#define CONFIG_HEVCPARSE 1
+ #define CONFIG_HPELDSP 1
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+@@ -767,7 +767,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1465,7 +1465,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_MJPEG_PARSER 0
+ #define CONFIG_MLP_PARSER 0
+ #define CONFIG_MPEG4VIDEO_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/codec_list.c
+index 49f757b2d8..5ca1e9958c 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/codec_list.c
+@@ -17,4 +17,5 @@ static const AVCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/parser_list.c
+index 19d670aa24..f55c2ca459 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win-msvc/x64/libavcodec/parser_list.c
+@@ -7,4 +7,5 @@ static const AVCodecParser * const parser_list[] = {
+     &ff_vorbis_parser,
+     &ff_vp3_parser,
+     &ff_vp8_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config.h b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config.h
+index a89077281e..4bccb3a950 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --arch=aarch64 --as=clang-cl --extra-cflags='--target=arm64-windows' --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --arch=aarch64 --as=clang-cl --extra-cflags='--target=arm64-windows' --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -735,7 +735,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -778,8 +778,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/arm64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.asm b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.asm
+index e732a5b0cc..f22ee4be0e 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.asm
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.asm
+@@ -720,7 +720,7 @@
+ %define CONFIG_AUDIO_FRAME_QUEUE 0
+ %define CONFIG_AUDIODSP 0
+ %define CONFIG_BLOCKDSP 0
+-%define CONFIG_BSWAPDSP 0
++%define CONFIG_BSWAPDSP 1
+ %define CONFIG_CABAC 1
+ %define CONFIG_CBS 0
+ %define CONFIG_CBS_APV 0
+@@ -763,8 +763,8 @@
+ %define CONFIG_H264PRED 1
+ %define CONFIG_H264QPEL 1
+ %define CONFIG_H264_SEI 1
+-%define CONFIG_HEVCPARSE 0
+-%define CONFIG_HEVC_SEI 0
++%define CONFIG_HEVCPARSE 1
++%define CONFIG_HEVC_SEI 1
+ %define CONFIG_HPELDSP 0
+ %define CONFIG_HUFFMAN 0
+ %define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.h b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.h
+index dcc9050bd2..b95f96f296 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --extra-cflags=-m32 --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --extra-cflags=-m32 --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/ia32/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.asm b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.asm
+index 6dcccc367a..7503f2866a 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.asm
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.asm
+@@ -720,7 +720,7 @@
+ %define CONFIG_AUDIO_FRAME_QUEUE 0
+ %define CONFIG_AUDIODSP 0
+ %define CONFIG_BLOCKDSP 0
+-%define CONFIG_BSWAPDSP 0
++%define CONFIG_BSWAPDSP 1
+ %define CONFIG_CABAC 1
+ %define CONFIG_CBS 0
+ %define CONFIG_CBS_APV 0
+@@ -763,8 +763,8 @@
+ %define CONFIG_H264PRED 1
+ %define CONFIG_H264QPEL 1
+ %define CONFIG_H264_SEI 1
+-%define CONFIG_HEVCPARSE 0
+-%define CONFIG_HEVC_SEI 0
++%define CONFIG_HEVCPARSE 1
++%define CONFIG_HEVC_SEI 1
+ %define CONFIG_HPELDSP 0
+ %define CONFIG_HUFFMAN 0
+ %define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.h b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.h
+index 7c52440fd2..43c0887952 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config.h
+@@ -1,7 +1,7 @@
+ /* Automatically generated by configure - do not modify! */
+ #ifndef FFMPEG_CONFIG_H
+ #define FFMPEG_CONFIG_H
+-/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --target-os=win64 --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264' --enable-demuxer=aac --enable-parser='aac,h264'" -- elide long configuration string from binary */
++/* #define FFMPEG_CONFIGURATION "--disable-everything --disable-all --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-static --enable-avcodec --enable-avformat --enable-avutil --enable-static --enable-libopus --disable-debug --disable-bzlib --disable-error-resilience --disable-iconv --disable-network --disable-schannel --disable-sdl2 --disable-symver --disable-xlib --disable-zlib --disable-securetransport --disable-faan --disable-alsa --disable-iamf --disable-checkasm --disable-autodetect --enable-decoder='vorbis,libopus,flac' --enable-decoder='pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3' --enable-decoder='pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw' --enable-demuxer='ogg,matroska,wav,flac,mp3,mov' --enable-parser='opus,vorbis,flac,mpegaudio,vp9' --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/opus/src/include --disable-linux-perf --x86asmexe=nasm --optflags='\"-O2\"' --toolchain=msvc --extra-cflags=-I/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/ffmpeg/chromium/include/win --target-os=win64 --enable-cross-compile --cc=clang-cl --ld=lld-link --nm=llvm-nm --ar=llvm-ar --extra-cflags=-O2 --extra-cflags=/winsysroot/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68 --extra-ldflags='/winsysroot:/usr/local/google/home/ezemtsov/projects/chrome/src/third_party/depot_tools/win_toolchain/vs_files/e66617bc68' --enable-decoder='aac,h264,hevc' --enable-demuxer=aac --enable-parser='aac,h264,hevc'" -- elide long configuration string from binary */
+ #define FFMPEG_LICENSE "LGPL version 2.1 or later"
+ #define CONFIG_THIS_YEAR 2026
+ #define FFMPEG_DATADIR "/usr/local/share/ffmpeg"
+@@ -734,7 +734,7 @@
+ #define CONFIG_AUDIO_FRAME_QUEUE 0
+ #define CONFIG_AUDIODSP 0
+ #define CONFIG_BLOCKDSP 0
+-#define CONFIG_BSWAPDSP 0
++#define CONFIG_BSWAPDSP 1
+ #define CONFIG_CABAC 1
+ #define CONFIG_CBS 0
+ #define CONFIG_CBS_APV 0
+@@ -777,8 +777,8 @@
+ #define CONFIG_H264PRED 1
+ #define CONFIG_H264QPEL 1
+ #define CONFIG_H264_SEI 1
+-#define CONFIG_HEVCPARSE 0
+-#define CONFIG_HEVC_SEI 0
++#define CONFIG_HEVCPARSE 1
++#define CONFIG_HEVC_SEI 1
+ #define CONFIG_HPELDSP 0
+ #define CONFIG_HUFFMAN 0
+ #define CONFIG_HUFFYUVDSP 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config_components.h
+index 5737f74785..549cdbcc18 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/x64/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/x64/config_components.h
+@@ -144,7 +144,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1050,7 +1050,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/codec_list.c
+index fe5adb0d92..c9666ae199 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/codec_list.c
+@@ -14,4 +14,5 @@ static const FFCodec * const codec_list[] = {
+     &ff_pcm_s32le_decoder,
+     &ff_pcm_u8_decoder,
+     &ff_libopus_decoder,
++    &ff_hevc_decoder,
+     NULL };
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/parser_list.c
+index e3684b3b3d..241c90ba98 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/win/x64/libavcodec/parser_list.c
+@@ -6,4 +6,5 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_opus_parser,
+     &ff_vorbis_parser,
+     &ff_vp9_parser,
++    &ff_hevc_parser,
+     NULL };
+diff --git a/third_party/ffmpeg/ffmpeg_generated.gni b/third_party/ffmpeg/ffmpeg_generated.gni
+index 6075e647ae..cd0840b77d 100644
+--- a/third_party/ffmpeg/ffmpeg_generated.gni
++++ b/third_party/ffmpeg/ffmpeg_generated.gni
+@@ -306,6 +306,23 @@ if (((current_cpu == "arm64" || current_cpu == "arm64e") &&
+     (is_apple && ffmpeg_branding == "Chrome") ||
+     (is_win && ffmpeg_branding == "Chrome") ||
+     (use_linux_config && ffmpeg_branding == "Chrome")) {
++
++  ffmpeg_c_sources += [
++    "libavcodec/bswapdsp.c",
++    "libavcodec/hevc/autorename_libavcodec_hevc_parse.c",
++    "libavcodec/hevc/autorename_libavcodec_hevc_parser.c",
++    "libavcodec/hevc/autorename_libavcodec_hevc_cabac.c",
++    "libavcodec/hevc/data.c",
++    "libavcodec/hevc/dsp.c",
++    "libavcodec/hevc/filter.c",
++    "libavcodec/hevc/hevcdec.c",
++    "libavcodec/hevc/mvs.c",
++    "libavcodec/hevc/pred.c",
++    "libavcodec/hevc/ps.c",
++    "libavcodec/hevc/refs.c",
++    "libavcodec/hevc/sei.c"
++  ]
++
+   ffmpeg_c_sources += [
+     "libavcodec/aom_film_grain.c",
+     "libavcodec/atsc_a53.c",
+@@ -345,6 +362,25 @@ if (((current_cpu == "arm64" || current_cpu == "arm64e") &&
+ if ((current_cpu == "x64" && ffmpeg_branding == "Chrome") ||
+     (is_win && current_cpu == "x86" && ffmpeg_branding == "Chrome") ||
+     (use_linux_config && current_cpu == "x86" && ffmpeg_branding == "Chrome")) {
++
++  ffmpeg_c_sources += [
++    "libavcodec/x86/bswapdsp_init.c",
++    "libavcodec/x86/hevc/dsp_init.c",
++    "libavcodec/x86/h26x/h2656dsp.c"
++  ]
++
++  ffmpeg_asm_sources += [
++    "libavcodec/x86/bswapdsp.asm",
++    "libavcodec/x86/hevc/add_res.asm",
++    "libavcodec/x86/hevc/deblock.asm",
++    "libavcodec/x86/hevc/dequant.asm",
++    "libavcodec/x86/hevc/idct.asm",
++    "libavcodec/x86/hevc/mc.asm",
++    "libavcodec/x86/hevc/sao.asm",
++    "libavcodec/x86/hevc/sao_10bit.asm",
++    "libavcodec/x86/h26x/h2656_inter.asm"
++  ]
++
+   ffmpeg_c_sources += [
+     "libavcodec/x86/autorename_libavcodec_x86_aacpsdsp_init.c",
+     "libavcodec/x86/autorename_libavcodec_x86_h264_intrapred_init.c",
+@@ -440,6 +476,15 @@ if (current_cpu == "x64" || (is_win && current_cpu == "x86") ||
+ 
+ if (use_linux_config && current_cpu == "riscv64" &&
+     ffmpeg_branding == "Chrome") {
++
++  ffmpeg_c_sources += [
++    "libavcodec/riscv/hevcdsp_init.c"
++  ]
++
++  ffmpeg_gas_sources += [
++    "libavcodec/riscv/h26x/h2656_inter_rvv.S"
++  ]
++
+   ffmpeg_c_sources += [
+     "libavcodec/riscv/aacpsdsp_init.c",
+     "libavcodec/riscv/autorename_libavcodec_riscv_videodsp_init.c",
+@@ -467,6 +512,22 @@ if (use_linux_config && current_cpu == "riscv64" &&
+ 
+ if ((current_cpu == "arm64" || current_cpu == "arm64e") &&
+     ffmpeg_branding == "Chrome") {
++
++  ffmpeg_c_sources += [
++    "libavcodec/aarch64/hevcdsp_init_aarch64.c",
++    "libavcodec/aarch64/hevcpred_init_aarch64.c"
++  ]
++
++  ffmpeg_gas_sources += [
++    "libavcodec/aarch64/autorename_libavcodec_aarch64_hevcdsp_idct_neon.S",
++    "libavcodec/aarch64/hevcdsp_deblock_neon.S",
++    "libavcodec/aarch64/hevcdsp_dequant_neon.S",
++    "libavcodec/aarch64/hevcpred_neon.S",
++    "libavcodec/aarch64/h26x/epel_neon.S",
++    "libavcodec/aarch64/h26x/qpel_neon.S",
++    "libavcodec/aarch64/h26x/sao_neon.S"
++  ]
++
+   ffmpeg_c_sources += [
+     "libavcodec/aarch64/aacpsdsp_init_aarch64.c",
+     "libavcodec/aarch64/h264chroma_init_aarch64.c",
+@@ -490,6 +551,23 @@ if ((current_cpu == "arm64" || current_cpu == "arm64e") &&
+ }
+ 
+ if (use_linux_config && current_cpu == "arm" && ffmpeg_branding == "Chrome") {
++
++  ffmpeg_c_sources += [
++    "libavcodec/arm/hevcdsp_init_neon.c"
++  ]
++
++  ffmpeg_gas_sources += [
++    "libavcodec/arm/hevcdsp_deblock_neon.S",
++    "libavcodec/arm/hevcdsp_idct_neon.S",
++    "libavcodec/arm/hevcdsp_qpel_neon.S",
++    "libavcodec/arm/hevcdsp_sao_neon.S"
++  ]
++
++
++  ffmpeg_c_sources += [
++    "libavcodec/arm/hevcdsp_init_arm.c"
++  ]
++
+   ffmpeg_c_sources += [
+     "libavcodec/arm/h264chroma_init_arm.c",
+     "libavcodec/arm/h264dsp_init_arm.c",
+diff --git a/third_party/ffmpeg/libavcodec/aarch64/autorename_libavcodec_aarch64_hevcdsp_idct_neon.S b/third_party/ffmpeg/libavcodec/aarch64/autorename_libavcodec_aarch64_hevcdsp_idct_neon.S
+new file mode 100644
+index 0000000000..26b255b3a2
+--- /dev/null
++++ b/third_party/ffmpeg/libavcodec/aarch64/autorename_libavcodec_aarch64_hevcdsp_idct_neon.S
+@@ -0,0 +1,2 @@
++// File automatically generated. See crbug.com/495833.
++#include "hevcdsp_idct_neon.S"
+\ No newline at end of file
+diff --git a/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_cabac.c b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_cabac.c
+new file mode 100644
+index 0000000000..cba1eac9ce
+--- /dev/null
++++ b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_cabac.c
+@@ -0,0 +1,2 @@
++// File automatically generated. See crbug.com/495833.
++#include "cabac.c"
+\ No newline at end of file
+diff --git a/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parse.c b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parse.c
+new file mode 100644
+index 0000000000..daa90f6047
+--- /dev/null
++++ b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parse.c
+@@ -0,0 +1,2 @@
++// File automatically generated. See crbug.com/495833.
++#include "parse.c"
+\ No newline at end of file
+diff --git a/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parser.c b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parser.c
+new file mode 100644
+index 0000000000..d46820091a
+--- /dev/null
++++ b/third_party/ffmpeg/libavcodec/hevc/autorename_libavcodec_hevc_parser.c
+@@ -0,0 +1,2 @@
++// File automatically generated. See crbug.com/495833.
++#include "parser.c"
+\ No newline at end of file

@@ -1,11 +1,11 @@
 --- a/common/rpackagefilter.cc
 +++ b/common/rpackagefilter.cc
-@@ -788,7 +788,7 @@
+@@ -781,7 +781,7 @@
     _enabled = conf.FindB(key + "::enabled");
     if (_enabled == true) {
-       string FileName = _config->Find("Synaptic::ReducedViewFile",
--                                      "/etc/apt/metadata");
-+                                      "@TERMUX_PREFIX@/etc/apt/metadata");
+       string FileName =
+-         _config->Find("Synaptic::ReducedViewFile", "/etc/apt/metadata");
++         _config->Find("Synaptic::ReducedViewFile", "@TERMUX_PREFIX@/etc/apt/metadata");
        if (FileExists(FileName))
           addFile(FileName);
     }

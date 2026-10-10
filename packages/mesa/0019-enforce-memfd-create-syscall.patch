@@ -1,0 +1,35 @@
+Use the memfd_create syscall when __ANDROID__ is defined; DETECT_OS_ANDROID is
+disabled, so upstream skips it. Fall back to TMPDIR when XDG_RUNTIME_DIR is not
+a directory.
+
+--- a/src/util/anon_file.c
++++ b/src/util/anon_file.c
+@@ -40,7 +40,7 @@
+ 
+ #if defined(HAVE_MEMFD_CREATE) || defined(__FreeBSD__) || defined(__OpenBSD__)
+ #include <sys/mman.h>
+-#elif DETECT_OS_ANDROID
++#elif DETECT_OS_ANDROID || defined(__ANDROID__)
+ #include <sys/syscall.h>
+ #include <linux/memfd.h>
+ #endif
+@@ -118,7 +118,9 @@
+     int n;
+ 
+     env = os_get_option("XDG_RUNTIME_DIR");
+-    if (env && env[0] != '\0') {
++    if (!(env && env[0] != '\0' && stat(env, &st) == 0 && S_ISDIR(st.st_mode)))
++        env = os_get_option("TMPDIR");
++    if (env && env[0] != '\0' && stat(env, &st) == 0 && S_ISDIR(st.st_mode)) {
+         n = asprintf(&buf, "%s", env);
+         if (n < 0)
+            return NULL;
+@@ -192,7 +194,7 @@
+    if (!debug_name)
+       debug_name = "mesa-shared";
+    fd = memfd_create(debug_name, MFD_CLOEXEC | MFD_ALLOW_SEALING);
+-#elif DETECT_OS_ANDROID
++#elif DETECT_OS_ANDROID || defined(__ANDROID__)
+    if (!debug_name)
+       debug_name = "mesa-shared";
+    fd = syscall(SYS_memfd_create, debug_name, MFD_CLOEXEC | MFD_ALLOW_SEALING);

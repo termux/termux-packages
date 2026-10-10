@@ -1,0 +1,53 @@
+diff --git a/libinotifytools/src/cio.rs b/libinotifytools/src/cio.rs
+--- a/libinotifytools/src/cio.rs
++++ b/libinotifytools/src/cio.rs
+@@ -81,10 +81,16 @@
+ /// Set `errno`.
+ pub fn set_errno(e: c_int) {
+     unsafe {
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(target_os = "linux")]
+         {
+             *libc::__errno_location() = e;
+         }
++        #[cfg(target_os = "android")]
++        {
++            // Bionic exposes the errno accessor as `__errno()`, not the
++            // glibc name `__errno_location()`.
++            *libc::__errno() = e;
++        }
+         #[cfg(any(target_os = "freebsd", target_os = "dragonfly", target_os = "macos"))]
+         {
+             *libc::__error() = e;
+diff --git a/libinotifytools/src/inotify.rs b/libinotifytools/src/inotify.rs
+--- a/libinotifytools/src/inotify.rs
++++ b/libinotifytools/src/inotify.rs
+@@ -482,7 +482,9 @@
+         if w.fid.is_some() {
+             return false;
+         }
+-        let status = unsafe { sys::inotify_rm_watch(self.fd, w.wd) };
++        // `wd` is `c_int` on glibc but `u32` on Android's bionic libc;
++        // `as _` lets the compiler pick whichever the target expects.
++        let status = unsafe { sys::inotify_rm_watch(self.fd, w.wd as _) };
+         if status < 0 {
+             ceprint!("Failed to remove watch on ", w.filename, ": ", strerror(status), "\n");
+             self.error = status;
+@@ -994,7 +996,7 @@
+                         unsafe { libc::closedir(dir) };
+                         return false;
+                     }
+-                } else if st.st_mode & libc::S_IFMT == libc::S_IFDIR {
++                } else if st.st_mode & (libc::S_IFMT as u32) == (libc::S_IFDIR as u32) {
+                     let next_file = cat!(my_path, name, "/");
+                     if !is_excluded(&next_file, exclude_list) {
+                         let status =
+@@ -1867,7 +1869,7 @@
+         }
+         return false;
+     }
+-    st.st_mode & libc::S_IFMT == libc::S_IFDIR
++    st.st_mode & (libc::S_IFMT as u32) == (libc::S_IFDIR as u32)
+ }
+ 
+ /// Convert a single event name (case insensitive, without `IN_`) to its

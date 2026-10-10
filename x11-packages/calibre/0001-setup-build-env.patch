@@ -1,0 +1,268 @@
+diff --git a/setup/build.py b/setup/build.py
+index 486249dd1f..cde5249b68 100644
+--- a/setup/build.py
++++ b/setup/build.py
+@@ -529,7 +529,7 @@ def run(self, opts):
+                 self.build_pyqt_extension(ext, sbf)
+ 
+         if opts.only in {'all', 'headless'}:
+-            self.build_headless()
++            pass
+ 
+     def dest(self, ext, env):
+         return os.path.join(self.output_dir, getattr(ext, 'name', ext)) + env.dest_ext
+diff --git a/setup/build_environment.py b/setup/build_environment.py
+index e39e128d00..3128729cc3 100644
+--- a/setup/build_environment.py
++++ b/setup/build_environment.py
+@@ -9,6 +9,7 @@
+ import re
+ import shutil
+ import subprocess
++import sys
+ from functools import lru_cache
+ 
+ from setup import isfreebsd, ishaiku, islinux, ismacos, iswindows
+@@ -18,10 +19,19 @@
+ 
+ @lru_cache(maxsize=2)
+ def pyqt_sip_abi_version():
+-    import PyQt6
++    try:
++        import PyQt6
++    except Exception:
++        PyQt6 = None
+ 
++    candidate_paths = []
+     if getattr(PyQt6, '__file__', None):
+-        bindings_path = os.path.join(os.path.dirname(PyQt6.__file__), 'bindings', 'QtCore', 'QtCore.toml')
++        candidate_paths.append(os.path.join(os.path.dirname(PyQt6.__file__), 'bindings', 'QtCore', 'QtCore.toml'))
++    termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++    for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
++        candidate_paths.append(os.path.join(termux_prefix, 'lib', pyver, 'site-packages', 'PyQt6', 'bindings', 'QtCore', 'QtCore.toml'))
++
++    for bindings_path in candidate_paths:
+         if os.path.exists(bindings_path):
+             with open(bindings_path) as f:
+                 raw = f.read()
+@@ -127,8 +137,8 @@ def readvar(name):
+ freetype_libs = []
+ freetype_inc_dirs = []
+ 
+-podofo_inc = '/usr/include/podofo'
+-podofo_lib = '/usr/lib'
++podofo_inc = ''
++podofo_lib = ''
+ 
+ usb_library = 'usb' if isfreebsd else 'usb-1.0'
+ 
+@@ -156,6 +166,7 @@ def readvar(name):
+ openssl_inc_dirs, openssl_lib_dirs = [], []
+ 
+ piper_inc_dirs, piper_lib_dirs, piper_libs = [], [], []
++piper_error = 'piper TTS is disabled for Termux build'
+ 
+ ICU = sw = ''
+ 
+@@ -206,28 +217,28 @@ def readvar(name):
+     piper_lib_dirs = [sw_lib_dir]
+     piper_libs = ['espeak-ng', 'onnxruntime']
+ else:
+-    freetype_inc_dirs = pkgconfig_include_dirs('freetype2', 'FT_INC_DIR', '/usr/include/freetype2')
+-    freetype_lib_dirs = pkgconfig_lib_dirs('freetype2', 'FT_LIB_DIR', '/usr/lib')
++    freetype_inc_dirs = pkgconfig_include_dirs('freetype2', 'FT_INC_DIR', '')
++    freetype_lib_dirs = pkgconfig_lib_dirs('freetype2', 'FT_LIB_DIR', '')
+     freetype_libs = pkgconfig_libs('freetype2', '', '')
+-    hunspell_inc_dirs = pkgconfig_include_dirs('hunspell', 'HUNSPELL_INC_DIR', '/usr/include/hunspell')
+-    hunspell_lib_dirs = pkgconfig_lib_dirs('hunspell', 'HUNSPELL_LIB_DIR', '/usr/lib')
++    hunspell_inc_dirs = pkgconfig_include_dirs('hunspell', 'HUNSPELL_INC_DIR', '')
++    hunspell_lib_dirs = pkgconfig_lib_dirs('hunspell', 'HUNSPELL_LIB_DIR', '')
+     sw = os.environ.get('SW', os.path.expanduser('~/sw'))
+-    podofo_inc = '/usr/include/podofo'
+-    podofo_lib = '/usr/lib'
++    podofo_inc = ''
++    podofo_lib = ''
+     if not os.path.exists(podofo_inc + '/podofo.h'):
+         podofo_inc = os.path.join(sw, 'include', 'podofo')
+         podofo_lib = os.path.join(sw, 'lib')
+-    uchardet_inc_dirs = pkgconfig_include_dirs('uchardet', '', '/usr/include/uchardet')
+-    uchardet_lib_dirs = pkgconfig_lib_dirs('uchardet', '', '/usr/lib')
++    uchardet_inc_dirs = pkgconfig_include_dirs('uchardet', '', '')
++    uchardet_lib_dirs = pkgconfig_lib_dirs('uchardet', '', '')
+     uchardet_libs = pkgconfig_libs('uchardet', '', '')
+-    piper_inc_dirs = pkgconfig_include_dirs('espeak-ng', '', '/usr/include') + pkgconfig_include_dirs('libonnxruntime', '', '/usr/include/onnxruntime')
+-    piper_lib_dirs = pkgconfig_lib_dirs('espeak-ng', '', '/usr/lib') + pkgconfig_lib_dirs('libonnxruntime', '', '/usr/lib')
++    piper_inc_dirs = pkgconfig_include_dirs('espeak-ng', '', '') + pkgconfig_include_dirs('libonnxruntime', '', '')
++    piper_lib_dirs = pkgconfig_lib_dirs('espeak-ng', '', '') + pkgconfig_lib_dirs('libonnxruntime', '', '')
+     piper_libs = pkgconfig_libs('espeak-ng', '', 'espeak-ng') + pkgconfig_libs('libonnxruntime', '', 'onnxruntime')
+     for x in ('libavcodec', 'libavformat', 'libavdevice', 'libavfilter', 'libavutil', 'libpostproc', 'libswresample', 'libswscale'):
+-        for inc in pkgconfig_include_dirs(x, '', '/usr/include'):
++        for inc in pkgconfig_include_dirs(x, '', ''):
+             if inc and inc not in ffmpeg_inc_dirs:
+                 ffmpeg_inc_dirs.append(inc)
+-        for lib in pkgconfig_lib_dirs(x, '', '/usr/lib'):
++        for lib in pkgconfig_lib_dirs(x, '', ''):
+             if lib and lib not in ffmpeg_lib_dirs:
+                 ffmpeg_lib_dirs.append(lib)
+ 
+diff --git a/setup/extensions.json b/setup/extensions.json
+index 7133a21fa4..6bcc4cea21 100644
+--- a/setup/extensions.json
++++ b/setup/extensions.json
+@@ -100,7 +100,9 @@
+         "name": "lzx",
+         "sources": "calibre/utils/lzx/lzxmodule.c calibre/utils/lzx/compressor.c calibre/utils/lzx/lzxd.c calibre/utils/lzx/lzc.c calibre/utils/lzx/lzxc.c",
+         "inc_dirs": "calibre/utils/lzx",
+-        "headers": "calibre/utils/lzx/lzc.h calibre/utils/lzx/system.h calibre/utils/lzx/lzxc.h calibre/utils/lzx/lzxd.h calibre/utils/lzx/mspack.h"
++        "headers": "calibre/utils/lzx/lzc.h calibre/utils/lzx/system.h calibre/utils/lzx/lzxc.h calibre/utils/lzx/lzxd.h calibre/utils/lzx/mspack.h",
++        "libraries": "m",
++        "windows_libraries": ""
+     },
+     {
+         "name": "freetype",
+@@ -140,7 +142,9 @@
+ 		"needs_c++": "17",
+         "libraries": "!piper_libs",
+         "lib_dirs": "!piper_lib_dirs",
+-        "inc_dirs": "!piper_inc_dirs"
++        "inc_dirs": "!piper_inc_dirs",
++        "optional": true,
++        "error": "!piper_error"
+     },
+     {
+         "name": "html_as_json",
+diff --git a/setup/install.py b/setup/install.py
+index 574105aa0a..a07162ad03 100644
+--- a/setup/install.py
++++ b/setup/install.py
+@@ -142,7 +142,7 @@ def pre_sub_commands(self, opts):
+             raise SystemExit(1)
+         # Ensure any config files created as a side effect of importing calibre
+         # during the build process are in /tmp
+-        os.environ['CALIBRE_CONFIG_DIRECTORY'] = os.environ.get('CALIBRE_CONFIG_DIRECTORY', '/tmp/calibre-install-config')
++        os.environ['CALIBRE_CONFIG_DIRECTORY'] = os.environ.get('CALIBRE_CONFIG_DIRECTORY', os.path.join(tempfile.gettempdir(), 'calibre-install-config'))
+ 
+     def run(self, opts):
+         self.manifest = []
+@@ -238,7 +238,7 @@ class Install(Develop):
+     ''')
+     short_description = 'Install calibre from source'
+ 
+-    sub_commands = ['build', 'gui']
++    sub_commands = ['build']
+ 
+     def add_options(self, parser):
+         parser.add_option('--prefix', help='Installation prefix.')
+diff --git a/setup/resources.py b/setup/resources.py
+index bccb1626b5..3f04d90f61 100644
+--- a/setup/resources.py
++++ b/setup/resources.py
+@@ -116,7 +116,7 @@ def run(self, opts):
+ 
+ class Resources(Command):  # {{{
+     description = 'Compile various needed calibre resources'
+-    sub_commands = ['liberation_fonts', 'mathjax', 'rapydscript', 'hyphenation', 'piper_voices']
++    sub_commands = []
+ 
+     def run(self, opts):
+         from calibre.utils.serialize import msgpack_dumps
+diff --git a/setup/translations.py b/setup/translations.py
+index 48f83c1aac..3b299dd3aa 100644
+--- a/setup/translations.py
++++ b/setup/translations.py
+@@ -27,6 +27,17 @@
+ from setup.iso_codes import iso_data
+ from setup.parallel_build import batched_parallel_jobs
+ 
++def msgpack_dumps(obj):
++    import msgpack
++
++    def encoder(o):
++        if isinstance(o, (set, frozenset)):
++            return msgpack.ExtType(1, msgpack_dumps(tuple(o)))
++        raise TypeError(f'Cannot serialize objects of type {type(o)}')
++
++    return msgpack.packb(obj, default=encoder, use_bin_type=True)
++
++
+ 
+ def serialize_msgid(text):
+     """Serialize a string in the format used by msgid in GNU POT files."""
+@@ -429,7 +440,7 @@ def action_per_file(f):
+             if ln in lcdata:
+                 ld = lcdata[ln]
+                 lcdest = self.j(self.d(dest), 'lcdata.calibre_msgpack')
+-                from calibre.utils.serialize import msgpack_dumps
++                # from calibre.utils.serialize import msgpack_dumps
+ 
+                 with open(lcdest, 'wb') as lcf:
+                     lcf.write(msgpack_dumps(ld))
+@@ -524,7 +535,7 @@ def handle_stats(f, data):
+         except OSError as err:
+             if err.errno != errno.EEXIST:
+                 raise
+-        from calibre.utils.serialize import msgpack_dumps
++        # from calibre.utils.serialize import msgpack_dumps
+ 
+         with open(dest, 'wb') as f:
+             f.write(msgpack_dumps(stats))
+@@ -905,7 +916,7 @@ def run(self, opts):
+             nm[base_name] = threeb
+ 
+         x = {'by_2': by_2, 'by_3': by_3, 'codes2': codes2, 'codes3': codes3, '2to3': m2to3, '3to2': m3to2, 'name_map': nm}
+-        from calibre.utils.serialize import msgpack_dumps
++        # from calibre.utils.serialize import msgpack_dumps
+ 
+         with open(dest, 'wb') as f:
+             f.write(msgpack_dumps(x))
+@@ -945,7 +956,7 @@ def run(self, opts):
+             if three:
+                 three_map[str(three)] = two
+         x = {'names': name_map, 'codes': frozenset(codes), 'three_map': three_map}
+-        from calibre.utils.serialize import msgpack_dumps
++        # from calibre.utils.serialize import msgpack_dumps
+ 
+         with open(dest, 'wb') as f:
+             f.write(msgpack_dumps(x))
+diff --git a/src/calibre/utils/localization.py b/src/calibre/utils/localization.py
+index 505fab0473..9b70763f76 100644
+--- a/src/calibre/utils/localization.py
++++ b/src/calibre/utils/localization.py
+@@ -7,7 +7,36 @@
+ import re
+ 
+ from calibre.utils.resources import get_path as P
+-from calibre_extensions.translator import Translator
++try:
++    from calibre_extensions.translator import Translator
++except Exception:
++    class Translator:
++        def __init__(self, *args, **kwargs):
++            pass
++        def plural(self, n=0):
++            return 0
++        def add_fallback(self, other):
++            pass
++        def install(self, names=None):
++            pass
++        def info(self):
++            return {}
++        def charset(self):
++            return 'utf-8'
++        def gettext(self, message):
++            return message
++        def ngettext(self, singular, plural, n):
++            return singular if n == 1 else plural
++        def pgettext(self, context, message):
++            return message
++        def npgettext(self, context, singular, plural, n):
++            return singular if n == 1 else plural
++        def set_as_qt_translator(self):
++            return 0
++        def has_data(self):
++            return False
++        def install_for_qt(self):
++            pass
+ 
+ _available_translations = None
+ 

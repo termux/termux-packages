@@ -1,0 +1,22 @@
+diff -rauN libpagemaker-0.0.4/src/lib/PMDParser.cpp libpagemaker-0.0.4-const-ref-exception-patch/src/lib/PMDParser.cpp
+--- libpagemaker-0.0.4/src/lib/PMDParser.cpp	2018-01-08 13:27:29.000000000 +0100
++++ libpagemaker-0.0.4-const-ref-exception-patch/src/lib/PMDParser.cpp	2019-12-10 20:32:26.167629754 +0100
+@@ -852,7 +852,7 @@
+     *tocLength = readU16(m_input, m_bigEndian);
+     PMD_DEBUG_MSG(("[Header] TOC length is %d\n", *tocLength));
+   }
+-  catch (PMDStreamException)
++  catch (const PMDStreamException&)
+   {
+     throw PMDParseException("Can't find the table of contents length in the header.");
+   }
+@@ -862,7 +862,7 @@
+     *tocOffset = readU32(m_input, m_bigEndian);
+     PMD_DEBUG_MSG(("[Header] TOC offset is 0x%x\n", *tocOffset));
+   }
+-  catch (PMDStreamException)
++  catch (const PMDStreamException&)
+   {
+     throw PMDParseException("Can't find the table of contents offset in the header.");
+   }
+

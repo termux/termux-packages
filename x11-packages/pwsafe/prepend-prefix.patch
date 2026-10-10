@@ -20,16 +20,14 @@
    return helpdir;
 --- a/src/ui/wxWidgets/PWSafeApp.cpp
 +++ b/src/ui/wxWidgets/PWSafeApp.cpp
-@@ -220,9 +220,9 @@ void PWSafeApp::Init()
- {
-   pws_os::install_cleanup_handler(cleanup_handler, &m_core);
-   m_locale = new wxLocale;
--  wxLocale::AddCatalogLookupPathPrefix(L"/usr/share/locale");
--  wxLocale::AddCatalogLookupPathPrefix(L"/usr");
--  wxLocale::AddCatalogLookupPathPrefix(L"/usr/local");
-+  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/share/locale");
-+  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@");
-+  wxLocale::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/local");
- #if defined(__WXDEBUG__) || defined(_DEBUG) || defined(DEBUG)
-   wxLocale::AddCatalogLookupPathPrefix(L"../I18N/mos");
-   wxLocale::AddCatalogLookupPathPrefix(L"src/ui/wxWidgets/I18N/mos"); // located in cmake's build directory
+@@ -219,8 +219,8 @@ void PWSafeApp::Init()
+   m_locale = new PWSLocale;
+ #endif
+ #if defined(__UNIX__) && !defined(__WXMAC__)
+-  wxFileTranslationsLoader::AddCatalogLookupPathPrefix(L"/usr/share/locale");
+-  wxFileTranslationsLoader::AddCatalogLookupPathPrefix(L"/usr/local/share/locale");
++  wxFileTranslationsLoader::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/share/locale");
++  wxFileTranslationsLoader::AddCatalogLookupPathPrefix(L"@TERMUX_PREFIX@/local/share/locale");
+ #endif
+ #if defined(_DEBUG) || defined(DEBUG)
+   wxFileTranslationsLoader::AddCatalogLookupPathPrefix(L"../I18N/mos");

@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE="https://pwmt.org/projects/zathura-pdf-poppler/"
+TERMUX_PKG_DESCRIPTION="PDF support for zathura (poppler backend)"
+TERMUX_PKG_LICENSE="ZLIB"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="2026.07.18"
+TERMUX_PKG_SRCURL="https://github.com/pwmt/zathura-pdf-poppler/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=93003f41d8d2dc4c3c5d5ee076012563d1836ab0043debe741945881fb62d2ca
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_DEPENDS="girara, glib, libcairo, poppler, zathura"

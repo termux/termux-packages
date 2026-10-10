@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/neovim/unibilium
 TERMUX_PKG_DESCRIPTION="Terminfo parsing library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.1.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.1.4"
 TERMUX_PKG_SRCURL="https://github.com/neovim/unibilium/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=370ecb07fbbc20d91d1b350c55f1c806b06bf86797e164081ccc977fc9b3af7a
+TERMUX_PKG_SHA256=7360907bcf79ba49f6fc4a504767ff86e93ab9018477026fcc70d5ab77e1f2c1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libunibilium-dev"
 TERMUX_PKG_REPLACES="libunibilium-dev"
@@ -35,7 +34,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	CFLAGS+=" -DTERMINFO_DIRS=\"$TERMUX_PREFIX/share/terminfo/\""
+	CFLAGS+=" -DTERMINFO=\"$TERMUX_PREFIX/share/terminfo/\" -DTERMINFO_DIRS=\"$TERMUX_PREFIX/share/terminfo/\""
 	$CC $CFLAGS -c -fPIC unibilium.c -o unibilium.o
 	$CC $CFLAGS -c -fPIC uninames.c -o uninames.o
 	$CC $CFLAGS -c -fPIC uniutil.c -o uniutil.o

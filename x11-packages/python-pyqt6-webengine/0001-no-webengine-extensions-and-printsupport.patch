@@ -1,0 +1,40 @@
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -34,4 +34,4 @@
+ qmake-QT = ["webenginequick"]
+ 
+ [tool.sip.bindings.QtWebEngineWidgets]
+-qmake-QT = ["webenginewidgets"]
++qmake-QT = ["webenginewidgets", "printsupport"]
+--- a/sip/QtWebEngineCore/QtWebEngineCoremod.sip
++++ b/sip/QtWebEngineCore/QtWebEngineCoremod.sip
+@@ -67,8 +67,6 @@
+ %Include qwebenginecookiestore.sip
+ %Include qwebenginedesktopmediarequest.sip
+ %Include qwebenginedownloadrequest.sip
+-%Include qwebengineextensioninfo.sip
+-%Include qwebengineextensionmanager.sip
+ %Include qwebenginefilesystemaccessrequest.sip
+ %Include qwebenginefindtextresult.sip
+ %Include qwebengineframe.sip
+--- a/sip/QtWebEngineCore/qwebengineprofile.sip
++++ b/sip/QtWebEngineCore/qwebengineprofile.sip
+@@ -46,11 +46,7 @@
+         {sipName_QWebEngineContextMenuRequest, &sipType_QWebEngineContextMenuRequest, -1, 2},
+         {sipName_QWebEngineCookieStore, &sipType_QWebEngineCookieStore, -1, 3},
+         {sipName_QWebEngineDownloadRequest, &sipType_QWebEngineDownloadRequest, -1, 4},
+-    #if QT_VERSION >= 0x060a00
+-        {sipName_QWebEngineExtensionManager, &sipType_QWebEngineExtensionManager, -1, 5},
+-    #else
+         {0, 0, -1, 5},
+-    #endif
+         {sipName_QWebEngineHistory, &sipType_QWebEngineHistory, -1, 6},
+         {sipName_QWebEngineHistoryModel, &sipType_QWebEngineHistoryModel, -1, 7},
+         {sipName_QWebEngineNavigationRequest, &sipType_QWebEngineNavigationRequest, -1, 8},
+@@ -291,6 +287,5 @@
+     QList<QSslCertificate> additionalTrustedCertificates() const;
+ %End
+ %If (QtWebEngine_6_10_0 -)
+-    QWebEngineExtensionManager *extensionManager() const;
+ %End
+ };

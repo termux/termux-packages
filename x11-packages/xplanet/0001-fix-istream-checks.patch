@@ -1,0 +1,149 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: 3ls-it <3ls-it@pm.me>
+Date: Tue, 22 Jul 2026 22:26:59 -0400
+Subject: [PATCH] xplanet: fix legacy istream getline() NULL comparisons
+
+Several xplanet source files use an old iostream idiom of comparing
+the return value of istream::getline() against NULL. That no longer
+builds with current Clang/libc++, where getline() returns an
+istream& rather than a pointer.
+
+Convert these tests to direct stream-state checks so the code builds
+cleanly with modern toolchains without changing behavior.
+---
+--- a/src/libannotate/addArcs.cpp	2008-11-13 18:43:42.000000000 -0500
++++ b/src/libannotate/addArcs.cpp	2026-07-22 22:26:59.816727537 -0400
+@@ -258,7 +258,7 @@
+         {
+             ifstream inFile(arcFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
++		     while (inFile.getline (line, MAX_LINE_LENGTH, '\n'))
+                 readArcFile(line, planet, view, projection,
+                             planetProperties, annotationMap);
+             
+@@ -292,7 +292,7 @@
+         {
+             ifstream inFile(arcFile.c_str());
+             char *line = new char[256];
+-            while (inFile.getline (line, 256, '\n') != NULL)
++            while (inFile.getline (line, 256, '\n'))
+                 readArcFile(line, NULL, view, NULL, NULL, annotationMap);
+ 
+             inFile.close();
+--- a/src/libannotate/addMarkers.cpp	2011-11-14 20:44:24.000000000 -0500
++++ b/src/libannotate/addMarkers.cpp	2026-07-22 22:31:26.524727537 -0400
+@@ -423,7 +423,7 @@
+         {
+             ifstream inFile(markerFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
++            while (inFile.getline (line, MAX_LINE_LENGTH, '\n'))
+             {
+                 unsigned char color[3];
+                 memcpy(color, planetProperties->MarkerColor(), 3);
+@@ -469,7 +469,7 @@
+         {
+             ifstream inFile(markerFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
++            while (inFile.getline (line, MAX_LINE_LENGTH, '\n'))
+             {
+                 unsigned char color[3];
+                 memcpy(color, options->Color(), 3);
+--- a/src/libannotate/addSatellites.cpp	2010-07-30 17:49:06.000000000 -0400
++++ b/src/libannotate/addSatellites.cpp	2026-07-22 22:36:40.320727537 -0400
+@@ -488,10 +488,10 @@
+         {
+             ifstream inFile(tleFile.c_str());
+             char lines[3][80];
+-            while (inFile.getline(lines[0], 80) != NULL)
++            while (inFile.getline(lines[0], 80))
+             {
+-                if ((inFile.getline(lines[1], 80) == NULL) 
+-                    || (inFile.getline(lines[2], 80) == NULL))
++                if ((inFile.getline(lines[1], 80)) 
++                    || (inFile.getline(lines[2], 80)))
+                 {
+                     ostringstream errStr;
+                     errStr << "Malformed TLE file (" << tleFile << ")?\n";
+@@ -542,7 +542,7 @@
+         {
+             ifstream inFile(satFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline (line, MAX_LINE_LENGTH, '\n') != NULL)
++            while (inFile.getline (line, MAX_LINE_LENGTH, '\n'))
+                 readSatelliteFile(line, planet, view, projection,
+                                   planetProperties, annotationMap);
+             
+--- a/src/libannotate/addSpiceObjects.cpp	2008-11-13 18:44:59.000000000 -0500
++++ b/src/libannotate/addSpiceObjects.cpp	2026-07-22 22:39:20.992727537 -0400
+@@ -524,7 +524,7 @@
+         {
+             ifstream inFile(kernelFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++            while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+             {
+                 int ii = 0;
+                 while (isDelimiter(line[ii]))
+@@ -576,7 +576,7 @@
+         {
+             ifstream inFile(spiceFile.c_str());
+             char *line = new char[MAX_LINE_LENGTH];
+-            while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++            while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+                 readSpiceFile(line, planetsFromSunMap, view, projection,
+                               annotationMap);
+             inFile.close();
+--- a/src/libmultiple/RayleighScattering.cpp	2012-02-25 11:32:59.000000000 -0500
++++ b/src/libmultiple/RayleighScattering.cpp	2026-07-22 22:48:06.276727537 -0400
+@@ -369,7 +369,7 @@
+ 
+     diskTemplate_.clear();
+     limbTemplate_.clear();
+-    while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++    while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+     {
+         int i = 0;
+         while (isDelimiter(line[i]))
+@@ -439,7 +439,7 @@
+     values.clear();
+ 
+     char line[MAX_LINE_LENGTH];
+-    while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++    while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+     {
+         int i = 0;
+         while (isDelimiter(line[i]))
+@@ -470,7 +470,7 @@
+                               double &value)
+ {
+     char line[MAX_LINE_LENGTH];
+-    while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++    while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+     {
+         int i = 0;
+         while (isDelimiter(line[i]))
+--- a/src/libmultiple/drawStars.cpp	2006-03-25 23:55:59.000000000 -0500
++++ b/src/libmultiple/drawStars.cpp	2026-07-22 22:50:26.212727537 -0400
+@@ -41,7 +41,7 @@
+     ifstream inFile(starMap.c_str());
+ 
+     char line[MAX_LINE_LENGTH];
+-    while (inFile.getline(line, MAX_LINE_LENGTH, '\n') != NULL)
++    while (inFile.getline(line, MAX_LINE_LENGTH, '\n'))
+     {
+         if (line[0] == '#') continue;
+ 
+--- a/src/readConfig.cpp	2012-03-02 22:20:05.000000000 -0500
++++ b/src/readConfig.cpp	2026-07-22 22:53:05.988727537 -0400
+@@ -550,7 +550,7 @@
+ 
+         ifstream inFile(configFile.c_str());
+         char *line = new char[256];
+-        while (inFile.getline(line, 256, '\n') != NULL)
++        while (inFile.getline(line, 256, '\n'))
+             readConfig(line, planetProperties);
+         
+         // This condition will only be true if [default] is the only

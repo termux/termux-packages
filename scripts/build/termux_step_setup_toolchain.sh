@@ -6,11 +6,11 @@ termux_step_setup_toolchain() {
 		# Bump TERMUX_STANDALONE_TOOLCHAIN if a change is made in
 		# toolchain setup to ensure that everyone gets an updated
 		# toolchain
-		if [ "${TERMUX_NDK_VERSION}" = "29" ]; then
-			TERMUX_STANDALONE_TOOLCHAIN+="-v4"
-			termux_setup_toolchain_29
+		if [ "${TERMUX_NDK_VERSION}" = "30" ]; then
+			TERMUX_STANDALONE_TOOLCHAIN+="-v0"
+			termux_setup_toolchain_30
 		elif [ "${TERMUX_NDK_VERSION}" = 23c ]; then
-			TERMUX_STANDALONE_TOOLCHAIN+="-v11"
+			TERMUX_STANDALONE_TOOLCHAIN+="-v12"
 			termux_setup_toolchain_23c
 		else
 			termux_error_exit "We do not have a setup_toolchain function for NDK version $TERMUX_NDK_VERSION"

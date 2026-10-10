@@ -1,6 +1,6 @@
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=1.10.0
+	local MESON_VERSION=1.11.0
 	local MESON_FOLDER
 
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
@@ -16,7 +16,7 @@ termux_setup_meson() {
 		termux_download \
 			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
 			"$MESON_TAR_FILE" \
-			8071860c1f46a75ea34801490fd1c445c9d75147a65508cd3a10366a7006cc1c
+			dffdd0915ceb028541fe3bed77d63ba35e78514591c043736b450d62634eeb31
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
 		shopt -s nullglob
 		local f

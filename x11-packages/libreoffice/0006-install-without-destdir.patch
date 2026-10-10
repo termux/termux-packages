@@ -1,0 +1,281 @@
+diff --git a/solenv/bin/ooinstall b/solenv/bin/ooinstall
+index 71f10c739..39a959ef6 100755
+--- a/solenv/bin/ooinstall
++++ b/solenv/bin/ooinstall
+@@ -81,10 +81,6 @@ if ($is_windows) {
+ # make distro-pack-install shuffle with the SDK installation to make it LSB compliant
+ # it creates symlinks from the original path to /usr/share; they are not valid with $DESTDIR
+ # and potential second ooinstall call fails with strange error messages if the old tree is still there
+-if ($destdir && "$ENV{DESTDIR}" ne "/" && -d "$ENV{DESTDIR}") {
+-    print "Cleaning destdir...\n";
+-    system ("rm -rf \"$ENV{DESTDIR}\"") && die "Failed to clean up destdir: $!";
+-}
+ 
+ print "Running LibreOffice installer\n";
+ 
+diff --git a/bin/distro-install-clean-up b/bin/distro-install-clean-up
+index 701c9ffa0..184d7d9d7 100755
+--- a/bin/distro-install-clean-up
++++ b/bin/distro-install-clean-up
+@@ -20,8 +20,8 @@ remove_help_localization()
+     echo "... remove \"$lang\""
+ 
+     rm -rf $DESTDIR$INSTALLDIR/help/$lang
+-    grep -v "$INSTALLDIR/help/$lang" $DESTDIR/gid_Module_Root.$lang >$DESTDIR/gid_Module_Root.$lang.new
+-    mv -f $DESTDIR/gid_Module_Root.$lang.new $DESTDIR/gid_Module_Root.$lang
++    grep -v "$INSTALLDIR/help/$lang" $INSTALLDIR/gid_Module_Root.$lang >$INSTALLDIR/gid_Module_Root.$lang.new
++    mv -f $INSTALLDIR/gid_Module_Root.$lang.new $INSTALLDIR/gid_Module_Root.$lang
+     # FIXME: the following code could be used without the condition
+     #        and should replace the lines above after only the milestones
+     #	     providing gid_Module_Helppack_Help and fixed gid_Module_Root.$lang
+@@ -30,9 +30,9 @@ remove_help_localization()
+     #       %dir */help/* entries.
+     # Note: It was still necessary on ppc with gcj (OOo-2.0.2). Strange. Have to
+     # investigate it later.
+-    if test -f $DESTDIR/gid_Module_Helppack_Help.$lang ; then
+-	grep -v "$INSTALLDIR/help/$lang" $DESTDIR/gid_Module_Helppack_Help.$lang >$DESTDIR/gid_Module_Helppack_Help.$lang.new
+-	mv -f $DESTDIR/gid_Module_Helppack_Help.$lang.new $DESTDIR/gid_Module_Helppack_Help.$lang
++    if test -f $INSTALLDIR/gid_Module_Helppack_Help.$lang ; then
++	grep -v "$INSTALLDIR/help/$lang" $INSTALLDIR/gid_Module_Helppack_Help.$lang >$INSTALLDIR/gid_Module_Helppack_Help.$lang.new
++	mv -f $INSTALLDIR/gid_Module_Helppack_Help.$lang.new $INSTALLDIR/gid_Module_Helppack_Help.$lang
+     fi
+ 
+     # Note: We created a compat symlink in the past. It is no longer necessary.
+diff --git a/bin/distro-install-desktop-integration b/bin/distro-install-desktop-integration
+index 7e1428ffb..aae992fd2 100755
+--- a/bin/distro-install-desktop-integration
++++ b/bin/distro-install-desktop-integration
+@@ -33,7 +33,7 @@ EOT
+         chmod 755 "$DESTDIR$BINDIR/$1"
+     fi
+     # put into file list
+-    test -f "$DESTDIR/$4" && echo "$BINDIR/$1" >>$DESTDIR/$4
++    test -f "$INSTALLDIR/$4" && echo "$BINDIR/$1" >>$INSTALLDIR/$4
+ }
+ 
+ create_man_link()
+@@ -43,7 +43,7 @@ create_man_link()
+     mkdir -p $DESTDIR$MANDIR/man1
+     echo ".so man1/$2.1" >| $DESTDIR$MANDIR/man1/$1.1
+     gzip -f $DESTDIR$MANDIR/man1/$1.1
+-    test -f "$DESTDIR/$3" && echo "$MANDIR/man1/$1.1.gz" >>"$DESTDIR/$3"
++    test -f "$INSTALLDIR/$3" && echo "$MANDIR/man1/$1.1.gz" >>"$INSTALLDIR/$3"
+ }
+ 
+ install_man()
+@@ -53,7 +53,7 @@ install_man()
+     mkdir -p $DESTDIR$MANDIR/man1
+     cp "${SRCDIR?}"/sysui/desktop/man/$1.1 $DESTDIR$MANDIR/man1 || exit 1;
+     gzip -f $DESTDIR$MANDIR/man1/$1.1
+-    test -f "$DESTDIR/$2" && echo "$MANDIR/man1/$1.1.gz" >>"$DESTDIR/$2"
++    test -f "$INSTALLDIR/$2" && echo "$MANDIR/man1/$1.1.gz" >>"$INSTALLDIR/$2"
+ }
+ 
+ 
+@@ -89,7 +89,7 @@ add_wrapper()
+     test -n "$oowrapper_name" && create_man_link "$oowrapper_name" "$used_man_page" "$file_list"
+ 
+     # add desktop file to the right file list
+-    test -n "$desktop_file" -a -f "$DESTDIR/$file_list" && echo "$PREFIXDIR/share/applications/$desktop_file" >>"$DESTDIR/$file_list"
++    test -n "$desktop_file" -a -f "$INSTALLDIR/$file_list" && echo "$PREFIXDIR/share/applications/$desktop_file" >>"$INSTALLDIR/$file_list"
+ }
+ 
+ # install desktop integration from plain packages
+@@ -119,9 +119,9 @@ cd -
+ rm -rf $sysui_temp
+ 
+ # we do not want some stuff from the plain packages
+-if test -d $DESTDIR/opt ; then
+-    rm -f $DESTDIR/opt/$INSTALLDIRNAME
+-    rmdir $DESTDIR/opt 2>/dev/null || true
++if test -d $INSTALLDIR/opt ; then
++    rm -f $INSTALLDIR/opt/$INSTALLDIRNAME
++    rmdir $INSTALLDIR/opt 2>/dev/null || true
+ fi
+ 
+ # we want non-versioned desktop files
+@@ -136,10 +136,10 @@ cd -
+ 
+ # put the stuff installed by create_tree.sh into the right file lists
+ # desktop files will be added by the corresponding add_wrapper command
+-if test -f $DESTDIR/gid_Module_Root_Brand ; then
++if test -f $INSTALLDIR/gid_Module_Root_Brand ; then
+     for dir in $PREFIXDIR/share/mime/packages \
+                $PREFIXDIR/share/icons ; do
+-        find "$DESTDIR$dir" \( -type f -o -type l \) -printf "$dir/%P\n" >>$DESTDIR/gid_Module_Root_Brand
++        find "$DESTDIR$dir" \( -type f -o -type l \) -printf "$dir/%P\n" >>$INSTALLDIR/gid_Module_Root_Brand
+     done
+ fi
+ 
+@@ -158,7 +158,7 @@ add_wrapper loffice        soffice ""            "libreoffice" ""
+ add_wrapper unopkg         unopkg  ""            "unopkg"      ""                                "gid_Module_Root_Brand"
+ 
+ # there are two more desktop files for optional filters
+-test -f $DESTDIR/gid_Module_Optional_Xsltfiltersamples && echo "$PREFIXDIR/share/applications/libreoffice-xsltfilter.desktop" >>"$DESTDIR/gid_Module_Optional_Xsltfiltersamples"
++test -f $INSTALLDIR/gid_Module_Optional_Xsltfiltersamples && echo "$PREFIXDIR/share/applications/libreoffice-xsltfilter.desktop" >>"$INSTALLDIR/gid_Module_Optional_Xsltfiltersamples"
+ 
+ # $BINDIR/ooffice symlink is necessary by java UNO components to find
+ # the UNO installation using $PATH, see
+@@ -168,21 +168,21 @@ test -f $DESTDIR/gid_Module_Optional_Xsltfiltersamples && echo "$PREFIXDIR/share
+ #       For example, the Novell package mark this symlink as %ghost
+ #	and update it in %post and %postun
+ ln -sf "$INSTALLDIR/program/soffice" "$DESTDIR$BINDIR/soffice"
+-test -f $DESTDIR/gid_Module_Root_Brand && echo "$BINDIR/soffice" >>$DESTDIR/gid_Module_Root_Brand
++test -f $INSTALLDIR/gid_Module_Root_Brand && echo "$BINDIR/soffice" >>$INSTALLDIR/gid_Module_Root_Brand
+ 
+ # create bash completion
+-mkdir -p $DESTDIR/usr/share/bash-completion/completions
+-"${SRCDIR?}"/bin/generate-bash-completion.py bin/bash-completion.in $DESTDIR/usr/share/bash-completion/completions/$INSTALLDIRNAME.sh
+-test -f $DESTDIR/gid_Module_Root_Brand && echo "/usr/share/bash-completion/completions/$INSTALLDIRNAME.sh" >>$DESTDIR/gid_Module_Root_Brand
++mkdir -p $INSTALLDIR/usr/share/bash-completion/completions
++"${SRCDIR?}"/bin/generate-bash-completion.py bin/bash-completion.in $INSTALLDIR/usr/share/bash-completion/completions/$INSTALLDIRNAME.sh
++test -f $INSTALLDIR/gid_Module_Root_Brand && echo "/usr/share/bash-completion/completions/$INSTALLDIRNAME.sh" >>$INSTALLDIR/gid_Module_Root_Brand
+ if test "$WITH_COMPAT_OOWRAPPERS" = "TRUE" ; then
+-    "${SRCDIR?}"/bin/generate-bash-completion.py --compat-oowrappers bin/bash-completion.in $DESTDIR/usr/share/bash-completion/completions/ooffice.sh
+-    test -f $DESTDIR/gid_Module_Root_Brand && echo "/usr/share/bash-completion/completions/ooffice.sh" >>$DESTDIR/gid_Module_Root_Brand
++    "${SRCDIR?}"/bin/generate-bash-completion.py --compat-oowrappers bin/bash-completion.in $INSTALLDIR/usr/share/bash-completion/completions/ooffice.sh
++    test -f $INSTALLDIR/gid_Module_Root_Brand && echo "/usr/share/bash-completion/completions/ooffice.sh" >>$INSTALLDIR/gid_Module_Root_Brand
+ fi
+ 
+ echo "Install $OOINSTDIR/basis$VERSION/program/java-set-classpath";
+ mkdir -p $DESTDIR$INSTALLDIR/program
+ sed -e "s|@INSTALLDIR@|$INSTALLDIR|g" "${SRCDIR?}"/bin/java-set-classpath.in >| "$DESTDIR$INSTALLDIR/program/java-set-classpath" || exit 1;
+ chmod 755 "$DESTDIR$INSTALLDIR/program/java-set-classpath"
+-test -f $DESTDIR/gid_Module_Root_Brand && echo "$INSTALLDIR/program/java-set-classpath" >>$DESTDIR/gid_Module_Root_Brand
++test -f $INSTALLDIR/gid_Module_Root_Brand && echo "$INSTALLDIR/program/java-set-classpath" >>$INSTALLDIR/gid_Module_Root_Brand
+ 
+ exit 0
+diff --git a/bin/distro-install-file-lists b/bin/distro-install-file-lists
+index 9fccb81dc..3b9309988 100755
+--- a/bin/distro-install-file-lists
++++ b/bin/distro-install-file-lists
+@@ -59,7 +59,7 @@ merge_flists()
+     fi
+ }
+ 
+-if ! test -f $DESTDIR/gid_Module_Root; then
++if ! test -f $INSTALLDIR/gid_Module_Root; then
+     echo "Error: Failed to generate package file lists";
+     echo "       Have you defined DESTDIR?"
+     exit
+@@ -69,7 +69,7 @@ fi
+ rm -rf "$FILELISTSDIR"
+ mkdir -p "$FILELISTSDIR"
+ 
+-cd $DESTDIR
++cd $INSTALLDIR
+ 
+ if test "z$OOO_VENDOR" != "zDebian" ; then
+ 
+@@ -217,7 +217,7 @@ if test "z$OOO_VENDOR" != "zDebian" ; then
+     cd $FILELISTSDIR
+ 
+     # gnome subpackage
+-    test -f $DESTDIR/gid_Module_Optional_Gnome && cp $DESTDIR/gid_Module_Optional_Gnome gnome_list.txt || :
++    test -f $INSTALLDIR/gid_Module_Optional_Gnome && cp $INSTALLDIR/gid_Module_Optional_Gnome gnome_list.txt || :
+     mv_file_between_flists gnome_list.txt common_list.txt $INSTALLDIR/program/libevoab2.so
+     mv_file_between_flists gnome_list.txt common_list.txt $INSTALLDIR/program/libvclplug_gtk[0-9]*l..so
+     add_used_directories gnome_list.txt common_list.txt
+@@ -235,7 +235,7 @@ if test "z$OOO_VENDOR" != "zDebian" ; then
+     test -f mono_gac && cat mono_gac >>mono_list.txt
+ 
+     # postgresql subpackage
+-    test -f $DESTDIR/gid_Module_Optional_PostgresqlSdbc && cp $DESTDIR/gid_Module_Optional_PostgresqlSdbc postgresql_list.txt || :
++    test -f $INSTALLDIR/gid_Module_Optional_PostgresqlSdbc && cp $INSTALLDIR/gid_Module_Optional_PostgresqlSdbc postgresql_list.txt || :
+ 
+     # mailmerge
+     if test "$SPLIT_OPT_FEATURES" = "TRUE" ; then
+@@ -250,7 +250,7 @@ if test "z$OOO_VENDOR" != "zDebian" ; then
+ 
+     if test "z$OOO_VENDOR" = "zSUSE" ; then
+         # officebean subpackage
+-        test -f $DESTDIR/gid_Module_Optional_Extensions_Script_Provider_For_BS && cp $DESTDIR/gid_Module_Optional_Extensions_Script_Provider_For_BS officebean_list.txt || :
++        test -f $INSTALLDIR/gid_Module_Optional_Extensions_Script_Provider_For_BS && cp $INSTALLDIR/gid_Module_Optional_Extensions_Script_Provider_For_BS officebean_list.txt || :
+         mv_file_between_flists officebean_list.txt common_list.txt $INSTALLDIR/program/classes/officebean.jar
+         mv_file_between_flists officebean_list.txt common_list.txt $INSTALLDIR/program/libofficebean.so
+         add_used_directories officebean_list.txt common_list.txt
+@@ -450,13 +450,13 @@ else
+ 
+     # Move all libraries, binaries, *.rdb from -common to -core
+     for d in $INSTALLDIR/program $INSTALLDIR/program; do \
+-      if [ ! -d $DESTDIR/pkg/libreoffice-core/$d ]; then \
+-      mkdir -p $DESTDIR/pkg/libreoffice-core/$d; \
++      if [ ! -d $INSTALLDIR/pkg/libreoffice-core/$d ]; then \
++      mkdir -p $INSTALLDIR/pkg/libreoffice-core/$d; \
+       fi &&
+       ( cd pkg/libreoffice-common/$d
+         find -maxdepth 1 \
+            -regex '\./\(.*\.so.*\|.*\.bin\|pagein\|msfontextract\|.*\.rdb\|javaldx\|uri-encode\)' \
+-           -exec mv {} $DESTDIR/pkg/libreoffice-core/$d \;
++           -exec mv {} $INSTALLDIR/pkg/libreoffice-core/$d \;
+       ); \
+     done
+ 
+@@ -513,4 +513,4 @@ if test "z$RPM_CONFIG_FILE_TAGS" != "z" ; then
+ fi
+ 
+ mkdir -p $FILELISTSDIR/orig
+-mv -f $DESTDIR/gid_Module_* $FILELISTSDIR/orig
++mv -f $INSTALLDIR/gid_Module_* $FILELISTSDIR/orig
+diff --git a/bin/distro-install-sdk b/bin/distro-install-sdk
+index aad5c4c8c..c92adeb51 100755
+--- a/bin/distro-install-sdk
++++ b/bin/distro-install-sdk
+@@ -47,22 +47,22 @@ if test -d $DESTDIR$INSTALLDIR/sdk ; then
+ 	-e "s|^\(%dir \)\?$INSTALLDIR/sdk/share.*$||" \
+ 	-e "/\.orig$/D" \
+ 	-e "/^$/D" \
+-	$DESTDIR/gid_Module_Root_SDK | sort -u \
+-	>$DESTDIR/gid_Module_Root_SDK.new
+-    mv $DESTDIR/gid_Module_Root_SDK.new $DESTDIR/gid_Module_Root_SDK
++	$INSTALLDIR/gid_Module_Root_SDK | sort -u \
++	>$INSTALLDIR/gid_Module_Root_SDK.new
++    mv $INSTALLDIR/gid_Module_Root_SDK.new $INSTALLDIR/gid_Module_Root_SDK
+     #
+-    echo "%dir $DATADIR/$INSTALLDIRNAME/sdk"                    >>$DESTDIR/gid_Module_Root_SDK
+-    echo "%dir $DATADIR/$INSTALLDIRNAME"                        >>$DESTDIR/gid_Module_Root_SDK
+-    echo "%dir $DATADIR/idl"                                    >>$DESTDIR/gid_Module_Root_SDK
+-    echo "%dir $DOCDIR/sdk/docs"                                >>$DESTDIR/gid_Module_Root_SDK
+-    echo "%dir $DOCDIR/sdk"                                     >>$DESTDIR/gid_Module_Root_SDK
+-    echo "%dir $DOCDIR"                                         >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$INSTALLDIR/sdk/include"     >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$INSTALLDIR/sdk/classes"     >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$INSTALLDIR/sdk/idl"         >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$INSTALLDIR/sdk/docs"        >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$INSTALLDIR/sdk/index.html"  >>$DESTDIR/gid_Module_Root_SDK
+-    echo "$DOCDIR/sdk/examples"                                 >>$DESTDIR/gid_Module_Root_SDK
++    echo "%dir $DATADIR/$INSTALLDIRNAME/sdk"                    >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "%dir $DATADIR/$INSTALLDIRNAME"                        >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "%dir $DATADIR/idl"                                    >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "%dir $DOCDIR/sdk/docs"                                >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "%dir $DOCDIR/sdk"                                     >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "%dir $DOCDIR"                                         >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$INSTALLDIR/sdk/include"     >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$INSTALLDIR/sdk/classes"     >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$INSTALLDIR/sdk/idl"         >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$INSTALLDIR/sdk/docs"        >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$INSTALLDIR/sdk/index.html"  >>$INSTALLDIR/gid_Module_Root_SDK
++    echo "$DOCDIR/sdk/examples"                                 >>$INSTALLDIR/gid_Module_Root_SDK
+ 
+     # generate default profiles
+     sed -e "s,@OO_SDK_NAME@,libreoffice${PRODUCTVERSION}_sdk," \
+@@ -80,6 +80,6 @@ if test -d $DESTDIR$INSTALLDIR/sdk ; then
+             $DESTDIR$INSTALLDIR/sdk/setsdkenv_unix.sh.in \
+         > $DESTDIR$INSTALLDIR/sdk/setsdkenv_unix.sh
+     chmod 755 $DESTDIR$INSTALLDIR/sdk/setsdkenv_unix.sh
+-    echo $INSTALLDIR/sdk/setsdkenv_unix.sh >>$DESTDIR/gid_Module_Root_SDK
++    echo $INSTALLDIR/sdk/setsdkenv_unix.sh >>$INSTALLDIR/gid_Module_Root_SDK
+ 
+ fi
+diff --git a/Makefile.in b/Makefile.in
+index 4891bb4e3..d0f441ac1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -475,7 +475,6 @@ distro-pack-install: install
+ 	WITH_LANG_LIST="$(WITH_LANG_LIST)" WITH_POOR_HELP_LOCALIZATIONS="$(WITH_POOR_HELP_LOCALIZATIONS)" $(SRCDIR)/bin/distro-install-clean-up
+ 	$(SRCDIR)/bin/distro-install-desktop-integration
+ 	$(SRCDIR)/bin/distro-install-sdk
+-	WITH_LANG_LIST="$(WITH_LANG_LIST)" $(SRCDIR)/bin/distro-install-file-lists
+ 
+ install-package-%:
+ 	$(MAKE) $(GMAKE_OPTIONS) -f $(SRCDIR)/Makefile.gbuild $@

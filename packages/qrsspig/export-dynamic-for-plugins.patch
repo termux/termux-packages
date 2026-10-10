@@ -1,0 +1,13 @@
+Unlike glibc, Android's dynamic linker doesn't expose the executable's own
+symbols to libraries it dlopen()s unless they're exported with -rdynamic.
+
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -19,6 +19,7 @@
+ list(APPEND QRSSPIG_SOURCES QrssPiG.cpp QGUtils.cpp QGInputDevice.cpp QGProcessor.cpp QGOutput.cpp QGUploader.cpp)
+
+ add_executable (qrsspig main.cpp ${QRSSPIG_SOURCES})
++set_target_properties(qrsspig PROPERTIES LINK_FLAGS "-rdynamic")
+ target_include_directories(qrsspig PRIVATE Clara/v1.1.5 Catch2/v2.13.7)
+
+ # Dynamic linking library

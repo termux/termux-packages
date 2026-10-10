@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION=" Rust implementation of Magic Wormhole, with new feature
 TERMUX_PKG_LICENSE="EUPL-1.2"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.7.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="0.8.1"
 TERMUX_PKG_SRCURL="https://github.com/magic-wormhole/magic-wormhole.rs/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=1d76e80108291f0a31e1a0e2e1d6199decb55bec73bc725baacb93ea0ae06e5e
+TERMUX_PKG_SHA256=90e8b1d7270a4c251f78376e10948c994df1a559152eca7eedd4aecbf70b70d9
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_rust

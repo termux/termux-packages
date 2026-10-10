@@ -1,8 +1,7 @@
-diff --git a/src/ctypes.c b/src/ctypes.c
-index 7d976ee..cd6411f 100644
---- a/src/ctypes.c
-+++ b/src/ctypes.c
-@@ -452,7 +452,7 @@ static char *dlcall_usage[] = {
+diff -uNr ctypes-sh-1.3.orig/src/ctypes.c ctypes-sh-1.3/src/ctypes.c
+--- ctypes-sh-1.3.orig/src/ctypes.c	2026-08-20 18:28:11.030439206 +0530
++++ ctypes-sh-1.3/src/ctypes.c	2026-08-20 18:28:11.050439206 +0530
+@@ -456,7 +456,7 @@
      "These are specified followed by a ':' then the type.",
      "",
      "    $ dlopen libc.so.6",
@@ -11,11 +10,10 @@ index 7d976ee..cd6411f 100644
      "",
      "Options:",
      "    -a abi      Use the specified ABI rather than the default.",
-diff --git a/src/struct/dutil.h b/src/struct/dutil.h
-index 0401b3e..c6d35f3 100644
---- a/src/struct/dutil.h
-+++ b/src/struct/dutil.h
-@@ -296,7 +296,7 @@ void *zalloc(const size_t size);
+diff -uNr ctypes-sh-1.3.orig/src/struct/dutil.h ctypes-sh-1.3/src/struct/dutil.h
+--- ctypes-sh-1.3.orig/src/struct/dutil.h	2026-08-20 18:28:11.034439206 +0530
++++ ctypes-sh-1.3/src/struct/dutil.h	2026-08-20 18:28:11.062439206 +0530
+@@ -309,7 +309,7 @@
  Elf_Scn *elf_section_by_name(Elf *elf, GElf_Ehdr *ep,
  			     GElf_Shdr *shp, const char *name, size_t *index);
  
@@ -24,10 +22,9 @@ index 0401b3e..c6d35f3 100644
  /* Just a way to check if we're using an old elfutils version */
  static inline int elf_getshdrstrndx(Elf *elf, size_t *dst)
  {
-diff --git a/src/struct/struct.c b/src/struct/struct.c
-index dd3687d..70d0a8d 100644
---- a/src/struct/struct.c
-+++ b/src/struct/struct.c
+diff -uNr ctypes-sh-1.3.orig/src/struct/struct.c ctypes-sh-1.3/src/struct/struct.c
+--- ctypes-sh-1.3.orig/src/struct/struct.c	2026-08-20 18:28:11.034439206 +0530
++++ ctypes-sh-1.3/src/struct/struct.c	2026-08-20 18:28:11.130439206 +0530
 @@ -21,6 +21,10 @@
  
  #define MAX_ELEMENT_SIZE 128    // Maximum length of array_name[element_name]
@@ -39,10 +36,9 @@ index dd3687d..70d0a8d 100644
  static int select_union_string(char *unionstr, const char *unionname, char *membername, size_t maxlen);
  
  // This is just to disable ctf support.
-diff --git a/src/unpack.c b/src/unpack.c
-index e50c33b..d9dd611 100644
---- a/src/unpack.c
-+++ b/src/unpack.c
+diff -uNr ctypes-sh-1.3.orig/src/unpack.c ctypes-sh-1.3/src/unpack.c
+--- ctypes-sh-1.3.orig/src/unpack.c	2026-08-20 18:28:11.034439206 +0530
++++ ctypes-sh-1.3/src/unpack.c	2026-08-20 18:28:11.150439206 +0530
 @@ -22,7 +22,7 @@
  #include "types.h"
  #include "shell.h"

@@ -2,15 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cargo-bins/cargo-binstall
 TERMUX_PKG_DESCRIPTION="Tool to fetch and install precompiled musl-based static binaries from the Rust ecosystem"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.21.0"
+TERMUX_PKG_VERSION="1.25.2"
 TERMUX_PKG_SRCURL="https://github.com/cargo-bins/cargo-binstall/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=a7d5349ce3fb7883c911ae7c4154770d5782214ba2c6c65579e8e0b339c82764
+TERMUX_PKG_SHA256=77b17312c655720977b8debae624c9983c735f74e6b60eb51492cd245fe74ae4
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
+
+	# jitterentropy needs -O0, which -Oz in CFLAGS overrides
+	export AWS_LC_SYS_NO_JITTER_ENTROPY=1
 
 	cargo vendor
 	find ./vendor \

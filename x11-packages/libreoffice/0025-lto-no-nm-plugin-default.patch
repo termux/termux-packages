@@ -1,0 +1,20 @@
+llvm-nm/llvm-ar read LTO bitcode natively and reject GNU binutils'
+--plugin flag ("llvm-nm: error: : unknown argument '--plugin'"),
+which corrupts the generated .exports lists gbuild uses to skip
+relinking dependents. Only pass --plugin when LD_PLUGIN is set
+explicitly (the GNU binutils case).
+
+
+diff --git a/solenv/gbuild/platform/com_GCC_defs.mk b/solenv/gbuild/platform/com_GCC_defs.mk
+index 31900e8b9..683651ad1 100644
+--- a/solenv/gbuild/platform/com_GCC_defs.mk
++++ b/solenv/gbuild/platform/com_GCC_defs.mk
+@@ -190,7 +190,7 @@ ifeq ($(ENABLE_LTO),TRUE)
+ ifeq ($(COM_IS_CLANG),TRUE)
+ gb_LTOFLAGS := -flto=thin
+ ifeq (,$(index,iOS MACOSX,$(OS)))
+-gb_LTOPLUGINFLAGS := --plugin $(if $(LD_PLUGIN),$(LD_PLUGIN),LLVMgold.so)
++gb_LTOPLUGINFLAGS := $(if $(LD_PLUGIN),--plugin $(LD_PLUGIN))
+ endif
+ else
+ # use parallelism based on make's job handling

@@ -1,0 +1,32 @@
+`pthread_t` is an alias of `long` in bionic.
+
+--- a/src/shared/CLucene/util/Misc.cpp
++++ b/src/shared/CLucene/util/Misc.cpp
+@@ -466,6 +466,7 @@
+ std::string Misc::toString(const bool value){
+   return value ? "true" : "false";
+ }
++#if !defined(__ANDROID__) || !defined(__LP64__)
+ std::string Misc::toString(_LUCENE_THREADID_TYPE value){
+   static int32_t nextindex = 0;
+   static std::map<_LUCENE_THREADID_TYPE, int32_t> ids;
+@@ -474,6 +475,7 @@
+   }
+   return toString(ids[value]);
+ }
++#endif
+ std::string Misc::toString(const int32_t value){
+   char buf[20];
+   TCHAR tbuf[20];
+--- a/src/shared/CLucene/util/Misc.h
++++ b/src/shared/CLucene/util/Misc.h
+@@ -67,7 +67,9 @@
+ 
+   static std::string toString(const int32_t value);
+   static std::string toString(const int64_t value);
++#if !defined(__ANDROID__) || !defined(__LP64__)
+   static std::string toString(const _LUCENE_THREADID_TYPE value);
++#endif
+   static std::string toString(const bool value);
+   static std::string toString(const float_t value);
+   static std::string toString(const TCHAR* s, int32_t len=-1);
