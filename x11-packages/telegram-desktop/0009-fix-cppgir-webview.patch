@@ -1,7 +1,7 @@
 diff --git a/cmake/external/glib/cppgir/gi/string.hpp b/cmake/external/glib/cppgir/gi/string.hpp
 --- a/cmake/external/glib/cppgir/gi/string.hpp
 +++ b/cmake/external/glib/cppgir/gi/string.hpp
-@@ -203,6 +203,8 @@
+@@ -203,6 +203,8 @@ public:
    // custom
    constexpr const_pointer gobj_() const { return data_; }
  
@@ -13,36 +13,25 @@ diff --git a/cmake/external/glib/cppgir/gi/string.hpp b/cmake/external/glib/cppg
 diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp b/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
 --- a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
 +++ b/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
-@@ -2873,8 +2873,8 @@
-	_master.signal_handle_message_received().connect([=](
-			Master,
-			Gio::DBusMethodInvocation invocation,
--			const std::string &message,
--			const std::string &sourceUrl) {
-+			const gi::cstring_v message,
-+			const gi::cstring_v sourceUrl) {
- 		if (_messageHandler) {
- 			_messageHandler(Message{
- 				.text = message,
-@@ -2890,7 +2890,7 @@
-	_master.signal_handle_navigation_started().connect([=](
-			Master,
-			Gio::DBusMethodInvocation invocation,
+@@ -2807,7 +2807,7 @@ void Instance::registerMasterMethodHandlers() {
+ 	_master.signal_handle_navigation_policy().connect([=](
+ 			Master,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &uri,
 +			const gi::cstring_v uri,
  			bool newWindow) {
  		if (newWindow) {
- 			if (_navigationStartHandler
-@@ -2903,7 +2903,7 @@
+ 			if (_navigationPolicyHandler
+@@ -2820,7 +2820,7 @@ void Instance::registerMasterMethodHandlers() {
  				QDesktopServices::openUrl(QString::fromStdString(uri));
  			}
- 			_master.complete_navigation_started(invocation, false);
+ 			_master.complete_navigation_policy(invocation, false);
 -		} else if (!uri.starts_with(dataDomain())
 +		} else if (!std::string(uri).starts_with(dataDomain())
- 				&& _navigationStartHandler
- 				&& !_navigationStartHandler(uri, false)) {
- 			_master.complete_navigation_started(invocation, false);
-@@ -2940,8 +2940,8 @@
+ 				&& _navigationPolicyHandler
+ 				&& !_navigationPolicyHandler(uri, false)) {
+ 			_master.complete_navigation_policy(invocation, false);
+@@ -2845,8 +2845,8 @@ void Instance::registerMasterMethodHandlers() {
  			Master,
  			Gio::DBusMethodInvocation invocation,
  			int type,
@@ -51,29 +40,18 @@ diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk
 +			const gi::cstring_v text,
 +			const gi::cstring_v value) {
  		if (!_dialogHandler) {
- 			invocation.return_gerror(MethodError());
- 			return true;
-@@ -2995,8 +2995,8 @@
-	_master.signal_handle_navigation_state_update().connect([=](
-			Master,
-			Gio::DBusMethodInvocation invocation,
--			const std::string &url,
--			const std::string &title,
-+			const gi::cstring_v url,
-+			const gi::cstring_v title,
- 			bool canGoBack,
- 			bool canGoForward) {
- 		_navigationHistoryState = NavigationHistoryState{
-@@ -3118,7 +3118,7 @@
-	_master.signal_data_server_started().connect([=](
-			Master,
-			std::uint16_t port,
+ 			return false;
+ 		}
+@@ -2954,7 +2954,7 @@ int Instance::exec() {
+ 	_master.signal_data_server_started().connect([=](
+ 			Master,
+ 			std::uint16_t port,
 -			const std::string &password) {
 +			const gi::cstring_v password) {
  		_dataPort = port;
  		_dataPassword = password;
  	});
-@@ -3139,10 +3139,10 @@
+@@ -2998,10 +2998,10 @@ void Instance::registerHelperMethodHandlers() {
  			int g,
  			int b,
  			int a,
@@ -86,7 +64,7 @@ diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk
  			int marginLeft,
  			int marginRight,
  			int marginTop,
-@@ -3150,8 +3150,8 @@
+@@ -3009,8 +3009,8 @@ void Instance::registerHelperMethodHandlers() {
  			int initialWidth,
  			int initialHeight,
  			bool allowThirdPartyCookies,
@@ -94,22 +72,22 @@ diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk
 -			const std::string &restrictedContentSecurityPolicy) {
 +			const gi::cstring_v restrictedOrigin,
 +			const gi::cstring_v restrictedContentSecurityPolicy) {
- 		if (create({
+ 		if (!create({
  			.opaqueBg = QColor(r, g, b, a),
  			.userDataPath = path,
-@@ -3195,7 +3195,7 @@
-	_helper.signal_handle_navigate().connect([=](
-			Helper,
-			Gio::DBusMethodInvocation invocation,
+@@ -3053,7 +3053,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_navigate().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &url) {
 +			const gi::cstring_v url) {
  		navigate(url);
  		_helper.complete_navigate(invocation);
  		return true;
-@@ -3204,8 +3204,8 @@
-	_helper.signal_handle_load_html().connect([=](
-			Helper,
-			Gio::DBusMethodInvocation invocation,
+@@ -3062,8 +3062,8 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_load_html().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &html,
 -			const std::string &baseUrl) {
 +			const gi::cstring_v html,
@@ -117,30 +95,52 @@ diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk
  		loadHtml(html, baseUrl);
  		_helper.complete_load_html(invocation);
  		return true;
-@@ -3233,7 +3233,7 @@
-	_helper.signal_handle_init().connect([=](
-			Helper,
-			Gio::DBusMethodInvocation invocation,
+@@ -3109,7 +3109,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_init().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &js) {
 +			const gi::cstring_v js) {
  		init(js);
  		_helper.complete_init(invocation);
  		return true;
-@@ -3242,7 +3242,7 @@
-	_helper.signal_handle_init_all_frames().connect([=](
-			Helper,
-			Gio::DBusMethodInvocation invocation,
+@@ -3118,7 +3118,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_init_all_frames().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &js) {
 +			const gi::cstring_v js) {
  		initAllFrames(js);
  		_helper.complete_init_all_frames(invocation);
  		return true;
-@@ -3251,7 +3251,7 @@
-	_helper.signal_handle_eval().connect([=](
-			Helper,
-			Gio::DBusMethodInvocation invocation,
+@@ -3127,7 +3127,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_eval().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
 -			const std::string &js) {
 +			const gi::cstring_v js) {
  		eval(js);
  		_helper.complete_eval(invocation);
  		return true;
+@@ -3184,8 +3184,8 @@ void Instance::registerHelperMethodHandlers() {
+ void Instance::registerHelperSignalHandlers() {
+ 	_helper.signal_message_received().connect([=](
+ 			Helper,
+-			const std::string &message,
+-			const std::string &sourceUrl) {
++			const gi::cstring_v message,
++			const gi::cstring_v sourceUrl) {
+ 		if (_messageHandler) {
+ 			_messageHandler(Message{
+ 				.text = message,
+@@ -3214,8 +3214,8 @@ void Instance::registerHelperSignalHandlers() {
+ 
+ 	_helper.signal_navigation_state_update().connect([=](
+ 			Helper,
+-			const std::string &url,
+-			const std::string &title,
++			const gi::cstring_v url,
++			const gi::cstring_v title,
+ 			bool canGoBack,
+ 			bool canGoForward) {
+ 		_navigationHistoryState = NavigationHistoryState{

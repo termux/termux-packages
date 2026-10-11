@@ -1,7 +1,7 @@
 diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
 --- a/Telegram/CMakeLists.txt
 +++ b/Telegram/CMakeLists.txt
-@@ -29,7 +29,10 @@
+@@ -29,7 +29,10 @@ include(cmake/lib_ffmpeg.cmake)
  include(cmake/lib_stripe.cmake)
  include(cmake/lib_tgcalls.cmake)
  include(cmake/lib_prisma.cmake)
@@ -9,10 +9,10 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
  include(cmake/lib_fido2.cmake)
 +    set(fido2_target tdesktop::lib_fido2)
 +endif()
+ include(cmake/lib_zxcvbn.cmake)
  include(cmake/td_export.cmake)
- include(cmake/td_iv.cmake)
- include(cmake/td_lang.cmake)
-@@ -37,7 +40,10 @@
+ include(cmake/td_gram.cmake)
+@@ -39,7 +42,10 @@ include(cmake/td_mtproto.cmake)
  include(cmake/td_scheme.cmake)
  include(cmake/td_tde2e.cmake)
  include(cmake/td_ui.cmake)
@@ -23,7 +23,7 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
  include(cmake/telegram_apple_swift_runtime.cmake)
  include(cmake/generate_appstream_changelog.cmake)
  
-@@ -64,7 +70,7 @@
+@@ -72,7 +78,7 @@ set_target_properties(Telegram PROPERTIES AUTOMOC ON)
  
  target_link_libraries(Telegram
  PRIVATE
@@ -31,8 +31,8 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
 +    ${fido2_target}
      tdesktop::lib_tgcalls
      tdesktop::td_export
-     tdesktop::td_iv
-@@ -73,7 +79,7 @@
+     tdesktop::td_gram
+@@ -82,7 +88,7 @@ PRIVATE
      tdesktop::td_scheme
      tdesktop::td_tde2e
      tdesktop::td_ui
@@ -41,7 +41,7 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
      desktop-app::lib_webrtc
      desktop-app::lib_base
      desktop-app::lib_crl
-@@ -2194,6 +2200,18 @@
+@@ -2352,6 +2358,18 @@ PRIVATE
      tray.h
  )
  
@@ -129,7 +129,7 @@ new file mode 100644
 diff --git a/Telegram/cmake/telegram_options.cmake b/Telegram/cmake/telegram_options.cmake
 --- a/Telegram/cmake/telegram_options.cmake
 +++ b/Telegram/cmake/telegram_options.cmake
-@@ -52,6 +52,8 @@
+@@ -53,6 +53,8 @@ if (DESKTOP_APP_SPECIAL_TARGET)
      target_compile_definitions(Telegram PRIVATE TDESKTOP_ALLOW_CLOSED_ALPHA)
  endif()
  
