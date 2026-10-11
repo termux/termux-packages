@@ -1,0 +1,17 @@
+--- a/src/sdk/scripting/bindings/sc_wxtypes.cpp
++++ b/src/sdk/scripting/bindings/sc_wxtypes.cpp
+@@ -1075,10 +1075,10 @@ void Register_wxTypes(HSQUIRRELVM v)
+         BindDefaultClone<wxColour>(v);
+ 
+         BindMethod(v, _SC("_tostring"), wxColour_ToString, _SC("wxColour::_tostring"));
+-        BindMethod(v, _SC("Blue"), NoParamGetterInt<wxColour::ChannelType, wxColour, &wxColour::Blue>, _SC("wxColour::Blue"));
+-        BindMethod(v, _SC("Green"), NoParamGetterInt<wxColour::ChannelType, wxColour, &wxColour::Green>, _SC("wxColour::Green"));
+-        BindMethod(v, _SC("Red"), NoParamGetterInt<wxColour::ChannelType, wxColour, &wxColour::Red>, _SC("wxColour::Red"));
+-        BindMethod(v, _SC("Alpha"), NoParamGetterInt<wxColour::ChannelType, wxColour, &wxColour::Alpha>, _SC("wxColour::Alpha"));
++        BindMethod(v, _SC("Blue"), NoParamGetterInt<wxColour::ChannelType, wxColour, wxColourBase, &wxColourBase::Blue>, _SC("wxColour::Blue"));
++        BindMethod(v, _SC("Green"), NoParamGetterInt<wxColour::ChannelType, wxColour, wxColourBase, &wxColourBase::Green>, _SC("wxColour::Green"));
++        BindMethod(v, _SC("Red"), NoParamGetterInt<wxColour::ChannelType, wxColour, wxColourBase, &wxColourBase::Red>, _SC("wxColour::Red"));
++        BindMethod(v, _SC("Alpha"), NoParamGetterInt<wxColour::ChannelType, wxColour, wxColourBase, &wxColourBase::Alpha>, _SC("wxColour::Alpha"));
+         BindMethod(v, _SC("IsOk"), wxColour_IsOk, _SC("wxColour::IsOk"));
+         BindMethod(v, _SC("Set"), wxColour_Set, _SC("wxColour::Set"));
+ 

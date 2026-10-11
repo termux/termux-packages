@@ -1,0 +1,19 @@
+--- a/src/include/scripting/bindings/sc_utils.h
++++ b/src/include/scripting/bindings/sc_utils.h
+@@ -998,6 +998,16 @@ SQInteger NoParamGetterInt(HSQUIRRELVM v)
+     return 1;
+ }
+ 
++template<typename ReturnType, typename ClassType, typename BaseType, ReturnType (BaseType::*func)() const>
++SQInteger NoParamGetterInt(HSQUIRRELVM v)
++{
++    ExtractParams1<const ClassType*> extractor(v);
++    if (!extractor.Process("NoParamGetter"))
++        return extractor.ErrorMessage();
++    sq_pushinteger(v, (extractor.p0->*func)());
++    return 1;
++}
++
+ inline SQInteger ThrowIndexNotFound(HSQUIRRELVM v)
+ {
+     sq_pushnull(v);
