@@ -1,6 +1,6 @@
 --- a/src/unix/mimetype.cpp
 +++ b/src/unix/mimetype.cpp
-@@ -536,8 +536,8 @@ void wxMimeTypesManagerImpl::Initialize(
+@@ -542,8 +542,8 @@ void wxMimeTypesManagerImpl::Initialize(int mailcapStyles,
  #else
  
      // Read MIME type - extension associations
@@ -11,7 +11,7 @@
  
      // Load desktop files for XDG, and then override them with the defaults.
      // We will override them one desktop file at a time, rather
-@@ -550,12 +550,12 @@ void wxMimeTypesManagerImpl::Initialize(
+@@ -556,12 +556,12 @@ void wxMimeTypesManagerImpl::Initialize(int mailcapStyles,
          wxString xdgDataDirs = wxGetenv("XDG_DATA_DIRS");
          if ( xdgDataDirs.empty() )
          {
@@ -27,7 +27,7 @@
              }
  
              if ( mailcapStyles & wxMAILCAP_KDE )
-@@ -563,8 +563,8 @@ void wxMimeTypesManagerImpl::Initialize(
+@@ -569,8 +569,8 @@ void wxMimeTypesManagerImpl::Initialize(int mailcapStyles,
                  for ( int kdeVer = 5; kdeVer >= 3; kdeVer-- )
                  {
                      const wxString& kdeDir = wxString::Format("kde%d", kdeVer);

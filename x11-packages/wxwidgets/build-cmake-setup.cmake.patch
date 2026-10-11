@@ -1,0 +1,13 @@
+--- a/build/cmake/setup.cmake
++++ b/build/cmake/setup.cmake
+@@ -453,7 +453,9 @@ if(UNIX)
+         if(HAVE_FUNC_GETHOSTBYNAME_R_6)
+             # Assume that we have getservbyname_r() with consistent signature,
+             # this does seem to be the case in practice.
+-            set(HAVE_FUNC_GETSERVBYNAME_R_6 1)
++            if(NOT ANDROID)
++                set(HAVE_FUNC_GETSERVBYNAME_R_6 1)
++            endif()
+         else()
+             wx_check_c_source_compiles(
+                 [[struct hostent ret;
