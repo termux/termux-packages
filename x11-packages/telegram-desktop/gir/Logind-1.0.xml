@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<dump>
+  <interface name="LogindManager" get-type="logind_manager_get_type">
+    <signal name="prepare-for-sleep" return="void" when="last">
+      <param type="gboolean"/>
+    </signal>
+  </interface>
+  <class name="LogindManagerProxy" get-type="logind_manager_proxy_get_type" parents="GDBusProxy,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="LogindManager"/>
+  </class>
+  <class name="LogindManagerSkeleton" get-type="logind_manager_skeleton_get_type" parents="GDBusInterfaceSkeleton,GObject">
+    <implements name="GDBusInterface"/>
+    <implements name="LogindManager"/>
+  </class>
+  <interface name="LogindObject" get-type="logind_object_get_type">
+    <prerequisite name="GDBusObject"/>
+    <property name="manager" type="LogindManager" flags="227"/>
+  </interface>
+  <class name="LogindObjectProxy" get-type="logind_object_proxy_get_type" parents="GDBusObjectProxy,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="LogindObject"/>
+  </class>
+  <class name="LogindObjectSkeleton" get-type="logind_object_skeleton_get_type" parents="GDBusObjectSkeleton,GObject">
+    <implements name="GDBusObject"/>
+    <implements name="LogindObject"/>
+  </class>
+  <class name="LogindObjectManagerClient" get-type="logind_object_manager_client_get_type" parents="GDBusObjectManagerClient,GObject">
+    <implements name="GInitable"/>
+    <implements name="GAsyncInitable"/>
+    <implements name="GDBusObjectManager"/>
+  </class>
+</dump>

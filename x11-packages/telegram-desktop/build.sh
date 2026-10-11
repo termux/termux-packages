@@ -4,9 +4,9 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.2.9"
+TERMUX_PKG_VERSION="7.3.0"
 TERMUX_PKG_SRCURL="https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz"
-TERMUX_PKG_SHA256=dcf2e25c4e8aa961c2439312164d42408afa0130e89f31e77b55409a80da942a
+TERMUX_PKG_SHA256=74b2cd8b26efa2cf5da53270f7aaf70e0774bab0e65d6da3c2b4f47eddb9f517
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtshadertools, qt6-qtsvg, qt6-qtwayland, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools, qt6-qtshadertools-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -28,15 +28,31 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCRL_FORCE_QT=ON
 "
 
-__tlottie_fetch_source() {
-	local _archive="$TERMUX_PKG_CACHEDIR/tlottie-0.1.0.tar.gz"
+__tdesktop_rust_fetch_source() {
+	local _tlottie_archive="$TERMUX_PKG_CACHEDIR/tlottie-92df98dc.tar.gz"
 	termux_download \
-		"https://github.com/dkaraush/tlottie/archive/31f1b542f88e7b4be9a01e749920d857535fc715.tar.gz" \
-		"$_archive" \
-		"971f7acb6d6ba3001e4487f3b32d1a6a375b75eb4ffc9ead3c0a18d2389752b9"
+		"https://github.com/dkaraush/tlottie/archive/92df98dc209bc39b1e567ec74a8c86a0af5239de.tar.gz" \
+		"$_tlottie_archive" \
+		"7855c45912e59c51fbc530af5e849d6867e52e4d64a0117815add728e5cbee92"
 	rm -rf "$TERMUX_PKG_SRCDIR/tlottie"
 	mkdir -p "$TERMUX_PKG_SRCDIR/tlottie"
-	tar -xf "$_archive" --strip-components=1 -C "$TERMUX_PKG_SRCDIR/tlottie"
+	tar -xf "$_tlottie_archive" --strip-components=1 -C "$TERMUX_PKG_SRCDIR/tlottie"
+
+	local _wallet_engine_archive="$TERMUX_PKG_CACHEDIR/wallet-engine-e59e0d89.tar.gz"
+	termux_download \
+		"https://github.com/i582/wallet-engine/archive/e59e0d89d7ee90c388bf36e3334c5b276f396697.tar.gz" \
+		"$_wallet_engine_archive" \
+		"45d22ed481dc4fab07390abfa811c095c424e11c745e87b9d0d27b40efa17da2"
+	rm -rf "$TERMUX_PKG_SRCDIR/wallet-engine"
+	mkdir -p "$TERMUX_PKG_SRCDIR/wallet-engine"
+	tar -xf "$_wallet_engine_archive" --strip-components=1 -C "$TERMUX_PKG_SRCDIR/wallet-engine"
+
+	local _wallet_engine_patch="$TERMUX_PKG_CACHEDIR/wallet-engine-aec47495.patch"
+	termux_download \
+		"https://raw.githubusercontent.com/desktop-app/patches/aec474953ff7ee9b6e4cd9b8658288ea86d124f3/wallet-engine.patch" \
+		"$_wallet_engine_patch" \
+		"b40aba82c39a42d0526a85ecfa40d613baa57b1a2d6600e601a42a1576b3b822"
+	patch -p1 -d "$TERMUX_PKG_SRCDIR/wallet-engine" -i "$_wallet_engine_patch"
 }
 
 __tg_owt_fetch_source() {
@@ -84,7 +100,7 @@ __libtd_fetch_source() {
 }
 
 termux_step_post_get_source() {
-	__tlottie_fetch_source
+	__tdesktop_rust_fetch_source
 	__tg_owt_fetch_source
 	__libtd_fetch_source
 }
@@ -140,23 +156,43 @@ termux_step_host_build() {
 	__cppgir_build
 }
 
-__tlottie_build() {
+__tdesktop_rust_build() {
 	termux_setup_rust
 
-	local _tlottie_build_dir="$TERMUX_PKG_BUILDDIR/tlottie"
-	pushd "$TERMUX_PKG_SRCDIR/tlottie"
-	CARGO_TARGET_DIR="$_tlottie_build_dir" cargo rustc \
+	local _rust_dir="$TERMUX_PKG_BUILDDIR/tdesktop_rust"
+	local _rust_prefix="$TERMUX_PKG_BUILDDIR/tdesktop_rust-prefix"
+	rm -rf "$_rust_dir" "$_rust_prefix"
+	mkdir -p "$_rust_dir" "$_rust_prefix"/{lib,include/tlottie,include/wallet_engine}
+
+	pushd "$_rust_dir"
+	cargo init --lib --vcs none --name tdesktop_rust .
+	printf 'pub use ::tlottie;\npub use ::wallet_engine;\n' > src/lib.rs
+	cargo add --path "$TERMUX_PKG_SRCDIR/tlottie" --features c-api
+	cargo add --path "$TERMUX_PKG_SRCDIR/wallet-engine"
+	cargo rustc --lib --release \
 		--jobs "$TERMUX_PKG_MAKE_PROCESSES" \
-		--locked \
 		--target "$CARGO_TARGET_NAME" \
-		--release \
-		--features c-api \
-		--lib \
-		--crate-type staticlib
+		--crate-type staticlib --crate-type cdylib \
+		--config "profile.release.opt-level=3" \
+		--config "profile.release.lto='off'" \
+		--config "profile.release.codegen-units=1" \
+		--config "profile.release.panic='unwind'"
+	local _rust_target_dir="$_rust_dir/target/$CARGO_TARGET_NAME/release"
+	cp "$_rust_target_dir/libtdesktop_rust.a" "$_rust_prefix/lib/"
+	cp "$TERMUX_PKG_SRCDIR/tlottie/include/tlottie.h" "$_rust_prefix/include/tlottie/"
+	(
+		unset CARGO_BUILD_TARGET CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR RANLIB
+		cargo run --release \
+			--manifest-path "$TERMUX_PKG_SRCDIR/wallet-engine/bindgen/cpp/bindgen/Cargo.toml" \
+			--locked -- \
+			--library --out-dir "$_rust_prefix/include/wallet_engine" \
+			"$_rust_target_dir/libtdesktop_rust.so"
+	)
 	popd
 
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDESKTOP_APP_TLOTTIE_LIBRARY=$_tlottie_build_dir/$CARGO_TARGET_NAME/release/libtlottie.a"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDESKTOP_APP_TLOTTIE_INCLUDE_DIR=$TERMUX_PKG_SRCDIR/tlottie/include"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDESKTOP_APP_TDESKTOP_RUST_LIBRARY=$_rust_prefix/lib/libtdesktop_rust.a"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDESKTOP_APP_TLOTTIE_INCLUDE_DIR=$_rust_prefix/include/tlottie"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDESKTOP_APP_WALLET_ENGINE_INCLUDE_DIR=$_rust_prefix/include/wallet_engine"
 }
 
 __tg_owt_build() {
@@ -262,7 +298,7 @@ __libtd_build() {
 }
 
 termux_step_configure() {
-	__tlottie_build
+	__tdesktop_rust_build
 	__tg_owt_build
 	__libtd_build
 
@@ -288,6 +324,14 @@ termux_step_configure() {
 				exec $(command -v termux-proot-run) $TERMUX_PKG_BUILDDIR/Telegram/codegen/codegen/$_type/codegen_$_type "\$@"
 			EOF
 			chmod +x $TERMUX_PKG_TMPDIR/bin/codegen_$_type
+		done
+		local _tool
+		for _tool in zxcvbn_dictgen zxcvbn_translit; do
+			cat <<-EOF > $TERMUX_PKG_TMPDIR/bin/$_tool
+				#!$(command -v sh)
+				exec $(command -v termux-proot-run) $TERMUX_PKG_BUILDDIR/Telegram/$_tool "\$@"
+			EOF
+			chmod +x $TERMUX_PKG_TMPDIR/bin/$_tool
 		done
 		export PATH="$TERMUX_PKG_TMPDIR/bin:$PATH"
 	else
