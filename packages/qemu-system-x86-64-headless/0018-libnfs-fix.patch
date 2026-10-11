@@ -13,12 +13,12 @@
  #endif
              if (my_buffer) {
                  g_free(buf);
-@@ -320,7 +320,7 @@
- 
-     WITH_QEMU_LOCK_GUARD(&client->mutex) {
+@@ -355,7 +355,7 @@ static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, int64_t offset,
+                              nfs_co_generic_cb, &task) != 0) {
+ #else
          if (nfs_pwrite_async(client->context, client->fh,
 -                             offset, bytes, buf,
 +                             buf, bytes, offset,
                               nfs_co_generic_cb, &task) != 0) {
+ #endif
              if (my_buffer) {
-                 g_free(buf);
