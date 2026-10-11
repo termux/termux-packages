@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="osmpbf is a Java/C library to read and write OpenStreetM
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/openstreetmap/OSM-binary/archive/refs/tags/v${TERMUX_PKG_VERSION}.zip"
 TERMUX_PKG_SHA256=72d4a6abe7d98bd02febea5459477988862164d861b8c0163ba87f88cc034bf0
 TERMUX_PKG_DEPENDS="libc++, libprotobuf"
