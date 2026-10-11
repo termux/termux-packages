@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Proxy server to bypass Cloudflare protection"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.5.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/FlareSolverr/FlareSolverr/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256="e83ffb2e7f8b95769d33fad7848ea31c3a84d2e0a7771f7536209457ea03661c"
 TERMUX_PKG_DEPENDS="python, chromium, xorg-server-xvfb, python-pip, python-xvfbwrapper"
