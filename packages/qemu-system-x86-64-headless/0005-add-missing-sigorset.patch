@@ -1,8 +1,7 @@
-diff -uNr qemu-4.2.0/linux-user/signal.c qemu-4.2.0.mod/linux-user/signal.c
---- qemu-4.2.0/linux-user/signal.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/linux-user/signal.c	2019-12-15 00:15:27.954549467 +0200
-@@ -182,6 +182,27 @@
-     return atomic_xchg(&ts->signal_pending, 1);
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -195,6 +195,26 @@ int block_signals(void)
+     return qatomic_xchg(&ts->signal_pending, 1);
  }
  
 +#ifdef _NSIG_WORDS
@@ -18,7 +17,6 @@ diff -uNr qemu-4.2.0/linux-user/signal.c qemu-4.2.0.mod/linux-user/signal.c
 +#else
 +static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
 +{
-+    int i;
 +    if (!dest || !a || !b)
 +        return -1;
 +    *dest = *a | *b;
@@ -28,4 +26,4 @@ diff -uNr qemu-4.2.0/linux-user/signal.c qemu-4.2.0.mod/linux-user/signal.c
 +
  /* Wrapper for sigprocmask function
   * Emulates a sigprocmask in a safe way for the guest. Note that set and oldset
-  * are host signal set, not guest ones. Returns -TARGET_ERESTARTSYS if
+  * are host signal set, not guest ones. Returns -QEMU_ERESTARTSYS if
