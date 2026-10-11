@@ -1,6 +1,17 @@
+--- a/dom/media/CubebUtils.cpp
++++ b/dom/media/CubebUtils.cpp
+@@ -61,7 +61,7 @@
+ #define PREF_AUDIOIPC_STACK_SIZE "media.audioipc.stack_size"
+ #define PREF_AUDIOIPC_SHM_AREA_SIZE "media.audioipc.shm_area_size"
+ 
+-#if defined(XP_LINUX) || defined(XP_MACOSX) || defined(XP_WIN)
++#if (defined(XP_LINUX) && !defined(__TERMUX__)) || defined(XP_MACOSX) || defined(XP_WIN)
+ #  define MOZ_CUBEB_REMOTING
+ #endif
+ 
 --- a/dom/media/systemservices/VideoEngine.cpp
 +++ b/dom/media/systemservices/VideoEngine.cpp
-@@ -30,7 +30,7 @@
+@@ -28,7 +28,7 @@ mozilla::LazyLogModule gVideoEngineLog("VideoEngine");
  #define LOG(args) MOZ_LOG(gVideoEngineLog, mozilla::LogLevel::Debug, args)
  #define LOG_ENABLED() MOZ_LOG_TEST(gVideoEngineLog, mozilla::LogLevel::Debug)
  
@@ -11,7 +22,7 @@
  
 --- a/ipc/chromium/src/base/lock_impl_posix.cc
 +++ b/ipc/chromium/src/base/lock_impl_posix.cc
-@@ -22,7 +22,7 @@
+@@ -22,7 +22,7 @@ namespace internal {
  // Lock::PriorityInheritanceAvailable still must be checked as the code may
  // compile but the underlying platform still may not correctly support priority
  // inheritance locks.
@@ -22,7 +33,7 @@
  #  define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
 --- a/js/src/ctypes/libffi/src/closures.c
 +++ b/js/src/ctypes/libffi/src/closures.c
-@@ -112,7 +112,7 @@
+@@ -112,7 +112,7 @@ ffi_closure_free (void *ptr)
  #else /* !NetBSD with PROT_MPROTECT */
  
  #if !FFI_MMAP_EXEC_WRIT && !FFI_EXEC_TRAMPOLINE_TABLE
@@ -33,7 +44,7 @@
     option is defined will attempt to map such pages once, but if it
 --- a/memory/build/malloc_decls.h
 +++ b/memory/build/malloc_decls.h
-@@ -39,7 +39,7 @@
+@@ -48,7 +48,7 @@
  // consistent declare certain functions as `throw()`, though.
  
  // Bionic and OS X don't seem to care about `throw()`ness.
@@ -42,20 +53,9 @@
  #    undef NOTHROW_MALLOC_DECL
  #    define NOTHROW_MALLOC_DECL MALLOC_DECL
  // Some places don't care about the distinction.
---- a/dom/media/CubebUtils.cpp
-+++ b/dom/media/CubebUtils.cpp
-@@ -57,7 +57,7 @@
- #define PREF_AUDIOIPC_STACK_SIZE "media.audioipc.stack_size"
- #define PREF_AUDIOIPC_SHM_AREA_SIZE "media.audioipc.shm_area_size"
- 
--#if defined(XP_LINUX) || defined(XP_MACOSX) || defined(XP_WIN)
-+#if (defined(XP_LINUX) && !defined(__TERMUX__)) || defined(XP_MACOSX) || defined(XP_WIN)
- #  define MOZ_CUBEB_REMOTING
- #endif
- 
 --- a/mozglue/misc/ConditionVariable_posix.cpp
 +++ b/mozglue/misc/ConditionVariable_posix.cpp
-@@ -23,7 +23,7 @@
+@@ -23,7 +23,7 @@ static const long NanoSecPerSec = 1000000000;
  // Android 4.4 or earlier & macOS 10.12 has the clock functions, but not
  // pthread_condattr_setclock.
  #if defined(HAVE_CLOCK_MONOTONIC) && \
@@ -66,7 +66,7 @@
  
 --- a/mozglue/misc/StackWalk.cpp
 +++ b/mozglue/misc/StackWalk.cpp
-@@ -692,7 +692,7 @@
+@@ -946,7 +946,7 @@ MFBT_API void MozStackWalk(MozWalkStackCallback aCallback,
    stackEnd = __libc_stack_end;
  #    elif defined(XP_DARWIN)
    stackEnd = pthread_get_stackaddr_np(pthread_self());
@@ -74,15 +74,15 @@
 +#    elif defined(__TERMUX__)
    pthread_attr_t sattr;
    pthread_attr_init(&sattr);
-   pthread_getattr_np(pthread_self(), &sattr);
+   int rc = pthread_getattr_np(pthread_self(), &sattr);
 --- a/nsprpub/pr/src/pthreads/ptsynch.c
 +++ b/nsprpub/pr/src/pthreads/ptsynch.c
-@@ -953,7 +953,7 @@
- #if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) \
-     || (defined(FREEBSD) && __FreeBSD_version < 1200059) \
-     || defined(OPENBSD) || defined(BSDI) \
--    || defined(DARWIN)
-+    || defined(DARWIN) || defined(__TERMUX__)
+@@ -864,7 +864,7 @@ PR_IMPLEMENT(PRStatus) PR_DeleteSemaphore(const char* name) {
+  */
+ #    if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) || \
+         (defined(FREEBSD) && __FreeBSD_version < 1200059) ||            \
+-        defined(OPENBSD) || defined(DARWIN)
++        defined(OPENBSD) || defined(DARWIN) || defined(__TERMUX__)
  /* union semun is defined by including <sys/sem.h> */
- #else
+ #    else
  /* according to X/OPEN we have to define it ourselves */

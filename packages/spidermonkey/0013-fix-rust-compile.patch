@@ -1,50 +1,44 @@
---- a/toolkit/components/extensions/storage/moz.build
-+++ b/toolkit/components/extensions/storage/moz.build
-@@ -17,7 +17,7 @@
- # a delegate for consumers to use instead. Android Components can then provide
- # an implementation of the delegate that's backed by the Rust component. For
- # details, please see bug 1626506, comment 4.
--if CONFIG["MOZ_WIDGET_TOOLKIT"] != "android":
-+if False:
-     EXPORTS.mozilla.extensions.storage += [
-         "ExtensionStorageComponents.h",
-     ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -104,7 +104,6 @@
- # Since we're building with at least rustc 1.63, enable rust 1.57 features (use of try_reserve methods).
- fallible_collections = { version = "0.4", features = ["rust_1_57"] }
+@@ -112,15 +112,15 @@ fallible_collections = { version = "0.4", features = ["rust_1_57"] }
  
+ libz-rs-sys = { version = "0.4.1", features = ["custom-prefix"], optional = true }
+ 
+-[target.'cfg(any(target_os = "android", target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
+-osclientcerts = { path = "../../../../security/manager/ssl/osclientcerts" }
+-
 -[target.'cfg(not(target_os = "android"))'.dependencies]
+ gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom"] }
+ gkrust-uniffi-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/fixtures/", features = ["xpcom"], optional = true }
  viaduct = "0.1"
- webext_storage_bridge = { path = "../../../components/extensions/storage/webext_storage_bridge" }
- tabs = { version = "0.1" }
+ webext-storage = "0.1"
+ 
++[target.'cfg(any(target_os = "android", target_os = "macos", target_os = "ios", all(target_os = "windows", not(target_arch = "aarch64"))))'.dependencies]
++osclientcerts = { path = "../../../../security/manager/ssl/osclientcerts" }
++
++
+ [target.'cfg(target_os = "windows")'.dependencies]
+ detect_win32k_conflicts = { path = "../../../xre/detect_win32k_conflicts" }
+ shell_windows = { path = "../../../../browser/components/shell/rust/shell_windows", optional = true }
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -51,20 +51,16 @@
+@@ -55,7 +55,6 @@ extern crate xpcom;
  
  extern crate audio_thread_priority;
  
 -#[cfg(not(target_os = "android"))]
- extern crate webext_storage_bridge;
- 
--#[cfg(not(target_os = "android"))]
- extern crate tabs;
- 
--#[cfg(not(target_os = "android"))]
- mod reexport_appservices_uniffi_scaffolding {
-     tabs::uniffi_reexport_scaffolding!();
-     relevancy::uniffi_reexport_scaffolding!();
-     suggest::uniffi_reexport_scaffolding!();
- }
- 
--#[cfg(not(target_os = "android"))]
- extern crate suggest;
+ extern crate webext_storage;
  
  #[cfg(feature = "webrtc")]
-@@ -93,7 +88,6 @@
- extern crate l10nregistry_ffi;
- extern crate localization_ffi;
+@@ -96,13 +95,11 @@ extern crate trust_anchors;
+ ))]
+ extern crate osclientcerts;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate gkrust_uniffi_components;
+ 
+ #[cfg(feature = "uniffi_fixtures")]
+ extern crate gkrust_uniffi_fixtures;
  
 -#[cfg(not(target_os = "android"))]
  extern crate viaduct;
