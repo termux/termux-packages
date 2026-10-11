@@ -552,24 +552,24 @@ diff --git a/v8/src/heap/minor-mark-sweep.cc b/v8/src/heap/minor-mark-sweep.cc
 index 7dfcaa336c..278397237f 100644
 --- a/v8/src/heap/minor-mark-sweep.cc
 +++ b/v8/src/heap/minor-mark-sweep.cc
-@@ -862,6 +862,8 @@ void MinorMarkSweepCollector::TraceFragmentation() {
-                free_bytes_of_class[3]);
- }
+@@ -860,6 +860,8 @@
+ 
+ namespace {
  
 +#define NewSpacePageEvacuationThreshold NewSpacePageEvacuationThreshold_MinorMarkSweep
 +
- namespace {
- 
  // NewSpacePages with more live bytes than this threshold qualify for fast
-@@ -903,6 +905,8 @@ bool ShouldMovePage(PageMetadata* p, intptr_t live_bytes,
- 
- }  // namespace
+ // evacuation.
+ intptr_t NewSpacePageEvacuationThreshold() {
+@@ -896,6 +898,8 @@
+   return should_move_page;
+ }
  
 +#undef NewSpacePageEvacuationThreshold
 +
- void MinorMarkSweepCollector::EvacuateExternalPointerReferences(
-     MutablePageMetadata* p) {
- #ifdef V8_COMPRESS_POINTERS
+ }  // namespace
+ 
+ void MinorMarkSweepCollector::EvacuateExternalPointerReferencesDuringSweeping(
 diff --git a/v8/src/inspector/BUILD.gn b/v8/src/inspector/BUILD.gn
 index 9a86323237..422ea6032d 100644
 --- a/v8/src/inspector/BUILD.gn
@@ -880,16 +880,6 @@ index 4b1d2bd42b..f55c0b4aec 100644
 +
 +#undef ror
 +#undef shr
-diff --git a/v8/src/compiler/revectorizer.cc b/v8/src/compiler/revectorizer.cc
-index 1d332c42ae..dc9e3906b6 100644
---- a/v8/src/compiler/revectorizer.cc
-+++ b/v8/src/compiler/revectorizer.cc
-@@ -1459,3 +1459,5 @@ void Revectorizer::PrintStores(ZoneMap<Node*, StoreNodeSet>* store_chains) {
- }  // namespace compiler
- }  // namespace internal
- }  // namespace v8
-+
-+#undef TRACE
 diff --git a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc b/v8/src/compiler/turboshaft/wasm-revec-reducer.cc
 index ddf3b81c7a..f6548579c7 100644
 --- a/v8/src/compiler/turboshaft/wasm-revec-reducer.cc

@@ -929,3 +929,28 @@ index 5641bd744d..5581b9e7c6 100644
  }  // namespace net
 +
 +#undef IsEchEnabled
+--- a/net/device_bound_sessions/jwk_utils.cc
++++ b/net/device_bound_sessions/jwk_utils.cc
+@@ -34,13 +34,15 @@
+ constexpr char kRsaModulus[] = "n";
+ constexpr char kRsaExponent[] = "e";
+ 
+-std::string Base64UrlEncode(base::span<const uint8_t> input) {
++std::string Base64UrlEncode_jwk_utils(base::span<const uint8_t> input) {
+   std::string output;
+   base::Base64UrlEncode(input, base::Base64UrlEncodePolicy::OMIT_PADDING,
+                         &output);
+   return output;
+ }
+ 
++#define Base64UrlEncode Base64UrlEncode_jwk_utils
++
+ base::DictValue ConvertES256PkeySpkiToJwk(base::span<const uint8_t> pkey_spki) {
+   bssl::UniquePtr<EVP_PKEY> pkey = crypto::evp::PublicKeyFromBytes(pkey_spki);
+   if (!pkey || EVP_PKEY_id(pkey.get()) != EVP_PKEY_EC) {
+@@ -146,3 +148,5 @@
+ }
+ 
+ }  // namespace net::device_bound_sessions
++
++#undef Base64UrlEncode

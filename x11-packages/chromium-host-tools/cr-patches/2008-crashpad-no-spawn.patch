@@ -1,9 +1,9 @@
 --- a/third_party/crashpad/crashpad/util/posix/spawn_subprocess.cc
 +++ b/third_party/crashpad/crashpad/util/posix/spawn_subprocess.cc
-@@ -15,12 +15,15 @@
- #include "util/posix/spawn_subprocess.h"
+@@ -16,12 +16,15 @@
  
  #include <errno.h>
+ #include <fcntl.h>
 -#include <spawn.h>
  #include <stdlib.h>
  #include <string.h>
@@ -14,10 +14,10 @@
 +#include <spawn.h>
 +#endif
 +
- #include "base/check.h"
- #include "base/check_op.h"
- #include "base/logging.h"
-@@ -171,7 +174,7 @@
+ #include <set>
+ #include <string>
+ #include <vector>
+@@ -176,7 +179,7 @@
      char* const* envp_for_spawn =
          envp ? const_cast<char* const*>(envp_c.data()) : environ;
  

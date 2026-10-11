@@ -1924,7 +1924,15 @@ diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
 index c807284750..dc915caa50 100644
 --- a/content/common/BUILD.gn
 +++ b/content/common/BUILD.gn
-@@ -58,7 +58,7 @@ if (is_linux || is_chromeos) {
+@@ -3,6 +3,7 @@
+ # found in the LICENSE file.
+ 
+ import("//build/buildflag_header.gni")
++import("//build/config/jumbo.gni")
+ import("//build/config/ui.gni")
+ import("//content/public/common/zygote/features.gni")
+ import("//ipc/features.gni")
+@@ -58,7 +59,7 @@
    }
  }
  
@@ -1933,7 +1941,7 @@ index c807284750..dc915caa50 100644
    # Targets external to content should always link to the public API.
    # In addition, targets outside of the content component (shell and tests)
    # must not link to this because it will duplicate the code in the component
-@@ -192,6 +192,9 @@ source_set("common") {
+@@ -198,6 +199,9 @@
      "webid/identity_url_loader_throttle.cc",
      "webid/identity_url_loader_throttle.h",
    ]
@@ -2159,15 +2167,15 @@ index ff11e0d050..4bb49944ad 100644
  import("//components/on_device_translation/buildflags/features.gni")
  import("//device/vr/buildflags/buildflags.gni")
  import("//media/gpu/args.gni")
-@@ -11,7 +12,7 @@ import("//printing/buildflags/buildflags.gni")
+@@ -11,7 +12,7 @@
  import("//services/accessibility/buildflags.gni")
  import("//services/screen_ai/buildflags/features.gni")
  
 -source_set("utility") {
 +jumbo_source_set("utility") {
-   # Only the public target should depend on this. All other targets (even
-   # internal content ones other than test) should depend on the public one.
    visibility = [
+     ":for_content_tests",
+     "//content/app:*",
 diff --git a/content/browser/devtools/protocol/media_recorder.cc b/content/browser/devtools/protocol/media_recorder.cc
 index 44ebbcbab6..eb9cdb8700 100644
 --- a/content/browser/devtools/protocol/media_recorder.cc
