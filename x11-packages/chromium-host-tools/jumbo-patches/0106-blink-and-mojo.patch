@@ -227,14 +227,13 @@ diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
 index 8c293f5bb0..6d7ad583bc 100644
 --- a/content/common/BUILD.gn
 +++ b/content/common/BUILD.gn
-@@ -438,6 +438,10 @@ mojom("mojo_bindings") {
- 
-   disable_variants = true
- 
+@@ -438,6 +446,9 @@ mojom("mojo_bindings") {
+ mojom("mojo_bindings") {
+   # This interface is internal to content.
+   visibility = [ "//content/*" ]
 +  # Fail to compile with error
 +  # `redefinition of 'ParamTraits<content::WebPluginMimeType::Param>'`
 +  disable_jumbo = true
-+
    sources = [
      "agent_scheduling_group.mojom",
      "associated_interfaces.mojom",
@@ -319,18 +318,18 @@ index 87b3bbe9ae..d3d7f411fa 100644
  import("//mojo/public/tools/bindings/mojom_rust.gni")
  import("//third_party/closure_compiler/closure_args.gni")
  import("//third_party/closure_compiler/compile_js.gni")
-@@ -1029,7 +1030,7 @@ template("mojom") {
-   }
+@@ -1031,7 +1032,7 @@
  
    shared_cpp_sources_target_name = "${target_name}_shared_cpp_sources"
+ 
 -  source_set(shared_cpp_sources_target_name) {
 +  jumbo_source_set(shared_cpp_sources_target_name) {
      if (defined(invoker.testonly)) {
        testonly = invoker.testonly
      }
-@@ -1218,6 +1219,13 @@ template("mojom") {
-   } else {
-     enabled_configurations = [ default_variant ]
+@@ -1221,6 +1222,13 @@
+     }
+     enabled_configurations += [ blink_variant ]
    }
 +
 +  if (defined(invoker.disable_jumbo) && invoker.disable_jumbo) {
@@ -340,9 +339,9 @@ index 87b3bbe9ae..d3d7f411fa 100644
 +  }
 +
    foreach(bindings_configuration, enabled_configurations) {
-     cpp_only = false
-     if (defined(invoker.cpp_only)) {
-@@ -1609,6 +1617,10 @@ template("mojom") {
+     generate_cpp_for_variant =
+         generate_cpp || defined(bindings_configuration.variant)
+@@ -1583,6 +1591,10 @@
        sources_target_type = "source_set"
      }
  
@@ -353,18 +352,10 @@ index 87b3bbe9ae..d3d7f411fa 100644
      output_target_name = "${target_name}${variant_suffix}"
      if (proxy_target != "") {
        group(output_target_name) {
-@@ -1779,6 +1791,7 @@ template("mojom") {
- 
-     target(sources_target_type, sources_target_name) {
-       if (defined(output_name_override)) {
-+
-         output_name = output_name_override
-       }
-       visibility = output_visibility + [
-@@ -1886,7 +1899,7 @@ template("mojom") {
- 
+@@ -1746,7 +1758,7 @@
        mojolpm_target_name = "${target_name}_mojolpm"
        mojolpm_generator_target_name = "${target_name}__generator"
+ 
 -      source_set(mojolpm_target_name) {
 +      jumbo_source_set(mojolpm_target_name) {
          # There are still a few missing header dependencies between mojo targets

@@ -885,24 +885,9 @@ index 8eca87e4b9..a6cbfded24 100644
        BrowserWindowInterface* browser,
 -      tabs::TabInterface* tab_interface);
 +      ::tabs::TabInterface* tab_interface);
- #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
  };
  
-diff --git a/chrome/browser/glic/BUILD.gn b/chrome/browser/glic/BUILD.gn
-index e8cea2242c..efae52430a 100644
---- a/chrome/browser/glic/BUILD.gn
-+++ b/chrome/browser/glic/BUILD.gn
-@@ -285,6 +285,10 @@ jumbo_source_set("impl") {
-     "widget/glic_tab_ui.cc",
-     "widget/glic_tab_ui.h",
-   ]
-+  jumbo_excluded_sources = [
-+    # Many conflictions
-+    "host/glic_cookie_synchronizer.cc",
-+  ]
- 
-   public_deps = [
-     ":private_types",
+ }  // namespace extensions
 diff --git a/chrome/browser/glic/host/context/glic_focused_tab_manager.cc b/chrome/browser/glic/host/context/glic_focused_tab_manager.cc
 index a6bfe8e0fa..f6a9ae8f08 100644
 --- a/chrome/browser/glic/host/context/glic_focused_tab_manager.cc
@@ -2641,10 +2626,10 @@ index 360b9aa6d6..a97a65e0e5 100644
  namespace {
  
  using TabRole = ::TabSharingInfoBarDelegate::TabRole;
-@@ -679,3 +681,5 @@ void TabSharingUIViews::CapturedSurfaceControlObserver::
-     std::move(callback_).Run();
+@@ -771,3 +773,5 @@
    }
  }
+ #endif
 +
 +#undef GetOriginFromId
 diff --git a/chrome/browser/ui/views/tabs/groups/avatar_container_view.cc b/chrome/browser/ui/views/tabs/groups/avatar_container_view.cc
@@ -4730,32 +4715,6 @@ index 8e1fa712e7..3b55757e92 100644
  
  // Allows for the passing of a `WebUIContentsWrapperT<ReadAnythingUntrustedUI>`
  // without having to (directly or indirectly) include either class. This avoids
-diff --git a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-index a30bfbf1a3..cbd48a0e8a 100644
---- a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-+++ b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-@@ -47,12 +47,14 @@ namespace {
- constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
- constexpr char kVoiceSearchQueryParameterValue[] = "1";
- 
--bool IsAimEligible(Profile* profile) {
-+bool IsAimEligible_omnibox_everywhere_handler(Profile* profile) {
-   auto* aim_eligibility_service =
-       AimEligibilityServiceFactory::GetForProfile(profile);
-   return aim_eligibility_service && aim_eligibility_service->IsAimEligible();
- }
- 
-+#define IsAimEligible IsAimEligible_omnibox_everywhere_handler
-+
- class OmniboxEverywhereClient : public ContextualOmniboxClient {
-  public:
-   OmniboxEverywhereClient(Profile* profile,
-@@ -347,3 +349,5 @@ void OmniboxEverywhereHandler::PushProfileInfo() {
-                             base::UTF16ToUTF8(display_name),
-                             base::UTF16ToUTF8(entry->GetUserName()));
- }
-+
-+#undef IsAimEligible
 diff --git a/chrome/browser/actor/tools/translate_page_tool.cc b/chrome/browser/actor/tools/translate_page_tool.cc
 index 64a5257d1e..8093685c9b 100644
 --- a/chrome/browser/actor/tools/translate_page_tool.cc
@@ -4949,3 +4908,96 @@ index 9fc77e09a7..b41fa76422 100644
  }  // namespace ttc
 +
 +#undef GetActiveWebContentsFromBrowser
+--- a/chrome/browser/extensions/extension_context_menu_model.cc
++++ b/chrome/browser/extensions/extension_context_menu_model.cc
+@@ -1116,7 +1116,7 @@
+ }
+ 
+ content::WebContents* ExtensionContextMenuModel::GetActiveWebContents() const {
+-  tabs::TabInterface* active_tab =
++  ::tabs::TabInterface* active_tab =
+       TabListInterface::From(browser_)->GetActiveTab();
+   return active_tab ? active_tab->GetContents() : nullptr;
+ }
+--- a/chrome/browser/ui/passwords/remote_actor_selection_dialog_controller.cc
++++ b/chrome/browser/ui/passwords/remote_actor_selection_dialog_controller.cc
+@@ -90,7 +90,7 @@
+   }
+   content::OpenURLParams params(
+       GURL(kRemoteActorDataHandlingHelpUrl), content::Referrer(),
+-      WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
++      WindowOpenDisposition::NEW_FOREGROUND_TAB, ::ui::PAGE_TRANSITION_LINK,
+       /*is_renderer_initiated=*/false);
+   web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
+ }
+--- a/chrome/browser/context_hub/tab_context_fetcher.cc
++++ b/chrome/browser/context_hub/tab_context_fetcher.cc
+@@ -24,7 +24,7 @@
+ 
+ namespace {
+ 
+-base::TimeDelta GetDurationOfCurrentOrLastVisit(
++base::TimeDelta GetDurationOfCurrentOrLastVisit_tab_context_fetcher(
+     content::WebContents* web_contents) {
+   if (tabs::TabInterface* tab =
+           tabs::TabInterface::MaybeGetFromContents(web_contents)) {
+@@ -38,6 +38,8 @@
+ 
+ }  // namespace
+ 
++#define GetDurationOfCurrentOrLastVisit GetDurationOfCurrentOrLastVisit_tab_context_fetcher
++
+ TabContextFetcher::TabContextFetcher(
+     page_content_annotations::PageContentExtractionService& extraction_service,
+     content::WebContents* web_contents,
+@@ -184,3 +186,5 @@
+ }
+ 
+ }  // namespace context_hub
++
++#undef GetDurationOfCurrentOrLastVisit
+--- a/chrome/browser/ui/views/frame/browser_frame_view_layout_linux.cc
++++ b/chrome/browser/ui/views/frame/browser_frame_view_layout_linux.cc
+@@ -10,6 +10,8 @@
+ #include "ui/gfx/geometry/insets.h"
+ #include "ui/views/window/frame_view_utils_linux.h"
+ 
++#define kResizeBorder kResizeBorder_browser_frame_view_layout_linux
++
+ namespace {
+ 
+ // This is the same thickness as the resize border on ChromeOS.
+@@ -74,3 +76,5 @@
+ int BrowserFrameViewLayoutLinux::NonClientExtraTopThickness() const {
+   return delegate_->IsTabStripVisible() ? 0 : kExtraTopBorder;
+ }
++
++#undef kResizeBorder
+--- a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
++++ b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
+@@ -58,7 +58,7 @@
+ constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
+ constexpr char kVoiceSearchQueryParameterValue[] = "1";
+ 
+-bool IsFuseboxEligible(Profile* profile) {
++bool IsFuseboxEligible_omnibox_everywhere_handler(Profile* profile) {
+   if (!profile) {
+     return false;
+   }
+@@ -68,6 +68,9 @@
+          aim_eligibility_service->IsFuseboxEligible();
+ }
+ 
++#define IsFuseboxEligible IsFuseboxEligible_omnibox_everywhere_handler
++#define IsFuseboxEnabled IsFuseboxEnabled_omnibox_everywhere_handler
++
+ bool IsFuseboxEnabled(Profile* profile) {
+   if (!IsFuseboxEligible(profile)) {
+     return false;
+@@ -566,3 +569,6 @@
+         context_token, context_upload_status, error_type);
+   }
+ }
++
++#undef IsFuseboxEligible
++#undef IsFuseboxEnabled

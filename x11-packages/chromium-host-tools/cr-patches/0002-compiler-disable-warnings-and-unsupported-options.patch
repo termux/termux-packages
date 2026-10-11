@@ -18,23 +18,6 @@
        cflags += [ "-fno-lifetime-dse" ]
      }
  
-@@ -1590,7 +1590,7 @@
- # See also: https://crbug.com/40891132#comment10
- ubsan_hardening("c_array_bounds") {
-   sanitizer = "array-bounds"
--  condition = !(is_asan && target_cpu == "x86")
-+  condition = !(is_asan && target_cpu == "x86") && false
- 
-   # Because we've enabled array-bounds sanitizing we also want to suppress
-   # the related warning about "unsafe-buffer-usage-in-static-sized-array",
-@@ -1604,6 +1604,7 @@
- # `NOTREACHED()` at the end of such functions.
- ubsan_hardening("return") {
-   sanitizer = "return"
-+  condition = false
- }
- 
- config("rustc_revision") {
 @@ -2031,6 +2032,12 @@
        # should always be added for clang builds.
        cflags += [ "-Wexit-time-destructors" ]
@@ -48,3 +31,14 @@
    }
  
    # TODO(crbug.com/354162568): Clean up and enable.
+--- a/build/config/sanitizers/sanitizers.gni
++++ b/build/config/sanitizers/sanitizers.gni
+@@ -526,7 +526,7 @@
+     # *   the build is not for Wasm, which doesn't recognize any of
+     #     these sanitizer flags (see https://crrev.com/c/7911761), and
+     # *   the build is Clang, which provides the UBSan instrumentation.
+-    _condition = !is_ubsan && !is_wasm && is_clang
++    _condition = !is_ubsan && !is_wasm && is_clang && false
+     if (defined(invoker.condition)) {
+       _condition = invoker.condition && _condition
+     }
