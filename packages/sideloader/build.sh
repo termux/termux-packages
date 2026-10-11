@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER=@termux
 _COMMIT="ed89e287ec64d39f09cacc1d1903b8a5af074201"
 _COMMIT_DATE=2026.9.18
 TERMUX_PKG_VERSION="1.0~pre4.${_COMMIT_DATE}"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="usbmuxd, libplist, libimobiledevice"
 TERMUX_PKG_BUILD_DEPENDS="ldc, ndk-sysroot, jq"
 TERMUX_PKG_SRCURL="https://github.com/Dadoum/Sideloader/archive/${_COMMIT}.zip"
