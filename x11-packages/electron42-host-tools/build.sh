@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML,
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=148.0.7778.280
-TERMUX_PKG_VERSION=42.7.1
+TERMUX_PKG_VERSION=42.11.12
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
@@ -54,14 +54,14 @@ termux_step_post_get_source() {
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/cr-patches" -maxdepth 1 -type f -name *.patch | sort); do
 		echo "Applying patch: $(basename $f)"
-		patch --silent -p1 < "$f" || bash
+		patch --silent -p1 < "$f"
 	done
 
 	# Apply patches related to electron
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/electron-patches" -maxdepth 1 -type f -name *.patch | sort); do
 		echo "Applying patch: $(basename $f)"
-		patch --silent -p1 < "$f" || bash
+		patch --silent -p1 < "$f"
 	done
 
 	# Enable jumbo build for //components and //chrome
@@ -76,7 +76,7 @@ termux_step_post_get_source() {
 	local f
 	for f in $(find "$TERMUX_PKG_BUILDER_DIR/jumbo-patches" -maxdepth 1 -type f -name *.patch | sort); do
 		echo "Applying patch: $(basename $f)"
-		patch --silent -p1 < "$f" || bash
+		patch --silent -p1 < "$f"
 	done
 
 	# Install version file
