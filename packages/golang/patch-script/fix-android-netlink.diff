@@ -33,7 +33,7 @@ Fixes #40569
  // Netlink sockets and messages
  
  package syscall
-@@ -65,7 +67,11 @@
+@@ -65,7 +67,11 @@ func NetlinkRIB(proto, family int) ([]byte, error) {
  	defer Close(s)
  	sa := &SockaddrNetlink{Family: AF_NETLINK}
  	if err := Bind(s, sa); err != nil {
@@ -72,7 +72,7 @@ Fixes #40569
  	"os"
  	"syscall"
  	"unsafe"
-@@ -16,7 +19,9 @@
+@@ -16,7 +19,9 @@ import (
  func interfaceTable(ifindex int) ([]Interface, error) {
  	tab, err := syscall.NetlinkRIB(syscall.RTM_GETLINK, syscall.AF_UNSPEC)
  	if err != nil {
@@ -83,7 +83,7 @@ Fixes #40569
  	}
  	msgs, err := syscall.ParseNetlinkMessage(tab)
  	if err != nil {
-@@ -45,6 +50,64 @@
+@@ -45,6 +50,64 @@ loop:
  	return ift, nil
  }
  
@@ -148,7 +148,7 @@ Fixes #40569
  const (
  	// See linux/if_arp.h.
  	// Note that Linux doesn't support IPv4 over IPv6 tunneling.
-@@ -255,3 +318,75 @@
+@@ -255,3 +318,75 @@ func parseProcNetIGMP6(path string, ifi *Interface) []Addr {
  	}
  	return ifmat
  }

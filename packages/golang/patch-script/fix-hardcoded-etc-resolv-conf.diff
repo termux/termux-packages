@@ -1,5 +1,5 @@
---- a/src/net/conf.go	2024-02-02 23:39:55.000000000 +0530
-+++ b/src/net/conf.go	2024-02-18 22:34:10.016000996 +0530
+--- a/src/net/conf.go
++++ b/src/net/conf.go
 @@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
@@ -9,8 +9,8 @@
  package net
  
  import (
---- a/src/net/conf_android.go	2024-02-18 22:31:59.680000988 +0530
-+++ b/src/net/conf_android.go	2024-02-18 22:41:52.060001024 +0530
+--- a/src/net/conf_android.go
++++ b/src/net/conf_android.go
 @@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
@@ -20,7 +20,7 @@
  package net
  
  import (
-@@ -420,7 +422,7 @@
+@@ -420,7 +422,7 @@ func (c *conf) lookupOrder(r *Resolver, hostname string) (ret hostLookupOrder, d
  				var haveMDNSAllow bool
  				switch c.mdnsTest {
  				case mdnsFromSystem:
@@ -29,8 +29,8 @@
  					if err != nil && !errors.Is(err, fs.ErrNotExist) {
  						// Let libc figure out what is going on.
  						return hostLookupCgo, dnsConf
---- a/src/net/dnsclient_unix.go	2024-02-02 23:39:55.000000000 +0530
-+++ b/src/net/dnsclient_unix.go	2024-02-18 22:36:17.948001004 +0530
+--- a/src/net/dnsclient_unix.go
++++ b/src/net/dnsclient_unix.go
 @@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
@@ -40,8 +40,8 @@
  // DNS client: see RFC 1035.
  // Has to be linked into package net for Dial.
  
---- a/src/net/dnsclient_android.go	2024-02-18 22:32:31.136000990 +0530
-+++ b/src/net/dnsclient_android.go	2024-02-18 22:43:13.612001028 +0530
+--- a/src/net/dnsclient_android.go
++++ b/src/net/dnsclient_android.go
 @@ -2,6 +2,8 @@
  // Use of this source code is governed by a BSD-style
  // license that can be found in the LICENSE file.
@@ -51,7 +51,7 @@
  // DNS client: see RFC 1035.
  // Has to be linked into package net for Dial.
  
-@@ -366,7 +368,7 @@
+@@ -366,7 +368,7 @@ type resolverConfig struct {
  var resolvConf resolverConfig
  
  func getSystemDNSConfig() *dnsConfig {
@@ -60,7 +60,7 @@
  }
  
  func getSystemDNSConfigNamed(path string) *dnsConfig {
-@@ -378,7 +380,7 @@
+@@ -378,7 +380,7 @@ func getSystemDNSConfigNamed(path string) *dnsConfig {
  func (conf *resolverConfig) init() {
  	// Set dnsConfig and lastChecked so we don't parse
  	// resolv.conf twice the first time.
