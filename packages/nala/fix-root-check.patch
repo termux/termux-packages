@@ -1,0 +1,13 @@
+--- a/src/util/privilege.rs
++++ b/src/util/privilege.rs
+@@ -20,8 +20,8 @@
+ 
+ /// Check for root. Errors if not root.
+ pub fn sudo_check(config: &Config) -> Result<()> {
+-	if !Uid::effective().is_root() {
+-		bail!("{}", t!("root-required", "command" => &config.command))
++	if Uid::effective().is_root() {
++		bail!("Ability to run this command as root has been disabled permanently for safety purposes.");
+ 	}
+ 	Ok(())
+ }

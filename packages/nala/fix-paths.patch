@@ -1,0 +1,79 @@
+--- a/src/config/paths.rs
++++ b/src/config/paths.rs
+@@ -1,7 +1,7 @@
+-const HISTORY_DEFAULT: &str = "/var/lib/nala/history";
+-const NALA_SOURCES_PATH: &str = "/etc/apt/sources.list.d/nala.sources";
+-const REBOOT_REQUIRED: &str = "/run/reboot-required";
+-const REBOOT_PKGS: &str = "/run/reboot-required.pkgs";
++const HISTORY_DEFAULT: &str = "@TERMUX_PREFIX@/var/lib/nala/history";
++const NALA_SOURCES_PATH: &str = "@TERMUX_PREFIX@/etc/apt/sources.list.d/nala.sources";
++const REBOOT_REQUIRED: &str = "@TERMUX_PREFIX@/var/run/reboot-required";
++const REBOOT_PKGS: &str = "@TERMUX_PREFIX@/var/run/reboot-required.pkgs";
+ 
+ #[derive(Clone, Copy)]
+ pub enum PathSpec {
+@@ -41,21 +41,21 @@
+ 	pub fn spec(&self) -> PathSpec {
+ 		match self {
+ 			Paths::Archive => PathSpec::Apt {
+ 				key: "Dir::Cache::Archives",
+-				default: "/var/cache/apt/archives/",
++				default: "@TERMUX_PREFIX@/var/cache/apt/archives/",
+ 			},
+ 			Paths::Lists => PathSpec::Apt {
+ 				key: "Dir::State::Lists",
+-				default: "/var/lib/apt/lists/",
++				default: "@TERMUX_PREFIX@/var/lib/apt/lists/",
+ 			},
+ 			Paths::SourceList => PathSpec::Apt {
+ 				key: "Dir::Etc::sourcelist",
+-				default: "/etc/apt/sources.list",
++				default: "@TERMUX_PREFIX@/etc/apt/sources.list",
+ 			},
+ 			Paths::SourceParts => PathSpec::Apt {
+ 				key: "Dir::Etc::sourceparts",
+-				default: "/etc/apt/sources.list.d/",
++				default: "@TERMUX_PREFIX@/etc/apt/sources.list.d/",
+ 			},
+ 			Paths::NalaSources => PathSpec::Fixed(NALA_SOURCES_PATH),
+ 			Paths::RebootRequired => PathSpec::Fixed(REBOOT_REQUIRED),
+ 			Paths::RebootRequiredPkgs => PathSpec::Fixed(REBOOT_PKGS),
+--- a/src/config/mod.rs
++++ b/src/config/mod.rs
+@@ -95,7 +95,7 @@
+ 	let config_path = derived
+ 		.config
+ 		.as_deref()
+-		.unwrap_or(Path::new("/etc/nala/nala.conf"));
++		.unwrap_or(Path::new("@TERMUX_PREFIX@/etc/nala/nala.conf"));
+ 
+ 	let config = if derived.config.is_none()
+ 		&& !config_path
+--- a/src/cli/completion.rs
++++ b/src/cli/completion.rs
+@@ -6,7 +6,7 @@
+ use clap_complete::engine::CompletionCandidate;
+ use rust_apt::{Cache, PackageSort, PkgCurrentState, new_cache};
+ 
+-const HISTORY_DEFAULT: &str = "/var/lib/nala/history";
++const HISTORY_DEFAULT: &str = "@TERMUX_PREFIX@/var/lib/nala/history";
+ 
+ fn candidates_from_names(names: impl IntoIterator<Item = String>) -> Vec<CompletionCandidate> {
+ 	names.into_iter().map(CompletionCandidate::new).collect()
+--- a/src/download/auth.rs
++++ b/src/download/auth.rs
+@@ -20,12 +20,12 @@
+ impl AuthConf {
+ 	pub(super) fn load(config: &Config) -> Self {
+ 		let mut paths = vec![PathBuf::from(
+-			config.apt.file("Dir::Etc::netrc", "/etc/apt/auth.conf"),
++			config.apt.file("Dir::Etc::netrc", "@TERMUX_PREFIX@/etc/apt/auth.conf"),
+ 		)];
+ 		let parts = PathBuf::from(
+ 			config
+ 				.apt
+-				.dir("Dir::Etc::netrcparts", "/etc/apt/auth.conf.d/"),
++				.dir("Dir::Etc::netrcparts", "@TERMUX_PREFIX@/etc/apt/auth.conf.d/"),
+ 		);
+ 
+ 		if let Ok(entries) = fs::read_dir(parts) {
