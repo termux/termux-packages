@@ -1,0 +1,14 @@
+CMake requires logical operators in upper case, lower case 'and' makes
+configuration fail on ARM.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -83,7 +83,7 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x|i[3456])86")
+ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES ".*(arm|ARM).*")
+   message(STATUS "Using ARM fixed point math")
+   option (FPM_ARM "ARM fixed point math" ON)
+-  if(ASO and FALSE)
++  if(ASO AND FALSE)
+     enable_language(ASM)
+     list(APPEND MAD_CONFIG_DEFS ASO_INTERLEAVE1 ASO_IMDCT)
+     if (BUILD_SHARED_LIBS)
