@@ -2,8 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://grafana.com/
 TERMUX_PKG_DESCRIPTION="The open-source platform for monitoring and observability"
 TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:12.3.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1:13.2.3"
 TERMUX_PKG_SRCURL=git+https://github.com/grafana/grafana
 TERMUX_PKG_BUILD_DEPENDS="yarn"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -39,17 +38,24 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	GO_BUILD_FLAGS="-goos=$(go env GOOS) -goarch=$(go env GOARCH) -cc=$(go env CC)" \
-		GOOS=linux GOARCH=amd64 \
-		make "$TERMUX_PKG_EXTRA_MAKE_ARGS" build-go
+	make "$TERMUX_PKG_EXTRA_MAKE_ARGS" build-go
 	make "$TERMUX_PKG_EXTRA_MAKE_ARGS" deps-js
 	# get rid of unnecessary things during build to not run out of storage
-	rm -r .yarn/cache node_modules/@storybook
+	rm -rf .yarn/cache node_modules/@storybook
 	make "$TERMUX_PKG_EXTRA_MAKE_ARGS" build-js
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin bin/*/grafana-server bin/*/grafana-cli bin/*/grafana
+	install -Dm700 -t "$TERMUX_PREFIX"/bin bin/*/*/grafana
+	local c
+	for c in server cli; do
+		cat > "$TERMUX_PREFIX/bin/grafana-$c" <<-EOF
+			#!$TERMUX_PREFIX/bin/sh
+			echo "Deprecation warning: 'grafana-$c' is deprecated, use 'grafana $c' instead." >&2
+			exec "$TERMUX_PREFIX/bin/grafana" $c "\$@"
+		EOF
+		chmod 0700 "$TERMUX_PREFIX/bin/grafana-$c"
+	done
 	local sharedir="$TERMUX_PREFIX/share/grafana"
 	mkdir -p "$sharedir"
 	for d in conf public; do
