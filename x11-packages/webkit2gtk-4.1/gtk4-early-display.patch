@@ -2,7 +2,7 @@ Avoid probing GTK4 GL before a default display exists.
 
 --- a/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
 +++ b/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
-@@ -121,7 +121,11 @@ static bool gtkCanUseHardwareAcceleration()
+@@ -124,7 +124,11 @@ static bool gtkCanUseHardwareAcceleration()
      std::call_once(onceFlag, [] {
          GUniqueOutPtr<GError> error;
  #if USE(GTK4)

@@ -1,6 +1,6 @@
 --- a/Source/ThirdParty/ANGLE/src/libANGLE/renderer/driver_utils.cpp
 +++ b/Source/ThirdParty/ANGLE/src/libANGLE/renderer/driver_utils.cpp
-@@ -395,7 +395,7 @@
+@@ -395,7 +395,7 @@ OSVersion GetLinuxOSVersion()
  
  bool IsXWayland()
  {
@@ -11,15 +11,21 @@
      // fixed for the life of the process.
 --- a/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
 +++ b/Source/WebKit/UIProcess/gtk/AcceleratedBackingStore.cpp
-@@ -106 +106,2 @@
--        if (auto* glDisplay = Display::singleton().glDisplay()) {
+@@ -106,11 +106,13 @@ OptionSet<RendererBufferTransportMode> AcceleratedBackingStore::rendererBufferTr
+             return;
+ #endif
+ 
 +#if USE(GBM)
-+        if (auto* glDisplay = Display::singleton().glDisplay()) {
-@@ -110 +111,2 @@
--        }
-+        }
+         if (auto* glDisplay = Display::singleton().glDisplay()) {
+             const auto& eglExtensions = glDisplay->extensions();
+             if (eglExtensions.KHR_image_base && eglExtensions.EXT_image_dma_buf_import)
+                 mode.add(RendererBufferTransportMode::Hardware);
+         }
 +#endif
-@@ -390,6 +390,9 @@
+     });
+     return mode;
+ }
+@@ -393,6 +395,9 @@ void AcceleratedBackingStore::BufferDMABuf::release()
  
  RefPtr<AcceleratedBackingStore::Buffer> AcceleratedBackingStore::BufferEGLImage::create(WebPageProxy& webPage, uint64_t id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes)
  {
@@ -29,7 +35,7 @@
      auto* glDisplay = Display::singleton().glDisplay();
      if (!glDisplay)
          return nullptr;
-@@ -401,6 +404,7 @@
+@@ -404,6 +409,7 @@ RefPtr<AcceleratedBackingStore::Buffer> AcceleratedBackingStore::BufferEGLImage:
      }
  
      return adoptRef(*new BufferEGLImage(webPage, id, surfaceID, size, usage, WTF::move(dmaBufAttributes), image));
