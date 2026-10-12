@@ -1,17 +1,13 @@
-+++ ./CMakeLists.txt
-@@ -226,6 +226,7 @@
-    message( STATUS "Building for 32-bit target" )
- endif()
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -142,8 +142,8 @@
+ set(MUSE_MODULE_UI ON)
+ set(MUSE_MODULE_UI_TESTS OFF)
+ set(MUSE_MODULE_WORKSPACE ON)
+-set(MUSE_MODULE_VST ON)
+-set(MUSE_MODULE_VST_QML ON)
++set(MUSE_MODULE_VST ${AU_MODULE_EFFECTS_VST})
++set(MUSE_MODULE_VST_QML ${AU_MODULE_EFFECTS_VST})
  
-+if( FALSE )
- # Check for compiler flags
- if( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang|Clang|GNU" )
-    check_cxx_compiler_flag( "-mmmx" HAVE_MMX )
-@@ -255,6 +256,7 @@
-       set( SSE2_FLAG "/arch:SSE2" )
-    endif()
- endif()
-+endif( FALSE )
- 
- check_include_files( "float.h;stdarg.h;stdlib.h;string.h" STDC_HEADERS )
- 
+ # Skip TestFlow in release builds
+ if (AU4_BUILD_MODE STREQUAL "release")
