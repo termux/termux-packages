@@ -1,0 +1,242 @@
+--- a/au3/src/AudacityApp.cpp
++++ b/au3/src/AudacityApp.cpp
+@@ -2046,9 +2046,7 @@
+ 
+ #if defined(__UNIX__)
+ 
+-#include <sys/ipc.h>
+-#include <sys/sem.h>
+-#include <sys/shm.h>
++#include <fcntl.h>
+ 
+ // Return true if there are no other instances of Audacity running,
+ // false otherwise.
+@@ -2061,126 +2059,54 @@
+     wxIPV4address addr;
+     addr.LocalHost();
+ 
+-    struct sembuf op = {};
+-
+-    // Generate the IPC key we'll use for both shared memory and semaphores.
+-    wxString datadir = FileNames::DataDir();
+-    key_t memkey = ftok(datadir.c_str(), 0);
+-    key_t servkey = ftok(datadir.c_str(), 1);
+-    key_t lockkey = ftok(datadir.c_str(), 2);
+-
+-    // Create and map the shared memory segment where the port number
+-    // will be stored.
+-    int memid = shmget(memkey, sizeof(int), IPC_CREAT | S_IRUSR | S_IWUSR);
+-    if (memid == -1) {
+-        AudacityMessageBox(
+-            XO("Unable to create shared memory segment.\n\n"
+-               "error code=%d : \"%s\".").Format(errno, strerror(errno)),
+-            XO("Audacity Startup Failure"),
+-            wxOK | wxICON_ERROR);
++    wxString lockPath = "@TERMUX_PREFIX@/tmp/audacity.lock";
++    int lockFd = open(lockPath, O_RDWR | O_CREAT, 0666);
++    uint16_t portnum;
+ 
++    if (lockFd == -1) {
++        dprintf(2, "Unable to create Audacity lock file. Error code=%d : \"%s\".", errno, strerror(errno));
+         return false;
+     }
+ 
+-    int* portnum = (int*)shmat(memid, nullptr, 0);
+-
+-    // Create (or return) the SERVER semaphore ID
+-    int servid = semget(servkey, 1, IPC_CREAT | S_IRUSR | S_IWUSR);
+-
+-    // Create the LOCK semaphore only if it doesn't already exist.
+-    int lockid = semget(lockkey, 1, IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+-
+-    // If the LOCK semaphore was successfully created, then this is the first
+-    // time Audacity has been run during this boot of the system. In this
+-    // case we know we'll become the "server" application, so set up the
+-    // semaphores to prepare for it.
+-    if (lockid != -1) {
+-        // Initialize value of each semaphore, 1 indicates released and 0
+-        // indicates acquired.
+-        //
+-        // Note that this action is NOT recorded in the semaphore's
+-        // UNDO buffer.
+-        semctl(servid, 0, SETVAL, 1);
+-        semctl(lockid, 0, SETVAL, 1);
+-
+-        // Now acquire them so the semaphores will be set to the
+-        // released state when the process terminates.
+-        op.sem_num = 0;
+-        op.sem_op = -1;
+-        op.sem_flg = SEM_UNDO;
+-        if (semop(lockid, &op, 1) == -1 || semop(servid, &op, 1) == -1) {
+-            AudacityMessageBox(
+-                XO("Unable to acquire semaphores.\n\n"
+-                   "This is likely due to a resource shortage\n"
+-                   "and a reboot may be required."),
+-                XO("Audacity Startup Failure"),
+-                wxOK | wxICON_ERROR);
+-
+-            return false;
+-        }
+-
+-        // We will be the server...
+-        isServer = true;
++    if (ftruncate(lockFd, sizeof(portnum)) == -1) {
++        dprintf(2, "Unable to resize Audacity lock file. Error code=%d : \"%s\".", errno, strerror(errno));
++        close(lockFd);
++        return false;
+     }
+-    // Something catastrophic must have happened, so bail.
+-    else if (errno != EEXIST) {
+-        AudacityMessageBox(
+-            XO("Unable to create semaphores.\n\n"
+-               "This is likely due to a resource shortage\n"
+-               "and a reboot may be required."),
+-            XO("Audacity Startup Failure"),
+-            wxOK | wxICON_ERROR);
+ 
++    // Byte 0 is the SERVER lock and byte 1 is the CLIENT setup lock.
++    struct flock client = {};
++    client.l_type = F_WRLCK;
++    client.l_whence = SEEK_SET;
++    client.l_start = 1;
++    client.l_len = 1;
++    if (fcntl(lockFd, F_SETLKW, &client) == -1) {
++        dprintf(2, "Failed to obtain Audacity client lock. Error code=%d : \"%s\".", errno, strerror(errno));
++        close(lockFd);
+         return false;
+     }
+-    // Otherwise it's a normal startup and we need to determine whether
+-    // we'll be the server or the client.
+-    else {
+-        // Retrieve the LOCK semaphore since we wouldn't have gotten it above.
+-        lockid = semget(lockkey, 1, 0);
+-
+-        // Acquire the LOCK semaphore. We may block here if another
+-        // process is currently setting up the server.
+-        op.sem_num = 0;
+-        op.sem_op = -1;
+-        op.sem_flg = SEM_UNDO;
+-        if (semop(lockid, &op, 1) == -1) {
+-            AudacityMessageBox(
+-                XO("Unable to acquire lock semaphore.\n\n"
+-                   "This is likely due to a resource shortage\n"
+-                   "and a reboot may be required."),
+-                XO("Audacity Startup Failure"),
+-                wxOK | wxICON_ERROR);
+-
+-            return false;
+-        }
+-
+-        // Try to acquire the SERVER semaphore. If it's not currently active, then
+-        // we will become the server. Otherwise, this will fail and we'll know that
+-        // the server is already active and we will become the client.
+-        op.sem_num = 0;
+-        op.sem_op = -1;
+-        op.sem_flg = IPC_NOWAIT | SEM_UNDO;
+-        if (semop(servid, &op, 1) == 0) {
+-            isServer = true;
+-        } else if (errno != EAGAIN) {
+-            AudacityMessageBox(
+-                XO("Unable to acquire server semaphore.\n\n"
+-                   "This is likely due to a resource shortage\n"
+-                   "and a reboot may be required."),
+-                XO("Audacity Startup Failure"),
+-                wxOK | wxICON_ERROR);
+ 
++    struct flock server = {};
++    server.l_type = F_WRLCK;
++    server.l_whence = SEEK_SET;
++    server.l_start = 0;
++    server.l_len = 1;
++    if (fcntl(lockFd, F_SETLK, &server) == -1) {
++        if (errno == EAGAIN || errno == EACCES) {
++            isServer = false;
++        } else {
++            dprintf(2, "Failed to obtain Audacity server lock. Error code=%d : \"%s\".", errno, strerror(errno));
++            close(lockFd);
+             return false;
+         }
++    } else {
++        isServer = true;
+     }
+ 
+     // Initialize the socket server if we're to be the server.
+     if (isServer) {
+-        // The system will randomly assign a port
+         addr.Service(0);
+ 
+-        // Create the socket and bind to it.
+         auto serv = std::make_unique<wxSocketServer>(addr, wxSOCKET_NOWAIT);
+         if (serv && serv->IsOk()) {
+             serv->SetEventHandler(*this, ID_IPC_SERVER);
+@@ -2188,21 +2114,23 @@
+             serv->Notify(true);
+             mIPCServ = std::move(serv);
+ 
+-            // Save the port number in shared memory so that clients
+-            // know where to connect.
+             mIPCServ->GetLocal(addr);
+-            *portnum = addr.Service();
++            portnum = addr.Service();
++            lseek(lockFd, 0, SEEK_SET);
++            if (write(lockFd, &portnum, sizeof(portnum)) != sizeof(portnum)) {
++                dprintf(2, "Failed to write Audacity IPC port. Error code=%d : \"%s\".", errno, strerror(errno));
++                close(lockFd);
++                return false;
++            }
+         }
+ 
+-        // Now that the server is active, we release the LOCK semaphore
+-        // to allow any waiters to continue. The SERVER semaphore will
+-        // remain locked for the duration of this processes execution
+-        // and will be cleaned up by the system.
+-        op.sem_num = 0;
+-        op.sem_op = 1;
+-        semop(lockid, &op, 1);
++        client.l_type = F_UNLCK;
++        if (fcntl(lockFd, F_SETLK, &client) == -1) {
++            dprintf(2, "Failed to release Audacity client lock. Error code=%d : \"%s\".", errno, strerror(errno));
++            close(lockFd);
++            return false;
++        }
+ 
+-        // Bail if the server creation failed.
+         if (mIPCServ == nullptr) {
+             AudacityMessageBox(
+                 XO("The Audacity IPC server failed to initialize.\n\n"
+@@ -2214,18 +2142,27 @@
+             return false;
+         }
+ 
+-        // We've successfully created the socket server and the app
+-        // should continue to initialize.
+         return true;
+     }
+ 
+-    // Retrieve the port number that the server is listening on.
+-    addr.Service(*portnum);
++    lseek(lockFd, 0, SEEK_SET);
++    if (read(lockFd, &portnum, sizeof(portnum)) != sizeof(portnum)) {
++        AudacityMessageBox(
++            XO("Failed to read Audacity IPC port.\n\n"
++               "error code=%d : \"%s\".").Format(errno, strerror(errno)),
++            XO("Audacity Startup Failure"),
++            wxOK | wxICON_ERROR);
++        close(lockFd);
++        return false;
++    }
++    addr.Service(portnum);
+ 
+-    // Now release the LOCK semaphore.
+-    op.sem_num = 0;
+-    op.sem_op = 1;
+-    semop(lockid, &op, 1);
++    client.l_type = F_UNLCK;
++    if (fcntl(lockFd, F_SETLK, &client) == -1) {
++        dprintf(2, "Failed to release Audacity client lock. Error code=%d : \"%s\".", errno, strerror(errno));
++        close(lockFd);
++        return false;
++    }
+ 
+     // If we get here, then Audacity is currently active. So, we connect
+     // to it and we forward all filenames listed on the command line to
