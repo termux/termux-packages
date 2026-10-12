@@ -78,12 +78,14 @@ index c27602f164..c16d1d5a00 100644
  import("//build/config/locales.gni")
  import("//build/config/ui.gni")
  import("//build/config/win/manifest.gni")
-@@ -420,7 +421,7 @@ action("electron_generate_node_defines") {
+@@ -465,7 +466,9 @@ action("electron_generate_node_defines") {
    args = [ rebase_path(target_gen_dir) ] + rebase_path(inputs)
  }
  
 -source_set("electron_lib") {
 +jumbo_source_set("electron_lib") {
++  # Disable jumbo build as `node_includes.h` breaks it
++  never_build_jumbo = true
    configs += [
      "//v8:external_startup_data",
      "//third_party/electron_node:node_external_config",
