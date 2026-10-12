@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library to assist with accessing public transport timeta
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kpublictransport-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=929b0e12494892b4e3066919006e0d8f47d361111e42bde0502dfb638e93fe60
 TERMUX_PKG_AUTO_UPDATE=true
