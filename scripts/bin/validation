@@ -32,8 +32,9 @@ BIG_PACKAGES_IN_SEPARATE_BATCH=false
 
 case "${2}" in
 	golang)
-		readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh --exclude-dir=golang "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 || :) || :
-		STRATEGY=(100)
+		# chromium is updated separately and takes too long to build within a validation batch.
+		readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh --exclude-dir=golang "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 | grep -vxE 'chromium|chromium-host-tools' || :) || :
+		STRATEGY=(50 50)
 		EXCLUDE_BIG_PACKAGES=true
 		BIG_PACKAGES_IN_SEPARATE_BATCH=true
 		;;
