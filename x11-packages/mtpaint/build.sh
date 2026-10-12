@@ -21,13 +21,13 @@ tiff
 "
 
 termux_pkg_auto_update() {
-	local latest latest_commit latest_version
-	latest="$(curl -s "https://api.github.com/repos/wjaguar/mtPaint/commits?per_page=20" | jq -r '
-		[.[] | {sha, title: (.commit.message | split("\n")[0])} | select(.title | test("^Version [0-9]+(\\.[0-9]+)+$"))][0] |
-		"\(.sha) \(.title | ltrimstr("Version "))"')"
-	read -r latest_commit latest_version <<< "${latest}"
-	if [[ -z "${latest_commit}" || "${latest_commit}" == "null" ]]; then
-		echo "WARN: Unable to get latest release commit from upstream" >&2
+	local latest_commit latest_version
+	read -r latest_commit latest_version < <(
+		curl -s "https://api.github.com/repos/wjaguar/mtPaint/commits/master" |
+			jq -r '"\(.sha) \(.commit.message | split("\n")[0] | ltrimstr("Version "))"'
+	)
+	if [[ ! "${latest_version}" =~ ^[0-9]+(\.[0-9]+)+$ ]]; then
+		echo "WARN: Unable to get latest version from upstream" >&2
 		return
 	fi
 
