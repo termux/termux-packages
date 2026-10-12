@@ -1,0 +1,37 @@
+--- a/src/cmd/history/store.rs
++++ b/src/cmd/history/store.rs
+@@ -1,7 +1,6 @@
+ use std::path::Path;
+ 
+ use anyhow::{bail, Context, Result};
+-use nix::fcntl::{renameat2, RenameFlags, AT_FDCWD};
+ 
+ use super::legacy::{legacy_history_path, read_legacy_history};
+ use super::model::{HistoryEntry, HISTORY_SCHEMA_VERSION};
+@@ -271,18 +270,16 @@
+ 			.with_context(|| t!("file-write", "path" => marker.display().to_string()))?;
+ 
+ 		if history_dir.exists() {
+-			renameat2(
+-				AT_FDCWD,
+-				&staging_dir,
+-				AT_FDCWD,
+-				&history_dir,
+-				RenameFlags::RENAME_EXCHANGE,
+-			)
+-			.with_context(|| t!("file-replace", "path" => history_dir.display().to_string()))?;
+-			if let Err(error) = std::fs::remove_dir_all(&staging_dir) {
++			let backup_dir =
++				history_dir.with_file_name(format!(".{name}.old-{}", std::process::id()));
++			std::fs::rename(&history_dir, &backup_dir)
++				.with_context(|| t!("file-replace", "path" => backup_dir.display().to_string()))?;
++			std::fs::rename(&staging_dir, &history_dir)
++				.with_context(|| t!("file-replace", "path" => history_dir.display().to_string()))?;
++			if let Err(error) = std::fs::remove_dir_all(&backup_dir) {
+ 				warn!(
+ 					"History migration succeeded, but the old store at '{}' could not be removed: {error}",
+-					staging_dir.display()
++					backup_dir.display()
+ 				);
+ 			}
+ 		} else {
