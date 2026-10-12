@@ -531,16 +531,30 @@ echo "INFO: Running updates for: $*"
 if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
 	_start_time="$(date +%10s%3N)"
 
-	while read -r number title; do
-		_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
-	done < <(
-		gh issue list \
-			--limit 10000 \
-			--label "auto update failing" --label "bot" \
-			--state open \
-			--search "Auto update failing for in:title type:issue" \
-			--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
-	)
+	_issues_fetched=false
+	for _attempt in 1 2 3; do
+		if _issues_json="$(
+			gh issue list \
+				--limit 10000 \
+				--label "auto update failing" --label "bot" \
+				--state open \
+				--search "Auto update failing for in:title type:issue" \
+				--json number,title
+		)"; then
+			_issues_fetched=true
+			break
+		fi
+		sleep 60
+	done
+
+	if [[ "${_issues_fetched}" == "true" ]]; then
+		while read -r number title; do
+			_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
+		done < <(jq -r '.[] | "\(.number) \(.title)"' <<< "${_issues_json}" | sort | uniq)
+	else
+		echo "::error::Failed to cache existing issues. Disabling issue creation to avoid duplicates."
+		CREATE_ISSUE=false
+	fi
 	printf "Cached %s existing issues - took %s\n" \
 		"${#_CACHED_ISSUES[*]}" \
 		"$(ms_to_human_readable "$(date +%10s%3N)" "$_start_time")"
