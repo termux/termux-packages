@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/OpenNMT/CTranslate2
 TERMUX_PKG_DESCRIPTION="A fast inference engine for Transformer models"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.8.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="4.8.3"
 TERMUX_PKG_SRCURL=git+https://github.com/OpenNMT/CTranslate2
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libopenblas, libc++, python"
 TERMUX_PKG_BUILD_DEPENDS="half, nlohmann-json"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'pybind11==2.11.1'"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="build, 'pybind11==2.13.6'"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
