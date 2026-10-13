@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Office and graphic art suite by KDE"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/calligra-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=f4b9c11f5957798face6cf29834695d76506c5e28049e21abcb62884ce9cc96c
 # it could use qt6-qtwebengine, but that dependency is not available for 32-bit x86 architecture.
