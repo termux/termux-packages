@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="AGPL-3.0-or-later"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pymupdf/PyMuPDF/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=23a64814bb9dce3088256c6bed981b03a163aa232a6f698180432b9a5990a891
 TERMUX_PKG_DEPENDS="freetype, gumbo-parser, harfbuzz, jbig2dec, leptonica, libc++, libjpeg-turbo, mupdf, openjpeg, python, python-mupdf, tesseract"
