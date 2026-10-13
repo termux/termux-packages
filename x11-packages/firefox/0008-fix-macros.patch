@@ -1,6 +1,6 @@
 --- a/dom/media/systemservices/VideoEngine.cpp
 +++ b/dom/media/systemservices/VideoEngine.cpp
-@@ -25,7 +25,7 @@
+@@ -25,7 +25,7 @@ mozilla::LazyLogModule gVideoEngineLog("VideoEngine");
                MOZ_LOG_EXPAND_ARGS args)
  #define LOG_ENABLED() MOZ_LOG_TEST(gVideoEngineLog, mozilla::LogLevel::Debug)
  
@@ -11,7 +11,7 @@
  
 --- a/third_party/zucchini/chromium/base/synchronization/lock_impl_posix.cc
 +++ b/third_party/zucchini/chromium/base/synchronization/lock_impl_posix.cc
-@@ -59,7 +59,7 @@
+@@ -59,7 +59,7 @@ void dcheck_unlock_result(int rv) {
  // Lock::PriorityInheritanceAvailable still must be checked as the code may
  // compile but the underlying platform still may not correctly support priority
  // inheritance locks.
@@ -22,7 +22,7 @@
  #define PRIORITY_INHERITANCE_LOCKS_POSSIBLE() 1
 --- a/js/src/ctypes/libffi/src/closures.c
 +++ b/js/src/ctypes/libffi/src/closures.c
-@@ -124,7 +124,7 @@
+@@ -124,7 +124,7 @@ ffi_tramp_is_present (__attribute__((unused)) void *ptr)
  #else /* !NetBSD with PROT_MPROTECT */
  
  #if !FFI_MMAP_EXEC_WRIT && !FFI_EXEC_TRAMPOLINE_TABLE
@@ -55,7 +55,7 @@
  
 --- a/mozglue/misc/StackWalk.cpp
 +++ b/mozglue/misc/StackWalk.cpp
-@@ -941,7 +941,7 @@
+@@ -940,7 +940,7 @@ MFBT_API void MozStackWalk(MozWalkStackCallback aCallback,
    stackEnd = __libc_stack_end;
  #    elif defined(XP_DARWIN)
    stackEnd = pthread_get_stackaddr_np(pthread_self());
@@ -66,7 +66,7 @@
    int rc = pthread_getattr_np(pthread_self(), &sattr);
 --- a/nsprpub/pr/src/pthreads/ptsynch.c
 +++ b/nsprpub/pr/src/pthreads/ptsynch.c
-@@ -929,7 +929,7 @@
+@@ -929,7 +929,7 @@ PR_DeleteSemaphore(const char* name)
   */
  #if (defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)) || \
      (defined(FREEBSD) && __FreeBSD_version < 1200059) ||            \

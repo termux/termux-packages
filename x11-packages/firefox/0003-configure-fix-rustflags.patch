@@ -1,6 +1,6 @@
 --- a/build/moz.configure/rust.configure
 +++ b/build/moz.configure/rust.configure
-@@ -522,11 +522,21 @@
+@@ -575,11 +575,21 @@ def rust_host_triple(rustc, host, rustc_host, rust_supported_targets, arm_target
      assert_rust_compile(host, rustc_target, rustc)
      return rustc_target
  
@@ -25,12 +25,11 @@
      assert_rust_compile(target, rustc_target, rustc)
      return rustc_target
  
-@@ -608,8 +618,6 @@
- 
+@@ -662,7 +672,6 @@ set_define("MOZ_DEBUG_RUST", debug_rust)
  # ==============================================================
  
--option(env="RUSTFLAGS", nargs=1, help="Rust compiler flags")
+ option(env="RUSTFLAGS", nargs=1, help="Rust compiler flags")
 -set_config("RUSTFLAGS", depends("RUSTFLAGS")(lambda flags: flags))
  
- 
- # Rust compiler flags
+ option(env="CARGOFLAGS", nargs=1, help="Flags to pass to cargo")
+ set_config("CARGOFLAGS", depends("CARGOFLAGS")(lambda flags: flags))
