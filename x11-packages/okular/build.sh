@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multi-platform document viewer for PDF, comics, EPub, an
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/okular-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=f9b39abcb7c6c3ace5d7acf669fa7ed47cf3aa7b932a8b6abe2abbd8075fc9f5
 TERMUX_PKG_AUTO_UPDATE=true
