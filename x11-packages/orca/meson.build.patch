@@ -3,7 +3,15 @@
 
 --- a/meson.build
 +++ b/meson.build
-@@ -20,7 +20,7 @@
+@@ -29,14 +29,14 @@
+   'sys.exit(0 if Atspi.Accessible.__hash__.__module__ == "gi.overrides.Atspi" else 1)',
+ ])
+ atspi_override_test = run_command(python3, '-c', atspi_override_command, check: false)
+-if atspi_override_test.returncode() != 0
++if meson.can_run_host_binaries() and atspi_override_test.returncode() != 0
+   error('AT-SPI Python overrides (gi/overrides/Atspi.py) are not installed. '
+         + 'Rebuild at-spi2-core with Python available at configure time.')
+ endif
  
  # Hard Python module dependencies
  dasbus_result = python.find_installation('python3', modules:['dasbus'], required: false)
@@ -12,7 +20,7 @@
    error('dasbus is required for D-Bus remote controller interface')
  endif
  
-@@ -37,7 +37,7 @@
+@@ -53,7 +53,7 @@
  gtk_test = run_command(python3, '-c', gtk_command, check: false)
  description = f'GTK @gtk_major_version@.@gtk_minor_version@'
  version = gtk_test.stdout().strip()

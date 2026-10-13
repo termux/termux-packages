@@ -1,0 +1,19 @@
+diff --git a/rtgui/dirbrowser.cc b/rtgui/dirbrowser.cc
+index 925fdc6..6e91d08 100644
+--- a/rtgui/dirbrowser.cc
++++ b/rtgui/dirbrowser.cc
+@@ -41,6 +41,14 @@ std::vector<Glib::ustring> listSubDirs (const Glib::RefPtr<Gio::File>& dir, bool
+ 
+     try {
+ 
++#ifdef __ANDROID__
++        if (dir->get_path () == "/") { subDirs.push_back ("sdcard"); }
++#endif
++#ifdef __TERMUX__
++        if (dir->get_path () == "/") { subDirs.push_back ("data"); }
++        if (dir->get_path () == "/data") { subDirs.push_back ("data"); }
++        if (dir->get_path () == "/data/data") { subDirs.push_back (TERMUX_APP_PACKAGE_NAME); }
++#endif
+         // CD-ROM with no disc inserted are reported, but do not exist.
+         if (!Glib::file_test (dir->get_path (), Glib::FILE_TEST_EXISTS)) {
+             return subDirs;

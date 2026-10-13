@@ -1,0 +1,15 @@
+Fixes:
+wxUtilities.cpp:404:41: error: use of undeclared identifier 'wxGetLinuxDistributionInfo';
+did you mean 'wxLinuxDistributionInfo'?
+
+--- a/src/ui/wxWidgets/wxUtilities.cpp
++++ b/src/ui/wxWidgets/wxUtilities.cpp
+@@ -395,7 +395,7 @@ bool IsRunningInFlatpak()
+ // on Fedora or Ubuntu
+ bool IsTaskBarIconAvailable()
+ {
+-#if defined(__WXGTK__) && !defined(__OpenBSD__) && !defined(__FreeBSD__)
++#if defined(__WXGTK__) && !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__ANDROID__)
+   const wxVersionInfo verInfo = wxGetLibraryVersionInfo();
+   int major = verInfo.GetMajor();
+   int minor = verInfo.GetMinor();

@@ -6,31 +6,23 @@ TERMUX_SUBPKG_INCLUDE=
 
 case "$TERMUX_ARCH" in
 	aarch64 )
-		TERMUX_SUBPKG_INCLUDE+="
-			aarch64-linux-android/lib/libc.a
-			aarch64-linux-android/lib/libdl.a
-			aarch64-linux-android/lib/libm.a
-		"
+		for lib in "${NDK_MULTILIB_STATIC_LIBS[@]}"; do
+			TERMUX_SUBPKG_INCLUDE+=" aarch64-linux-android/lib/$lib"
+		done
 		;& # fallthrough
 	arm )
-		TERMUX_SUBPKG_INCLUDE+="
-			arm-linux-androideabi/lib/libc.a
-			arm-linux-androideabi/lib/libdl.a
-			arm-linux-androideabi/lib/libm.a
-		"
+		for lib in "${NDK_MULTILIB_STATIC_LIBS[@]}"; do
+			TERMUX_SUBPKG_INCLUDE+=" arm-linux-androideabi/lib/$lib"
+		done
 		;;
 	x86_64 )
-		TERMUX_SUBPKG_INCLUDE+="
-			x86_64-linux-android/lib/libc.a
-			x86_64-linux-android/lib/libdl.a
-			x86_64-linux-android/lib/libm.a
-		"
+		for lib in "${NDK_MULTILIB_STATIC_LIBS[@]}"; do
+			TERMUX_SUBPKG_INCLUDE+=" x86_64-linux-android/lib/$lib"
+		done
 		;& # fallthrough
 	i686 )
-		TERMUX_SUBPKG_INCLUDE+="
-			i686-linux-android/lib/libc.a
-			i686-linux-android/lib/libdl.a
-			i686-linux-android/lib/libm.a
-		"
+		for lib in "${NDK_MULTILIB_STATIC_LIBS[@]}"; do
+			TERMUX_SUBPKG_INCLUDE+=" i686-linux-android/lib/$lib"
+		done
 		;;
 esac

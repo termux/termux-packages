@@ -7,8 +7,21 @@ TERMUX_PKG_REVISION=29
 TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/sox/sox/${TERMUX_PKG_VERSION}/sox-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c
 TERMUX_PKG_DEPENDS="libandroid-glob, libao, libflac, libiconv, libid3tag, libltdl, libmad, libmagic, libmp3lame, libogg, libpng, libsndfile, libvorbis, opusfile, pulseaudio, zlib, wget"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="sox-dev"
 TERMUX_PKG_REPLACES="sox-dev"
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(curl --silent https://sourceforge.net/projects/sox/files/sox/ | grep -oP '/files/sox/\K[0-9]+(\.[0-9]+)+(?=/)' | sort -V | tail -n1)"
+
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -l:libomp.a -landroid-glob"

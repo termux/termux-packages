@@ -1,0 +1,22 @@
+diff --git a/src/collection/collectionwatcher.cpp b/src/collection/collectionwatcher.cpp
+index 0214230f2..295793656 100644
+--- a/src/collection/collectionwatcher.cpp
++++ b/src/collection/collectionwatcher.cpp
+@@ -60,7 +60,7 @@
+ #include "constants/collectionsettings.h"
+ #include "engine/ebur128measures.h"
+ 
+-#if defined(Q_OS_LINUX)
++#if defined(Q_OS_LINUX) && !defined __TERMUX__
+ #  include "core/filesystemwatcherinotify.h"
+ #elif defined(Q_OS_WIN32)
+ #  include "core/filesystemwatcherwin.h"
+@@ -114,7 +114,7 @@ CollectionWatcher::CollectionWatcher(const Song::Source source,
+       task_manager_(task_manager),
+       tagreader_client_(tagreader_client),
+       backend_(backend),
+-#if defined(Q_OS_LINUX)
++#if defined(Q_OS_LINUX) && !defined __TERMUX__
+       fs_watcher_(new FileSystemWatcherInotify(this)),
+ #elif defined(Q_OS_WIN32)
+       fs_watcher_(new FileSystemWatcherWin(this)),

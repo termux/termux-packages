@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Personal and small-business financial-accounting softwar
 TERMUX_PKG_LICENSE="GPL-2.0-or-later" # with OpenSSL linking exceptions
 TERMUX_PKG_LICENSE_FILE="LICENSE"     # specified for additional nuance.
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.16"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="5.17"
 TERMUX_PKG_SRCURL="https://github.com/Gnucash/gnucash/releases/download/${TERMUX_PKG_VERSION}/gnucash-${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=bb9b6c67ebb6a3e06d9ff4f4e0417a97bef0159d26912be9b0e75a32901fd493
+TERMUX_PKG_SHA256=3d18a88f5b8230f01e04c2d2d73bf95e7dcd3bf8d8cee6ffa54bb24dee58b85f
 TERMUX_PKG_DEPENDS="boost, gettext, guile, glib, gtk3, libicu, libsecret, libxml2, libxslt, perl, python, swig, webkit2gtk-4.1, xsltproc, zlib"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs, boost-headers, googletest"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -25,6 +24,10 @@ termux_step_pre_configure() {
 	# gnc-autoclear.c:151:22: error: format string is not a string literal (potentially insecure)
 	CFLAGS+=" -Wno-format-security"
 	CXXFLAGS+=" -Wno-format-security"
+
+	# gnc-date.cpp:787:31: error: 'strtok' is deprecated: strtok() is not thread-safe; use strtok_r() instead
+	CFLAGS+=" -Wno-deprecated-declarations"
+	CXXFLAGS+=" -Wno-deprecated-declarations"
 
 	# ERROR: ./lib/libgnc-expressions.so contains undefined symbols log, pow, exp...
 	LDFLAGS+=" -lm"

@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/pim/mailimporter"
 TERMUX_PKG_DESCRIPTION="Mail importer library"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/mailimporter-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="47face1e8f0b2ad7158f6a1f033338856848a5599faf5a286887c69be8114b69"
+TERMUX_PKG_SHA256=7badf1e23f8a3660f20d9e36397bc6015dc70c0ba51825fd6f47ed405a55853c
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, akonadi-mime, kf6-karchive, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kmime, libc++, pimcommon, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, akonadi-mime, kf6-karchive, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kmime, libc++, pimcommon, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules"
 # akonadi, akonadi-mime, pimcommon depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

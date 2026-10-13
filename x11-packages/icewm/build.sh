@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Window manager with goals of speed, simplicity, and usab
 TERMUX_PKG_LICENSE="LGPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/ice-wm/icewm/releases/download/$TERMUX_PKG_VERSION/icewm-$TERMUX_PKG_VERSION.tar.lz"
 TERMUX_PKG_SHA256=16ad06ea40973c478962eae87cb9d902c4590293bfdf165c79bc2b20a0c0c12a
 TERMUX_PKG_AUTO_UPDATE=true

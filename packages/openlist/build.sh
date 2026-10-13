@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-3.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
 TERMUX_PKG_VERSION=(
-	"4.2.5"
-	"4.2.5" # Web Frontend
+	"4.2.6"
+	"4.2.6" # Web Frontend
 )
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
@@ -12,8 +12,8 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${TERMUX_PKG_VERSION[1]}/openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	dd9f19bb4dc9b8a06bb839dff91eb69833b2b9c77a9bfe82fc8caf1f47e97df1
-	78e957e5b8855e30d00767458ab90ec11125a0344a238cc1e1990f46553d4308
+	028694b14ba7368429774f33c1b7eb584b2bf6235fb7d72df371e528a5c6b04c
+	eb620950a07dd081c5470a91361bde018ffd6a3cefb5b9a11b0f24f07960b444
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -45,14 +45,14 @@ termux_pkg_auto_update() {
 
 	local tmpdir
 	tmpdir="$(mktemp -d)"
-	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenListTeam/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
+	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenList/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
 	tar -C "${tmpdir}" -xf "${tmpdir}/openlist-linux-amd64.tar.gz"
 	chmod +x "${tmpdir}/openlist"
 	local latest_web_version
 	latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
 
-	curl -sLo "${tmpdir}/src" "https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
-	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
+	curl -sLo "${tmpdir}/src" "https://github.com/OpenList/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
+	curl -sLo "${tmpdir}/web" "https://github.com/OpenList/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
 	local -a sha=(
 		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
 		"$(sha256sum "${tmpdir}/web" | cut -d ' ' -f 1)"
@@ -103,7 +103,7 @@ termux_step_make() {
 	local ldflags
 	local _builtAt=$(date +'%F %T %z')
 	local _goVersion=$(go version | sed 's/go version //')
-	local _gitAuthor="The OpenList Projects Contributors <noreply@openlist.team>"
+	local _gitAuthor="The OpenList Projects Contributors <noreply@oplist.org>"
 	local _gitCommit=$(git ls-remote https://github.com/OpenListTeam/OpenList "refs/tags/v${TERMUX_PKG_VERSION[0]}" | head -c 7)
 	export CGO_ENABLED=1
 

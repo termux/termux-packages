@@ -23,7 +23,7 @@ index afd1bd8388..25481aba32 100644
  import("//build/config/sanitizers/sanitizers.gni")
  import("//build/toolchain/kythe.gni")
  
-@@ -638,9 +639,17 @@ template("proto_library") {
+@@ -658,9 +659,18 @@ template("proto_library") {
               (defined(invoker.component_build_force_source_set) &&
                invoker.component_build_force_source_set && is_component_build)) {
      # Option to disable building a library in component build.
@@ -34,7 +34,8 @@ index afd1bd8388..25481aba32 100644
 +    _library_type = "jumbo_static_library"
 +  }
 +
-+  if (defined(invoker.testonly) && invoker.testonly) {
++  if ((defined(invoker.testonly) && invoker.testonly) ||
++      (defined(invoker.disable_jumbo) && invoker.disable_jumbo)) {
 +    if (_library_type == "jumbo_source_set") {
 +      _library_type = "source_set"
 +    } else if (_library_type == "jumbo_static_library") {

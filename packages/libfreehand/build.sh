@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://wiki.documentfoundation.org/DLP/Libraries/libfreeha
 TERMUX_PKG_DESCRIPTION="a library for import of Aldus/Macromedia/Adobe FreeHand documents"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.1.2"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="0.1.4"
 TERMUX_PKG_SRCURL="https://dev-www.libreoffice.org/src/libfreehand/libfreehand-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=0e422d1564a6dbf22a9af598535425271e583514c0f7ba7d9091676420de34ac
+TERMUX_PKG_SHA256=350b10d24a76d7e8c8ae98b74c2d432a2c8ddec08935d09856d20b695a35e600
 TERMUX_PKG_DEPENDS="boost, littlecms, libicu, librevenge, zlib"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, gperf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests

@@ -1,0 +1,19 @@
+use target strip instead of hosts
+
+--- a/plugins/adb/CMakeLists.txt
++++ b/plugins/adb/CMakeLists.txt
+@@ -45,12 +45,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
+     target_compile_options(adb PRIVATE -Os -fomit-frame-pointer)
+     if(APPLE)
+         add_custom_command(TARGET adb POST_BUILD
+-            COMMAND strip -x "$<TARGET_FILE:adb>"
++            COMMAND ${CMAKE_STRIP} -x "$<TARGET_FILE:adb>"
+             COMMENT "Stripping debug symbols from adb plugin"
+         )
+     else()
+         add_custom_command(TARGET adb POST_BUILD
+-            COMMAND strip --strip-unneeded "$<TARGET_FILE:adb>"
++            COMMAND ${CMAKE_STRIP} --strip-unneeded "$<TARGET_FILE:adb>"
+             COMMENT "Stripping debug symbols from adb plugin"
+         )
+     endif()

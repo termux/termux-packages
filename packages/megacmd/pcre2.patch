@@ -1,0 +1,136 @@
+diff --git a/build/cmake/modules/megacmd_libraries.cmake b/build/cmake/modules/megacmd_libraries.cmake
+--- a/build/cmake/modules/megacmd_libraries.cmake
++++ b/build/cmake/modules/megacmd_libraries.cmake
+@@ -2,8 +2,8 @@
+ 
+     if(VCPKG_ROOT)
+         if(USE_PCRE)
+-            find_package(unofficial-pcre REQUIRED)
+-            target_link_libraries(LMegacmdServer PRIVATE unofficial::pcre::pcrecpp)
++            find_package(pcre2 CONFIG REQUIRED)
++            target_link_libraries(LMegacmdServer PRIVATE PCRE2::8BIT)
+             set(USE_PCRE 1)
+         endif()
+ 
+@@ -16,8 +16,8 @@
+         find_package(PkgConfig REQUIRED) # For libraries loaded using pkg-config
+ 
+         if(USE_PCRE) #TODO: UNTESTED!
+-            pkg_check_modules(pcre REQUIRED IMPORTED_TARGET libpcre)
+-            target_link_libraries(LMegacmdServer PRIVATE PkgConfig::pcre)
++            pkg_check_modules(pcre2 REQUIRED IMPORTED_TARGET libpcre2-8)
++            target_link_libraries(LMegacmdServer PRIVATE PkgConfig::pcre2)
+             set(USE_PCRE 1)
+         endif()
+     endif()
+diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
+--- a/src/megacmdutils.cpp
++++ b/src/megacmdutils.cpp
+@@ -20,7 +20,8 @@
+ #include "mega/types.h"
+ 
+ #ifdef USE_PCRE
+-#include <pcrecpp.h>
++#define PCRE2_CODE_UNIT_WIDTH 8
++#include <pcre2.h>
+ #elif __cplusplus >= 201103L && !defined(__MINGW32__)
+ #include <regex>
+ #endif
+@@ -937,6 +938,31 @@
+ }
+ 
+ 
++string quoteMeta(const string &what)
++{
++    string quoted;
++    for (unsigned char c : what)
++    {
++        if (c == '\0')
++        {
++            quoted += "\\0";
++        }
++        else if (!((c >= 'a' && c <= 'z') ||
++                   (c >= 'A' && c <= 'Z') ||
++                   (c >= '0' && c <= '9') ||
++                   c == '_' || (c & 128)))
++        {
++            quoted += '\\';
++            quoted += c;
++        }
++        else
++        {
++            quoted += c;
++        }
++    }
++    return quoted;
++}
++
+ bool isRegExp(string what)
+ {
+ #ifdef USE_PCRE
+@@ -975,7 +990,7 @@
+     replaceAll(what, "/./", "/");
+     replaceAll(what, "/", "");
+ 
+-    string s = pcrecpp::RE::QuoteMeta(what);
++    string s = quoteMeta(what);
+     string ns = s;
+     replaceAll(ns, "\\\\\\", "\\");
+     bool isregex = strcmp(what.c_str(), ns.c_str());
+@@ -1013,7 +1028,7 @@
+         }
+     }
+ 
+-    string s = pcrecpp::RE::QuoteMeta(what.c_str());
++    string s = quoteMeta(what);
+     string ns = s;
+     replaceAll(ns, "\\\\\\", "\\");
+ 
+@@ -1077,25 +1092,41 @@
+     if (usepcre)
+     {
+ #ifdef USE_PCRE
+-        pcrecpp::RE re(pattern);
+-        if (re.error().length())
++        auto compilePattern = [](const char *expression, int &errorCode)
++        {
++            PCRE2_SIZE errorOffset;
++            return pcre2_compile(reinterpret_cast<PCRE2_SPTR>(expression), PCRE2_ZERO_TERMINATED,
++                                 0, &errorCode, &errorOffset, nullptr);
++        };
++
++        int errorCode;
++        pcre2_code *re = compilePattern(pattern, errorCode);
++        if (!re)
+         {
+             //In case the user supplied non-pcre regexp with * or ? in it.
+             string newpattern(pattern);
+             replaceAll(newpattern,"*",".*");
+             replaceAll(newpattern,"?",".");
+-            re=pcrecpp::RE(newpattern);
++            re = compilePattern(newpattern.c_str(), errorCode);
+         }
+ 
+-        if (!re.error().length())
++        if (re)
+         {
+-            bool toret = re.FullMatch(what);
++            pcre2_match_data *matchData = pcre2_match_data_create_from_pattern(re, nullptr);
++            int result = pcre2_match(re, reinterpret_cast<PCRE2_SPTR>(what), PCRE2_ZERO_TERMINATED,
++                                     0, PCRE2_ANCHORED, matchData, nullptr);
++            PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(matchData);
++            bool toret = result >= 0 && ovector[0] == 0 && ovector[1] == string(what).size();
+ 
++            pcre2_match_data_free(matchData);
++            pcre2_code_free(re);
+             return toret;
+         }
+         else
+         {
+-            LOG_warn << "Invalid PCRE regex: " << re.error();
++            PCRE2_UCHAR errorMessage[256];
++            pcre2_get_error_message(errorCode, errorMessage, sizeof(errorMessage));
++            LOG_warn << "Invalid PCRE regex: " << errorMessage;
+             return false;
+         }
+ #elif __cplusplus >= 201103L && !defined(__MINGW32__)

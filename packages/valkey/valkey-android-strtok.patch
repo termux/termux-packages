@@ -1,0 +1,11 @@
+--- a/src/cli_common.c
++++ b/src/cli_common.c
+@@ -335,7 +335,8 @@
+ #else
+         char *copy = strdup(curr);
+-        char *curr_scheme = strtok(copy, "://");
++        char *saveptr;
++        char *curr_scheme = strtok_r(copy, "://", &saveptr);
+         fprintf(stderr, "%s:// is only supported when %s is compiled with OpenSSL\n", curr_scheme, tool_name);
+         free(copy);
+         exit(1);

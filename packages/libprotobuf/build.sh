@@ -11,9 +11,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - update SHA256 checksum for $_PROTOBUF_ZIP in
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
-TERMUX_PKG_VERSION="2:35.1"
+TERMUX_PKG_VERSION="2:36.2"
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/refs/tags/v${TERMUX_PKG_VERSION#*:}.tar.gz
-TERMUX_PKG_SHA256=22775f9376938295efa2d59a59bde4cd075a42df5a9b4d27aa9b99fa6a413bd2
+TERMUX_PKG_SHA256=7e7eaf580ec77f1a392ff1ab1013c13d3b04a6716f002f697f67f3c1113f0530
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="abseil-cpp, libc++, zlib"
 TERMUX_PKG_BREAKS="libprotobuf-dev, protobuf-dev, protobuf-static, libutf8-range"

@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=http://lynx.browser.org/
 TERMUX_PKG_DESCRIPTION="The text web browser"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.9.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.9.3"
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/lynx/tarballs/lynx${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=7374b89936d991669e101f4e97f2c9592036e1e8cdaa7bafc259a77ab6fb07ce
+TERMUX_PKG_SHA256=174b7f2866a60f3247ba75f5c7dbb10b124aede4a1359312de15f3bfebd2050f
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="brotli, libiconv, ncurses, openssl, libbz2, libidn, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-screen=ncursesw --enable-widec --enable-scrollbar --enable-nested-tables --enable-htmlized-cfg --with-ssl --with-zlib --with-bzlib --enable-cjk --enable-japanese-utf8 --enable-progressbar --enable-prettysrc --enable-forms-options --enable-8bit-toupper --enable-ascii-ctypes --disable-font-switch --with-mime-libdir=$TERMUX_PREFIX/etc"
 
@@ -29,6 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_path_ZIP=${TERMUX_PREFIX}/bin/zip"
 termux_step_pre_configure() {
 	CC+=" $LDFLAGS"
 	unset LDFLAGS
+	CFLAGS+=" -Wno-error=implicit-function-declaration"
 }
 
 termux_step_make_install() {

@@ -1,7 +1,7 @@
 #include "platform-ns.h"
 
 #include <dlfcn.h>
-#include <stdatomic.h>
+#include <pthread.h>
 #include <stdio.h>
 
 // const attribute will not let us modify our variables
@@ -88,10 +88,9 @@ static struct {
 } stubs;
 #undef STUB
 
-static void ensure_loaded() {
-    static atomic_flag tried = ATOMIC_FLAG_INIT;
-    if (atomic_flag_test_and_set(&tried))
-        return;
+static pthread_once_t loaded_once = PTHREAD_ONCE_INIT;
+
+static void load_stubs(void) {
 
     // simulate LD_PRELOAD=/system/lib64/libskcodec.so
     void *skcodec_handle = platform_dlopen(SKCODEC, RTLD_GLOBAL); // ignore errors, we only need to upload it to global namespace
@@ -108,6 +107,10 @@ static void ensure_loaded() {
     #define LOAD(s) stubs.s = dlsym(handle, #s);
     FUNCTIONS(LOAD)
     #undef LOAD
+}
+
+static inline void ensure_loaded(void) {
+    pthread_once(&loaded_once, load_stubs);
 }
 
 #define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)

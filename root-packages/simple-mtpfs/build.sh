@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION=0.4.0
 TERMUX_PKG_SRCURL=https://github.com/phatina/simple-mtpfs/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1d011df3fa09ad0a5c09d48d84c03e6cddf86390af9eb4e0c178193f32f0e2fc
 TERMUX_PKG_DEPENDS="libmtp, libfuse2, libusb"
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_BUILD_DEPENDS="autoconf-archive"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 

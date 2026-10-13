@@ -227,14 +227,13 @@ diff --git a/content/common/BUILD.gn b/content/common/BUILD.gn
 index 8c293f5bb0..6d7ad583bc 100644
 --- a/content/common/BUILD.gn
 +++ b/content/common/BUILD.gn
-@@ -438,6 +438,10 @@ mojom("mojo_bindings") {
- 
-   disable_variants = true
- 
+@@ -438,6 +446,9 @@ mojom("mojo_bindings") {
+ mojom("mojo_bindings") {
+   # This interface is internal to content.
+   visibility = [ "//content/*" ]
 +  # Fail to compile with error
 +  # `redefinition of 'ParamTraits<content::WebPluginMimeType::Param>'`
 +  disable_jumbo = true
-+
    sources = [
      "agent_scheduling_group.mojom",
      "associated_interfaces.mojom",
@@ -319,18 +318,18 @@ index 87b3bbe9ae..d3d7f411fa 100644
  import("//mojo/public/tools/bindings/mojom_rust.gni")
  import("//third_party/closure_compiler/closure_args.gni")
  import("//third_party/closure_compiler/compile_js.gni")
-@@ -1029,7 +1030,7 @@ template("mojom") {
-   }
+@@ -1031,7 +1032,7 @@
  
    shared_cpp_sources_target_name = "${target_name}_shared_cpp_sources"
+ 
 -  source_set(shared_cpp_sources_target_name) {
 +  jumbo_source_set(shared_cpp_sources_target_name) {
      if (defined(invoker.testonly)) {
        testonly = invoker.testonly
      }
-@@ -1218,6 +1219,13 @@ template("mojom") {
-   } else {
-     enabled_configurations = [ default_variant ]
+@@ -1221,6 +1222,13 @@
+     }
+     enabled_configurations += [ blink_variant ]
    }
 +
 +  if (defined(invoker.disable_jumbo) && invoker.disable_jumbo) {
@@ -340,9 +339,9 @@ index 87b3bbe9ae..d3d7f411fa 100644
 +  }
 +
    foreach(bindings_configuration, enabled_configurations) {
-     cpp_only = false
-     if (defined(invoker.cpp_only)) {
-@@ -1609,6 +1617,10 @@ template("mojom") {
+     generate_cpp_for_variant =
+         generate_cpp || defined(bindings_configuration.variant)
+@@ -1583,6 +1591,10 @@
        sources_target_type = "source_set"
      }
  
@@ -353,18 +352,10 @@ index 87b3bbe9ae..d3d7f411fa 100644
      output_target_name = "${target_name}${variant_suffix}"
      if (proxy_target != "") {
        group(output_target_name) {
-@@ -1779,6 +1791,7 @@ template("mojom") {
- 
-     target(sources_target_type, sources_target_name) {
-       if (defined(output_name_override)) {
-+
-         output_name = output_name_override
-       }
-       visibility = output_visibility + [
-@@ -1886,7 +1899,7 @@ template("mojom") {
- 
+@@ -1746,7 +1758,7 @@
        mojolpm_target_name = "${target_name}_mojolpm"
        mojolpm_generator_target_name = "${target_name}__generator"
+ 
 -      source_set(mojolpm_target_name) {
 +      jumbo_source_set(mojolpm_target_name) {
          # There are still a few missing header dependencies between mojo targets
@@ -3971,9 +3962,9 @@ index 368305c6b0..969c6dcf2e 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
  import("//testing/test.gni")
  import("//third_party/blink/renderer/build/scripts/scripts.gni")
+ import("//third_party/blink/renderer/platform/blink_fuzzer_test.gni")
 @@ -189,6 +190,14 @@ blink_platform_sources("loader") {
    sources +=
        get_target_outputs(":make_platform_loader_generated_delivery_type_names")
@@ -4267,7 +4258,7 @@ index 36c923d28b..c168252f9b 100644
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
+ import("//third_party/blink/renderer/platform/blink_fuzzer_test.gni")
  import("//third_party/blink/renderer/platform/platform.gni")
  import("//third_party/protobuf/proto_library.gni")
 @@ -190,7 +191,7 @@ blink_platform_sources("scheduler") {
@@ -4812,3 +4803,124 @@ index 12a864be8e..55711b2902 100644
  
    deps = [
      "//third_party/blink/public/strings:strings_grit",
+diff --git a/third_party/blink/public/mojom/BUILD.gn b/third_party/blink/public/mojom/BUILD.gn
+index d045fffd78..440d3eef18 100644
+--- a/third_party/blink/public/mojom/BUILD.gn
++++ b/third_party/blink/public/mojom/BUILD.gn
+@@ -24,6 +24,10 @@ if (is_android) {
+ # //content/public/common has private dependencies there.
+ mojom("mojom_platform") {
+   generate_java = true
++  # Fail to compile with error
++  # error: static assertion failed due to requirement 'perfetto::internal::has_traced_value_support<const std::optional<std::string> &>::value': The provided type (passed to TRACE_EVENT argument / TracedArray::Append / TracedDictionary::Add) does not support being written in a trace format. Please see the comment in traced_value.h for more details.
++  # ./host/gen/third_party/blink/public/mojom/speculation_rules/speculation_rules.mojom.cc:156:13: note: in instantiation of function template specialization 'perfetto::WriteIntoTracedValueWithFallback<const std::vector<std::optional<std::string>> &>' requested here
++  disable_jumbo = true
+   sources = [
+     "ad_tagging/ad_evidence.mojom",
+     "aggregation_service/aggregatable_report.mojom",
+diff --git a/third_party/blink/renderer/platform/fonts/font_size_adjust.cc b/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
+index 2a6c9cec27..a6a72b96f7 100644
+--- a/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
++++ b/third_party/blink/renderer/platform/fonts/font_size_adjust.cc
+@@ -9,7 +9,7 @@
+ 
+ namespace blink {
+ 
+-namespace {
++namespace font_size_adjust {
+ 
+ StringView ToString(FontSizeAdjust::Metric metric) {
+   switch (metric) {
+@@ -45,7 +45,7 @@ String FontSizeAdjust::ToString() const {
+   if (metric_ == Metric::kExHeight) {
+     return adjustment;
+   }
+-  return StrCat({::blink::ToString(metric_), " ", adjustment});
++  return StrCat({::blink::font_size_adjust::ToString(metric_), " ", adjustment});
+ }
+ 
+ }  // namespace blink
+diff --git a/third_party/blink/renderer/modules/webtransport/receive_stream.cc b/third_party/blink/renderer/modules/webtransport/receive_stream.cc
+index d62e98f89c..be3bf62d6e 100644
+--- a/third_party/blink/renderer/modules/webtransport/receive_stream.cc
++++ b/third_party/blink/renderer/modules/webtransport/receive_stream.cc
+@@ -12,6 +12,8 @@
+ #include "third_party/blink/renderer/platform/heap/visitor.h"
+ #include "third_party/blink/renderer/platform/wtf/functional.h"
+ 
++#define ForgetStream ForgetStream_receive_stream
++
+ namespace blink {
+ 
+ namespace {
+@@ -43,3 +45,5 @@ void ReceiveStream::Trace(Visitor* visitor) const {
+ }
+ 
+ }  // namespace blink
++
++#undef ForgetStream
+diff --git a/third_party/blink/renderer/core/BUILD.gn b/third_party/blink/renderer/core/BUILD.gn
+index 9198e3dc6a..26cb3e258d 100644
+--- a/third_party/blink/renderer/core/BUILD.gn
++++ b/third_party/blink/renderer/core/BUILD.gn
+@@ -470,7 +470,6 @@ jumbo_component("core") {
+     "//third_party/blink/renderer/core/url_pattern",
+     "//third_party/blink/renderer/core/xml:xpath_generated",
+   ]
+-  jumbo_excluded_sources += rebase_path([ "attribution_reporting_to_mojom.cc" ], "", "fetch")
+   jumbo_excluded_sources += rebase_path([ "frame_fetch_context.cc" ], "", "loader")
+   jumbo_excluded_sources += rebase_path([ "image_loader.cc" ], "", "loader")
+   jumbo_excluded_sources += rebase_path([ "create_window.cc" ], "", "page")
+diff --git a/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc b/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
+index a28243d65a..c6845ca742 100644
+--- a/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
++++ b/third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.cc
+@@ -343,8 +343,8 @@ void HTMLCanvasAccessibilityManager::SetOCRDeadline() {
+ }
+ 
+ bool HTMLCanvasAccessibilityManager::ShouldRunOCR() const {
+-  if (features::GetCanvasAccessibilityMode() !=
+-      features::CanvasAccessibilityMode::kAdvanced) {
++  if (::features::GetCanvasAccessibilityMode() !=
++      ::features::CanvasAccessibilityMode::kAdvanced) {
+     return false;
+   }
+   if (!NeedsA11ySupport()) {
+diff --git a/third_party/blink/renderer/core/layout/grid_lanes/layout_grid_lanes.cc b/third_party/blink/renderer/core/layout/grid_lanes/layout_grid_lanes.cc
+index 1c6e8d1ef2..1400c34bb6 100644
+--- a/third_party/blink/renderer/core/layout/grid_lanes/layout_grid_lanes.cc
++++ b/third_party/blink/renderer/core/layout/grid_lanes/layout_grid_lanes.cc
+@@ -7,6 +7,8 @@
+ #include "third_party/blink/renderer/core/layout/grid/layout_grid.h"
+ #include "third_party/blink/renderer/platform/text/writing_mode_utils.h"
+ 
++#define GetOverflowConverter GetOverflowConverter_layout_grid_lanes
++
+ namespace blink {
+ 
+ namespace {
+@@ -191,3 +193,5 @@ Vector<LayoutUnit, 1> LayoutGridLanes::TrackSizesForComputedStyle(
+ }
+ 
+ }  // namespace blink
++
++#undef GetOverflowConverter
+diff --git a/third_party/blink/renderer/bindings/modules/v8/BUILD.gn b/third_party/blink/renderer/bindings/modules/v8/BUILD.gn
+index ed1acb2f99..99f5a7052a 100644
+--- a/third_party/blink/renderer/bindings/modules/v8/BUILD.gn
++++ b/third_party/blink/renderer/bindings/modules/v8/BUILD.gn
+@@ -26,6 +26,14 @@ blink_modules_sources("v8") {
+       generated_observable_array_sources_in_modules +
+       generated_sync_iterator_sources_in_modules +
+       generated_typedef_sources_in_modules + generated_union_sources_in_modules
++  jumbo_excluded_sources = [
++    # v8_password_credential.cc
++    # explicit specialization of 'blink::HashTraits<base::UnguessableToken>' after instantiation
++    "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_navigator.cc",
++    # v8_document.cc
++    # explicit specialization of 'blink::HashTraits<base::UnguessableToken>' after instantiation
++    "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_capture_controller.cc",
++  ]
+ 
+   deps = [
+     ":generated",

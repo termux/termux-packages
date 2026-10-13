@@ -1,42 +1,42 @@
---- a/build/config/compiler/BUILD.gn
-+++ b/build/config/compiler/BUILD.gn
-@@ -1278,7 +1278,7 @@
-     # CPU architecture. We may or may not be doing a cross compile now, so for
-     # simplicity we always explicitly set the architecture.
-     if (current_cpu == "x64") {
--      if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device) {
-+      if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device && false) {
-         cflags += [ "--target=x86_64-unknown-linux-gnu" ]
-         ldflags += [ "--target=x86_64-unknown-linux-gnu" ]
-       } else {
-@@ -1287,7 +1287,7 @@
-       }
-       cflags += [ "-msse3" ]
-     } else if (current_cpu == "x86") {
--      if (is_clang && !is_android && !is_chromeos_device) {
-+      if (is_clang && !is_android && !is_chromeos_device && false) {
-         cflags += [ "--target=i386-unknown-linux-gnu" ]
-         ldflags += [ "--target=i386-unknown-linux-gnu" ]
-       } else {
-@@ -1300,8 +1300,8 @@
-       ]
-     } else if (current_cpu == "arm") {
-       if (is_clang && !is_android && !is_chromeos_device) {
--        cflags += [ "--target=arm-linux-gnueabihf" ]
--        ldflags += [ "--target=arm-linux-gnueabihf" ]
-+        cflags += [ "--target=armv7a-linux-androideabi24" ]
-+        ldflags += [ "--target=armv7a-linux-androideabi24" ]
-       }
-       cflags += [
-         "-march=$arm_arch",
-@@ -1312,8 +1312,8 @@
-       }
-     } else if (current_cpu == "arm64") {
-       if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device) {
--        cflags += [ "--target=aarch64-linux-gnu" ]
--        ldflags += [ "--target=aarch64-linux-gnu" ]
-+        cflags += [ "--target=aarch64-linux-android24" ]
-+        ldflags += [ "--target=aarch64-linux-android24" ]
-       }
-     } else if (current_cpu == "mipsel") {
-       ldflags += [ "-Wl,--hash-style=sysv" ]
+--- a/build/config/compiler_cpu_abi.gn
++++ b/build/config/compiler_cpu_abi.gn
+@@ -48,7 +48,7 @@
+ if ((is_posix && !is_apple) || is_fuchsia) {
+   # simplicity we always explicitly set the architecture.
+   if (current_cpu == "x64") {
+-    if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device) {
++    if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device && false) {
+       cpu_abi_cflags += [ "--target=x86_64-unknown-linux-gnu" ]
+       cpu_abi_ldflags += [ "--target=x86_64-unknown-linux-gnu" ]
+     } else {
+@@ -62,7 +62,7 @@
+       cpu_abi_ldflags += [ "-march=$cros_target_cpu_arch" ]
+     }
+   } else if (current_cpu == "x86") {
+-    if (is_clang && !is_android && !is_chromeos_device) {
++    if (is_clang && !is_android && !is_chromeos_device && false) {
+       cpu_abi_cflags += [ "--target=i386-unknown-linux-gnu" ]
+       cpu_abi_ldflags += [ "--target=i386-unknown-linux-gnu" ]
+     } else {
+@@ -75,8 +75,8 @@
+     ]
+   } else if (current_cpu == "arm") {
+     if (is_clang && !is_android && !is_chromeos_device) {
+-      cpu_abi_cflags += [ "--target=arm-linux-gnueabihf" ]
+-      cpu_abi_ldflags += [ "--target=arm-linux-gnueabihf" ]
++      cpu_abi_cflags += [ "--target=armv7a-linux-androideabi24" ]
++      cpu_abi_ldflags += [ "--target=armv7a-linux-androideabi24" ]
+     }
+     cpu_abi_cflags += [
+       "-march=$arm_arch",
+@@ -84,8 +84,8 @@
+     ]
+   } else if (current_cpu == "arm64") {
+     if (is_clang && !is_android && !is_fuchsia && !is_chromeos_device) {
+-      cpu_abi_cflags += [ "--target=aarch64-linux-gnu" ]
+-      cpu_abi_ldflags += [ "--target=aarch64-linux-gnu" ]
++      cpu_abi_cflags += [ "--target=aarch64-linux-android24" ]
++      cpu_abi_ldflags += [ "--target=aarch64-linux-android24" ]
+     }
+     if (target_os == "chromeos" && cros_target_cpu_arch != "" &&
+         is_a_target_toolchain) {

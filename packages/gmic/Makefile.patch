@@ -1,39 +1,42 @@
-diff -u -r ../gmic-3.4.3/src/Makefile ./src/Makefile
---- ../gmic-3.4.3/src/Makefile	2024-10-11 15:23:57.000000000 +0000
-+++ ./src/Makefile	2024-10-12 11:00:29.832806811 +0000
-@@ -190,7 +190,7 @@
- ifndef NO_SRIPDLIB
- MANDATORY_CFLAGS += -std=c++11 -pedantic
- endif
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -191,7 +191,7 @@
+ ifeq ($(BUILD_OS),Darwin)
+ MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ else ifneq ($(BUILD_OS),Windows)
 -MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB) -Wl,-rpath,.
 +MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
- ifdef IS_GCC
- MANDATORY_CFLAGS += -Wall -Wextra -Wfatal-errors -Werror=unknown-pragmas -Werror=unused-label
- GCC_VER_GTEQ5 = $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 5)
-@@ -378,8 +378,8 @@ endif
+ else
+ MANDATORY_LIBS += -L. -L$(PREFIX)/$(LIB)
+ endif
+@@ -367,8 +367,8 @@
  GMIC_STD_CFLAGS = $(MANDATORY_CFLAGS) $(DISPLAY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
  GMIC_STD_LIBS = $(MANDATORY_LIBS) $(DISPLAY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
- ifeq ($(OS),Unix) # Unix
+ ifeq ($(BUILD_OS),Unix) # Unix
 -GMIC_STD_CFLAGS += $(OPENMP_CFLAGS) $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
 -GMIC_STD_LIBS += $(OPENMP_LIBS) $(OPENEXR_LIBS) $(WEBP_LIBS)
 +GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS) $(WEBP_CFLAGS)
 +GMIC_STD_LIBS += $(OPENEXR_LIBS) $(WEBP_LIBS)
- else
- ifeq ($(OS),Darwin) # MacOSX
+ else ifeq ($(BUILD_OS),Darwin) # MacOSX
  GMIC_STD_CFLAGS += $(OPENEXR_CFLAGS)
-@@ -434,6 +434,10 @@
- 	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
+ GMIC_STD_LIBS += $(OPENEXR_LIBS)
+@@ -442,9 +442,13 @@
+ # Regular builds.
+ #
+ cli: # Default: Without OpenCV support
+-	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
++	$(MAKE) --no-print-directory "CFLAGS+=$(OPT_CFLAGS) $(GMIC_STD_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
  	$(STRIP) gmic$(EXE)
  
 +cli_gm:
-+	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS)" "LIBS+=gmic_gm.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic_gm.o _cli_gm
++	$(MAKE) --no-print-directory "CFLAGS+=$(OPT_CFLAGS) $(GMIC_STD_CFLAGS)" "LIBS+=gmic_gm.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic_gm.o _cli_gm
 +	$(STRIP) gmic-gm$(EXE)
 +
  opencv: # Default: With OpenCV support
- 	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) $(OPENCV_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS) $(OPENCV_LIBS)" gmic.o _cli
+ 	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) $(OPENCV_CFLAGS)" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS) $(OPENCV_LIBS)" gmic.o _cli
  	$(STRIP) gmic$(EXE)
-@@ -489,13 +489,20 @@ gprof: # With optimization enabled, symbols kept and gprof enabled, for code pro
- 	$(MAKE) "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) -g -pg" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
+@@ -482,13 +486,20 @@
+ 	$(MAKE) --no-print-directory "CFLAGS+=$(GMIC_STD_CFLAGS) $(OPT_CFLAGS) -g -pg" "LIBS+=gmic.o $(GMIC_STD_LIBS) $(OPT_LIBS)" gmic.o _cli
  
  _cli: gmic$(EXE)
 +_cli_gm: gmic-gm$(EXE)

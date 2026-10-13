@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="XML-RPC for C and C++"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="doc/COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.64.03"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/xmlrpc-c/Xmlrpc-c%20Super%20Stable/${TERMUX_PKG_VERSION}/xmlrpc-${TERMUX_PKG_VERSION}.tgz
-TERMUX_PKG_SHA256=74729d364edbedbe42e782822da1e076f3f45c65c4278a3cfba5f2342d7cedbe
+TERMUX_PKG_VERSION="1.64.04"
+TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/xmlrpc-c/Xmlrpc-c%20Super%20Stable/${TERMUX_PKG_VERSION}/xmlrpc-c-${TERMUX_PKG_VERSION}.tgz"
+TERMUX_PKG_SHA256=509c3a3bffb77c81e2c364175ac70b95b799e5b695cc37d4bf833ec28fdfe0b6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
@@ -27,8 +26,8 @@ TERMUX_PKG_MAKE_PROCESSES=1
 
 # separate host-build directory but build system does not support out-of-tree build
 termux_step_host_build() {
-	pushd $TERMUX_PKG_HOSTBUILD_DIR
-	cp -r $TERMUX_PKG_SRCDIR/* .
+	pushd "$TERMUX_PKG_HOSTBUILD_DIR"
+	cp -r "$TERMUX_PKG_SRCDIR"/* .
 	./configure
 
 	# build only the required tool

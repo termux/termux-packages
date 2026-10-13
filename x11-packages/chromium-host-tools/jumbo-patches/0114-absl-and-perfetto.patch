@@ -149,18 +149,18 @@ index ee0aa497d0..2be9d78a9e 100644
  
 +import("//build/config/jumbo.gni")
 +
- source_set("for_testing") {
-   deps = [
-     "../../gn:default_deps",
-@@ -21,7 +23,7 @@
-   defines = [ "PERFETTO_SHLIB_SDK_IMPLEMENTATION" ]
+ import("../../gn/perfetto.gni")
+ 
+ # Makes the public ABI headers annotate symbols for shared library usage
+@@ -40,7 +42,7 @@
+   sources = [ "reset_for_testing.h" ]
  }
  
 -source_set("shared_lib") {
 +jumbo_source_set("shared_lib") {
+   configs += [ ":shlib_impl_config" ]
    deps = [
      ":for_testing",
-     "../../gn:default_deps",
 diff --git a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn b/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
 index 3be2a5d292..be9ca2a672 100644
 --- a/third_party/perfetto/src/trace_processor/importers/common/BUILD.gn
@@ -198,12 +198,13 @@ diff --git a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn b
 index ed254e5a67..215ac02e98 100644
 --- a/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
 +++ b/third_party/perfetto/src/trace_processor/importers/proto/BUILD.gn
-@@ -12,9 +12,10 @@
+@@ -12,10 +12,11 @@
  # See the License for the specific language governing permissions and
  # limitations under the License.
  
 +import("//build/config/jumbo.gni")
  import("../../../../gn/perfetto_cc_proto_descriptor.gni")
+ import("../../../../gn/test.gni")
  
 -source_set("minimal") {
 +jumbo_source_set("minimal") {

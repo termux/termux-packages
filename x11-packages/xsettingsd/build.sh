@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE="https://codeberg.org/derat/xsettingsd"
 TERMUX_PKG_DESCRIPTION="Provides settings to X11 applications via the XSETTINGS specification"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.0.4"
 TERMUX_PKG_SRCURL="https://codeberg.org/derat/xsettingsd/archive/v${TERMUX_PKG_VERSION}.tar.gz"

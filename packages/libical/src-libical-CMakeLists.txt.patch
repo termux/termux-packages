@@ -1,0 +1,11 @@
+--- a/src/libical/CMakeLists.txt
++++ b/src/libical/CMakeLists.txt
+@@ -292,7 +292,7 @@
+ target_include_directories(ical INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>")
+ 
+ if(DEFINED CMAKE_THREAD_LIBS_INIT)
+-  target_link_libraries(ical ${CMAKE_THREAD_LIBS_INIT})
++  target_link_libraries(ical PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+ endif()
+ if(ICU_FOUND)
+   target_link_libraries(ical PRIVATE ${ICU_LIBRARIES})

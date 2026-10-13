@@ -3,39 +3,25 @@ TERMUX_PKG_DESCRIPTION="Open Object Rexx"
 TERMUX_PKG_LICENSE="CPL-1.0"
 TERMUX_PKG_LICENSE_FILE="CPLv1.0.txt, NOTICE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.2.0
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/oorexx/oorexx/${TERMUX_PKG_VERSION}/ooRexx-${TERMUX_PKG_VERSION}-source.tar.gz
-TERMUX_PKG_SHA256=ac5af11e7d4d239d2ebe06f40092f4aebf87fc40740b46458bff3b4069ce6e0b
-TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-wordexp, libc++, libcrypt"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_catopen=no"
+TERMUX_PKG_VERSION=5.2.0
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/oorexx/oorexx/${TERMUX_PKG_VERSION}/oorexx-${TERMUX_PKG_VERSION}-13156.tar.gz
+TERMUX_PKG_SHA256=0c1378ee212ffae7a192412e908849c0df38fa9c4009f6400e6a5d43a53fbd73
+TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-spawn, libandroid-wordexp, libc++, libcrypt, ncurses"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="CFLAGS=-O0"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DORX_PREBUILT_IMAGE=$TERMUX_PKG_HOSTBUILD_DIR/lib/rexx.img
+"
 
-termux_step_post_get_source() {
-	sed -i 's:__type:_&:g' api/oorexxapi.h
+termux_step_host_build() {
+	termux_setup_cmake
+	termux_setup_ninja
+	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release "$TERMUX_PKG_SRCDIR"
+	cmake --build . --target rexx_img -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
-
 	CFLAGS+=" -fwrapv -fno-strict-aliasing"
-	LDFLAGS+=" -landroid-posix-semaphore"
-	LDFLAGS+=" -landroid-wordexp -lcrypt $($CC -print-libgcc-file-name)"
-
-	local _SOVERSION=${TERMUX_PKG_VERSION%%.*}
-
-	local dummylibdir=$TERMUX_PKG_BUILDDIR/_dummylib
-	mkdir -p $dummylibdir
-	echo 'void RexxVariablePool(void){}' | $CC -x c - -shared -nostdlib \
-		-Wl,-soname=librexx.so.${_SOVERSION} \
-		-o $dummylibdir/librexx.so
-	echo 'void RexxFreeMemory(void){}' | $CC -x c - -shared -nostdlib \
-		-Wl,-soname=librexxapi.so.${_SOVERSION} \
-		-o $dummylibdir/librexxapi.so
-	export DLDFLAGS="-L./.libs -L${dummylibdir}"
-}
-
-termux_step_post_configure() {
-	sed -i 's:\./\(rexximage\):\1:' Makefile
+	CXXFLAGS+=" -fwrapv -fno-strict-aliasing"
+	LDFLAGS+=" -landroid-posix-semaphore -landroid-spawn -landroid-wordexp -lcrypt"
 }

@@ -1,8 +1,6 @@
-diff --git a/electrum/daemon.py b/electrum/daemon.py
-index 818b32786..579f57c97 100644
 --- a/electrum/daemon.py
 +++ b/electrum/daemon.py
-@@ -645,7 +645,7 @@ class Daemon(Logger):
+@@ -673,7 +673,7 @@
          threading.current_thread().name = 'GUI'
          gui_name = self.config.GUI_NAME
          if gui_name in ['lite', 'classic']:
@@ -11,16 +9,13 @@ index 818b32786..579f57c97 100644
          self._plugins = Plugins(self.config, gui_name)  # init plugins
          self.logger.info(f'launching GUI: {gui_name}')
          try:
-diff --git a/electrum/simple_config.py b/electrum/simple_config.py
-index f1bdf240c..07bf2541b 100644
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
-@@ -793,7 +793,7 @@ Warning: setting this to too low will result in lots of payment failures."""),
-     RPC_SOCKET_TYPE = ConfigVar('rpcsock', default='auto', type_=str)
-     RPC_SOCKET_FILEPATH = ConfigVar('rpcsockpath', default=None, type_=str)
+@@ -811,6 +811,6 @@
+     DISABLE_MEMORY_HARDENING_LINUX = ConfigVar('nohardening', default=None, type_=bool) # default is False in add_global_options
  
 -    GUI_NAME = ConfigVar('gui', default='qt', type_=str)
 +    GUI_NAME = ConfigVar('gui', default='text', type_=str)
-     CURRENT_WALLET = ConfigVar('current_wallet', default=None, type_=str)
- 
-     GUI_QT_COLOR_THEME = ConfigVar(
+     CURRENT_WALLET = ConfigVar(
+         'current_wallet', default=None, type_=str,
+         convert_setter=lambda v: None if util.is_hidden_wallet_path(v) else v,  # don't save "hidden wallet" paths

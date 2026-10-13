@@ -1,0 +1,82 @@
+--- a/chrome/common/logging_chrome.h
++++ b/chrome/common/logging_chrome.h
+@@ -61,7 +61,7 @@
+ void CleanupChromeLogging();
+ 
+ // Returns the fully-qualified name of the log file.
+-base::FilePath GetLogFileName(const base::CommandLine& command_line);
++base::FilePath GetLogFileName_Chrome(const base::CommandLine& command_line);
+ 
+ // Returns true when error/assertion dialogs are not to be shown, false
+ // otherwise.
+--- a/chrome/common/logging_chrome.cc
++++ b/chrome/common/logging_chrome.cc
+@@ -358,7 +358,7 @@
+ 
+ base::FilePath GetSessionLogFile(const base::CommandLine& command_line) {
+   return GetSessionLogDir(command_line)
+-      .Append(GetLogFileName(command_line).BaseName());
++      .Append(GetLogFileName_Chrome(command_line).BaseName());
+ }
+ 
+ base::FilePath SetUpLogFile(const base::FilePath& target_path, bool new_log) {
+@@ -426,7 +426,7 @@
+       }
+ #endif
+     } else {
+-      log_path = GetLogFileName(command_line);
++      log_path = GetLogFileName_Chrome(command_line);
+ 
+ #if BUILDFLAG(IS_CHROMEOS)
+       // For BWSI (Incognito) logins, we want to put the logs in the user
+@@ -557,7 +557,7 @@
+   chrome_logging_redirected_ = false;
+ }
+ 
+-base::FilePath GetLogFileName(const base::CommandLine& command_line) {
++base::FilePath GetLogFileName_Chrome(const base::CommandLine& command_line) {
+   // Try the command line.
+   auto filename = command_line.GetSwitchValueNative(switches::kLogFile);
+   // Try the environment.
+--- a/electron/shell/common/logging.h
++++ b/electron/shell/common/logging.h
+@@ -15,7 +15,7 @@
+ void InitElectronLogging(const base::CommandLine& command_line,
+                          bool is_preinit);
+ 
+-base::FilePath GetLogFileName(const base::CommandLine& command_line);
++base::FilePath GetLogFileName_Electron(const base::CommandLine& command_line);
+ 
+ }  // namespace logging
+ 
+--- a/electron/shell/common/logging.cc
++++ b/electron/shell/common/logging.cc
+@@ -52,7 +52,7 @@
+ }
+ #endif
+ 
+-base::FilePath GetLogFileName(const base::CommandLine& command_line) {
++base::FilePath GetLogFileName_Electron(const base::CommandLine& command_line) {
+   std::string filename = command_line.GetSwitchValueASCII(switches::kLogFile);
+   if (filename.empty())
+     filename = base::Environment::Create()->GetVar(kLogFileName).value_or("");
+@@ -173,7 +173,7 @@
+       }
+ #endif
+     } else {
+-      log_path = GetLogFileName(command_line);
++      log_path = GetLogFileName_Electron(command_line);
+     }
+   } else {
+     log_locking_state = DONT_LOCK_LOG_FILE;
+--- a/electron/shell/browser/electron_browser_client.cc
++++ b/electron/shell/browser/electron_browser_client.cc
+@@ -790,7 +790,7 @@
+ 
+ base::FilePath ElectronBrowserClient::GetLoggingFileName(
+     const base::CommandLine& cmd_line) {
+-  return logging::GetLogFileName(cmd_line);
++  return logging::GetLogFileName_Electron(cmd_line);
+ }
+ 
+ std::unique_ptr<net::ClientCertStore>

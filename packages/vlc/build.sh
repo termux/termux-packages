@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.videolan.org/
 TERMUX_PKG_DESCRIPTION="A popular libre and open source media player and multimedia engine"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.0.23"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="3.0.24"
 TERMUX_PKG_SRCURL="https://download.videolan.org/pub/videolan/vlc/${TERMUX_PKG_VERSION}/vlc-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=e891cae6aa3ccda69bf94173d5105cbc55c7a7d9b1d21b9b21666e69eff3e7e0
-TERMUX_PKG_DEPENDS="libchromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdnav, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libiconv, libidn, libjpeg-turbo, lua52, libmad, libmatroska, libmpeg2, libnfs, libogg, libopus, libpng, librsvg, libsecret, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, libmpg123, ncurses, opengl, pulseaudio, samba, taglib, zlib"
+TERMUX_PKG_SHA256=e7cab503d1d7d5849b89d2cf0e1ee60d0ef6d012407791b644b9cfc0cc225fdf
+TERMUX_PKG_DEPENDS="libchromaprint, dbus, ffmpeg, fluidsynth, fontconfig, freetype, fribidi, glib, gst-plugins-base, gstreamer, harfbuzz, liba52, libandroid-shmem, libandroid-spawn, libaom, libarchive, libass, libbluray, libc++, libcaca, libcairo, libcddb, libdav1d, libdvbpsi, libdvdnav, libdvdread, libebml, libflac, libgcrypt, libgnutls, libgpg-error, libiconv, libidn, libjpeg-turbo, lua52, libmad, libmatroska, libmpeg2, libnfs, libogg, libopus, libpng, librist, librsvg, libsecret, libsoxr, libssh2, libtheora, libtwolame, libvorbis, libvpx, libx11, libx264, libx265, libxcb, libxml2, libmpg123, ncurses, opengl, pulseaudio, samba, taglib, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
@@ -90,4 +90,9 @@ termux_step_pre_configure() {
 termux_step_post_configure() {
 	# Avoid overlinking
 	sed -i 's/ -shared / -Wl,--as-needed\0/g' ./libtool
+}
+
+termux_step_post_massage() {
+	# Remove unnecessary libtool files and static libraries
+	find "$TERMUX_PKG_MASSAGEDIR" -type f \( -name "*.a" -o -name "*.la" \) -exec rm {} \;
 }

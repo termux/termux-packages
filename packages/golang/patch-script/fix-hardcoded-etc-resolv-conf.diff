@@ -20,7 +20,7 @@
  package net
  
  import (
-@@ -414,7 +416,7 @@
+@@ -420,7 +422,7 @@
  				var haveMDNSAllow bool
  				switch c.mdnsTest {
  				case mdnsFromSystem:
@@ -51,16 +51,16 @@
  // DNS client: see RFC 1035.
  // Has to be linked into package net for Dial.
  
-@@ -367,7 +369,7 @@
+@@ -366,7 +368,7 @@
  var resolvConf resolverConfig
  
  func getSystemDNSConfig() *dnsConfig {
--	resolvConf.tryUpdate("/etc/resolv.conf")
-+	resolvConf.tryUpdate("@TERMUX_PREFIX@/etc/resolv.conf")
- 	return resolvConf.dnsConfig.Load()
+-	return getSystemDNSConfigNamed("/etc/resolv.conf")
++	return getSystemDNSConfigNamed("@TERMUX_PREFIX@/etc/resolv.conf")
  }
  
-@@ -375,7 +377,7 @@
+ func getSystemDNSConfigNamed(path string) *dnsConfig {
+@@ -378,7 +380,7 @@
  func (conf *resolverConfig) init() {
  	// Set dnsConfig and lastChecked so we don't parse
  	// resolv.conf twice the first time.

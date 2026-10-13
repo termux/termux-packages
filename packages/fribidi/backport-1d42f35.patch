@@ -1,0 +1,56 @@
+From 1d42f35e26f7ee4cde23a4103ace0f9f4f86a1aa Mon Sep 17 00:00:00 2001
+From: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date: Sun, 20 Sep 2026 11:39:41 +0300
+Subject: [PATCH] bin: don't run help2man on a cross-built binary
+
+The autotools man page rule executed the freshly built fribidi binary
+to feed help2man, which fails when that binary targets a different
+host than the build machine. Skip regeneration (falling back to a
+pre-shipped man page if present) when cross-compiling, matching the
+meson build's existing behavior.
+---
+ bin/Makefile.am | 14 ++++++++++++++
+ configure.ac    |  2 ++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/bin/Makefile.am b/bin/Makefile.am
+index ca5ecdf..2b3aa7c 100644
+--- a/bin/Makefile.am
++++ b/bin/Makefile.am
+@@ -23,9 +23,23 @@ man1 = $(dist_man_MANS)
+ $(top_builddir)/lib/libfribidi.la:
+ 	cd $(top_builddir)/lib && $(MAKE) $(AM_MAKEFLAGS) libfribidi.la
+ 
++if CROSS_COMPILING
++# help2man needs to execute the freshly built binary to query its --help
++# output, which is not possible when that binary is built for a different
++# host. Fall back to a man page shipped in the source tree (e.g. from a
++# release tarball) if there is one, otherwise skip generating it.
++%.1: %
++	@if test -f $(srcdir)/$@; then \
++	  cp $(srcdir)/$@ $@; \
++	else \
++	  echo "$@: skipping man page generation; help2man can't run $< while cross-compiling" >&2; \
++	  : > $@; \
++	fi
++else
+ %.1: %
+ 	$(top_srcdir)/missing --run help2man ./$< --no-info \
+ 	--version-string=- -n "$(shell ./$< --help | head -n 2 | tail -n 1)" \
+ 	--output=$@
++endif
+ 
+ -include $(top_srcdir)/git.mk
+diff --git a/configure.ac b/configure.ac
+index 8b0821e..5bab2c2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -97,6 +97,8 @@ AC_MSG_CHECKING([for some Win32 platform])
+ AC_MSG_RESULT([$platform_win32])
+ AM_CONDITIONAL(PLATFORM_WIN32, test "$platform_win32" = "yes")
+ 
++AM_CONDITIONAL(CROSS_COMPILING, test "x$cross_compiling" = "xyes")
++
+ 
+ # Checks for header files.
+ AC_HEADER_STDC

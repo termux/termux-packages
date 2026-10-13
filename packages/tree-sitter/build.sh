@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://tree-sitter.github.io/
 TERMUX_PKG_DESCRIPTION="An incremental parsing system for programming tools"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="0.26.12"
-TERMUX_PKG_SRCURL=https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=428e2b182fe38eddc100d8bd851e47c96921a69281b66abafc25ba4b0aaeeeab
+TERMUX_PKG_VERSION="0.27.1"
+TERMUX_PKG_SRCURL="https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=982cd3d4d9eb7be18c243240a622423fd2e4ecb4bec2cd98832c2f3fa1f0f333
 TERMUX_PKG_BREAKS="libtreesitter"
 TERMUX_PKG_REPLACES="libtreesitter"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -32,7 +32,7 @@ termux_pkg_auto_update() {
 
 	# Do not forget to bump revision of reverse dependencies
 	# and rebuild them after SOVERSION has changed.
-	local _SOVERSION=0.26
+	local _SOVERSION=0.27
 
 	# This blocks auto-updates to an incompatible SO version.
 	if [[ "${latest_release}" != "${_SOVERSION}".* ]]; then
@@ -56,9 +56,10 @@ termux_pkg_auto_update() {
 	NEW_TS_SHA256="$(curl -sL "$TS_BIN_URL" | sha256sum | cut -d' ' -f1)"
 
 	# Replace the SHA256 sum for the `tree-sitter` binary in `termux_setup_treesitter.sh`
-	sed \
+	sed -i \
+		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_VERSION=.*|\1local TERMUX_TREE_SITTER_VERSION=${latest_release}|" \
 		-e "s|\(^\s*\)local TERMUX_TREE_SITTER_SHA256=[0-9a-f]*|\1local TERMUX_TREE_SITTER_SHA256=${NEW_TS_SHA256}|" \
-		-i "${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_treesitter.sh"
+		"${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_treesitter.sh"
 
 	termux_pkg_upgrade_version "${latest_release}"
 }
@@ -71,7 +72,9 @@ termux_step_pre_configure() {
 
 	# error: function-like macro '__GLIBC_USE' is not defined
 	# solution borrowed from packages/oma/build.sh
-	export BINDGEN_EXTRA_CLANG_ARGS_${CARGO_TARGET_NAME//-/_}="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}"
+	# error: Unversioned target triples are not supported!
+	# `rquickjs-sys` >= 0.12.2 rejects ${TERMUX_ARCH}-linux-android targets without a ${TERMUX_PKG_API_LEVEL}
+	export BINDGEN_EXTRA_CLANG_ARGS_"${CARGO_TARGET_NAME//-/_}"="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot --target=${CARGO_TARGET_NAME}${TERMUX_PKG_API_LEVEL}"
 }
 
 termux_step_post_make_install() {

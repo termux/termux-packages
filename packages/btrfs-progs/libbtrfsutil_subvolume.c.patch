@@ -1,0 +1,23 @@
+--- a/libbtrfsutil/subvolume.c	2026-07-15 01:41:48.000000000 +0300
++++ b/libbtrfsutil/subvolume.c	2026-09-20 13:00:00.000000000 +0300
+@@ -24,6 +24,20 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <stdlib.h>
++
++#if defined(__ANDROID__)
++__attribute__((weak, visibility("hidden")))
++void *reallocarray(void *ptr, size_t nmemb, size_t size)
++{
++	size_t bytes;
++	if (__builtin_mul_overflow(nmemb, size, &bytes)) {
++		errno = ENOMEM;
++		return NULL;
++	}
++	return realloc(ptr, bytes);
++}
++#endif
++
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdbool.h>

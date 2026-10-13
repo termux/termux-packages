@@ -1,21 +1,25 @@
 <?xml version="1.0"?>
 <dump>
   <class name="GdkAppLaunchContext" get-type="gdk_app_launch_context_get_type" parents="GAppLaunchContext,GObject">
-    <property name="display" type="GdkDisplay" flags="235"/>
+    <property name="display" type="GdkDisplay" flags="43"/>
+  </class>
+  <class name="GdkDrawContext" get-type="gdk_draw_context_get_type" parents="GObject" abstract="1">
+    <property name="display" type="GdkDisplay" flags="43"/>
+    <property name="surface" type="GdkSurface" flags="43"/>
   </class>
   <class name="GdkCairoContext" get-type="gdk_cairo_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
   </class>
   <class name="GdkCicpParams" get-type="gdk_cicp_params_get_type" parents="GObject">
-    <property name="color-primaries" type="guint" flags="1073742051" default-value="2"/>
-    <property name="transfer-function" type="guint" flags="1073742051" default-value="2"/>
-    <property name="matrix-coefficients" type="guint" flags="1073742051" default-value="2"/>
-    <property name="range" type="GdkCicpRange" flags="1073742051" default-value="GDK_CICP_RANGE_NARROW"/>
+    <property name="color-primaries" type="guint" flags="1073741859" default-value="2"/>
+    <property name="transfer-function" type="guint" flags="1073741859" default-value="2"/>
+    <property name="matrix-coefficients" type="guint" flags="1073741859" default-value="2"/>
+    <property name="range" type="GdkCicpRange" flags="1073741859" default-value="GDK_CICP_RANGE_NARROW"/>
   </class>
   <class name="GdkClipboard" get-type="gdk_clipboard_get_type" parents="GObject">
-    <property name="display" type="GdkDisplay" flags="1073742059"/>
-    <property name="formats" type="GdkContentFormats" flags="1073742049"/>
-    <property name="local" type="gboolean" flags="1073742049" default-value="TRUE"/>
-    <property name="content" type="GdkContentProvider" flags="1073742049"/>
+    <property name="display" type="GdkDisplay" flags="1073741867"/>
+    <property name="formats" type="GdkContentFormats" flags="1073741857"/>
+    <property name="local" type="gboolean" flags="1073741857" default-value="TRUE"/>
+    <property name="content" type="GdkContentProvider" flags="1073741857"/>
     <signal name="changed" return="void" when="last">
     </signal>
   </class>
@@ -27,8 +31,8 @@
   <boxed name="GdkContentFormatsBuilder" get-type="gdk_content_formats_builder_get_type"/>
   <boxed name="GdkFileList" get-type="gdk_file_list_get_type"/>
   <class name="GdkContentProvider" get-type="gdk_content_provider_get_type" parents="GObject">
-    <property name="formats" type="GdkContentFormats" flags="1073742049"/>
-    <property name="storable-formats" type="GdkContentFormats" flags="1073742049"/>
+    <property name="formats" type="GdkContentFormats" flags="1073741857"/>
+    <property name="storable-formats" type="GdkContentFormats" flags="1073741857"/>
     <signal name="content-changed" return="void" when="last">
     </signal>
   </class>
@@ -36,37 +40,37 @@
     <implements name="GAsyncResult"/>
   </class>
   <class name="GdkCursor" get-type="gdk_cursor_get_type" parents="GObject">
-    <property name="fallback" type="GdkCursor" flags="235"/>
-    <property name="hotspot-x" type="gint" flags="235" default-value="0"/>
-    <property name="hotspot-y" type="gint" flags="235" default-value="0"/>
-    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
-    <property name="texture" type="GdkTexture" flags="235"/>
+    <property name="fallback" type="GdkCursor" flags="43"/>
+    <property name="hotspot-x" type="gint" flags="43" default-value="0"/>
+    <property name="hotspot-y" type="gint" flags="43" default-value="0"/>
+    <property name="name" type="gchararray" flags="43" default-value="NULL"/>
+    <property name="texture" type="GdkTexture" flags="43"/>
   </class>
   <class name="GdkDeviceTool" get-type="gdk_device_tool_get_type" parents="GObject">
-    <property name="serial" type="guint64" flags="235" default-value="0"/>
-    <property name="tool-type" type="GdkDeviceToolType" flags="235" default-value="GDK_DEVICE_TOOL_TYPE_UNKNOWN"/>
-    <property name="axes" type="GdkAxisFlags" flags="11" default-value="0"/>
-    <property name="hardware-id" type="guint64" flags="235" default-value="0"/>
+    <property name="serial" type="guint64" flags="43" default-value="0"/>
+    <property name="tool-type" type="GdkDeviceToolType" flags="43" default-value="GDK_DEVICE_TOOL_TYPE_UNKNOWN"/>
+    <property name="axes" type="GdkAxisFlags" flags="43" default-value="0"/>
+    <property name="hardware-id" type="guint64" flags="43" default-value="0"/>
   </class>
   <class name="GdkDevice" get-type="gdk_device_get_type" parents="GObject" abstract="1">
-    <property name="display" type="GdkDisplay" flags="235"/>
-    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
-    <property name="source" type="GdkInputSource" flags="1073742059" default-value="GDK_SOURCE_MOUSE"/>
-    <property name="has-cursor" type="gboolean" flags="235" default-value="FALSE"/>
-    <property name="n-axes" type="guint" flags="225" default-value="0"/>
-    <property name="vendor-id" type="gchararray" flags="235" default-value="NULL"/>
-    <property name="product-id" type="gchararray" flags="235" default-value="NULL"/>
-    <property name="seat" type="GdkSeat" flags="227"/>
-    <property name="num-touches" type="guint" flags="235" default-value="0"/>
-    <property name="tool" type="GdkDeviceTool" flags="225"/>
-    <property name="direction" type="PangoDirection" flags="225" default-value="PANGO_DIRECTION_NEUTRAL"/>
-    <property name="has-bidi-layouts" type="gboolean" flags="225" default-value="FALSE"/>
-    <property name="caps-lock-state" type="gboolean" flags="225" default-value="FALSE"/>
-    <property name="num-lock-state" type="gboolean" flags="225" default-value="FALSE"/>
-    <property name="scroll-lock-state" type="gboolean" flags="225" default-value="FALSE"/>
-    <property name="modifier-state" type="GdkModifierType" flags="225" default-value="GDK_NO_MODIFIER_MASK"/>
-    <property name="layout-names" type="GStrv" flags="225"/>
-    <property name="active-layout-index" type="gint" flags="225" default-value="0"/>
+    <property name="display" type="GdkDisplay" flags="43"/>
+    <property name="name" type="gchararray" flags="43" default-value="NULL"/>
+    <property name="source" type="GdkInputSource" flags="1073741867" default-value="GDK_SOURCE_MOUSE"/>
+    <property name="has-cursor" type="gboolean" flags="43" default-value="FALSE"/>
+    <property name="n-axes" type="guint" flags="33" default-value="0"/>
+    <property name="vendor-id" type="gchararray" flags="43" default-value="NULL"/>
+    <property name="product-id" type="gchararray" flags="43" default-value="NULL"/>
+    <property name="seat" type="GdkSeat" flags="35"/>
+    <property name="num-touches" type="guint" flags="43" default-value="0"/>
+    <property name="tool" type="GdkDeviceTool" flags="33"/>
+    <property name="direction" type="PangoDirection" flags="33" default-value="PANGO_DIRECTION_NEUTRAL"/>
+    <property name="has-bidi-layouts" type="gboolean" flags="33" default-value="FALSE"/>
+    <property name="caps-lock-state" type="gboolean" flags="33" default-value="FALSE"/>
+    <property name="num-lock-state" type="gboolean" flags="33" default-value="FALSE"/>
+    <property name="scroll-lock-state" type="gboolean" flags="33" default-value="FALSE"/>
+    <property name="modifier-state" type="GdkModifierType" flags="33" default-value="GDK_NO_MODIFIER_MASK"/>
+    <property name="layout-names" type="GStrv" flags="33"/>
+    <property name="active-layout-index" type="gint" flags="33" default-value="0"/>
     <signal name="changed" return="void" when="last">
     </signal>
     <signal name="tool-changed" return="void" when="last">
@@ -77,13 +81,13 @@
     <prerequisite name="GdkDevice"/>
   </interface>
   <class name="GdkDrag" get-type="gdk_drag_get_type" parents="GObject" abstract="1">
-    <property name="content" type="GdkContentProvider" flags="1073742059"/>
-    <property name="device" type="GdkDevice" flags="1073742059"/>
-    <property name="display" type="GdkDisplay" flags="1073742049"/>
-    <property name="formats" type="GdkContentFormats" flags="1073742059"/>
-    <property name="selected-action" type="GdkDragAction" flags="1073742051" default-value="GDK_ACTION_NONE"/>
-    <property name="actions" type="GdkDragAction" flags="1073742051" default-value="GDK_ACTION_NONE"/>
-    <property name="surface" type="GdkSurface" flags="1073742059"/>
+    <property name="content" type="GdkContentProvider" flags="1073741867"/>
+    <property name="device" type="GdkDevice" flags="1073741867"/>
+    <property name="display" type="GdkDisplay" flags="1073741857"/>
+    <property name="formats" type="GdkContentFormats" flags="1073741867"/>
+    <property name="selected-action" type="GdkDragAction" flags="1073741859" default-value="GDK_ACTION_NONE"/>
+    <property name="actions" type="GdkDragAction" flags="1073741859" default-value="GDK_ACTION_NONE"/>
+    <property name="surface" type="GdkSurface" flags="1073741867"/>
     <signal name="cancel" return="void" when="last">
       <param type="GdkDragCancelReason"/>
     </signal>
@@ -139,32 +143,32 @@
     </signal>
   </class>
   <class name="GdkMonitor" get-type="gdk_monitor_get_type" parents="GObject">
-    <property name="description" type="gchararray" flags="225" default-value="NULL"/>
-    <property name="display" type="GdkDisplay" flags="235"/>
-    <property name="manufacturer" type="gchararray" flags="225" default-value="NULL"/>
-    <property name="model" type="gchararray" flags="225" default-value="NULL"/>
-    <property name="connector" type="gchararray" flags="225" default-value="NULL"/>
-    <property name="scale-factor" type="gint" flags="225" default-value="1"/>
-    <property name="scale" type="gdouble" flags="225" default-value="1.000000"/>
-    <property name="geometry" type="GdkRectangle" flags="225"/>
-    <property name="width-mm" type="gint" flags="225" default-value="0"/>
-    <property name="height-mm" type="gint" flags="225" default-value="0"/>
-    <property name="refresh-rate" type="gint" flags="225" default-value="0"/>
-    <property name="subpixel-layout" type="GdkSubpixelLayout" flags="225" default-value="GDK_SUBPIXEL_LAYOUT_UNKNOWN"/>
-    <property name="valid" type="gboolean" flags="225" default-value="TRUE"/>
+    <property name="description" type="gchararray" flags="33" default-value="NULL"/>
+    <property name="display" type="GdkDisplay" flags="43"/>
+    <property name="manufacturer" type="gchararray" flags="33" default-value="NULL"/>
+    <property name="model" type="gchararray" flags="33" default-value="NULL"/>
+    <property name="connector" type="gchararray" flags="33" default-value="NULL"/>
+    <property name="scale-factor" type="gint" flags="33" default-value="1"/>
+    <property name="scale" type="gdouble" flags="33" default-value="1.000000"/>
+    <property name="geometry" type="GdkRectangle" flags="33"/>
+    <property name="width-mm" type="gint" flags="33" default-value="0"/>
+    <property name="height-mm" type="gint" flags="33" default-value="0"/>
+    <property name="refresh-rate" type="gint" flags="33" default-value="0"/>
+    <property name="subpixel-layout" type="GdkSubpixelLayout" flags="33" default-value="GDK_SUBPIXEL_LAYOUT_UNKNOWN"/>
+    <property name="valid" type="gboolean" flags="33" default-value="TRUE"/>
     <signal name="invalidate" return="void" when="first">
     </signal>
   </class>
   <boxed name="GdkPopupLayout" get-type="gdk_popup_layout_get_type"/>
   <class name="GdkSurface" get-type="gdk_surface_get_type" parents="GObject" abstract="1">
-    <property name="cursor" type="GdkCursor" flags="227"/>
-    <property name="display" type="GdkDisplay" flags="235"/>
-    <property name="frame-clock" type="GdkFrameClock" flags="235"/>
-    <property name="mapped" type="gboolean" flags="225" default-value="FALSE"/>
-    <property name="width" type="gint" flags="225" default-value="0"/>
-    <property name="height" type="gint" flags="225" default-value="0"/>
-    <property name="scale-factor" type="gint" flags="225" default-value="1"/>
-    <property name="scale" type="gdouble" flags="225" default-value="1.000000"/>
+    <property name="cursor" type="GdkCursor" flags="35"/>
+    <property name="display" type="GdkDisplay" flags="43"/>
+    <property name="frame-clock" type="GdkFrameClock" flags="43"/>
+    <property name="mapped" type="gboolean" flags="33" default-value="FALSE"/>
+    <property name="width" type="gint" flags="33" default-value="0"/>
+    <property name="height" type="gint" flags="33" default-value="0"/>
+    <property name="scale-factor" type="gint" flags="33" default-value="1"/>
+    <property name="scale" type="gdouble" flags="33" default-value="1.000000"/>
     <signal name="layout" return="void" when="first">
       <param type="gint"/>
       <param type="gint"/>
@@ -183,7 +187,7 @@
     </signal>
   </class>
   <class name="GdkSeat" get-type="gdk_seat_get_type" parents="GObject" abstract="1">
-    <property name="display" type="GdkDisplay" flags="235"/>
+    <property name="display" type="GdkDisplay" flags="43"/>
     <signal name="device-added" return="void" when="last">
       <param type="GdkDevice"/>
     </signal>
@@ -198,11 +202,11 @@
     </signal>
   </class>
   <class name="GdkDisplay" get-type="gdk_display_get_type" parents="GObject">
-    <property name="composited" type="gboolean" flags="225" default-value="TRUE"/>
-    <property name="rgba" type="gboolean" flags="225" default-value="TRUE"/>
-    <property name="shadow-width" type="gboolean" flags="225" default-value="TRUE"/>
-    <property name="input-shapes" type="gboolean" flags="225" default-value="TRUE"/>
-    <property name="dmabuf-formats" type="GdkDmabufFormats" flags="225"/>
+    <property name="composited" type="gboolean" flags="33" default-value="TRUE"/>
+    <property name="rgba" type="gboolean" flags="33" default-value="TRUE"/>
+    <property name="shadow-width" type="gboolean" flags="33" default-value="TRUE"/>
+    <property name="input-shapes" type="gboolean" flags="33" default-value="TRUE"/>
+    <property name="dmabuf-formats" type="GdkDmabufFormats" flags="33"/>
     <signal name="opened" return="void" when="last">
     </signal>
     <signal name="closed" return="void" when="last">
@@ -219,7 +223,7 @@
     </signal>
   </class>
   <class name="GdkDisplayManager" get-type="gdk_display_manager_get_type" parents="GObject">
-    <property name="default-display" type="GdkDisplay" flags="227"/>
+    <property name="default-display" type="GdkDisplay" flags="35"/>
     <signal name="display-opened" return="void" when="last">
       <param type="GdkDisplay"/>
     </signal>
@@ -229,9 +233,9 @@
     <implements name="GdkPaintable"/>
     <implements name="GIcon"/>
     <implements name="GLoadableIcon"/>
-    <property name="width" type="gint" flags="1073742059" default-value="1"/>
-    <property name="height" type="gint" flags="1073742059" default-value="1"/>
-    <property name="color-state" type="GdkColorState" flags="1073742059"/>
+    <property name="width" type="gint" flags="1073741867" default-value="1"/>
+    <property name="height" type="gint" flags="1073741867" default-value="1"/>
+    <property name="color-state" type="GdkColorState" flags="1073741867"/>
   </class>
   <class name="GdkDmabufTexture" get-type="gdk_dmabuf_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
@@ -239,16 +243,16 @@
     <implements name="GLoadableIcon"/>
   </class>
   <class name="GdkDmabufTextureBuilder" get-type="gdk_dmabuf_texture_builder_get_type" parents="GObject">
-    <property name="display" type="GdkDisplay" flags="1073742051"/>
-    <property name="width" type="guint" flags="1073742051" default-value="0"/>
-    <property name="height" type="guint" flags="1073742051" default-value="0"/>
-    <property name="fourcc" type="guint" flags="1073742051" default-value="0"/>
-    <property name="modifier" type="guint64" flags="1073742051" default-value="0"/>
-    <property name="premultiplied" type="gboolean" flags="1073742051" default-value="TRUE"/>
-    <property name="n-planes" type="guint" flags="1073742051" default-value="1"/>
-    <property name="color-state" type="GdkColorState" flags="1073742051"/>
-    <property name="update-region" type="CairoRegion" flags="1073742051"/>
-    <property name="update-texture" type="GdkTexture" flags="1073742051"/>
+    <property name="display" type="GdkDisplay" flags="1073741859"/>
+    <property name="width" type="guint" flags="1073741859" default-value="0"/>
+    <property name="height" type="guint" flags="1073741859" default-value="0"/>
+    <property name="fourcc" type="guint" flags="1073741859" default-value="0"/>
+    <property name="modifier" type="guint64" flags="1073741859" default-value="0"/>
+    <property name="premultiplied" type="gboolean" flags="1073741859" default-value="TRUE"/>
+    <property name="n-planes" type="guint" flags="1073741859" default-value="1"/>
+    <property name="color-state" type="GdkColorState" flags="1073741859"/>
+    <property name="update-region" type="CairoRegion" flags="1073741859"/>
+    <property name="update-texture" type="GdkTexture" flags="1073741859"/>
   </class>
   <interface name="GdkDragSurface" get-type="gdk_drag_surface_get_type">
     <prerequisite name="GdkSurface"/>
@@ -256,17 +260,14 @@
       <param type="GdkDragSurfaceSize"/>
     </signal>
   </interface>
-  <class name="GdkDrawContext" get-type="gdk_draw_context_get_type" parents="GObject" abstract="1">
-    <property name="display" type="GdkDisplay" flags="235"/>
-    <property name="surface" type="GdkSurface" flags="235"/>
-  </class>
+  <pointer name="GdkDragSurfaceSize" get-type="gdk_drag_surface_size_get_type"/>
   <class name="GdkDrop" get-type="gdk_drop_get_type" parents="GObject" abstract="1">
-    <property name="actions" type="GdkDragAction" flags="1073742059" default-value="GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK"/>
-    <property name="device" type="GdkDevice" flags="1073742059"/>
-    <property name="display" type="GdkDisplay" flags="1073742049"/>
-    <property name="drag" type="GdkDrag" flags="1073742059"/>
-    <property name="formats" type="GdkContentFormats" flags="1073742059"/>
-    <property name="surface" type="GdkSurface" flags="1073742059"/>
+    <property name="actions" type="GdkDragAction" flags="1073741867" default-value="GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK"/>
+    <property name="device" type="GdkDevice" flags="1073741867"/>
+    <property name="display" type="GdkDisplay" flags="1073741857"/>
+    <property name="drag" type="GdkDrag" flags="1073741867"/>
+    <property name="formats" type="GdkContentFormats" flags="1073741867"/>
+    <property name="surface" type="GdkSurface" flags="1073741867"/>
   </class>
   <enum name="GdkCicpRange" get-type="gdk_cicp_range_get_type">
     <member name="GDK_CICP_RANGE_NARROW" nick="narrow" value="0"/>
@@ -382,6 +383,14 @@
     <member name="GDK_SCROLL_RELATIVE_DIRECTION_IDENTICAL" nick="identical" value="0"/>
     <member name="GDK_SCROLL_RELATIVE_DIRECTION_INVERTED" nick="inverted" value="1"/>
     <member name="GDK_SCROLL_RELATIVE_DIRECTION_UNKNOWN" nick="unknown" value="2"/>
+  </enum>  <enum name="GdkFrameResult" get-type="gdk_frame_result_get_type">
+    <member name="GDK_FRAME_PREPARING" nick="preparing" value="0"/>
+    <member name="GDK_FRAME_SKIPPED" nick="skipped" value="1"/>
+    <member name="GDK_FRAME_EMPTY" nick="empty" value="2"/>
+    <member name="GDK_FRAME_SUBMITTED" nick="submitted" value="3"/>
+    <member name="GDK_FRAME_OUTSTANDING" nick="outstanding" value="4"/>
+    <member name="GDK_FRAME_DISCARDED" nick="discarded" value="5"/>
+    <member name="GDK_FRAME_PRESENTED" nick="presented" value="6"/>
   </enum>  <enum name="GdkMemoryFormat" get-type="gdk_memory_format_get_type">
     <member name="GDK_MEMORY_B8G8R8A8_PREMULTIPLIED" nick="b8g8r8a8-premultiplied" value="0"/>
     <member name="GDK_MEMORY_A8R8G8B8_PREMULTIPLIED" nick="a8r8g8b8-premultiplied" value="1"/>
@@ -448,7 +457,13 @@
     <member name="GDK_MEMORY_G16_B16_R16_420" nick="g16-b16-r16-420" value="62"/>
     <member name="GDK_MEMORY_G16_B16_R16_422" nick="g16-b16-r16-422" value="63"/>
     <member name="GDK_MEMORY_G16_B16_R16_444" nick="g16-b16-r16-444" value="64"/>
-    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="65"/>
+    <member name="GDK_MEMORY_ARGB2101010_PREMULTIPLIED" nick="argb2101010-premultiplied" value="65"/>
+    <member name="GDK_MEMORY_ARGB2101010" nick="argb2101010" value="66"/>
+    <member name="GDK_MEMORY_XRGB2101010" nick="xrgb2101010" value="67"/>
+    <member name="GDK_MEMORY_ABGR2101010_PREMULTIPLIED" nick="abgr2101010-premultiplied" value="68"/>
+    <member name="GDK_MEMORY_ABGR2101010" nick="abgr2101010" value="69"/>
+    <member name="GDK_MEMORY_XBGR2101010" nick="xbgr2101010" value="70"/>
+    <member name="GDK_MEMORY_N_FORMATS" nick="n-formats" value="71"/>
   </enum>  <enum name="GdkEventType" get-type="gdk_event_type_get_type">
     <member name="GDK_DELETE" nick="delete" value="0"/>
     <member name="GDK_MOTION_NOTIFY" nick="motion-notify" value="1"/>
@@ -609,9 +624,9 @@
     <member name="GDK_TOPLEVEL_CAPABILITIES_LOWER" nick="lower" value="128"/>
   </flags>
   <class name="GdkGLContext" get-type="gdk_gl_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
-    <property name="allowed-apis" type="GdkGLAPI" flags="1073742051" default-value="GDK_GL_API_GL | GDK_GL_API_GLES"/>
-    <property name="api" type="GdkGLAPI" flags="1073742049" default-value="0"/>
-    <property name="shared-context" type="GdkGLContext" flags="-2147483413"/>
+    <property name="allowed-apis" type="GdkGLAPI" flags="1073741859" default-value="GDK_GL_API_GL | GDK_GL_API_GLES"/>
+    <property name="api" type="GdkGLAPI" flags="1073741857" default-value="0"/>
+    <property name="shared-context" type="GdkGLContext" flags="-2147483605"/>
   </class>
   <class name="GdkGLTexture" get-type="gdk_gl_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
@@ -619,16 +634,16 @@
     <implements name="GLoadableIcon"/>
   </class>
   <class name="GdkGLTextureBuilder" get-type="gdk_gl_texture_builder_get_type" parents="GObject">
-    <property name="context" type="GdkGLContext" flags="1073742051"/>
-    <property name="format" type="GdkMemoryFormat" flags="1073742051" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
-    <property name="has-mipmap" type="gboolean" flags="1073742051" default-value="FALSE"/>
-    <property name="height" type="gint" flags="1073742051" default-value="0"/>
-    <property name="id" type="guint" flags="1073742051" default-value="0"/>
-    <property name="sync" type="gpointer" flags="1073742051"/>
-    <property name="color-state" type="GdkColorState" flags="1073742051"/>
-    <property name="update-region" type="CairoRegion" flags="1073742051"/>
-    <property name="update-texture" type="GdkTexture" flags="1073742051"/>
-    <property name="width" type="gint" flags="1073742051" default-value="0"/>
+    <property name="context" type="GdkGLContext" flags="1073741859"/>
+    <property name="format" type="GdkMemoryFormat" flags="1073741859" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
+    <property name="has-mipmap" type="gboolean" flags="1073741859" default-value="FALSE"/>
+    <property name="height" type="gint" flags="1073741859" default-value="0"/>
+    <property name="id" type="guint" flags="1073741859" default-value="0"/>
+    <property name="sync" type="gpointer" flags="1073741859"/>
+    <property name="color-state" type="GdkColorState" flags="1073741859"/>
+    <property name="update-region" type="CairoRegion" flags="1073741859"/>
+    <property name="update-texture" type="GdkTexture" flags="1073741859"/>
+    <property name="width" type="gint" flags="1073741859" default-value="0"/>
   </class>
   <class name="GdkMemoryTexture" get-type="gdk_memory_texture_get_type" parents="GdkTexture,GObject">
     <implements name="GdkPaintable"/>
@@ -636,14 +651,14 @@
     <implements name="GLoadableIcon"/>
   </class>
   <class name="GdkMemoryTextureBuilder" get-type="gdk_memory_texture_builder_get_type" parents="GObject">
-    <property name="bytes" type="GBytes" flags="1073742051"/>
-    <property name="color-state" type="GdkColorState" flags="1073742051"/>
-    <property name="format" type="GdkMemoryFormat" flags="1073742051" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
-    <property name="height" type="gint" flags="1073742051" default-value="0"/>
-    <property name="stride" type="guint64" flags="1073742051" default-value="0"/>
-    <property name="update-region" type="CairoRegion" flags="1073742051"/>
-    <property name="update-texture" type="GdkTexture" flags="1073742051"/>
-    <property name="width" type="gint" flags="1073742051" default-value="0"/>
+    <property name="bytes" type="GBytes" flags="1073741859"/>
+    <property name="color-state" type="GdkColorState" flags="1073741859"/>
+    <property name="format" type="GdkMemoryFormat" flags="1073741859" default-value="GDK_MEMORY_R8G8B8A8_PREMULTIPLIED"/>
+    <property name="height" type="gint" flags="1073741859" default-value="0"/>
+    <property name="stride" type="guint64" flags="1073741859" default-value="0"/>
+    <property name="update-region" type="CairoRegion" flags="1073741859"/>
+    <property name="update-texture" type="GdkTexture" flags="1073741859"/>
+    <property name="width" type="gint" flags="1073741859" default-value="0"/>
   </class>
   <interface name="GdkPaintable" get-type="gdk_paintable_get_type">
     <signal name="invalidate-contents" return="void" when="last">
@@ -653,8 +668,8 @@
   </interface>
   <interface name="GdkPopup" get-type="gdk_popup_get_type">
     <prerequisite name="GdkSurface"/>
-    <property name="autohide" type="gboolean" flags="235" default-value="FALSE"/>
-    <property name="parent" type="GdkSurface" flags="235"/>
+    <property name="autohide" type="gboolean" flags="43" default-value="FALSE"/>
+    <property name="parent" type="GdkSurface" flags="43"/>
   </interface>
   <boxed name="GdkRectangle" get-type="gdk_rectangle_get_type"/>
   <boxed name="GdkRGBA" get-type="gdk_rgba_get_type"/>
@@ -664,22 +679,23 @@
   <boxed name="GdkToplevelLayout" get-type="gdk_toplevel_layout_get_type"/>
   <interface name="GdkToplevel" get-type="gdk_toplevel_get_type">
     <prerequisite name="GdkSurface"/>
-    <property name="capabilities" type="GdkToplevelCapabilities" flags="1073741825" default-value="0"/>
-    <property name="decorated" type="gboolean" flags="1073741827" default-value="FALSE"/>
-    <property name="deletable" type="gboolean" flags="1073741827" default-value="FALSE"/>
-    <property name="fullscreen-mode" type="GdkFullscreenMode" flags="1073741827" default-value="GDK_FULLSCREEN_ON_CURRENT_MONITOR"/>
-    <property name="gravity" type="GdkGravity" flags="1073741827" default-value="GDK_GRAVITY_NORTH_EAST"/>
-    <property name="icon-list" type="gpointer" flags="1073741827"/>
-    <property name="modal" type="gboolean" flags="1073741827" default-value="FALSE"/>
-    <property name="shortcuts-inhibited" type="gboolean" flags="1073741825" default-value="FALSE"/>
-    <property name="startup-id" type="gchararray" flags="1073741827" default-value="NULL"/>
-    <property name="state" type="GdkToplevelState" flags="225" default-value="0"/>
-    <property name="title" type="gchararray" flags="1073741827" default-value="NULL"/>
-    <property name="transient-for" type="GdkSurface" flags="1073741827"/>
+    <property name="capabilities" type="GdkToplevelCapabilities" flags="1073741857" default-value="0"/>
+    <property name="decorated" type="gboolean" flags="1073741859" default-value="FALSE"/>
+    <property name="deletable" type="gboolean" flags="1073741859" default-value="FALSE"/>
+    <property name="fullscreen-mode" type="GdkFullscreenMode" flags="1073741859" default-value="GDK_FULLSCREEN_ON_CURRENT_MONITOR"/>
+    <property name="gravity" type="GdkGravity" flags="1073741859" default-value="GDK_GRAVITY_NORTH_EAST"/>
+    <property name="icon-list" type="gpointer" flags="1073741859"/>
+    <property name="modal" type="gboolean" flags="1073741859" default-value="FALSE"/>
+    <property name="shortcuts-inhibited" type="gboolean" flags="1073741857" default-value="FALSE"/>
+    <property name="startup-id" type="gchararray" flags="1073741859" default-value="NULL"/>
+    <property name="state" type="GdkToplevelState" flags="33" default-value="0"/>
+    <property name="title" type="gchararray" flags="1073741859" default-value="NULL"/>
+    <property name="transient-for" type="GdkSurface" flags="1073741859"/>
     <signal name="compute-size" return="void" when="last">
       <param type="GdkToplevelSize"/>
     </signal>
   </interface>
+  <pointer name="GdkToplevelSize" get-type="gdk_toplevel_size_get_type"/>
   <class name="GdkVulkanContext" get-type="gdk_vulkan_context_get_type" parents="GdkDrawContext,GObject" abstract="1">
     <signal name="images-updated" return="void" when="last">
     </signal>

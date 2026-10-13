@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library that contains a lot of things used by other ki
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="14.2.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/kiwix/libkiwix/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=cff1eb06d62ab42e1720a49f473b7d9364f02ee77a8a455c9adb26db419e0fff
 TERMUX_PKG_AUTO_UPDATE=true
