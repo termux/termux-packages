@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL="https://github.com/unfs3/unfs3/archive/refs/tags/unfs3-${TERM
 TERMUX_PKG_SHA256=563359f4e336d89f3f04361555ff4483acb951b1442a067407a19214410668c6
 TERMUX_PKG_DEPENDS="libtirpc"
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="unfs3-\K\d+\.\d+\.\d+"
 TERMUX_PKG_SERVICE_SCRIPT=("unfsd" "exec unfsd 2>&1")
 
 termux_step_pre_configure() {
