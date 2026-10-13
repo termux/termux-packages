@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://hk.jdx.dev/
 TERMUX_PKG_DESCRIPTION="A tool for managing git hooks"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.5.0"
+TERMUX_PKG_VERSION="2.6.0"
 TERMUX_PKG_SRCURL="https://github.com/jdx/hk/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=7361e4428acc923a19d82c84a48c840f9ac1eff75afc1752b4ca41f24b8bf99e
+TERMUX_PKG_SHA256=7de101a93eea599fd9738c50dfe0defe7dc80f7bc88d40a858332fd7e21132b0
 TERMUX_PKG_DEPENDS="git, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -12,6 +12,10 @@ TERMUX_PKG_AUTO_UPDATE=true
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
+
+	local cflags_var="CFLAGS_${CARGO_TARGET_NAME//-/_}"
+	export "${cflags_var}=${!cflags_var//-Oz/}"
+	unset CFLAGS
 
 	export CARGO_TARGET_DIR="$(dirname "$TERMUX_PKG_SRCDIR")/cargo-target"
 
@@ -69,6 +73,7 @@ termux_step_post_make_install() {
 	# compiler used by build scripts.
 	(
 		unset CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR AS CPP LD RANLIB READELF STRIP
+		unset CFLAGS_x86_64_unknown_linux_gnu
 		cargo run --bin hk -- completion bash > "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
 		cargo run --bin hk -- completion fish > "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
 		cargo run --bin hk -- completion zsh > "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
