@@ -14,46 +14,8 @@ TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 
-termux_step_post_get_source() {
-	# Upstream pins its own electron version, informational only
-	local _electron_version
-	_electron_version="$(jq -r '.devDependencies.electron // .dependencies.electron' \
-		"$TERMUX_PKG_SRCDIR/packages/bruno-electron/package.json")"
-	local _available_version
-	_available_version="$(. "$TERMUX_SCRIPTDIR/x11-packages/electron42-host-tools/build.sh"; echo "$TERMUX_PKG_VERSION")"
-	echo "Bruno was built/tested against Electron $_electron_version; this build uses $_available_version instead."
-}
-
 termux_step_make() {
-	termux_setup_nodejs
-
-	unset PREFIX prefix
-
-	case "$TERMUX_ARCH" in
-		"aarch64")
-			export NPM_CONFIG_ARCH=arm64
-			_electron_arch=arm64
-		;;
-		"arm")
-			export NPM_CONFIG_ARCH=arm
-			_electron_arch=armv7l
-		;;
-		"x86_64")
-			export NPM_CONFIG_ARCH=x64
-			_electron_arch=x64
-		;;
-		*)
-			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-		;;
-	esac
-	export npm_config_arch="$NPM_CONFIG_ARCH"
-
-	# Rebuild native addons (@usebruno/sqlite) against electron headers
-	export npm_config_nodedir="$TERMUX_PREFIX/opt/electron42-host-tools/node_headers"
-	export CXX="$CXX -v -L$TERMUX_PREFIX/lib"
-
-	# Skip electron binary download
-	export ELECTRON_SKIP_BINARY_DOWNLOAD=1
+	termux_setup_electron "$TERMUX_PKG_SRCDIR/packages/bruno-electron/package.json"
 
 	npm ci
 
@@ -77,24 +39,15 @@ termux_step_make() {
 	# Bundle web build into bruno-electron
 	bash scripts/build-electron.sh
 
-	# Only app.asar is needed from electron-builder, so give it a
-	# placeholder "electron" binary
-	local _electron_dist_dir="$TERMUX_PKG_TMPDIR/electron-dist"
-	rm -rf "$_electron_dist_dir"
-	mkdir -p "$_electron_dist_dir"
-	touch "$_electron_dist_dir/electron"
-	chmod 0755 "$_electron_dist_dir/electron"
-
-	local _electron_version
-	_electron_version="$(. "$TERMUX_SCRIPTDIR/x11-packages/electron42-host-tools/build.sh"; echo "$TERMUX_PKG_VERSION")"
-
+	# Only app.asar is needed from electron-builder; termux_setup_electron
+	# already provides a placeholder "electron" binary in $TERMUX_ELECTRON_DIST
 	(
 		cd packages/bruno-electron
 		npm exec electron-builder -- \
-			--linux --"$_electron_arch" --dir \
+			--linux --"$TERMUX_ELECTRON_ARCH" --dir \
 			--config electron-builder-config.js \
-			-c.electronDist="$_electron_dist_dir" \
-			-c.electronVersion="$_electron_version" \
+			-c.electronDist="$TERMUX_ELECTRON_DIST" \
+			-c.electronVersion="$TERMUX_ELECTRON_VERSION" \
 			-c.npmRebuild=false
 	)
 }
