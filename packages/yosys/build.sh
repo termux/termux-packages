@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://yosyshq.net/yosys/
 TERMUX_PKG_DESCRIPTION="A framework for RTL synthesis tools"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.69"
+TERMUX_PKG_VERSION="0.70"
 TERMUX_PKG_SRCURL=git+https://github.com/YosysHQ/yosys
 TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -20,4 +20,9 @@ termux_step_pre_configure() {
 	chmod +x "$TERMUX_PKG_TMPDIR/python3-config"
 	ln -sf "$(command -v "$STRIP")" "$TERMUX_PKG_TMPDIR/strip"
 	rm "$TERMUX_PKG_SRCDIR"/pyproject.toml
+}
+
+termux_step_post_make_install() {
+	mkdir -p "$TERMUX_PREFIX/libexec/yosys"
+	mv "$TERMUX_PREFIX/bin/sn" "$TERMUX_PREFIX/libexec/yosys/sn"
 }
