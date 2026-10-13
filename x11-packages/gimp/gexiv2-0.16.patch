@@ -1,0 +1,32 @@
+https://gitlab.gnome.org/GNOME/gimp/-/work_items/16435
+
+Upstream does not support gexiv2 0.16 yet. Manual testing of metadata
+loading, export, the metadata editor and the metadata viewer showed no
+regressions compared to gexiv2 0.14.
+
+--- a/meson.build
++++ b/meson.build
+@@ -468,9 +468,9 @@ gegl_minver       = '0.4.66'
+ gegl              = dependency('gegl-0.4',           version: '>='+gegl_minver)
+ exiv2_minver      = '0.27.4'
+ exiv2             = dependency('exiv2',              version: '>='+exiv2_minver)
+-gexiv2_minver     = '0.14.0'
+-gexiv2_maxver     = '0.15.0'
+-gexiv2            = dependency('gexiv2',             version: ['>='+gexiv2_minver, '<'+gexiv2_maxver])
++gexiv2_minver     = '0.16.0'
++gexiv2_maxver     = '0.17.0'
++gexiv2            = dependency('gexiv2-0.16',        version: ['>='+gexiv2_minver, '<'+gexiv2_maxver])
+ 
+ gio               = dependency('gio-2.0')
+ gio_specific_name = platform_windows ? 'gio-windows-2.0' : 'gio-unix-2.0'
+--- a/libgimp/meson.build
++++ b/libgimp/meson.build
+@@ -399,7 +399,7 @@ libgimp_deps_table = [
+     { 'gir': 'cairo-1.0',         'vapi': 'cairo-1.0',       },
+     { 'gir': 'GdkPixbuf-2.0',     'vapi': 'gdk-pixbuf-2.0',  },
+     { 'gir': 'Gegl-0.4',          'vapi': 'gegl-0.4',        },
+-    { 'gir': 'GExiv2-0.10',       'vapi': 'gexiv2',          },
++    { 'gir': 'GExiv2-0.16',       'vapi': 'gexiv2-0.16',     },
+     { 'gir': 'Gio-2.0',           'vapi': 'gio-2.0',         },
+     { 'gir': gio_specific_gir,    'vapi': gio_specific_vapi, },
+     { 'gir': 'GLib-2.0',          'vapi': 'glib-2.0',        },
