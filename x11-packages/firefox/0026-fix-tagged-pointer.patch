@@ -2,7 +2,7 @@ https://github.com/termux/termux-packages/issues/22907
 
 --- a/layout/generic/IntrinsicISizesCache.h
 +++ b/layout/generic/IntrinsicISizesCache.h
-@@ -129,25 +129,14 @@
+@@ -129,25 +129,14 @@ struct IntrinsicISizesCache final {
    };
  
    // If the high bit of mOutOfLine is 1, then it points to an OutOfLineCache.
@@ -31,7 +31,7 @@ https://github.com/termux/termux-packages/issues/22907
    }
    bool IsInline() const { return !IsOutOfLine(); }
    OutOfLineCache* EnsureOutOfLine() {
-@@ -157,13 +146,8 @@
+@@ -157,13 +146,8 @@ struct IntrinsicISizesCache final {
      auto inlineCache = mInline;
      auto* ool = new OutOfLineCache();
      ool->mCacheWithoutPercentageBasis = inlineCache;
@@ -46,7 +46,7 @@ https://github.com/termux/termux-packages/issues/22907
      MOZ_ASSERT(IsOutOfLine());
      return ool;
    }
-@@ -172,16 +156,10 @@
+@@ -172,16 +156,10 @@ struct IntrinsicISizesCache final {
      if (!IsOutOfLine()) {
        return nullptr;
      }
