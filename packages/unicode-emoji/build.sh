@@ -3,16 +3,17 @@ TERMUX_PKG_DESCRIPTION="Unicode Emoji Data Files"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="copyright.html"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="17.0.0"
+# Revbump revdeps after updating
+TERMUX_PKG_VERSION="18.0.0"
 TERMUX_PKG_SRCURL=(
 	https://www.unicode.org/Public/$TERMUX_PKG_VERSION/emoji/emoji-sequences.txt
 	https://www.unicode.org/Public/$TERMUX_PKG_VERSION/emoji/emoji-test.txt
 	https://www.unicode.org/Public/$TERMUX_PKG_VERSION/emoji/emoji-zwj-sequences.txt
 )
 TERMUX_PKG_SHA256=(
-	12cc8267dc33cbd11ed32bcf6fc5dc2ad9c7a77bae1bdfba2f41b1b9b3ead8dd
-	1d8a944f88d7952f7ef7c5167fef3c67995bcae24543949710231b03a201acda
-	5b25441daed2322b068c5e70cda522946a4f0274df864445a1965a92e5fc5cad
+	1823dce71f3dd9cb0ad1976797baee4ffbdc1909756f43af8ce4c57f732843a4
+	8f3735cda1f92a779d78af67cf86066bb1f07143dc22f2ac29394d9bc57ab21a
+	f61b5213bdf85a57741a9f903cb38d0f39a3d13be6ff4aca3b39857e859a9191
 )
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
