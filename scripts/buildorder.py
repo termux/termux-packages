@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 "Script to generate a build order respecting package dependencies."
 
-import json, os, re, sys
+import functools, json, os, re, sys
 
 from itertools import filterfalse
 
@@ -37,19 +37,24 @@ def remove_nl_and_quotes(var):
         var = var.replace(char, '')
     return var
 
+@functools.lru_cache(maxsize=None)
+def read_build_script(path):
+    "Read and cache lines of a build script file."
+    with open(path, encoding="utf-8") as build_script:
+        return tuple(build_script)
+
+
 def parse_build_file_dependencies_with_vars(path, vars):
     "Extract the dependencies specified in the given variables of a build.sh or *.subpackage.sh file."
     dependencies = []
+    for line in read_build_script(path):
+        if line.startswith(vars):
+            dependencies_string = remove_nl_and_quotes(line.split('DEPENDS=')[1])
 
-    with open(path, encoding="utf-8") as build_script:
-        for line in build_script:
-            if line.startswith(vars):
-                dependencies_string = remove_nl_and_quotes(line.split('DEPENDS=')[1])
-
-                arch = termux_arch.replace('_', '-')
-                dependencies_string = re.sub(r"\${TERMUX_ARCH/_/-}", arch, dependencies_string)
-                dependencies_string = re.sub(r"\(.*?\)", "", dependencies_string)
-                dependencies.extend(tuple(re.findall(r"[\w+.-]+", d)) if "|" in d else d.strip() for d in dependencies_string.split(",") if d.strip())
+            arch = termux_arch.replace('_', '-')
+            dependencies_string = re.sub(r"\${TERMUX_ARCH/_/-}", arch, dependencies_string)
+            dependencies_string = re.sub(r"\(.*?\)", "", dependencies_string)
+            dependencies.extend(tuple(re.findall(r"[\w+.-]+", d)) if "|" in d else d.strip() for d in dependencies_string.split(",") if d.strip())
 
     return set(dependencies)
 
@@ -64,24 +69,20 @@ def parse_build_file_antidependencies(path):
 def parse_build_file_excluded_arches(path):
     "Extract the excluded arches specified in a build.sh or *.subpackage.sh file."
     arches = []
-
-    with open(path, encoding="utf-8") as build_script:
-        for line in build_script:
-            if line.startswith(('TERMUX_PKG_EXCLUDED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
-                arches_string = remove_nl_and_quotes(line.split('ARCHES=')[1])
-                for arches_value in re.split(',', arches_string):
-                    arches.append(arches_value.strip())
+    for line in read_build_script(path):
+        if line.startswith(('TERMUX_PKG_EXCLUDED_ARCHES', 'TERMUX_SUBPKG_EXCLUDED_ARCHES')):
+            arches_string = remove_nl_and_quotes(line.split('ARCHES=')[1])
+            for arches_value in re.split(',', arches_string):
+                arches.append(arches_value.strip())
 
     return set(arches)
 
 def parse_build_file_variable(path, var):
     value = None
-
-    with open(path, encoding="utf-8") as build_script:
-        for line in build_script:
-            if line.startswith(var):
-                value = remove_nl_and_quotes(line.split('=')[-1])
-                break
+    for line in read_build_script(path):
+        if line.startswith(var):
+            value = remove_nl_and_quotes(line.split('=')[-1])
+            break
 
     return value
 
