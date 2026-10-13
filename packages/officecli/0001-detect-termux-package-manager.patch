@@ -1,0 +1,32 @@
+diff --git a/src/officecli/Core/UpdateChecker.cs b/src/officecli/Core/UpdateChecker.cs
+index 82903bc7..5e82a7e8 100644
+--- a/src/officecli/Core/UpdateChecker.cs
++++ b/src/officecli/Core/UpdateChecker.cs
+@@ -821,6 +821,9 @@ internal static class UpdateChecker
+                 p.Contains("/Caskroom/", StringComparison.Ordinal)))
+             return "Homebrew";
+         if (candidates.Any(IsScoopPath)) return "Scoop";
++        if (candidates.Any(p => p.Contains("/com.termux/", StringComparison.Ordinal)) ||
++            Environment.GetEnvironmentVariable("TERMUX_VERSION") != null)
++            return "Termux";
+         return null;
+     }
+ 
+diff --git a/src/officecli/Program.cs b/src/officecli/Program.cs
+index 54c58f6d..db709232 100644
+--- a/src/officecli/Program.cs
++++ b/src/officecli/Program.cs
+@@ -73,6 +73,13 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globaliz
+ OfficeCli.Core.PipeTempDirGuard.EnsurePipePathFits();
+ 
+ // Internal commands (spawned as separate processes, not user-facing)
++if (args.Length >= 1 && (args[0] == "update" || args[0] == "upgrade"))
++{
++    Console.Error.WriteLine("officecli: self-update is disabled because it is managed by Termux.");
++    Console.Error.WriteLine("To update, please run: pkg upgrade officecli (or pacman -Syu officecli)");
++    return 1;
++}
++
+ if (args.Length == 1 && args[0] == "__update-check__")
+ {
+     OfficeCli.Core.UpdateChecker.RunRefresh();
