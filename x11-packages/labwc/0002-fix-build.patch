@@ -92,3 +92,78 @@
  static int anonymous_shm_open(void)
  {
  	int retries = 100;
+--- a/src/config/libinput.c
++++ b/src/config/libinput.c
+@@ -7,6 +7,7 @@
+ #include "common/string-helpers.h"
+ #include "config/rcxml.h"
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static void
+ libinput_category_init(struct libinput_category *l)
+ {
+@@ -96,3 +97,4 @@ libinput_category_get_default(void)
+ 	}
+ 	return NULL;
+ }
++#endif
+--- a/src/config/rcxml.c
++++ b/src/config/rcxml.c
+@@ -703,6 +703,7 @@ fill_tablet_button_map(xmlNode *node)
+ 	tablet_button_mapping_add(map_from, map_to);
+ }
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static int
+ get_accel_profile(const char *s)
+ {
+@@ -938,6 +939,7 @@ fill_libinput_category(xmlNode *node)
+ 		}
+ 	}
+ }
++#endif
+ 
+ static void
+ set_font_attr(struct font *font, const char *nodename, const char *content)
+@@ -1111,8 +1113,10 @@ entry(xmlNode *node, char *nodename, char *content)
+ 		fill_mouse_context(node);
+ 	} else if (!strcasecmp(nodename, "touch")) {
+ 		fill_touch(node);
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	} else if (!strcasecmp(nodename, "device.libinput")) {
+ 		fill_libinput_category(node);
++#endif
+ 	} else if (!strcasecmp(nodename, "regions")) {
+ 		fill_regions(node);
+ 	} else if (!strcasecmp(nodename, "fields.windowSwitcher")) {
+@@ -1860,6 +1864,7 @@ post_processing(void)
+ 	if (!rc.font_osd.name) {
+ 		rc.font_osd.name = xstrdup("sans");
+ 	}
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	if (!libinput_category_get_default()) {
+ 		/* So we set default values of <tap> and <scrollFactor> */
+ 		struct libinput_category *l = libinput_category_create();
+@@ -1876,6 +1881,7 @@ post_processing(void)
+ 			l->scroll_factor = mouse_scroll_factor;
+ 		}
+ 	}
++#endif
+ 
+ 	int nr_workspaces = wl_list_length(&rc.workspace_config.workspaces);
+ 	if (nr_workspaces < rc.workspace_config.min_nr_workspaces) {
+@@ -2104,12 +2110,14 @@ rcxml_finish(void)
+ 		zfree(touch_config);
+ 	}
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ 	struct libinput_category *l, *l_tmp;
+ 	wl_list_for_each_safe(l, l_tmp, &rc.libinput_categories, link) {
+ 		wl_list_remove(&l->link);
+ 		zfree(l->name);
+ 		zfree(l);
+ 	}
++#endif
+ 
+ 	struct workspace_config *w, *w_tmp;
+ 	wl_list_for_each_safe(w, w_tmp, &rc.workspace_config.workspaces, link) {
