@@ -1,7 +1,6 @@
-diff --git a/crates/mise-util/src/file.rs b/crates/mise-util/src/file.rs
 --- a/crates/mise-util/src/file.rs
 +++ b/crates/mise-util/src/file.rs
-@@ -201,7 +201,10 @@
+@@ -200,7 +200,10 @@ pub fn remove_all_at<Fd: std::os::fd::AsFd>(parent: Fd, name: &std::ffi::OsStr)
          };
      // Compare the whole type field: sockets and block devices share the
      // directory bit.
@@ -12,10 +11,9 @@ diff --git a/crates/mise-util/src/file.rs b/crates/mise-util/src/file.rs
      if kind == nix::sys::stat::SFlag::S_IFDIR {
          let fd = nix::fcntl::openat(
              &parent,
-diff --git a/src/system/files.rs b/src/system/files.rs
 --- a/src/system/files.rs
 +++ b/src/system/files.rs
-@@ -5514,7 +5514,10 @@
+@@ -5926,7 +5926,10 @@ fn chmod_unopenable_no_follow(path: &Path, mode: nix::sys::stat::Mode) -> Result
          Mode::empty(),
      )
      .wrap_err_with(|| format!("failed to open {}", path.display_user()))?;
@@ -26,10 +24,9 @@ diff --git a/src/system/files.rs b/src/system/files.rs
      if kind == SFlag::S_IFLNK {
          bail!(
              "{} is a symlink, which is never followed",
-diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
 --- a/src/system/managed_files.rs
 +++ b/src/system/managed_files.rs
-@@ -1985,7 +1985,14 @@
+@@ -1992,7 +1992,14 @@ impl EntryMetadata {
      fn from_stat(stat: &nix::sys::stat::FileStat) -> Self {
          use nix::sys::stat::SFlag;
  
@@ -44,7 +41,7 @@ diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
          Self {
              kind: if file_type == SFlag::S_IFREG {
                  ManagedPathKind::File
-@@ -1996,7 +2003,7 @@
+@@ -2003,7 +2010,7 @@ impl EntryMetadata {
              } else {
                  ManagedPathKind::Other
              },
@@ -53,7 +50,7 @@ diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
              uid: stat.st_uid,
              gid: stat.st_gid,
          }
-@@ -2518,9 +2525,15 @@
+@@ -2525,9 +2532,15 @@ fn open_or_create_directory_tree_inner(
              Ok(directory) => directory,
              Err(open_error) => {
                  let metadata = fstatat(&directory, name.as_os_str(), AtFlags::AT_SYMLINK_NOFOLLOW);
@@ -71,7 +68,7 @@ diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
                      let parent = fstat(&directory)?;
                      if parent.st_uid != 0 || parent.st_mode & 0o022 != 0 {
                          return Err(UntrustedSymlink(component_path).into());
-@@ -2741,7 +2754,11 @@
+@@ -2748,7 +2761,11 @@ fn ensure_regular_file(file: &std::os::fd::OwnedFd, path: &Path) -> Result<()> {
      use nix::sys::stat::{SFlag, fstat};
  
      let stat = fstat(file)?;
@@ -84,10 +81,9 @@ diff --git a/src/system/managed_files.rs b/src/system/managed_files.rs
          bail!(
              "refusing to set permissions on non-file path: {}",
              path.display()
-diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/brew/cask/app_version.rs
 --- a/src/system/packages/brew/cask/app_version.rs
 +++ b/src/system/packages/brew/cask/app_version.rs
-@@ -56,7 +56,11 @@
+@@ -56,7 +56,11 @@ pub(super) fn read_app_version(app: &Path) -> Result<AppVersion> {
          OFlag::O_RDONLY | OFlag::O_NOFOLLOW | OFlag::O_NONBLOCK,
          Mode::empty(),
      )?;
@@ -100,10 +96,9 @@ diff --git a/src/system/packages/brew/cask/app_version.rs b/src/system/packages/
          bail!("app Info.plist must be a regular file");
      }
      let plist = plist::Value::from_reader(std::fs::File::from(fd))?;
-diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cask/mod.rs
 --- a/src/system/packages/brew/cask/mod.rs
 +++ b/src/system/packages/brew/cask/mod.rs
-@@ -2592,9 +2592,14 @@
+@@ -2628,9 +2628,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
      use std::os::unix::fs::PermissionsExt;
  
      let metadata = from.symlink_metadata()?;
@@ -118,7 +113,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
      if metadata.file_type().is_symlink() {
          nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
      } else if metadata.is_dir() {
-@@ -2831,6 +2836,7 @@
+@@ -2867,6 +2872,7 @@ fn open_trusted_directory(
              || current_groups.contains(&stat.st_gid);
          let writable_by_untrusted = stat.st_mode & 0o002 != 0
              || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
@@ -126,7 +121,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
          if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
              || !trusted_owner
              || writable_by_untrusted
-@@ -2840,6 +2846,17 @@
+@@ -2876,6 +2882,17 @@ fn open_trusted_directory(
                  directory.display()
              );
          }
@@ -144,7 +139,7 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
          Ok(())
      };
      let mut directory = resolved_root.to_path_buf();
-@@ -3270,9 +3287,14 @@
+@@ -3390,9 +3407,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
      // Restore the bundle's own permissions, which the private staging mode hid.
      if let Ok(metadata) = from.symlink_metadata() {
          use std::os::unix::fs::PermissionsExt;
@@ -159,10 +154,9 @@ diff --git a/src/system/packages/brew/cask/mod.rs b/src/system/packages/brew/cas
          nix::sys::stat::fchmod(&destination, mode)?;
      }
      Ok(())
-diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/cask/state.rs
 --- a/src/system/packages/brew/cask/state.rs
 +++ b/src/system/packages/brew/cask/state.rs
-@@ -670,7 +670,10 @@
+@@ -713,7 +713,10 @@ pub(super) fn cask_target_fingerprint_at<Fd: std::os::fd::AsFd>(
  ) -> Result<CaskTargetFingerprint> {
      let stat = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)
          .wrap_err_with(|| format!("failed to fingerprint {}", Path::new(name).display()))?;
@@ -173,7 +167,7 @@ diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/c
      if kind.contains(nix::sys::stat::SFlag::S_IFLNK) {
          let target = read_link_verified_at(&parent, name, &stat)?;
          return Ok(CaskTargetFingerprint {
-@@ -757,7 +760,10 @@
+@@ -800,7 +803,10 @@ pub(super) fn read_link_verified_at<Fd: std::os::fd::AsFd>(
  ) -> Result<Vec<u8>> {
      let target = nix::fcntl::readlinkat(&parent, name)?;
      let after = nix::sys::stat::fstatat(&parent, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
@@ -184,7 +178,7 @@ diff --git a/src/system/packages/brew/cask/state.rs b/src/system/packages/brew/c
      if after.st_dev != classified.st_dev
          || after.st_ino != classified.st_ino
          || kind(after.st_mode) != kind(classified.st_mode)
-@@ -815,7 +821,10 @@
+@@ -858,7 +864,10 @@ fn collect_digest_entries_at(
          let name = std::ffi::OsStr::from_bytes(name.to_bytes());
          let relative = prefix.join(name);
          let stat = nix::sys::stat::fstatat(&dir, name, nix::fcntl::AtFlags::AT_SYMLINK_NOFOLLOW)?;
