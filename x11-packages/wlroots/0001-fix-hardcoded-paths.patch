@@ -1,8 +1,8 @@
 --- a/xwayland/sockets.c
 +++ b/xwayland/sockets.c
-@@ -14,11 +14,11 @@
- #include <wlr/util/log.h>
+@@ -16,11 +16,11 @@
  #include "sockets.h"
+ #include "util/fd.h"
  
 -static const char lock_fmt[] = "/tmp/.X%d-lock";
 -static const char socket_dir[] = "/tmp/.X11-unix";
@@ -15,12 +15,12 @@
 +static const char socket_fmt2[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X%d_";
  #endif
  
- bool set_cloexec(int fd, bool cloexec) {
+ static int open_socket(struct sockaddr_un *addr, size_t path_size) {
 --- a/xwayland/server.c
 +++ b/xwayland/server.c
 @@ -18,6 +18,13 @@
  #include "sockets.h"
- #include "xwayland/config.h"
+ #include "util/fd.h"
  
 +#ifdef __TERMUX__
 +#ifdef XWAYLAND_PATH
@@ -34,7 +34,7 @@
  		close(fd);
 --- a/xcursor/xcursor.c
 +++ b/xcursor/xcursor.c
-@@ -486,11 +486,11 @@
+@@ -486,11 +486,11 @@ xcursor_xc_file_load_images(FILE *file, int size)
   */
  
  #ifndef ICONDIR
