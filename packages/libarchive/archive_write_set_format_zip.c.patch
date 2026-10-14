@@ -1,7 +1,6 @@
-diff -u -r ../libarchive-3.2.0/libarchive/archive_write_set_format_zip.c ./libarchive/archive_write_set_format_zip.c
---- ../libarchive-3.2.0/libarchive/archive_write_set_format_zip.c	2016-01-01 17:18:57.000000000 -0500
-+++ ./libarchive/archive_write_set_format_zip.c	2016-05-02 20:09:52.331542213 -0400
-@@ -651,10 +651,8 @@
+--- a/libarchive/archive_write_set_format_zip.c
++++ b/libarchive/archive_write_set_format_zip.c
+@@ -933,10 +933,8 @@ archive_write_zip_header(struct archive_write *a, struct archive_entry *entry)
  			if (strcmp(archive_string_conversion_charset_name(
  					zip->opt_sconv), "UTF-8") == 0)
  				zip->entry_flags |= ZIP_ENTRY_FLAG_UTF8_NAME;
@@ -12,4 +11,4 @@ diff -u -r ../libarchive-3.2.0/libarchive/archive_write_set_format_zip.c ./libar
 -#endif
  		}
  	}
- 	filename_length = path_length(zip->entry);
+ 	/* Reject empty or overlong pathnames */
