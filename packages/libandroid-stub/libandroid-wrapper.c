@@ -23,6 +23,9 @@
 #include <android/surface_texture_jni.h>
 #include <android/trace.h>
 
+struct native_handle;
+const struct native_handle* AHardwareBuffer_getNativeHandle(const AHardwareBuffer* buffer);
+
 #ifdef __LP64__
 #define LIB "/system/lib64/libandroid.so"
 #else
@@ -40,7 +43,8 @@
     f(AHardwareBuffer_lock) \
     f(AHardwareBuffer_unlock) \
     f(AHardwareBuffer_sendHandleToUnixSocket) \
-    f(AHardwareBuffer_recvHandleFromUnixSocket)
+    f(AHardwareBuffer_recvHandleFromUnixSocket) \
+    f(AHardwareBuffer_getNativeHandle)
 #else
 #define AHardwareBuffer_API26_FUNCTIONS_1(f)
 #endif
@@ -661,6 +665,10 @@ int AHardwareBuffer_sendHandleToUnixSocket(const AHardwareBuffer* _Nonnull buffe
 
 int AHardwareBuffer_recvHandleFromUnixSocket(int socketFd, AHardwareBuffer* _Nullable* _Nonnull outBuffer) {
     CALL(AHardwareBuffer_recvHandleFromUnixSocket, 0, socketFd, outBuffer);
+}
+
+const struct native_handle* AHardwareBuffer_getNativeHandle(const AHardwareBuffer* buffer) {
+    CALL(AHardwareBuffer_getNativeHandle, NULL, buffer);
 }
 #endif
 
