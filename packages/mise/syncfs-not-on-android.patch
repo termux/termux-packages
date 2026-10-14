@@ -1,0 +1,31 @@
+--- a/crates/mise-util/src/file.rs
++++ b/crates/mise-util/src/file.rs
+@@ -584,7 +584,7 @@ pub fn write_atomic_unsynced<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents:
+ /// Makes every write on the filesystem holding `path` durable, for a batch written with
+ /// [`write_atomic_unsynced`]. Only Linux can flush one filesystem and wait for it: elsewhere
+ /// `sync()` may return before the writes reach the disk, so a batch syncs each file instead.
+-#[cfg(any(target_os = "linux", target_os = "android"))]
++#[cfg(target_os = "linux")]
+ pub fn sync_filesystem<P: AsRef<Path>>(path: P) -> Result<()> {
+     let path = path.as_ref();
+     trace!("sync filesystem of {}", display_path(path));
+--- a/src/system/history/store.rs
++++ b/src/system/history/store.rs
+@@ -1308,7 +1308,7 @@ pub(crate) struct CacheBatch<'a> {
+ }
+ 
+ impl<'a> CacheBatch<'a> {
+-    const DEFERS_SYNC: bool = cfg!(any(target_os = "linux", target_os = "android"));
++    const DEFERS_SYNC: bool = cfg!(target_os = "linux");
+ 
+     pub(crate) fn new(state_dir: &'a Path) -> Self {
+         Self {
+@@ -1335,7 +1335,7 @@ impl<'a> CacheBatch<'a> {
+     }
+ 
+     pub(crate) fn finish(self) -> Result<()> {
+-        #[cfg(any(target_os = "linux", target_os = "android"))]
++        #[cfg(target_os = "linux")]
+         if self.written {
+             file::sync_filesystem(index_dir_in(self.state_dir))?;
+         }
