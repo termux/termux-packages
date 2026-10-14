@@ -1,0 +1,38 @@
+From: Termux packaging
+Subject: Use a hyphenated PyPI project name
+
+Termux's generic postinst generator
+(scripts/build/termux_step_create_python_debscripts.sh) reads this
+package's pip METADATA to pick up its declared runtime dependency on
+typing-extensions, and installs it via `pip install <name>` on-device
+at package configuration time. To avoid re-downloading/recompiling
+pydantic-core itself from PyPI (there's no prebuilt wheel for Android,
+and no Rust toolchain on-device), that script skips passing `--upgrade`
+when the package's own pip-facing name (with the Termux "python-"
+prefix stripped) is already present in the dependency list it's about
+to install.
+
+That comparison is a plain string match against the Termux package
+name "pydantic-core" (hyphenated) - it does not normalize
+underscore/hyphen per PEP 503. Upstream's pyproject.toml declares the
+project name with an underscore ('pydantic_core'), so the match fails,
+`--upgrade` stays enabled, and the on-device postinst ends up trying
+to reinstall/recompile pydantic-core from PyPI, which fails because
+there is no Android wheel and no Rust toolchain available there.
+
+Renaming the PyPI-facing project name to use a hyphen fixes the
+match. This is purely cosmetic for packaging metadata: maturin's
+`module-name` is set explicitly to `pydantic_core._pydantic_core` in
+the `[tool.maturin]` section, so `import pydantic_core` is unaffected.
+
+--- a/pydantic-core/pyproject.toml
++++ b/pydantic-core/pyproject.toml
+@@ -3,7 +3,7 @@
+ build-backend = 'maturin'
+ 
+ [project]
+-name = 'pydantic_core'
++name = 'pydantic-core'
+ description = "Core functionality for Pydantic validation and serialization"
+ requires-python = '>=3.10'
+ license = 'MIT'
