@@ -4767,15 +4767,17 @@ index 6317969cd3..48249cd2ff 100644
      EligibilityCallback callback) {
    if (!web_contents) {
      CUEING_LOG("GlicCueTarget::CheckEligibility failed: WebContents gone.");
-@@ -148,13 +148,13 @@ bool GlicCueTarget::IsPageEligible(
-        result.GetCategoryResults()) {
-     if (category.category_type ==
+@@ -149,7 +149,7 @@ bool GlicCueTarget::IsPageEligible(
+     if (base::FeatureList::IsEnabled(features::kGlicContextualCuesHandleEdu) &&
+         category.category_type ==
              page_content_annotations::CategoryType::kEducation &&
 -        category.score > contextual_cueing::kEduClassifierThreshold.Get()) {
 +        category.score > ::contextual_cueing::kEduClassifierThreshold.Get()) {
        passes_edu = true;
      }
-     if (category.category_type ==
+     if (base::FeatureList::IsEnabled(
+@@ -157,7 +157,7 @@ bool GlicCueTarget::IsPageEligible(
+         category.category_type ==
              page_content_annotations::CategoryType::kShopping &&
          category.score >
 -            contextual_cueing::kShoppingClassifierThreshold.Get()) {
@@ -4783,7 +4785,7 @@ index 6317969cd3..48249cd2ff 100644
        passes_shopping = true;
      }
    }
-@@ -163,7 +163,7 @@ bool GlicCueTarget::IsPageEligible(
+@@ -166,7 +166,7 @@ bool GlicCueTarget::IsPageEligible(
        "GlicCueTarget::IsPageEligible passes_edu=%d passes_shopping=%d",
        passes_edu, passes_shopping));
  
@@ -4792,7 +4794,7 @@ index 6317969cd3..48249cd2ff 100644
        active_web_contents->GetContentsMimeType() == pdf::kPDFMimeType) {
      CUEING_LOG("GlicCueTarget::IsPageEligible discard shopping pdf");
      return passes_edu && !passes_shopping;
-@@ -203,7 +203,7 @@ bool GlicCueTarget::IsEligible() const {
+@@ -214,7 +214,7 @@ bool GlicCueTarget::IsEligible() const {
  }
  
  void GlicCueTarget::OnAnchoredMessageClicked(
@@ -4801,7 +4803,7 @@ index 6317969cd3..48249cd2ff 100644
    InvokeGlic(std::move(data), base::FeatureList::IsEnabled(
                                    features::kGlicContextualCueingV2AutoSubmit));
  }
-@@ -212,19 +212,19 @@ bool GlicCueTarget::SupportsEditPrompt() const {
+@@ -223,19 +223,19 @@ bool GlicCueTarget::SupportsEditPrompt() const {
    return true;
  }
  
@@ -4825,7 +4827,7 @@ index 6317969cd3..48249cd2ff 100644
    Target target(*tab_, NewConversation());
    GlicInvokeOptions options(
        std::move(target),
-@@ -270,10 +270,10 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
+@@ -281,10 +281,10 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
  #endif
  }
  
