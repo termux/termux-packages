@@ -1,52 +1,51 @@
 --- a/lib_pypy/_pwdgrp_build.py
 +++ b/lib_pypy/_pwdgrp_build.py
-@@ -35,9 +35,9 @@
+@@ -35,9 +35,9 @@ struct group {
  struct passwd *getpwuid(uid_t uid);
  struct passwd *getpwnam(const char *name);
-
+ 
 -struct passwd *getpwent(void);
 -void setpwent(void);
 -void endpwent(void);
 +// struct passwd *getpwent(void);
 +// void setpwent(void);
 +// void endpwent(void);
-
+ 
  struct group *getgrgid(gid_t gid);
  struct group *getgrnam(const char *name);
-
 --- a/lib-python/2.7/smtpd.py
 +++ b/lib-python/2.7/smtpd.py
-@@ -9,7 +9,8 @@
+@@ -9,7 +9,8 @@ Options:
      -n
          This program generally tries to setuid `nobody', unless this flag is
          set.  The setuid call will fail if this program is not run as root (in
 -        which case, use this flag).
 +        which case, use this flag). Ignored in Termux as no setuid done on this
 +        platform.
-
+ 
      --version
      -V
-@@ -461,7 +462,7 @@
-
-
+@@ -461,7 +462,7 @@ class MailmanProxy(PureProxy):
+ 
+ 
  class Options:
 -    setuid = 1
 +    setuid = 0
      classname = 'PureProxy'
-
-
+ 
+ 
 --- a/pypy/module/pwd/interp_pwd.py
 +++ b/pypy/module/pwd/interp_pwd.py
-@@ -19,18 +19,25 @@
+@@ -19,18 +19,25 @@ config = rffi_platform.configure(CConfig)
  uid_t = config['uid_t']
  gid_t = config['gid_t']
-
+ 
 -class CConfig:
 -    _compilation_info_ = eci
 +# Android bionic libc has a different define for passwd.
 +# On LP32, it defines pw_gecos to pw_passwd since they're both NULL.
 +DEFINED__LP64__ = rffi_platform.getdefined('__LP64__', '')
-
+ 
 -    passwd = rffi_platform.Struct(
 -        'struct passwd',
 -        [('pw_name', rffi.CCHARP),
@@ -66,11 +65,11 @@
 +    _compilation_info_ = eci
 +
 +    passwd = rffi_platform.Struct('struct passwd', fields)
-
+ 
  config = rffi_platform.configure(CConfig)
-
-@@ -42,9 +49,10 @@
-
+ 
+@@ -42,9 +49,10 @@ def external(name, args, result, **kwargs):
+ 
  c_getpwuid = external("getpwuid", [uid_t], passwd_p)
  c_getpwnam = external("getpwnam", [rffi.CCHARP], passwd_p)
 -c_setpwent = external("setpwent", [], lltype.Void)
@@ -80,10 +79,10 @@
 +# c_setpwent = external("setpwent", [], lltype.Void)
 +# c_getpwent = external("getpwent", [], passwd_p)
 +# c_endpwent = external("endpwent", [], lltype.Void)
-
-
+ 
+ 
  def uid_converter(space, w_uid):
-@@ -80,7 +88,7 @@
+@@ -80,7 +88,7 @@ def make_struct_passwd(space, pw):
          space.newtext(rffi.charp2str(pw.c_pw_passwd)),
          space.int(space.newint(pw.c_pw_uid)),
          space.int(space.newint(pw.c_pw_gid)),
@@ -92,10 +91,10 @@
          space.newtext(rffi.charp2str(pw.c_pw_dir)),
          space.newtext(rffi.charp2str(pw.c_pw_shell)),
          ])
-@@ -120,15 +128,15 @@
+@@ -120,15 +128,15 @@ def getpwnam(space, name):
          raise oefmt(space.w_KeyError, "getpwnam(): name not found: %s", name)
      return make_struct_passwd(space, pw)
-
+ 
 -def getpwall(space):
 -    users_w = []
 -    c_setpwent()
@@ -120,26 +119,25 @@
 +#     finally:
 +#         c_endpwent()
 +#     return space.newlist(users_w)
-
 --- a/pypy/module/pwd/moduledef.py
 +++ b/pypy/module/pwd/moduledef.py
-@@ -15,11 +15,11 @@
+@@ -15,11 +15,11 @@ class Module(MixedModule):
      interpleveldefs = {
          'getpwuid': 'interp_pwd.getpwuid',
          'getpwnam': 'interp_pwd.getpwnam',
 -        'getpwall': 'interp_pwd.getpwall',
 +        # 'getpwall': 'interp_pwd.getpwall',
      }
-
+ 
      appleveldefs = {
          'struct_passwd': 'app_pwd.struct_passwd',
 -        'struct_pwent': 'app_pwd.struct_passwd',
 +        # 'struct_pwent': 'app_pwd.struct_passwd',
      }
-
+ 
 --- a/rpython/rlib/rvmprof/cintf.py
 +++ b/rpython/rlib/rvmprof/cintf.py
-@@ -21,15 +21,15 @@
+@@ -22,15 +22,15 @@ class VMProfPlatformUnsupported(Exception):
  # vmprof works only on x86 for now
  IS_SUPPORTED = False
  NATIVE_PROFILING_SUPPORTED = False
@@ -161,12 +159,12 @@
 +#         NATIVE_PROFILING_SUPPORTED = proc.startswith('x86')
 +#     except detect_cpu.ProcessorAutodetectError:
 +#         print("PROCESSOR NOT DETECTED, SKIPPING VMPROF")
-
+ 
  ROOT = py.path.local(rpythonroot).join('rpython', 'rlib', 'rvmprof')
  SRC = ROOT.join('src')
 --- a/pypy/module/posix/moduledef.py
 +++ b/pypy/module/posix/moduledef.py
-@@ -134,12 +134,12 @@
+@@ -134,12 +134,12 @@ corresponding Unix manual entries for more information on calls."""
          interpleveldefs['pathconf_names'] = 'space.wrap(os.pathconf_names)'
      if hasattr(os, 'pathconf'):
          interpleveldefs['pathconf'] = 'interp_posix.pathconf'
@@ -183,7 +181,7 @@
          interpleveldefs['makedev'] = 'interp_posix.makedev'
 --- a/rpython/rlib/rposix.py
 +++ b/rpython/rlib/rposix.py
-@@ -3086,7 +3086,7 @@
+@@ -3102,7 +3102,7 @@ elif not _WIN32:
  # ____________________________________________________________
  # Support for *xattr functions
  
