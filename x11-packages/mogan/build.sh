@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.9.8"
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION="2026.3.7"
 TERMUX_PKG_SRCURL="https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=70af74dad16816a8097b877dc4cd94202f35517468ab54f6ae6f84ede32746fb
-TERMUX_PKG_DEPENDS="freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libgit2, libiconv, libjpeg-turbo, libpng, qt6-qtbase, qt6-qtsvg, tree-sitter, zlib"
+TERMUX_PKG_SHA256=676966aefccaa8f8e4add2916fe02362c69b2bb3d991635a81a46f2dee3c6383
+TERMUX_PKG_DEPENDS="dbus, fontconfig, freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libexpat, libffi, libiconv, libjpeg-turbo, libpng, libx11, libxkbcommon, libxml2, mupdf, openssl, otf-noto-sans-cjk, qt6-qtbase, qt6-qtdeclarative, qt6-qtnetworkauth, qt6-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,20 +20,9 @@ termux_pkg_auto_update() {
 		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
 		return
 	fi
-	local latest_version=$(echo "${latest_refs_tags}" | grep "^1.2.9." | sort -V | tail -n1)
+	local latest_version=$(echo "${latest_refs_tags}" | grep -E "^[0-9]{4}\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n1)
 
 	termux_pkg_upgrade_version "${latest_version}"
-}
-
-termux_step_post_get_source() {
-	sed \
-		"s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|" \
-		"${TERMUX_PKG_BUILDER_DIR}/lolly.diff" \
-		> "${TERMUX_PKG_SRCDIR}"/xmake/packages/l/lolly/lolly.diff
-	cp -f "${TERMUX_PKG_BUILDER_DIR}"/s7.diff \
-		"${TERMUX_PKG_SRCDIR}"/xmake/packages/s/s7/s7.diff
-	cp -f "${TERMUX_PKG_BUILDER_DIR}"/moebius.diff \
-		"${TERMUX_PKG_SRCDIR}"/xmake/packages/m/moebius/moebius.diff
 }
 
 termux_step_pre_configure() {
@@ -44,6 +32,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_DEPENDS+=", mogan-data"
 
 	termux_setup_cmake
+	termux_setup_ninja
 	termux_setup_xmake
 
 	# xmake tests -ldl wrongly?
@@ -66,9 +55,16 @@ termux_step_pre_configure() {
 	cp "$XMAKE_ORIG" "$TERMUX_PKG_TMPDIR/backup_dir/xmake"
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
-		install -Dm755 "${TERMUX_PKG_BUILDER_DIR}/qmake.sh" "${TERMUX_PKG_TMPDIR}/qmake"
-		sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" -i "${TERMUX_PKG_TMPDIR}/qmake"
-		export PATH="${TERMUX_PKG_TMPDIR}:${TERMUX_PREFIX}/opt/qt6/cross/bin:${PATH}"
+		# xmake finds Qt by running qmake from an SDK directory; Termux has only a cross Qt
+		# with a different layout, so present a scratch SDK made of a qmake wrapper and an include symlink.
+		install -Dm755 "${TERMUX_PKG_BUILDER_DIR}/qmake.sh" "${TERMUX_PKG_TMPDIR}/qtsdk/bin/qmake"
+		sed \
+			-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+			-e "s|@QT_SDK_DIR@|${TERMUX_PKG_TMPDIR}/qtsdk|g" \
+			-i "${TERMUX_PKG_TMPDIR}/qtsdk/bin/qmake"
+		ln -sf qmake "${TERMUX_PKG_TMPDIR}/qtsdk/bin/qmake6"
+		ln -sfn "${TERMUX_PREFIX}/include/qt6" "${TERMUX_PKG_TMPDIR}/qtsdk/include"
+		export PATH="${TERMUX_PKG_TMPDIR}/qtsdk/bin:${TERMUX_PREFIX}/opt/qt6/cross/bin:${PATH}"
 	fi
 
 	command -v qmake
@@ -81,9 +77,14 @@ termux_step_make() {
 	arm) host_platform="armv7a-linux-androideabi" ;;
 	esac
 
+	# xmake's qtbase package requires aqt and dpkg; Qt comes from the system, so stub them.
+	# Cross objcopy and strip are used for the debug symbols of the target binaries.
 	mkdir -p "$TERMUX_PKG_TMPDIR/nodpkg"
 	printf '#!/bin/sh\n[ "$1" = --version ]\n' > "$TERMUX_PKG_TMPDIR/nodpkg/dpkg"
-	chmod +x "$TERMUX_PKG_TMPDIR/nodpkg/dpkg"
+	printf '#!/bin/sh\necho "aqt, version 3.3.0"\n' > "$TERMUX_PKG_TMPDIR/nodpkg/aqt"
+	chmod +x "$TERMUX_PKG_TMPDIR/nodpkg/dpkg" "$TERMUX_PKG_TMPDIR/nodpkg/aqt"
+	ln -sf "${TERMUX_STANDALONE_TOOLCHAIN}/bin/llvm-objcopy" "$TERMUX_PKG_TMPDIR/nodpkg/objcopy"
+	ln -sf "${TERMUX_STANDALONE_TOOLCHAIN}/bin/llvm-strip" "$TERMUX_PKG_TMPDIR/nodpkg/strip"
 	local PATH="$TERMUX_PKG_TMPDIR/nodpkg:$PATH"
 	export CPATH="$TERMUX_PREFIX/include/freetype2"
 
@@ -97,17 +98,19 @@ termux_step_make() {
 		--diagnosis \
 		-m releasedbg \
 		--sdk="${TERMUX_STANDALONE_TOOLCHAIN}" \
+		--qt="${TERMUX_PKG_TMPDIR}/qtsdk" \
 		--cross="${host_platform}-" \
-		--cflags="${CPPFLAGS} ${CFLAGS}" \
+		--cflags="${CPPFLAGS} ${CFLAGS} -include ${TERMUX_PKG_BUILDER_DIR}/complex-compat.h" \
 		--cxxflags="${CPPFLAGS} ${CXXFLAGS}" \
-		--ldflags="${LDFLAGS}"
+		--ldflags="${LDFLAGS} -landroid-complex-math -landroid-execinfo -landroid-spawn -landroid-wordexp -liconv"
 
 	echo "xmake build"
 	xmake build \
 		--yes \
 		--verbose \
 		--diagnosis \
-		--jobs="${TERMUX_PKG_MAKE_PROCESSES}"
+		--jobs="${TERMUX_PKG_MAKE_PROCESSES}" \
+		stem
 }
 
 termux_step_make_install() {
@@ -116,8 +119,9 @@ termux_step_make_install() {
 		--yes \
 		--verbose \
 		--diagnosis \
-		-o "${TERMUX_PREFIX}" \
-		research
+		-o "${TERMUX_PKG_TMPDIR}/stage" \
+		stem
+	cp -r "${TERMUX_PKG_TMPDIR}/stage"/{bin,share} "${TERMUX_PREFIX}/"
 }
 
 termux_step_post_make_install() {
