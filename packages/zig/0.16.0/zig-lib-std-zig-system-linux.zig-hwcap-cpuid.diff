@@ -1,0 +1,15 @@
+--- a/zig/lib/std/zig/system/linux.zig	2026-10-14 12:35:51.331974311 +0200
++++ b/zig/lib/std/zig/system/linux.zig	2026-10-14 12:35:51.347974311 +0200
+@@ -458,6 +458,12 @@
+             return ArmCpuinfoParser.parse(current_arch, &file_reader.interface) catch null;
+         },
+         .aarch64, .aarch64_be => {
++            // Reading the ID registers from EL0 with `mrs` only works when the
++            // kernel traps and emulates it, which it advertises via HWCAP_CPUID
++            // (Linux 4.11+). Older kernels (common on Android) raise SIGILL, so
++            // fall back to baseline in that case.
++            const HWCAP_CPUID: usize = 1 << 11;
++            if (std.os.linux.getauxval(std.elf.AT_HWCAP) & HWCAP_CPUID == 0) return null;
+             const registers = [12]u64{
+                 getAArch64CpuFeature("MIDR_EL1"),
+                 getAArch64CpuFeature("ID_AA64PFR0_EL1"),
