@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multimedia Framework. Author, manage, and run multitrack
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION="7.42.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mltframework/mlt/releases/download/v${TERMUX_PKG_VERSION}/mlt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8800e343f43aaa885bd5d9d23553030fa220aa3e2f0c94d9fd6a936d41638cdd
 TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, fftw, fontconfig, frei0r-plugins, gdk-pixbuf, glib, jack, movit, libebur128, libepoxy, libexif, librnnoise, libsamplerate, libvidstab, libvorbis, libx11, libxml2, lilv, qt6-qt5compat, qt6-qtbase, qt6-qtsvg, opengl, pango, python, rubberband, sdl, sdl2 | sdl2-compat, sox, zlib"
