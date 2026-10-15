@@ -19,6 +19,9 @@ termux_step_make() {
 	# It needs a host (x86_64-linux) zig, and the vendored ghostty pins zig 0.15.2.
 	export TERMUX_ZIG_VERSION=0.15.2
 	termux_setup_zig
+	# ghostty cross-compiles for Android through the NDK (zig has no native
+	# bionic support yet, ziglang/zig#23906); point it at the NDK from termux.
+	export ANDROID_NDK_HOME="$NDK"
 	cargo build --release --package turbo --target "$CARGO_TARGET_NAME"
 }
 
