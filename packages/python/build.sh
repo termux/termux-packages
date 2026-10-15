@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION="3.14.6"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 _DEBPYTHON_COMMIT=f358ab52bf2932ad55b1a72a29c9762169e6ac47
 TERMUX_PKG_SRCURL=(
 	https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
@@ -90,6 +90,7 @@ termux_step_pre_configure() {
 	# if extension modules should be built (specifically, the
 	# zlib extension module is not built without this):
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	CPPFLAGS+=" -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL3_METHOD -DOPENSSL_NO_TLS1_METHOD -DOPENSSL_NO_TLS1_1_METHOD -DOPENSSL_NO_TLS1_2_METHOD"
 	# Without this all symbols are removed from the built libpython3.so
 	LDFLAGS="${LDFLAGS/-Wl,--as-needed/}"
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
