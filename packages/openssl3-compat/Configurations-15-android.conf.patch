@@ -1,0 +1,55 @@
+--- a/Configurations/15-android.conf
++++ b/Configurations/15-android.conf
+@@ -184,14 +184,14 @@
+         # systems are perfectly capable of executing binaries targeting
+         # Froyo. Keep in mind that in the nutshell Android builds are
+         # about JNI, i.e. shared libraries, not applications.
+-        cflags           => add(sub { android_ndk()->{cflags} }),
+-        cppflags         => add(sub { android_ndk()->{cppflags} }),
+-        cxxflags         => add(sub { android_ndk()->{cflags} }),
+-        bn_ops           => sub { android_ndk()->{bn_ops} },
++        #cflags           => add(sub { android_ndk()->{cflags} }),
++        #cppflags         => add(sub { android_ndk()->{cppflags} }),
++        #cxxflags         => add(sub { android_ndk()->{cflags} }),
++        #bn_ops           => sub { android_ndk()->{bn_ops} },
+         bin_cflags       => "-fPIE",
+         bin_lflags       => "-pie",
+         enable           => [ ],
+-        shared_extension => ".so",
++        shared_extension => ".so.\$(SHLIB_VERSION_NUMBER)",
+     },
+     "android-arm" => {
+         ################################################################
+@@ -222,13 +222,13 @@
+         # Newer NDK versions reportedly require additional -latomic.
+         #
+         inherit_from     => [ "android" ],
+-        bn_ops           => add("RC4_CHAR"),
++        bn_ops           => "BN_LLONG RC4_CHAR",
+         asm_arch         => 'armv4',
+         perlasm_scheme   => "void",
+     },
+     "android-arm64" => {
+         inherit_from     => [ "android" ],
+-        bn_ops           => add("RC4_CHAR"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_CHAR",
+         asm_arch         => 'aarch64',
+         perlasm_scheme   => "linux64",
+     },
+@@ -258,14 +258,14 @@
+     "android-x86" => {
+         inherit_from     => [ "android" ],
+         CFLAGS           => add(picker(release => "-fomit-frame-pointer")),
+-        bn_ops           => add("RC4_INT"),
++        bn_ops           => "BN_LLONG RC4_INT",
+         asm_arch         => 'x86',
+         perlasm_scheme   => "android",
+         ex_libs          => add(threads("-latomic")),
+     },
+     "android-x86_64" => {
+         inherit_from     => [ "android" ],
+-        bn_ops           => add("RC4_INT"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_INT",
+         asm_arch         => 'x86_64',
+         perlasm_scheme   => "elf",
+     },
