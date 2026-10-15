@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An easy-to-use, multi-track audio editor and recorder"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/audacity/audacity/releases/download/Audacity-${TERMUX_PKG_VERSION}/audacity-sources-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6cf1230a1aa940a9188476737d342100c5de6480a476f253fc844bd031d7e6f4
 TERMUX_PKG_AUTO_UPDATE=true
