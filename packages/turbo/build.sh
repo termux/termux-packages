@@ -16,7 +16,8 @@ termux_step_make() {
 	# turborepo-ui's "tui" feature is enabled unconditionally by turborepo-lib,
 	# turborepo-run-cache and turborepo-task-executor, so the vendored
 	# turborepo-ghostty-sys build script always runs and shells out to `zig build`.
-	# termux_setup_zig provides a host (x86_64-linux) zig on PATH.
+	# It needs a host (x86_64-linux) zig, and the vendored ghostty pins zig 0.15.2.
+	export TERMUX_ZIG_VERSION=0.15.2
 	termux_setup_zig
 	cargo build --release --package turbo --target "$CARGO_TARGET_NAME"
 }
