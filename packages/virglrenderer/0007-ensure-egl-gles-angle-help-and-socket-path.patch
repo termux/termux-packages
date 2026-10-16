@@ -1,0 +1,220 @@
+diff --git a/vtest/meson.build b/vtest/meson.build
+--- a/vtest/meson.build
++++ b/vtest/meson.build
+@@ -42,6 +42,8 @@
+    libdrm_dep.partial_dependency(compile_args: true, includes: true),
+    drm_uapi_dep,
+    mesa_dep,
++   # vtest_server.c calls epoxy_set_library_paths() directly.
++   epoxy_dep,
+ ]
+ 
+ if with_tracing == 'percetto'
+diff --git a/vtest/vtest_server.c b/vtest/vtest_server.c
+--- a/vtest/vtest_server.c
++++ b/vtest/vtest_server.c
+@@ -37,6 +37,7 @@
+ #include <sys/un.h>
+ #include <fcntl.h>
+ #include <getopt.h>
++#include <limits.h>
+ #include <string.h>
+ 
+ #include "util.h"
+@@ -48,6 +49,8 @@
+ #include "virglrenderer.h"
+ #include "vtest_server.h"
+ #include "virgl_util.h"
++#include "vrend_mode.h"
++#include <epoxy/common.h>
+ #ifdef HAVE_SYS_SELECT_H
+ #include <sys/select.h>
+ #endif
+@@ -89,7 +92,6 @@
+    bool loop;
+    bool multi_clients;
+ 
+-   bool use_glx;
+    bool use_egl_surfaceless;
+    bool use_gles;
+ 
+@@ -98,6 +100,11 @@
+    bool use_compat_profile;
+    bool drm;
+ 
++   /* Android/ANGLE mode only: "gl", "vulkan" or "vulkan-null" subdirectory
++    * of angle-android's install, selected by --angle-gl/--angle-vulkan/
++    * --angle-null. NULL means the (mode-dependent) default. */
++   const char *angle_variant;
++
+    int ctx_flags;
+ 
+    struct list_head new_clients;
+@@ -123,6 +130,7 @@
+ 
+ static void vtest_server_getenv(void);
+ static void vtest_server_parse_args(int argc, char **argv);
++static void vtest_server_setup_epoxy_paths(void);
+ static void vtest_server_set_signal_child(void);
+ static void vtest_server_set_signal_segv(void);
+ static void vtest_server_open_read_file(void);
+@@ -138,8 +146,10 @@
+ while (__AFL_LOOP(1000)) {
+ #endif
+ 
++   vrend_mode_init(argv[0]);
+    vtest_server_getenv();
+    vtest_server_parse_args(argc, argv);
++   vtest_server_setup_epoxy_paths();
+ 
+    list_inithead(&server.new_clients);
+    list_inithead(&server.active_clients);
+@@ -166,7 +176,6 @@
+ #define OPT_NO_FORK 'f'
+ #define OPT_NO_LOOP_OR_FORK 'l'
+ #define OPT_MULTI_CLIENTS 'm'
+-#define OPT_USE_GLX 'x'
+ #define OPT_USE_EGL_SURFACELESS 's'
+ #define OPT_USE_GLES 'e'
+ #define OPT_RENDERNODE 'r'
+@@ -176,6 +185,9 @@
+ #define OPT_NO_VIRGL 'g'
+ #define OPT_COMPAT_PROFILE 'c'
+ #define OPT_DRM 'd'
++#define OPT_ANGLE_GL 400
++#define OPT_ANGLE_VULKAN 401
++#define OPT_ANGLE_NULL 402
+ 
+ static void vtest_server_parse_args(int argc, char **argv)
+ {
+@@ -185,7 +197,6 @@
+       {"no-fork",             no_argument, NULL, OPT_NO_FORK},
+       {"no-loop-or-fork",     no_argument, NULL, OPT_NO_LOOP_OR_FORK},
+       {"multi-clients",       no_argument, NULL, OPT_MULTI_CLIENTS},
+-      {"use-glx",             no_argument, NULL, OPT_USE_GLX},
+       {"use-egl-surfaceless", no_argument, NULL, OPT_USE_EGL_SURFACELESS},
+       {"use-gles",            no_argument, NULL, OPT_USE_GLES},
+       {"rendernode",          required_argument, NULL, OPT_RENDERNODE},
+@@ -194,6 +205,9 @@
+       {"no-virgl",            no_argument, NULL, OPT_NO_VIRGL},
+       {"compat",              no_argument, NULL, OPT_COMPAT_PROFILE},
+       {"drm",                 no_argument, NULL, OPT_DRM},
++      {"angle-gl",            no_argument, NULL, OPT_ANGLE_GL},
++      {"angle-vulkan",        no_argument, NULL, OPT_ANGLE_VULKAN},
++      {"angle-null",          no_argument, NULL, OPT_ANGLE_NULL},
+       {0, 0, 0, 0}
+    };
+ 
+@@ -217,9 +231,6 @@
+          printf("multi-clients enabled: clients must trust each other\n");
+          server.multi_clients = true;
+          break;
+-      case OPT_USE_GLX:
+-         server.use_glx = true;
+-         break;
+       case OPT_USE_EGL_SURFACELESS:
+          server.use_egl_surfaceless = true;
+          break;
+@@ -248,17 +259,28 @@
+          server.drm = true;
+          break;
+ #endif
++      case OPT_ANGLE_GL:
++         server.angle_variant = "gl";
++         break;
++      case OPT_ANGLE_VULKAN:
++         server.angle_variant = "vulkan";
++         break;
++      case OPT_ANGLE_NULL:
++         server.angle_variant = "vulkan-null";
++         break;
+       default:
+          printf("Usage: %s [--no-fork] [--no-loop-or-fork] [--multi-clients] "
+-                "[--use-glx] [--use-egl-surfaceless] [--use-gles] [--no-virgl]"
+                 "[--rendernode <dev>] [--socket-path <path>] "
++                "%s"
+ #ifdef ENABLE_VENUS
+                 " [--venus]"
+ #endif
+ #ifdef ENABLE_DRM
+                 " [--drm]"
+ #endif
+-                " [file]\n", argv[0]);
++                " [file]\n", argv[0],
++                g_vrend_android_mode ? "[--angle-gl] [--angle-vulkan] [--angle-null]"
++                                     : "[--use-egl-surfaceless] [--use-gles] [--no-virgl]");
+          exit(EXIT_FAILURE);
+          break;
+       }
+@@ -272,20 +294,24 @@
+       server.multi_clients = false;
+    }
+ 
++   /* ANGLE provides only EGL/GLES on Android: no desktop GL, no GLX, and
++    * virgl must stay enabled. Reject explicit requests for the opposite
++    * instead of silently overriding them. */
++   if (g_vrend_android_mode) {
++      if (server.no_virgl) {
++         fprintf(stderr, "--no-virgl is not supported in Android mode.\n");
++         exit(EXIT_FAILURE);
++      }
++      server.use_egl_surfaceless = true;
++      server.use_gles = true;
++   }
++
+    if (!server.no_virgl) {
+       server.ctx_flags = VIRGL_RENDERER_USE_EGL;
+-      if (server.use_glx) {
+-         if (server.use_egl_surfaceless || server.use_gles) {
+-            fprintf(stderr, "Cannot use surfaceless or GLES with GLX.\n");
+-            exit(EXIT_FAILURE);
+-         }
+-         server.ctx_flags = VIRGL_RENDERER_USE_GLX;
+-      } else {
+-         if (server.use_egl_surfaceless)
+-            server.ctx_flags |= VIRGL_RENDERER_USE_SURFACELESS;
+-         if (server.use_gles)
+-            server.ctx_flags |= VIRGL_RENDERER_USE_GLES;
+-      }
++      if (server.use_egl_surfaceless)
++         server.ctx_flags |= VIRGL_RENDERER_USE_SURFACELESS;
++      if (server.use_gles)
++         server.ctx_flags |= VIRGL_RENDERER_USE_GLES;
+ 
+       if (server.use_compat_profile) {
+          if (server.use_gles) {
+@@ -307,9 +333,33 @@
+    }
+ }
+ 
++static void vtest_server_setup_epoxy_paths(void)
++{
++   if (!g_vrend_android_mode) {
++      epoxy_set_library_paths(TERMUX_PREFIX "/lib/libEGL.so.1",
++                              TERMUX_PREFIX "/lib/libGLESv1_CM.so.1",
++                              TERMUX_PREFIX "/lib/libGLESv2.so.2",
++                              TERMUX_PREFIX "/lib/libGL.so.1");
++      return;
++   }
++
++   const char *variant = server.angle_variant ? server.angle_variant : "gl";
++   char egl_path[PATH_MAX], gles1_path[PATH_MAX], gles2_path[PATH_MAX];
++
++   snprintf(egl_path, sizeof(egl_path),
++            TERMUX_PREFIX "/opt/angle-android/%s/libEGL_angle.so", variant);
++   snprintf(gles1_path, sizeof(gles1_path),
++            TERMUX_PREFIX "/opt/angle-android/%s/libGLESv1_CM_angle.so", variant);
++   snprintf(gles2_path, sizeof(gles2_path),
++            TERMUX_PREFIX "/opt/angle-android/%s/libGLESv2_angle.so", variant);
++   /* ANGLE provides no desktop GL; GLX_LIB/OPENGL_LIB stay at their
++    * compiled-in defaults so a stray desktop-GL context request fails
++    * with the normal "couldn't open" error instead of misresolving. */
++   epoxy_set_library_paths(egl_path, gles1_path, gles2_path, NULL);
++}
++
+ static void vtest_server_getenv(void)
+ {
+-   server.use_glx = getenv("VTEST_USE_GLX") != NULL;
+    server.use_egl_surfaceless = getenv("VTEST_USE_EGL_SURFACELESS") != NULL;
+    server.use_gles = getenv("VTEST_USE_GLES") != NULL;
+    server.render_device = getenv("VTEST_RENDERNODE");
