@@ -1,0 +1,32 @@
+From bf598127d032d909971125cf4f79abb47d360495 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 20:32:04 +0900
+Subject: [PATCH 3/9] fix-android-timespec
+
+---
+ libobs/util/platform.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/libobs/util/platform.c b/libobs/util/platform.c
+index 548afc03f..abd83bc8a 100644
+--- a/libobs/util/platform.c
++++ b/libobs/util/platform.c
+@@ -799,7 +799,15 @@ static struct {
+ 
+ static void init_timespec_offset(void)
+ {
++#if defined(__ANDROID__)
++	struct timespec ts;
++	int ret = clock_gettime(CLOCK_REALTIME, &ts);
++	timespec_offset.ts_valid = (ret == 0);
++	if (ret == 0)
++		timespec_offset.ts = ts;
++#else
+ 	timespec_offset.ts_valid = timespec_get(&timespec_offset.ts, TIME_UTC) == TIME_UTC;
++#endif
+ 	timespec_offset.timestamp = os_gettime_ns();
+ }
+ 
+-- 
+2.54.0
+
