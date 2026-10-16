@@ -1,0 +1,24 @@
+diff --git a/app/utils/cli-install.ts b/app/utils/cli-install.ts
+index 02cc789..849a49e 100644
+--- a/app/utils/cli-install.ts
++++ b/app/utils/cli-install.ts
+@@ -127,6 +127,10 @@ const logNotify = (withNotification: boolean, title: string, body: string, detai
+ };
+ 
+ export const installCLI = async (withNotification: boolean) => {
++  if (process.platform === 'linux') {
++    logNotify(withNotification, 'Hyper CLI installed', 'The hyper command is provided by the package');
++    return;
++  }
+   if (process.platform === 'win32') {
+     try {
+       await addBinToUserPath();
+@@ -138,7 +142,7 @@ export const installCLI = async (withNotification: boolean) => {
+     } catch (err) {
+       logNotify(withNotification, 'Hyper CLI installation failed', `Failed to add Hyper CLI path to user PATH ${err}`);
+     }
+-  } else if (process.platform === 'darwin' || process.platform === 'linux') {
++  } else if (process.platform === 'darwin') {
+     // AppImages are mounted on run at a temporary path, don't create symlink
+     if (process.env['APPIMAGE']) {
+       console.log('Skipping CLI symlink creation as it is an AppImage install');

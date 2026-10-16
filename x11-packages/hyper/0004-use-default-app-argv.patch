@@ -1,0 +1,24 @@
+diff --git a/app/index.ts b/app/index.ts
+index c102dbd..cfaae87 100644
+--- a/app/index.ts
++++ b/app/index.ts
+@@ -1,5 +1,5 @@
+ // Print diagnostic information for a few arguments instead of running Hyper.
+-if (['--help', '-v', '--version'].includes(process.argv[1])) {
++if (['--help', '-v', '--version'].includes(process.argv[process.defaultApp ? 2 : 1])) {
+   // eslint-disable-next-line @typescript-eslint/no-var-requires
+   const {version} = require('./package');
+   const configLocation = process.platform === 'win32' ? `${process.env.userprofile}\\.hyper.js` : '~/.hyper.js';
+diff --git a/app/ui/window.ts b/app/ui/window.ts
+index 3c3dd9e..fc097aa 100644
+--- a/app/ui/window.ts
++++ b/app/ui/window.ts
+@@ -64,7 +64,7 @@ export function newWindow(
+   };
+ 
+   // set working directory
+-  let argPath = process.argv[1];
++  let argPath = process.argv[process.defaultApp ? 2 : 1];
+   if (argPath && process.platform === 'win32') {
+     if (/[a-zA-Z]:"/.test(argPath)) {
+       argPath = argPath.replace('"', sep);

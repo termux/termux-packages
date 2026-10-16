@@ -1,0 +1,32 @@
+diff --git a/app/session.ts b/app/session.ts
+index 5c0759f..7701868 100644
+--- a/app/session.ts
++++ b/app/session.ts
+@@ -1,6 +1,5 @@
+ import {EventEmitter} from 'events';
+ import {StringDecoder} from 'string_decoder';
+-import defaultShell from 'default-shell';
+ import {getDecoratedEnv} from './plugins';
+ import {productName, version} from './package.json';
+ import * as config from './config';
+@@ -10,6 +9,8 @@ import {dirname} from 'path';
+ import shellEnv from 'shell-env';
+ import osLocale from 'os-locale';
+ 
++const defaultShell = process.env['SHELL'] || '@TERMUX_PREFIX@/bin/sh';
++
+ const createNodePtyError = () =>
+   new Error(
+     '`node-pty` failed to load. Typically this means that it was built incorrectly. Please check the `readme.md` to more info.'
+@@ -130,6 +131,11 @@ export default class Session extends EventEmitter {
+         .join(':');
+     }
+ 
++    baseEnv['PATH'] = (baseEnv['PATH'] || '')
++      .split(':')
++      .filter((val) => val !== '@TERMUX_PREFIX@/opt/hyper/bin')
++      .join(':');
++
+     // Electron has a default value for process.env.GOOGLE_API_KEY
+     // We don't want to leak this to the shell
+     // See https://github.com/vercel/hyper/issues/696

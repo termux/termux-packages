@@ -1,0 +1,24 @@
+diff --git a/app/index.ts b/app/index.ts
+index cfaae87..a8b23f2 100644
+--- a/app/index.ts
++++ b/app/index.ts
+@@ -38,6 +38,19 @@ app.config = config;
+ app.plugins = plugins;
+ app.getWindows = () => new Set([...windowSet]); // return a clone
+ 
++// Electron >= 28 removed process.mainModule, so @electron/remote can no longer
++// resolve relative paths like './plugins'. The renderer then throws before it
++// sends 'init', and since the window is created hidden it is never shown.
++// Serve the only module the renderer requests ourselves.
++(app as NodeJS.EventEmitter).on(
++  'remote-require',
++  (event: {returnValue?: unknown}, _webContents: unknown, moduleName: string) => {
++    if (moduleName === './plugins') {
++      event.returnValue = plugins;
++    }
++  }
++);
++
+ // function to retrieve the last focused window in windowSet;
+ // added to app object in order to expose it to plugins.
+ app.getLastFocusedWindow = () => {

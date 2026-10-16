@@ -1,0 +1,16 @@
+diff --git a/app/ui/window.ts b/app/ui/window.ts
+index c8b6194..3c3dd9e 100644
+--- a/app/ui/window.ts
++++ b/app/ui/window.ts
+@@ -290,7 +290,10 @@ export function newWindow(
+   // If file is dropped onto the terminal window, navigate and new-window events are prevented
+   // and his path is added to active session.
+   window.webContents.on('will-navigate', handleDrop);
+-  window.webContents.on('new-window', handleDrop);
++  window.webContents.setWindowOpenHandler(({url}) => {
++    handleDrop({preventDefault: () => undefined} as Event, url);
++    return {action: 'deny'};
++  });
+ 
+   // expose internals to extension authors
+   window.rpc = rpc;
