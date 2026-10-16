@@ -1,0 +1,175 @@
+From 44346c3ee23bddb477f507882c55a120fce7aee4 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Mon, 20 Apr 2026 20:24:41 +0900
+Subject: [PATCH 2/9] system-info-android
+
+---
+ frontend/cmake/os-linux.cmake            |   3 +-
+ frontend/utility/system-info-android.cpp | 141 +++++++++++++++++++++++
+ 2 files changed, 143 insertions(+), 1 deletion(-)
+ create mode 100644 frontend/utility/system-info-android.cpp
+
+diff --git a/frontend/cmake/os-linux.cmake b/frontend/cmake/os-linux.cmake
+index 0aa18d558..29aa32e3e 100644
+--- a/frontend/cmake/os-linux.cmake
++++ b/frontend/cmake/os-linux.cmake
+@@ -4,7 +4,8 @@ target_sources(
+     utility/CrashHandler_Linux.cpp
+     utility/NativeEventFilter.cpp
+     utility/platform-x11.cpp
+-    utility/system-info-posix.cpp
++    $<$<NOT:$<BOOL:${OS_ANDROID}>>:utility/system-info-posix.cpp>
++    $<$<BOOL:${OS_ANDROID}>:utility/system-info-android.cpp>
+ )
+ target_compile_definitions(
+   obs-studio
+diff --git a/frontend/utility/system-info-android.cpp b/frontend/utility/system-info-android.cpp
+new file mode 100644
+index 000000000..f99ab71b0
+--- /dev/null
++++ b/frontend/utility/system-info-android.cpp
+@@ -0,0 +1,141 @@
++#include "system-info.hpp"
++#include "util/platform.h"
++#include <sys/utsname.h>
++#include <unistd.h>
++#include <fstream>
++#include <string>
++#include <vector>
++#include <optional>
++#include <cstring>
++
++namespace {
++
++std::vector<GoLiveApi::Gpu> system_gpu_data() {
++    std::vector<GoLiveApi::Gpu> adapter_info;
++    GoLiveApi::Gpu gpu{};
++
++    obs_enter_graphics();
++    const char *renderer = gs_get_renderer();
++    const char *driver_ver = gs_get_driver_version();
++
++    // Convert from MB (as returned by OBS) to bytes
++    gpu.dedicated_video_memory = (uint64_t)gs_get_gpu_dmem() * 1024 * 1024;
++    gpu.shared_system_memory = (uint64_t)gs_get_gpu_smem() * 1024 * 1024;
++    obs_leave_graphics();
++
++    gpu.vendor_id = 0; // Blocked by SELinux on Android
++    gpu.device_id = 0;
++    gpu.model = renderer && *renderer ? renderer : "Unknown Android GPU";
++    gpu.driver_version = driver_ver ? driver_ver : "Unknown Android Driver";
++
++    adapter_info.push_back(gpu);
++    return adapter_info;
++}
++
++bool get_cpu_name(std::optional<std::string> &proc_name) {
++    std::ifstream file("/proc/cpuinfo");
++    std::string line;
++
++    // Default fallback
++    proc_name = "Unknown ARM Processor";
++
++    if (!file.is_open())
++        return false;
++
++    while (std::getline(file, line)) {
++        // Android ARM chips usually use "Hardware", "Processor", or "model name"
++        if (line.compare(0, 8, "Hardware") == 0 ||
++            line.compare(0, 9, "Processor") == 0 ||
++            line.compare(0, 10, "model name") == 0) {
++
++            auto pos = line.find(':');
++            if (pos == std::string::npos)
++                continue;
++
++            std::string name = line.substr(pos + 1);
++
++            // Trim whitespace
++            const char* trimChars = " \t\n\r\f\v";
++            auto start = name.find_first_not_of(trimChars);
++	    if (start == std::string::npos) {
++		    name.clear();
++	    } else {
++		    auto end = name.find_last_not_of(trimChars);
++		    name = name.substr(start, end - start + 1);
++	    }
++
++            // Skip generic "Processor" or "BogoMIPS" type labels
++            if (!name.empty() && name != "Processor") {
++                proc_name = name;
++                return true;
++            }
++        }
++    }
++    return false;
++}
++
++bool get_cpu_freq(uint32_t &cpu_freq) {
++    std::ifstream f("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
++    std::string line;
++    cpu_freq = 0;
++
++    if (!f.is_open())
++        return false;
++
++    if (std::getline(f, line)) {
++        try {
++            // kHz -> MHz
++            cpu_freq = std::stoul(line) / 1000;
++            return true;
++        } catch (...) {
++            cpu_freq = 0;
++        }
++    }
++    return false;
++}
++
++} // namespace
++
++void system_info(GoLiveApi::Capabilities &capabilities) {
++    capabilities = GoLiveApi::Capabilities{};
++
++    // GPU Data
++    capabilities.gpu = system_gpu_data();
++
++    // CPU Data
++    auto &cpu_data = capabilities.cpu;
++    cpu_data.physical_cores = os_get_physical_cores();
++    cpu_data.logical_cores = os_get_logical_cores();
++    get_cpu_name(cpu_data.name);
++
++    uint32_t freq = 0;
++    if (get_cpu_freq(freq))
++        cpu_data.speed = freq;
++
++    // Memory Data
++    auto &mem_data = capabilities.memory;
++    mem_data.total = os_get_sys_total_size();
++    mem_data.free = os_get_sys_free_size();
++
++    // System info
++    auto &sys_data = capabilities.system;
++    sys_data.name = "Android";
++
++    struct utsname utsinfo;
++    if (uname(&utsinfo) == 0) {
++        // utsinfo.release is the kernel version (e.g., "6.1.25-android14")
++        sys_data.release = utsinfo.release;
++        sys_data.bits = sizeof(void*) * 8;
++        sys_data.arm = strstr(utsinfo.machine, "arm") || strstr(utsinfo.machine, "aarch");
++        sys_data.version = std::string(utsinfo.sysname) + " " + utsinfo.release;
++    } else {
++        // If uname fails, we truly don't know the kernel or OS version
++        sys_data.release = "Unknown";
++        sys_data.version = "Android (Generic)";
++    }
++
++    sys_data.armEmulation = os_get_emulation_status();
++
++    // Explicitly handle unused fields
++    UNUSED_PARAMETER(capabilities.gaming_features);
++}
+-- 
+2.54.0
+
