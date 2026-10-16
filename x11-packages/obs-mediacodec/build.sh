@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/lumaparallax/obs-mediacodec
+TERMUX_PKG_DESCRIPTION="Hardware MediaCodec encoder plugin for OBS Studio"
+TERMUX_PKG_LICENSE="GPL-2.0-or-later"
+TERMUX_PKG_MAINTAINER="lumaparallax <257510328+lumaparallax@users.noreply.github.com>"
+TERMUX_PKG_API_LEVEL=26
+TERMUX_PKG_VERSION="0.1.1"
+TERMUX_PKG_SRCURL="https://github.com/lumaparallax/obs-mediacodec/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=be5deebeda1083becfaafa9f3d2f1813983122e4f5f47e978cae9fdd14baf7fc
+TERMUX_PKG_DEPENDS="obs-studio"
