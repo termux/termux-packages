@@ -9,17 +9,18 @@
 # python of the same version is required. For pip package cross compilation,
 # ideally same version of python is recommended by crossenv.
 termux_setup_build_python() {
+	local _PYTHON_PACKAGE=${1:-python}
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
-		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' python 2>/dev/null)" != "installed" ]] ||
-		[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q python 2>/dev/null)" ]]; then
-			echo "Package 'python is not installed."
+		if [[ "$TERMUX_APP_PACKAGE_MANAGER" = "apt" && "$(dpkg-query -W -f '${db:Status-Status}\n' "$_PYTHON_PACKAGE" 2>/dev/null)" != "installed" ]] ||
+		[[ "$TERMUX_APP_PACKAGE_MANAGER" = "pacman" && ! "$(pacman -Q "$_PYTHON_PACKAGE" 2>/dev/null)" ]]; then
+			echo "Package '$_PYTHON_PACKAGE' is not installed."
 			echo "You can install it with"
 			echo
-			echo "  pkg install python"
+			echo "  pkg install $_PYTHON_PACKAGE"
 			echo
-			echo "  pacman -S python"
+			echo "  pacman -S $_PYTHON_PACKAGE"
 			echo
-			echo "Note that package 'python' is known to be problematic for building on device."
+			echo "Note that package '$_PYTHON_PACKAGE' is known to be problematic for building on device."
 			exit 1
 		fi
 	else
@@ -27,8 +28,8 @@ termux_setup_build_python() {
 		local _PYTHON_SHA256
 		local _PYTHON_FOLDER
 		if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
-			_PYTHON_SRCURL="$(. "$TERMUX_SCRIPTDIR/packages/python/build.sh"; echo "$TERMUX_PKG_SRCURL")"
-			_PYTHON_SHA256="$(. "$TERMUX_SCRIPTDIR/packages/python/build.sh"; echo "$TERMUX_PKG_SHA256")"
+			_PYTHON_SRCURL="$(. "$TERMUX_SCRIPTDIR/packages/$_PYTHON_PACKAGE/build.sh"; echo "$TERMUX_PKG_SRCURL")"
+			_PYTHON_SHA256="$(. "$TERMUX_SCRIPTDIR/packages/$_PYTHON_PACKAGE/build.sh"; echo "$TERMUX_PKG_SHA256")"
 		else # glibc
 			_PYTHON_SRCURL="$(. "$TERMUX_SCRIPTDIR/gpkg/python/build.sh"; echo "$TERMUX_PKG_SRCURL")"
 			_PYTHON_SHA256="$(. "$TERMUX_SCRIPTDIR/gpkg/python/build.sh"; echo "$TERMUX_PKG_SHA256")"
@@ -54,10 +55,9 @@ termux_setup_build_python() {
 			cd "$_PYTHON_FOLDER"
 
 			if [[ "${TERMUX_PACKAGE_LIBRARY}" = "bionic" ]]; then
-				for f in "$TERMUX_SCRIPTDIR"/packages/python/0008-fix-ctypes-util-find_library.patch; do
-					echo "[${FUNCNAME[0]}]: Applying $(basename "$f")"
-					cat "$f" | sed -e "s|@@TERMUX_PKG_API_LEVEL@@|${TERMUX_PKG_API_LEVEL}|g" | patch --silent -p1
-				done
+				local _PYTHON_PATCH="$TERMUX_SCRIPTDIR/packages/$_PYTHON_PACKAGE/0008-fix-ctypes-util-find_library.patch"
+				echo "[${FUNCNAME[0]}]: Applying $(basename "$_PYTHON_PATCH")"
+				sed -e "s|@@TERMUX_PKG_API_LEVEL@@|${TERMUX_PKG_API_LEVEL}|g" "$_PYTHON_PATCH" | patch --silent -p1
 			fi
 
 			# Perform a hostbuild of python. We are kind of doing a minimal build, which
