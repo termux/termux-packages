@@ -1,0 +1,45 @@
+diff --git a/scripts/build/build.mts b/scripts/build/build.mts
+index 79002c7..5c27933 100644
+--- a/scripts/build/build.mts
++++ b/scripts/build/build.mts
+@@ -39,38 +39,11 @@ async function createContext(options: BuildOptions) {
+ }
+ 
+ async function copyVenmic() {
+-    if (process.platform !== "linux") return;
+-
+-    return Promise.all([
+-        copyFile(
+-            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
+-            "./static/dist/venmic-x64.node"
+-        ),
+-        copyFile(
+-            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
+-            "./static/dist/venmic-arm64.node"
+-        )
+-    ]).catch(() => console.warn("Failed to copy venmic. Building without venmic support"));
++    return;
+ }
+ 
+ async function copyLibVesktop() {
+-    if (process.platform !== "linux") return;
+-
+-    try {
+-        await copyFile(
+-            "./packages/libvesktop/build/Release/vesktop.node",
+-            `./static/dist/libvesktop-${process.arch}.node`
+-        );
+-        console.log("Using local libvesktop build");
+-    } catch {
+-        console.log(
+-            "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
+-        );
+-        return Promise.all([
+-            copyFile("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
+-            copyFile("./packages/libvesktop/prebuilds/vesktop-arm64.node", "./static/dist/libvesktop-arm64.node")
+-        ]).catch(() => console.warn("Failed to copy libvesktop. Building without libvesktop support"));
+-    }
++    return;
+ }
+ 
+ await Promise.all([
