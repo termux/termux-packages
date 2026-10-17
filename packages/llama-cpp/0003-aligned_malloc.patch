@@ -1,0 +1,13 @@
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp
+@@ -9,6 +9,10 @@
+ static void * portable_aligned_malloc(size_t align, size_t size) {
+ #ifdef _WIN32
+     return _aligned_malloc(size, align);
++#elif defined(__ANDROID__) && __ANDROID_API__ < 26
++	void *result = nullptr;
++	(void)::posix_memalign(&result, align, size);
++	return result;
+ #else
+     return std::aligned_alloc(align, size);
+ #endif
