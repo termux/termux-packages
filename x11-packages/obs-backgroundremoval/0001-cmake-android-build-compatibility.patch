@@ -1,0 +1,25 @@
+From f3703f23ff9953071cb07f2fae9be80648613fb6 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 13:29:44 +0900
+Subject: [PATCH] cmake android build compatibility
+
+---
+ cmake/common/compiler_common.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/common/compiler_common.cmake b/cmake/common/compiler_common.cmake
+index 06f85ad..d1e3220 100644
+--- a/cmake/common/compiler_common.cmake
++++ b/cmake/common/compiler_common.cmake
+@@ -73,6 +73,6 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 20)
+   list(APPEND _obs_clang_cxx_options -fno-char8_t)
+ endif()
+ 
+-if(NOT DEFINED CMAKE_COMPILE_WARNING_AS_ERROR)
+-  set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
++if(DEFINED CMAKE_COMPILE_WARNING_AS_ERROR)
++  set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
+ endif()
+-- 
+2.56.0
+
