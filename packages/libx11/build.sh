@@ -4,10 +4,9 @@ TERMUX_PKG_DESCRIPTION="X11 client-side library"
 TERMUX_PKG_LICENSE="MIT, X11"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.8.13"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.8.14"
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libX11-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=69606f485c2c07c14ef64f75b7bb326d48587af33795d9ab3e607c0b5f94f11c
+TERMUX_PKG_SHA256=bbc78c46217174655c2b32b138ad119f3ac15f50808b4d0b3a2677a4b1afc950
 TERMUX_PKG_AUTO_UPDATE=true
 # building all reverse dependencies of libx11 requires xorgproto
 # and the x11.pc file of libx11 explicitly marks a dependency on xorgproto
