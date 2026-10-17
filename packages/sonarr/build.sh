@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://sonarr.tv"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.0.20.3014"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="5.0.0.2870"
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=5ee97754ed69f41bccfb6dc00c7f820f76d21526886efd609c99fb28530e138c
+TERMUX_PKG_SHA256=d93c24dff7e24fcf26f082f2b1033de0a74e76519164f618d2b4bf97b46c23b8
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, mono, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -64,7 +63,7 @@ termux_step_pre_configure() {
 	# Build UI
 	export NODE_OPTIONS="--max-old-space-size=4096"
 	yarn install
-	yarn build --env production
+	yarn build
 }
 
 termux_step_make() {
@@ -102,13 +101,16 @@ termux_step_make() {
 
 termux_step_make_install() {
 	# Remove bundled native libs that we want to use from system
-	rm -f build/{libe_sqlite3,libMonoPosixHelper}.so*
+	rm -f build/{libe_sqlite3,libMono.Unix}.so*
 
 	rm -rf "${TERMUX_PREFIX}/lib/sonarr"
 	mkdir -p "${TERMUX_PREFIX}/lib/sonarr"
 
 	# Copy build artifacts
 	cp -r build/* "${TERMUX_PREFIX}/lib/sonarr/"
+
+	# Symlink libMono.Unix.so to system libMonoPosixHelper.so (provided by mono)
+	ln -sf "${TERMUX_PREFIX}/lib/libMonoPosixHelper.so" "${TERMUX_PREFIX}/lib/sonarr/libMono.Unix.so"
 
 	# Copy UI files
 	mkdir -p "${TERMUX_PREFIX}/lib/sonarr/UI"
