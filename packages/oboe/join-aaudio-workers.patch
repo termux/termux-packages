@@ -1,0 +1,371 @@
+diff -uNr a/include/oboe/AudioStream.h b/include/oboe/AudioStream.h
+--- a/include/oboe/AudioStream.h
++++ b/include/oboe/AudioStream.h
+@@ -94,6 +94,21 @@
+      * Close the stream and deallocate any resources from the open() call.
+      */
+     virtual Result close();
++
++    /**
++     * Termux extension: close the stream and wait for its library-created notification and
++     * stop workers, including workers retained by a conversion stream. Ordinary close()
++     * preserves upstream behavior and does not wait for these workers.
++     *
++     * Call from a control thread, never a native/data callback, and hold no lock needed by
++     * a callback. Keep the stream alive until this call returns. This does not wait for
++     * threads created by the application.
++     *
++     * Returns the close() result, including ErrorClosed after waiting for an already-closed
++     * stream. Calls from an Oboe worker return ErrorInvalidState without closing anything.
++     * Other errors retain close()'s native resource semantics.
++     */
++    Result closeAndWaitForCallbacks();
+ 
+     /**
+      * Start the stream. This will block until the stream has been started, an error occurs
+diff -uNr a/src/aaudio/AudioStreamAAudio.cpp b/src/aaudio/AudioStreamAAudio.cpp
+--- a/src/aaudio/AudioStreamAAudio.cpp
++++ b/src/aaudio/AudioStreamAAudio.cpp
+@@ -313,13 +313,12 @@
+         LOGW("%s() stream already closed or closing", __func__); // might happen if there are bugs
+     } else if (sharedStream) {
+         // Handle error on a separate thread using shared pointer.
+-        std::thread t(oboe_aaudio_error_thread_proc_shared, sharedStream, sharedParentStream,
+-                      oboeResult);
+-        t.detach();
++        oboeStream->mWorkerThreads->launch(oboe_aaudio_error_thread_proc_shared,
++                                          sharedStream, sharedParentStream, oboeResult);
+     } else {
+         // Handle error on a separate thread.
+-        std::thread t(oboe_aaudio_error_thread_proc, oboeStream, oboeResult);
+-        t.detach();
++        oboeStream->mWorkerThreads->launch(oboe_aaudio_error_thread_proc,
++                                          oboeStream, oboeResult);
+     }
+ }
+ 
+@@ -684,6 +683,8 @@
+ 
+ Result AudioStreamAAudio::close() {
+     LOGD("%s", __func__);
++    const auto workers = mWorkerThreads;
++    workers->disable();
+     // Always remove the stream from the collection before closing it as after closing, the client
+     // will free the resource of the stream.
+     AAudioStreamCollection::getInstance().removeStream(this);
+@@ -691,28 +692,34 @@
+     // Prevent two threads from closing the stream at the same time and crashing.
+     // This could occur, for example, if an application called close() at the same
+     // time that an onError callback was being executed because of a disconnect.
+-    std::lock_guard<std::mutex> lock(mLock);
+-
+-    AudioStream::close();
+-
+-    AAudioStream *stream = nullptr;
+-    {
+-        // Wait for any methods using mAAudioStream to finish.
+-        std::unique_lock<std::shared_mutex> lock2(mAAudioStreamLock);
+-        // Closing will delete *mAAudioStream so we need to null out the pointer atomically.
+-        stream = mAAudioStream.exchange(nullptr);
+-    }
+-    if (stream != nullptr) {
+-        if (OboeGlobals::areWorkaroundsEnabled()) {
+-            // Make sure we are really stopped. Do it under mLock
+-            // so another thread cannot call requestStart() right before the close.
+-            requestStop_l(stream);
+-            sleepBeforeClose();
+-        }
+-        return static_cast<Result>(mLibLoader->stream_close(stream));
+-    } else {
+-        return Result::ErrorClosed;
+-    }
++    const auto result = [this]() -> Result {
++        std::lock_guard<std::mutex> lock(mLock);
++
++        AudioStream::close();
++
++        AAudioStream *stream = nullptr;
++        {
++            // Wait for any methods using mAAudioStream to finish.
++            std::unique_lock<std::shared_mutex> lock2(mAAudioStreamLock);
++            // Closing deletes *mAAudioStream; clear its pointer atomically.
++            stream = mAAudioStream.exchange(nullptr);
++        }
++        if (stream != nullptr) {
++            if (OboeGlobals::areWorkaroundsEnabled()) {
++                // Stop under mLock so requestStart cannot race native close.
++                requestStop_l(stream);
++                sleepBeforeClose();
++            }
++            return static_cast<Result>(mLibLoader->stream_close(stream));
++        } else {
++            return Result::ErrorClosed;
++        }
++    }();
++    // Ordinary close preserves upstream's asynchronous worker semantics. The
++    // explicit completion operation waits even for an already-closed stream,
++    // after releasing mLock and mAAudioStreamLock.
++    if (WorkerThreadGroup::completionRequested()) workers->join();
++    return result;
+ }
+ 
+ static void oboe_stop_thread_proc(AudioStream *oboeStream) {
+@@ -725,8 +732,7 @@
+     // Prevent multiple stop threads from being launched.
+     if (mStopThreadAllowed.exchange(false)) {
+         // Stop this stream on a separate thread
+-        std::thread t(oboe_stop_thread_proc, this);
+-        t.detach();
++        mWorkerThreads->launch(oboe_stop_thread_proc, this);
+     }
+ }
+ 
+@@ -1119,13 +1125,11 @@
+         LOGW("%s() stream already closed or closing", __func__); // might happen if there are bugs
+     } else if (sharedStream) {
+         // Handle error on a separate thread using shared pointer.
+-        std::thread t(oboe_aaudio_presentation_end_thread_proc_shared, sharedStream,
+-                      sharedParentStream);
+-        t.detach();
++        oboeStream->mWorkerThreads->launch(oboe_aaudio_presentation_end_thread_proc_shared,
++                                          sharedStream, sharedParentStream);
+     } else {
+         // Handle error on a separate thread.
+-        std::thread t(oboe_aaudio_presentation_thread_proc, oboeStream);
+-        t.detach();
++        oboeStream->mWorkerThreads->launch(oboe_aaudio_presentation_thread_proc, oboeStream);
+     }
+ }
+ 
+@@ -1149,16 +1153,15 @@
+         oboeStream->onRoutingChanged(deviceIdsCopy);
+         if (oboeStream->getRoutingCallback() != nullptr) {
+             // Handle routing change on a separate thread using shared pointer.
+-            std::thread t(oboe_aaudio_routing_changed_thread_proc_shared, sharedStream,
+-                          sharedParentStream, deviceIdsCopy);
+-            t.detach();
++            oboeStream->mWorkerThreads->launch(oboe_aaudio_routing_changed_thread_proc_shared,
++                                              sharedStream, sharedParentStream, deviceIdsCopy);
+         }
+     } else {
+         oboeStream->onRoutingChanged(deviceIdsCopy);
+         if (oboeStream->getRoutingCallback() != nullptr) {
+             // Handle routing change on a separate thread.
+-            std::thread t(oboe_aaudio_routing_changed_thread_proc, oboeStream, deviceIdsCopy);
+-            t.detach();
++            oboeStream->mWorkerThreads->launch(oboe_aaudio_routing_changed_thread_proc,
++                                              oboeStream, deviceIdsCopy);
+         }
+     }
+ }
+diff -uNr a/src/aaudio/AudioStreamAAudio.h b/src/aaudio/AudioStreamAAudio.h
+--- a/src/aaudio/AudioStreamAAudio.h
++++ b/src/aaudio/AudioStreamAAudio.h
+@@ -27,6 +27,7 @@
+ #include "oboe/AudioStream.h"
+ #include "oboe/Definitions.h"
+ #include "AAudioLoader.h"
++#include "WorkerThreadGroup.h"
+ 
+ namespace oboe {
+ 
+@@ -194,6 +195,7 @@
+ 
+     std::atomic<bool>    mCallbackThreadEnabled;
+     std::atomic<bool>    mStopThreadAllowed{false};
++    std::shared_ptr<WorkerThreadGroup> mWorkerThreads{std::make_shared<WorkerThreadGroup>()};
+ 
+     // pointer to the underlying 'C' AAudio stream, valid if open, null if closed
+     std::atomic<AAudioStream *> mAAudioStream{nullptr};
+diff -uNr a/src/aaudio/WorkerThreadGroup.h b/src/aaudio/WorkerThreadGroup.h
+--- a/src/aaudio/WorkerThreadGroup.h
++++ b/src/aaudio/WorkerThreadGroup.h
+@@ -0,0 +1,161 @@
++// SPDX-License-Identifier: Apache-2.0
++#ifndef OBOE_WORKER_THREAD_GROUP_H_
++#define OBOE_WORKER_THREAD_GROUP_H_
++
++#include <condition_variable>
++#include <functional>
++#include <list>
++#include <memory>
++#include <mutex>
++#include <thread>
++#include <tuple>
++#include <utility>
++
++namespace oboe {
++
++// Track library-created workers separately from native close so consumers can
++// explicitly await completion. Independent ownership keeps the group alive
++// through worker stream/parent destruction and the wrapper's return.
++class WorkerThreadGroup final : public std::enable_shared_from_this<WorkerThreadGroup> {
++    struct Worker {
++        std::thread thread;
++        bool ready{false};
++        bool completed{false};
++    };
++    using Workers = std::list<std::unique_ptr<Worker>>;
++
++    std::mutex mMutex;
++    std::condition_variable mCompletion;
++    Workers mWorkers;
++    bool mClosing{false};
++    bool mJoining{false};
++    bool mJoined{false};
++    inline static thread_local WorkerThreadGroup *sCurrentGroup{nullptr};
++    inline static thread_local bool sCompletionRequested{false};
++
++    struct Context {
++        WorkerThreadGroup *previous;
++        explicit Context(WorkerThreadGroup *group) : previous{sCurrentGroup} {
++            sCurrentGroup = group;
++        }
++        ~Context() { sCurrentGroup = previous; }
++    };
++
++    void complete(Worker *current) {
++        Workers retired;
++        {
++            const auto lock = std::lock_guard<std::mutex>{mMutex};
++            for (auto it = mWorkers.begin(); it != mWorkers.end();) {
++                auto candidate = it++;
++                if (candidate->get() != current && (*candidate)->completed)
++                    retired.splice(retired.end(), mWorkers, candidate);
++            }
++        }
++        // Reap before marking this worker complete, so two workers cannot
++        // select one another. The completion flag only permits join; join
++        // itself waits through the old wrapper and its trampoline return.
++        for (auto &worker : retired) worker->thread.join();
++        {
++            const auto lock = std::lock_guard<std::mutex>{mMutex};
++            current->completed = true;
++        }
++    }
++
++public:
++    static bool isWorkerThread() noexcept { return sCurrentGroup != nullptr; }
++    static bool completionRequested() noexcept { return sCompletionRequested; }
++
++    class CompletionScope final {
++        const bool previous{sCompletionRequested};
++    public:
++        CompletionScope() noexcept { sCompletionRequested = true; }
++        ~CompletionScope() { sCompletionRequested = previous; }
++        CompletionScope(const CompletionScope &) = delete;
++        CompletionScope &operator=(const CompletionScope &) = delete;
++    };
++
++    ~WorkerThreadGroup() {
++        // Without an external close, the last wrapper may release this group.
++        // All other wrappers have released their strong group references.
++        // Preserve self-close behavior without destroying a joinable self handle.
++        for (auto &worker : mWorkers) {
++            if (!worker->thread.joinable()) continue;
++            if (worker->thread.get_id() == std::this_thread::get_id())
++                worker->thread.detach();
++            else
++                worker->thread.join();
++        }
++    }
++
++    template<typename Procedure, typename... Args>
++    void launch(Procedure procedure, Args... args) {
++        const auto group = shared_from_this();
++        // This outer owner survives rejection and thread-construction failure.
++        // Final stream/parent/callable captures are destroyed after unlocking.
++        auto payload = std::make_shared<std::tuple<Procedure, std::tuple<Args...>>>(
++            std::move(procedure), std::make_tuple(std::move(args)...));
++        auto worker = std::make_unique<Worker>();
++        auto *record = worker.get();
++        {
++            const auto lock = std::lock_guard<std::mutex>{mMutex};
++            if (mClosing) return;
++            mWorkers.push_back(std::move(worker));
++            try {
++                record->thread = std::thread([group, payload, record]() mutable {
++                    {
++                        auto lock = std::unique_lock<std::mutex>{group->mMutex};
++                        group->mCompletion.wait(lock, [record]{ return record->ready; });
++                    }
++                    const auto context = Context{group.get()};
++                    std::apply(std::get<0>(*payload), std::move(std::get<1>(*payload)));
++                    // Keep TLS and group ownership through all stream/parent
++                    // capture destruction, including reentrant self-close.
++                    payload.reset();
++                    group->complete(record);
++                });
++            } catch (...) {
++                mWorkers.pop_back();
++                throw;
++            }
++        }
++        // Drop the launcher's protective payload reference before the wrapper
++        // can run. Its completion mark must follow final payload destruction.
++        payload.reset();
++        {
++            const auto lock = std::lock_guard<std::mutex>{mMutex};
++            record->ready = true;
++        }
++        mCompletion.notify_all();
++        // Joining here could deadlock native close waiting for this native
++        // callback to return. Finished handles are reaped by worker completion.
++    }
++
++    void disable() {
++        const auto lock = std::lock_guard<std::mutex>{mMutex};
++        mClosing = true;
++    }
++
++    void join() {
++        // Workers may close each other's streams. Joining from any Oboe
++        // worker can form a reciprocal wait; explicit completion is external.
++        if (sCurrentGroup != nullptr) return;
++        Workers pending;
++        {
++            auto lock = std::unique_lock<std::mutex>{mMutex};
++            mCompletion.wait(lock, [this]{ return !mJoining; });
++            if (mJoined) return;
++            mJoining = true;
++            pending.splice(pending.end(), mWorkers);
++        }
++        for (auto &worker : pending) worker->thread.join();
++        {
++            const auto lock = std::lock_guard<std::mutex>{mMutex};
++            mJoined = true;
++            mJoining = false;
++        }
++        mCompletion.notify_all();
++    }
++};
++
++} // namespace oboe
++#endif // OBOE_WORKER_THREAD_GROUP_H_
+diff -uNr a/src/common/AudioStream.cpp b/src/common/AudioStream.cpp
+--- a/src/common/AudioStream.cpp
++++ b/src/common/AudioStream.cpp
+@@ -25,6 +25,7 @@
+ 
+ #include "oboe/Utilities.h"
+ #include "OboeDebug.h"
++#include "../aaudio/WorkerThreadGroup.h"
+ 
+ namespace oboe {
+ 
+@@ -47,6 +48,15 @@
+     updateFramesWritten();
+     updateFramesRead();
+     return Result::OK;
++}
++
++Result AudioStream::closeAndWaitForCallbacks() {
++    if (WorkerThreadGroup::isWorkerThread()) return Result::ErrorInvalidState;
++    const auto streamOwner = lockWeakThis();
++    // A synchronous conversion-wrapper close propagates this request to its
++    // native child without changing public class layouts or virtual tables.
++    const auto completion = WorkerThreadGroup::CompletionScope{};
++    return close();
+ }
+ 
+ // Call this from fireDataCallback() if you want to monitor CPU scheduler.
