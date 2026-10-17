@@ -1,0 +1,24 @@
+From 8483dfdaa2abf97ee89ad0e5f337e7b508550c6b Mon Sep 17 00:00:00 2001
+From: pipetto-crypto <pipetto-crypto@gmail.com>
+Date: Mon, 18 Aug 2025 16:11:59 +0200
+Subject: [PATCH] driver: do not use memfd when a tmpdir is set
+
+---
+ src/driver.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/driver.cpp b/src/driver.cpp
+index 5c94dce..581e04a 100644
+--- a/src/driver.cpp
++++ b/src/driver.cpp
+@@ -23,8 +23,8 @@ void *adrenotools_open_libvulkan(int dlopenFlags, int featureFlags, const char *
+         return nullptr;
+     }    
+ 
+-    // Always use memfd on Q+ since it's guaranteed to work
+-    if (android_get_device_api_level() >= 29)
++    // Use memfd on Q+ since it's guaranteed to work, but only if tmpLibDir wasn't set
++    if (android_get_device_api_level() >= 29 && !tmpLibDir)
+         tmpLibDir = nullptr;
+ 
+     // Verify that params for specific features are only passed if they are enabled
