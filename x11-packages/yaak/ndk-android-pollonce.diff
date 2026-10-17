@@ -1,0 +1,45 @@
+--- a/src/looper.rs
++++ b/src/looper.rs
+@@ -169,20 +169,28 @@
+         let mut fd = -1;
+         let mut events = -1;
+         let mut data: *mut c_void = ptr::null_mut();
+-        match unsafe { ffi::ALooper_pollAll(ms, &mut fd, &mut events, &mut data) } {
+-            ffi::ALOOPER_POLL_WAKE => Ok(Poll::Wake),
+-            ffi::ALOOPER_POLL_TIMEOUT => Ok(Poll::Timeout),
+-            ffi::ALOOPER_POLL_ERROR => Err(LooperError),
+-            ident if ident >= 0 => Ok(Poll::Event {
+-                ident,
+-                // SAFETY: Even though this FD at least shouldn't outlive self, a user could have
+-                // closed it after calling add_fd or add_fd_with_callback.
+-                fd: unsafe { BorrowedFd::borrow_raw(fd) },
+-                events: FdEvent::from_bits(events as u32)
+-                    .expect("poll event contains unknown bits"),
+-                data,
+-            }),
+-            _ => unreachable!(),
++        let mut timeout = ms;
++        loop {
++            match unsafe { ffi::ALooper_pollOnce(timeout, &mut fd, &mut events, &mut data) } {
++                ffi::ALOOPER_POLL_WAKE => break Ok(Poll::Wake),
++                ffi::ALOOPER_POLL_CALLBACK => {
++                    timeout = 0;
++                }
++                ffi::ALOOPER_POLL_TIMEOUT => break Ok(Poll::Timeout),
++                ffi::ALOOPER_POLL_ERROR => break Err(LooperError),
++                ident if ident >= 0 => {
++                    break Ok(Poll::Event {
++                        ident,
++                        // SAFETY: Even though this FD at least shouldn't outlive self, a user could have
++                        // closed it after calling add_fd or add_fd_with_callback.
++                        fd: unsafe { BorrowedFd::borrow_raw(fd) },
++                        events: FdEvent::from_bits(events as u32)
++                            .expect("poll event contains unknown bits"),
++                        data,
++                    })
++                }
++                _ => unreachable!(),
++            }
+         }
+     }
+ 

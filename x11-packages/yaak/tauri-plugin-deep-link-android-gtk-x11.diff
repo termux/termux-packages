@@ -1,0 +1,38 @@
+diff -ruN tauri-plugin-deep-link-src-orig/src/lib.rs tauri-plugin-deep-link-src/src/lib.rs
+--- tauri-plugin-deep-link-src-orig/src/lib.rs	2026-09-27 15:40:00.000000000 +0000
++++ tauri-plugin-deep-link-src/src/lib.rs	2026-09-27 15:40:15.000000000 +0000
+@@ -13,14 +13,14 @@
+ 
+ pub use error::{Error, Result};
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ const PLUGIN_IDENTIFIER: &str = "app.tauri.deep_link";
+ 
+ fn init_deep_link<R: Runtime>(
+     app: &AppHandle<R>,
+     api: PluginApi<R, Option<config::Config>>,
+ ) -> crate::Result<DeepLink<R>> {
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     {
+         let _api = api;
+ 
+@@ -84,7 +84,7 @@
+     }
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ mod imp {
+     use tauri::{ipc::Channel, plugin::PluginHandle, AppHandle, Runtime};
+ 
+@@ -159,7 +159,7 @@
+     }
+ }
+ 
+-#[cfg(not(target_os = "android"))]
++#[cfg(any(not(target_os = "android"), target_os = "android"))]
+ mod imp {
+     use std::sync::Mutex;
+     #[cfg(target_os = "linux")]

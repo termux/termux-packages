@@ -1,0 +1,35 @@
+--- a/crates-tauri/yaak-app-client/src/lib.rs
++++ b/crates-tauri/yaak-app-client/src/lib.rs
+@@ -72,6 +72,8 @@
+ mod sync_ext;
+ mod updates;
+ mod uri_scheme;
++// tauri::menu is desktop-only (cfg(desktop) excludes android)
++#[cfg(not(target_os = "android"))]
+ mod window_menu;
+ mod ws_ext;
+ 
+@@ -83,6 +85,14 @@
+ #[cfg(all(not(feature = "cef"), feature = "wry"))]
+ type TauriRuntime = tauri::Wry;
+ 
++// App menu, set_menu() and on_menu_event() are all desktop-only tauri APIs
++// (cfg(desktop) excludes android), so skip the whole menu setup there
++#[cfg(target_os = "android")]
++fn setup_window_menu<R: Runtime>(_win: &WebviewWindow<R>) -> Result<()> {
++    Ok(())
++}
++
++#[cfg(not(target_os = "android"))]
+ fn setup_window_menu<R: Runtime>(win: &WebviewWindow<R>) -> Result<()> {
+     #[allow(unused_variables)]
+     let menu = window_menu::app_menu(win.app_handle())?;
+@@ -1248,6 +1258,8 @@
+ 
+     // Only enable single-instance in production builds. In dev mode, we want to allow
+     // multiple instances for testing and worktree workflows (running multiple branches).
++    // tauri-plugin-single-instance only builds init() for windows/linux/macos, so skip on android.
++    #[cfg(not(target_os = "android"))]
+     if !is_dev() {
+         builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+             // When trying to open a new app instance (common operation on Linux),
