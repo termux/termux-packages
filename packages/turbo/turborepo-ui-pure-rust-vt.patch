@@ -1,0 +1,333 @@
+diff --git a/crates/turborepo-ui/Cargo.toml b/crates/turborepo-ui/Cargo.toml
+index 3296907..3f8db51 100644
+--- a/crates/turborepo-ui/Cargo.toml
++++ b/crates/turborepo-ui/Cargo.toml
+@@ -24,7 +24,6 @@ tui = [
+   "dep:futures",
+   "dep:nix",
+   "dep:ratatui",
+-  "dep:turborepo-ghostty",
+   "dep:which",
+   "dep:clipboard-win",
+   "dep:windows-sys",
+@@ -48,7 +47,6 @@ tokio = { workspace = true }
+ tracing = { workspace = true }
+ turbopath = { workspace = true }
+ turborepo-ci = { workspace = true }
+-turborepo-ghostty = { workspace = true, optional = true }
+ turborepo-log = { workspace = true }
+ turborepo-types = { workspace = true }
+ which = { workspace = true, optional = true }
+diff --git a/crates/turborepo-ui/src/tui/mod.rs b/crates/turborepo-ui/src/tui/mod.rs
+index cb3066f..1642895 100644
+--- a/crates/turborepo-ui/src/tui/mod.rs
++++ b/crates/turborepo-ui/src/tui/mod.rs
+@@ -16,6 +16,7 @@ mod spinner;
+ mod table;
+ mod task;
+ mod term_output;
++mod vt;
+ 
+ pub use app::{run_app, terminal_big_enough};
+ use clipboard::copy_to_clipboard;
+@@ -45,5 +46,5 @@ pub enum Error {
+     #[error("Unable to persist preferences.")]
+     Preferences(#[from] preferences::Error),
+     #[error(transparent)]
+-    Ghostty(#[from] turborepo_ghostty::Error),
++    Ghostty(#[from] vt::Error),
+ }
+diff --git a/crates/turborepo-ui/src/tui/pane.rs b/crates/turborepo-ui/src/tui/pane.rs
+index 8935666..c238e28 100644
+--- a/crates/turborepo-ui/src/tui/pane.rs
++++ b/crates/turborepo-ui/src/tui/pane.rs
+@@ -4,7 +4,7 @@ use ratatui::{
+     text::Line,
+     widgets::{Block, Widget},
+ };
+-use turborepo_ghostty::TerminalWidget;
++use super::vt::TerminalWidget;
+ 
+ use super::{PANE_LEFT_PADDING_WITH_SIDEBAR, TerminalOutput, app::LayoutSections};
+ 
+diff --git a/crates/turborepo-ui/src/tui/term_output.rs b/crates/turborepo-ui/src/tui/term_output.rs
+index 71c0ac1..d79cc36 100644
+--- a/crates/turborepo-ui/src/tui/term_output.rs
++++ b/crates/turborepo-ui/src/tui/term_output.rs
+@@ -1,6 +1,6 @@
+ use std::io::Write;
+ 
+-use turborepo_ghostty as ghostty;
++use super::vt as ghostty;
+ 
+ use super::{
+     Error,
+diff --git a/crates/turborepo-ui/src/tui/vt.rs b/crates/turborepo-ui/src/tui/vt.rs
+new file mode 100644
+index 0000000..e91ca56
+--- /dev/null
++++ b/crates/turborepo-ui/src/tui/vt.rs
+@@ -0,0 +1,263 @@
++//! Pure-Rust stand-in for Ghostty's virtual terminal.
++//!
++//! Environments without a working `zig`/NDK toolchain (e.g. Termux, where
++//! `turborepo-ghostty-sys`'s build script shells out to `zig build` and the
++//! vendored sources reference `__tls_get_addr`, unavailable before API 29)
++//! build the TUI without the `turborepo-ghostty` dependency.
++//!
++//! This module mirrors the surface the TUI relies on (`Parser`, `Terminal`,
++//! `RenderState`, `TerminalWidget`) so the rest of the crate is untouched. It
++//! does not interpret escape sequences; task output is rendered as plain text.
++#![allow(
++    clippy::all,
++    missing_docs,
++    dead_code,
++    reason = "stand-in for the vendored libghostty-vt bindings"
++)]
++
++use ratatui::{buffer::Buffer, layout::Rect, style::Style, widgets::Widget};
++
++/// Fallible result for terminal operations.
++pub type Result<T> = std::result::Result<T, Error>;
++
++/// Errors a terminal operation can produce.
++#[derive(Debug, thiserror::Error)]
++pub enum Error {
++    /// The terminal was in an inconsistent state.
++    #[error("invalid terminal state")]
++    Invalid,
++    /// An underlying I/O operation failed.
++    #[error(transparent)]
++    Io(#[from] std::io::Error),
++}
++
++/// Rendering state. The fallback renders directly from [`Terminal`], so this
++/// carries no data but keeps the call sites unchanged.
++pub struct RenderState;
++
++/// A scrollback buffer of raw terminal output.
++pub struct Terminal {
++    rows: u16,
++    cols: u16,
++    max_scrollback: usize,
++    output: Vec<u8>,
++}
++
++impl Terminal {
++    fn new(rows: u16, cols: u16, max_scrollback: usize) -> Self {
++        Self {
++            rows,
++            cols,
++            max_scrollback,
++            output: Vec::new(),
++        }
++    }
++
++    fn push(&mut self, bytes: &[u8]) {
++        self.output.extend_from_slice(bytes);
++        let budget = self
++            .max_scrollback
++            .saturating_mul(self.cols as usize)
++            .max(1);
++        if self.output.len() > budget {
++            let excess = self.output.len() - budget;
++            self.output.drain(..excess);
++        }
++    }
++
++    fn screen_lines(&self) -> Vec<String> {
++        strip_ansi(&self.output)
++            .split('\n')
++            .map(|line| line.trim_end_matches('\r').to_string())
++            .collect()
++    }
++}
++
++/// Virtual terminal parser. Mirrors `turborepo_ghostty::Parser`.
++pub struct Parser {
++    /// The terminal being driven.
++    pub terminal: Terminal,
++    /// Rendering state paired with `terminal`.
++    pub render_state: RenderState,
++    selection_start: Option<(u16, u16)>,
++    selection_range: Option<(u16, u16, u16, u16)>,
++}
++
++impl Parser {
++    /// Creates a parser with the given viewport and scrollback budget.
++    pub fn new(rows: u16, cols: u16, scrollback_len: usize) -> Self {
++        Self {
++            terminal: Terminal::new(rows, cols, scrollback_len),
++            render_state: RenderState,
++            selection_start: None,
++            selection_range: None,
++        }
++    }
++
++    /// Feeds output into the terminal.
++    pub fn process(&mut self, bytes: &[u8]) {
++        self.terminal.push(bytes);
++    }
++
++    /// Returns the current viewport size.
++    pub fn size(&self) -> Result<(u16, u16)> {
++        Ok((self.terminal.rows, self.terminal.cols))
++    }
++
++    /// Resizes the viewport.
++    pub fn resize(&mut self, rows: u16, cols: u16) -> Result<()> {
++        self.terminal.rows = rows;
++        self.terminal.cols = cols;
++        Ok(())
++    }
++
++    /// Scrolls the viewport. The fallback keeps the whole buffer in view.
++    pub fn scroll_by(&mut self, _up: bool, _magnitude: usize) -> Result<()> {
++        Ok(())
++    }
++
++    /// Scrolls to the top of the buffer.
++    pub fn scroll_to_top(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    /// Scrolls to the bottom of the buffer.
++    pub fn scroll_to_bottom(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    /// Formats the visible screen as bytes.
++    pub fn format_screen_vt(&self) -> Result<Vec<u8>> {
++        Ok(self.terminal.output.clone())
++    }
++
++    /// Clears the current selection.
++    pub fn clear_selection(&mut self) -> Result<()> {
++        self.selection_start = None;
++        self.selection_range = None;
++        Ok(())
++    }
++
++    /// Sets the selection range from two viewport coordinates.
++    pub fn update_selection(
++        &mut self,
++        start_row: u16,
++        start_col: u16,
++        row: u16,
++        col: u16,
++    ) -> Result<()> {
++        self.selection_range = Some((start_row, start_col, row, col));
++        Ok(())
++    }
++
++    /// Returns the text between the selection endpoints, if any.
++    pub fn selected_text(&mut self) -> Result<Option<String>> {
++        let Some((start_row, start_col, end_row, end_col)) = self.selection_range else {
++            return Ok(None);
++        };
++        if start_row != end_row {
++            return Ok(None);
++        }
++        let lines = self.terminal.screen_lines();
++        let line = lines.get(start_row as usize).cloned().unwrap_or_default();
++        Ok(line
++            .get(start_col as usize..=end_col as usize)
++            .map(str::to_string))
++    }
++
++    /// Whether a selection is active.
++    pub fn has_selection(&self) -> bool {
++        self.selection_range.is_some()
++    }
++
++    /// Prepares the terminal for rendering.
++    pub fn prepare_render(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    /// Resets the terminal, discarding all output.
++    pub fn reset(&mut self) {
++        self.terminal.output.clear();
++        self.selection_start = None;
++        self.selection_range = None;
++    }
++}
++
++/// Renders a [`Terminal`] into a ratatui buffer. Mirrors
++/// `turborepo_ghostty::TerminalWidget`.
++pub struct TerminalWidget<'a> {
++    terminal: &'a mut Terminal,
++    render_state: &'a mut RenderState,
++}
++
++impl<'a> TerminalWidget<'a> {
++    /// Pairs a terminal with its rendering state.
++    pub fn new(terminal: &'a mut Terminal, render_state: &'a mut RenderState) -> Self {
++        Self {
++            terminal,
++            render_state,
++        }
++    }
++}
++
++impl Widget for &mut TerminalWidget<'_> {
++    fn render(self, area: Rect, buf: &mut Buffer) {
++        let _ = &self.render_state;
++        for (index, line) in self.terminal.screen_lines().iter().enumerate() {
++            let y = area.y.saturating_add(index as u16);
++            if y >= area.bottom() {
++                break;
++            }
++            buf.set_string(area.x, y, line, Style::default());
++        }
++    }
++}
++
++fn strip_ansi(bytes: &[u8]) -> String {
++    let mut out = String::with_capacity(bytes.len());
++    let mut i = 0;
++    while i < bytes.len() {
++        if bytes[i] == 0x1b {
++            i += 1;
++            if i < bytes.len() && bytes[i] == b'[' {
++                i += 1;
++                while i < bytes.len() && !(0x40..=0x7e).contains(&bytes[i]) {
++                    i += 1;
++                }
++                i += 1;
++            }
++            continue;
++        }
++        out.push(bytes[i] as char);
++        i += 1;
++    }
++    out
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn processes_and_formats_output() {
++        let mut parser = Parser::new(10, 40, 100);
++        parser.process(b"hello\nworld\n");
++        let screen = String::from_utf8(parser.format_screen_vt().unwrap()).unwrap();
++        assert!(screen.contains("hello"));
++        assert!(screen.contains("world"));
++    }
++
++    #[test]
++    fn selection_is_inclusive_and_copied() {
++        let mut parser = Parser::new(10, 40, 100);
++        parser.process(b"hello world\r\n");
++        parser.update_selection(0, 0, 0, 4).unwrap();
++        assert!(parser.has_selection());
++        assert_eq!(parser.selected_text().unwrap().as_deref(), Some("hello"));
++    }
++
++    #[test]
++    fn strips_escape_sequences() {
++        assert_eq!(strip_ansi(b"\x1b[31mred\x1b[0m"), "red");
++    }
++}
