@@ -1,6 +1,6 @@
 --- a/Configurations/15-android.conf
 +++ b/Configurations/15-android.conf
-@@ -184,14 +184,14 @@
+@@ -185,14 +185,14 @@ my %targets = (
          # systems are perfectly capable of executing binaries targeting
          # Froyo. Keep in mind that in the nutshell Android builds are
          # about JNI, i.e. shared libraries, not applications.
@@ -20,7 +20,7 @@
      },
      "android-arm" => {
          ################################################################
-@@ -222,13 +222,13 @@
+@@ -223,13 +223,13 @@ my %targets = (
          # Newer NDK versions reportedly require additional -latomic.
          #
          inherit_from     => [ "android" ],
@@ -35,8 +35,8 @@
 +        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_CHAR",
          asm_arch         => 'aarch64',
          perlasm_scheme   => "linux64",
-     },
-@@ -258,14 +258,14 @@
+         shared_ldflag    => add("-Wl,-z,max-page-size=16384"),
+@@ -260,14 +260,14 @@ my %targets = (
      "android-x86" => {
          inherit_from     => [ "android" ],
          CFLAGS           => add(picker(release => "-fomit-frame-pointer")),
@@ -52,4 +52,4 @@
 +        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_INT",
          asm_arch         => 'x86_64',
          perlasm_scheme   => "elf",
-     },
+         shared_ldflag    => add("-Wl,-z,max-page-size=16384"),

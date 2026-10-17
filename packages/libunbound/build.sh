@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A validating, recursive, caching DNS resolver"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.26.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nlnetlabs.nl/downloads/unbound/unbound-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=35a6dc0e425a9282c3426d9a3043144011bf0534aed4b73ab62c52aee0af1503
 TERMUX_PKG_AUTO_UPDATE=true
@@ -19,6 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_chown=no
 ac_cv_func_chroot=no
 ac_cv_func_getpwnam=no
+--disable-gost
 --enable-event-api
 --enable-ipsecmod
 --enable-linux-ip-local-port-range
