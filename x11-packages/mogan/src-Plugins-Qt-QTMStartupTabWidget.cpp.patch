@@ -1,0 +1,25 @@
+By default the template category list in the startup tab shows the Chinese
+names. As the audience of Termux is mostly English-speaking, show the English
+name first and the original one in parentheses; fall back to whichever of the
+two is available.
+
+--- a/src/Plugins/Qt/QTMStartupTabWidget.cpp
++++ b/src/Plugins/Qt/QTMStartupTabWidget.cpp
+@@ -213,9 +213,15 @@ QTMStartupTabWidget::setupCategoryNavButtons () {
+ 
+   auto categories= templateManager_->categories ();
+   for (const auto& cat : categories) {
+-    QPushButton* btn= create_nav_button (cat.name);
++    QString      name= cat.nameEn.isEmpty () ? cat.name
++                         : cat.name.isEmpty () ? cat.nameEn
++                                               : cat.nameEn + " (" + cat.name + ")";
++    QPushButton* btn = create_nav_button (
++        cat.nameEn.isEmpty () || cat.name.isEmpty ()
++            ? name
++            : cat.nameEn + "\n(" + cat.name + ")");
+     btn->setProperty ("categoryId", cat.id);
+-    btn->setProperty ("name", cat.name);
++    btn->setProperty ("name", name);
+     navButtonGroup_->addButton (btn);
+     categoryLayout_->addWidget (btn);
+     navCategoryBtns_.append (btn);
