@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="python, python-pip"
 TERMUX_PKG_SETUP_PYTHON=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(?=x)"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,--no-as-needed -lpython${TERMUX_PYTHON_VERSION}"
