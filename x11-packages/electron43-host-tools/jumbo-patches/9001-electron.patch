@@ -1,0 +1,31 @@
+From ba646fbe7bebb0debfb6bb271573352d20ccccc4 Mon Sep 17 00:00:00 2001
+From: Chongyun Lee <licy183@termux.dev>
+Date: Sat, 10 May 2025 02:42:36 +0800
+Subject: [PATCH] electron jumbo
+
+Temporarily disable jumbo build in `//electron` as `node_includes.h` breaks it
+
+--- a/third_party/blink/renderer/platform/BUILD.gn
++++ b/third_party/blink/renderer/platform/BUILD.gn
+@@ -1700,6 +1700,9 @@
+ 
+     # FIXME(chongyun): scoped_refptr?
+     "graphics/canvas_resource_dispatcher.cc",
++
++    # Conflict with //electron:electron_lib
++    "//electron/shell/renderer/electron_smooth_round_rect.cc",
+   ]
+ 
+   if (is_mac) {
+diff --git a/gin/BUILD.gn b/gin/BUILD.gn
+index ef288ce49b..9acefb179a 100644
+--- a/gin/BUILD.gn
++++ b/gin/BUILD.gn
+@@ -84,6 +84,7 @@ jumbo_component("gin") {
+   ]
+   jumbo_excluded_sources = [
+     "converter.cc", # Fail to compile
++    "wrapper_info.cc", # Conflicts with //electron:electron_lib
+   ]
+ 
+   if (use_partition_alloc) {

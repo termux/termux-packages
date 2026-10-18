@@ -1,0 +1,12 @@
+We pass `--no-history` to gclient, so there will be no version for electron.
+--- a/electron/script/get-git-version.py
++++ b/electron/script/get-git-version.py
+@@ -20,7 +20,7 @@
+ 
+ try:
+   output = subprocess.check_output(
+-      ['git', 'describe', '--tags', '--abbrev=0'],
++      ['cat', 'ELECTRON_VERSION'],
+       cwd=os.path.abspath(os.path.join(os.path.dirname(__file__), '..')),
+       stderr=subprocess.PIPE,
+       universal_newlines=True)
