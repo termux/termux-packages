@@ -1,5 +1,3 @@
-diff --git a/CMake/dcmtkMacros.cmake b/CMake/dcmtkMacros.cmake
-index bd35469..23016c8 100644
 --- a/CMake/dcmtkMacros.cmake
 +++ b/CMake/dcmtkMacros.cmake
 @@ -11,7 +11,7 @@ function(DCMTK_ADD_TESTS MODULE)
@@ -11,11 +9,9 @@ index bd35469..23016c8 100644
                  set(TEST_COMMAND "${ANDROID_TEMPORARY_FILES_LOCATION}/${MODULE}_tests")
                  set(MODULE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MODULE}_tests${CMAKE_EXECUTABLE_SUFFIX}")
                  list(APPEND DCMTK_TEST_EXECUTABLE_PATH "${MODULE_PATH}")
-diff --git a/CMake/dcmtkPrepare.cmake b/CMake/dcmtkPrepare.cmake
-index cfcfa44..ef94021 100644
 --- a/CMake/dcmtkPrepare.cmake
 +++ b/CMake/dcmtkPrepare.cmake
-@@ -280,10 +280,6 @@ if(CMAKE_CROSSCOMPILING)
+@@ -296,10 +296,6 @@ if(CMAKE_CROSSCOMPILING)
    if(WIN32)
      include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkUseWine.cmake")
      DCMTK_SETUP_WINE()
@@ -26,7 +22,7 @@ index cfcfa44..ef94021 100644
    endif()
  endif()
  
-@@ -300,10 +296,6 @@ include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkMacros.cmake")
+@@ -316,10 +312,6 @@ include("${DCMTK_CMAKE_INCLUDE}CMake/dcmtkMacros.cmake")
  
  if(CMAKE_CROSSCOMPILING)
    unset(DCMTK_UNIT_TESTS_UNSUPPORTED_WARN_ONCE CACHE)
@@ -37,8 +33,6 @@ index cfcfa44..ef94021 100644
  endif()
  
  #-----------------------------------------------------------------------------
-diff --git a/CMake/dcmtkTryRun.cmake b/CMake/dcmtkTryRun.cmake
-index 5786728..dd7b937 100644
 --- a/CMake/dcmtkTryRun.cmake
 +++ b/CMake/dcmtkTryRun.cmake
 @@ -41,26 +41,6 @@ function(DCMTK_TRY_RUN_CROSS RUN_RESULT_VAR COMPILE_RESULT_VAR bindir srcfile)
@@ -68,11 +62,9 @@ index 5786728..dd7b937 100644
          else()
              message(WARNING "Emulation for your target platform is not available, please fill in the required configure test results manually.")
              try_run("${RUN_RESULT_VAR}" "${COMPILE_RESULT_VAR}" "${bindir}" "${srcfile}" ${ARGN})
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d6c8ad9..663f2b7 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -58,8 +58,6 @@ configure_file("${DCMTK_SOURCE_DIR}/CMake/osconfig.h.in"
+@@ -71,8 +71,6 @@ configure_file("${DCMTK_SOURCE_DIR}/CMake/osconfig.h.in"
  if(CMAKE_CROSSCOMPILING)
    if(WIN32)
      set(DCMTK_RUN_CTEST_SCRIPT "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/dcmtkCTestRunWine.cmake" CACHE INTERNAL "path to the CMake script for launching a unit test as a detached Wine process in the prepared wineprefix")
@@ -81,7 +73,7 @@ index d6c8ad9..663f2b7 100644
    elseif(NOT CMAKE_CROSSCOMPILING_EMULATOR)
      message(WARNING "Emulation for your target platform is not available, CTest will not be able to execute the unit tests!")
    endif()
-@@ -120,7 +120,7 @@ if(CMAKE_CROSSCOMPILING)
+@@ -139,7 +137,7 @@ if(CMAKE_CROSSCOMPILING)
      configure_file("${DCMTK_SOURCE_DIR}/CMake/CTest/dcmtkCTestRunWine.cmake.in"
        "${DCMTK_RUN_CTEST_SCRIPT}" ESCAPE_QUOTES @ONLY
      )
