@@ -1,0 +1,176 @@
+From fff410c3939c84ba63449df4fb282339b50e8a5d Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 15:14:47 +0200
+Subject: [PATCH] um/arm64: derive the bionic symbol rename list at link time
+
+Which kernel symbols collide with the target libc is a property of that
+libc, not of this tree, and a list fixed at one NDK version shipped a
+link failure to everyone on another:
+
+	ld.lld: error: duplicate symbol: sched_setattr
+	ld.lld: error: duplicate symbol: sync_file_range
+
+NDK r27c's bionic has no sched_setattr at all, so no amount of testing
+against it would have found this. Compute the intersection against the
+libc actually being linked, and add whatever the checked-in list does
+not already cover.
+
+Both halves of the set matter and they fail differently. A name libc
+also defines is a duplicate-symbol error, loud and immediate. A name
+libc merely references binds silently to the kernel's definition -- that
+was sched_getaffinity, where bionic's startup reached the kernel's
+implementation and dereferenced a task_struct that does not exist yet,
+for a SIGSEGV before main() with no output at all.
+
+The checked-in list stays as the explanation, and as the fallback for a
+build where nm or libc.a cannot be found. It also gains the five names
+this config and r27c do collide on: running the derivation against the
+previous list adds exactly bsearch, strcat, strncat, strspn and
+sync_file_range, which is the check that it works. A rename for a name
+the kernel does not define is a no-op, so listing one that some config
+leaves out costs nothing.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/bionic-syms.redef | 26 +++++++++++
+ scripts/link-vmlinux.sh         | 76 ++++++++++++++++++++++++++++-----
+ 2 files changed, 92 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/um/bionic-syms.redef b/arch/arm64/um/bionic-syms.redef
+index 446e8e37fa8f6..c4a0aeec97eb8 100644
+--- a/arch/arm64/um/bionic-syms.redef
++++ b/arch/arm64/um/bionic-syms.redef
+@@ -15,10 +15,25 @@
+ # BPF_FUNC_kernel_snprintf and CONFIG_BPF_SYSCALL will not build. objcopy
+ # renames definitions and references together and cannot make that mistake.
+ #
++# This file is no longer the whole answer. scripts/link-vmlinux.sh computes the
++# same intersection against the libc actually being linked and adds whatever it
++# finds that is not already here, because the set depends on the libc and not on
++# this tree: NDK r27c's bionic has no sched_setattr, newer ones do, and a list
++# fixed at the version I happened to build with shipped
++#
++#	ld.lld: error: duplicate symbol: sched_setattr
++#	ld.lld: error: duplicate symbol: sync_file_range
++#
++# to anyone using a different NDK. What remains here is the explanation, and the
++# fallback for a build where nm or libc.a cannot be found.
++#
+ # Derived, not guessed:
+ #   llvm-nm --undefined-only libc.a                > A
+ #   llvm-nm --defined-only --extern-only vmlinux.a > B
+ #   comm -12 A B
++#
++# and the same again with --defined-only on both sides, which is the set that
++# fails loudly as a duplicate symbol rather than quietly as a bad binding.
+ snprintf kernel_snprintf
+ vsnprintf kernel_vsnprintf
+ sprintf kernel_sprintf
+@@ -40,3 +55,14 @@ strlcat kernel_strlcat
+ strpbrk kernel_strpbrk
+ strsep kernel_strsep
+ strstr kernel_strstr
++
++# Defined by both sides, so these are the ones that stop the link outright.
++# A rename for a name the kernel does not define is a no-op, so listing one
++# that a given config leaves out costs nothing.
++bsearch kernel_bsearch
++strcat kernel_strcat
++strncat kernel_strncat
++strspn kernel_strspn
++sync_file_range kernel_sync_file_range
++sched_setattr kernel_sched_setattr
++sched_getattr kernel_sched_getattr
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 27feafdaf99f2..a890aa83d4f24 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -78,22 +78,78 @@ vmlinux_link()
+ 	objs="${objs} init/version-timestamp.o"
+ 
+ 	if [ "${SRCARCH}" = "um" ]; then
+-		# Rename the kernel symbols that the target libc also references,
++		# Rename the kernel symbols that the target libc also uses,
+ 		# before it gets a chance to bind to them. Doing it here rather
+ 		# than with -D during compilation keeps the preprocessor out of
+ 		# it: these names also occur as bare tokens that other headers
+ 		# paste into identifiers, and rewriting those breaks builds in
+ 		# places that have nothing to do with libc. See the list itself
+ 		# for which names and why.
+-		if [ -n "${UM_REDEF_SYMS}" ] && [ -f "${UM_REDEF_SYMS}" ]; then
+-			for a in ${objs} ${libs}; do
+-				case "${a}" in
+-				*.a|*.o)
+-					${OBJCOPY} --redefine-syms="${UM_REDEF_SYMS}" \
+-						"${a}" || exit 1
+-					;;
+-				esac
+-			done
++		#
++		# The list is derived here rather than only read from the file,
++		# because which names collide is a property of the libc being
++		# linked against and not of this tree. NDK r27c's bionic has no
++		# sched_setattr, newer ones do, so a build that worked shipped
++		# a link failure to anyone on a different NDK:
++		#
++		#	ld.lld: error: duplicate symbol: sched_setattr
++		#	ld.lld: error: duplicate symbol: sync_file_range
++		#
++		# Deriving it means a new libc adds a rename instead of a bug
++		# report. The checked-in file stays as the explanation and as
++		# the fallback when nm or libc.a cannot be found.
++		#
++		# Both halves matter and they fail differently. A name libc
++		# DEFINES is a duplicate-symbol error, loud and immediate. A
++		# name libc only REFERENCES silently binds to the kernel's
++		# definition -- that was sched_getaffinity, where bionic's
++		# startup called into the kernel's implementation and touched a
++		# task_struct that does not exist yet, for a SIGSEGV before
++		# main() with no output at all.
++		if [ -n "${UM_REDEF_SYMS}" ]; then
++			um_redef=.tmp_um_redef_syms
++			: > "${um_redef}"
++			if [ -f "${UM_REDEF_SYMS}" ]; then
++				sed -e 's/#.*//' -e '/^[[:space:]]*$/d' \
++					"${UM_REDEF_SYMS}" > "${um_redef}"
++			fi
++
++			um_libc=$(${CC} ${KBUILD_CFLAGS} -print-file-name=libc.a \
++				  2>/dev/null)
++			if [ -n "${NM}" ] && [ -f "${um_libc}" ]; then
++				# Anything the kernel defines...
++				${NM} --defined-only --extern-only \
++					${objs} ${libs} 2>/dev/null |
++					awk '$2 ~ /^[TWDBR]$/ { print $3 }' |
++					sort -u > .tmp_um_kdef
++				# ...that libc defines or references. Undefined
++				# entries print as "U name", defined ones as
++				# "addr T name"; archive member headers end in
++				# ':' and match neither.
++				${NM} "${um_libc}" 2>/dev/null |
++					awk '$1 == "U" { print $2 }
++					     $2 ~ /^[TWDBR]$/ { print $3 }' |
++					sort -u > .tmp_um_libc
++				comm -12 .tmp_um_kdef .tmp_um_libc |
++				while read -r sym; do
++					grep -q "^${sym}[[:space:]]" \
++						"${um_redef}" && continue
++					echo "${sym} kernel_${sym}"
++				done >> "${um_redef}"
++				rm -f .tmp_um_kdef .tmp_um_libc
++			fi
++
++			if [ -s "${um_redef}" ]; then
++				for a in ${objs} ${libs}; do
++					case "${a}" in
++					*.a|*.o)
++						${OBJCOPY} \
++						  --redefine-syms="${um_redef}" \
++						  "${a}" || exit 1
++						;;
++					esac
++				done
++			fi
+ 		fi
+ 
+ 		wl=-Wl,

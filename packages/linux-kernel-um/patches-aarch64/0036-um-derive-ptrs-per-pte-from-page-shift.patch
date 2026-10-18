@@ -1,0 +1,73 @@
+From f235346e267ba8e326e437fa19d3cfc2baf42607 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 03:15:29 +0200
+Subject: [PATCH] um: derive PTRS_PER_PTE from PAGE_SHIFT
+
+PTRS_PER_PTE is how many pages one PMD covers, so it is
+PMD_SIZE >> PAGE_SHIFT and cannot be a literal. It was 512, which is
+correct at 4K pages and four times too large at 16K.
+
+Generic mm reads PTRS_PER_PTE as "entries belonging to this PMD".
+finish_fault() bounds a large folio's PTE run with it, so an oversized
+value permits a run four times longer than the PMD owns and set_ptes()
+writes past that window, into slots no lookup for those addresses will
+consult and zap_pte_range() will never free -- after the rmap and rss
+counters have already counted them. The guest then re-faults forever on
+those addresses and prints "Bad rss-counter state" as each process
+exits. There is no out-of-bounds access, so it is silent.
+
+ext4 makes it reachable rather than theoretical: it enables large folios
+on every regular file, and at 16K pages any folio of order 7 or above
+straddles a PMD.
+
+The upper three levels stay literal; their invariants already hold at
+both page sizes. Add a static_assert for the one that did not.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/asm/pgtable-4level.h | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/arch/um/include/asm/pgtable-4level.h b/arch/um/include/asm/pgtable-4level.h
+index 7a271b7b83d2b..ae109ff909546 100644
+--- a/arch/um/include/asm/pgtable-4level.h
++++ b/arch/um/include/asm/pgtable-4level.h
+@@ -35,11 +35,37 @@
+  * entries per page directory level
+  */
+ 
+-#define PTRS_PER_PTE 512
++/*
++ * PTRS_PER_PTE is how many pages one PMD covers, so it follows PAGE_SHIFT and
++ * cannot be a literal.
++ *
++ * At 4 KB pages this is 2 MB >> 12 = 512, exactly what the literal said. At
++ * 16 KB it is 128, and the literal was four times too large -- with real
++ * consequences, because generic mm reads PTRS_PER_PTE as "entries belonging to
++ * this PMD". finish_fault() bounds a large folio's PTE run with it, so a run
++ * four times too long was permitted and set_ptes() wrote past the window this
++ * PMD actually owns, into slots no lookup for those addresses will ever
++ * consult and zap_pte_range() will never free -- while the rmap and rss
++ * counters had already counted them. The result is a guest that re-faults
++ * forever on those addresses and prints "Bad rss-counter state" as each
++ * process exits. Silent, not a crash: the stray index still lands inside the
++ * page-table page.
++ *
++ * ext4 makes this reachable rather than theoretical: it enables large folios
++ * on every regular file, and any folio of order 7 or above straddles a PMD at
++ * 16 KB pages.
++ *
++ * The upper three levels stay literal because their invariants already hold at
++ * both page sizes: 512 * PMD_SIZE == PUD_SIZE and so on up.
++ */
++#define PTRS_PER_PTE (1UL << (PMD_SHIFT - PAGE_SHIFT))
+ #define PTRS_PER_PMD 512
+ #define PTRS_PER_PUD 512
+ #define PTRS_PER_PGD 512
+ 
++/* The invariant the literal used to break. */
++static_assert(PTRS_PER_PTE == (PMD_SIZE >> PAGE_SHIFT));
++
+ #define USER_PTRS_PER_PGD ((TASK_SIZE + (PGDIR_SIZE - 1)) / PGDIR_SIZE)
+ 
+ #define pte_ERROR(e) \

@@ -1,0 +1,103 @@
+From 132819f10a89a867d058718b412c9c07ef35b4d9 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 02:14:20 +0200
+Subject: [PATCH] um: arm64: tolerate stub signals while stepping off a syscall
+ stop
+
+The step that gets off a syscall stop can be interrupted before it
+happens: the stub is a real process and can be stopped for SIGALRM or
+SIGWINCH at that point, which is why wait_stub_done() has tolerated exactly
+those two signals all along.
+
+As written, anything other than the expected trap called fatal_sigsegv(),
+so a SIGALRM landing in that window would have taken the whole guest down.
+Drop the signal and step again instead, bounded so a stub that will never
+trap still fails rather than spins. Dropping is right here: neither signal
+is for the guest, and the stub installs no handler for either in ptrace
+mode, so delivering one would kill it.
+
+Found by review rather than by a failure, which is the reason for the
+bound: this window is narrow enough that testing would not have found it
+reliably either.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/os-Linux/skas/process.c | 65 +++++++++++++++++++++------------
+ 1 file changed, 42 insertions(+), 23 deletions(-)
+
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index cb8b693fdefef..72a9405c8c534 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -699,29 +699,48 @@ void userspace(struct uml_pt_regs *regs)
+ 			if (WIFSTOPPED(status) &&
+ 			    WSTOPSIG(status) == (SIGTRAP | 0x80)) {
+ 				unsigned long hidden[MAX_REG_NR];
+-				int sstatus;
+-
+-				if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0)) {
+-					printk(UM_KERN_ERR "%s - failed to step off a syscall stop, errno = %d\n",
+-					       __func__, errno);
+-					fatal_sigsegv();
+-				}
+-
+-				CATCH_EINTR(err = waitpid(pid, &sstatus,
+-							  WUNTRACED | __WALL));
+-				if (err < 0) {
+-					printk(UM_KERN_ERR "%s - wait after step failed, errno = %d\n",
+-					       __func__, errno);
+-					fatal_sigsegv();
+-				}
+-
+-				/*
+-				 * Anything else means the assumption above no
+-				 * longer holds. Fail loudly rather than run a
+-				 * guest on registers that are quietly wrong.
+-				 */
+-				if (!WIFSTOPPED(sstatus) ||
+-				    WSTOPSIG(sstatus) != SIGTRAP) {
++				int sstatus, tries = 0;
++
++				while (1) {
++					if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0)) {
++						printk(UM_KERN_ERR "%s - failed to step off a syscall stop, errno = %d\n",
++						       __func__, errno);
++						fatal_sigsegv();
++					}
++
++					CATCH_EINTR(err = waitpid(pid, &sstatus,
++								  WUNTRACED | __WALL));
++					if (err < 0) {
++						printk(UM_KERN_ERR "%s - wait after step failed, errno = %d\n",
++						       __func__, errno);
++						fatal_sigsegv();
++					}
++
++					if (WIFSTOPPED(sstatus) &&
++					    WSTOPSIG(sstatus) == SIGTRAP)
++						break;
++
++					/*
++					 * The stub can be interrupted here, and
++					 * wait_stub_done() tolerates the same two
++					 * signals for the same reason. Neither is
++					 * for the guest -- the stub installs no
++					 * handler for either in ptrace mode, so
++					 * delivering one would kill it -- and the
++					 * step has not happened yet, so drop the
++					 * signal and step again.
++					 */
++					if (WIFSTOPPED(sstatus) &&
++					    ((1 << WSTOPSIG(sstatus)) & STUB_SIG_MASK) &&
++					    ++tries < 16)
++						continue;
++
++					/*
++					 * Anything else means the assumption
++					 * above no longer holds. Fail loudly
++					 * rather than run a guest on registers
++					 * that are quietly wrong.
++					 */
+ 					printk(UM_KERN_ERR "%s - unexpected status 0x%x stepping off a syscall stop\n",
+ 					       __func__, sstatus);
+ 					fatal_sigsegv();

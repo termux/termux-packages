@@ -1,0 +1,97 @@
+From 257d23eed9ae5171222bb12eac3063496f78a452 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 17 Oct 2026 14:26:26 +0200
+Subject: [PATCH] um: give libc back what it allocated inside physical memory
+
+__wrap_free() decides who owns a pointer by where it points, and
+everything between uml_physmem and high_physmem is taken to be kmalloc's.
+Not all of it is. The range starts at the kernel image, and the brk heap
+right after the image is inside it too: whatever host libc served from
+there before kmalloc_ok was set is libc's, and kfree() on it hands
+reserved pages to the page allocator. Reported on low-end Samsung
+devices.
+
+Those pages are told apart by being reserved -- setup_physmem() reserves
+the image and the brk area, and the page allocator never returns them --
+so ask the page before freeing: a reserved one goes to __real_free().
+
+The check is made only inside the physical-memory branch.
+virt_to_page() of an address outside physical memory is not a struct
+page, and free() is called with those too -- every libc pointer from
+mmap -- so testing the page first, for every pointer, reads memory that
+is not mem_map.
+
+Whether this path is reached depends on the libc's allocator. NDK r27c's
+bionic uses scudo, which never calls sbrk(), so in testing under an
+arm64 QEMU host it was not taken and the boot was unchanged; an allocator
+that can fall back to the brk heap is what makes it matter.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+Co-authored-by: mirivan
+---
+ arch/um/include/shared/kern_util.h |  2 ++
+ arch/um/kernel/um_arch.c           | 14 ++++++++++++++
+ arch/um/os-Linux/main.c            | 17 +++++++++++++++--
+ 3 files changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/arch/um/include/shared/kern_util.h b/arch/um/include/shared/kern_util.h
+index 9812efd14ec0e..84332678244c2 100644
+--- a/arch/um/include/shared/kern_util.h
++++ b/arch/um/include/shared/kern_util.h
+@@ -67,4 +67,6 @@ void um_idle_sleep(void);
+ 
+ void kasan_map_memory(void *start, size_t len);
+ 
++extern int reserved_address(void *addr);
++
+ #endif
+diff --git a/arch/um/kernel/um_arch.c b/arch/um/kernel/um_arch.c
+index 88b7ed3895378..a7098d59ae1f2 100644
+--- a/arch/um/kernel/um_arch.c
++++ b/arch/um/kernel/um_arch.c
+@@ -624,3 +624,17 @@ static int init_pm_wake_signal(void)
+ 
+ late_initcall(init_pm_wake_signal);
+ #endif
++
++/*
++ * Is the page under this physical-memory address reserved -- the kernel image
++ * or the brk heap after it, which the page allocator never hands out?
++ *
++ * Only meaningful for an address inside physical memory, and only once
++ * mem_map is set up: virt_to_page() of anything else is not a struct page.
++ */
++int reserved_address(void *addr)
++{
++	struct page *page = virt_to_page(addr);
++
++	return PageReserved(page);
++}
+diff --git a/arch/um/os-Linux/main.c b/arch/um/os-Linux/main.c
+index 7e114862a7235..1d7d00d3a9f07 100644
+--- a/arch/um/os-Linux/main.c
++++ b/arch/um/os-Linux/main.c
+@@ -254,8 +254,21 @@ void __wrap_free(void *ptr)
+ 	 */
+ 
+ 	if ((addr >= uml_physmem) && (addr < high_physmem)) {
+-		if (kmalloc_ok)
+-			kfree(ptr);
++		/*
++		 * Not everything in physical memory came from kmalloc. Host
++		 * libc can serve allocations made before kmalloc_ok from the
++		 * brk heap just past the kernel image, and that is inside
++		 * physical memory too -- reserved, so the page allocator never
++		 * hands it out, which is how such a pointer is told apart.
++		 * kfree() on one corrupts the kernel heap. The check is only
++		 * made here, where virt_to_page() is valid for the address.
++		 */
++		if (kmalloc_ok) {
++			if (reserved_address(ptr))
++				__real_free(ptr);
++			else
++				kfree(ptr);
++		}
+ 	}
+ 	else if ((addr >= start_vm) && (addr < end_vm)) {
+ 		if (kmalloc_ok)

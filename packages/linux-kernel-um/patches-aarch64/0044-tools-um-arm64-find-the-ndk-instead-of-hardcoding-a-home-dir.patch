@@ -1,0 +1,106 @@
+From c03a93b43a939008933d7d44566cd06dd0e987fe Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 15:14:47 +0200
+Subject: [PATCH] tools/um-arm64: find the NDK instead of hardcoding a home
+ directory
+
+The script opened with
+
+	TREE=${TREE:-/root/mlu-arm64/linux}
+	NDK=${NDK:-/tmp/ndk/android-ndk-r27c}
+
+and wrote its compiler shim into that same tree, which tells a reader
+nothing except that it was written on somebody else's machine. The first
+question anyone asked about it was what those paths are.
+
+Nothing here needs root or a fixed location. Derive the kernel tree from
+where the script is -- it sits at <repo>/harness in the standalone tree
+and at tools/um-arm64/harness inside a kernel tree, so recognise both --
+put the shim in the build directory where it belongs, and look for the
+NDK in $NDK, the two variables Google's own tooling sets, and the usual
+install paths. If none of them has a clang, name all of them, rather
+than reporting one path that nobody set.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ tools/um-arm64/harness/build-bionic.sh | 55 +++++++++++++++++++++-----
+ 1 file changed, 45 insertions(+), 10 deletions(-)
+
+diff --git a/tools/um-arm64/harness/build-bionic.sh b/tools/um-arm64/harness/build-bionic.sh
+index dd125e11f40df..f9d17c6ea5787 100644
+--- a/tools/um-arm64/harness/build-bionic.sh
++++ b/tools/um-arm64/harness/build-bionic.sh
+@@ -13,20 +13,55 @@
+ # script does differently from build-android.sh is aim the compiler at Android,
+ # which it does by shimming --target on after kbuild's own -- clang takes the
+ # last one. Overriding CC instead would turn off kbuild's compiler probing.
++#
++# Every path below is derived from where this script actually is, or taken from
++# the environment. It used to hardcode one particular home directory, which
++# told anyone else reading it very little:
++#
++#   TREE=${TREE:-/root/mlu-arm64/linux}
++#
++# Nothing here wants to be root and nothing wants a specific location. Clone
++# anywhere, run it from there.
+ set -uo pipefail
+ 
+-TREE=${TREE:-/root/mlu-arm64/linux}
+-ART=${ART:-/root/mlu-arm64/artifacts}
+-NDK=${NDK:-/tmp/ndk/android-ndk-r27c}
+-# 30 is the oldest level whose bionic declares everything UML uses directly:
+-# statx (30), getrandom (28), futimes (26). The phone is API 35.
+-API=${API:-30}
++HERE=$(cd "$(dirname "$0")" && pwd)
++# The harness lives at <repo>/harness in this tree and at
++# <linux>/tools/um-arm64/harness when imported into a kernel tree; the kernel
++# source is the parent of whichever one this is.
++if [ -f "$HERE/../linux/Makefile" ]; then
++    TREE=${TREE:-$(cd "$HERE/.." && pwd)/linux}      # <repo>/harness
++elif [ -f "$HERE/../../../Makefile" ]; then
++    TREE=${TREE:-$(cd "$HERE/../../.." && pwd)}      # <linux>/tools/um-arm64/harness
++else
++    TREE=${TREE:-$(cd "$HERE/.." && pwd)}
++fi
++if [ ! -f "$TREE/Makefile" ]; then
++    echo "build-bionic.sh: no kernel tree at $TREE (set TREE=)" >&2
++    exit 2
++fi
++
++ART=${ART:-$TREE/../artifacts}
++API=${API:-30}   # oldest bionic declaring all UML uses: statx(30), getrandom(28)
+ JOBS=${JOBS:-$(nproc)}
+-O=${O:-/tmp/umarm-build-bionic}
++O=${O:-${TMPDIR:-/tmp}/umarm-build-bionic}
+ 
+-TOOL=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin
++# Find the NDK rather than insisting on one path. $NDK and the two variables
++# Google's own tooling sets are checked first, then the usual install
++# locations, newest last so the newest wins.
++if [ -z "${NDK:-}" ]; then
++    for c in "${ANDROID_NDK_HOME:-}" "${ANDROID_NDK_ROOT:-}" \
++             "$HOME"/Android/Sdk/ndk/* "$HOME"/Library/Android/sdk/ndk/* \
++             /usr/lib/android-ndk /opt/android-ndk* \
++             "${TMPDIR:-/tmp}"/ndk/android-ndk-*; do
++        [ -n "$c" ] && [ -x "$c/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" ] \
++            && NDK=$c
++    done
++fi
++TOOL=${NDK:-}/toolchains/llvm/prebuilt/linux-x86_64/bin
+ if [ ! -x "$TOOL/clang" ]; then
+-    echo "no NDK at $NDK (set NDK=)" >&2
++    echo "build-bionic.sh: no Android NDK found. Set NDK=/path/to/android-ndk-rXX" >&2
++    echo "  looked at \$NDK, \$ANDROID_NDK_HOME, \$ANDROID_NDK_ROOT," >&2
++    echo "  ~/Android/Sdk/ndk/*, /opt/android-ndk*, ${TMPDIR:-/tmp}/ndk/*" >&2
+     exit 2
+ fi
+ 
+@@ -34,7 +69,7 @@ export KBUILD_BUILD_TIMESTAMP=${KBUILD_BUILD_TIMESTAMP:-"Thu Jan  1 00:00:00 UTC
+ export KBUILD_BUILD_USER=um
+ export KBUILD_BUILD_HOST=arm64
+ 
+-SHIM=/root/mlu-arm64/.bionic-shim
++SHIM=${SHIM:-$O/.bionic-shim}
+ mkdir -p "$SHIM"
+ cat > "$SHIM/clang" <<EOF
+ #!/bin/sh

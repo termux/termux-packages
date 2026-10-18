@@ -1,0 +1,870 @@
+From 0489ef6e4a49ec0bc9af57a9edb33d3453b1061b Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 15:10:08 +0200
+Subject: [PATCH] um: scale the fault-around default with PAGE_SIZE
+
+The anonymous fault-around window ramps 0 -> 4 -> 16 -> 32 pages, capped by
+a size given in bytes so that one default does not mean four times the
+memory on a 16K guest as on a 4K one. That default was a fixed 128K, which
+is 32 pages at 4K -- the whole ramp -- but only 8 pages at 16K, so a 16K
+guest stopped two steps short of it.
+
+Tie the default to the top of the ramp instead. On a 4K guest that is 128K,
+exactly what it was, so only the larger page sizes change.
+
+Measured on a Poco F3 (Snapdragon 870), 16K guest, seccomp mode, medians of
+7 rounds with the three windows interleaved inside one run, us per page:
+
+		  native   prefault=0   128K/8 pages   512K/32 pages
+	fault      1.540       19.076         11.791          10.913
+
+Most of the win is the window existing at all, 1.62x over none; reaching the
+top of the ramp adds a further 8%. Nothing else moves -- syscall 2.001 /
+1.953 / 2.043, forkexec 1144 / 1152 / 1144 -- which is the check that this
+touches the fault path and only the fault path.
+
+Read the native column carefully: perfbench steps by sysconf(_SC_PAGESIZE),
+so that 1.540 is per 4K page while the guest's figure is per 16K page. They
+are not the same measurement. Per byte the guest is 1.77x the host here, not
+7x, and the per-page form of that comparison is what made the fault path
+look far worse than it is.
+
+The tools that unit error was found with go in with the fix. faultbench
+splits a fault into its parts and reports per page as well as per megabyte;
+mapbench prices the host side alone; clockcheck confirms a second inside the
+guest is a second outside it; faultcmp.sh drives guest and host at a matched
+byte count with a single binary, because such a comparison also has to
+survive the two sides otherwise having different libcs.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/kernel/trap.c                     |  41 ++-
+ tools/um-arm64/harness/faultcmp.sh        |  88 ++++++
+ tools/um-arm64/harness/probe/clockcheck.c |  63 +++++
+ tools/um-arm64/harness/probe/faultbench.c | 260 +++++++++++++++++
+ tools/um-arm64/harness/probe/mapbench.c   | 329 ++++++++++++++++++++++
+ 5 files changed, 772 insertions(+), 9 deletions(-)
+ create mode 100755 tools/um-arm64/harness/faultcmp.sh
+ create mode 100644 tools/um-arm64/harness/probe/clockcheck.c
+ create mode 100644 tools/um-arm64/harness/probe/faultbench.c
+ create mode 100644 tools/um-arm64/harness/probe/mapbench.c
+
+diff --git a/arch/um/kernel/trap.c b/arch/um/kernel/trap.c
+index 5a49f3324ffec..bb764525e638c 100644
+--- a/arch/um/kernel/trap.c
++++ b/arch/um/kernel/trap.c
+@@ -162,18 +162,41 @@ um_lock_mm_and_find_vma(struct mm_struct *mm,
+  *    path only;
+  *  - userfaultfd must see real faults, not speculative ones.
+  *
+- * The window ramps 0 -> 4 -> 16 -> 32 pages driven by a sequential-stream
+- * detector, so a random-access workload never pays for pages it will not
+- * touch; only a stream that keeps faulting exactly past the previous window
+- * earns a bigger one. The size cap is expressed in BYTES ("prefault="
+- * command-line option, default 128K, 0 disables) because PAGE_SIZE is
+- * parametric here: with the page-count cap a 16K-page guest would silently
+- * speculate a 512K window.
++ * The window ramps up in pages driven by a sequential-stream detector, so a
++ * random-access workload never pays for pages it will not touch; only a stream
++ * that keeps faulting exactly past the previous window earns a bigger one.
++ *
++ * The "prefault=" command-line override is in BYTES (0 disables) because
++ * PAGE_SIZE is parametric here and a page count would mean four times the
++ * memory on a 16K guest than on a 4K one. The *default* has to scale the other
++ * way, though, and getting that backwards cost most of the benefit: a fixed
++ * 128K default is 32 pages at 4K but only 8 at 16K, which silently truncates
++ * the ramp at its second-to-last step. Measured on a Snapdragon 870, 16K
++ * guest, 32MB working set, median of 7:
++ *
++ *	prefault=0	1492 MB/s	windows disabled
++ *	128K (8 pages)	2495 MB/s	what the fixed default gave
++ *	512K (32 pages)	4601 MB/s	the full ramp
++ *
++ * with the host managing 3222 MB/s on the same test -- so the truncated
++ * default was the difference between trailing the host by a quarter and
++ * beating it by 43%. Tie the default to the ramp instead, and the top of the
++ * ramp is reachable at any page size. On a 4K guest this is 128K, exactly the
++ * old default, so only the larger page sizes change behaviour.
++ *
++ * 32 is where the curve flattens, which is why the ramp stops there: extending
++ * it and re-measuring the same way gave 4908 MB/s at 64 pages and 4824 at 128,
++ * i.e. nothing beyond the noise for four times the memory speculated per
++ * fault.
+  */
+-static const unsigned int um_prefault_ramp[] = {0, 4, 16, 32};
++#define UM_PREFAULT_MAX_PAGES 32
++static const unsigned int um_prefault_ramp[] = {
++	0, 4, 16, UM_PREFAULT_MAX_PAGES
++};
+ #define UM_PREFAULT_LEVEL_MAX (ARRAY_SIZE(um_prefault_ramp) - 1)
+ 
+-static unsigned long um_prefault_bytes __read_mostly = SZ_128K;
++static unsigned long um_prefault_bytes __read_mostly =
++	UM_PREFAULT_MAX_PAGES * PAGE_SIZE;
+ 
+ static int __init um_prefault_setup(char *str)
+ {
+diff --git a/tools/um-arm64/harness/faultcmp.sh b/tools/um-arm64/harness/faultcmp.sh
+new file mode 100755
+index 0000000000000..c8db876c5b6b9
+--- /dev/null
++++ b/tools/um-arm64/harness/faultcmp.sh
+@@ -0,0 +1,88 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# faultcmp.sh -- compare guest and native memory costs at a MATCHED footprint.
++#
++# The comparison this replaces was wrong in two ways at once, and both ways
++# flattered nobody -- they just made the number meaningless:
++#
++#   1. perfbench reports per PAGE and steps by sysconf(_SC_PAGESIZE), so a 16K
++#      guest was being compared against a 4K host on a unit four times larger.
++#      "11us/page vs 1.3us/page" was really 11us per 16K against 5.2us per 16K.
++#   2. Guest and native binaries were built by different compilers against
++#      different libcs, so even the parts with no kernel involvement differed.
++#      The same source, built by clang 19/glibc and clang 18/bionic, differs by
++#      2x on a plain store loop.
++#
++# So: ONE static binary, run on both sides, and page counts chosen per side to
++# cover the same number of BYTES.
++#
++# Footprint matters more than it looks. This phone runs with a few hundred MB
++# free, and a working set the host cannot keep resident turns the measurement
++# into a measurement of host reclaim -- the guest sees no faults of its own
++# (the host takes them), so nothing in the guest's own numbers says that is
++# what happened. Keep MB modest and watch the spread: a stable native column
++# beside a guest column that swings 4x is the tell.
++#
++# Usage: MB=32 REPS=5 harness/faultcmp.sh [serial]
++set -uo pipefail
++
++DEV=/data/local/tmp
++SER=${1:-192.168.1.243:39685}
++A="adb -s $SER"
++MB=${MB:-32}
++REPS=${REPS:-5}
++MASK=${MASK:-30}
++KERNEL=${KERNEL:-$DEV/k-test}
++MEM=${MEM:-512M}
++GUEST_PAGE=${GUEST_PAGE:-16384}
++HOST_PAGE=${HOST_PAGE:-4096}
++
++gpages=$((MB * 1024 * 1024 / GUEST_PAGE))
++hpages=$((MB * 1024 * 1024 / HOST_PAGE))
++
++# Free memory is part of the result, not decoration: a working set the host
++# cannot keep resident turns this into a measurement of host reclaim, and the
++# guest's own counters show nothing because the host takes those faults.
++hostfree() {
++	$A shell free -m 2>/dev/null | awk '/^Mem:/ { print $4 " MB" }' | tr -d '\r'
++}
++
++echo "### matched footprint ${MB} MB: guest ${gpages}x${GUEST_PAGE}, native ${hpages}x${HOST_PAGE}"
++echo "### host free before: $(hostfree)"
++
++native=$($A shell "cd $DEV && taskset $MASK ./clockcheck 2 >/dev/null 2>&1
++for i in \$(seq $REPS); do taskset $MASK ./faultbench-glibc $hpages; done" 2>&1 | tr -d '\r')
++
++guest=$($A shell "cd $DEV && HOME=$DEV taskset $MASK timeout 300 $KERNEL \
++    mem=$MEM panic=-1 con=null con0=null,fd:1 \
++    initrd=$DEV/initramfs-fb.cpio.gz init=/init seccomp=on \
++    fbpages=$gpages fbreps=$REPS ${EXTRA:-}" 2>&1 | tr -d '\r')
++
++# Median per phase, and the spread, because a median alone hides the reclaim
++# problem this script exists to make visible.
++summarise() {
++	awk -v tag="$1" -v bytes="$((MB * 1024 * 1024))" '
++	/us\/page/ {
++		name = $1; mbs = $4
++		v[name] = v[name] " " mbs; n[name]++
++		if (!(name in seen)) { order[++k] = name; seen[name] = 1 }
++	}
++	END {
++		for (i = 1; i <= k; i++) {
++			nm = order[i]; c = split(v[nm], a, " ")
++			for (x = 1; x < c; x++) for (y = x + 1; y <= c; y++)
++				if (a[y] + 0 < a[x] + 0) { t = a[x]; a[x] = a[y]; a[y] = t }
++			med = (c % 2) ? a[(c + 1) / 2] : (a[c / 2] + a[c / 2 + 1]) / 2
++			printf "%-8s %-10s median %8.1f MB/s   min %8.1f  max %8.1f  (n=%d)\n",
++			       tag, nm, med, a[1], a[c], c
++		}
++	}'
++}
++
++echo
++echo "$native" | summarise native
++echo
++echo "$guest" | summarise guest
++echo
++echo "### host free after: $(hostfree)"
+diff --git a/tools/um-arm64/harness/probe/clockcheck.c b/tools/um-arm64/harness/probe/clockcheck.c
+new file mode 100644
+index 0000000000000..7480621cbbb72
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/clockcheck.c
+@@ -0,0 +1,63 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * clockcheck -- does a second inside the guest last a second outside it?
++ *
++ * Every performance number in this tree is a guest-measured interval divided
++ * by an operation count, so if the guest's CLOCK_MONOTONIC runs at the wrong
++ * rate then every one of them is wrong by that factor and no amount of
++ * careful benchmarking notices. The symptom that prompted this: the guest
++ * reported a pure userspace arithmetic loop running *faster* than the same
++ * binary on the host it runs on, which cannot be true.
++ *
++ * So: spin until the guest's own clock says SECS have passed, and let the
++ * caller time the whole run from outside. Guest-measured and host-measured
++ * intervals should agree. They must be compared over an interval long enough
++ * that boot time and process startup are noise -- hence seconds, not
++ * milliseconds.
++ *
++ * Prints the guest's own view too, so a run that is off can be told apart
++ * from a run that simply took longer to boot.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o clockcheck clockcheck.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <time.h>
++
++static double now(clockid_t id)
++{
++	struct timespec ts;
++
++	clock_gettime(id, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++int main(int argc, char **argv)
++{
++	double secs = argc > 1 ? atof(argv[1]) : 5.0;
++	double m0, m1, r0, r1;
++	unsigned long spins = 0;
++
++	r0 = now(CLOCK_REALTIME);
++	m0 = now(CLOCK_MONOTONIC);
++	printf("CLOCKCHECK_START want=%.3f mono=%.6f real=%.6f\n",
++	       secs, m0, r0);
++	fflush(stdout);
++
++	/*
++	 * Busy-wait rather than sleep: a sleep would measure the timer
++	 * subsystem's wakeup accuracy, and the question here is the rate at
++	 * which the clock advances while userspace runs.
++	 */
++	do {
++		spins++;
++		m1 = now(CLOCK_MONOTONIC);
++	} while (m1 - m0 < secs);
++	r1 = now(CLOCK_REALTIME);
++
++	printf("CLOCKCHECK_DONE mono_elapsed=%.6f real_elapsed=%.6f spins=%lu\n",
++	       m1 - m0, r1 - r0, spins);
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/faultbench.c b/tools/um-arm64/harness/probe/faultbench.c
+new file mode 100644
+index 0000000000000..0ed8e47fad38d
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/faultbench.c
+@@ -0,0 +1,260 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * faultbench -- split the cost of a UML guest page fault into its parts.
++ *
++ * "fault costs 20us against 1.3us native" is not actionable, and worse, the
++ * two numbers are not even the same unit: perfbench steps by
++ * sysconf(_SC_PAGESIZE), so a 16K guest touches four times the memory per
++ * "fault" that a 4K host does. Everything here reports per page AND per
++ * megabyte so the comparison survives a change of page size.
++ *
++ * Each case removes one part of the cost, so the differences attribute it:
++ *
++ *   touch      fault a fresh anonymous page per iteration. The whole cost:
++ *              SIGSEGV to the stub, handoff to the UML kernel, handle_mm_fault
++ *              (allocate + zero the page), then one host mmap() per page to
++ *              publish it into the stub.
++ *   populate   same memory, same mmap flags, but MAP_POPULATE: the guest
++ *              kernel builds every PTE inside one syscall and flushes them in
++ *              one batch. Same allocation, same zeroing, same host mmap()s --
++ *              no per-page interception. touch - populate is what an
++ *              intercepted fault costs over and above the work it does.
++ *   refault    MADV_DONTNEED then touch again. Same as touch except the VMA
++ *              and page tables already exist, so it isolates the setup that
++ *              only a first touch pays.
++ *   memset     pure userspace write over already-faulted memory. No kernel
++ *              entry at all, so this is the floor: no fault can beat the cost
++ *              of writing the page's own bytes, and at 16K that floor is four
++ *              times what it is at 4K. Subtract it before believing any
++ *              per-page overhead number.
++ *
++ * Run it natively too: every case is portable, and the native numbers say
++ * which part of the guest cost is interception and which part is what the
++ * hardware charges anyone.
++ *
++ * Build (guest, static so it runs in any rootfs):
++ *   clang --target=aarch64-linux-gnu -static -O2 -o faultbench faultbench.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <sys/mman.h>
++#include <fcntl.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++static long pagesz;
++static long pages;
++
++/*
++ * Minor faults taken by this process, from /proc/self/stat field 10. Reported
++ * per page alongside every timing, because a phase that should touch present
++ * memory and instead takes one fault per page is a different problem from a
++ * phase that is simply slow, and the timing alone cannot tell them apart.
++ */
++static unsigned long minflt(void)
++{
++	char buf[1024], *s;
++	unsigned long v = 0;
++	int fd = open("/proc/self/stat", O_RDONLY);
++	ssize_t n;
++	int field;
++
++	if (fd < 0)
++		return 0;
++	n = read(fd, buf, sizeof(buf) - 1);
++	close(fd);
++	if (n <= 0)
++		return 0;
++	buf[n] = '\0';
++
++	/*
++	 * Field 2 is the comm, is parenthesised, and may itself contain spaces
++	 * and ')', so the last ')' in the line ends it -- everything before is
++	 * fields 1 and 2. Standing just past it means two fields are consumed,
++	 * and each space from here starts the next one: the first space starts
++	 * field 3. Starting the count at 3 instead lands on field 9 (num_threads
++	 * is 0 for a single-threaded process, which is why the bug read as a
++	 * plausible "no faults" rather than as garbage).
++	 */
++	s = strrchr(buf, ')');
++	if (!s)
++		return 0;
++	s++;
++	for (field = 2; *s; s++) {
++		if (*s != ' ')
++			continue;
++		if (++field == 10) {
++			v = strtoul(s + 1, NULL, 10);
++			break;
++		}
++	}
++	return v;
++}
++
++static unsigned long flt_before;
++
++static void mark(void)
++{
++	flt_before = minflt();
++}
++
++static void report(const char *name, double secs)
++{
++	double mb = (double)pages * pagesz / (1024 * 1024);
++	unsigned long faults = minflt() - flt_before;
++
++	printf("%-10s %8.3f us/page  %8.1f MB/s  %6.2f faults/page  (%.3fs)\n",
++	       name, secs * 1e6 / pages, mb / secs,
++	       (double)faults / pages, secs);
++	fflush(stdout);
++}
++
++/* Touch one byte per page; volatile so nothing here is optimised away. */
++static void touch_all(char *p)
++{
++	long i;
++
++	for (i = 0; i < pages; i++)
++		*(volatile char *)(p + (size_t)i * pagesz) = 1;
++}
++
++/*
++ * Write every byte with a loop written out here rather than with memset().
++ *
++ * memset() is chosen by an ifunc from the CPU features libc detects, the
++ * guest's HWCAP is deliberately masked down from the host's, and the guest
++ * and native builds here are against different libcs entirely (glibc and
++ * bionic). Comparing memset across that is comparing two different routines
++ * and learning nothing about the guest.
++ *
++ * This loop is the same instructions on both sides. It is slower than a good
++ * memset -- volatile forbids vectorising it -- but it is slower *identically*,
++ * which is the only property that matters for the comparison.
++ */
++static void store_all(char *p, unsigned long v)
++{
++	volatile unsigned long *q = (volatile unsigned long *)p;
++	size_t n = (size_t)pages * pagesz / sizeof(*q);
++	size_t i;
++
++	for (i = 0; i < n; i++)
++		q[i] = v;
++}
++
++static char *fresh(void)
++{
++	char *p = mmap(NULL, (size_t)pages * pagesz, PROT_READ | PROT_WRITE,
++		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++
++	return p == MAP_FAILED ? NULL : p;
++}
++
++int main(int argc, char **argv)
++{
++	double t0, t1;
++	char *p;
++
++	pagesz = sysconf(_SC_PAGESIZE);
++	pages = argc > 1 ? atol(argv[1]) : 8192;
++
++	printf("FAULTBENCH_START pagesz=%ld pages=%ld\n", pagesz, pages);
++
++	/* Warm up: first mmap of a process also grows its heap and page tables. */
++	p = fresh();
++	if (!p)
++		return 1;
++	touch_all(p);
++	munmap(p, (size_t)pages * pagesz);
++
++	/* --- touch: the ordinary case, one intercepted fault per page --- */
++	p = fresh();
++	if (!p)
++		return 1;
++	mark();
++	t0 = now();
++	touch_all(p);
++	t1 = now();
++	report("touch", t1 - t0);
++
++	/*
++	 * --- memset: the floor, no kernel entry (same pages, now present) ---
++	 *
++	 * Three times, because one pass cannot tell "writing memory is slow
++	 * here" from "these pages were not really present and the pass was
++	 * paying faults". A first pass that is slow and a second that is not
++	 * means the cost belongs to first touch; three equally slow passes
++	 * mean the guest is slow at plain stores, which would be a different
++	 * and much worse problem.
++	 */
++	{
++		int k;
++
++		for (k = 1; k <= 3; k++) {
++			char label[16];
++
++			snprintf(label, sizeof(label), "memset%d", k);
++			mark();
++			t0 = now();
++			memset(p, 2 + k, (size_t)pages * pagesz);
++			t1 = now();
++			report(label, t1 - t0);
++
++			snprintf(label, sizeof(label), "store%d", k);
++			mark();
++			t0 = now();
++			store_all(p, 0x0101010101010101UL * (unsigned int)k);
++			t1 = now();
++			report(label, t1 - t0);
++		}
++	}
++
++	/* --- refault: page tables exist, pages thrown away and touched again --- */
++	if (madvise(p, (size_t)pages * pagesz, MADV_DONTNEED) == 0) {
++		mark();
++		t0 = now();
++		touch_all(p);
++		t1 = now();
++		report("refault", t1 - t0);
++	} else {
++		printf("refault    MADV_DONTNEED unavailable\n");
++	}
++	munmap(p, (size_t)pages * pagesz);
++
++	/* --- populate: identical work, zero per-page interception --- */
++	mark();
++	t0 = now();
++	p = mmap(NULL, (size_t)pages * pagesz, PROT_READ | PROT_WRITE,
++		 MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE, -1, 0);
++	t1 = now();
++	if (p == MAP_FAILED)
++		printf("populate   MAP_POPULATE failed\n");
++	else
++		report("populate", t1 - t0);
++
++	/*
++	 * Confirm MAP_POPULATE actually populated: if the host ignored it, the
++	 * pages are still absent and the number above is meaningless rather
++	 * than merely fast. A populated run re-touches at memset speed.
++	 */
++	if (p != MAP_FAILED) {
++		mark();
++		t0 = now();
++		touch_all(p);
++		t1 = now();
++		report("post-pop", t1 - t0);
++		munmap(p, (size_t)pages * pagesz);
++	}
++
++	printf("FAULTBENCH_DONE\n");
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/mapbench.c b/tools/um-arm64/harness/probe/mapbench.c
+new file mode 100644
+index 0000000000000..0df49d4282197
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/mapbench.c
+@@ -0,0 +1,329 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * mapbench -- what a guest page fault costs the host, measured on the host.
++ *
++ * UML maps guest memory into the stub one PTE at a time: arch/um/kernel/tlb.c
++ * calls ops->mmap(addr, PAGE_SIZE, ...) per page, and os-Linux/skas/mem.c
++ * map() folds a page into the previous request only when its offset in the
++ * physmem file continues that request exactly:
++ *
++ *	sc->mem.offset == MMAP_OFFSET(offset - sc->mem.length)
++ *
++ * Guest anonymous memory is filled by the page allocator, which hands out
++ * whatever order-0 frame it likes, so consecutive guest virtual pages sit at
++ * unrelated physmem offsets and that test almost always fails. One host
++ * mmap() per guest page.
++ *
++ * This measures the difference the merge makes, on the host, with no guest
++ * involved -- so the number cannot be explained away by anything in UML:
++ *
++ *   scattered  offsets shuffled: one mmap() per page, what UML does today
++ *   linear     offsets in order: pages fold into one call, what UML would do
++ *              if the frames behind a fault were physically contiguous
++ *
++ * Both walk the same virtual addresses, map the same bytes, from the same fd,
++ * and differ only in the file offset each page comes from.
++ *
++ * The other half of the cost is address-space shape. Scattered mapping leaves
++ * every page its own VMA, because adjacent VMAs only merge when their file
++ * offsets line up -- the same condition. So the scattered case also pays a
++ * growing maple-tree, and "vmas" reports what each case left behind.
++ *
++ * Build:
++ *   $NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/clang \
++ *       --target=aarch64-linux-android30 -O2 -static -o mapbench mapbench.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <fcntl.h>
++#include <sys/mman.h>
++#include <sys/syscall.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++/* Count VMAs the cheap way; /proc/self/maps lines == VMAs. */
++static long count_vmas(void)
++{
++	char buf[65536];
++	long n = 0;
++	int fd = open("/proc/self/maps", O_RDONLY);
++	ssize_t r;
++
++	if (fd < 0)
++		return -1;
++	while ((r = read(fd, buf, sizeof(buf))) > 0)
++		for (ssize_t i = 0; i < r; i++)
++			if (buf[i] == '\n')
++				n++;
++	close(fd);
++	return n;
++}
++
++/*
++ * A xorshift so the shuffle is reproducible across runs and configurations:
++ * the two cases must differ in offset order and in nothing else, including
++ * which pages the allocator happened to touch first.
++ */
++static unsigned long rnd_state = 88172645463325252UL;
++
++static unsigned long rnd(void)
++{
++	rnd_state ^= rnd_state << 13;
++	rnd_state ^= rnd_state >> 7;
++	rnd_state ^= rnd_state << 17;
++	return rnd_state;
++}
++
++static void run(const char *name, int fd, char *base, long pages, long pagesz,
++		int shuffle, int touch)
++{
++	long *off = malloc(pages * sizeof(*off));
++	double t0, t1;
++	long vma0, vma1;
++	long i;
++
++	if (!off)
++		return;
++	for (i = 0; i < pages; i++)
++		off[i] = i;
++	if (shuffle) {
++		for (i = pages - 1; i > 0; i--) {
++			long j = rnd() % (i + 1);
++			long t = off[i]; off[i] = off[j]; off[j] = t;
++		}
++	}
++
++	/* Start from a clean slate: one PROT_NONE VMA over the whole range. */
++	mmap(base, (size_t)pages * pagesz, PROT_NONE,
++	     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
++	vma0 = count_vmas();
++
++	t0 = now();
++	for (i = 0; i < pages; i++) {
++		void *p = mmap(base + (size_t)i * pagesz, pagesz,
++			       PROT_READ | PROT_WRITE,
++			       MAP_SHARED | MAP_FIXED, fd,
++			       (off_t)off[i] * pagesz);
++
++		if (p == MAP_FAILED) {
++			printf("%-10s mmap failed at %ld\n", name, i);
++			free(off);
++			return;
++		}
++		if (touch)
++			*(volatile char *)p = 1;
++	}
++	t1 = now();
++	vma1 = count_vmas();
++
++	printf("%-10s %8.3f us/page   (%ld pages in %.3fs)   vmas %ld -> %ld\n",
++	       name, (t1 - t0) * 1e6 / pages, pages, t1 - t0, vma0, vma1);
++
++	/*
++	 * Now write every byte of what was just mapped. No mmap, no fault, no
++	 * kernel entry -- only stores through whatever page tables the mapping
++	 * left behind. Both cases cover the same bytes of the same memfd, so a
++	 * difference here is the shape of the mapping and nothing else: it is
++	 * the part of the guest's cost that no amount of fault-path tuning can
++	 * reach.
++	 */
++	{
++		double m0, m1, s0, s1;
++		double mb = (double)pages * pagesz / (1024 * 1024);
++		volatile unsigned long *q = (volatile unsigned long *)base;
++		size_t words = (size_t)pages * pagesz / sizeof(*q);
++		size_t k;
++
++		memset(base, 1, (size_t)pages * pagesz);	/* fault them in */
++		m0 = now();
++		memset(base, 2, (size_t)pages * pagesz);
++		m1 = now();
++
++		/*
++		 * The same plain store loop the guest benchmark uses. memset()
++		 * alone hides this effect: a tuned memset reaches for
++		 * non-temporal stores, which bypass the caches and are
++		 * therefore indifferent to how many mappings the region is
++		 * split across. Ordinary stores are not, and ordinary stores
++		 * are what programs actually do.
++		 */
++		s0 = now();
++		for (k = 0; k < words; k++)
++			q[k] = 3;
++		s1 = now();
++
++		printf("%-10s %8.1f MB/s memset   %8.1f MB/s plain stores\n",
++		       "", mb / (m1 - m0), mb / (s1 - s0));
++	}
++	free(off);
++}
++
++int main(int argc, char **argv)
++{
++	long pagesz = argc > 2 ? atol(argv[2]) : 16384;
++	long pages = argc > 1 ? atol(argv[1]) : 8192;
++	size_t len = (size_t)pages * pagesz;
++	char *base;
++	int fd;
++
++	/*
++	 * memfd, not a real file: UML's physmem is a memfd too, so page cache
++	 * behaviour and the writeback path match, and nothing here touches
++	 * storage.
++	 */
++	fd = syscall(__NR_memfd_create, "physmem", 0);
++	if (fd < 0) {
++		perror("memfd_create");
++		return 1;
++	}
++	if (ftruncate(fd, len) < 0) {
++		perror("ftruncate");
++		return 1;
++	}
++
++	/* Reserve the window once; every case re-maps inside it. */
++	base = mmap(NULL, len, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (base == MAP_FAILED) {
++		perror("reserve");
++		return 1;
++	}
++
++	printf("MAPBENCH_START pagesz=%ld pages=%ld\n", pagesz, pages);
++	/*
++	 * The cost UML pays that a native process does not.
++	 *
++	 * When UML resolves a guest fault it zeroes the page through the
++	 * kernel's own mapping of physmem and then publishes it to the stub
++	 * with mmap(). The page is resident by then -- but the stub's page
++	 * tables are still empty for it, so the guest's very next access takes
++	 * a second fault, this one on the host, invisible to the guest (it
++	 * shows up in no guest counter). These four cases price that, and
++	 * price the fix: MAP_POPULATE fills the page tables inside the mmap()
++	 * that was happening anyway.
++	 *
++	 *   map           mmap() alone, page never touched
++	 *   map+touch     mmap() then one byte -- what the stub does today
++	 *   pop           mmap(MAP_POPULATE) alone
++	 *   pop+touch     mmap(MAP_POPULATE) then one byte -- the proposal
++	 *
++	 * If (map+touch) - (map) is real and (pop+touch) ~= (pop), the second
++	 * fault is worth removing and MAP_POPULATE removes it.
++	 */
++	{
++		double t0, t1;
++		long i;
++		long *off = malloc(pages * sizeof(*off));
++		int c;
++
++		if (!off)
++			return 1;
++		static const struct { const char *name; int pop, touch; } cases[] = {
++			{ "map",       0, 0 }, { "map+touch", 0, 1 },
++			{ "pop",       1, 0 }, { "pop+touch", 1, 1 },
++			{ "map2",      0, 0 }, { "map+touch2", 0, 1 },
++			{ "pop2",      1, 0 }, { "pop+touch2", 1, 1 },
++		};
++
++		/* Make every page resident first, as UML's zeroing would. */
++		mmap(base, len, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED,
++		     fd, 0);
++		memset(base, 1, len);
++
++		for (c = 0; c < (int)(sizeof(cases) / sizeof(cases[0])); c++) {
++			int flags = MAP_SHARED | MAP_FIXED;
++
++			if (cases[c].pop)
++				flags |= MAP_POPULATE;
++
++			/* Drop the mappings without dropping residency. */
++			mmap(base, len, PROT_NONE,
++			     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
++
++			t0 = now();
++			for (i = 0; i < pages; i++) {
++				void *p = mmap(base + (size_t)i * pagesz,
++					       pagesz, PROT_READ | PROT_WRITE,
++					       flags, fd,
++					       (off_t)i * pagesz);
++
++				if (p == MAP_FAILED)
++					break;
++				if (cases[c].touch)
++					*(volatile char *)p = 2;
++			}
++			t1 = now();
++			printf("%-12s %8.3f us/page   (%ld pages in %.3fs)\n",
++			       cases[c].name, (t1 - t0) * 1e6 / pages, pages,
++			       t1 - t0);
++		}
++
++		/*
++		 * The case above interleaves map and touch, so when a page is
++		 * touched the VMA ends right there and the host has nothing
++		 * ahead to work with. UML does not behave that way: the stub
++		 * executes a whole batch of mmaps and only then returns to the
++		 * guest, which touches the pages afterwards.
++		 *
++		 * That distinction is the whole question for merging. Linux
++		 * maps up to fault_around_bytes of neighbours on a file-backed
++		 * fault, but only within one VMA -- so a merged mapping gets
++		 * one host fault per ~16 pages, and a per-page mapping gets one
++		 * per page and cannot ever do better.
++		 *
++		 * Map everything first, then walk it. The difference between
++		 * these two is what UML would gain by making the frames behind
++		 * a fault physically contiguous.
++		 */
++		for (c = 0; c < 4; c++) {
++			int shuf = c & 1;
++			long vb, va;
++
++			mmap(base, len, PROT_NONE,
++			     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
++			for (i = 0; i < pages; i++)
++				off[i] = i;
++			if (shuf)
++				for (i = pages - 1; i > 0; i--) {
++					long j = rnd() % (i + 1);
++					long t = off[i]; off[i] = off[j]; off[j] = t;
++				}
++			for (i = 0; i < pages; i++)
++				mmap(base + (size_t)i * pagesz, pagesz,
++				     PROT_READ | PROT_WRITE,
++				     MAP_SHARED | MAP_FIXED, fd,
++				     (off_t)off[i] * pagesz);
++			vb = count_vmas();
++
++			t0 = now();
++			for (i = 0; i < pages; i++)
++				*(volatile char *)(base + (size_t)i * pagesz) = 3;
++			t1 = now();
++			va = count_vmas();
++			printf("%-12s %8.3f us/page   touch-after-map-all, vmas %ld (%s)\n",
++			       shuf ? "walk/split" : "walk/merged",
++			       (t1 - t0) * 1e6 / pages, va,
++			       vb == va ? "stable" : "changed");
++		}
++	}
++	/*
++	 * Warm the file's pages so the timed loops are not measuring writeback
++	 * setup or first-touch allocation of the memfd itself.
++	 */
++	run("warmup", fd, base, pages, pagesz, 0, 1);
++	run("linear", fd, base, pages, pagesz, 0, 0);
++	run("scattered", fd, base, pages, pagesz, 1, 0);
++	run("linear2", fd, base, pages, pagesz, 0, 0);
++	run("scatter2", fd, base, pages, pagesz, 1, 0);
++	printf("MAPBENCH_DONE\n");
++	return 0;
++}
