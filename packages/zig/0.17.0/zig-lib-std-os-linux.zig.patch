@@ -1,0 +1,20 @@
+--- a/zig/lib/std/os/linux.zig
++++ b/zig/lib/std/os/linux.zig
+@@ -1874,7 +1874,7 @@ pub fn symlinkat(existing: [*:0]const u8, newfd: fd_t, newpath: [*:0]const u8) u
+ }
+ 
+ pub fn access(path: [*:0]const u8, mode: mode_t) usize {
+-    if (@hasField(SYS, "access")) {
++    if (@hasField(SYS, "access") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall2(.access, @intFromPtr(path), mode);
+     } else {
+         return faccessat(AT.FDCWD, path, mode, 0);
+@@ -1895,7 +1895,7 @@ pub fn acct(path: [*:0]const u8) usize {
+ pub fn pipe(fd: *[2]fd_t) usize {
+     if (native_arch.isMIPS() or native_arch.isSPARC()) {
+         return syscall_pipe(fd);
+-    } else if (@hasField(SYS, "pipe")) {
++    } else if (@hasField(SYS, "pipe") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall1(.pipe, @intFromPtr(fd));
+     } else {
+         return syscall2(.pipe2, @intFromPtr(fd), 0);
