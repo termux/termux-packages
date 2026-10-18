@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ayn2op/discordo
 TERMUX_PKG_DESCRIPTION="A lightweight, secure, and feature-rich Discord terminal client"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.10.03+gf7180f87"
+TERMUX_PKG_VERSION="2026.10.17+gb860df0a"
 TERMUX_PKG_SRCURL="https://github.com/ayn2op/discordo/archive/${TERMUX_PKG_VERSION##*+g}.tar.gz"
-TERMUX_PKG_SHA256=246bf1d16c4d887454d3dd5cce156d78f18a623da8633fd1405d483f090afff0
+TERMUX_PKG_SHA256=3f8b35a9df518238be3dab24fdfaad994d038f468eccc215e4a662ed2b7c9b99
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
