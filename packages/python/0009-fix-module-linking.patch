@@ -1,13 +1,11 @@
 Based off https://github.com/msys2-contrib/cpython-mingw/commit/e719663e07d6655e042f9c48910c65606cc4ae5e
-diff --git a/Modules/makesetup b/Modules/makesetup
-index f6cf695b457..7fc408a4bd8 100755
---- a/Modules/makesetup
-+++ b/Modules/makesetup
-@@ -276,7 +276,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |
+--- a/Modules/makesetup	2026-10-18 18:02:49.130000000 +0600
++++ b/Modules/makesetup	2026-10-18 18:02:49.170000000 +0600
+@@ -276,7 +276,7 @@
  				;;
  			esac
  			rule="$file: $objs \$(MODULE_${mods_upper}_LDEPS)"
--			rule="$rule; \$(BLDSHARED) $objs $libs \$(LIBPYTHON) -o $file"
+-			rule="$rule; \$(BLDSHARED) $objs $libs \$(MODULE_LDFLAGS_SHARED) -o $file"
 +			rule="$rule; \$(BLDSHARED) $objs $libs \$(BLDLIBRARY) -o $file"
  			echo "$rule" >>$rulesf
  		done
