@@ -1,10 +1,9 @@
 # Patch meson to copy mu4e source files even if emacs was not found.
 # Also disable dbus since we are not building emacs with dbus support
 
-diff -uNr a/meson.build b/meson.build
---- a/meson.build	2026-01-16 01:29:15.000000000 +0530
-+++ b/meson.build	2026-01-16 10:25:54.391552150 +0530
-@@ -365,8 +365,7 @@
+--- a/meson.build
++++ b/meson.build
+@@ -375,8 +375,7 @@ subdir('mu')
  emacs_name=get_option('emacs')
  emacs_min_version='28.1'
  emacs=find_program([emacs_name], version: '>=' + emacs_min_version, required:false)
@@ -14,10 +13,9 @@ diff -uNr a/meson.build b/meson.build
    subdir('mu4e')
  else
    message('emacs not found; not pre-compiling mu4e / generating man-pages')
-diff -uNr a/mu4e/meson.build b/mu4e/meson.build
---- a/mu4e/meson.build	2026-01-16 01:29:15.000000000 +0530
-+++ b/mu4e/meson.build	2026-01-16 10:29:59.896162690 +0530
-@@ -79,8 +79,7 @@
+--- a/mu4e/meson.build
++++ b/mu4e/meson.build
+@@ -82,8 +82,7 @@ mu4e_bc_srcs = mu4e_srcs
  
  # do have we have dbus support?
  mu4e_srcs += 'mu4e-dbus.el'
@@ -27,15 +25,15 @@ diff -uNr a/mu4e/meson.build b/mu4e/meson.build
  if emacs_dbus.returncode() == 0
    mu4e_bc_srcs += 'mu4e-dbus.el'
  else
-@@ -95,6 +94,7 @@
+@@ -98,6 +97,7 @@ endif
  #... so let's not do that!
  
  # byte compile the sources that can be byte-compiled. This may exclude mu4e-dbus.el
 +if false
  foreach src : mu4e_bc_srcs
    target_name= '@BASENAME@.elc'
-   target_path = join_paths(meson.current_build_dir(), target_name)
-@@ -139,6 +139,7 @@
+   target_path = meson.current_build_dir() / target_name
+@@ -143,6 +143,7 @@ mu4e_autoloads = custom_target('mu4e-autoloads',
              '--load', 'package',
              '--eval', '(package-generate-autoloads "mu4e" "' +
                        meson.current_build_dir() + '" )'])
@@ -43,3 +41,12 @@ diff -uNr a/mu4e/meson.build b/mu4e/meson.build
  
  # also install the sources and the config
  install_data(mu4e_srcs, install_dir: mu4e_lispdir)
+@@ -150,7 +151,7 @@ install_data(mu4e_srcs, install_dir: mu4e_lispdir)
+ # install mu4e-about.org
+ install_data('mu4e-about.org', install_dir : datadir / 'doc' / 'mu')
+ 
+-if makeinfo.found()
++if false
+   custom_target('mu4e_info',
+                 input: 'mu4e.texi',
+                 output: 'mu4e.info',
