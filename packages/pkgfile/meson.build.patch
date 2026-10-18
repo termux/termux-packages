@@ -1,7 +1,6 @@
-diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
---- pkgfile-22/meson.build	2024-07-31 01:13:37.000000000 +0800
-+++ pkgfile-22.mod/meson.build	2024-08-19 22:21:43.911872718 +0800
-@@ -11,7 +11,7 @@
+--- a/meson.build
++++ b/meson.build
+@@ -11,7 +11,7 @@ conf = configuration_data()
  conf.set_quoted('PACKAGE_NAME', meson.project_name())
  conf.set_quoted('PACKAGE_VERSION', meson.project_version())
  conf.set_quoted('DEFAULT_CACHEPATH', get_option('cachedir'))
@@ -10,7 +9,7 @@ diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
  
  cpp = meson.get_compiler('cpp')
  
-@@ -31,15 +31,15 @@
+@@ -27,9 +27,9 @@ add_project_arguments(
  libpcre = dependency('libpcre', version: '>= 8.30')
  libarchive = dependency('libarchive', version: '>= 3.2.0')
  libcurl = dependency('libcurl')
@@ -19,8 +18,10 @@ diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
  pthreads = dependency('threads')
 -stdcppfs = cpp.find_library('stdc++fs')
 +stdcppfs = cpp.find_library('stdc++fs', required: false)
- gtest = dependency('gtest', required: false)
- gmock = dependency('gmock', required: false)
+ gtest = declare_dependency(
+     dependencies: [
+         dependency(
+@@ -49,7 +49,7 @@ gmock = dependency('gmock', required: false, disabler: true)
  
  pod2man = find_program('pod2man')
  pkgconfig = find_program('pkg-config')
@@ -29,7 +30,7 @@ diff -uNr pkgfile-22/meson.build pkgfile-22.mod/meson.build
  
  libcommon = static_library(
      'pkgfile',
-@@ -77,14 +77,6 @@
+@@ -91,14 +91,6 @@ executable(
      install: true,
  )
  
