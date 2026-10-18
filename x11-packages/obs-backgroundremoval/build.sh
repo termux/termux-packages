@@ -2,13 +2,14 @@ TERMUX_PKG_HOMEPAGE="https://github.com/royshil/obs-backgroundremoval"
 TERMUX_PKG_DESCRIPTION="Portrait background removal/virtual green-screen and low-light enhancement for obs studio"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.4.0
+TERMUX_PKG_VERSION=1.4.1
 TERMUX_PKG_SRCURL="https://github.com/royshil/obs-backgroundremoval/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=e897daccd05bc605ffa0ff1adf103bbf5db31218b7c15166fc71bf6fa6c57772
+TERMUX_PKG_SHA256=3ebc0ef66ef7603e8cf564e7e84a412e552abc21cf548c1653074ed03175f213
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="obs-studio, onnxruntime, opencv"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_OUT_OF_TREE=ON
+-DCMAKE_SYSTEM_NAME=Linux
 -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
 -DOpenCV_DIR=${TERMUX_PREFIX}/lib/cmake/opencv4
 "
