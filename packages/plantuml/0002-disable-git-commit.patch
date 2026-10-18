@@ -6,13 +6,13 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
 +++ b/gradle/libs.versions.toml
 @@ -6,7 +6,6 @@
  [versions]
- ant                 = "1.10.17"
+ ant                 = "1.10.18"
  elk                 = "0.12.0"
 -gorylenko-gradle-git-properties = "4.0.1"
- graalvm-native      = "1.1.11"
+ graalvm-native      = "1.1.14"
  jdepend             = "2.9.1"
  jlatexmath          = "1.0.7"
-@@ -43,7 +42,6 @@
+@@ -43,7 +42,6 @@ openpdf                     = { module = "com.github.librepdf:openpdf", version.
  
  [plugins]
  adarshr-test-logger = { id = "com.adarshr.test-logger", version.ref = "adarshr-test-logger" }
@@ -22,7 +22,7 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
  sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -20,7 +20,6 @@
+@@ -20,7 +20,6 @@ plugins {
  	signing
  	eclipse
  	jacoco
@@ -30,7 +30,7 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
  //	alias(libs.plugins.adarshr.test.logger)
  	alias(libs.plugins.teavm)
  }
-@@ -629,41 +628,6 @@
+@@ -703,41 +702,6 @@ tasks.named("siteAssemble") {
  // CompilationInfo - Git commit & timestamp injection
  // ============================================
  
@@ -72,7 +72,7 @@ Ensure the gitProperties.dotGitDirectory property points to the correct .git dir
  // `patchCompilationInfo` injects build metadata (version, git commit id, compile timestamp)
  // directly into src/main/java/.../CompilationInfo.java.
  //
-@@ -686,14 +650,11 @@
+@@ -760,14 +724,11 @@ val patchCompilationInfo by tasks.registering {
  	group = "build"
  	description = "Patches src/main/java/.../CompilationInfo.java in place with version, git commit id and compile timestamp. NOT wired automatically -- call explicitly (typically from CI)."
  

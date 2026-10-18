@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://plantuml.com/
 TERMUX_PKG_DESCRIPTION="Draws UML diagrams, using a simple and human readable text description"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2026.8"
+TERMUX_PKG_VERSION="1.2026.9"
 TERMUX_PKG_SRCURL="https://github.com/plantuml/plantuml/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=caa1dc0b2df3058c38b69de5878eb048a24a99346aeab663b7027e85cdc83467
+TERMUX_PKG_SHA256=9998e5afacf3dc532acae52fe6992e4de21828d34857aaff12a43dc98b9acdf6
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openjdk-21"
+TERMUX_PKG_RECOMMENDS="graphviz"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
@@ -18,7 +19,7 @@ termux_step_make() {
 	# increase gradle memory to avoid 'JVM garbage collector thrashing':
 	# https://stackoverflow.com/a/74143183/11708026
 	# https://github.com/termux/termux-packages/issues/24917
-	$TERMUX_PKG_SRCDIR/gradlew --no-daemon --parallel --stacktrace assemble -Dorg.gradle.jvmargs=-Xmx4096M
+	$TERMUX_PKG_SRCDIR/gradlew --no-daemon --parallel --stacktrace patchCompilationInfo assemble -Dorg.gradle.jvmargs=-Xmx4096M
 
 	export JAVA_HOME="$_OLD_JAVA_HOME"
 }
