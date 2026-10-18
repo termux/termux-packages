@@ -1,0 +1,253 @@
+bionic regcomp(3) does not support the Perl-style \w, \s, \S, \b, lazy and possessive
+quantifiers or empty alternatives used by the stock config, so multitail exits at
+startup with "trailing backslash". Replace them with POSIX equivalents.
+
+--- a/multitail.conf
++++ b/multitail.conf
+@@ -995,28 +995,28 @@ cs_re:black,yellow,bold:DEBUG
+ # Date
+ cs_re_s:,,bold:([0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3})
+ # Thread
+-cs_re_s:cyan: \[.*\.(\w*?)\s?\]
+-cs_re_s:cyan,,bold: \[(\w*?)\s*\]
+-cs_re_s:blue,,bold: (\[.*?\]).
++cs_re_s:cyan: \[.*\.([[:alnum:]_]*)[[:space:]]?\]
++cs_re_s:cyan,,bold: \[([[:alnum:]_]*)[[:space:]]*\]
++cs_re_s:blue,,bold: (\[.*\]).
+ #Class
+ cs_re:cyan:[INFO|WARNING|ERROR|DEBUG|FATAL]\ ([a-zA-Z0-9\.]*)\..
+ # IP address (with port)
+ cs_re:yellow:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(:[0-9]{1,5})+
+ # Numbers
+-cs_re:magenta:(\b|-)([0-9]{1,})(\.[0-9]*)?\b
++cs_re:magenta:([[:<:]]|-)([0-9]{1,})(\.[0-9]*)?[[:>:]]
+ # States
+ cs_re:red,,bold: (UNDEF|NULL)
+ cs_re:green,,bold: (ON|OPEN|ONLINE|PLAY)
+ cs_re:yellow,,bold: (OFF|CLOSED|OFFLINE|PAUSE)
+-cs_re_s:magenta,,bold: received command (.*?).?
+-cs_re_s:magenta,,bold: changed from (.*) to ([^ ]*?)
++cs_re_s:magenta,,bold: received command (.*).?
++cs_re_s:magenta,,bold: changed from (.*) to ([^ ]*)
+ # Items
+ cs_re_s:yellow: - (.*) changed from
+ cs_re_s:yellow: through (.*)
+ cs_re_s:yellow: Item '(.*)'
+ # Filenames and quotes
+-cs_re:yellow,,bold:\w*?\.(cfg|items|persist|rules|script|sitemap|things|map)
+-cs_re_s:yellow:.*'(.*?)'
++cs_re:yellow,,bold:[[:alnum:]_]*\.(cfg|items|persist|rules|script|sitemap|things|map)
++cs_re_s:yellow:.*'(.*)'
+ # others
+ cs_re:red: (failed|Failed|error|Error|Stopped)
+ cs_re:green: (Loading model|Started|Restore\ Values|has\ been\ started|Added\ new\ thing|Connected)
+@@ -1024,37 +1024,37 @@ cs_re:green: (Loading model|Started|Restore\ Values|has\ been\ started|Added\ ne
+ # ProFTPD
+ colorscheme:proftpd
+ # Date (default color)
+-cs_re_s:white:^(\w{3}\ \w{3}\ [0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}\ [0-9]{4})
++cs_re_s:white:^([[:alnum:]_]{3}\ [[:alnum:]_]{3}\ [0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}\ [0-9]{4})
+ # transfer time in seconds
+-cs_re_val_less:green:300:^\S*\ \S*\ \S*\ \S*\ \S*\ ([0-9]*)
+-cs_re_val_equal:yellow:300:^\S*\ \S*\ \S*\ \S*\ \S*\ ([0-9]*)
+-cs_re_val_bigger:red:300:^\S*\ \S*\ \S*\ \S*\ \S*\ ([0-9]*)
++cs_re_val_less:green:300:^[^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ ([0-9]*)
++cs_re_val_equal:yellow:300:^[^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ ([0-9]*)
++cs_re_val_bigger:red:300:^[^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ ([0-9]*)
+ # ip address
+ cs_re_s:magenta:([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})
+ # transfered bytes
+-cs_re_val_less:green,,bold:100000000:([0-9]*)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
+-cs_re_val_equal:yellow,,bold:100000000:([0-9]*)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
+-cs_re_val_bigger:red,,bold:100000000:([0-9]*)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_val_less:green,,bold:100000000:([0-9]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
++cs_re_val_equal:yellow,,bold:100000000:([0-9]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
++cs_re_val_bigger:red,,bold:100000000:([0-9]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # file
+-cs_re_s:white,,bold:(\S*)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_s:white,,bold:([^[:space:]]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # transfer type
+-cs_re_s:blue,,bold:(a|b)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_s:blue,,bold:(a|b)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # special action flag
+-cs_re_s:yellow,,bold:(_|C|U)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_s:yellow,,bold:(_|C|U)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # direction
+-cs_re_s:red:(i)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
+-cs_re_s:green:(o)\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_s:red:(i)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
++cs_re_s:green:(o)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # access mode (a=anonymous, r=user)
+-cs_re_s:black,red,bold:(a)\ \S*\ \S*\ \S*\ \S*\ \S*$
+-cs_re_s:cyan:(r)\ \S*\ \S*\ \S*\ \S*\ \S*$
++cs_re_s:black,red,bold:(a)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
++cs_re_s:cyan:(r)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # user name
+-cs_re_s:cyan,,bold:^\S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ \S*\ (\S*)\ \S*\ \S*\ \S*\ \S*
++cs_re_s:cyan,,bold:^[^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ ([^[:space:]]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*
+ # service name
+-cs_re_s:yellow,,bold:(\S*)\ \S*\ \S*\ \S*$
++cs_re_s:yellow,,bold:([^[:space:]]*)\ [^[:space:]]*\ [^[:space:]]*\ [^[:space:]]*$
+ # auth mode
+-cs_re_s:blue,,bold:\ (0|1)\ \S*\ \S*$
++cs_re_s:blue,,bold:\ (0|1)\ [^[:space:]]*\ [^[:space:]]*$
+ # user ID
+-cs_re_s:cyan:\ (\S*)\ \S*$
++cs_re_s:cyan:\ ([^[:space:]]*)\ [^[:space:]]*$
+ # status (in/complete)
+ cs_re_s:green,,bold:(c)$
+ cs_re_s:red,,bold:(i)$
+@@ -1063,28 +1063,28 @@ cs_re_s:red,,bold:(i)$
+ colorscheme:kodi
+ cs_re:white,,bold:^....-..-..\ ..:..:..\.....
+ cs_re:blue:T:[0-9]*
+-cs_re:red,,bold:\s(ERROR|error)
+-cs_re:yellow,,bold:\s(WARNING|warning)
+-cs_re:green,,bold:\s(NOTICE|notice)
++cs_re:red,,bold:[[:space:]](ERROR|error)
++cs_re:yellow,,bold:[[:space:]](WARNING|warning)
++cs_re:green,,bold:[[:space:]](NOTICE|notice)
+ cs_re:black,yellow,bold:(DEBUG|debug)
+ cs_re:white,,bold:(INFO|info)
+ cs_re:green:Opening:
+ cs_re_s:yellow,,underline:.*Opening: (.*)
+ cs_re:red:(CloseFile\(\)|:OnExit\(\))
+-cs_re_s:cyan:: ([0-9a-zA-Z\ ]*?):
++cs_re_s:cyan:: ([0-9a-zA-Z\ ]*):
+ 
+ # MQTT
+ colorscheme:mqtt
+ # Topics
+ cs_re_s:white,,bold:\/?([^\/\ ]*)\/
+-cs_re_s:cyan,,bold:/(\w*).
+-cs_re_s:cyan,,bold:/(\$\w*).
++cs_re_s:cyan,,bold:/([[:alnum:]_]*).
++cs_re_s:cyan,,bold:/(\$[[:alnum:]_]*).
+ cs_re_s:magenta,,bold:/(set).
+-cs_re_s:cyan,,bold:/(\w*)/set
++cs_re_s:cyan,,bold:/([[:alnum:]_]*)/set
+ cs_re:magenta,,bold:/
+-cs_re_s:white,,bold:/(\$\w*)
+-cs_re:white:^(\w|/|\$)*
+-cs_re_s:white: \[.*\.(\w*?)\s?\]
++cs_re_s:white,,bold:/(\$[[:alnum:]_]*)
++cs_re:white:^([[:alnum:]_]|/|\$)*
++cs_re_s:white: \[.*\.([[:alnum:]_]*)[[:space:]]?\]
+ # Values
+ cs_re:green,,bold:(on|ON|OPEN|ONLINE|Online|true)
+ cs_re:yellow,,bold:(off|OFF|CLOSE|CLOSED)
+@@ -1095,57 +1095,57 @@ cs_re_s:blue,,bold: [0-9]{1,3},[0-9]{1,3},([0-9]{1,3})
+ cs_re_s:white,,bold: [0-9]{1,3},[0-9]{1,3},[0-9]{1,3},([0-9]{1,3})
+ cs_re_s:magenta: ([a-zA-Z0-9_,.]*)
+ # JSON Payload
+-cs_re_s:yellow:,("\w*")
+-cs_re_s:yellow: ("\w*")
+-cs_re_s:yellow:\{("\w*")
+-cs_re_s:magenta:\:("\w*")
+-cs_re_s:magenta:\:(\w*)
++cs_re_s:yellow:,("[[:alnum:]_]*")
++cs_re_s:yellow: ("[[:alnum:]_]*")
++cs_re_s:yellow:\{("[[:alnum:]_]*")
++cs_re_s:magenta:\:("[[:alnum:]_]*")
++cs_re_s:magenta:\:([[:alnum:]_]*)
+ cs_re_s:magenta:\:(".*")
+ 
+ # Cisco IOS and IOS-XE
+ colorscheme:cisco_ios
+ # IP address and port
+ cs_re:yellow,,bold:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}
+-cs_re_s:yellow:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\(([0-9]*?)\)
+-cs_re_s:yellow:localport\: ([0-9]*?)
++cs_re_s:yellow:[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\(([0-9]*)\)
++cs_re_s:yellow:localport\: ([0-9]*)
+ # interfaces
+-cs_re:magenta:\s(\w?+Ethernet|Port-channel|GigE|Fa|Gi|Te|Twe|Fo|Fi|Hu|TH|Po)
+-cs_re_s:magenta,,bold:(Ethernet|GigE|Fa|Gi|Te|Twe|Fo|Fi|Hu|TH)([0-9]+/[0-9]+(/[0-9]+|))
++cs_re:magenta:[[:space:]]([[:alnum:]_]?Ethernet|Port-channel|GigE|Fa|Gi|Te|Twe|Fo|Fi|Hu|TH|Po)
++cs_re_s:magenta,,bold:(Ethernet|GigE|Fa|Gi|Te|Twe|Fo|Fi|Hu|TH)([0-9]+/[0-9]+(/[0-9]+)?)
+ cs_re_s:magenta,,bold:(Port-channel|Po)([0-9]+)
+-cs_re:green,,bold:\b(up|on)\b
++cs_re:green,,bold:[[:<:]](up|on)[[:>:]]
+ # Vlans
+-cs_re:cyan:\s(Vlan|vlan)
++cs_re:cyan:[[:space:]](Vlan|vlan)
+ cs_re_s:cyan,,bold:(VLAN|Vlan|vlan|VLAN |Vlan |vlan ) ([0-9]{1,4})
+ # MAC address
+ cs_re:,,bold:[0-9a-fA-F]{4}\.[0-9a-fA-F]{4}\.[0-9a-fA-F]{4}
+ cs_re:,,bold:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\:[0-9a-fA-F]{2}\:[0-9a-fA-F]{2}\:[0-9a-fA-F]{2}\:[0-9a-fA-F]{2}
+ # User
+-cs_re_s:magenta,,bold:User (\w+?)
+-cs_re_s:magenta,,bold:user: (\w+?)
++cs_re_s:magenta,,bold:User ([[:alnum:]_]+)
++cs_re_s:magenta,,bold:user: ([[:alnum:]_]+)
+ # log levels
+-cs_re:black,red:%\S*-0-\S*
+-cs_re:black,red:%\S*-1-\S*
+-cs_re:red:%\S*-2-\S*
+-cs_re:red:%\S*-3-\S*
+-cs_re:yellow:%\S*-4-\S*
+-cs_re:yellow:%\S*-5-\S*
+-cs_re:green:%\S*-6-\S*
+-cs_re:black,white:%\S*-7-\S*
++cs_re:black,red:%[^[:space:]]*-0-[^[:space:]]*
++cs_re:black,red:%[^[:space:]]*-1-[^[:space:]]*
++cs_re:red:%[^[:space:]]*-2-[^[:space:]]*
++cs_re:red:%[^[:space:]]*-3-[^[:space:]]*
++cs_re:yellow:%[^[:space:]]*-4-[^[:space:]]*
++cs_re:yellow:%[^[:space:]]*-5-[^[:space:]]*
++cs_re:green:%[^[:space:]]*-6-[^[:space:]]*
++cs_re:black,white:%[^[:space:]]*-7-[^[:space:]]*
+ # spanning-tree
+-cs_re:green,,bold:\bforwarding\b
+-cs_re:red,,bold:\bblocking\b
+-cs_re:cyan:\sinstance
++cs_re:green,,bold:[[:<:]]forwarding[[:>:]]
++cs_re:red,,bold:[[:<:]]blocking[[:>:]]
++cs_re:cyan:[[:space:]]instance
+ cs_re_s:cyan,,bold:instance ([0-9]{1,4})
+ # access lists
+ cs_re_s:,,bold: list ([0-9]+)
+-cs_re_s:blue,,bold: list [0-9]+ denied ([a-z0-9]*+).
+-cs_re_s:blue,,bold: list [0-9]+ permitted ([a-z0-9]*+).
+-cs_re:green,,bold:\bpermitted\b
+-cs_re:red,,bold:\bdenied\b
++cs_re_s:blue,,bold: list [0-9]+ denied ([a-z0-9]*).
++cs_re_s:blue,,bold: list [0-9]+ permitted ([a-z0-9]*).
++cs_re:green,,bold:[[:<:]]permitted[[:>:]]
++cs_re:red,,bold:[[:<:]]denied[[:>:]]
+ # misc
+-cs_re:red,,bold:\b(down|off)\b
++cs_re:red,,bold:[[:<:]](down|off)[[:>:]]
+ cs_re_s:,,bold:[Pp]ower\ [Ss]upply\ ([0-9])
+-cs_re:red,,bold:\bfaulty\b
++cs_re:red,,bold:[[:<:]]faulty[[:>:]]
+ cs_re:red,,bold:error
+ cs_re:yellow,,bold:high warning
+ cs_re:yellow,,bold:low warning
+@@ -1158,17 +1158,17 @@ cs_re:red,,bold:exceeds warning level
+ # The colorscheme cisco_ios should be used after this one.
+ colorscheme:cisco_asa
+ # User
+-cs_re_s:magenta,,bold:User <(\w+?)>
+-cs_re_s:magenta,,bold:Username: (\w+?)
+-cs_re_s:magenta,,bold:User=(\w+?)
+-cs_re_s:magenta,,bold:Username = (\w+?)
+-cs_re_s:magenta,,bold:LOCAL\\(\w+?)
++cs_re_s:magenta,,bold:User <([[:alnum:]_]+)>
++cs_re_s:magenta,,bold:Username: ([[:alnum:]_]+)
++cs_re_s:magenta,,bold:User=([[:alnum:]_]+)
++cs_re_s:magenta,,bold:Username = ([[:alnum:]_]+)
++cs_re_s:magenta,,bold:LOCAL\\([[:alnum:]_]+)
+ # GroupPolicy
+-cs_re_s:blue,,bold: Group <(\S+?)>
+-cs_re_s:blue,,bold: Group = (\S+?)
+-cs_re_s:blue,,bold:GroupPolicy <(\S+?)>
++cs_re_s:blue,,bold: Group <([^[:space:]]+)>
++cs_re_s:blue,,bold: Group = ([^[:space:]]+)
++cs_re_s:blue,,bold:GroupPolicy <([^[:space:]]+)>
+ # TunnelGroup
+-cs_re_s:cyan,,bold:TunnelGroup <(\S+?)>
++cs_re_s:cyan,,bold:TunnelGroup <([^[:space:]]+)>
+ # Assigned IP
+ cs_re_s:green,,bold:IPv4 Address <([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})>
+ cs_re_s:green,,bold: Assigned IP=([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})
