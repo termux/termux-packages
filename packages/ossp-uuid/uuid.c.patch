@@ -1,0 +1,20 @@
+--- a/uuid.c
++++ b/uuid.c
+@@ -805,7 +805,7 @@ static uuid_rc_t uuid_make_v1_v6(uuid_t *uuid, unsigned int mode, unsigned versi
+     /* determine current system time and sequence counter */
+     for (;;) {
+         /* determine current system time */
+-        timespec_get(&time_now, TIME_UTC);
++        clock_gettime(CLOCK_REALTIME, &time_now);
+ 
+         /* check whether system time changed since last retrieve */
+         if (!(    time_now.tv_sec         == uuid->time_last.tv_sec
+@@ -1067,7 +1067,7 @@ static uuid_rc_t uuid_make_v7(uuid_t *uuid, unsigned int mode, va_list ap)
+     (void)mode, (void)ap;
+ 
+     struct timespec time_now;
+-    timespec_get(&time_now, TIME_UTC);
++    clock_gettime(CLOCK_REALTIME, &time_now);
+     uint64_t millis = time_now.tv_sec * 1000 + time_now.tv_nsec / 1000000;
+ 
+     uint8_t uuid_buf[UUID_LEN_BIN] = {};
