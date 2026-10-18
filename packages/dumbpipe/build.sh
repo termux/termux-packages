@@ -6,9 +6,9 @@ LICENSE-APACHE
 LICENSE-MIT
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.39.0"
+TERMUX_PKG_VERSION="0.40.0"
 TERMUX_PKG_SRCURL="https://github.com/n0-computer/dumbpipe/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=89d01b0b6d25fc8baf06ab791fd0a2b35b24ac51d0bd01b64d36c35750aaf3e9
+TERMUX_PKG_SHA256=04717f503fadd0ee86747036b232f89432c9d5ac2083b626019095f3f08266ef
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,12 +21,13 @@ termux_step_pre_configure() {
 	find ./vendor \
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor/rustls-platform-verifier \
-		! -wholename ./vendor/hickory-resolver \
-		! -wholename ./vendor/resolv-conf \
+		! -wholename ./vendor/iroh-dns \
+		! -wholename ./vendor/n0-dns-resolver \
 		! -wholename ./vendor/netdev \
+		! -wholename ./vendor/netdev-0.45.1 \
 		-exec rm -rf '{}' \;
 
-	find vendor/{rustls-platform-verifier,hickory-resolver} -type f -print0 | \
+	find vendor/{rustls-platform-verifier,iroh-dns,n0-dns-resolver} -type f -print0 | \
 		xargs -0 sed -i \
 		-e 's|"android"|"disabling_this_because_it_is_for_building_an_apk"|g' \
 		-e "s|ANDROID|DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK|g" \
@@ -40,8 +41,9 @@ termux_step_pre_configure() {
 
 		[patch.crates-io]
 		rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }
-		hickory-resolver = { path = "./vendor/hickory-resolver" }
-		resolv-conf = { path = "./vendor/resolv-conf" }
+		iroh-dns = { path = "./vendor/iroh-dns" }
+		n0-dns-resolver = { path = "./vendor/n0-dns-resolver" }
 		netdev = { path = "./vendor/netdev" }
+		netdev-0-45 = { package = "netdev", path = "./vendor/netdev-0.45.1" }
 	EOF
 }
