@@ -16,9 +16,9 @@ TERMUX_PKG_SHA256=(
 	35d3cd0979d65664fada7119fdb612eca7c34b61a1623a330caec74bf72626c4
 	5e9f06aae32a8ac0f94886e8caa5947ad7da41670169c9ee1a08e28cf53c65f5
 )
-TERMUX_PKG_DEPENDS="ffmpeg, libcurl, libfdk-aac, libjansson, mesa, pulseaudio, qt6-qtbase, qt6-qtsvg, mbedtls, qrcodegen, librnnoise, libx11, libxcb, libxkbcommon, zlib, glib, libuuid, fontconfig, freetype, libx264, vulkan-loader, libxext, libxfixes, libxcomposite, libxinerama, libxrandr, libxrender, libxcursor, libxdamage, libandroid-glob, libandroid-spawn, libdatachannel"
-TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, swig, glslang, pkg-config, nlohmann-json, websocketpp, simde, uthash, libasio, libwayland, vlc-qt, python, libfdk-aac, luajit, speexdsp, librnnoise, mbedtls-static, libandroid-stub, libandroid-shmem"
-TERMUX_PKG_SUGGESTS="vlc-qt, luajit, python, librnnoise, libfdk-aac, speexdsp"
+TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, glib, libandroid-glob, libandroid-spawn, libcurl, libdatachannel, libjansson, librnnoise, libuuid, libx11, libx264, libxcb, libxcomposite, libxcursor, libxdamage, libxext, libxfixes, libxinerama, libxkbcommon, libxrandr, libxrender, mbedtls, mesa, pulseaudio, qrcodegen, qt6-qtbase, qt6-qtsvg, vulkan-loader, zlib"
+TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, librnnoise, luajit, nlohmann-json, pkg-config, python, simde, speexdsp, swig, uthash, vlc-qt, websocketpp"
+TERMUX_PKG_SUGGESTS="libfdk-aac, librnnoise, luajit, python, speexdsp, vlc-qt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DOBS_VERSION_OVERRIDE=${TERMUX_PKG_VERSION[0]}
 -DENABLE_BROWSER=OFF
