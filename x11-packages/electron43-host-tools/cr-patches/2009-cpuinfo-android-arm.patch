@@ -1,0 +1,13 @@
+--- a/third_party/cpuinfo/src/src/arm/linux/init.c
++++ b/third_party/cpuinfo/src/src/arm/linux/init.c
+@@ -14,6 +14,10 @@
+ #include <cpuinfo/log.h>
+ #include <linux/api.h>
+ 
++#ifdef __TERMUX__
++#include <arm/android/properties.c>
++#endif
++
+ struct cpuinfo_arm_isa cpuinfo_isa = {0};
+ 
+ static struct cpuinfo_package package = {{0}};

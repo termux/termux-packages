@@ -1,0 +1,56 @@
+--- a/build/config/compiler/BUILD.gn
++++ b/build/config/compiler/BUILD.gn
+@@ -588,12 +588,14 @@
+   if (is_clang) {
+     # Flags for diagnostics.
+     cflags += [ "-fcolor-diagnostics" ]
++    if (false) {
+     if (!is_win) {
+       cflags += [ "-fdiagnostics-show-inlining-chain" ]
+     } else {
+       # Combine after https://github.com/llvm/llvm-project/pull/192241
+       cflags += [ "/clang:-fdiagnostics-show-inlining-chain" ]
+     }
++    }
+     if (diagnostics_print_source_range_info && !is_win) {
+       cflags += [ "-fdiagnostics-print-source-range-info" ]
+     }
+@@ -627,7 +627,7 @@
+     # The performance improvement does not seem worth the risk. See
+     # https://crbug.com/484082200 for background and https://crrev.com/c/7593035
+     # for discussion.
+-    if (!is_wasm) {
++    if (!is_wasm && false) {
+       cflags += [ "-fno-lifetime-dse" ]
+     }
+ 
+@@ -1911,7 +1911,7 @@
+ # See also: https://crbug.com/40891132#comment10
+ ubsan_hardening("c_array_bounds") {
+   sanitizer = "array-bounds"
+-  condition = !(is_asan && target_cpu == "x86")
++  condition = !(is_asan && target_cpu == "x86") && false
+ 
+   # Because we've enabled array-bounds sanitizing we also want to suppress
+   # the related warning about "unsafe-buffer-usage-in-static-sized-array",
+@@ -1925,6 +1925,7 @@
+ # `NOTREACHED()` at the end of such functions.
+ ubsan_hardening("return") {
+   sanitizer = "return"
++  condition = false
+ }
+ 
+ config("rustc_revision") {
+@@ -2332,6 +2333,12 @@
+       # should always be added for clang builds.
+       cflags += [ "-Wexit-time-destructors" ]
+     }
++
++    # Ignore unknown options and pragmas
++    cflags += [
++      "-Wno-unknown-warning-option",
++      "-Wno-unknown-pragmas",
++    ]
+   }
+ 
+   # TODO(crbug.com/354162568): Clean up and enable.
