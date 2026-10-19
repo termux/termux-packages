@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://www.calculix.de/
 TERMUX_PKG_DESCRIPTION="CalculiX CrunchiX (ccx) - Three-Dimensional Structural Finite Element Solver"
 TERMUX_PKG_GROUPS="science"
+TERMUX_PKG_VERSION="2.23"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_LICENSE_FILE="CalculiX/ccx_${TERMUX_PKG_VERSION}/src/ccx_${TERMUX_PKG_VERSION}.c"
 TERMUX_PKG_MAINTAINER="Daniel <danielpdiamon@gmail.com>"
-TERMUX_PKG_VERSION="2.23"
 TERMUX_PKG_SRCURL=(
 	"http://www.dhondt.de/ccx_${TERMUX_PKG_VERSION}.src.tar.bz2"
 	"http://www.netlib.org/linalg/spooles/spooles.2.2.tgz"
