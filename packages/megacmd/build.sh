@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=(
 	"2.6.0"
 	"10.19.0"
 )
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(
 	"https://github.com/meganz/MEGAcmd/archive/refs/tags/${TERMUX_PKG_VERSION[0]}_Linux.tar.gz"
 	"https://github.com/meganz/sdk/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz"
