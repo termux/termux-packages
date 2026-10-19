@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=(
 	"32.2.2"
 	"5.7.3"
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/obsproject/obs-studio/archive/refs/tags/${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/obsproject/obs-websocket/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz"
