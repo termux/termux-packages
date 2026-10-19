@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Automatic Language-Agnostic Subtitle Synchronization"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://github.com/kaegi/alass/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=ce88f92c7a427b623edcabb1b64e80be70cca2777f3da4b96702820a6cdf1e26
 TERMUX_PKG_DEPENDS="ffmpeg"
@@ -15,6 +15,7 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	termux_setup_rust
+	export CFLAGS_${CARGO_TARGET_NAME//-/_}="${CFLAGS} --target=${CARGO_TARGET_NAME}${TERMUX_PKG_API_LEVEL}"
 	cargo install \
 		--jobs $TERMUX_PKG_MAKE_PROCESSES \
 		--path alass-cli \
