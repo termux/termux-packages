@@ -8,7 +8,7 @@ LICENSES/CC-BY-SA-4.0.txt
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.1.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/crow-translate/$TERMUX_PKG_VERSION/crow-translate-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=70cab22a089aa976627fb0f04ea2bf2e918a138c36ff0337d4a7709ea5462fa3
 TERMUX_PKG_DEPENDS="libc++, hicolor-icon-theme, kf6-kiconthemes, kwayland, libx11, libxcb, onnxruntime, qt6-qtbase, qt6-qtmultimedia, qt6-qtscxml, qt6-qtspeech, tesseract"
