@@ -8,8 +8,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_VERSION=0.26
 TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=https://releases.pagure.org/mlocate/mlocate-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL="https://src.fedoraproject.org/repo/pkgs/mlocate/mlocate-${TERMUX_PKG_VERSION}.tar.xz/md5/539e6f86bf387358aa2b14d5f880e49a/mlocate-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=3063df79fe198fb9618e180c54baf3105b33d88fe602ff2d8570aaf944f1263e
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX"
