@@ -1,0 +1,34 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/chennes/med
+TERMUX_PKG_DESCRIPTION="Modeling and Exchange of Data (MED) library"
+TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@Danielk10"
+TERMUX_PKG_VERSION="6.0.1"
+TERMUX_PKG_SRCURL=https://github.com/chennes/med/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=62f163812e4df09c23e93d42342856a6da438cbf98d9dfe0360ce7b14a92b035
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_DEPENDS="libc++, libhdf5, zlib"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DHDF5_ROOT=$TERMUX_PREFIX
+-DHDF5_ROOT_DIR=$TERMUX_PREFIX
+-DHDF5_INCLUDE_DIR=$TERMUX_PREFIX/include
+-DHDF5_LIBRARY=$TERMUX_PREFIX/lib/libhdf5.so
+-DHDF5_C_LIBRARY=$TERMUX_PREFIX/lib/libhdf5.so
+-DHDF5_NO_FIND_PACKAGE_CONFIG_FILE=ON
+-DMEDFILE_BUILD_TESTS=OFF
+-DMEDFILE_BUILD_PYTHON=OFF
+-DMEDFILE_INSTALL_DOC=OFF
+-DMEDFILE_USE_MPI=OFF
+-DBUILD_SHARED_LIBS=ON
+"
+
+termux_step_post_massage() {
+	local _SOVERSION_GUARD_FILES="
+lib/libmedC.so.14
+"
+	local f
+	for f in ${_SOVERSION_GUARD_FILES}; do
+		if [ ! -e "${f}" ]; then
+			termux_error_exit "SOVERSION guard check failed."
+		fi
+	done
+}
