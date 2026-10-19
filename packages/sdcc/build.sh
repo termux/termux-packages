@@ -7,9 +7,8 @@ TERMUX_PKG_MAINTAINER="Daniel <danielpdiamon@gmail.com>"
 TERMUX_PKG_VERSION="4.5.0"
 TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/sdcc/sdcc/${TERMUX_PKG_VERSION}/sdcc-src-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256="d5030437fb436bb1d93a8dbdbfb46baaa60613318f4fb3f5871d72815d1eed80"
-TERMUX_PKG_DEPENDS="libgc, zlib"
+TERMUX_PKG_DEPENDS="gputils, libgc, zlib"
 TERMUX_PKG_BUILD_DEPENDS="bison, boost-headers, flex"
-TERMUX_PKG_SUGGESTS="gputils"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-libgc
 gcc_cv_c_no_fpie=no
