@@ -4,8 +4,8 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE_LGPL_21.txt"
 TERMUX_PKG_MAINTAINER="Daniel <danielpdiamon@gmail.com>"
-TERMUX_PKG_VERSION="8.0.0.1"
-TERMUX_PKG_SRCURL="https://github.com/Open-Cascade-SAS/OCCT/archive/refs/tags/V8_0_0_p1.tar.gz"
+TERMUX_PKG_VERSION="8.0.0.p1"
+TERMUX_PKG_SRCURL="https://github.com/Open-Cascade-SAS/OCCT/archive/refs/tags/V${TERMUX_PKG_VERSION//./_}.tar.gz"
 TERMUX_PKG_SHA256="ad794cba1f377274b40050b098c106e02409def7e23b0763fae4b0aea95ac3a7"
 TERMUX_PKG_DEPENDS="draco, freeimage, freetype, rapidjson, tcl, tk"
 TERMUX_PKG_BUILD_DEPENDS="fontconfig"
@@ -65,4 +65,15 @@ termux_step_post_get_source() {
 	EOF
 	sed -i '1r '"$TERMUX_PKG_TMPDIR/fdsan_patch.inc" src/Draw/TKDraw/Draw/Draw_Main.cxx
 	sed -i '/int Draw_Main/ {n; s/{/{\n#if defined(__ANDROID__)\n  _disable_fdsan_android();\n#endif/}' src/Draw/TKDraw/Draw/Draw_Main.cxx
+}
+
+termux_step_post_make_install() {
+	cat <<- INS_EOF > "$TERMUX_PREFIX/bin/drawenv"
+	#!$TERMUX_PREFIX/bin/sh
+	export TCL_LIBRARY="$TERMUX_PREFIX/lib/tcl8.6"
+	export TK_LIBRARY="$TERMUX_PREFIX/lib/tk8.6"
+	export TCLLIBPATH="$TERMUX_PREFIX/lib $TERMUX_PREFIX/lib/tcl8.6 $TERMUX_PREFIX/lib/tk8.6"
+	exec "$TERMUX_PREFIX/bin/DRAWEXE" "\$@"
+	INS_EOF
+	chmod 0755 "$TERMUX_PREFIX/bin/drawenv"
 }
