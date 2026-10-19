@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple markdown note management app"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.6.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/marknote/marknote-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="d3bb39614e22fd1a8ddd74bcfb4c384cbffe25685ec01116f694e470816284a9"
 TERMUX_PKG_AUTO_UPDATE=true
