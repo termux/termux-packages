@@ -1,0 +1,37 @@
+--- a/plocate.cpp
++++ b/plocate.cpp
+@@ -482,17 +482,21 @@ uint64_t do_search_file(const vector<Needle> &needles, const std::string &filena
+ 	}
+ 
+ 	// Drop privileges.
++#ifndef __ANDROID__
+ 	if (setresgid(getgid(), getgid(), getgid()) != 0) {
+ 		perror("setresgid");
+ 		exit(EXIT_FAILURE);
+ 	}
++#endif
+ 
+ 	start = steady_clock::now();
++#ifndef __ANDROID__
+ 	if (access("/", R_OK | X_OK)) {
+ 		// We can't find anything, no need to bother...
+ 		close(fd);
+ 		return 0;
+ 	}
++#endif
+ 
+ 	IOUringEngine engine(/*slop_bytes=*/16);  // 16 slop bytes as described in turbopfor.h.
+ 	Corpus corpus(fd, filename.c_str(), &engine);
+@@ -951,10 +955,12 @@ int main(int argc, char **argv)
+ 		// from making plocate slow for everyone else.
+ 		// --ignore-visibility is obvious; if we allowed to keep sgid with
+ 		// that flag on, it would subvert the entire security model.
++#ifndef __ANDROID__
+ 		if (setresgid(getgid(), getgid(), getgid()) != 0) {
+ 			perror("setresgid");
+ 			exit(EXIT_FAILURE);
+ 		}
++#endif
+ 	}
+ 
+ 	if (!print_nul) {
