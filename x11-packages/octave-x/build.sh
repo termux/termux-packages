@@ -3,13 +3,16 @@ TERMUX_PKG_DESCRIPTION="GNU Octave is a high-level language, primarily intended 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2:11.3.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://ftpmirror.gnu.org/octave/octave-${TERMUX_PKG_VERSION#*:}.tar.xz"
 TERMUX_PKG_SHA256=2b80f3149b2de6d1f4f2fcb4fe6515a17eb363b52111bf57b90f37bf6f5e12e1
-TERMUX_PKG_DEPENDS="arpack-ng, clang, fftw, fltk, fontconfig, freetype, ghostscript, glpk, glu, graphicsmagick, libandroid-complex-math, libbz2, libc++, libcurl, libhdf5, libiconv, libopenblas, libsndfile, libx11, libxcursor, libxext, libxfixes, libxft, libxinerama, libxrender, make, opengl, openssl, pcre2, portaudio, qhull, qrupdate-ng, qscintilla-qt6, qt6-qt5compat, qt6-qtbase, qt6-qttools, readline, suitesparse, sundials, zlib"
+TERMUX_PKG_DEPENDS="arpack-ng, clang, fftw, fltk, fontconfig, freetype, ghostscript, gl2ps, glpk, glu, graphicsmagick, libandroid-complex-math, libbz2, libc++, libcurl, libhdf5, libiconv, libopenblas, libsndfile, libx11, libxcursor, libxext, libxfixes, libxft, libxinerama, libxrender, make, opengl, openssl, pcre2, portaudio, qhull, qrupdate-ng, qscintilla-qt6, qt6-qt5compat, qt6-qtbase, qt6-qttools, readline, suitesparse, sundials, zlib"
 TERMUX_PKG_BUILD_DEPENDS="gnuplot, less, rapidjson, qt6-qtbase-cross-tools, qt6-qttools-cross-tools"
 TERMUX_PKG_RECOMMENDS="gnuplot, less"
-TERMUX_PKG_CONFLICTS="octave"
+TERMUX_PKG_BREAKS="octave-static, octave-x-static"
+TERMUX_PKG_CONFLICTS="octave, octave-static, octave-x-static"
+TERMUX_PKG_REPLACES="octave-static, octave-x-static"
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 # gl_cv_cc_visibility=no prevents error about no '-fvisibility=hidden'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -57,11 +60,10 @@ termux_step_pre_configure() {
 
 	export F77="$FC"
 	mkdir -p $TERMUX_PKG_TMPDIR/_deps
-	ln -sf $flang_libs_dir/libFortranRuntime.a $TERMUX_PKG_TMPDIR/_deps/
-	ln -sf $flang_libs_dir/libFortranDecimal.a $TERMUX_PKG_TMPDIR/_deps/
-	export ac_cv_f77_libs="-L$TERMUX_PKG_TMPDIR/_deps -l:libFortranRuntime.a -l:libFortranDecimal.a"
+	ln -sf $flang_libs_dir/libflang_rt.runtime.a $TERMUX_PKG_TMPDIR/_deps/
+	export ac_cv_f77_libs="-L$TERMUX_PKG_TMPDIR/_deps -l:libflang_rt.runtime.a"
 
-	LDFLAGS+=" -Wl,-rpath,$TERMUX_PREFIX/lib/octave/$TERMUX_PKG_VERSION"
+	LDFLAGS+=" -Wl,-rpath,$TERMUX_PREFIX/lib/octave/$TERMUX_PKG_VERSION -Wl,-Bsymbolic"
 	local _libgcc_file="$($CC -print-libgcc-file-name)"
 	local _libgcc_path="$(dirname $_libgcc_file)"
 	local _libgcc_name="$(basename $_libgcc_file)"
