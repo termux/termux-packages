@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<dump>
+  <boxed name="NiceAddress" get-type="nice_address_get_type"/>
+  <boxed name="NiceCandidate" get-type="nice_candidate_get_type"/>
+  <class name="NiceAgent" get-type="nice_agent_get_type" parents="GObject">
+    <property name="compatibility" type="guint" flags="11" default-value="0"/>
+    <property name="main-context" type="gpointer" flags="11"/>
+    <property name="stun-server" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="stun-server-port" type="guint" flags="3" default-value="1"/>
+    <property name="controlling-mode" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="full-mode" type="gboolean" flags="11" default-value="TRUE"/>
+    <property name="stun-pacing-timer" type="guint" flags="7" default-value="20"/>
+    <property name="max-connectivity-checks" type="guint" flags="3" default-value="0"/>
+    <property name="proxy-type" type="guint" flags="3" default-value="0"/>
+    <property name="proxy-ip" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="proxy-port" type="guint" flags="3" default-value="1"/>
+    <property name="proxy-username" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="proxy-password" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="proxy-extra-headers" type="GHashTable" flags="3"/>
+    <property name="upnp" type="gboolean" flags="7" default-value="TRUE"/>
+    <property name="upnp-timeout" type="guint" flags="7" default-value="200"/>
+    <property name="reliable" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="ice-udp" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="ice-tcp" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="bytestream-tcp" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="keepalive-conncheck" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="force-relay" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="stun-max-retransmissions" type="guint" flags="7" default-value="3"/>
+    <property name="stun-initial-timeout" type="guint" flags="7" default-value="500"/>
+    <property name="stun-reliable-timeout" type="guint" flags="7" default-value="2000"/>
+    <property name="nomination-mode" type="NiceNominationMode" flags="11" default-value="NICE_NOMINATION_MODE_AGGRESSIVE"/>
+    <property name="ice-trickle" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="support-renomination" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="idle-timeout" type="guint" flags="7" default-value="5000"/>
+    <property name="consent-freshness" type="gboolean" flags="3" default-value="FALSE"/>
+    <property name="close-forced" type="gboolean" flags="11" default-value="FALSE"/>
+    <property name="recv-tos" type="gboolean" flags="11" default-value="FALSE"/>
+    <signal name="component-state-changed" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="candidate-gathering-done" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="new-selected-pair" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="new-candidate" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="new-remote-candidate" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="gchararray"/>
+    </signal>
+    <signal name="initial-binding-request-received" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="reliable-transport-writable" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="streams-removed" return="void" when="last">
+      <param type="_NiceAgentStreamIds"/>
+    </signal>
+    <signal name="new-selected-pair-full" return="void" when="last">
+      <param type="guint"/>
+      <param type="guint"/>
+      <param type="NiceCandidate"/>
+      <param type="NiceCandidate"/>
+    </signal>
+    <signal name="new-candidate-full" return="void" when="last">
+      <param type="NiceCandidate"/>
+    </signal>
+    <signal name="new-remote-candidate-full" return="void" when="last">
+      <param type="NiceCandidate"/>
+    </signal>
+  </class>
+  <class name="PseudoTcpSocket" get-type="pseudo_tcp_socket_get_type" parents="GObject">
+    <property name="conversation" type="guint" flags="235" default-value="0"/>
+    <property name="callbacks" type="gpointer" flags="227"/>
+    <property name="state" type="guint" flags="225" default-value="0"/>
+    <property name="ack-delay" type="guint" flags="227" default-value="100"/>
+    <property name="no-delay" type="gboolean" flags="227" default-value="TRUE"/>
+    <property name="rcv-buf" type="guint" flags="227" default-value="61440"/>
+    <property name="snd-buf" type="guint" flags="227" default-value="92160"/>
+    <property name="support-fin-ack" type="gboolean" flags="235" default-value="TRUE"/>
+  </class>
+</dump>
