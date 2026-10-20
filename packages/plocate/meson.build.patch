@@ -1,0 +1,32 @@
+--- a/meson.build
++++ b/meson.build
+@@ -1,8 +1,8 @@
+ project('plocate', 'cpp', default_options: ['buildtype=debugoptimized','cpp_std=c++17'], version: '1.1.25')
+ 
+ add_project_arguments('-DGROUPNAME="' + get_option('locategroup') + '"', language: 'cpp')
+-add_project_arguments('-DUPDATEDB_CONF="/etc/updatedb.conf"', language: 'cpp')
+-dbfile = join_paths(get_option('sharedstatedir'), get_option('dbpath'))
++add_project_arguments('-DUPDATEDB_CONF="@TERMUX_PREFIX@/etc/updatedb.conf"', language: 'cpp')
++dbfile = join_paths(get_option('prefix'), get_option('sharedstatedir'), get_option('dbpath'))
+ add_project_arguments('-DDBFILE="' + dbfile + '"', language: 'cpp')
+ add_project_arguments('-DPACKAGE_NAME="plocate"', language: 'cpp')
+ add_project_arguments('-DPACKAGE_VERSION="' + meson.project_version() + '"', language: 'cpp')
+@@ -32,8 +32,7 @@ endif
+ 
+ executable('plocate', ['plocate.cpp', 'io_uring_engine.cpp', 'turbopfor.cpp', 'parse_trigrams.cpp', 'serializer.cpp', 'access_rx_cache.cpp', 'needle.cpp', 'complete_pread.cpp'],
+ 	dependencies: [uringdep, zstddep, threaddep, atomicdep],
+-	install: true,
+-	install_mode: ['rwxr-sr-x', 'root', get_option('locategroup')])
++	install: true)
+ executable('plocate-build', ['plocate-build.cpp', 'database-builder.cpp'],
+ 	dependencies: [zstddep],
+ 	install: true,
+@@ -49,7 +48,7 @@ conf_data.set('PROCESSED_BY_MESON', '1')
+ conf_data.set('sbindir', join_paths(get_option('prefix'), get_option('sbindir')))
+ conf_data.set('groupname', get_option('locategroup'))
+ conf_data.set('dbfile', dbfile)
+-conf_data.set('updatedb_conf', '/etc/updatedb.conf')
++conf_data.set('updatedb_conf', '@TERMUX_PREFIX@/etc/updatedb.conf')
+ conf_data.set('updatedb_progname', updatedb_progname)
+ update_script = configure_file(input: 'update-plocate.sh',
+                output: 'update-plocate.sh',
