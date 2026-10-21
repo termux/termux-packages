@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Updates Go import lines, adding missing ones and removin
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="0.52.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/golang/tools/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=52846a0ad92cde47a8ed152c5f1908f81daa93114c8fa5c10a8f19352af1a1d9
 TERMUX_PKG_AUTO_UPDATE=true
