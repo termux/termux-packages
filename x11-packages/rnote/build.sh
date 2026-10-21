@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="An infinite canvas vector-based drawing application for 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@EDLLT"
 TERMUX_PKG_VERSION="0.14.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/flxzt/rnote/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=10dd7849b593034b7fbd55f5b5baa51fb082ef48d96e1a6200d361e6ed49363e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="alsa-lib, gdk-pixbuf, gettext, glib, graphene, gtk4, hicolor-icon-theme, libadwaita, libcairo, pipewire, pango, poppler"
-TERMUX_PKG_BUILD_DEPENDS="libiconv"
+TERMUX_PKG_BUILD_DEPENDS="appstream, libiconv"
 TERMUX_PKG_PYTHON_CROSS_BUILD_DEPS="toml2json"
 
 termux_step_pre_configure() {
