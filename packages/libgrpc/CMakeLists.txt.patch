@@ -1,9 +1,7 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f6de091a0c..d21e04a24d 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -1432,12 +1432,6 @@ target_link_libraries(gpr
-   absl::strings
+--- a/CMakeLists.txt	2026-10-21 19:27:39.948152477 +0530
++++ b/CMakeLists.txt	2026-10-21 20:00:54.357184676 +0530
+@@ -2189,12 +2189,6 @@
+   absl::time
    absl::optional
  )
 -if(_gRPC_PLATFORM_ANDROID)
@@ -14,4 +12,14 @@ index f6de091a0c..d21e04a24d 100644
 -endif()
  
  foreach(_hdr
-   include/grpc/support/alloc.h
+   include/grpc/impl/codegen/atm.h
+@@ -56353,9 +56347,6 @@
+   DESTINATION ${gRPC_INSTALL_CMAKEDIR}/modules
+ )
+ 
+-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/etc/roots.pem
+-  DESTINATION ${gRPC_INSTALL_SHAREDIR})
+-
+ # Function to generate pkg-config files.
+ function(generate_pkgconfig name description version requires requires_private
+                             libs libs_private output_filename)
