@@ -119,6 +119,8 @@ termux_step_post_get_source() {
 	rm -rf third_party/termux-patches/
 	mkdir -p third_party/termux-patches/
 	cp -Rfv $TERMUX_PKG_BUILDER_DIR/dep-patches/* third_party/termux-patches/
+	sed -i -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		third_party/termux-patches/*
 }
 
 termux_step_configure() {
