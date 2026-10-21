@@ -79,7 +79,7 @@ termux_step_make() {
 
 	# 3. Compile CalculiX (ccx_2.23_MT)
 	local CCX_CFLAGS="-Wall -O2 $CFLAGS -fPIC -fPIE -fopenmp -I../SPOOLES.2.2 -DARCH=\"Linux\" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1"
-	local CCX_FFLAGS="-Wall -O2 $FCFLAGS -fopenmp -cpp -fallow-argument-mismatch -Wno-error"
+	local CCX_FFLAGS="-Wall -O2 $FCFLAGS -fopenmp -cpp -Wno-error"
 	local CCX_LIBS="../SPOOLES.2.2/MT/src/spoolesMT.a ../SPOOLES.2.2/spooles.a -larpack -lopenblas -lomp -lm"
 
 	chmod +x date.pl
