@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="TUI for Telegram and WhatsApp"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.19.18"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/d99kris/nchat/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=69c3cf421871059f6726c58999d58a11f5a5a45a19828799a276c8b424992f52
 TERMUX_PKG_DEPENDS="file, libandroid-execinfo, libandroid-glob, libandroid-wordexp, libpng, libsqlite, ncurses, openssl, zlib"
