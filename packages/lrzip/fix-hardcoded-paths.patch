@@ -8,10 +8,10 @@
 +# TMPDIR = @TERMUX_PREFIX@/tmp
  
  # Whether to use encryption on compression YES, NO (-e)
- # ENCRYPT = NO
+ # Default suite is modern AES-256-GCM (not readable by lrzip 0.6.x)
 --- a/lrzip.c
 +++ b/lrzip.c
-@@ -470,10 +470,10 @@
+@@ -629,10 +629,10 @@ int open_tmpinfile(rzip_control *control)
  	/* Use /tmp if nothing is writeable so far */
  	if (fd_in == -1) {
  		dealloc(control->infile);
@@ -26,7 +26,7 @@
  
 --- a/man/lrzip.conf.5
 +++ b/man/lrzip.conf.5
-@@ -12,7 +12,7 @@
+@@ -12,7 +12,7 @@ The lrzip program will search for the file automatically in one of
  three places\&:
  .nf
  $PWD \- Current Directory
@@ -37,7 +37,7 @@
  Parameters are set in \fBPARAMETER\&=VALUE\fP fashion where any line
 --- a/util.c
 +++ b/util.c
-@@ -209,9 +209,9 @@
+@@ -228,9 +228,9 @@ bool read_config(rzip_control *control)
  		}
  	}
  	if (fp == NULL) {
