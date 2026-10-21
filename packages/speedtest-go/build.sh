@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command line interface to test internet speed using spee
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.8.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/showwin/speedtest-go/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=48d01137468da9d419a3940a652803dafd8a6820abcd985b85c9d0c86b417ba3
 TERMUX_PKG_AUTO_UPDATE=true
