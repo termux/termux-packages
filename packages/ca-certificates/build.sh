@@ -3,11 +3,24 @@ TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:2026.10.20"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://curl.se/ca/cacert-$(sed 's/\./-/g' <<< ${TERMUX_PKG_VERSION:2}).pem
 TERMUX_PKG_SHA256=796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+
+termux_pkg_auto_update() {
+	local latest
+	latest="$(
+		curl -fsSL https://curl.se/docs/caextract.html |
+			grep -Eo 'href="/ca/cacert-.*\.pem"' |          # First extract all the download URLs
+			grep -Eo "[0-9]{4}-[0-9]{2}-[0-9]{2}" |         # Now extract the version code
+			sed -E 's/-/./g' |                              # Now finally change the - to .
+			head -n1                                        # Select only the first version
+	)"
+	termux_pkg_upgrade_version "${latest}"
+}
 
 termux_step_make_install() {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls
