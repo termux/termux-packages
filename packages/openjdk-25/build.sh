@@ -3,14 +3,15 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.0.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz"
 TERMUX_PKG_SHA256=9a850ceee8c2fb2a5cda99fde4bb74a1bc12fbbabbd995273a2febd9206070c4
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='25\.\d+\.\d+(?=-ga)'
-TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
+TERMUX_PKG_DEPENDS="ca-certificates-java, libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto, alsa-lib"
 # openjdk-25-x is recommended because X11 separation is still very experimental.
-TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-25-x, resolv-conf"
+TERMUX_PKG_RECOMMENDS="openjdk-25-x, resolv-conf"
 # openjdk no longer officially supports 32-bit x86
 # technically, it has been manually force-tested by the author of the openjdk-25 Termux package,
 # and it does still work superficially,
@@ -152,4 +153,10 @@ termux_step_post_make_install() {
 	if [[ "$failure" = true ]]; then
 		termux_error_exit "ERROR: openjdk-25.alternatives is not up to date, please update it."
 	fi
+
+	# Use System CA certificates
+	local opendk25_cacerts="$TERMUX_PREFIX/lib/jvm/java-25-openjdk/lib/security/cacerts"
+	local ca_certificates_cacerts="$TERMUX_PREFIX/etc/tls/certs/java/cacerts"
+	rm "$opendk25_cacerts"
+	ln -s "$ca_certificates_cacerts" "$opendk25_cacerts"
 }
