@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Sparse volume data structure and tools"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="13.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/AcademySoftwareFoundation/openvdb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=21659ef2330a06805519dd8d4369375f181a0dfee205b0180da69b4edd3329ae
 TERMUX_PKG_DEPENDS="boost, imath, libblosc, libtbb, zlib"
