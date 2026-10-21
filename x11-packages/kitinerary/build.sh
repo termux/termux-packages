@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Data model and extraction system for travel reservation 
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kitinerary-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=5e1f0aeec768747a8e5e93d2e0759fa220f37191c9ce1ca3ffa15898a98a1f43
 TERMUX_PKG_AUTO_UPDATE=true
