@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # NOTE: as of 1.12.0 compilation fails when package zstd is
 # present in TERMUX_PREFIX.
 TERMUX_PKG_VERSION="2.1.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e9794cab0adf5b0a59d9b631e994dce055c57cb805228555bdfa68118be4bd0a
 TERMUX_PKG_AUTO_UPDATE=true
