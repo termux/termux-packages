@@ -21,6 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DHDF5_INCLUDE_DIR=$TERMUX_PREFIX/include
 -DHDF5_LIBRARIES=$TERMUX_PREFIX/lib/libhdf5.so
 -DHDF5_FOUND=TRUE
+-DHDF5_VERSION=2.2.0
 -DZLIB_INCLUDE_DIR=$TERMUX_PREFIX/include
 -DZLIB_LIBRARY=$TERMUX_PREFIX/lib/libz.so
 -DZLIB_FOUND=TRUE
@@ -41,6 +42,26 @@ termux_step_post_get_source() {
 	find SRC/reliability/tcl -type f \( -name "*.h" -o -name "*.cpp" \) -exec sed -i 's/char \*\*argv/const char \*\*argv/g' {} +
 	find SRC/reliability -type f \( -name "*.h" -o -name "*.cpp" \) -exec sed -i 's/TCL_Char \*fileName/const TCL_Char *fileName/g' {} +
 	find SRC/reliability -type f \( -name "*.h" -o -name "*.cpp" \) -exec sed -i 's/TCL_Char \*arrayName/const TCL_Char *arrayName/g' {} +
+
+	# 4. Patch HDF5 detection for cross-compilation (avoid failed h5cc host wrapper)
+	python3 - <<- EOF
+	with open('CMakeLists.txt', 'r') as f:
+	    s = f.read()
+	patch = '''set(HDF5_FOUND TRUE)
+	set(HDF5_VERSION "2.2.0")
+	set(HDF5_INCLUDE_DIR "${TERMUX_PREFIX}/include")
+	set(HDF5_LIBRARIES "${TERMUX_PREFIX}/lib/libhdf5.so")
+	if(NOT TARGET HDF5::HDF5)
+	    add_library(HDF5::HDF5 UNKNOWN IMPORTED)
+	    set_target_properties(HDF5::HDF5 PROPERTIES
+	        IMPORTED_LOCATION "\${HDF5_LIBRARIES}"
+	        INTERFACE_INCLUDE_DIRECTORIES "\${HDF5_INCLUDE_DIR}"
+	    )
+	endif()'''
+	s = s.replace('find_package(HDF5 REQUIRED)', patch)
+	with open('CMakeLists.txt', 'w') as f:
+	    f.write(s)
+	EOF
 }
 
 termux_step_pre_configure() {
