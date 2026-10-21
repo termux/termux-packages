@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fast and flexible static site generator"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.168.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=45ba430ac86cfe8e5fb07b81eaef78769973af9b4d1c51f1d88195e0d438be3e
 TERMUX_PKG_AUTO_UPDATE=true

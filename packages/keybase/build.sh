@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Key directory that maps social media identities to encry
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.6.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/keybase/client/releases/download/v$TERMUX_PKG_VERSION/keybase-v$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=8404764b69c18b35d5c93f464cc668fd4867189f14b8289c14d380fce2e75b57
 TERMUX_PKG_AUTO_UPDATE=true
