@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/realh/roxterm
 TERMUX_PKG_DESCRIPTION="ROXTerm is a terminal emulator based on the VTE library"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="@Yisus7u7"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
 TERMUX_PKG_VERSION="3.18.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/realh/roxterm/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=d20a19abe03798bfc6c9404eb7ce4fbecabf2e1ab527b587aab76d06635a92e7
 TERMUX_PKG_AUTO_UPDATE=true
