@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Hetzner Cloud command line client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.70.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/hetznercloud/cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5b8f1d258a2f96d65f0fbd26ce41b35e6d529432b4bde77fc8b26245d4d01a7d
 TERMUX_PKG_DEPENDS="resolv-conf"

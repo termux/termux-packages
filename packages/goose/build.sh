@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A database migration tool. Supports SQL migrations and G
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.29.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pressly/goose/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=267124956365ab3ed32ec9e36f4f341050916ed69fd2c4fbfc42355bb7fbf66f
 TERMUX_PKG_BUILD_IN_SRC=true

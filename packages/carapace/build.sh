@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Multi-shell multi-command argument completer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.8.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/carapace-sh/carapace-bin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1dc7314cbda4643186bcf00b6e2402002a113b09a0220e5d564a40e77daa886e
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GO Simple Tunnel - a simple tunnel written in golang"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@ian4hu"
 TERMUX_PKG_VERSION="3.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/go-gost/gost/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=2a65e2da14fef6b6da8d4e32a8bc62e39970dbb141db42bc6f5821f90ac1e9a3
 TERMUX_PKG_BUILD_IN_SRC=true
