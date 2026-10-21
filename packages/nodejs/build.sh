@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION=26.4.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=9eceb3621024069d91035b5471d2ebe86aa04d22dbeba72a782eaf36ff9183ac
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
@@ -183,6 +183,7 @@ termux_step_configure() {
 		--shared-cares \
 		--shared-ffi \
 		--shared-openssl \
+		--openssl-use-def-ca-store \
 		--shared-sqlite \
 		--shared-zlib \
 		--with-intl=system-icu \
