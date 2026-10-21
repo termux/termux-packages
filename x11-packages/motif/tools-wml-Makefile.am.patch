@@ -1,6 +1,8 @@
---- a/tools/wml/Makefile.in
-+++ b/tools/wml/Makefile.in
-@@ -812,15 +812,15 @@
+Run wmluiltok, wml and wmldbcreate from PATH: the target build cannot run the cross-compiled ones, so the host-built tools are used.
+
+--- a/tools/wml/Makefile.am
++++ b/tools/wml/Makefile.am
+@@ -51,15 +51,15 @@ $(WMLTARGETS): wml-uil.mm
  
  wml-uil.mm: wmluiltok wml UilLexPars.c $(TABLE)
  	$(RM) $(WMLTARGETS) wml.report wml-uil.mm
@@ -18,4 +20,4 @@
 +	wmldbcreate -o motif.wmd
  
  clean-local:
- 	$(RM) $(WMLTARGETS) $(WMDTABLE) $(REPORT) lex.yy.c libwml.a wml \
+ 	$(RM) $(WMLTARGETS) $(WMDTABLE) $(REPORT) lex.yy.c libwml.la wml \
