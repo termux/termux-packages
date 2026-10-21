@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open source visual routing tool that pursues light we
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nxtrace/Ntrace-V1/archive/refs/tags/v${TERMUX_PKG_VERSION//\~/-}.tar.gz
 TERMUX_PKG_SHA256=4f61bca83abfbb53550b3fe443dd7d61dfc76ec3d7749e24a69463e69187f249
 TERMUX_PKG_BREAKS="nexttrace-enhanced"
