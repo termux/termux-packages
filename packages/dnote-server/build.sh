@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="This package contains the Dnote server. It comprises of 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Ravener <ravener.anime@gmail.com>"
 TERMUX_PKG_VERSION="3.0.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/dnote/dnote/archive/refs/tags/server-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5a6beef7e8902386443407e020e2c4b54dec9e5e285224646c39020deebb5880
 TERMUX_PKG_AUTO_UPDATE=true
