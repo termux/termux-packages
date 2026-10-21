@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION="5.0.0"
 TERMUX_PKG_SRCURL="git+https://gitlab.onelab.info/gmsh/gmsh.git"
 TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_AUTO_UPDATE=false
-TERMUX_PKG_DEPENDS="libc++, libhdf5, libopenblas, zlib"
+TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libhdf5, libopenblas, zlib"
 TERMUX_PKG_SUGGESTS="medfile, opencascade"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_BUILD_DYNAMIC=ON
@@ -26,6 +26,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_post_get_source() {
 	git checkout $_COMMIT
+}
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-glob"
 }
 
 termux_step_post_massage() {
