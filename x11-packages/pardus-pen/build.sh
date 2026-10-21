@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Screen Drawing Tool"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pardus/pardus-pen/archive/refs/tags/debian/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=87f41146aa170f38304836d6647f2dedd455891c05fb201b6b44b9fab7b40a75
 TERMUX_PKG_DEPENDS="qt6-qtbase, qt6-qtsvg, poppler-qt, libarchive"
