@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=b505949bb27827b32f54c9f1f5ca660a6fae3fde61cbe0a971975a3ed34a7ee1
 TERMUX_PKG_AUTO_UPDATE=true
@@ -31,6 +32,12 @@ termux_step_post_make_install() {
 
 	"$TERMUX_PREFIX"/bin/pip completion --bash | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
 	"$TERMUX_PREFIX"/bin/pip completion --fish | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
+
+	# replace certifi's CA certificates with our copy
+	local pip_certifi_ca_path="${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/site-packages/pip/_vendor/certifi/cacert.pem"
+	local ca_certificates_ca_path="${TERMUX_PREFIX}/etc/tls/cert.pem"
+	rm "$pip_certifi_ca_path"
+	ln -s "$ca_certificates_ca_path" "$pip_certifi_ca_path"
 }
 
 termux_step_create_debscripts() {
