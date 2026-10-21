@@ -32,7 +32,7 @@ termux_step_host_build() {
 	termux_download "$GPUTILS_SRCURL" "$gputils_tar" "$GPUTILS_SHA256"
 	tar xf "$gputils_tar"
 	cd "gputils-${GPUTILS_VERSION}"
-	./configure --prefix="$TERMUX_PKG_HOSTBUILD_DIR/prefix"
+	./configure --prefix="$TERMUX_PKG_HOSTBUILD_DIR/prefix" CFLAGS="-O2 -std=gnu17"
 	make -j "$TERMUX_PKG_MAKE_PROCESSES"
 	make install
 }
