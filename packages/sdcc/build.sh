@@ -39,6 +39,9 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/bin:$PATH"
+	export GPUTILS_HEADER_PATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/share/gputils/header"
+	export GPUTILS_LKR_PATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/share/gputils/lkr"
+	export GPUTILS_LIBPATH="$TERMUX_PKG_HOSTBUILD_DIR/prefix/share/gputils/lib"
 	# Android Bionic libc does not provide *_unlocked stdio functions
 	local UNLOCKED_FLAGS="-Dfputc_unlocked=fputc -Dputc_unlocked=putc -Dgetc_unlocked=getc -Dgetchar_unlocked=getchar -Dputchar_unlocked=putchar -Dclearerr_unlocked=clearerr -Dfeof_unlocked=feof -Dferror_unlocked=ferror -Dfflush_unlocked=fflush"
 	CFLAGS+=" $UNLOCKED_FLAGS"
