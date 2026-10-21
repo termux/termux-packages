@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Developer-centric CLI for creating, provisioning and dep
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.37.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Azure/azure-dev/archive/refs/tags/azure-dev-cli_${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=83c9eff702b5ecbdedf6d9861c7f22b3efc0077630beb909d7a3162aad89d891
 TERMUX_PKG_AUTO_UPDATE=true
