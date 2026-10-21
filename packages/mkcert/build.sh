@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple zero-config tool to make locally trusted develo
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.4.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/FiloSottile/mkcert/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=32bd5519581bf0b03f53e5b22721692b99f39ab5b161dc27532c51eafa512ca9
 TERMUX_PKG_SUGGESTS="nss-utils"
