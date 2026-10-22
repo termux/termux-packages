@@ -7,7 +7,16 @@ table, redefining the table would be a TOML error.
 
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -1033,6 +1033,21 @@
+@@ -983,7 +983,7 @@ features = [
+ ]
+ 
+ [patch.crates-io]
+-cpal = { git = "https://github.com/RustAudio/cpal", rev = "e1612d5d98152f8dc2a62e1b51ef7cbf4f7f26b7" }
++cpal = { path = "vendor/cpal" }
+ # Unify `tree_sitter_language::LanguageFn` between crates.io grammar crates and
+ # the git tree-sitter above; two instances of the crate would make grammar
+ # constants type-incompatible with `tree_sitter::Language`.
+@@ -1012,6 +1012,23 @@ khronos-egl = { git = "https://github.com/zed-industries/khronos-egl", rev = "42
  # per-crate scratch dirs are sufficient. Upstream issue:
  # https://github.com/dtolnay/cxx/issues/1752
  scratch = { path = "tooling/corgi/patches/scratch" }
@@ -16,6 +25,8 @@ table, redefining the table would be a TOML error.
 +wayland-cursor = { path = "vendor/wayland-cursor" }
 +rustls-platform-verifier = { path = "vendor/rustls-platform-verifier" }
 +wasmtime-internal-jit-icache-coherence = { path = "vendor/wasmtime-internal-jit-icache-coherence" }
++
++[patch."https://github.com/RustAudio/cpal"]
 +cpal = { path = "vendor/cpal" }
 +
 +[patch."https://github.com/zed-industries/scap"]
