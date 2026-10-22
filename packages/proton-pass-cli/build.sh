@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://protonpass.github.io/pass-cli/
 TERMUX_PKG_DESCRIPTION="Proton Pass Command Line Interface (CLI)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.4.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.5.0"
 TERMUX_PKG_SRCURL="https://github.com/protonpass/pass-cli/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=75f9212c548e1e8d5358b1ace7b825e6352aad3d7454e4339fd04b261a4f6db2
+TERMUX_PKG_SHA256=ea6104210c3809f42dc52d24748e07d07a0f70bcd4b443c314dcdb79a2f5fe80
 TERMUX_PKG_DEPENDS="openssl, protobuf, sqlcipher, zlib"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,6 +13,9 @@ termux_step_pre_configure() {
 	termux_setup_protobuf
 	termux_setup_rust
 	termux_setup_cmake
+
+	# Fix upstream Cargo.toml listing pass-uniffi-bindgen in default-members
+	sed -i 's/"pass-uniffi-bindgen",\?//g' Cargo.toml
 
 	export OPENSSL_NO_VENDOR=1
 	export LIBSQLITE3_SYS_USE_PKG_CONFIG=1
