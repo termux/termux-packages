@@ -66,16 +66,16 @@ diff --git a/gpu/command_buffer/service/raster_decoder.cc b/gpu/command_buffer/s
 index fe8e42fca2..7e8daa1fa4 100644
 --- a/gpu/command_buffer/service/raster_decoder.cc
 +++ b/gpu/command_buffer/service/raster_decoder.cc
-@@ -2973,7 +2973,7 @@
+@@ -3005,7 +3005,7 @@
  
-   auto paint_buffer_opt =
-       GetSharedMemoryAsSpan(raster_shm_id, raster_shm_offset, raster_shm_size);
+   auto paint_buffer_opt = GetSharedMemoryAsSpan<volatile uint8_t>(
+       raster_shm_id, raster_shm_offset, raster_shm_size);
 -  if (paint_buffer_opt.value_or({}).empty()) {
 +  if (paint_buffer_opt.value_or(base::span<uint8_t>()).empty()) {
      LOCAL_SET_GL_ERROR(GL_INVALID_VALUE, "glRasterCHROMIUM",
                         "Can not read paint buffer.");
      return;
-@@ -3018,7 +3018,7 @@
+@@ -3049,7 +3049,7 @@
      // Deserialize fonts before raster.
      auto font_buffer_opt = GetSharedMemoryAsSpan<volatile uint8_t>(
          font_shm_id, font_shm_offset, font_shm_size);

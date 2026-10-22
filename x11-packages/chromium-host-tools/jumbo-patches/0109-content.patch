@@ -96,7 +96,7 @@ index 7b194eabd7..6fc6c1ae2e 100644
  import("//build/config/linux/pangocairo/pangocairo.gni")
  import("//build/config/ozone.gni")
  import("//build/config/ui.gni")
-@@ -96,7 +97,129 @@ if (is_ios) {
+@@ -98,7 +99,131 @@ if (is_ios) {
    import("//build/config/apple/mobile_config.gni")  # For `target_platform`
  }
  
@@ -140,6 +140,8 @@ index 7b194eabd7..6fc6c1ae2e 100644
 +    "$target_gen_dir/devtools/protocol/fed_cm.h",
 +    "$target_gen_dir/devtools/protocol/fetch.cc",
 +    "$target_gen_dir/devtools/protocol/fetch.h",
++    "$target_gen_dir/devtools/protocol/find_in_page.cc",
++    "$target_gen_dir/devtools/protocol/find_in_page.h",
 +    "$target_gen_dir/devtools/protocol/forward.h",
 +    "$target_gen_dir/devtools/protocol/input.cc",
 +    "$target_gen_dir/devtools/protocol/input.h",
@@ -244,7 +246,7 @@ index 7b194eabd7..6fc6c1ae2e 100644
    ]
  
    public_deps = [
-@@ -399,68 +521,6 @@ source_set("browser") {
+@@ -400,70 +524,6 @@ source_set("browser") {
    ]
  
    sources = [
@@ -270,6 +272,8 @@ index 7b194eabd7..6fc6c1ae2e 100644
 -    "$target_gen_dir/devtools/protocol/fed_cm.h",
 -    "$target_gen_dir/devtools/protocol/fetch.cc",
 -    "$target_gen_dir/devtools/protocol/fetch.h",
+-    "$target_gen_dir/devtools/protocol/find_in_page.cc",
+-    "$target_gen_dir/devtools/protocol/find_in_page.h",
 -    "$target_gen_dir/devtools/protocol/forward.h",
 -    "$target_gen_dir/devtools/protocol/input.cc",
 -    "$target_gen_dir/devtools/protocol/input.h",
@@ -313,13 +317,15 @@ index 7b194eabd7..6fc6c1ae2e 100644
      "about_url_loader_factory.cc",
      "about_url_loader_factory.h",
      "accessibility/accessibility_tree_formatter_blink.cc",
-@@ -2390,6 +2450,10 @@ source_set("browser") {
+@@ -2381,6 +2441,12 @@ source_set("browser") {
      "worker_host/worker_util.cc",
      "worker_host/worker_util.h",
    ]
 +  jumbo_excluded_sources = [
 +    # It requires CloneTraits<std::vector<bool>>
 +    "webid/document_metadata.cc",
++    # Class `ClientMetadata` conflict
++    "webid/idp_network_request_manager.cc",
 +  ]
  
    if (is_android) {

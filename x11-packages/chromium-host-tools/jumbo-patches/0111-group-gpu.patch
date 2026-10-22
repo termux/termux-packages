@@ -33,7 +33,6 @@ Enable jumbo build for the following component(s)/source_set(s):
 - //services/network/public/cpp:cpp
 - //services/network/public/cpp:cpp_base
 - //services/network/public/cpp:crash_keys
-- //services/network/public/cpp:first_party_sets_mojom_support
 - //services/network/public/cpp:ip_address_mojom_support
 - //services/network/public/cpp:web_platform
 - //services/network:network_service
@@ -1114,15 +1113,6 @@ index 2732eb3f88..69688009b2 100644
    sources = [
      "client_hints.cc",
      "client_hints.h",
-@@ -560,7 +561,7 @@ component("schemeful_site_mojom_support") {
- 
- # This component is separate from cpp_base as it is a dependency of
- # //services/network/public/mojom:cookies_mojom.
--component("first_party_sets_mojom_support") {
-+jumbo_component("first_party_sets_mojom_support") {
-   sources = [
-     "first_party_sets_mojom_traits.cc",
-     "first_party_sets_mojom_traits.h",
 @@ -590,7 +591,7 @@ component("storage_access_api_mojom_support") {
    defines = [ "IS_STORAGE_ACCESS_API_MOJOM_TRAITS_IMPL" ]
  }
