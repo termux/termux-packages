@@ -1,0 +1,32 @@
+--- a/lxsession-default-apps/combobox.vala
++++ b/lxsession-default-apps/combobox.vala
+@@ -295,15 +295,15 @@
+                         }
+                         else
+                         {
+-                            default_command = "/usr/bin/" + default_text;
++                            default_command = "@TERMUX_PREFIX@/bin/" + default_text;
+                         }
+                         switch (item)
+                         {
+                             case "webbrowser":
+                                 try
+                                 {
+-                                    Process.spawn_command_line_async(   "gksu \"update-alternatives --set x-www-browser "
+-                                                                        + default_command + "\"");
++                                    Process.spawn_command_line_async(   "update-alternatives --set x-www-browser "
++                                                                        + default_command);
+                                 }
+                                 catch (GLib.SpawnError err)
+                                 {
+@@ -314,8 +314,8 @@
+                             case "terminal_manager":
+                                 try
+                                 {
+-                                    Process.spawn_command_line_async(   "gksu \"update-alternatives --set x-terminal-emulator "
+-                                                                        + default_command + "\"");
++                                    Process.spawn_command_line_async(   "update-alternatives --set x-terminal-emulator "
++                                                                        + default_command);
+                                 }
+                                 catch (GLib.SpawnError err)
+                                 {
