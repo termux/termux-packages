@@ -1,0 +1,24 @@
+--- a/src/polkit/polkitunixprocess.c
++++ b/src/polkit/polkitunixprocess.c
+@@ -1376,7 +1376,8 @@
+ get_cgroupid_for_pidfd (gint    pidfd,
+                         GError **error)
+ {
+-#ifdef __linux__
++/* Bionic lacks name_to_handle_at(); callers tolerate the failure. */
++#if defined(__linux__) && !defined(__ANDROID__)
+   guint64 cgroupid;
+   gint pid;
+   gchar *filename;
+@@ -1469,9 +1470,9 @@
+   free (fhp);
+ 
+   return cgroupid;
+-#else /* !__linux__ */
++#else
+   return 0;
+-#endif /* __linux__ */
++#endif
+ }
+ 
+ static guint
