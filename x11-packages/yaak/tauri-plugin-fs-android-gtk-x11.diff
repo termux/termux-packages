@@ -1,0 +1,88 @@
+diff -ruN tauri-plugin-fs-src-orig/src/commands.rs tauri-plugin-fs-src/src/commands.rs
+--- tauri-plugin-fs-src-orig/src/commands.rs	2026-09-27 16:00:00.000000000 +0000
++++ tauri-plugin-fs-src/src/commands.rs	2026-09-27 16:00:15.000000000 +0000
+@@ -854,7 +854,7 @@
+     .map_err(Into::into)
+ }
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ fn get_metadata<R: Runtime, F: FnOnce(&PathBuf) -> std::io::Result<std::fs::Metadata>>(
+     permission: &str,
+     metadata_fn: F,
+@@ -900,7 +900,7 @@
+     }
+ }
+ 
+-#[cfg(not(target_os = "android"))]
++#[cfg(any(not(target_os = "android"), target_os = "android"))]
+ fn get_metadata<R: Runtime, F: FnOnce(&PathBuf) -> std::io::Result<std::fs::Metadata>>(
+     permission: &str,
+     metadata_fn: F,
+diff -ruN tauri-plugin-fs-src-orig/src/error.rs tauri-plugin-fs-src/src/error.rs
+--- tauri-plugin-fs-src-orig/src/error.rs	2026-09-27 16:00:00.000000000 +0000
++++ tauri-plugin-fs-src/src/error.rs	2026-09-27 16:00:15.000000000 +0000
+@@ -24,7 +24,7 @@
+     #[cfg(feature = "watch")]
+     #[error(transparent)]
+     Watch(#[from] notify::Error),
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     #[error(transparent)]
+     PluginInvoke(#[from] tauri::plugin::mobile::PluginInvokeError),
+     #[error("URL is not a valid path")]
+diff -ruN tauri-plugin-fs-src-orig/src/lib.rs tauri-plugin-fs-src/src/lib.rs
+--- tauri-plugin-fs-src-orig/src/lib.rs	2026-09-27 16:00:00.000000000 +0000
++++ tauri-plugin-fs-src/src/lib.rs	2026-09-27 16:00:15.000000000 +0000
+@@ -28,7 +28,7 @@
+     AppHandle, DragDropEvent, Manager, RunEvent, Runtime, WindowEvent,
+ };
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ mod android;
+ mod commands;
+ mod config;
+@@ -38,13 +38,13 @@
+ mod file_path;
+ #[cfg(target_os = "ios")]
+ mod ios;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ mod models;
+ mod scope;
+ #[cfg(feature = "watch")]
+ mod watcher;
+ 
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ pub use android::Fs;
+ #[cfg(desktop)]
+ pub use desktop::Fs;
+@@ -306,7 +306,7 @@
+ }
+ 
+ impl OpenOptions {
+-    #[cfg(target_os = "android")]
++    #[cfg(all(target_os = "android", not(target_os = "android")))]
+     fn android_mode(&self) -> String {
+         let mut mode = String::new();
+ 
+@@ -370,7 +370,7 @@
+ 
+         match app.path().parse(path) {
+             Ok(path) => Ok(Self { path: Some(path) }),
+-            #[cfg(not(target_os = "android"))]
++            #[cfg(any(not(target_os = "android"), target_os = "android"))]
+             Err(tauri::Error::UnknownPath) => Ok(Self { path: None }),
+             Err(err) => Err(err.into()),
+         }
+@@ -494,7 +494,7 @@
+                 scope: tauri::fs::Scope::new(app, &FsScope::default())?,
+             };
+ 
+-            #[cfg(target_os = "android")]
++            #[cfg(all(target_os = "android", not(target_os = "android")))]
+             {
+                 let fs = android::init(app, api)?;
+                 app.manage(fs);
