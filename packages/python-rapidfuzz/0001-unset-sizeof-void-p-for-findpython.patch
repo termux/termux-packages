@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,10 @@
+   add_link_options(-fexceptions)
+ endif()
+ 
++# FindPython rejects cross interpreters whose pointer size differs from
++# CMAKE_SIZEOF_VOID_P, which can never match on 32-bit targets.
++unset(CMAKE_SIZEOF_VOID_P)
++unset(CMAKE_SIZEOF_VOID_P CACHE)
+ if(CMAKE_VERSION VERSION_LESS 3.18)
+   find_package(
+     Python
