@@ -1,0 +1,13 @@
+diff --git a/packages/core/src/filesystem/watcher.ts b/packages/core/src/filesystem/watcher.ts
+index b5c4386..41869ed 100644
+--- a/packages/core/src/filesystem/watcher.ts
++++ b/packages/core/src/filesystem/watcher.ts
+@@ -26,7 +26,7 @@ const watcher = lazy((): typeof ParcelWatcher | undefined => {
+ function getBackend() {
+   if (process.platform === "win32") return "windows"
+   if (process.platform === "darwin") return "fs-events"
+-  if (process.platform === "linux") return "inotify"
++  if (process.platform === "linux" || process.platform === "android") return "inotify"
+ }
+ 
+ export const hasNativeBinding = () => !!watcher()
