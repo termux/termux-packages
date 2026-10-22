@@ -1,6 +1,8 @@
+diff --git a/src/sys/lib.rs b/src/sys/lib.rs
+index 9a64391f..73b784ca 100644
 --- a/src/sys/lib.rs
 +++ b/src/sys/lib.rs
-@@ -2824,7 +2824,11 @@
+@@ -2886,7 +2886,11 @@ mod posix_impl {
              );
              Ok(())
          }
@@ -11,5 +13,26 @@
 +        }
 +        #[cfg(not(any(target_os = "macos", target_os = "freebsd", target_os = "android")))]
          {
-             const SYS_FCHMODAT2: libc::c_long = 452;
-             loop {
+             // glibc/musl `fchmodat(.., AT_SYMLINK_NOFOLLOW)` try `fchmodat2(2)` too.
+             #[cfg(any(target_os = "linux", target_os = "android"))]
+@@ -2920,7 +2924,7 @@ mod posix_impl {
+         }
+     }
+     /// musl's fallback: `O_PATH` + `chmod("/proc/self/fd/N")`; symlinks get EOPNOTSUPP like libc.
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(target_os = "linux")]
+     fn lchmod_no_fchmodat2(path: &ZStr, mode: Mode) -> Maybe<()> {
+         let retag = |mut err: Error| {
+             err.syscall = Tag::lchmod;
+diff --git a/src/sys/linux_syscall.rs b/src/sys/linux_syscall.rs
+index db37bd92..d1fc7802 100644
+--- a/src/sys/linux_syscall.rs
++++ b/src/sys/linux_syscall.rs
+@@ -90,6 +90,7 @@ pub(crate) fn openat(dir: Fd, path: &ZStr, flags: i32, mode: Mode) -> Result<Fd,
+ }
+ 
+ /// Android's seccomp answers `openat2`/`fchmodat2` with SIGSYS; Termux runs the linux build.
++#[cfg(not(target_os = "android"))]
+ pub(crate) fn is_android_kernel() -> bool {
+     static CACHED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+     *CACHED.get_or_init(|| {
