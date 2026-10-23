@@ -442,7 +442,7 @@ source "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 	# Setup TERMUX_APP_PACKAGE_MANAGER
 	# shellcheck source=/dev/null
-	source "$TERMUX_PREFIX/bin/termux-setup-package-manager"
+	if [ -f "$TERMUX_PREFIX/bin/termux-setup-package-manager" ]; then source "$TERMUX_PREFIX/bin/termux-setup-package-manager"; else TERMUX_APP_PACKAGE_MANAGER="${TERMUX_APP_PACKAGE_MANAGER:-apt}"; fi
 
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
