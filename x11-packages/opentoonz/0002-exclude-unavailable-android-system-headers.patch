@@ -1,0 +1,98 @@
+diff --git a/toonz/sources/common/tsystem/tpluginmanager.cpp b/toonz/sources/common/tsystem/tpluginmanager.cpp
+index 8074691..8463350 100644
+--- a/toonz/sources/common/tsystem/tpluginmanager.cpp
++++ b/toonz/sources/common/tsystem/tpluginmanager.cpp
+@@ -20,14 +20,15 @@
+ #endif
+ #include <stdio.h>
+ #include <unistd.h>
+-#if !defined(HAIKU) && (!defined(FREEBSD) || __FreeBSD_version < 1300040)
++#if !defined(HAIKU) && !defined(__ANDROID__) && \
++    (!defined(FREEBSD) || __FreeBSD_version < 1300040)
+ #include <sys/dir.h>
+ #endif
+ #include <sys/param.h>  // for getfsstat
+ #ifdef MACOSX
+ #include <sys/ucred.h>
+ #endif
+-#ifndef HAIKU
++#if !defined(HAIKU) && !defined(__ANDROID__)
+ #include <sys/mount.h>
+ #endif
+ #include <pwd.h>
+diff --git a/toonz/sources/common/tsystem/tsystempd.cpp b/toonz/sources/common/tsystem/tsystempd.cpp
+index ebd5743..58fad64 100644
+--- a/toonz/sources/common/tsystem/tsystempd.cpp
++++ b/toonz/sources/common/tsystem/tsystempd.cpp
+@@ -54,12 +54,14 @@
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <dirent.h>
++#ifndef __ANDROID__
+ #include <sys/dir.h>
+ #include <sys/sysinfo.h>
+ #include <sys/swap.h>
++#include <mntent.h>
++#endif
+ #include <sys/statfs.h>
+ #include <pwd.h>
+-#include <mntent.h>
+ #include <dlfcn.h>
+ #include <sys/time.h>
+ 
+@@ -285,6 +287,7 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhysicalMemory) {
+ 
+ #elif defined(LINUX)
+ 
++#ifndef __ANDROID__
+   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
+ 
+   if (!sysinfo(sysInfo)) {
+@@ -296,6 +299,9 @@ TINT64 TSystem::getFreeMemorySize(bool onlyPhysicalMemory) {
+     assert(!"sysinfo function failed");
+   }
+   free(sysInfo);
++#else
++  totalFree = 0;
++#endif
+ 
+ #elif defined(FREEBSD)
+ 
+@@ -455,6 +461,7 @@ TINT64 TSystem::getMemorySize(bool onlyPhysicalMemory) {
+     return logSwapLibero >> 1;
+ #elif defined(LINUX)
+ 
++#ifndef __ANDROID__
+   struct sysinfo *sysInfo = (struct sysinfo *)calloc(1, sizeof(struct sysinfo));
+   TINT64 ret              = 0;
+ 
+@@ -465,6 +472,9 @@ TINT64 TSystem::getMemorySize(bool onlyPhysicalMemory) {
+ 
+   free(sysInfo);
+   return ret;
++#else
++  return 0;
++#endif
+ 
+ #elif defined(FREEBSD)
+ 
+diff --git a/toonz/sources/toonzfarm/tnzcore_stuff/tsystem.cpp b/toonz/sources/toonzfarm/tnzcore_stuff/tsystem.cpp
+index 1357439..7ed83a9 100644
+--- a/toonz/sources/toonzfarm/tnzcore_stuff/tsystem.cpp
++++ b/toonz/sources/toonzfarm/tnzcore_stuff/tsystem.cpp
+@@ -32,12 +32,15 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <dirent.h>
++#ifndef __ANDROID__
+ #include <sys/dir.h>
+ #include <sys/sysinfo.h>
+ #include <sys/swap.h>
+ #include <sys/statfs.h>
+ #include <pwd.h>
+ #include <mntent.h>
++#endif
++#include <sys/statfs.h>
+ #include <dlfcn.h>
+ 
+ extern "C" {

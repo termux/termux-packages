@@ -1,0 +1,77 @@
+diff --git a/toonz/sources/toonz/crashhandler.cpp b/toonz/sources/toonz/crashhandler.cpp
+index 1c34236..fd52b68 100644
+--- a/toonz/sources/toonz/crashhandler.cpp
++++ b/toonz/sources/toonz/crashhandler.cpp
+@@ -13,7 +13,7 @@
+ #include <signal.h>
+ #include <unistd.h>
+ #include <err.h>
+-#include <regex>
++#include <dlfcn.h>
+ #endif
+ 
+ #include "tgl.h"
+@@ -280,20 +280,21 @@ static bool sh(std::string &out, const char *cmd) {
+   FILE *p = popen(cmd, "r");
+   if (p == NULL) return false;
+   while (fgets(buffer, 128, p)) out.append(buffer);
+-  pclose(p);
+-  return true;
++  return pclose(p) == 0;
+ }
+ 
+ //-----------------------------------------------------------------------------
+ 
+-static bool addr2line(std::string &out, const char *exepath, const char *addr) {
++static bool addr2line(std::string &out, const char *modpath, const void *base,
++                      const void *addr) {
+   char cmd[512];
+ #ifdef MACOSX
+-  sprintf(cmd, "atos -o \"%.400s\" %s 2>&1", exepath, addr);
++  sprintf(cmd, "atos -o \"%.400s\" -l %p %p 2>&1", modpath, base, addr);
+ #else
+-  sprintf(cmd, "addr2line -f -p -e \"%.400s\" %s 2>&1", exepath, addr);
++  sprintf(cmd, "addr2line -f -p -e \"%.400s\" 0x%" PRIxPTR " 2>&1", modpath,
++          (uintptr_t)addr - (uintptr_t)base);
+ #endif
+-  return sh(out, cmd);
++  return sh(out, cmd) && out.find("??") == std::string::npos;
+ }
+ 
+ //-----------------------------------------------------------------------------
+@@ -314,16 +315,9 @@ static void printBacktrace(std::string &out) {
+   const int size = 256;
+   void *buffer[size];
+ 
+-  // Get executable path
+-  char exepath[512];
+-  memset(exepath, 0, 512);
+-  if (readlink("/proc/self/exe", exepath, 512) < 0)
+-    fprintf(stderr, "Couldn't get exe path\n");
+-
+   // Back trace
+   int nptrs  = backtrace(buffer, size);
+   char **bts = backtrace_symbols(buffer, nptrs);
+-  std::regex re("\\[(.+)\\]");
+   if (bts) {
+     for (int i = 0; i < nptrs; ++i) {
+       // Skip first frames since they point to this function
+@@ -335,15 +329,11 @@ static void printBacktrace(std::string &out) {
+ 
+       std::string sym = bts[i];
+       std::string line;
+-      std::smatch ms;
++      Dl_info info;
+ 
+       bool found = false;
+-      if (std::regex_search(sym, ms, re)) {
+-        std::string addr = ms[1];
+-        if (addr2line(line, exepath, addr.c_str())) {
+-          found = (line.rfind("??", 0) != 0);
+-        }
+-      }
++      if (dladdr(buffer[i], &info) && info.dli_fname && info.dli_fbase)
++        found = addr2line(line, info.dli_fname, info.dli_fbase, buffer[i]);
+ 
+       out.append(found ? line : (sym + "\n"));
+     }
