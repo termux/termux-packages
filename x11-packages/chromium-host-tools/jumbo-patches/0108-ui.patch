@@ -1839,18 +1839,21 @@ diff --git a/ui/views/controls/webview/BUILD.gn b/ui/views/controls/webview/BUIL
 index 50bb38a38d..cf7c4610f3 100644
 --- a/ui/views/controls/webview/BUILD.gn
 +++ b/ui/views/controls/webview/BUILD.gn
-@@ -2,9 +2,10 @@
+@@ -2,12 +2,13 @@
  # Use of this source code is governed by a BSD-style license that can be
  # found in the LICENSE file.
  
 +import("//build/config/jumbo.gni")
  import("//build/config/ozone.gni")
+ import("//build/config/ui.gni")
+ 
+ assert(toolkit_views)
  
 -component("webview") {
 +jumbo_component("webview") {
    sources = [
-     "unhandled_keyboard_event_handler.cc",
-     "unhandled_keyboard_event_handler.h",
+     "simple_web_view.h",
+     "simple_web_view_dialog_delegate.h",
 diff --git a/ui/views/examples/BUILD.gn b/ui/views/examples/BUILD.gn
 index a4564d98d6..bcd069a3e0 100644
 --- a/ui/views/examples/BUILD.gn

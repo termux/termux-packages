@@ -3452,7 +3452,7 @@ index 589dd18b99..d65ab808e7 100644
    visibility = []  # Allow re-assignment of list.
    visibility = [
      "//third_party/blink/*",
-@@ -1702,6 +1703,23 @@ component("platform") {
+@@ -1724,6 +1725,27 @@ component("platform") {
      ]
    }
  
@@ -3471,11 +3471,15 @@ index 589dd18b99..d65ab808e7 100644
 +
 +    # FIXME(chongyun): scoped_refptr?
 +    "graphics/canvas_resource_dispatcher.cc",
++
++    # render_frame_metadata_observer_impl.cc
++    # explicit specialization of 'blink::HashTraits<base::UnguessableToken>' after instantiation
++    "weborigin/security_origin.cc",
 +  ]
 +
    if (is_mac) {
      sources += [
-       "audio/mac/fft_frame_mac.cc",
+       "audio/mac/vector_math_mac.h",
 @@ -1986,7 +2004,7 @@ component("platform") {
    configs += blink_symbols_config
  }
@@ -4711,27 +4715,6 @@ index bb862c3284..a5039ffbfd 100644
  }  // namespace blink
 +
 +#undef ToIntegerMilliseconds
-diff --git a/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc b/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
-index 96d1bfc991..eeae19041e 100644
---- a/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
-+++ b/third_party/blink/renderer/core/ad_tracker/sticky_ad_detector.cc
-@@ -20,6 +20,9 @@
- #include "third_party/blink/renderer/core/paint/timing/paint_timing.h"
- #include "third_party/blink/renderer/core/scroll/scrollable_area.h"
- 
-+#define kFireInterval kFireInterval_sticky_ad_detector
-+#define kLargeAdSizeToViewportSizeThreshold kLargeAdSizeToViewportSizeThreshold_sticky_ad_detector
-+
- namespace blink {
- 
- namespace {
-@@ -155,3 +158,6 @@ void StickyAdDetector::OnLargeStickyAdDetected(
- }
- 
- }  // namespace blink
-+
-+#undef kFireInterval
-+#undef kLargeAdSizeToViewportSizeThreshold
 diff --git a/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc b/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc
 index 247fc491ae..269fe797d7 100644
 --- a/third_party/blink/renderer/modules/mediastream/user_media_request_provider_impl.cc

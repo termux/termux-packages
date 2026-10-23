@@ -484,25 +484,6 @@ index 3797bb2448..47ee4a9753 100644
  }  // namespace autofill
 +
 +#undef ShouldUploadEntityChange
-diff --git a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
-index 00dd1ff986..1a715da5f6 100644
---- a/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
-+++ b/components/autofill/core/browser/webdata/valuables/valuable_sync_bridge.cc
-@@ -27,6 +27,8 @@
- #include "components/sync/protocol/entity_data.h"
- #include "components/webdata/common/web_database.h"
- 
-+#define AreAnyItemsDifferent AreAnyItemsDifferent_ValuableSyncBridge
-+
- namespace autofill {
- namespace {
- 
-@@ -675,3 +677,5 @@ EntityTable* ValuableSyncBridge::GetEntityTable() {
- }
- 
- }  // namespace autofill
-+
-+#undef AreAnyItemsDifferent
 diff --git a/components/autofill/core/browser/webdata/valuables/valuables_table.cc b/components/autofill/core/browser/webdata/valuables/valuables_table.cc
 index 9282851e03..5739cd6418 100644
 --- a/components/autofill/core/browser/webdata/valuables/valuables_table.cc
@@ -2703,3 +2684,37 @@ index 61ae85a6db..a968e6a632 100644
 +#undef kDataContentType
 +#undef kUploadContentType
 +#undef CreateFileDataPipeGetterBlocking
+--- a/components/cbor/writer.cc
++++ b/components/cbor/writer.cc
+@@ -25,6 +25,8 @@
+ #include "components/cbor/rust/cbor_rust.h"
+ #endif
+ 
++#define ScopedMetricsReporter ScopedMetricsReporter_writer
++
+ namespace cbor {
+ 
+ BASE_FEATURE(kUseRustCborWriter, base::FEATURE_DISABLED_BY_DEFAULT);
+@@ -395,3 +397,5 @@
+ }
+ 
+ }  // namespace cbor
++
++#undef ScopedMetricsReporter
+--- a/components/translate/core/browser/translate_url_fetcher.cc
++++ b/components/translate/core/browser/translate_url_fetcher.cc
+@@ -18,6 +18,8 @@
+ #include "services/network/public/cpp/resource_request.h"
+ #include "services/network/public/cpp/simple_url_loader.h"
+ 
++#define kMaxRetry kMaxRetry_translate_url_fetcher
++
+ namespace translate {
+ 
+ namespace {
+@@ -148,3 +150,5 @@
+ }
+ 
+ }  // namespace translate
++
++#undef kMaxRetry
