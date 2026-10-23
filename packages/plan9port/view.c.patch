@@ -1,0 +1,11 @@
+--- a/src/cmd/page/view.c
++++ b/src/cmd/page/view.c
+@@ -723,7 +723,7 @@ viewer(Document *dd)
+ 				break;
+ 			}
+ 			if(showdata(pm)) {
+-				s = estrdup("/tmp/pageplumbXXXXXXX");
++				s = estrdup("@TERMUX_PREFIX@/tmp/pageplumbXXXXXXX");
+ 				fd = opentemp(s, ORDWR|ORCLOSE);
+ 				write(fd, pm->data, pm->ndata);
+ 				/* lose fd reference on purpose; the file is open ORCLOSE */

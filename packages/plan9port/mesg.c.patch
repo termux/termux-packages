@@ -1,0 +1,11 @@
+--- a/src/cmd/sam/mesg.c
++++ b/src/cmd/sam/mesg.c
+@@ -88,7 +88,7 @@ journal(int out, char *s)
+ 	static int fd = 0;
+ 
+ 	if(fd <= 0)
+-		fd = create("/tmp/sam.out", 1, 0666L);
++		fd = create("@TERMUX_PREFIX@/tmp/sam.out", 1, 0666L);
+ 	fprint(fd, "%s%s\n", out? "out: " : "in:  ", s);
+ }
+ 

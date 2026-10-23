@@ -1,0 +1,11 @@
+--- a/src/libthread/thread.c
++++ b/src/libthread/thread.c
+@@ -39,7 +39,7 @@ _threaddebug(_Thread *t, char *fmt, ...)
+ 			p++;
+ 		else
+ 			p = argv0;
+-		snprint(buf, sizeof buf, "/tmp/%s.tlog", p);
++		snprint(buf, sizeof buf, "@TERMUX_PREFIX@/tmp/%s.tlog", p);
+ 		if((fd = create(buf, OWRITE, 0666)) < 0)
+ 			fd = open("/dev/null", OWRITE);
+ 		if(fd >= 0 && fd != 2){
