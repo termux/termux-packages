@@ -4,7 +4,7 @@ Termux is an open source application and it is built on users' contributions.
 However, most of work is done by Termux maintainers on their spare time and
 therefore only priority tasks are being completed.
 
-Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
+Developer's wiki is available at https://github.com/ropazfilho/alekas/wiki.
 
 ## How you can contribute to Termux project
 
@@ -32,17 +32,17 @@ Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
   dependencies, unprefixed hardcoded FHS paths, crashes, etc.
 
   If you can't submit a pull request with patches fixing the problem, you can
-  open new [issue](https://github.com/termux/termux-packages/issues/new/choose).
+  open new [issue](https://github.com/ropazfilho/alekas/issues/new/choose).
 
 - **Fixing known bugs**
 
-  Take a look at https://github.com/termux/termux-packages/issues. There many
+  Take a look at https://github.com/ropazfilho/alekas/issues. There many
   issue tickets having tag `bug report` or `help wanted`. They all are waiting
   to be resolved.
 
 - **Submitting new packages**
 
-  There are lots of unresolved [package requests](https://github.com/termux/termux-packages/issues?q=is%3Aissue+is%3Aopen+label%3A%22package+request%22).
+  There are lots of unresolved [package requests](https://github.com/ropazfilho/alekas/issues?q=is%3Aissue+is%3Aopen+label%3A%22package+request%22).
   Pay attention to tickets having tag `help wanted`.
 
 - **Keeping existing packages up-to-date**
@@ -60,14 +60,14 @@ Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
 
 - **Donate**
 
-  See https://github.com/termux/termux-packages/wiki/Donate for details.
+  See https://github.com/ropazfilho/alekas/wiki/Donate for details.
 
 ## Requesting new package
 
 If you are looking for specific package and didn't find it included in our
 repositories, you can request it.
 
-Open a new [issue](https://github.com/termux/termux-packages/issues/new/choose)
+Open a new [issue](https://github.com/ropazfilho/alekas/issues/new/choose)
 filling the `package request` template. You will need to provide at least
 package description and its home page and URL to source repository. Remember
 that your request will not be processed immediately.
@@ -180,13 +180,13 @@ or give some procedural recommendations, that DOES NOT mean they will do all of 
 - Experience with Linux distribution like Debian, Arch, Fedora, etc.
 - Experience with compiling software from source.
 - Good shell scripting skills.
-- You have read https://github.com/termux/termux-packages/wiki.
+- You have read https://github.com/ropazfilho/alekas/wiki.
 
 If you never used a Linux distribution or Termux was your first experience with a
 Linux environment,<br>
 we recommend to NOT sending pull requests.<br>
 If you have an issue with a package but are unsure how to submit a fix for it<br>
-feel free to open a [new issue](https://github.com/termux/termux-packages/issues/new/choose) or comment on an existing one about the problem.
+feel free to open a [new issue](https://github.com/ropazfilho/alekas/issues/new/choose) or comment on an existing one about the problem.
 
 Make sure to read the [packaging policy](#packaging-policy) when submitting new packages.
 
@@ -201,7 +201,7 @@ and we ask that the time and effort of our maintainers, contributors and reviewe
 
 Do not send disruptive changes, like reverting commits without reason or<br>
 deleting files, creating spam content, etc. Authors of such pull requests may<br>
-be blocked from contributing to [Termux](https://github.com/termux) project.
+be blocked from contributing to [Alekas](https://github.com/ropazfilho) project.
 
 ### Submitting new packages: checklist
 
@@ -305,7 +305,7 @@ Pay attention to things listed below.
    equivalents. Termux's standard installation prefix is
 
    ```console
-   /data/data/com.termux/files/usr
+   /data/data/com.alekas/files/usr
    ```
 
    which can be considered a virtual root directory.
@@ -313,7 +313,7 @@ Pay attention to things listed below.
    The home directory is stored outside of the prefix at:
 
    ```console
-   /data/data/com.termux/files/home
+   /data/data/com.alekas/files/home
    ```
 
    Don't hardcode home and prefix, use the placeholders `@TERMUX_HOME@` and
@@ -525,7 +525,7 @@ Here is example of `build.sh`:
 TERMUX_PKG_HOMEPAGE=https://example.com
 TERMUX_PKG_DESCRIPTION="Termux package"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="@ropazfilho"
 TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_SRCURL="https://example.com/sources-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=0000000000000000000000000000000000000000000000000000000000000000
@@ -553,7 +553,7 @@ Use of forks is allowed only under a good reason.
 
 Variable assignments containing `$VARIABLE` or `$(command substition)` expansions should be "quoted".
 
-For more about `build.sh` variables read the [developer's wiki](https://github.com/termux/termux-packages/wiki/Creating-new-package#table-of-available-package-control-fields).
+For more about `build.sh` variables read the [developer's wiki](https://github.com/ropazfilho/alekas/wiki/Creating-new-package#table-of-available-package-control-fields).
 
 ### Creating patch files
 
