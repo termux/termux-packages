@@ -1,0 +1,149 @@
+--- a/lib/dpkg/program.c
++++ b/lib/dpkg/program.c
+@@ -31,6 +31,13 @@
+ #include <dpkg/ehandle.h>
+ #include <dpkg/program.h>
+ 
++#include <stdlib.h>
++#include <unistd.h>
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
++
+ /**
+  * Standard initializations when starting a dpkg-based program.
+  *
+@@ -39,6 +44,26 @@
+ void
+ dpkg_program_init(const char *progname)
+ {
++	char seProcessContext[80];
++
++	if (getuid() == 0) {
++		printf("Ability to run this command as root has been disabled permanently for safety purposes.\n");
++		exit(1);
++	}
++
++	if ((getSeProcessContextFromEnv(progname, ENV__TERMUX__SE_PROCESS_CONTEXT,
++		seProcessContext, sizeof(seProcessContext)) ||
++		getSeProcessContextFromFile(progname,
++		seProcessContext, sizeof(seProcessContext))) &&
++		(stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++		is_selinux_enabled() && security_getenforce()) {
++		printf("Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes.\n");
++		exit(1);
++	}
++
+ 	dpkg_set_progname(progname);
+ 	dpkg_set_report_buffer(stdout);
+ 	dpkg_debug_init();
+--- a/utils/start-stop-daemon.c
++++ b/utils/start-stop-daemon.c
+@@ -29,6 +29,13 @@
+ 
+ #include <dpkg/macros.h>
+ 
++#include <stdlib.h>
++#include <unistd.h>
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
++
+ #if defined(__linux__)
+ #  define OS_Linux
+ #elif defined(__GNU__)
+@@ -2900,6 +2905,26 @@ main(int argc, char **argv)
+ {
+ 	progname = argv[0];
+ 
++	char seProcessContext[80];
++
++	if (getuid() == 0) {
++		printf("Ability to run this command as root has been disabled permanently for safety purposes.\n");
++		return 1;
++	}
++
++	if ((getSeProcessContextFromEnv(progname, ENV__TERMUX__SE_PROCESS_CONTEXT,
++		seProcessContext, sizeof(seProcessContext)) ||
++		getSeProcessContextFromFile(progname,
++		seProcessContext, sizeof(seProcessContext))) &&
++		(stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++		is_selinux_enabled() && security_getenforce()) {
++		printf("Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes.\n");
++		return 1;
++	}
++
+ 	parse_options(argc, argv);
+ 	setup_options();
+ 
+--- a/utils/update-alternatives.c
++++ b/utils/update-alternatives.c
+@@ -49,6 +49,13 @@
+ #include <dpkg/command.h>
+ #include <dpkg/subproc.h>
+ 
++#include <stdlib.h>
++#include <unistd.h>
++#include <selinux/selinux.h>
++#include <termux-core/termux/termux_core__nos__c/v1/data/DataUtils.h>
++#include <termux-core/termux/termux_core__nos__c/v1/termux/shell/command/environment/TermuxShellEnvironment.h>
++#include <termux-core/termux/termux_core__nos__c/v1/unix/os/selinux/UnixSeLinuxUtils.h>
++
+ /* Global variables: */
+ 
+ #define PROGNAME "update-alternatives"
+@@ -2983,6 +2988,26 @@ main(int argc, char **argv)
+ 
+ 	prog_path = argv[0];
+ 
++	char seProcessContext[80];
++
++	if (getuid() == 0) {
++		printf("Ability to run this command as root has been disabled permanently for safety purposes.\n");
++		return 1;
++	}
++
++	if ((getSeProcessContextFromEnv(prog_path, ENV__TERMUX__SE_PROCESS_CONTEXT,
++		seProcessContext, sizeof(seProcessContext)) ||
++		getSeProcessContextFromFile(prog_path,
++		seProcessContext, sizeof(seProcessContext))) &&
++		(stringEquals(seProcessContext, PROCESS_CONTEXT__SHELL) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__MAGISK_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__KERNEL_SU) ||
++		stringEquals(seProcessContext, PROCESS_CONTEXT__AOSP_SU)) &&
++		is_selinux_enabled() && security_getenforce()) {
++		printf("Ability to run this command from a process context that does not have MCS categories while SELinux is Enforcing has been disabled permanently for safety purposes.\n");
++		return 1;
++	}
++
+ 	for (i = 1; i < argc; i++) {
+ 		if (strstr(argv[i], "--") != argv[i]) {
+ 			error(_("unknown argument '%s'"), argv[i]);
+--- a/lib/dpkg/Makefile.am
++++ b/lib/dpkg/Makefile.am
+@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
+ 	-DCONFIGDIR=\"$(pkgconfdir)\" \
+ 	-DADMINDIR=\"$(admindir)\" \
+ 	-DDEFAULT_TEXT_DOMAIN=\"@PACKAGE@\" \
++	-DTERMUX_ENV__S_TERMUX=\"$(TERMUX_ENV__S_TERMUX)\" \
+ 	-idirafter $(top_srcdir)/lib/compat \
+ 	-I$(top_builddir) \
+ 	-I$(top_srcdir)/lib \
+--- a/utils/Makefile.am
++++ b/utils/Makefile.am
+@@ -6,6 +6,7 @@ AM_CPPFLAGS = \
+ 	-DLOGDIR=\"$(logdir)\" \
+ 	-DSYSCONFDIR=\"$(sysconfdir)\" \
+ 	-DRUNSTATEDIR=\"$(runstatedir)\" \
++	-DTERMUX_ENV__S_TERMUX=\"$(TERMUX_ENV__S_TERMUX)\" \
+ 	-idirafter $(top_srcdir)/lib/compat \
+ 	-I$(top_builddir) \
+ 	-I$(top_srcdir)/lib \
