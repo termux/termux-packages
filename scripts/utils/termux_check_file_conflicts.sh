@@ -33,7 +33,7 @@ shopt -u nullglob
 error=0
 download_jobs=()
 download_file() {
-	if ! curl --fail --silent --show-error --retry 5 --retry-all-errors --user-agent 'Termux-Packages/1.0\ (https://github.com/termux/termux-packages)' "$1" -o "$2"; then
+	if ! curl --fail --silent --show-error --retry 5 --retry-all-errors --user-agent 'Termux-Packages/1.0\ (https://github.com/ropazfilho/alekas)' "$1" -o "$2"; then
 		echo "ERROR: Failed to download $1" >&2
 		return 1
 	fi

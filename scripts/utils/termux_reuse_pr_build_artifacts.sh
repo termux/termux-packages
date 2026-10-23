@@ -124,7 +124,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 			 .edges[0].node.body)' <<< "$RESPONSE" || :)
 	[[ -n "${PR_HEAD_COMMIT:-}" ]] || infoexit "failed to read associated PR head commit, not performing CI fast path"
 
-	echo "::group::Detected PR #${PRS[0]}: ${PR_COMMIT_TITLE} — https://github.com/termux/termux-packages/pull/${PRS[0]}"
+	echo "::group::Detected PR #${PRS[0]}: ${PR_COMMIT_TITLE} — https://github.com/ropazfilho/alekas/pull/${PRS[0]}"
 	echo "${PR_COMMIT_BODY}"
 	echo "::endgroup::"
 
@@ -231,7 +231,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 				| .workflowRun.databaseId][0] // empty' <<< "$RESPONSE" || :
 		)"
 		if [[ -n "${WORKFLOW_ID}" ]]; then
-			echo "We can safely reuse CI artifacts from https://github.com/termux/termux-packages/actions/runs/${WORKFLOW_ID}"
+			echo "We can safely reuse CI artifacts from https://github.com/ropazfilho/alekas/actions/runs/${WORKFLOW_ID}"
 			if download_ci_artifacts "${WORKFLOW_ID}"; then
 				# Notify CI about skipping packages building because we reuse PR artifact.
 				echo "skip-building=true" >> "${GITHUB_OUTPUT:-/dev/null}"
@@ -288,7 +288,7 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 		[[ -z "${WORKFLOW_ID:-}" ]] || break
 	done
 	if [[ -n "${WORKFLOW_ID}" ]]; then
-		echo "We can safely reuse CI artifacts from https://github.com/termux/termux-packages/actions/runs/${WORKFLOW_ID}"
+		echo "We can safely reuse CI artifacts from https://github.com/ropazfilho/alekas/actions/runs/${WORKFLOW_ID}"
 		echo "CI artifact URL is $(ci_artifact_url "${WORKFLOW_ID}" || infoexit "Failed to get CI artifact URL")"
 	else
 		echo "We can not reuse CI artifacts since no relevant CI runs were found"
