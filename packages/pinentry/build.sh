@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=c2970f16d6afb66ecddfca767d743936c86239bff936eed7fd7597a678414b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libassuan, libgpg-error, libiconv, ncurses"
 # --disable-pinentry-qt avoids
-# /bin/bash: line 1: /data/data/com.termux/files/usr/lib/qt6/moc: cannot execute binary file: Exec format error
+# /bin/bash: line 1: /data/data/com.alekas/files/usr/lib/qt6/moc: cannot execute binary file: Exec format error
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pinentry-fltk
 --enable-pinentry-tty

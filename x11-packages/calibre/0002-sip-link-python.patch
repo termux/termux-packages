@@ -13,7 +13,7 @@ index cde5249b68..6335ffd6a1 100644
 +                sip_inc_dirs.append(os.path.join(os.path.dirname(PyQt6.__file__), 'bindings'))
 +        except Exception:
 +            pass
-+        termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++        termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.alekas/files/usr')
 +        for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
 +            tp = os.path.join(termux_prefix, 'lib', pyver, 'site-packages', 'PyQt6', 'bindings')
 +            if os.path.isdir(tp) and tp not in sip_inc_dirs:
@@ -43,7 +43,7 @@ index cde5249b68..6335ffd6a1 100644
              self.create_sip_build_skeleton(src_dir, ext)
              cwd = src_dir
              cmd = [sys.executable, '-m', 'sipbuild.tools.build', '--verbose', '--no-make', '--qmake', QMAKE]
-+            termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++            termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.alekas/files/usr')
 +            for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
 +                target_dir = os.path.join(termux_prefix, 'lib', pyver, 'site-packages')
 +                if os.path.isdir(target_dir):

@@ -37,7 +37,7 @@ index e39e128d00..3128729cc3 100644
      if getattr(PyQt6, '__file__', None):
 -        bindings_path = os.path.join(os.path.dirname(PyQt6.__file__), 'bindings', 'QtCore', 'QtCore.toml')
 +        candidate_paths.append(os.path.join(os.path.dirname(PyQt6.__file__), 'bindings', 'QtCore', 'QtCore.toml'))
-+    termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++    termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.alekas/files/usr')
 +    for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
 +        candidate_paths.append(os.path.join(termux_prefix, 'lib', pyver, 'site-packages', 'PyQt6', 'bindings', 'QtCore', 'QtCore.toml'))
 +

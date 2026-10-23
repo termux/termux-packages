@@ -37,10 +37,10 @@ termux_step_configure() {
 		return
 	fi
 	# note: 'host-qmake6' appears to correctly set some necessary build settings,
-	# such as '-Wl,-rpath,/data/data/com.termux/files/usr/lib'
-	# and '-I/data/data/com.termux/files/usr/include/qt6/QtCore',
+	# such as '-Wl,-rpath,/data/data/com.alekas/files/usr/lib'
+	# and '-I/data/data/com.alekas/files/usr/include/qt6/QtCore',
 	# but fails to correctly set some other necessary build settings,
-	# like 'aarch64-linux-android-clang++' and '-L/data/data/com.termux/files/usr/lib',
+	# like 'aarch64-linux-android-clang++' and '-L/data/data/com.alekas/files/usr/lib',
 	# so this overrides only the settings that are absolutely necessary to correct,
 	# while leaving other settings as they are.
 	# also, it's unclear how to successfully pass more than one argument at a time in variables like CPPFLAGS

@@ -1,9 +1,9 @@
 Avoids:
 error: call to undeclared function 'setusershell'
 Android does not have /etc/shells, so 
-Termux chsh only checks if the shell is in /data/data/com.termux/files/usr/bin if relative,
+Termux chsh only checks if the shell is in /data/data/com.alekas/files/usr/bin if relative,
 and if absolute, it only checks if it is executable and not
-/data/data/com.termux/files/usr/bin/login.
+/data/data/com.alekas/files/usr/bin/login.
 This patch simply stubs is_known_shell() by always returning true.
 print_shells() has no meaningful purpose that can be guessed at on Android, so this stubs it to no-op.
 print_shells() is not used in anything except util-linux chsh, which is not built in Termux.

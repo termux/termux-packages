@@ -17,6 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# prevents this error during linking reverse dependencies:
 	# ld.lld: error: undefined reference: ZSTD_decompress
-	# >>> referenced by /data/data/com.termux/files/usr/lib/libcpptrace.so.1.0.4
+	# >>> referenced by /data/data/com.alekas/files/usr/lib/libcpptrace.so.1.0.4
 	LDFLAGS+=" -lzstd"
 }

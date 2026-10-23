@@ -11,7 +11,7 @@ exit
 #pkg install -y emscripten-tests-third-party
 pkg install -y cmake libxml2 libxslt ndk-sysroot openjdk-25 python-cryptography python-lxml python-numpy python-pip python-psutil python-ruff rust
 
-export PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+export PREFIX="${PREFIX:-/data/data/com.alekas/files/usr}"
 cd "${PREFIX}/opt/emscripten"
 
 sed \

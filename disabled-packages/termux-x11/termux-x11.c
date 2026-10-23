@@ -7,11 +7,11 @@
 #include <wayland-client.h>
 
 #ifndef TERMUX_PREFIX
-# define TERMUX_PREFIX "/data/data/com.termux/files/usr"
+# define TERMUX_PREFIX "/data/data/com.alekas/files/usr"
 #endif
 
 #ifndef TERMUX_X11_DIR
-# define TERMUX_X11_DIR "/data/data/com.termux.x11/"
+# define TERMUX_X11_DIR "/data/data/com.alekas.x11/"
 #endif
 
 int dir_exists(const char *dir) {
