@@ -1,0 +1,23 @@
+--- a/bin/9l
++++ b/bin/9l
+@@ -25,9 +25,9 @@ case "$tag" in
+ 	nmflags="-B"
+ 	;;
+ *Linux*)
+-	ld="${CC9:-gcc} $CC9FLAGS"
++	ld="$CC $LDFLAGS -L@TERMUX_PREFIX@/lib"
+ 	userpath=true
+-	extralibs="$extralibs -lutil -lresolv -lpthread"
++	extralibs="$extralibs -lutil -lresolv_wrapper -lpthread"
+ 	;;
+ *Darwin*)
+ 	ld="${CC9:-gcc} -m64 $CC9FLAGS"
+@@ -342,7 +342,7 @@ quiet()
+ }
+ 
+ # Must use temp file to avoid pipe; pipe loses status.
+-xtmp=${TMPDIR-/tmp}/9l.$$.$USER.out
++xtmp=${TMPDIR-@TERMUX_PREFIX@/tmp}/9l.$$.$USER.out
+ $ld -L"$PLAN9/lib" "$@" $libsl $extralibs $frameworks >"$xtmp" 2>&1
+ status=$?
+ quiet "$xtmp"
