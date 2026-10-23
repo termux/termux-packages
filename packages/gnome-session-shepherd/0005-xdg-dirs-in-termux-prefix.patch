@@ -1,0 +1,11 @@
+--- a/services/gnome-session/services/xdg-autostart.scm
++++ b/services/gnome-session/services/xdg-autostart.scm
+@@ -49,7 +49,7 @@
+    (xdg-config-home)
+    (or (and=> (getenv "XDG_CONFIG_DIRS")
+               (lambda (s) (string-split s #\:)))
+-       (list "/etc/xdg"))))
++       (list "@TERMUX_PREFIX@/etc/xdg"))))
+ 
+ (define (autostart-directories)
+   "Returns a list of possible autostart directories that may or may not

@@ -1,0 +1,33 @@
+--- a/meson.build
++++ b/meson.build
+@@ -30,7 +30,7 @@
+ 
+ guiledep = dependency('guile-3.0')
+ 
+-guild = files(guiledep.get_variable(pkgconfig : 'guild'))
++guild = find_program('guild-3.0', 'guild', required : true)
+ guile = files(guiledep.get_variable(pkgconfig : 'guile'))
+ 
+ guile_output = join_paths(get_option('prefix'), get_option('datadir'), 'guile', 'site', '3.0')
+@@ -41,9 +41,21 @@
+   'GUILE_AUTO_COMPILE': '0'
+ }
+ 
++guile_target = []
++if meson.is_cross_build()
++  guild_triples = {
++    'aarch64': 'aarch64-linux-android',
++    'x86_64': 'x86_64-linux-android',
++    'x86': 'i686-linux-android',
++    'arm': 'arm-linux-androideabi',
++  }
++  guile_target = ['--target=' + guild_triples[host_machine.cpu_family()]]
++endif
++
+ guile_compile = [
+   guild,
+   'compile',
++  guile_target,
+   '-W3',
+   '-o',
+   '@OUTPUT@',
