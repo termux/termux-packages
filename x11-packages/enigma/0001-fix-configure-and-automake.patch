@@ -1,0 +1,70 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -6,7 +6,7 @@
+ AC_CONFIG_SRCDIR([src/enigma.cc])
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ AC_CONFIG_HEADERS([src/config.h])
+ AC_GNU_SOURCE
+ 
+@@ -115,32 +115,12 @@
+ CXXFLAGS_NOSDL="$CXXFLAGS"
+ LIBS_NOSDL="$LIBS"
+ 
+-AM_PATH_SDL2(2.0.0)
+-AC_SUBST(SDL_LIBS)
+-AC_SUBST(SDL_CFLAGS)
+-dnl The flags are now substituted inside the Makefile, but not used for the
+-dnl rest of the script. So we manually put them in. This is necessary if
+-dnl SDL has not been installed in the canonical locations.
+-
+-CFLAGS="$CFLAGS $SDL_CFLAGS"
+-CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+-LIBS="$LIBS $SDL_LIBS"
+-
+-dnl ----------------------------------------
+-dnl Check for SDL support libraries
+-dnl ----------------------------------------
+-AC_CHECK_LIB(SDL2_image,main,,[AC_MSG_ERROR([SDL2_image is required to compile Enigma])])
+-SDL_LIBS="$SDL_LIBS -lSDL2_image"
+-AC_CHECK_LIB(SDL2_mixer,main,,[AC_MSG_ERROR([SDL2_mixer is required to compile Enigma])])
+-SDL_LIBS="$SDL_LIBS -lSDL2_mixer"
+-AC_CHECK_LIB(SDL2_ttf, main,,[AC_MSG_ERROR([SDL2_ttf is required to compile Enigma])])
+-SDL_LIBS="$SDL_LIBS -lSDL2_ttf"
+-
+-if test "x$MACOSX" = xyes; then
+- SDL2_PREFIX=`$SDL2_CONFIG $sdl2_config_args --variable=libdir`
+- SDL_LIBS="-Wl,-rpath,@loader_path/../lib -framework AudioToolbox -framework AudioUnit -framework Cocoa -framework CoreAudio -framework IOKit -framework CoreFoundation -framework Carbon -framework CoreServices -framework ApplicationServices -framework Foundation -framework AppKit -framework OpenGL -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf $SDL2_PREFIX/libSDL2main.a"
+-AC_SUBST(SDL2_PREFIX)
+-fi
++PKG_CHECK_MODULES([SDL], [sdl2 >= 2.0.0 SDL2_image SDL2_mixer SDL2_ttf])
++AC_SUBST([SDL_CFLAGS])
++AC_SUBST([SDL_LIBS])
++CFLAGS="$CFLAGS $SDL_CFLAGS"
++CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
++LIBS="$LIBS $SDL_LIBS"
+ 
+ dnl ---------------------------------------
+ dnl Restoring variables to _NOSDL State
+--- a/lib-src/enet/configure.ac
++++ b/lib-src/enet/configure.ac
+@@ -1,6 +1,6 @@
+ AC_INIT([libenet], [1.0])
+ AC_CONFIG_SRCDIR([callbacks.c])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_PROG_CC
+ AC_PROG_RANLIB
+--- a/lib-src/zipios++/configure.ac
++++ b/lib-src/zipios++/configure.ac
+@@ -1,7 +1,7 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_INIT([zipios++], [0.1.5])
+ AC_CONFIG_SRCDIR([src/backbuffer.h])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ 
+ AC_CONFIG_HEADERS([zipios++/zipios-config.h])

@@ -1,0 +1,30 @@
+--- a/src/main.cc
++++ b/src/main.cc
+@@ -316,7 +316,7 @@
+         if ( newfp == NULL ) {  // This happens on NT
+             newfp = fopen((userStdPath + "/Output.log").c_str(), "w");
+             if (newfp) {  // in case stdout is a macro
+-                *stdout = *newfp;
++                // *stdout = *newfp;
+             }
+         }
+         setvbuf(stdout, NULL, _IOLBF, BUFSIZ);   // Line buffered
+@@ -325,7 +325,7 @@
+         if ( newfp == NULL ) {  // This happens on NT
+             newfp = fopen((userStdPath + "/Error.log").c_str(), "w");
+             if (newfp) {  // in case stderr is a macro
+-                *stderr = *newfp;
++                // *stderr = *newfp;
+             }
+         }
+         setbuf(stderr, NULL);   // No buffering
+--- a/src/nls.cc
++++ b/src/nls.cc
+@@ -93,7 +93,7 @@
+ 
+ std::unique_ptr<std::istream> TinyGetTextFileSystem::open_file(const std::string& filename) {
+     std::basic_ifstream<char> ifs(filename, ios::binary | ios::in);
+-    unique_ptr<std::basic_ifstream<char>> isptr = make_unique<std::basic_ifstream<char>>(move(ifs));
++    unique_ptr<std::basic_ifstream<char>> isptr = make_unique<std::basic_ifstream<char>>(std::move(ifs));
+     return isptr;
+ }
