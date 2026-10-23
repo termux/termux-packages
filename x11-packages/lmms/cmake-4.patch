@@ -1,0 +1,81 @@
+diff -ru lmms.orig/cmake/modules/BuildPlugin.cmake lmms/cmake/modules/BuildPlugin.cmake
+--- lmms.orig/cmake/modules/BuildPlugin.cmake	2025-07-19 11:07:33.912385512 +0200
++++ lmms/cmake/modules/BuildPlugin.cmake	2025-07-19 11:45:16.829453239 +0200
+@@ -27,7 +27,7 @@
+ 
+ 		SET(ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
+ 		ADD_CUSTOM_COMMAND(OUTPUT ${ER_H}
+-			COMMAND ${BIN2RES}
++			COMMAND bin2res
+ 			ARGS ${PLUGIN_EMBEDDED_RESOURCES} > "${ER_H}"
+ 			DEPENDS bin2res)
+ 	ENDIF(ER_LEN)
+diff -ru lmms.orig/CMakeLists.txt lmms/CMakeLists.txt
+--- lmms.orig/CMakeLists.txt	2025-07-19 11:07:33.906800214 +0200
++++ lmms/CMakeLists.txt	2025-07-19 11:32:18.905605542 +0200
+@@ -1,19 +1,9 @@
+-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
++CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+ 
+ PROJECT(lmms)
+ 
+ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+ 
+-IF(COMMAND CMAKE_POLICY)
+-	CMAKE_POLICY(SET CMP0005 NEW)
+-	CMAKE_POLICY(SET CMP0003 NEW)
+-	IF (CMAKE_MAJOR_VERSION GREATER 2)
+-		CMAKE_POLICY(SET CMP0026 OLD)
+-		CMAKE_POLICY(SET CMP0045 NEW)
+-		CMAKE_POLICY(SET CMP0050 OLD)
+-	ENDIF()
+-ENDIF(COMMAND CMAKE_POLICY)
+-
+ INCLUDE(AddFileDependencies)
+ INCLUDE(CheckIncludeFiles)
+ INCLUDE(FindPkgConfig)
+@@ -539,7 +529,6 @@
+ 	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
+ ELSE(WIN32 OR WIN64)
+ 	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
+-	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
+ ENDIF(WIN32 OR WIN64)
+ 
+ # we somehow have to make LMMS-binary depend on MOC-files
+diff -ru lmms.orig/plugins/vst_base/CMakeLists.txt lmms/plugins/vst_base/CMakeLists.txt
+--- lmms.orig/plugins/vst_base/CMakeLists.txt	2025-07-19 11:07:34.265267742 +0200
++++ lmms/plugins/vst_base/CMakeLists.txt	2025-07-19 11:28:57.289978604 +0200
+@@ -78,11 +78,10 @@
+ set(ENV{PATH} "$ENV{PATH}:${WINE_BINDIR}")
+ 
+ ADD_CUSTOM_COMMAND(
+-	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+ 	COMMAND export
+ 		ARGS "PATH=$PATH:${WINE_BINDIR}"
+ 	COMMAND ${WINE_CXX}
+-	ARGS ${WINE_CXX_ARGS}
++	ARGS ${WINE_CXX_ARGS} "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+ 	# Ensure correct file extension
+ 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
+ 	TARGET vstbase
+diff -ru lmms.orig/src/3rdparty/qt5-x11embed/CMakeLists.txt lmms/src/3rdparty/qt5-x11embed/CMakeLists.txt
+--- lmms.orig/src/3rdparty/qt5-x11embed/CMakeLists.txt	2025-07-19 11:07:34.328354510 +0200
++++ lmms/src/3rdparty/qt5-x11embed/CMakeLists.txt	2025-07-19 11:30:35.044525026 +0200
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
++cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+ project(qt5-x11embed)
+ 
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ECM/find-modules")
+diff -ru lmms.orig/src/CMakeLists.txt lmms/src/CMakeLists.txt
+--- lmms.orig/src/CMakeLists.txt	2025-07-19 11:07:34.334755638 +0200
++++ lmms/src/CMakeLists.txt	2025-07-19 11:42:19.047125040 +0200
+@@ -45,7 +45,7 @@
+ 
+ SET(lmms_EMBEDDED_RESOURCES "${CMAKE_SOURCE_DIR}/doc/AUTHORS" "${CMAKE_SOURCE_DIR}/LICENSE.txt" "${CONTRIBUTORS}")
+ SET(LMMS_ER_H "${CMAKE_CURRENT_BINARY_DIR}/embedded_resources.h")
+-ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND "${BIN2RES}" ARGS ${lmms_EMBEDDED_RESOURCES} > "${LMMS_ER_H}" DEPENDS bin2res)
++ADD_CUSTOM_COMMAND(OUTPUT "${LMMS_ER_H}" COMMAND bin2res ARGS ${lmms_EMBEDDED_RESOURCES} > "${LMMS_ER_H}" DEPENDS bin2res)
+ 
+ # Paths relative to lmms executable
+ FILE(RELATIVE_PATH LIB_DIR_RELATIVE "/${BIN_DIR}" "/${LIB_DIR}")
