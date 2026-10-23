@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/neutrinolabs/xorgxrdp
+TERMUX_PKG_DESCRIPTION="Xorg drivers for xrdp"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION="0.10.5"
+TERMUX_PKG_SRCURL="https://github.com/neutrinolabs/xorgxrdp/releases/download/v${TERMUX_PKG_VERSION}/xorgxrdp-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=a5d03435f0ef48bf3d5010e63d9264f2334e7063cba3ecd8d4c0a15616a4f712
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="xorg-server, xrdp, libxfont2"
+TERMUX_PKG_BUILD_DEPENDS="nasm, xorgproto"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-strict-locations"
