@@ -436,7 +436,7 @@ TERMUX__INTERNAL_NAME___MAX_LEN=7
 #
 # Default value: `termux`
 ##
-TERMUX__REPOS_HOST_ORG_NAME="termux"
+TERMUX__REPOS_HOST_ORG_NAME="ropazfilho"
 
 ##
 # Termux repositories host organization url.
