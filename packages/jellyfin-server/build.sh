@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A free media system for organizing and streaming media (
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	12.2
+	12.3
 	8.1.3.1
 )
 TERMUX_PKG_SRCURL=(
@@ -12,8 +12,8 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	a53a0bec23bf1e069e921e34ad9249bb24f4a60bbf519b7cf04324e8c8b3eed0
-	72ec1304bce2817887d9f1aad22903bbb3a3c8851d44bcc0fa188e36dc0a7994
+	2290073967c37572464c0c04c9e993f69396c28df624fc658367519e8c654f1f
+	29b71d3702a018a7d85ea7e44cda5a4d648b1388e6428798aeeb0fb30a49cd26
 	87bedcefc860cd234cdeddbebdcd3ce45aeedc81d0fbb258ed839ff778be3140
 )
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp (>= 3.119), libskiasharp (<< 4), libesqlite3, jellyfin-ffmpeg"
