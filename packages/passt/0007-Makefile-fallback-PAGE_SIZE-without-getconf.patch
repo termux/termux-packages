@@ -1,0 +1,17 @@
+diff --git a/Makefile b/Makefile
+index f6c87b1..bde5524 100644
+--- a/Makefile
++++ b/Makefile
+@@ -27,7 +27,11 @@ FORTIFY_FLAG := -D_FORTIFY_SOURCE=2
+ endif
+ 
+ BASE_CPPFLAGS := -D_XOPEN_SOURCE=700 -D_GNU_SOURCE $(FORTIFY_FLAG)
+-BASE_CPPFLAGS += -DPAGE_SIZE=$(shell getconf PAGE_SIZE)
++PAGE_SIZE ?= $(shell getconf PAGE_SIZE 2>/dev/null)
++ifeq ($(strip $(PAGE_SIZE)),)
++PAGE_SIZE := 4096
++endif
++BASE_CPPFLAGS += -DPAGE_SIZE=$(PAGE_SIZE)
+ BASE_CPPFLAGS += -DVERSION=\"$(VERSION)\"
+ 
+ BASE_CFLAGS := -std=c11 -pie -fPIE -O2

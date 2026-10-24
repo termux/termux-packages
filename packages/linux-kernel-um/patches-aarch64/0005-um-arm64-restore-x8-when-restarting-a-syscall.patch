@@ -1,0 +1,155 @@
+From 2021178e2a8ffc86ff65e53c1030aa0f4a0437bc Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 20:38:51 +0200
+Subject: [PATCH] um: arm64: restore x8 when restarting a syscall
+
+The guest re-executes the svc, and x8 is what selects the syscall at that
+point; NT_ARM_SYSTEM_CALL only redirects a syscall already in flight.
+Without restoring it, PT_REGS_ORIG_SYSCALL(regs) = __NR_restart_syscall has
+no effect and a signal-interrupted nanosleep restarts its full duration
+instead of its remainder.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/ptrace.h | 33 +++++++++++++++++++++-------
+ arch/um/include/asm/common.lds.S     | 19 +++++++++++-----
+ arch/um/kernel/dyn.lds.S             |  2 +-
+ arch/um/kernel/physmem.c             |  2 +-
+ arch/um/kernel/vmlinux.lds.S         |  7 +++++-
+ 5 files changed, 47 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm64/um/shared/sysdep/ptrace.h b/arch/arm64/um/shared/sysdep/ptrace.h
+index 15c7737786c82..0f66208d911a9 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace.h
++++ b/arch/arm64/um/shared/sysdep/ptrace.h
+@@ -56,15 +56,32 @@
+  * instructions are fixed 4-byte width, so this is exact; x86 subtracts 2 for
+  * its variable-length "syscall".
+  *
+- * x0 must be restored as well: by the time we decide to restart, the host has
+- * already replaced it with -ERESTARTSYS. x86 does not need this because there
+- * the syscall number and the return value share one register, so restoring the
+- * number restores the argument too.
++ * Two registers have to be put back, and both differ from x86:
++ *
++ *   x0  by the time we decide to restart, it holds -ERESTARTSYS rather than the
++ *       first argument. x86 does not need this because there the syscall number
++ *       and the return value share one register, so restoring the number
++ *       restores the argument too.
++ *
++ *   x8  because the guest is about to *re-execute* the svc, and it is x8 that
++ *       selects the syscall at that point -- not NT_ARM_SYSTEM_CALL, which only
++ *       redirects the syscall already in flight. Without this,
++ *       "PT_REGS_ORIG_SYSCALL(regs) = __NR_restart_syscall" in
++ *       arch/um/kernel/signal.c silently has no effect: the guest re-runs the
++ *       original syscall instead of restart_syscall, so a signal-interrupted
++ *       nanosleep restarts its full duration rather than its remainder. On x86
++ *       ORIG_SYSCALL is a register the kernel really does reload, so the same
++ *       code works there.
++ *
++ * The two call sites in arch/um/kernel/signal.c assign ORIG_SYSCALL before and
++ * after this macro respectively; taking the number from the slot rather than
++ * from a parameter is what makes both orderings come out right.
+  */
+-#define UPT_RESTART_SYSCALL(r)					\
+-	do {							\
+-		UPT_IP(r) -= 4;					\
+-		UPT_X(r, HOST_X0) = UPT_ORIG_X0(r);		\
++#define UPT_RESTART_SYSCALL(r)						\
++	do {								\
++		UPT_IP(r) -= 4;						\
++		UPT_X(r, HOST_X0) = UPT_ORIG_X0(r);			\
++		UPT_X(r, HOST_X8) = REGS_SYSCALL_NR((r)->gp);		\
+ 	} while (0)
+ 
+ extern unsigned long host_fp_size;
+diff --git a/arch/um/include/asm/common.lds.S b/arch/um/include/asm/common.lds.S
+index fd481ac371de0..6293008212eae 100644
+--- a/arch/um/include/asm/common.lds.S
++++ b/arch/um/include/asm/common.lds.S
+@@ -1,21 +1,30 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #include <asm-generic/vmlinux.lds.h>
+ 
++/*
++ * Section alignment below is (1 << CONFIG_PAGE_SHIFT), the *guest* page size,
++ * which for UML always equals the host's. These were literal 4096s, correct
++ * only on a 4K-page host. On a 16K-page host (Android 15 and later ship 16K) a
++ * 4096-byte alignment lets read-only and read-write data share a page, so
++ * CONFIG_STRICT_KERNEL_RWX either fails to mprotect or ends up granting write
++ * access to rodata.
++ */
++
+   .fini      : { *(.fini)    } =0x9090
+   _etext = .;
+   PROVIDE (etext = .);
+ 
+-  . = ALIGN(4096);
++  . = ALIGN((1 << CONFIG_PAGE_SHIFT));
+   _sdata = .;
+   PROVIDE (sdata = .);
+ 
+-  RO_DATA(4096)
++  RO_DATA((1 << CONFIG_PAGE_SHIFT))
+ 
+   .unprotected : { *(.unprotected) }
+-  . = ALIGN(4096);
++  . = ALIGN((1 << CONFIG_PAGE_SHIFT));
+   PROVIDE (_unprotected_end = .);
+ 
+-  . = ALIGN(4096);
++  . = ALIGN((1 << CONFIG_PAGE_SHIFT));
+   EXCEPTION_TABLE(0)
+ 
+   BUG_TABLE
+@@ -94,7 +103,7 @@
+ 	__fini_array_end = .;
+   }
+ 
+-   . = ALIGN(4096);
++   . = ALIGN((1 << CONFIG_PAGE_SHIFT));
+   .init.ramfs : {
+ 	INIT_RAM_FS
+   }
+diff --git a/arch/um/kernel/dyn.lds.S b/arch/um/kernel/dyn.lds.S
+index ad3cefeff2acb..b88bd144d5ac0 100644
+--- a/arch/um/kernel/dyn.lds.S
++++ b/arch/um/kernel/dyn.lds.S
+@@ -18,7 +18,7 @@ SECTIONS
+   . = START + SIZEOF_HEADERS;
+   .interp         : { *(.interp) }
+   __binary_start = .;
+-  . = ALIGN(4096);		/* Init code and data */
++  . = ALIGN((1 << CONFIG_PAGE_SHIFT));		/* Init code and data */
+   _text = .;
+   INIT_TEXT_SECTION(PAGE_SIZE)
+ 
+diff --git a/arch/um/kernel/physmem.c b/arch/um/kernel/physmem.c
+index ae6ca373c2610..d703a6ec37c98 100644
+--- a/arch/um/kernel/physmem.c
++++ b/arch/um/kernel/physmem.c
+@@ -34,7 +34,7 @@ void map_memory(unsigned long virt, unsigned long phys, unsigned long len,
+ 		if (err == -ENOMEM)
+ 			printk(KERN_ERR "try increasing the host's "
+ 			       "/proc/sys/vm/max_map_count to <physical "
+-			       "memory size>/4096\n");
++			       "memory size>/%lu\n", PAGE_SIZE);
+ 		panic("map_memory(0x%lx, %d, 0x%llx, %ld, %d, %d, %d) failed, "
+ 		      "err = %d\n", virt, fd, offset, len, r, w, x, err);
+ 	}
+diff --git a/arch/um/kernel/vmlinux.lds.S b/arch/um/kernel/vmlinux.lds.S
+index 53d719c04ba94..12bca8844de9f 100644
+--- a/arch/um/kernel/vmlinux.lds.S
++++ b/arch/um/kernel/vmlinux.lds.S
+@@ -1,5 +1,10 @@
+ #define RUNTIME_DISCARD_EXIT
+-KERNEL_STACK_SIZE = 4096 * (1 << CONFIG_KERNEL_STACK_ORDER);
++/*
++ * The guest kernel stack is measured in guest pages, not in 4K units: on a
++ * 16K-page host CONFIG_KERNEL_STACK_ORDER=2 must mean four 16K pages, the same
++ * as THREAD_SIZE in <asm/thread_info.h>, or the two disagree.
++ */
++KERNEL_STACK_SIZE = (1 << CONFIG_PAGE_SHIFT) * (1 << CONFIG_KERNEL_STACK_ORDER);
+ 
+ #ifdef CONFIG_LD_SCRIPT_STATIC
+ #include "uml.lds.S"

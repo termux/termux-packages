@@ -1,0 +1,110 @@
+From af50e005969e36721ff7ed20f74395043a682416 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 08:32:15 +0200
+Subject: [PATCH] um: arm64: implement the NT_ARM_SYSTEM_CALL regset for guest
+ tracers
+
+A guest tracer had no way to see or change the syscall number of a tracee
+it was stopped in: PTRACE_GETREGSET(NT_ARM_SYSTEM_CALL) simply failed,
+because the regset did not exist.
+
+That is not a missing extra. On arm64 the syscall number is not part of the
+general register set -- x8 carries it on entry but is not authoritative,
+and there is no orig_x8 -- so this regset is the only interface for it.
+Without it a tracer cannot name the call it is stopped in, and cannot
+cancel one by writing -1, which is how ptrace sandboxes block a syscall on
+this architecture.
+
+The storage is uml_pt_regs.syscall, which handle_syscall() fills before the
+tracehooks and re-reads afterwards, so a write really does redirect or
+cancel the call as it does on hardware.
+
+Found by a new test that runs ptrace inside the guest and compares against
+the same test run on real arm64. Nothing in the existing gates traces
+anything -- they run shells, a package manager and a compiler -- so this
+whole interface had never been executed.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/asm/ptrace.h |  1 +
+ arch/arm64/um/ptrace.c     | 48 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
+
+diff --git a/arch/arm64/um/asm/ptrace.h b/arch/arm64/um/asm/ptrace.h
+index eca32f9ce65e0..8a773c44cf1c3 100644
+--- a/arch/arm64/um/asm/ptrace.h
++++ b/arch/arm64/um/asm/ptrace.h
+@@ -11,6 +11,7 @@
+ enum {
+ 	REGSET_GENERAL,
+ 	REGSET_FP,
++	REGSET_SYSTEM_CALL,
+ };
+ 
+ #include <linux/compiler.h>
+diff --git a/arch/arm64/um/ptrace.c b/arch/arm64/um/ptrace.c
+index d8d804a194a92..437d92d20a726 100644
+--- a/arch/arm64/um/ptrace.c
++++ b/arch/arm64/um/ptrace.c
+@@ -152,6 +152,46 @@ static int fpregs_set(struct task_struct *target,
+ 				  fpregs, 0, regset->size * regset->n);
+ }
+ 
++/*
++ * NT_ARM_SYSTEM_CALL, without which a guest tracer cannot see or change the
++ * syscall number at all.
++ *
++ * On arm64 the number is not part of the general register set -- x8 holds it on
++ * entry but is not authoritative, and there is no orig_x8 -- so this regset is
++ * the only interface for it. That makes it not an optional extra: without it,
++ * PTRACE_GETREGSET(NT_ARM_SYSTEM_CALL) fails outright, and a tracer has no way
++ * to name the syscall it is stopped in, or to cancel one by writing -1, which
++ * is how every arm64 ptrace sandbox blocks a call.
++ *
++ * The storage is uml_pt_regs.syscall, which handle_syscall() fills before
++ * calling the tracehooks and re-reads afterwards -- so a write here really does
++ * redirect or cancel the syscall, as it does on real hardware.
++ */
++static int system_call_get(struct task_struct *target,
++			   const struct user_regset *regset,
++			   struct membuf to)
++{
++	int syscallno = PT_REGS_SYSCALL_NR(task_pt_regs(target));
++
++	return membuf_store(&to, syscallno);
++}
++
++static int system_call_set(struct task_struct *target,
++			   const struct user_regset *regset,
++			   unsigned int pos, unsigned int count,
++			   const void *kbuf, const void __user *ubuf)
++{
++	int syscallno = PT_REGS_SYSCALL_NR(task_pt_regs(target));
++	int ret;
++
++	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &syscallno, 0, -1);
++	if (ret)
++		return ret;
++
++	PT_REGS_SYSCALL_NR(task_pt_regs(target)) = syscallno;
++	return 0;
++}
++
+ static struct user_regset uml_regsets[] __ro_after_init = {
+ 	[REGSET_GENERAL] = {
+ 		USER_REGSET_NOTE_TYPE(PRSTATUS),
+@@ -174,6 +214,14 @@ static struct user_regset uml_regsets[] __ro_after_init = {
+ 		.regset_get	= fpregs_get,
+ 		.set		= fpregs_set,
+ 	},
++	[REGSET_SYSTEM_CALL] = {
++		USER_REGSET_NOTE_TYPE(ARM_SYSTEM_CALL),
++		.n		= 1,
++		.size		= sizeof(int),
++		.align		= sizeof(int),
++		.regset_get	= system_call_get,
++		.set		= system_call_set,
++	},
+ };
+ 
+ static const struct user_regset_view user_uml_view = {

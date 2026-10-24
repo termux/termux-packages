@@ -1,0 +1,17 @@
+diff --git a/passt.h b/passt.h
+index afd8e9f..388cd29 100644
+--- a/passt.h
++++ b/passt.h
+@@ -46,6 +46,12 @@ extern char *epoll_type_str[];
+ 	                                    epoll_type_str[(n)] : "?")
+ 
+ #include <resolv.h>	/* For MAXNS below */
++#ifndef MAXNS
++#  define MAXNS 3
++#endif /* MAXNS */
++#ifndef MAXDNSRCH
++#  define MAXDNSRCH 6
++#endif /* MAXDNSRCH */
+ 
+ /**
+  * struct fqdn - Representation of fully-qualified domain name

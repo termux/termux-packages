@@ -1,0 +1,281 @@
+From ecb38e2c61ab6845e69f2c669796187d6d22b544 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 17 Oct 2026 14:19:06 +0200
+Subject: [PATCH] um: do without close_range() where the host refuses it
+
+Three places called close_range(2) unconditionally, and two kinds of host
+refuse it: a kernel older than 5.9 returns -ENOSYS, and an Android app
+sandbox whose seccomp policy does not list the syscall kills the caller
+with SIGSYS. On the second, the seccomp probe's helper died before it
+had tested anything and the boot reported "seccomp cannot be installed",
+and in SECCOMP mode the stub exited 13 before the guest ran at all.
+
+Ask once instead. check_close_range() makes the call in a child, the
+way check_stub_cycles() pays for its answer, and os_early_checks() runs
+it before either userspace mode is chosen. Where it fails:
+
+  - the seccomp probe's helper skips the call it used to die on;
+
+  - userspace_tramp() marks the descriptors close-on-exec itself, walking
+    /proc/self/fd rather than every number below RLIMIT_NOFILE. That
+    limit is 32768 for an Android app, and the sweep would be paid again
+    for every process the guest starts; it stays as the fallback for a
+    host with no /proc;
+
+  - the stub closes the one descriptor that survives the exec besides its
+    socket, the memory FD it maps its code and data from. close_range()
+    used to drop it there. Left open, every guest process would hold an
+    FD onto all of guest memory for its lifetime.
+
+The boot line says which case applies:
+
+	Checking close_range()...OK
+	Checking close_range()...unavailable; closing by hand
+	Checking close_range()...blocked by the host (signal 31); closing by hand
+
+Tested booting the Stryker rootfs to sshd under an arm64 QEMU host, with
+close_range() allowed, returning -ENOSYS, and raising SIGSYS through a
+seccomp filter. All three come up in SECCOMP mode with each stub holding
+only its socket.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/shared/skas/skas.h      |  1 +
+ arch/um/include/shared/skas/stub-data.h | 11 +++++
+ arch/um/kernel/skas/stub_exe.c          | 13 +++++-
+ arch/um/os-Linux/skas/process.c         | 58 ++++++++++++++++++++++++-
+ arch/um/os-Linux/start_up.c             | 56 +++++++++++++++++++++++-
+ 5 files changed, 135 insertions(+), 4 deletions(-)
+
+diff --git a/arch/um/include/shared/skas/skas.h b/arch/um/include/shared/skas/skas.h
+index 5f69d0cecf06a..0d00ea1635742 100644
+--- a/arch/um/include/shared/skas/skas.h
++++ b/arch/um/include/shared/skas/skas.h
+@@ -18,6 +18,7 @@ extern int using_seccomp;
+ extern int have_ptrace_sysemu;
+ extern int syscall_cancel_nr;
+ extern int have_stub_cycles;
++extern int have_close_range;
+ 
+ extern void new_thread_handler(void);
+ extern void handle_syscall(struct uml_pt_regs *regs);
+diff --git a/arch/um/include/shared/skas/stub-data.h b/arch/um/include/shared/skas/stub-data.h
+index a295eeaec6790..516a77de36240 100644
+--- a/arch/um/include/shared/skas/stub-data.h
++++ b/arch/um/include/shared/skas/stub-data.h
+@@ -81,6 +81,17 @@ struct stub_spin_state {
+ struct stub_init_data {
+ 	int seccomp;
+ 
++	/*
++	 * Whether close_range(2) may be called at all.
++	 *
++	 * Not "does this kernel have it": on a host whose seccomp policy does
++	 * not allow the syscall -- an Android app sandbox, for instance -- the
++	 * caller is killed with SIGSYS rather than given -ENOSYS, so the stub
++	 * cannot find out for itself without dying. check_close_range() asks
++	 * once, in a child, and the answer is carried here.
++	 */
++	int have_close_range;
++
+ 	unsigned long stub_start;
+ 
+ 	int stub_code_fd;
+diff --git a/arch/um/kernel/skas/stub_exe.c b/arch/um/kernel/skas/stub_exe.c
+index 002e62adee57f..254207f55cf65 100644
+--- a/arch/um/kernel/skas/stub_exe.c
++++ b/arch/um/kernel/skas/stub_exe.c
+@@ -75,10 +75,21 @@ noinline static void real_init(void)
+ 		stub_syscall1(__NR_exit, 12);
+ 
+ 	/* In SECCOMP mode, we only need the signalling FD from now on */
+-	if (init_data.seccomp) {
++	if (init_data.seccomp && init_data.have_close_range) {
+ 		res = stub_syscall3(__NR_close_range, 1, ~0U, 0);
+ 		if (res != 0)
+ 			stub_syscall1(__NR_exit, 13);
++	} else if (init_data.seccomp) {
++		/*
++		 * Without close_range(2), userspace_tramp() has already made
++		 * every other descriptor close-on-exec, and the one it exempted
++		 * is the memory FD both mappings above came from (code and data
++		 * share it -- the code mapping would have failed otherwise). It
++		 * backs all of guest memory, so it must not outlive them.
++		 */
++		res = stub_syscall1(__NR_close, init_data.stub_data_fd);
++		if (res != 0)
++			stub_syscall1(__NR_exit, 13);
+ 	}
+ 
+ 	/* setup signal stack inside stub data */
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index e40bc4559003c..5a80cdc27a2f8 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -15,6 +15,7 @@
+ #include <mem_user.h>
+ 
+ #include <sys/mman.h>
++#include <sys/resource.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <sys/socket.h>
+@@ -367,6 +368,57 @@ struct tramp_data {
+ #define CLOSE_RANGE_CLOEXEC	(1U << 2)
+ #endif
+ 
++/*
++ * close_range(0, ~0U, CLOSE_RANGE_CLOEXEC), for a host that will not run it.
++ *
++ * Only the descriptors that are actually open, as /proc/self/fd lists them.
++ * Sweeping every number below RLIMIT_NOFILE would be paid again for every
++ * process the guest starts, and an Android app's limit is 32768; the sweep is
++ * kept only for a host with no /proc. getdents64 is called directly, into a
++ * small buffer, because this runs in a CLONE_VM child on a one-page stack,
++ * where neither opendir()'s allocation nor a large buffer is safe.
++ */
++static void cloexec_all_fds(void)
++{
++	struct {
++		unsigned long long d_ino;
++		long long d_off;
++		unsigned short d_reclen;
++		unsigned char d_type;
++		char d_name[];
++	} *d;
++	unsigned long long buf[32];
++	unsigned long fd, max = 4096;
++	struct rlimit lim;
++	long n, off;
++	int dir;
++
++	dir = open("/proc/self/fd", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++	if (dir >= 0) {
++		while ((n = syscall(__NR_getdents64, dir, buf, sizeof(buf))) > 0) {
++			for (off = 0; off < n; off += d->d_reclen) {
++				const char *p;
++
++				d = (void *)buf + off;
++				fd = 0;
++				for (p = d->d_name; *p >= '0' && *p <= '9'; p++)
++					fd = fd * 10 + (*p - '0');
++				/* skips "." and ".." */
++				if (p != d->d_name && !*p)
++					fcntl(fd, F_SETFD, FD_CLOEXEC);
++			}
++		}
++		close(dir);
++		if (n == 0)
++			return;
++	}
++
++	if (!getrlimit(RLIMIT_NOFILE, &lim) && lim.rlim_cur != RLIM_INFINITY)
++		max = lim.rlim_cur;
++	for (fd = 0; fd < max; fd++)
++		fcntl(fd, F_SETFD, FD_CLOEXEC);
++}
++
+ static int userspace_tramp(void *data)
+ {
+ 	struct tramp_data *tramp_data = data;
+@@ -374,6 +426,7 @@ static int userspace_tramp(void *data)
+ 	unsigned long long offset;
+ 	struct stub_init_data init_data = {
+ 		.seccomp = using_seccomp,
++		.have_close_range = have_close_range,
+ 		.stub_start = STUB_START,
+ 	};
+ 	int ret;
+@@ -405,7 +458,10 @@ static int userspace_tramp(void *data)
+ 	 * and then unsetting it on all memory related FDs.
+ 	 * This is not strictly necessary from a safety perspective.
+ 	 */
+-	syscall(__NR_close_range, 0, ~0U, CLOSE_RANGE_CLOEXEC);
++	if (have_close_range)
++		syscall(__NR_close_range, 0, ~0U, CLOSE_RANGE_CLOEXEC);
++	else
++		cloexec_all_fds();
+ 
+ 	fcntl(init_data.stub_data_fd, F_SETFD, 0);
+ 
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index bc129f59cb7e8..cdacd2e556407 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -435,6 +435,50 @@ static void __init check_sysemu(void)
+ 	      "intercept guest syscalls without one of them.\n");
+ }
+ 
++int have_close_range = 1;
++
++/*
++ * Can close_range(2) be called without dying?
++ *
++ * Two different hosts answer no. One is simply older than 5.9 and returns
++ * -ENOSYS. The other is an Android kernel whose seccomp policy does not list
++ * the syscall, and there the caller is killed with SIGSYS -- there is no return
++ * value to inspect, which is why this cannot be a test of the result.
++ *
++ * A child pays for the answer, exactly as check_stub_cycles() does. Getting it
++ * wrong is expensive in a way that is hard to read: the stub calls this before
++ * it has a filter of its own, so a stub that dies here takes the guest with it
++ * and the log blames seccomp.
++ */
++static void __init check_close_range(void)
++{
++	int pid, n, status;
++
++	os_info("Checking close_range()...");
++
++	pid = fork();
++	if (pid == 0)
++		_exit(stub_syscall3(__NR_close_range, 1, ~0U, 0) == 0 ? 0 : 1);
++	if (pid < 0)
++		fatal_perror("check_close_range: fork failed");
++
++	CATCH_EINTR(n = waitpid(pid, &status, 0));
++	if (n < 0)
++		fatal_perror("check_close_range: wait failed");
++
++	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
++		os_info("OK\n");
++		return;
++	}
++
++	have_close_range = 0;
++	if (WIFSIGNALED(status))
++		os_info("blocked by the host (signal %d); closing by hand\n",
++			WTERMSIG(status));
++	else
++		os_info("unavailable; closing by hand\n");
++}
++
+ /*
+  * Is the cycle counter the stub's adaptive spin is budgeted against readable?
+  *
+@@ -560,8 +604,15 @@ static int __init seccomp_helper(void *data)
+ 	};
+ 	struct sigaction sa;
+ 
+-	/* close_range is needed for the stub */
+-	if (stub_syscall3(__NR_close_range, 1, ~0U, 0))
++	/*
++	 * Rehearse the stub, which drops its descriptors with close_range(2)
++	 * only where check_close_range() -- already run by os_early_checks()
++	 * -- found that safe. Calling it unconditionally here is what used to
++	 * get this helper killed with SIGSYS on a host that filters the
++	 * syscall, reported as "seccomp cannot be installed": both wrong and
++	 * the hardest kind of wrong to trace.
++	 */
++	if (have_close_range && stub_syscall3(__NR_close_range, 1, ~0U, 0))
+ 		exit(1);
+ 
+ 	/*
+@@ -965,6 +1016,7 @@ void __init os_early_checks(void)
+ 	 * Before either mode is chosen: the spin this gates belongs to SECCOMP
+ 	 * mode, and that path returns below without reaching check_ptrace().
+ 	 */
++	check_close_range();
+ 	check_stub_cycles();
+ 
+ 	if (seccomp_config) {

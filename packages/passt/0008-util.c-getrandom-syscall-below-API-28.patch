@@ -1,0 +1,37 @@
+diff --git a/util.c b/util.c
+index ff1f19f..dc6dc23 100644
+--- a/util.c
++++ b/util.c
+@@ -960,7 +961,9 @@ bool snprintf_check(char *str, size_t size, const char *format, ...)
+ void raw_random(void *buf, size_t buflen)
+ {
+ 	size_t random_read = 0;
+-#ifndef HAS_GETRANDOM
++#ifdef HAS_GETRANDOM
++#elif defined __ANDROID__ && __ANDROID_API__ < 28
++#else
+ 	int fd = open(DEV_RANDOM, O_RDONLY | O_CLOEXEC);
+ 
+ 	if (fd < 0)
+@@ -973,6 +976,10 @@ void raw_random(void *buf, size_t buflen)
+ #ifdef HAS_GETRANDOM
+ 		ret = getrandom((char *)buf + random_read,
+ 				buflen - random_read, GRND_RANDOM);
++#elif defined __ANDROID__ && __ANDROID_API__ < 28
++		ret = syscall(SYS_getrandom,
++			      (char *)buf + random_read,
++			      buflen - random_read, 0);
+ #else
+ 		ret = read(fd, (char *)buf + random_read,
+ 			   buflen - random_read);
+@@ -990,7 +997,9 @@ void raw_random(void *buf, size_t buflen)
+ 		random_read += ret;
+ 	}
+ 
+-#ifndef HAS_GETRANDOM
++#ifdef HAS_GETRANDOM
++#elif defined __ANDROID__ && __ANDROID_API__ < 28
++#else
+ 	close(fd);
+ #endif
+ 
