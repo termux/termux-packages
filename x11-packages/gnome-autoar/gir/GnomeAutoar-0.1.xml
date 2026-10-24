@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="AutoarCompressor" get-type="autoar_compressor_get_type" parents="GObject">
+    <property name="source-files" type="gpointer" flags="235"/>
+    <property name="output-file" type="GFile" flags="235"/>
+    <property name="format" type="AutoarFormat" flags="235" default-value="AUTOAR_FORMAT_ZIP"/>
+    <property name="filter" type="AutoarFilter" flags="235" default-value="AUTOAR_FILTER_NONE"/>
+    <property name="create-top-level-directory" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="size" type="guint64" flags="225" default-value="0"/>
+    <property name="completed-size" type="guint64" flags="225" default-value="0"/>
+    <property name="files" type="guint" flags="225" default-value="0"/>
+    <property name="completed-files" type="guint" flags="225" default-value="0"/>
+    <property name="output-is-dest" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="notify-interval" type="gint64" flags="231" default-value="100000"/>
+    <signal name="decide-dest" return="void" when="last">
+      <param type="GFile"/>
+    </signal>
+    <signal name="progress" return="void" when="last">
+      <param type="guint64"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="cancelled" return="void" when="last">
+    </signal>
+    <signal name="completed" return="void" when="last">
+    </signal>
+    <signal name="error" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+  </class>
+  <class name="AutoarExtractor" get-type="autoar_extractor_get_type" parents="GObject">
+    <property name="source-file" type="GFile" flags="235"/>
+    <property name="output-file" type="GFile" flags="235"/>
+    <property name="total-size" type="guint64" flags="225" default-value="0"/>
+    <property name="completed-size" type="guint64" flags="225" default-value="0"/>
+    <property name="total-files" type="guint" flags="225" default-value="0"/>
+    <property name="completed-files" type="guint" flags="225" default-value="0"/>
+    <property name="output-is-dest" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="delete-after-extraction" type="gboolean" flags="231" default-value="FALSE"/>
+    <property name="notify-interval" type="gint64" flags="231" default-value="100000"/>
+    <signal name="progress" return="void" when="last">
+      <param type="guint64"/>
+      <param type="guint"/>
+    </signal>
+    <signal name="cancelled" return="void" when="last">
+    </signal>
+    <signal name="completed" return="void" when="last">
+    </signal>
+    <signal name="error" return="void" when="last">
+      <param type="GError"/>
+    </signal>
+    <signal name="scanned" return="void" when="last">
+      <param type="guint"/>
+    </signal>
+    <signal name="decide-destination" return="GObject" when="last">
+      <param type="GFile"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="conflict" return="guint" when="last">
+      <param type="GFile"/>
+      <param type="gpointer"/>
+    </signal>
+    <signal name="request-passphrase" return="gchararray" when="last">
+    </signal>
+  </class>
+</dump>
