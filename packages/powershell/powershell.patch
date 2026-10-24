@@ -1,0 +1,36 @@
+--- a/build.psm1
++++ b/build.psm1
+@@ -309,6 +309,10 @@ function Start-PSBuild {
+         # We do not use ValidateScript since we want tab completion
+         # If this parameter is not provided it will get determined automatically.
+         [ValidateSet("linux-musl-x64",
++                     "linux-bionic-arm",
++                     "linux-bionic-arm64",
++                     "linux-bionic-x86",
++                     "linux-bionic-x64",
+                      "fxdependent",
+                      "fxdependent-noopt-linux-musl-x64",
+                      "fxdependent-linux-x64",
+@@ -900,6 +904,10 @@ function New-PSOptions {
+         # We do not use ValidateScript since we want tab completion
+         [ValidateSet("",
+                      "linux-musl-x64",
++                     "linux-bionic-arm",
++                     "linux-bionic-arm64",
++                     "linux-bionic-x86",
++                     "linux-bionic-x64",
+                      "fxdependent",
+                      "fxdependent-noopt-linux-musl-x64",
+                      "fxdependent-linux-x64",
+--- a/src/powershell-unix/powershell-unix.csproj
++++ b/src/powershell-unix/powershell-unix.csproj
+@@ -9,7 +9,8 @@
+     <TieredCompilation>true</TieredCompilation>
+     <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+     <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>
+-    <RuntimeIdentifiers>linux-x64;osx-x64;</RuntimeIdentifiers>
++    <RuntimeIdentifiers>linux-arm;linux-arm64;linux-x64;osx-x64;</RuntimeIdentifiers>
++    <PublishReadyToRun>false</PublishReadyToRun>
+   </PropertyGroup>
+ 
+   <ItemGroup>
