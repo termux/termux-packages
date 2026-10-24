@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://codeberg.org/forgejo-contrib/forgejo-cli
 TERMUX_PKG_DESCRIPTION="CLI tool for Forgejo"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.6.0"
+TERMUX_PKG_VERSION="0.7.0"
 TERMUX_PKG_SRCURL="https://codeberg.org/forgejo-contrib/forgejo-cli/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=8b91194cb1886f253261a4567ee6f83aa34b05a9637644793f88b40b7110322a
+TERMUX_PKG_SHA256=748ce60eb18e72af83ef3956910933b1e091abf673f12ff9777aea214f6eae40
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libgit2, libssh2, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -32,8 +32,9 @@ termux_step_pre_configure() {
 		! -wholename ./vendor/rustls-platform-verifier \
 		-exec rm -rf '{}' \;
 
-	sed -i -e '/^build = /d' vendor/ssh2-config/Cargo.toml
-	sed -i -e '/\[build-dependencies/,$d' vendor/ssh2-config/Cargo.toml
+	patch --silent -p1 \
+		-d ./vendor/ssh2-config/ \
+		< "$TERMUX_PKG_BUILDER_DIR"/ssh2-config-Cargo.toml.diff
 
 	find vendor/rustls-platform-verifier -type f -print0 | \
 		xargs -0 sed -i \

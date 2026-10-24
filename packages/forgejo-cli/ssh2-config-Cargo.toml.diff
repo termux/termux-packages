@@ -1,0 +1,39 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -15,7 +15,6 @@
+ name = "ssh2-config"
+ version = "0.8.2"
+ authors = ["Christian Visintin <christian.visintin@veeso.dev>"]
+-build = "build/main.rs"
+ include = [
+     "build/**/*",
+     "examples/**/*",
+@@ -43,14 +42,6 @@
+ license = "MIT"
+ repository = "https://github.com/veeso/ssh2-config"
+
+-[features]
+-default = []
+-nolog = ["log/max_level_off"]
+-reload-ssh-algo = [
+-    "dep:anyhow",
+-    "dep:git2",
+-]
+-
+ [lib]
+ name = "ssh2_config"
+ path = "src/lib.rs"
+@@ -99,13 +90,3 @@
+
+ [dev-dependencies.tempfile]
+ version = "3"
+-
+-[build-dependencies.anyhow]
+-version = "1"
+-optional = true
+-
+-[build-dependencies.git2]
+-version = "0.21"
+-features = ["https"]
+-optional = true
+-default-features = false
