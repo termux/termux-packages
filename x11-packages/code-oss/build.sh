@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="1.132.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron42, libx11, libxkbfile, libsecret, ripgrep"
@@ -41,11 +42,14 @@ termux_step_post_get_source() {
 		termux_error_exit "Version mismatch: Expected 24, got $_node_version."
 	fi
 
-	# Check whether the prebuilt electron version matches the electron version from package.json
-	local _electron_verion="$(jq -r '.devDependencies.electron' $TERMUX_PKG_SRCDIR/package.json)"
-	local _header_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron-host-tools-for-code-oss/build.sh; echo $TERMUX_PKG_VERSION)"
-	if [ "$_electron_verion" != "$_header_version" ]; then
-		termux_error_exit "Version mismatch: version in package.json is $_electron_verion, prebuilt electron version $_header_version."
+	# Check whether the prebuilt electron's major version matches the electron major version from package.json
+	local _want_electron_major="$(jq -r \
+		'.registrations[] | select(.component.git.name == "electron") | .component.git.tag' \
+		$TERMUX_PKG_SRCDIR/cgmanifest.json | cut -d. -f1 -)"
+	local _prebuilt_electron_major=42
+	if [ "$_want_electron_major" != "$_prebuilt_electron_major" ]; then
+		termux_error_exit "Major version mismatch: \
+			version in package.json is $_want_electron_major, prebuilt electron version $_prebuilt_electron_major."
 	fi
 
 	# Use custom node-native-keymap
@@ -60,6 +64,11 @@ termux_step_post_get_source() {
 	# Replace package.json
 	jq ".dependencies.\"native-keymap\" = \"file:./node-native-keymap-src\"" package.json > package.json.tmp && mv package.json.tmp package.json
 	jq ".dependencies.\"node-ovsx-sign\" = \"^1.2.0\"" package.json > package.json.tmp && mv package.json.tmp package.json
+
+	# Disable sourcemap as it takes much space
+	# https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/commit/e050d3e8120e052cd7af19d2f67bcd36dc52e436
+	sed -r "s/\bsourcemap:\s*[\"'](inline|linked)[\"']/sourcemap: 'external'/" -i \
+		build/next/index.ts
 }
 
 termux_step_host_build() {
@@ -108,6 +117,18 @@ termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/lib/code-oss/resources/
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/resources/
 	cp -r --no-preserve=ownership --preserve=mode package-build-root/VSCode-linux-$CODE_ARCH/resources/* $TERMUX_PREFIX/lib/code-oss/resources/
+
+	# Clean up sourcemaps
+	echo "Removed $(find ""$TERMUX_PREFIX/lib/code-oss/resources -name '*.map' -print -delete | wc -l) sourcemaps"
+
+	# Clean extensions that are compiled for gnu libc
+	pushd $TERMUX_PREFIX/lib/code-oss/resources
+	rm -rf app/extensions/copilot
+	rm -rf app/node_modules.asar.unpacked/\@github/copilot-linux-*
+	rm -rf app/node_modules.asar.unpacked/\@microsoft/mxc-sdk
+	rm -rf app/node_modules.asar.unpacked/\@vscode/vsce-sign
+	rm -rf app/node_modules/\@vscode/sandbox-runtime
+	popd # $TERMUX_PREFIX/lib/code-oss/resources
 
 	# Install the dummy code-oss binary
 	ln -sf $TERMUX_PREFIX/lib/electron42/electron $TERMUX_PREFIX/lib/code-oss/code-oss
