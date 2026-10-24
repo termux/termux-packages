@@ -1,0 +1,34 @@
+diff --git a/meson.build b/meson.build
+index 2c7b6d0..31753ca 100644
+--- a/meson.build
++++ b/meson.build
+@@ -23,7 +23,6 @@ dependency('gobject-introspection-1.0', version: '>= 1.78.0')
+ dependency('gtk4', version: '>= 4.10.0')
+ dependency('libadwaita-1', version: '>= 1.4.0')
+ dependency('pygobject-3.0', version: '>= 3.46.0')
+-dependency('gudev-1.0', version: '>= 238')
+ dependency('gsettings-desktop-schemas', version: '>= 46.0')
+ 
+ prefix = get_option('prefix')
+--- a/gtweak/devicemanager.py
++++ b/gtweak/devicemanager.py
+@@ -2,7 +2,6 @@
+ # SPDX-License-Identifier: GPL-3.0+
+ # License-Filename: LICENSES/GPL-3.0
+ 
+-from gi.repository import GUdev
+ 
+ # Inspired by panels/common/gsd-device-manager.c in GNOME Settings
+ # https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/6d2add0e30538692c151e5fa0bd94ae9bece7690/panels/common/gsd-device-manager.c
+@@ -28,10 +27,7 @@ def udev_device_is_evdev(device):
+ 
+ 
+ def get_input_devices():
+-    udev_client = GUdev.Client()
+-    devices = udev_client.query_by_subsystem ("input")
+-    
+-    return [device for device in devices if udev_device_is_evdev(device)]
++    return []
+ 
+ 
+ def udev_device_get_device_types (device):
