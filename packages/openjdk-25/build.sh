@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="25.0.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/openjdk/jdk25u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz"
 TERMUX_PKG_SHA256=9a850ceee8c2fb2a5cda99fde4bb74a1bc12fbbabbd995273a2febd9206070c4
 TERMUX_PKG_AUTO_UPDATE=true
