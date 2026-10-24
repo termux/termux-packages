@@ -13,7 +13,7 @@ diff --git a/crates/ghostty-vt/build.rs b/crates/ghostty-vt/build.rs
 diff --git a/src/detect/mod.rs b/src/detect/mod.rs
 --- a/src/detect/mod.rs
 +++ b/src/detect/mod.rs
-@@ -387,20 +387,11 @@
+@@ -394,20 +394,11 @@
          return effective.to_string();
      }
 
@@ -39,7 +39,7 @@ diff --git a/src/detect/mod.rs b/src/detect/mod.rs
      }
 
      if let Some(wrapped_agent) = argv0_agent_name(process.argv.as_deref())
-@@ -413,8 +404,20 @@
+@@ -420,8 +411,20 @@
  }
 
  fn wrapped_agent_name_from_runtime_argv(runtime: &str, argv: Option<&[String]>) -> Option<String> {
@@ -62,7 +62,7 @@ diff --git a/src/detect/mod.rs b/src/detect/mod.rs
 
      match runtime_name.as_str() {
          "node" => cursor_agent_name_from_bundled_node_argv(argv)
-@@ -829,6 +832,12 @@
+@@ -892,6 +895,12 @@
          .unwrap_or(path)
  }
 
@@ -75,7 +75,7 @@ diff --git a/src/detect/mod.rs b/src/detect/mod.rs
  fn process_priority(process: &crate::platform::ForegroundProcess, normalized_name: &str) -> u8 {
      let lower_name = normalized_name.to_lowercase();
      if lower_name != process.name.to_lowercase() {
-@@ -841,10 +850,13 @@
+@@ -904,10 +913,13 @@
  }
 
  fn is_generic_runtime_or_shell(name: &str) -> bool {
@@ -92,7 +92,7 @@ diff --git a/src/detect/mod.rs b/src/detect/mod.rs
              "sh" | "bash"
                  | "zsh"
                  | "fish"
-@@ -874,6 +886,128 @@
+@@ -937,6 +949,128 @@
  #[cfg(test)]
  mod tests {
      use super::*;
@@ -224,7 +224,7 @@ diff --git a/src/detect/mod.rs b/src/detect/mod.rs
 diff --git a/src/pane.rs b/src/pane.rs
 --- a/src/pane.rs
 +++ b/src/pane.rs
-@@ -1834,9 +1834,14 @@
+@@ -1978,9 +1978,14 @@
      }
  }
 
@@ -240,7 +240,7 @@ diff --git a/src/pane.rs b/src/pane.rs
  }
 
  #[derive(Clone, Copy)]
-@@ -4227,11 +4232,14 @@
+@@ -4634,11 +4639,14 @@
 
      #[test]
      fn pane_shell_ignores_empty_values() {
@@ -250,7 +250,7 @@ diff --git a/src/pane.rs b/src/pane.rs
 -        );
 -        assert_eq!(pane_shell_from("", None), default_pane_shell());
 +        #[cfg(windows)]
-+        let expected = "powershell.exe";
++        let expected = default_pane_shell();
 +        #[cfg(target_os = "android")]
 +        let expected = "@TERMUX_PREFIX@/bin/sh";
 +        #[cfg(all(not(windows), not(target_os = "android")))]
@@ -303,7 +303,7 @@ diff --git a/src/platform/linux.rs b/src/platform/linux.rs
  }
 
  pub(crate) fn interactive_shell_command(argv: &[String], shell_name: &str) -> Option<String> {
-@@ -796,7 +807,7 @@
+@@ -872,7 +883,7 @@
  }
 
  pub fn open_url(url: &str) -> std::io::Result<Option<std::process::Child>> {
@@ -312,7 +312,7 @@ diff --git a/src/platform/linux.rs b/src/platform/linux.rs
          .arg(url)
          .stdin(Stdio::null())
          .stdout(Stdio::null())
-@@ -2163,7 +2174,10 @@
+@@ -2266,7 +2277,10 @@
          let path = std::path::Path::new("/tmp/herdr scrollback.txt");
          let argv = scrollback_editor_argv(path).unwrap();
 
@@ -326,7 +326,7 @@ diff --git a/src/platform/linux.rs b/src/platform/linux.rs
 diff --git a/src/platform/mod.rs b/src/platform/mod.rs
 --- a/src/platform/mod.rs
 +++ b/src/platform/mod.rs
-@@ -90,7 +90,7 @@
+@@ -178,7 +178,7 @@
      ChildExitReason::Exited
  }
 
@@ -335,7 +335,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub(crate) fn launch_executable() -> std::io::Result<std::path::PathBuf> {
      std::env::current_exe()
  }
-@@ -193,7 +193,7 @@
+@@ -290,7 +290,7 @@
      Ok(false)
  }
 
@@ -344,7 +344,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub fn detach_server_daemon_command(command: &mut std::process::Command) {
      use std::os::unix::process::CommandExt;
 
-@@ -210,7 +210,7 @@
+@@ -307,7 +307,7 @@
      }
  }
 
@@ -353,7 +353,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub fn current_process_is_detached_server_daemon() -> bool {
      unsafe { libc::getsid(0) == libc::getpid() }
  }
-@@ -343,9 +343,9 @@
+@@ -457,9 +457,9 @@
  #[cfg(not(unix))]
  pub(crate) fn end_cli_output() {}
 
@@ -365,9 +365,9 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub use linux::*;
 
  #[cfg(target_os = "macos")]
-@@ -358,12 +358,22 @@
- #[cfg(target_os = "windows")]
- pub use windows::*;
+@@ -475,12 +475,22 @@
+ #[cfg(not(windows))]
+ pub(crate) use process_cwd as pane_process_cwd;
 
 -#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 +#[cfg(not(any(
@@ -391,7 +391,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub(crate) fn available_pane_shell_from_job(child_pid: u32, job: ForegroundJob) -> Option<String> {
      if job.process_group_id != child_pid
          || job.processes.iter().any(|process| process.pid != child_pid)
-@@ -386,7 +396,7 @@
+@@ -503,7 +513,7 @@
          .to_ascii_lowercase()
  }
 
@@ -400,7 +400,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub(crate) fn is_powershell_process_name(name: &str) -> bool {
      matches!(
          normalized_process_name(name).as_str(),
-@@ -394,7 +404,7 @@
+@@ -511,7 +521,7 @@
      )
  }
 
@@ -409,7 +409,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub(crate) fn interactive_unix_shell_command(
      argv: &[String],
      shell_name: &str,
-@@ -477,12 +487,12 @@
+@@ -594,12 +604,12 @@
      )
  }
 
@@ -424,7 +424,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
  pub(crate) fn parse_agent_env_hint(environ: &[u8]) -> Option<crate::detect::Agent> {
      for record in environ.split(|&byte| byte == 0) {
          let Some(value) = record.strip_prefix(b"HERDR_AGENT=") else {
-@@ -565,6 +575,11 @@
+@@ -682,6 +692,11 @@
  mod tests {
      use super::*;
 
@@ -433,10 +433,19 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
 +    #[cfg(not(target_os = "android"))]
 +    const SHELL: &str = "/bin/sh";
 +
+     #[cfg(target_os = "linux")]
      #[test]
-     fn terminal_resize_signal_is_recorded_once_per_delivery() {
-         watch_terminal_resize_signal();
-@@ -591,7 +606,7 @@
+     fn live_pane_process_group_rejects_processes_outside_the_pane_session() {
+@@ -716,7 +731,7 @@
+         let _ = detached.wait();
+     }
+
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+     #[test]
+     fn live_pane_process_group_follows_the_agent_process_not_its_job() {
+         use std::os::unix::process::CommandExt;
+@@ -804,7 +819,7 @@
      #[test]
      fn detached_custom_command_preserves_unix_login_shell_flag() {
          let cmd = detached_custom_command_process("echo hello");
@@ -445,7 +454,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
          assert_eq!(
              cmd.get_args().collect::<Vec<_>>(),
              [
-@@ -604,14 +619,14 @@
+@@ -817,14 +832,14 @@
      #[test]
      fn pane_custom_command_builder_preserves_unix_shell_flag() {
          let expected: Vec<std::ffi::OsString> =
@@ -462,7 +471,7 @@ diff --git a/src/platform/mod.rs b/src/platform/mod.rs
      #[test]
      fn parse_agent_env_hint_accepts_known_agents() {
          assert_eq!(
-@@ -624,14 +639,14 @@
+@@ -837,14 +852,14 @@
          );
      }
 
