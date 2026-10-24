@@ -3,8 +3,10 @@ TERMUX_PKG_DESCRIPTION="Incredibly fast JavaScript runtime, bundler, test runner
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.4.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://github.com/oven-sh/bun
 TERMUX_PKG_GIT_BRANCH="bun-v$TERMUX_PKG_VERSION"
+TERMUX_PKG_DEPENDS="libicu"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -58,6 +60,29 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
+termux_step_post_get_source() {
+	local _wk_ver
+	_wk_ver="$(sed -nE 's/.*WEBKIT_VERSION = "([^"]+)".*/\1/p' "$TERMUX_PKG_SRCDIR/scripts/build/deps/webkit.ts")"
+	if [[ -z "${_wk_ver}" ]]; then
+		termux_error_exit "Failed to determine WEBKIT_VERSION from Bun source"
+	fi
+	local _wk_tag="${_wk_ver}"
+	if [[ "${_wk_tag}" != autobuild-* ]]; then
+		_wk_tag="autobuild-${_wk_tag}"
+	fi
+
+	if [[ ! -d "$TERMUX_PKG_SRCDIR/vendor/WebKit" ]]; then
+		echo "Fetching WebKit source for Bun from tag ${_wk_tag}..."
+		mkdir -p "$TERMUX_PKG_SRCDIR/vendor"
+		git clone \
+			--depth 1 \
+			--branch "${_wk_tag}" \
+			--single-branch \
+			https://github.com/oven-sh/WebKit.git \
+			"$TERMUX_PKG_SRCDIR/vendor/WebKit"
+	fi
+}
+
 termux_step_make() {
 	termux_setup_cmake
 	termux_setup_ninja
@@ -72,39 +97,16 @@ termux_step_make() {
 		_bun_arch="x64"
 	fi
 
-	# WebKit prebuilt archives were built with NDK r27c (has_val at offset 0xE8).
-	# NDK r30 packs has_val into tail padding at offset 0xE2.
-	# Create an unprivileged libc++ overlay to restore 0xE8 layout without touching root-owned $NDK.
-	local libcxx_overlay="$TERMUX_PKG_BUILDDIR/libcxx-overlay"
-	mkdir -p "$libcxx_overlay/__expected"
-	local orig_expected
-	orig_expected="$(find "$NDK" -type f -path "*/c++/v1/__expected/expected.h" 2> /dev/null | head -n 1)"
-	if [[ -z "$orig_expected" || ! -f "$orig_expected" ]]; then
-		termux_error_exit "Failed to locate __expected/expected.h in NDK at $NDK"
-	fi
-
-	if ! grep -q '__fits_in_tail_padding<__union_t, bool>' "$orig_expected"; then
-		termux_error_exit "Unexpected __expected/expected.h format in NDK at $orig_expected"
-	fi
-	cp "$orig_expected" "$libcxx_overlay/__expected/expected.h"
-	sed -i 's|__fits_in_tail_padding<__union_t, bool>|false|g' "$libcxx_overlay/__expected/expected.h"
-
-	# Inject overlay path into Android C++ flags before NDK sysroot's c++/v1
-	if ! grep -q "$libcxx_overlay" "$TERMUX_PKG_SRCDIR/scripts/build/flags.ts"; then
-		sed -i \
-			's|join(c.sysroot!, "usr", "include", "c++", "v1"),|"'"$libcxx_overlay"'",\n      "-isystem",\n      &|' \
-			"$TERMUX_PKG_SRCDIR/scripts/build/flags.ts"
-	fi
-
-	if ! grep -q "$libcxx_overlay" "$TERMUX_PKG_SRCDIR/scripts/build/flags.ts"; then
-		termux_error_exit "Failed to inject libcxx-overlay into scripts/build/flags.ts"
-	fi
+	export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
+	export CARGO_BUILD_JOBS=$(nproc)
+	export BUN_ANDROID_ICU_ROOT="$TERMUX_PREFIX"
 
 	rustup toolchain install
 	bun run build:release \
 		--abi=android \
 		--arch="$_bun_arch" \
 		--android-ndk="$NDK" \
+		--webkit=local \
 		--canary=false \
 		--lto=on
 }
