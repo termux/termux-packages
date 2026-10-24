@@ -1,0 +1,18 @@
+--- a/src/nautilus-date-utilities.h
++++ b/src/nautilus-date-utilities.h
+@@ -45,6 +45,7 @@
+  *
+  * Returns: true if the value of @date_time_pointer changed, false otherwise
+  */
++#if !GLIB_CHECK_VERSION (2, 89, 0)
+ static inline gboolean
+ g_set_date_time (GDateTime **date_time_pointer,
+                  GDateTime  *new_date_time)
+@@ -74,6 +75,7 @@
+ 
+     return TRUE;
+ }
++#endif
+ 
+ /**
+  * g_set_ptr_array: (skip)
