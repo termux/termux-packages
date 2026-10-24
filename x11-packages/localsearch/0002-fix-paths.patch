@@ -1,0 +1,29 @@
+--- a/utils/trackertestutils/__main__.py
++++ b/utils/trackertestutils/__main__.py
+@@ -49,7 +49,7 @@
+ prog = os.path.basename(getattr(sys, 'orig_argv', ['python'])[0])
+ script_name = "tracker-sandbox" if prog.startswith("python") else prog
+ 
+-default_store_location = '/tmp/tracker-sandbox'
++default_store_location = '@TERMUX_PREFIX@/tmp/tracker-sandbox'
+ 
+ store_pid = -1
+ store_proc = None
+@@ -118,7 +118,7 @@
+         extra_env['XDG_RUNTIME_DIR'] = '%s/run/' % store_location
+ 
+     # Prefix - only set if non-standard
+-    if prefix and prefix != '/usr':
++    if prefix and prefix != '@TERMUX_PREFIX@':
+         environment_set_and_add_path(extra_env, 'PATH', prefix, 'bin')
+         environment_set_and_add_path(extra_env, 'LD_LIBRARY_PATH', prefix, 'lib')
+         environment_set_and_add_path(extra_env, 'LD_LIBRARY_PATH', prefix, 'lib64')
+@@ -214,7 +214,7 @@
+     parser.add_argument('-p', '--prefix', metavar='DIR', action=expand_path,
+                         help="run Tracker from the given install prefix. You "
+                              "can run the system version of Tracker by "
+-                             "specifying --prefix=/usr")
++                             "specifying --prefix=@TERMUX_PREFIX@")
+     parser.add_argument('--use-session-dirs', action='store_true',
+                         help=f"update the real Tracker index (use with care!)")
+     store_group = parser.add_mutually_exclusive_group()

@@ -1,0 +1,11 @@
+--- a/leader/gnome-session/leader.scm
++++ b/leader/gnome-session/leader.scm
+@@ -45,7 +45,7 @@
+           (string= shell "nologin")
+           (string= shell "false"))
+       #f
+-      (call-with-input-file "/etc/shells"
++      (call-with-input-file "@TERMUX_PREFIX@/etc/shells"
+         (lambda (port)
+           (let loop ((line (get-line port)))
+             (if (eof-object? line)

@@ -1,0 +1,401 @@
+diff --git a/meson.build b/meson.build
+index 052babb..5b2a3af 100644
+--- a/meson.build
++++ b/meson.build
+@@ -214,14 +214,22 @@ common_deps = [
+   gtk_dep,
+ ]
+ 
+-polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.103')
+-# Also verify that polkit ITS files exist:
+-# https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/491
+-polkit_files = [ 'gettext/its/polkit.its', 'gettext/its/polkit.loc' ]
+-foreach polkit_file: polkit_files
+-  r = run_command('build-aux/meson/find_xdg_file.py', polkit_file, check: true)
+-  assert(r.returncode() == 0, 'ITS support missing from polkit, please upgrade or contact your distribution')
+-endforeach
++build_with_polkit = get_option('polkit')
++if build_with_polkit
++  polkit_gobject_dep = dependency('polkit-gobject-1', version: '>= 0.103')
++  # Also verify that polkit ITS files exist:
++  # https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/491
++  polkit_files = [ 'gettext/its/polkit.its', 'gettext/its/polkit.loc' ]
++  foreach polkit_file: polkit_files
++    r = run_command('build-aux/meson/find_xdg_file.py', polkit_file, check: true)
++    assert(r.returncode() == 0, 'ITS support missing from polkit, please upgrade or contact your distribution')
++  endforeach
++else
++  polkit_gobject_dep = dependency('', required: false)
++endif
++
++config_h.set('HAVE_POLKIT_SUPPORT', build_with_polkit,
++             description: 'Defined if build with polkit')
+ 
+ # Localisation API
+ if cc.has_header_symbol('langinfo.h', '_NL_TIME_FIRST_WEEKDAY')
+diff --git a/meson_options.txt b/meson_options.txt
+index b2302bf..8ea5c57 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -10,3 +10,4 @@ option('profile', type: 'combo', choices: ['default','development'], value: 'def
+ option('malcontent', type: 'boolean', value: false, description: 'build with malcontent support')
+ option('distributor_logo', type: 'string', description: 'absolute path to distributor logo for the About panel')
+ option('dark_mode_distributor_logo', type: 'string', description: 'absolute path to distributor logo dark mode variant')
++option('polkit', type: 'boolean', value: true, description: 'Enable polkit support')
+diff --git a/panels/common/cc-hostname-entry.c b/panels/common/cc-hostname-entry.c
+index 29e3b98..9838aed 100644
+--- a/panels/common/cc-hostname-entry.c
++++ b/panels/common/cc-hostname-entry.c
+@@ -23,8 +23,9 @@
+ #include "cc-hostname.h"
+ #include "cc-hostname-entry.h"
+ #include "hostname-helper.h"
+-
++#ifdef HAVE_POLKIT_SUPPORT
+ #include <polkit/polkit.h>
++#endif 
+ 
+ struct _CcHostnameEntry
+ {
+@@ -87,7 +88,7 @@ cc_hostname_entry_constructed (GObject *object)
+   GPermission *permission;
+   g_autoptr(GError) error = NULL;
+   g_autofree gchar *str = NULL;
+-
++#ifdef HAVE_POLKIT_SUPPORT
+   permission = polkit_permission_new_sync ("org.freedesktop.hostname1.set-static-hostname",
+                                            NULL, NULL, NULL);
+ 
+@@ -108,7 +109,7 @@ cc_hostname_entry_constructed (GObject *object)
+       g_debug ("Not allowed to change the hostname");
+       gtk_widget_set_sensitive (GTK_WIDGET (self), FALSE);
+     }
+-
++#endif
+   str = cc_hostname_get_display_hostname (cc_hostname_get_default ());
+   if (str != NULL)
+     gtk_editable_set_text (GTK_EDITABLE (self), str);
+diff --git a/panels/common/meson.build b/panels/common/meson.build
+index 7314235..88420e5 100644
+--- a/panels/common/meson.build
++++ b/panels/common/meson.build
+@@ -107,6 +107,7 @@ libdevice_dep = declare_dependency(
+   link_with: libdevice
+ )
+ 
++if build_with_polkit
+ polkit_conf = configuration_data()
+ polkit_conf.set('PRIVILEGED_GROUP', get_option('privileged_group'))
+ configure_file(
+@@ -115,3 +116,4 @@ configure_file(
+   configuration: polkit_conf,
+   install_dir: join_paths(control_center_datadir, 'polkit-1', 'rules.d')
+ )
++endif
+diff --git a/panels/system/datetime/cc-datetime-page.c b/panels/system/datetime/cc-datetime-page.c
+index 0c51dc3..6060d02 100644
+--- a/panels/system/datetime/cc-datetime-page.c
++++ b/panels/system/datetime/cc-datetime-page.c
+@@ -42,7 +42,9 @@
+ #include <glib/gi18n.h>
+ #include <libgnome-desktop/gnome-languages.h>
+ #include <libgnome-desktop/gnome-wall-clock.h>
++#ifdef HAVE_POLKIT_SUPPORT
+ #include <polkit/polkit.h>
++#endif
+ 
+ /* FIXME: This should be "Etc/GMT" instead */
+ #define DEFAULT_TZ "Europe/London"
+@@ -870,6 +872,7 @@ cc_date_time_page_init (CcDateTimePage *self)
+   gtk_list_box_invalidate_sort (self->date_box);
+ 
+   /* add the lock button */
++#ifdef HAVE_POLKIT_SUPPORT
+   self->permission = polkit_permission_new_sync (DATETIME_PERMISSION, NULL, NULL, NULL);
+   self->tz_permission = polkit_permission_new_sync (DATETIME_TZ_PERMISSION, NULL, NULL, NULL);
+   if (self->permission != NULL)
+@@ -882,6 +885,7 @@ cc_date_time_page_init (CcDateTimePage *self)
+       g_warning ("Your system does not have the '%s' PolicyKit files installed. Please check your installation",
+                  DATETIME_PERMISSION);
+     }
++#endif
+   cc_permission_infobar_set_permission (self->permission_infobar, self->permission);
+ 
+   self->location_settings = g_settings_new (LOCATION_SETTINGS);
+diff --git a/panels/system/datetime/meson.build b/panels/system/datetime/meson.build
+index cd94085..5202509 100644
+--- a/panels/system/datetime/meson.build
++++ b/panels/system/datetime/meson.build
+@@ -7,7 +7,7 @@ i18n.merge_file(
+   install: true,
+   install_dir: control_center_desktopdir
+ )
+-
++if build_with_polkit
+ polkit = 'org.gnome.controlcenter.@0@.policy'.format(cappletname)
+ 
+ i18n.merge_file(
+@@ -17,7 +17,7 @@ i18n.merge_file(
+   install: true,
+   install_dir: join_paths(control_center_datadir, 'polkit-1', 'actions')
+ )
+-
++endif
+ gdbus = 'timedated'
+ gdbus_iface_xml = gdbus + '1-interface.xml'
+ 
+diff --git a/panels/system/region/cc-region-page.c b/panels/system/region/cc-region-page.c
+index d723018..aa821fe 100644
+--- a/panels/system/region/cc-region-page.c
++++ b/panels/system/region/cc-region-page.c
+@@ -46,7 +46,9 @@
+ #include <libgnome-desktop/gnome-xkb-info.h>
+ 
+ #include <locale.h>
++#ifdef HAVE_POLKIT_SUPPORT
+ #include <polkit/polkit.h>
++#endif
+ 
+ #define GNOME_SYSTEM_LOCALE_DIR "org.gnome.system.locale"
+ #define KEY_REGION "region"
+@@ -70,8 +72,9 @@ struct _CcRegionPage {
+         CcListRow         *language_row;
+         CcLanguageChooser *language_chooser;
+         CcFormatChooser   *format_chooser;
+-
++#ifdef HAVE_POLKIT_SUPPORT
+         gboolean           login_auto_apply;
++#endif
+         GPermission       *permission;
+         GDBusProxy        *localed;
+         GDBusProxy        *session;
+@@ -314,8 +317,10 @@ update_language (CcRegionPage   *self,
+                 g_set_str (&self->language, language);
+                 set_accountservice_languages (self);
+ 
++#ifdef HAVE_POLKIT_SUPPORT
+                 if (self->login_auto_apply)
+                         set_system_language (self, language);
++#endif
+                 maybe_notify (self, LC_MESSAGES, language);
+ 
+                 update_user_language_row (self);
+@@ -357,8 +362,10 @@ update_region (CcRegionPage   *self,
+ 
+                 set_accountservice_languages (self);
+ 
++#ifdef HAVE_POLKIT_SUPPORT
+                 if (self->login_auto_apply)
+                         set_system_region (self, region);
++#endif
+ 
+                 if (region == NULL || region[0] == '\0') {
+                         // Formats (region) are being reset as part of changing the language,
+@@ -615,8 +622,12 @@ set_login_button_visibility (CcRegionPage *self)
+ 
+         g_object_get (self->user_manager, "has-multiple-users", &has_multiple_users, NULL);
+ 
++#ifdef HAVE_POLKIT_SUPPORT
+         self->login_auto_apply = !has_multiple_users && g_permission_get_allowed (self->permission);
+         gtk_widget_set_visible (self->login_group, !self->login_auto_apply);
++#else
++        gtk_widget_set_visible (self->login_group, TRUE);
++#endif
+ 
+         g_signal_handlers_disconnect_by_func (self->user_manager, set_login_button_visibility, self);
+ }
+@@ -696,6 +707,7 @@ localed_proxy_ready (GObject      *source,
+ static void
+ setup_login_permission (CcRegionPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+         g_autoptr(GDBusConnection) bus = NULL;
+         g_autoptr(GError) error = NULL;
+         gboolean can_acquire;
+@@ -730,6 +742,7 @@ setup_login_permission (CcRegionPage *self)
+                 (g_permission_get_allowed (self->permission) ||
+                  g_permission_get_can_acquire (self->permission));
+         gtk_widget_set_sensitive (self->login_group, can_acquire);
++#endif
+ }
+ 
+ static void
+@@ -755,6 +768,7 @@ session_proxy_ready (GObject      *source,
+ static void
+ on_login_formats_row_activated_cb (CcRegionPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+         if (g_permission_get_allowed (self->permission)) {
+                 show_format_chooser (self, SYSTEM);
+         } else if (g_permission_get_can_acquire (self->permission)) {
+@@ -763,11 +777,15 @@ on_login_formats_row_activated_cb (CcRegionPage *self)
+                                             choose_region_permission_cb,
+                                             self);
+         }
++#else
++    show_format_chooser (self, SYSTEM);
++#endif
+ }
+ 
+ static void
+ on_login_language_row_activated_cb (CcRegionPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+         if (g_permission_get_allowed (self->permission)) {
+                 show_language_chooser (self, SYSTEM);
+         } else if (g_permission_get_can_acquire (self->permission)) {
+@@ -776,6 +794,9 @@ on_login_language_row_activated_cb (CcRegionPage *self)
+                                             choose_language_permission_cb,
+                                             self);
+         }
++#else
++    show_language_chooser(self, SYSTEM);
++#endif
+ }
+ 
+ static void
+diff --git a/panels/system/remote-desktop/cc-remote-login-page.c b/panels/system/remote-desktop/cc-remote-login-page.c
+index 0e9ba99..a5bc09f 100644
+--- a/panels/system/remote-desktop/cc-remote-login-page.c
++++ b/panels/system/remote-desktop/cc-remote-login-page.c
+@@ -22,7 +22,9 @@
+ 
+ #include <glib/gi18n.h>
+ #include <glib/gstdio.h>
++#ifdef HAVE_POLKIT_SUPPORT
+ #include <polkit/polkit.h>
++#endif
+ #include <fcntl.h>
+ #include <stdio.h>
+ 
+@@ -43,7 +45,9 @@
+ #define REMOTE_DESKTOP_STORE_CREDENTIALS_TIMEOUT_S 2
+ #define REMOTE_LOGIN_DBUS_SERVICE "org.gnome.RemoteDesktop.Configuration"
+ #define REMOTE_LOGIN_OBJECT_PATH "/org/gnome/RemoteDesktop/Configuration"
++#ifdef HAVE_POLKIT_SUPPORT
+ #define REMOTE_LOGIN_PERMISSION "org.gnome.controlcenter.remote-session-helper"
++#endif
+ 
+ struct _CcRemoteLoginPage {
+   AdwBin parent_instance;
+@@ -52,7 +56,9 @@ struct _CcRemoteLoginPage {
+ 
+   AdwSwitchRow *remote_login_row;
+   GtkWidget    *toast_overlay;
++#ifdef HAVE_POLKIT_SUPPORT
+   CcPermissionInfobar *permission_infobar;
++#endif
+   AdwActionRow *hostname_row;
+   AdwActionRow *port_row;
+   GtkWidget    *credentials_group;
+@@ -64,7 +70,9 @@ struct _CcRemoteLoginPage {
+   GTlsCertificate *certificate;
+ 
+   GCancellable *cancellable;
++#ifdef HAVE_POLKIT_SUPPORT
+   GPermission *permission;
++#endif
+ 
+   char *temp_cert_dir;
+   char *cert_path;
+@@ -157,7 +165,9 @@ block_remote_login_row_activation (CcRemoteLoginPage *self)
+ static void
+ unblock_remote_login_row_activation (CcRemoteLoginPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+   if (g_permission_get_allowed (self->permission))
++#endif
+     gtk_widget_set_sensitive (GTK_WIDGET (self->remote_login_row), TRUE);
+   self->activating_blocked = FALSE;
+ }
+@@ -364,10 +374,12 @@ disable_remote_login_service (CcRemoteLoginPage *self)
+ static void
+ on_remote_login_active_changed (CcRemoteLoginPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+   if (adw_switch_row_get_active (self->remote_login_row))
+     enable_remote_login (self);
+   else
+     disable_remote_login_service (self);
++#endif
+ }
+ 
+ static void
+@@ -451,6 +463,7 @@ hide_password (CcRemoteLoginPage *self)
+ static void
+ sync_permissions (CcRemoteLoginPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+   if (!g_permission_get_allowed (self->permission))
+     {
+       hide_password (self);
+@@ -467,6 +480,7 @@ sync_permissions (CcRemoteLoginPage *self)
+       if (self->have_credentials)
+         gtk_widget_set_sensitive (self->credentials_group, TRUE);
+     }
++#endif
+ }
+ 
+ static void
+@@ -476,7 +490,9 @@ cc_remote_login_page_dispose (GObject *object)
+ 
+   g_cancellable_cancel (self->cancellable);
+   g_clear_object (&self->cancellable);
++#ifdef HAVE_POLKIT_SUPPORT
+   g_clear_object (&self->permission);
++#endif
+ 
+   g_clear_pointer (&self->temp_cert_dir, g_free);
+   g_clear_pointer (&self->cert_path, g_free);
+@@ -570,6 +586,7 @@ on_got_rdp_credentials (GObject      *source_object,
+ static void
+ fetch_credentials (CcRemoteLoginPage *self)
+ {
++#ifdef HAVE_POLKIT_SUPPORT
+   g_autoptr(GError) error = NULL;
+   g_autofree gchar *username = NULL;
+   g_autofree gchar *password = NULL;
+@@ -582,6 +599,7 @@ fetch_credentials (CcRemoteLoginPage *self)
+                                                                     (GAsyncReadyCallback)
+                                                                     on_got_rdp_credentials,
+                                                                     self);
++#endif
+ }
+ 
+ static void
+@@ -706,6 +724,7 @@ cc_remote_login_page_init (CcRemoteLoginPage *self)
+                            G_CALLBACK (on_remote_login_active_changed), self,
+                            G_CONNECT_SWAPPED);
+ 
++#ifdef HAVE_POLKIT_SUPPORT
+   self->permission = (GPermission*) polkit_permission_new_sync (REMOTE_LOGIN_PERMISSION, NULL, self->cancellable, &error);
+ 
+   if (error != NULL)
+@@ -718,7 +737,9 @@ cc_remote_login_page_init (CcRemoteLoginPage *self)
+   g_signal_connect_swapped (self->permission, "notify::allowed",
+                             G_CALLBACK (sync_permissions),
+                             self);
+-
++#else
++  self->permission = NULL;
++#endif
+   g_object_bind_property (self->password_entry, "sensitive",
+                           self->generate_password_button_row, "sensitive",
+                           G_BINDING_SYNC_CREATE);
+diff --git a/panels/system/remote-desktop/meson.build b/panels/system/remote-desktop/meson.build
+index 16dfc40..579eea2 100644
+--- a/panels/system/remote-desktop/meson.build
++++ b/panels/system/remote-desktop/meson.build
+@@ -6,6 +6,7 @@ sources += gnome.gdbus_codegen(
+   namespace: 'Gsd'
+ )
+ 
++if build_with_polkit
+ polkit_conf = configuration_data()
+ polkit_conf.set('libexecdir', control_center_libexecdir)
+ polkit = 'org.gnome.controlcenter.remote-session-helper.policy'
+@@ -23,3 +24,4 @@ i18n.merge_file(
+   install: true,
+   install_dir: join_paths(control_center_datadir, 'polkit-1', 'actions')
+ )
++endif
