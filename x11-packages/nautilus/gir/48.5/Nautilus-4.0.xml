@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<dump>
+  <enum name="NautilusOperationResult" get-type="nautilus_operation_result_get_type">
+    <member name="NAUTILUS_OPERATION_COMPLETE" nick="complete" value="0"/>
+    <member name="NAUTILUS_OPERATION_FAILED" nick="failed" value="1"/>
+    <member name="NAUTILUS_OPERATION_IN_PROGRESS" nick="in-progress" value="2"/>
+  </enum>  <interface name="NautilusColumnProvider" get-type="nautilus_column_provider_get_type">
+  </interface>
+  <class name="NautilusColumn" get-type="nautilus_column_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="attribute" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="attribute-q" type="guint" flags="1" default-value="0"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="description" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="xalign" type="gfloat" flags="3" default-value="0.000000"/>
+    <property name="default-sort-order" type="gint" flags="3" default-value="0"/>
+    <property name="visible" type="gboolean" flags="3" default-value="FALSE"/>
+  </class>
+  <interface name="NautilusFileInfo" get-type="nautilus_file_info_get_type">
+  </interface>
+  <interface name="NautilusInfoProvider" get-type="nautilus_info_provider_get_type">
+  </interface>
+  <interface name="NautilusMenuProvider" get-type="nautilus_menu_provider_get_type">
+    <signal name="items-updated" return="void" when="last">
+    </signal>
+  </interface>
+  <interface name="NautilusPropertiesModelProvider" get-type="nautilus_properties_model_provider_get_type">
+  </interface>
+  <class name="NautilusPropertiesModel" get-type="nautilus_properties_model_get_type" parents="GObject">
+    <property name="title" type="gchararray" flags="227" default-value="NULL"/>
+    <property name="model" type="GListModel" flags="235"/>
+  </class>
+  <class name="NautilusPropertiesItem" get-type="nautilus_properties_item_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="value" type="gchararray" flags="235" default-value="NULL"/>
+  </class>
+  <class name="NautilusMenu" get-type="nautilus_menu_get_type" parents="GObject">
+  </class>
+  <class name="NautilusMenuItem" get-type="nautilus_menu_item_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="11" default-value="NULL"/>
+    <property name="label" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="tip" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="icon" type="gchararray" flags="3" default-value="NULL"/>
+    <property name="sensitive" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="priority" type="gboolean" flags="3" default-value="TRUE"/>
+    <property name="menu" type="NautilusMenu" flags="3"/>
+    <signal name="activate" return="void" when="last">
+    </signal>
+  </class>
+</dump>
