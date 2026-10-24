@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.132.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.143.1"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
-TERMUX_PKG_DEPENDS="electron42, libx11, libxkbfile, libsecret, ripgrep"
-TERMUX_PKG_BUILD_DEPENDS="electron42-headers"
-TERMUX_PKG_ANTI_BUILD_DEPENDS="electron42"
+TERMUX_PKG_DEPENDS="electron43, libx11, libxkbfile, libsecret, ripgrep"
+TERMUX_PKG_BUILD_DEPENDS="electron43-headers"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="electron43"
 TERMUX_PKG_CONFLICTS="electron-for-code-oss (<= 42.7.0)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -46,10 +45,13 @@ termux_step_post_get_source() {
 	local _want_electron_major="$(jq -r \
 		'.registrations[] | select(.component.git.name == "electron") | .component.git.tag' \
 		$TERMUX_PKG_SRCDIR/cgmanifest.json | cut -d. -f1 -)"
-	local _prebuilt_electron_major=42
+	local _prebuilt_electron_major=43
 	if [ "$_want_electron_major" != "$_prebuilt_electron_major" ]; then
-		termux_error_exit "Major version mismatch: \
-			version in package.json is $_want_electron_major, prebuilt electron version $_prebuilt_electron_major."
+		termux_error_exit "
+			Major version mismatch:
+			version in cgmanifest.json is $_want_electron_major,
+			prebuilt electron version is $_prebuilt_electron_major.
+		"
 	fi
 
 	# Use custom node-native-keymap
@@ -100,7 +102,7 @@ termux_step_make() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 	export npm_config_arch=$NPM_CONFIG_ARCH
-	export npm_config_nodedir=$TERMUX_PREFIX/opt/electron42-host-tools/node_headers
+	export npm_config_nodedir=$TERMUX_PREFIX/opt/electron43-host-tools/node_headers
 
 	export CXX="$CXX -v -L$TERMUX_PREFIX/lib"
 	export CXXFLAGS="$CXXFLAGS -DSPDLOG_USE_STD_FORMAT=1"
@@ -124,18 +126,18 @@ termux_step_make_install() {
 	# Clean extensions that are compiled for gnu libc
 	pushd $TERMUX_PREFIX/lib/code-oss/resources
 	rm -rf app/extensions/copilot
-	rm -rf app/node_modules.asar.unpacked/\@github/copilot-linux-*
+	rm -rf app/node_modules.asar.unpacked/\@github/copilot-sdk-linux-*
 	rm -rf app/node_modules.asar.unpacked/\@microsoft/mxc-sdk
 	rm -rf app/node_modules.asar.unpacked/\@vscode/vsce-sign
 	rm -rf app/node_modules/\@vscode/sandbox-runtime
 	popd # $TERMUX_PREFIX/lib/code-oss/resources
 
 	# Install the dummy code-oss binary
-	ln -sf $TERMUX_PREFIX/lib/electron42/electron $TERMUX_PREFIX/lib/code-oss/code-oss
+	ln -sf $TERMUX_PREFIX/lib/electron43/electron $TERMUX_PREFIX/lib/code-oss/code-oss
 
 	# Install the code.mjs wrapper, taken from ArchLinux repo
 	cp -f $TERMUX_PKG_BUILDER_DIR/code.mjs $TERMUX_PREFIX/lib/code-oss/
-	sed "1s|.*|#!$TERMUX_PREFIX/lib/electron42/electron|" -i $TERMUX_PREFIX/lib/code-oss/code.mjs
+	sed "1s|.*|#!$TERMUX_PREFIX/lib/electron43/electron|" -i $TERMUX_PREFIX/lib/code-oss/code.mjs
 
 	# Install the start script
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/bin
