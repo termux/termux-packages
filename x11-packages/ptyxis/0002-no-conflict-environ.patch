@@ -1,0 +1,86 @@
+Prevents:
+../src/agent/ptyxis-run-context.c:67:48: error: declaration shadows a variable in the global scope [-Werror,-Wshadow]
+   67 |                            const char * const *environ,
+
+--- a/agent/ptyxis-run-context.c
++++ b/agent/ptyxis-run-context.c
+@@ -64,13 +64,13 @@ ptyxis_run_context_new (void)
+ 
+ static void
+ copy_envvar_with_fallback (PtyxisRunContext   *run_context,
+-                           const char * const *environ,
++                           const char * const *ptyxis_environ,
+                            const char         *key,
+                            const char         *fallback)
+ {
+   const char *val;
+ 
+-  if ((val = g_environ_getenv ((char **)environ, key)))
++  if ((val = g_environ_getenv ((char **)ptyxis_environ, key)))
+     ptyxis_run_context_setenv (run_context, key, val);
+   else if (fallback != NULL)
+     ptyxis_run_context_setenv (run_context, key, fallback);
+@@ -215,7 +215,7 @@ ptyxis_run_context_class_init (PtyxisRunContextClass *klass)
+ static void
+ ptyxis_run_context_init (PtyxisRunContext *self)
+ {
+-  g_auto(GStrv) environ = g_get_environ ();
++  g_auto(GStrv) ptyxis_environ = g_get_environ ();
+ 
+   self->setup_tty = TRUE;
+ 
+@@ -226,7 +226,7 @@ ptyxis_run_context_init (PtyxisRunContext *self)
+   /* Always start with full environment at the base layer, but allow
+    * removal by _set_environ(NULL) to clear it.
+    */
+-  ptyxis_run_context_set_environ (self, (const char * const *)environ);
++  ptyxis_run_context_set_environ (self, (const char * const *)ptyxis_environ);
+ }
+ 
+ void
+@@ -461,7 +461,7 @@ ptyxis_run_context_get_environ (PtyxisRunContext *self)
+ 
+ void
+ ptyxis_run_context_set_environ (PtyxisRunContext   *self,
+-                                const char * const *environ)
++                                const char * const *ptyxis_environ)
+ {
+   PtyxisRunContextLayer *layer;
+ 
+@@ -471,9 +471,9 @@ ptyxis_run_context_set_environ (PtyxisRunContext   *self,
+ 
+   g_array_set_size (layer->env, 0);
+ 
+-  if (environ != NULL && environ[0] != NULL)
++  if (ptyxis_environ != NULL && ptyxis_environ[0] != NULL)
+     {
+-      char **copy = g_strdupv ((char **)environ);
++      char **copy = g_strdupv ((char **)ptyxis_environ);
+       g_array_append_vals (layer->env, copy, g_strv_length (copy));
+       g_free (copy);
+     }
+@@ -481,20 +481,20 @@ ptyxis_run_context_set_environ (PtyxisRunContext   *self,
+ 
+ void
+ ptyxis_run_context_add_environ (PtyxisRunContext   *self,
+-                                const char * const *environ)
++                                const char * const *ptyxis_environ)
+ {
+   PtyxisRunContextLayer *layer;
+ 
+   g_return_if_fail (PTYXIS_IS_RUN_CONTEXT (self));
+ 
+-  if (environ == NULL || environ[0] == NULL)
++  if (ptyxis_environ == NULL || ptyxis_environ[0] == NULL)
+     return;
+ 
+   layer = ptyxis_run_context_current_layer (self);
+ 
+-  for (guint i = 0; environ[i]; i++)
++  for (guint i = 0; ptyxis_environ[i]; i++)
+     {
+-      const char *pair = environ[i];
++      const char *pair = ptyxis_environ[i];
+       const char *eq = strchr (pair, '=');
+       char **dest = NULL;
+       gsize keylen;
