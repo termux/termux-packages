@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://protonpass.github.io/pass-cli/
 TERMUX_PKG_DESCRIPTION="Proton Pass Command Line Interface (CLI)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.4.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="2.5.1"
 TERMUX_PKG_SRCURL="https://github.com/protonpass/pass-cli/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=75f9212c548e1e8d5358b1ace7b825e6352aad3d7454e4339fd04b261a4f6db2
+TERMUX_PKG_SHA256=cd7df559f428f04010d5f3d940accf0765c2acd57c7f5e54f3a8701affc9d662
 TERMUX_PKG_DEPENDS="openssl, protobuf, sqlcipher, zlib"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,6 +20,14 @@ termux_step_pre_configure() {
 	export PKG_CONFIG_ALLOW_CROSS=1
 	export SQLCIPHER_LIB_DIR="$TERMUX_PREFIX/lib"
 	export SQLCIPHER_INCLUDE_DIR="$TERMUX_PREFIX/include"
+
+	# Upstream lists pass-uniffi-bindgen in default-members, but the crate
+	# does not exist in the release tarball (it is only used by the excluded
+	# pass-python-sdk), which makes cargo fail to resolve the workspace.
+	sed -i '/pass-uniffi-bindgen/d' "${TERMUX_PKG_SRCDIR}"/Cargo.toml
+
+	# clash with rust host build
+	unset CFLAGS
 }
 
 termux_step_make() {
