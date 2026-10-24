@@ -1,0 +1,11 @@
+--- a/lxsession-logout/lxsession-logout.c
++++ b/lxsession-logout/lxsession-logout.c
+@@ -496,7 +496,7 @@
+     if (p != NULL) handler_context.lxsession_pid = atoi(p);
+ 
+     /* Create lock file to prevent more than one logout dialog per lxsession process. */
+-    sprintf(lockfile, "/tmp/.lxsession-logout-%d.lock", handler_context.lxsession_pid);
++    sprintf(lockfile, "@TERMUX_PREFIX@/tmp/.lxsession-logout-%d.lock", handler_context.lxsession_pid);
+     int fd = open(lockfile, O_RDONLY|O_CREAT, 00600);
+     if (fd >= 0)
+     {
