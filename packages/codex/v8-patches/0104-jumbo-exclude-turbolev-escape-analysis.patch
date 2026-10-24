@@ -1,0 +1,14 @@
+diff --git a/v8/BUILD.gn b/v8/BUILD.gn
+--- a/v8/BUILD.gn
++++ b/v8/BUILD.gn
+@@ -6548,6 +6548,10 @@
+       "src/maglev/maglev.cc",
+       "src/maglev/turbolev-escape-analysis.cc",
+     ]
++    jumbo_excluded_sources += [
++      # Defines TRACE and other macros without #undef (clashes with wasm/decoder.h)
++      "src/maglev/turbolev-escape-analysis.cc",
++    ]
+     if (v8_current_cpu == "arm") {
+       sources += [
+         "src/maglev/arm/maglev-assembler-arm.cc",
