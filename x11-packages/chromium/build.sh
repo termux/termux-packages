@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, l
 TERMUX_PKG_BUILD_DEPENDS="chromium-host-tools, libffi-static"
 # Chromium doesn't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 SYSTEM_LIBRARIES="    fontconfig"
@@ -24,36 +24,8 @@ termux_pkg_auto_update() {
 		return 0
 	fi
 
-	local tmpdir="$(mktemp -d)"
-	if ! curl -fsLo "${tmpdir}/tmpfile" "https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/$latest_version/chromium-$latest_version-linux.tar.xz"; then
-		rm -fr "${tmpdir}"
-		return 0
-	fi
-	local sha="$(sha256sum "${tmpdir}/tmpfile" | cut -d ' ' -f 1)"
-	rm -fr "${tmpdir}"
-	printf '%s\n' 'INFO: Generated checksums:' "${sha}"
-
-	local e=0
-	local uptime_now=$(cat /proc/uptime)
-	local uptime_s="${uptime_now//.*}"
-	local uptime_h_limit=1
-	local uptime_s_limit=$((uptime_h_limit*60*60))
-	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
-	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
-
-	if [[ "${e}" != 0 ]]; then
-		cat <<- EOL >&2
-		WARN: Auto update failure!
-		latest_version=${latest_version}
-		uptime_now=${uptime_now}
-		uptime_s=${uptime_s}
-		uptime_s_limit=${uptime_s_limit}
-		EOL
-		return
-	fi
-
-	termux_pkg_upgrade_version "${latest_version}"
+	termux_error_exit \
+		"Chromium Stable version ${latest_version} is available. Please update manually."
 }
 
 termux_step_post_get_source() {
