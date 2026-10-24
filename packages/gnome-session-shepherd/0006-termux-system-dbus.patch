@@ -1,0 +1,37 @@
+--- a/leader/gnome-session/leader.scm
++++ b/leader/gnome-session/leader.scm
+@@ -33,6 +33,26 @@
+   (apply format (current-error-port) message)
+   (exit 1))
+ 
++(define %system-dbus-pid-file "@TERMUX_PREFIX@/var/run/dbus/pid")
++
++(define (ensure-system-bus)
++  "Ensure that a system D-Bus daemon is running, restarting it if stale."
++  (when (file-exists? %system-dbus-pid-file)
++    (let* ((pid-string (call-with-input-file %system-dbus-pid-file get-line))
++           (pid (and (string? pid-string) (string->number pid-string))))
++      (when (and pid (> pid 0))
++        (format (current-error-port)
++                "Termux hack: killing stale system dbus-daemon (pid ~a)~%"
++                pid)
++        (catch 'system-error
++          (lambda () (system* "kill" "-TERM" (number->string pid)))
++          (lambda args #f)))
++      (catch 'system-error
++        (lambda () (delete-file %system-dbus-pid-file))
++        (lambda args #f))))
++  (format (current-error-port) "Termux hack: starting system dbus-daemon...~%")
++  (system* "dbus-daemon" "--system" "--fork"))
++
+ (define (ensure-session-bus)
+   "Ensures that there is a session bus running."
+   (unless (getenv "DBUS_SESSION_BUS_ADDRESS")
+@@ -209,6 +229,7 @@
+   (when (or (option-ref options 'debug #f)
+             (eq? 1 (and=> (getenv "GNOME_SESSION_DEBUG") string->number)))
+     (g-log-set-debug-enabled #t))
++  (ensure-system-bus)
+   (ensure-session-bus)
+   (unless (option-ref options 'no-reexec #f)
+     (maybe-reexec-with-login-shell args))
