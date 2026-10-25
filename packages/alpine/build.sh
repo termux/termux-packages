@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/alpine-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c0779c2be6c47d30554854a3e14ef5e36539502b331068851329275898a9baba
 TERMUX_PKG_DEPENDS="coreutils, libcrypt, ncurses, openssl, openssl-tool"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-debug
 --with-c-client-target=lnx
@@ -21,6 +22,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ssl-key-dir=$TERMUX_PREFIX/etc/ssl/private
 "
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(curl --silent https://alpineapp.email/alpine/release/src/ | grep -oP 'alpine-\K[0-9]+(\.[0-9]+)+(?=\.tar\.xz)' | sort -V | tail -n1)"
+
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_pre_configure() {
 	export TCC=$CC

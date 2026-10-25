@@ -1,0 +1,15 @@
+--- a/build/toolchain/gcc_toolchain.gni
++++ b/build/toolchain/gcc_toolchain.gni
+@@ -407,8 +407,12 @@
+         command = "cmd /s /c \"\"$python_path\" $tool_wrapper_path delete-file {{output}} && $command\""
+       } else {
+         command = "rm -f {{output}} && $command"
++        # Add ar to inputs if it's not from $PATH. Some toolchains leave
++        # |ar| empty during toolchain setup, so guard get_path_info() here.
++        if (ar != "" && get_path_info(ar, "file") != ar) {
+         inputs =
+             [ get_path_info(rebase_path(ar, ".", root_out_dir), "abspath") ]
++        }
+       }
+ 
+       # Almost all targets build with //build/config/compiler:thin_archive which

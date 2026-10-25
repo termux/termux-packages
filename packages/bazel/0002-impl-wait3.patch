@@ -1,0 +1,14 @@
+--- a/src/main/tools/process-tools.cc
++++ b/src/main/tools/process-tools.cc
+@@ -217,7 +217,11 @@
+     // Discard any zombies that we may get when the child subreaper feature is
+     // enabled.
+     do {
++#ifndef __ANDROID__
+       err = wait3(&status, 0, rusage);
++#else
++      err = wait4(-1, &status, 0, rusage);
++#endif
+     } while (err != pid || (err == -1 && errno == EINTR));
+   } else {
+     do {

@@ -1,0 +1,20 @@
+--- a/include/nasmlib.h
++++ b/include/nasmlib.h
+@@ -209,7 +209,7 @@
+  */
+ #ifdef static_assert
+ # define nasm_static_assert(x) static_assert((x), #x)
+-#elif defined(HAVE_FUNC_ATTRIBUTE_ERROR) && defined(__OPTIMIZE__)
++#elif defined(HAVE_FUNC_ATTRIBUTE_ERROR) && defined(__OPTIMIZE__) && !defined(__clang__)
+ # define nasm_static_assert(x)                                              \
+     do {                                                                    \
+         if (!(x)) {                                                         \
+@@ -236,7 +236,7 @@
+         static_assert(if_constant(x, true), #x);                            \
+         not_pedantic_end                                                    \
+     } while (0)
+-#elif defined(HAVE_FUNC_ATTRIBUTE_ERROR) && defined(__OPTIMIZE__)
++#elif defined(HAVE_FUNC_ATTRIBUTE_ERROR) && defined(__OPTIMIZE__) && !defined(__clang__)
+ # define nasm_try_static_assert(x)                                          \
+     do {                                                                    \
+         if (!if_constant(x, true)) {                                        \

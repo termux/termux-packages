@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.samba.org/
 TERMUX_PKG_DESCRIPTION="SMB/CIFS fileserver"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.16.11"
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION="4.25.0"
 TERMUX_PKG_SRCURL=https://download.samba.org/pub/samba/samba-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5218878cdcc01aa8e83d2c84ad16c5f37a01ea5e1a93f640f9ee282053c46e12
+TERMUX_PKG_SHA256=2e2cb7296833b35b8f7a7fb76045e0c57adc0c2cd03264b37df5d58e40f28437
 TERMUX_PKG_DEPENDS="krb5, libandroid-execinfo, libandroid-spawn, libbsd, libcap, libcrypt, libgnutls, libiconv, libicu, libpopt, libtalloc, libtasn1, libtirpc, ncurses, openssl, readline, tdb-tools, zlib"
 TERMUX_PKG_BUILD_DEPENDS="e2fsprogs"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,11 +19,13 @@ share/man/man8/tdbbackup.8.gz
 share/man/man8/tdbdump.8.gz
 share/man/man8/tdbrestore.8.gz
 share/man/man8/tdbtool.8.gz
+share/man/man3/talloc.3.gz
 "
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D_FILE_OFFSET_BITS=64"
 	LDFLAGS+=" -landroid-spawn"
+	export PYTHONHASHSEED=1
 }
 
 termux_step_configure() {
@@ -89,9 +90,10 @@ Checking for gnutls fips mode support: NO
 Checking whether the WRFILE -keytab is supported: OK
 EOF
 
+	local _samba_ldflags="${LDFLAGS//-L$TERMUX_PREFIX\/lib/}"
 	USING_SYSTEM_ASN1_COMPILE=1 ASN1_COMPILE=/usr/bin/asn1_compile \
 	USING_SYSTEM_COMPILE_ET=1 COMPILE_ET=/usr/bin/compile_et \
-	CFLAGS="$CFLAGS" LINKFLAGS="$CFLAGS $LDFLAGS" \
+	CFLAGS="$CFLAGS" LINKFLAGS="$CFLAGS $_samba_ldflags" \
 	./buildtools/bin/waf configure \
 		--jobs="$TERMUX_PKG_MAKE_PROCESSES" \
 		--bundled-libraries='!asn1_compile,!compile_et' \
@@ -130,7 +132,7 @@ EOF
 		--without-pam \
 		--without-quotas \
 		--without-regedit \
-		--with-system-mitkrb5 "$TERMUX_PREFIX" \
+		--with-system-mitkrb5 \
 		--without-systemd \
 		--without-utmp \
 		--without-winbind \
@@ -158,6 +160,37 @@ termux_step_post_make_install() {
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		"$TERMUX_PKG_BUILDER_DIR/smb.conf.example.in" \
 		> "$TERMUX_PREFIX/share/doc/samba/smb.conf.example"
+
+	# Waf may leave already-correct shared library symlinks untouched.
+	# Recreate them so their mtimes are newer than the package build timestamp
+	# and termux_step_copy_into_massagedir() includes them in the .deb.
+	local library soname unversioned
+	local libraries=(
+		libdcerpc-binding.so.0.0.1
+		libdcerpc-server-core.so.0.0.1
+		libndr-krb5pac.so.0.0.1
+		libndr-nbt.so.0.0.1
+		libndr-standard.so.0.0.1
+		libndr.so.6.1.0
+		libnetapi.so.1.0.0
+		libsamba-errors.so.1.0.0
+		libsamba-passdb.so.0.30.0
+		libsamba-util.so.0.0.1
+		libsmbclient.so.0.8.1
+		libsmbconf.so.0.0.1
+		libwbclient.so.0.16
+	)
+
+	for library in "${libraries[@]}"; do
+		soname="$($READELF -d "$TERMUX_PREFIX/lib/$library" | \
+			sed -n 's/.*SONAME.*\[\(.*\)\].*/\1/p')"
+		if [[ -z "$soname" ]]; then
+			termux_error_exit "Failed to determine SONAME for $library"
+		fi
+		unversioned="${soname%%.so.*}.so"
+		ln -sf "$library" "$TERMUX_PREFIX/lib/$soname"
+		ln -sf "$library" "$TERMUX_PREFIX/lib/$unversioned"
+	done
 }
 
 termux_step_post_massage() {

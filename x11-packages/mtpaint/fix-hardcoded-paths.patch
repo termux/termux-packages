@@ -1,7 +1,6 @@
-diff -uNr mtpaint/src/font.c mtpaint.mod/src/font.c
---- mtpaint/src/font.c	2019-05-09 22:29:43.000000000 +0300
-+++ mtpaint.mod/src/font.c	2019-05-19 18:17:33.792226029 +0300
-@@ -1436,8 +1436,8 @@
+--- a/src/font.c
++++ b/src/font.c
+@@ -1449,8 +1449,8 @@ static void init_font_lists()		//	LIST INITIALIZATION
  		FILE *fp;
  		char buf[4096], buf2[128], *s;
  
@@ -12,7 +11,7 @@ diff -uNr mtpaint/src/font.c mtpaint.mod/src/font.c
  
  		// If these files are not found the user will have to manually enter directories
  
-@@ -1463,7 +1463,7 @@
+@@ -1476,7 +1476,7 @@ static void init_font_lists()		//	LIST INITIALIZATION
  			fclose(fp);
  		}
  
@@ -21,10 +20,9 @@ diff -uNr mtpaint/src/font.c mtpaint.mod/src/font.c
  		{
  			char *s1, *s2;
  
-diff -uNr mtpaint/src/main.c mtpaint.mod/src/main.c
---- mtpaint/src/main.c	2019-05-09 22:29:43.000000000 +0300
-+++ mtpaint.mod/src/main.c	2019-05-19 18:17:33.794226039 +0300
-@@ -299,7 +299,7 @@
+--- a/src/main.c
++++ b/src/main.c
+@@ -415,7 +415,7 @@ int main( int argc, char *argv[] )
  	g_thread_init(NULL);
  #endif
  	env = getenv("MTPAINT_INI");
@@ -33,10 +31,9 @@ diff -uNr mtpaint/src/main.c mtpaint.mod/src/main.c
  
  #ifdef U_NLS
  #if GTK_MAJOR_VERSION == 1
-diff -uNr mtpaint/src/spawn.c mtpaint.mod/src/spawn.c
---- mtpaint/src/spawn.c	2019-05-09 22:29:43.000000000 +0300
-+++ mtpaint.mod/src/spawn.c	2019-05-19 18:17:23.999173630 +0300
-@@ -783,8 +783,7 @@
+--- a/src/spawn.c
++++ b/src/spawn.c
+@@ -1001,8 +1001,7 @@ int run_def_action_x(int action, da_settings *settings)
  #else /* Linux */
  
  #define HANDBOOK_BROWSER "seamonkey"
@@ -46,7 +43,7 @@ diff -uNr mtpaint/src/spawn.c mtpaint.mod/src/spawn.c
  
  #endif
  
-@@ -812,7 +811,6 @@
+@@ -1030,7 +1029,6 @@ int show_html(char *browser, char *docs)
  	if (!docs || !docs[0])
  	{
  		docs = HANDBOOK_LOCATION;

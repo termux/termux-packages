@@ -2,17 +2,19 @@ TERMUX_PKG_HOMEPAGE=https://openimageio.org
 TERMUX_PKG_DESCRIPTION="A library for reading and writing images, including classes, utilities, and applications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.1.16.0"
+TERMUX_PKG_VERSION="3.2.1.2"
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL="https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=5af7221be05bbe69d7ec4eb74b5656c6d15b8d1a332410d6af937b1df48647c0
+TERMUX_PKG_SHA256=3f4ccfbd9ef40098bcc81bbdcd7f9d4ed97724bb2f4de92daf2310885704404e
 # configure-time error if ptex and ptex-static are not both installed
-TERMUX_PKG_DEPENDS="boost, dcmtk, ffmpeg, fmt, freetype, glew, imath, libc++, libhdf5, libheif, libjpeg-turbo, libjxl, libpng, libraw, libtbb, libtiff, libwebp, libyaml-cpp, opencolorio, opencv, openexr, openjpeg, openvdb, ptex, pybind11, python, qt6-qtbase"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers, fontconfig, libjpeg-turbo-static, libpugixml, libxrender, mesa, ptex-static, robin-map"
+TERMUX_PKG_DEPENDS="boost, dcmtk, ffmpeg, fmt, freetype, imath, libc++, libhdf5, libheif, libjpeg-turbo, libjxl, libpng, libraw, libtbb, libtiff, libwebp, libyaml-cpp, opencolorio, opencv, openexr, openjpeg, openvdb, ptex, pybind11, python, qt6-qtbase, libpugixml, dbus"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers, fontconfig, libjpeg-turbo-static, libxrender, mesa, ptex-static, robin-map"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
 -DCMAKE_CXX_STANDARD=17
 -DUSE_PYTHON=ON
+-DOIIO_PYTHON_BINDINGS_BACKEND=pybind11
 -DINTERNALIZE_FMT=OFF
 -DOIIO_BUILD_TOOLS=ON
 -DOIIO_BUILD_TESTS=OFF
@@ -22,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	local _SOVERSION=31
+	local _SOVERSION=32
 
 	local v=$(sed -En 's/^set \(OpenImageIO_VERSION "([0-9]+.[0-9]+).*/\1/p' "$TERMUX_PKG_SRCDIR"/CMakeLists.txt)
 	v="${v//./}"
@@ -33,8 +35,15 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	CXXFLAGS+=" -DFLT_MAX=__FLT_MAX__ -DDBL_MAX=__DBL_MAX__ -DFLT_EPSILON=__FLT_EPSILON__ -DDBL_EPSILON=__DBL_EPSILON__"
 	# for code in openjph, which is downloaded by CMakeLists.txt of openexr at build-time
 	if [[ "$TERMUX_PKG_API_LEVEL" -lt 28 ]]; then
 		CPPFLAGS+=" -Daligned_alloc=memalign"
 	fi
+}
+
+termux_step_post_make_install() {
+	# OpenImageIO 3.2 preserves the 3.1 ABI despite changing SONAME.
+	ln -s libOpenImageIO.so.3.2 "$TERMUX_PREFIX/lib/libOpenImageIO.so.3.1"
+	ln -s libOpenImageIO_Util.so.3.2 "$TERMUX_PREFIX/lib/libOpenImageIO_Util.so.3.1"
 }

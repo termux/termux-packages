@@ -1,0 +1,28 @@
+# - careful_atomic_create uses hardlink. Android doesn't allow hardlink.
+# - I could have patched the careful_atomic_create function fallback logic (errno == EACCES).
+# - But that is waste of cpu (as fallback path is always guranteed).
+# - Directly use sloppy_atomic_create.
+
+--- a/src/atomic_create.c	2001-09-09 07:16:40.000000000 +0530
++++ b/src/atomic_create.c	2026-09-05 17:51:06.887419155 +0530
+@@ -166,6 +166,12 @@
+ 
+ int atomic_create(const char *p)
+ {
++  /* Android doesn't allow hardlink for untrusted code. It gives EACCES.
++   * So just directly fallback to sloppy.
++   */
++  #ifdef __ANDROID__
++    return sloppy_atomic_create(p);
++  #else
+     static int sloppy = -1;
+ 
+     if(sloppy < 0) {
+@@ -177,6 +183,7 @@
+         return sloppy_atomic_create(p);
+     else
+         return careful_atomic_create(p);
++  #endif /* ifdef __ANDROID__ */
+ }
+ 
+ #endif

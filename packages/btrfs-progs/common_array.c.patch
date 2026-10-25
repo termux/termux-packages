@@ -1,0 +1,26 @@
+--- a/common/array.c	2026-07-15 01:41:48.000000000 +0300
++++ b/common/array.c	2026-09-20 13:00:00.000000000 +0300
+@@ -17,9 +17,23 @@
+ #define _GNU_SOURCE 1
+ #include <stdio.h>
+ #include <stdlib.h>
++#include "kerncompat.h"
+ #include <string.h>
+ #include "common/array.h"
+ 
++#if defined(__ANDROID__)
++__attribute__((weak, visibility("hidden")))
++void *reallocarray(void *ptr, size_t nmemb, size_t size)
++{
++	size_t bytes;
++	if (__builtin_mul_overflow(nmemb, size, &bytes)) {
++		errno = ENOMEM;
++		return NULL;
++	}
++	return realloc(ptr, bytes);
++}
++#endif
++
+ /*
+  * Extensible array of pointers. Length is the number of user defined pointers,
+  * capacity is the whole allocated size. Pointers are potentially unstable after

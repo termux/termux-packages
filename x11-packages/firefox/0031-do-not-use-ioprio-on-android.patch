@@ -1,0 +1,31 @@
+ioprio_get/ioprio_set are blocked by the seccomp policy of Android apps, and ANDROID is not defined because Termux builds Firefox as Linux
+
+--- a/xpcom/threads/nsThreadUtils.cpp
++++ b/xpcom/threads/nsThreadUtils.cpp
+@@ -25,7 +25,7 @@
+ #  include <windows.h>
+ #elif defined(XP_MACOSX)
+ #  include <sys/resource.h>
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(ANDROID) && !defined(__ANDROID__)
+ #  include <sys/syscall.h>
+ // <linux/ioprio.h> has no glibc wrapper and is absent from some sysroots, so
+ // define the constants directly from the stable kernel ABI.
+@@ -522,7 +522,7 @@ nsAutoLowPriorityIO::nsAutoLowPriorityIO() {
+   lowIOPrioritySet =
+       oldPriority != -1 &&
+       setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_THREAD, IOPOL_THROTTLE) != -1;
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(ANDROID) && !defined(__ANDROID__)
+   // IOPRIO_CLASS_BE with priority 7 is the lowest best-effort I/O class,
+   // matching the throttled (not starved) semantics of macOS and Windows.
+   oldPriority =
+@@ -545,7 +545,7 @@ nsAutoLowPriorityIO::~nsAutoLowPriorityIO() {
+   if (MOZ_LIKELY(lowIOPrioritySet)) {
+     setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_THREAD, oldPriority);
+   }
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(ANDROID) && !defined(__ANDROID__)
+   if (MOZ_LIKELY(lowIOPrioritySet)) {
+     syscall(__NR_ioprio_set, IOPRIO_WHO_THREAD, 0, oldPriority);
+   }

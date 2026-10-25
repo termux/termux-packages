@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://yazi-rs.github.io/
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal file manager written in Rust, based on async I/O"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.5.6"
-TERMUX_PKG_SRCURL=https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a18445df86a20068f7b17609d12d6f635de488958579ae7a2b143a244ba7e63f
-TERMUX_PKG_BUILD_DEPENDS='aosp-libs, imagemagick'
-TERMUX_PKG_RECOMMENDS='7zip, chafa, fd, ffmpeg, fzf, imagemagick, jq, poppler, ripgrep, zoxide'
+TERMUX_PKG_VERSION="26.9.1"
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://github.com/sxyazi/yazi/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=66857f1b670469daf258edd0bb2ea51d9ad3e2cab4eea9684028c80059fd6862
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, imagemagick"
+TERMUX_PKG_RECOMMENDS="7zip, chafa, fd, ffmpeg, fzf, imagemagick, jq, poppler, ripgrep, zoxide"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 
@@ -41,8 +42,7 @@ termux_step_pre_configure() {
 	patch -p1 -d "$dir" < "$patch"
 
 	cat >> Cargo.toml <<-EOF
-
-		[patch.crates-io]
+		# these lines should be appended to [patch.crates-io]
 		trash = { path = "./vendor/trash" }
 		cc = { path = "./vendor/cc" }
 	EOF
@@ -58,12 +58,19 @@ termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/yazi"
 	install -Dm700 -t "$TERMUX_PREFIX/bin" "target/${CARGO_TARGET_NAME}/release/ya"
 
-	# shell completions
+	# yazi completions
 	install -Dm644 yazi-boot/completions/yazi.bash "$TERMUX_PREFIX/share/bash-completion/completions/yazi.bash"
 	install -Dm644 yazi-boot/completions/yazi.elv  "$TERMUX_PREFIX/share/elvish/lib/yazi.elv"
 	install -Dm644 yazi-boot/completions/yazi.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/yazi.fish"
 	install -Dm644 yazi-boot/completions/yazi.nu   "$TERMUX_PREFIX/share/nushell/vendor/autoload/yazi.nu"
 	install -Dm644 yazi-boot/completions/_yazi     "$TERMUX_PREFIX/share/zsh/site-functions/_yazi"
+
+	# ya completions
+	install -Dm644 yazi-cli/completions/ya.bash "$TERMUX_PREFIX/share/bash-completion/completions/ya.bash"
+	install -Dm644 yazi-cli/completions/ya.elv  "$TERMUX_PREFIX/share/elvish/lib/ya.elv"
+	install -Dm644 yazi-cli/completions/ya.fish "$TERMUX_PREFIX/share/fish/vendor_completions.d/ya.fish"
+	install -Dm644 yazi-cli/completions/ya.nu   "$TERMUX_PREFIX/share/nushell/vendor/autoload/ya.nu"
+	install -Dm644 yazi-cli/completions/_ya     "$TERMUX_PREFIX/share/zsh/site-functions/_ya"
 
 	# desktop entry
 	install -Dm644 assets/yazi.desktop "$TERMUX_PREFIX/share/applications/yazi.desktop"

@@ -1,0 +1,40 @@
+--- a/darcs.cabal	2001-09-09 07:16:40.000000000 +0530
++++ b/darcs.cabal	2026-09-02 17:48:12.360858261 +0530
+@@ -41,7 +41,7 @@
+ 
+ Homepage:       http://darcs.net/
+ 
+-Build-Type:     Custom
++Build-Type:     Simple
+ extra-source-files:
+   -- C files
+   src/*.h
+@@ -136,7 +136,7 @@
+ Library
+     default-language: Haskell2010
+ 
+-    hs-source-dirs:   src
++    hs-source-dirs:   src, autogen
+     include-dirs:     src
+ 
+     exposed-modules:
+@@ -385,8 +385,6 @@
+                       Darcs.Util.ValidHash
+                       Darcs.Util.Workaround
+ 
+-    autogen-modules:  Version
+-
+     other-modules:    Version
+ 
+     c-sources:        src/atomic_create.c
+@@ -536,9 +534,7 @@
+   default-language: Haskell2010
+ 
+   main-is:          darcs.hs
+-  hs-source-dirs:   darcs
+-
+-  autogen-modules:  Version
++  hs-source-dirs:   darcs, autogen
+ 
+   other-modules:    Version
+ 

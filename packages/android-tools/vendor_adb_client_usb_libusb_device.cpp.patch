@@ -1,0 +1,33 @@
+--- a/vendor/adb/client/usb_libusb_device.cpp
++++ b/vendor/adb/client/usb_libusb_device.cpp
+@@ -57,8 +57,8 @@
+     return (endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT;
+ }
+ 
+-LibUsbDevice::LibUsbDevice(libusb_device* device)
+-    : device_(device), device_address_(GetDeviceAddress()) {
++LibUsbDevice::LibUsbDevice(libusb_device* device, libusb_device_handle* handle)
++    : device_(device), device_handle_(handle), device_address_(GetDeviceAddress()) {
+     libusb_ref_device(device);
+     Init();
+ }
+@@ -454,13 +454,12 @@
+ bool LibUsbDevice::OpenDeviceHandle() {
+     if (device_handle_) {
+         VLOG(USB) << "device already open";
+-        return true;
+-    }
+-
+-    int rc = libusb_open(device_, &device_handle_);
+-    if (rc != 0) {
+-        VLOG(USB) << "Unable to open device: " << GetSerial() << " :" << libusb_strerror(static_cast<libusb_error>(rc));
+-        return false;
++    } else {
++        int rc = libusb_open(device_, &device_handle_);
++        if (rc != 0) {
++            VLOG(USB) << "Unable to open device: " << GetSerial() << " :" << libusb_strerror(static_cast<libusb_error>(rc));
++            return false;
++        }
+     }
+ 
+     if (!RetrieveSerial()) {

@@ -1,18 +1,16 @@
-diff -uNr samba-4.14.4/auth/credentials/credentials_krb5.c samba-4.14.4.mod/auth/credentials/credentials_krb5.c
---- samba-4.14.4/auth/credentials/credentials_krb5.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/auth/credentials/credentials_krb5.c	2021-05-06 11:30:43.338213898 +0000
-@@ -625,7 +625,7 @@
- 		must_free_cc_name = true;
+--- a/auth/credentials/credentials_krb5.c
++++ b/auth/credentials/credentials_krb5.c
+@@ -621,7 +621,7 @@
  
+ 	if (!ccache_name) {
  		if (lpcfg_parm_bool(lp_ctx, NULL, "credentials", "krb5_cc_file", false)) {
--			ccache_name = talloc_asprintf(ccc, "FILE:/tmp/krb5_cc_samba_%u_%p", 
+-			ccache_name = talloc_asprintf(ccc, "FILE:/tmp/krb5_cc_samba_%u_%p",
 +			ccache_name = talloc_asprintf(ccc, "FILE:@TERMUX_PREFIX@/tmp/krb5_cc_samba_%u_%p",
  						      (unsigned int)getpid(), ccc);
- 		} else {
- 			ccache_name = talloc_asprintf(ccc, "MEMORY:%p", 
-diff -uNr samba-4.14.4/ctdb/tests/src/porting_tests.c samba-4.14.4.mod/ctdb/tests/src/porting_tests.c
---- samba-4.14.4/ctdb/tests/src/porting_tests.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/ctdb/tests/src/porting_tests.c	2021-05-06 11:30:43.338213898 +0000
+ 			if (ccache_name == NULL) {
+ 				talloc_free(ccc);
+--- a/ctdb/tests/src/porting_tests.c
++++ b/ctdb/tests/src/porting_tests.c
 @@ -41,7 +41,7 @@
  	pid_t helper_pid;
  	int socket;
@@ -22,9 +20,8 @@ diff -uNr samba-4.14.4/ctdb/tests/src/porting_tests.c samba-4.14.4.mod/ctdb/test
  };
  
  
-diff -uNr samba-4.14.4/lib/ldb/tools/ldbedit.c samba-4.14.4.mod/lib/ldb/tools/ldbedit.c
---- samba-4.14.4/lib/ldb/tools/ldbedit.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/lib/ldb/tools/ldbedit.c	2021-05-06 11:30:43.338213898 +0000
+--- a/lib/ldb/tools/ldbedit.c
++++ b/lib/ldb/tools/ldbedit.c
 @@ -218,7 +218,7 @@
  {
  	int fd, ret;
@@ -34,10 +31,9 @@ diff -uNr samba-4.14.4/lib/ldb/tools/ldbedit.c samba-4.14.4.mod/lib/ldb/tools/ld
  	char *cmd;
  	struct ldb_ldif *ldif;
  	struct ldb_message **msgs2 = NULL;
-diff -uNr samba-4.14.4/lib/param/loadparm.c samba-4.14.4.mod/lib/param/loadparm.c
---- samba-4.14.4/lib/param/loadparm.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/lib/param/loadparm.c	2021-05-06 11:30:43.338213898 +0000
-@@ -2514,12 +2514,12 @@
+--- a/lib/param/loadparm.c
++++ b/lib/param/loadparm.c
+@@ -2662,12 +2662,12 @@
  
  		tmp = lpcfg_parm_string(lp_ctx, NULL, "vlp", "tdbfile");
  		if (tmp == NULL) {
@@ -52,10 +48,9 @@ diff -uNr samba-4.14.4/lib/param/loadparm.c samba-4.14.4.mod/lib/param/loadparm.
  		}
  
  		tmp = talloc_asprintf(tmp_ctx, "vlp %s print %%p %%s",
-diff -uNr samba-4.14.4/lib/replace/wscript samba-4.14.4.mod/lib/replace/wscript
---- samba-4.14.4/lib/replace/wscript	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/lib/replace/wscript	2021-05-06 11:30:43.342213897 +0000
-@@ -778,8 +778,8 @@
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -842,8 +842,8 @@
  
      conf.CHECK_CODE('''
                      struct stat st;
@@ -66,7 +61,7 @@ diff -uNr samba-4.14.4/lib/replace/wscript samba-4.14.4.mod/lib/replace/wscript
                      int fd = mkstemp(tpl);
                      int fd2 = mkstemp(tpl2);
                      if (fd == -1) {
-@@ -793,7 +793,7 @@
+@@ -857,7 +857,7 @@
                      unlink(tpl2);
                      if (fstat(fd, &st) != 0) exit(1);
                      if ((st.st_mode & 0777) != 0600) exit(1);
@@ -75,10 +70,9 @@ diff -uNr samba-4.14.4/lib/replace/wscript samba-4.14.4.mod/lib/replace/wscript
                            exit(1);
                      }
                      if (strcmp(tpl, tpl2) == 0) {
-diff -uNr samba-4.14.4/lib/util/util.c samba-4.14.4.mod/lib/util/util.c
---- samba-4.14.4/lib/util/util.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/lib/util/util.c	2021-05-06 11:30:43.342213897 +0000
-@@ -62,7 +62,7 @@
+--- a/lib/util/util.c
++++ b/lib/util/util.c
+@@ -64,7 +64,7 @@
  	char *p;
  	if ((p = getenv("TMPDIR")))
  		return p;
@@ -87,9 +81,8 @@ diff -uNr samba-4.14.4/lib/util/util.c samba-4.14.4.mod/lib/util/util.c
  }
  
  
-diff -uNr samba-4.14.4/nsswitch/winbind_nss_aix.c samba-4.14.4.mod/nsswitch/winbind_nss_aix.c
---- samba-4.14.4/nsswitch/winbind_nss_aix.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/nsswitch/winbind_nss_aix.c	2021-05-06 11:30:43.342213897 +0000
+--- a/nsswitch/winbind_nss_aix.c
++++ b/nsswitch/winbind_nss_aix.c
 @@ -63,7 +63,7 @@
  	if (!debug_enabled) {
  		return;
@@ -99,10 +92,9 @@ diff -uNr samba-4.14.4/nsswitch/winbind_nss_aix.c samba-4.14.4.mod/nsswitch/winb
  	if (!f) return;
  	va_start(ap, format);
  	vfprintf(f, format, ap);
-diff -uNr samba-4.14.4/source3/client/smbspool_krb5_wrapper.c samba-4.14.4.mod/source3/client/smbspool_krb5_wrapper.c
---- samba-4.14.4/source3/client/smbspool_krb5_wrapper.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/client/smbspool_krb5_wrapper.c	2021-05-06 11:30:43.342213897 +0000
-@@ -309,7 +309,7 @@
+--- a/source3/client/smbspool_krb5_wrapper.c
++++ b/source3/client/smbspool_krb5_wrapper.c
+@@ -306,7 +306,7 @@
  	}
  
  	/* Fallback to a FILE ccache */
@@ -111,9 +103,8 @@ diff -uNr samba-4.14.4/source3/client/smbspool_krb5_wrapper.c samba-4.14.4.mod/s
  
  create_env:
  	/*
-diff -uNr samba-4.14.4/source3/lib/smbconf/testsuite.c samba-4.14.4.mod/source3/lib/smbconf/testsuite.c
---- samba-4.14.4/source3/lib/smbconf/testsuite.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/lib/smbconf/testsuite.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/lib/smbconf/testsuite.c
++++ b/source3/lib/smbconf/testsuite.c
 @@ -208,7 +208,7 @@
  {
  	sbcErr err;
@@ -123,10 +114,9 @@ diff -uNr samba-4.14.4/source3/lib/smbconf/testsuite.c samba-4.14.4.mod/source3/
  	struct smbconf_ctx *conf_ctx = NULL;
  	TALLOC_CTX *mem_ctx = talloc_stackframe();
  
-diff -uNr samba-4.14.4/source3/modules/vfs_virusfilter.c samba-4.14.4.mod/source3/modules/vfs_virusfilter.c
---- samba-4.14.4/source3/modules/vfs_virusfilter.c	2021-04-20 10:04:03.000000000 +0000
-+++ samba-4.14.4.mod/source3/modules/vfs_virusfilter.c	2021-05-06 11:31:15.350214614 +0000
-@@ -292,7 +292,7 @@
+--- a/source3/modules/vfs_virusfilter.c
++++ b/source3/modules/vfs_virusfilter.c
+@@ -317,7 +317,7 @@
  
  	quarantine_dir = lp_parm_const_string(
  		snum, "virusfilter", "quarantine directory",
@@ -135,9 +125,8 @@ diff -uNr samba-4.14.4/source3/modules/vfs_virusfilter.c samba-4.14.4.mod/source
  	if (quarantine_dir != NULL) {
  		config->quarantine_dir = talloc_strdup(config, quarantine_dir);
  		if (config->quarantine_dir == NULL) {
-diff -uNr samba-4.14.4/source3/modules/vfs_virusfilter_fsav.c samba-4.14.4.mod/source3/modules/vfs_virusfilter_fsav.c
---- samba-4.14.4/source3/modules/vfs_virusfilter_fsav.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/modules/vfs_virusfilter_fsav.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/modules/vfs_virusfilter_fsav.c
++++ b/source3/modules/vfs_virusfilter_fsav.c
 @@ -23,7 +23,7 @@
  #ifdef FSAV_DEFAULT_SOCKET_PATH
  #  define VIRUSFILTER_DEFAULT_SOCKET_PATH	FSAV_DEFAULT_SOCKET_PATH
@@ -147,9 +136,8 @@ diff -uNr samba-4.14.4/source3/modules/vfs_virusfilter_fsav.c samba-4.14.4.mod/s
  #endif
  
  /* Default values for module-specific configuration variables */
-diff -uNr samba-4.14.4/source3/registry/tests/test_regfio.c samba-4.14.4.mod/source3/registry/tests/test_regfio.c
---- samba-4.14.4/source3/registry/tests/test_regfio.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/registry/tests/test_regfio.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/registry/tests/test_regfio.c
++++ b/source3/registry/tests/test_regfio.c
 @@ -65,7 +65,7 @@
  	if (ret == 0) {
  		test_ctx = talloc_get_type_abort(*state, struct test_ctx);
@@ -159,9 +147,8 @@ diff -uNr samba-4.14.4/source3/registry/tests/test_regfio.c samba-4.14.4.mod/sou
  		assert_non_null(test_ctx->tmp_regfile);
  
  		test_ctx->tmp_regfile_fd = mkstemp(test_ctx->tmp_regfile);
-diff -uNr samba-4.14.4/source3/smbd/notifyd/tests.c samba-4.14.4.mod/source3/smbd/notifyd/tests.c
---- samba-4.14.4/source3/smbd/notifyd/tests.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/smbd/notifyd/tests.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/smbd/notifyd/tests.c
++++ b/source3/smbd/notifyd/tests.c
 @@ -66,12 +66,12 @@
  			.instance.filter = UINT32_MAX,
  			.instance.subdir_filter = UINT32_MAX
@@ -177,10 +164,9 @@ diff -uNr samba-4.14.4/source3/smbd/notifyd/tests.c samba-4.14.4.mod/source3/smb
  
  		iov[0].iov_base = &msg;
  		iov[0].iov_len = offsetof(struct notify_rec_change_msg, path);
-diff -uNr samba-4.14.4/source3/smbd/process.c samba-4.14.4.mod/source3/smbd/process.c
---- samba-4.14.4/source3/smbd/process.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/smbd/process.c	2021-05-06 11:30:43.342213897 +0000
-@@ -1418,7 +1418,7 @@
+--- a/source3/smbd/smb1_process.c
++++ b/source3/smbd/smb1_process.c
+@@ -945,7 +945,7 @@
  	len = smb_len_tcp(data)+4;
  	for (i=1;i<100;i++) {
  		fname = talloc_asprintf(talloc_tos(),
@@ -189,9 +175,8 @@ diff -uNr samba-4.14.4/source3/smbd/process.c samba-4.14.4.mod/source3/smbd/proc
  				name,
  				i,
  				type ? "req" : "resp");
-diff -uNr samba-4.14.4/source3/utils/interact.c samba-4.14.4.mod/source3/utils/interact.c
---- samba-4.14.4/source3/utils/interact.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/utils/interact.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/utils/interact.c
++++ b/source3/utils/interact.c
 @@ -76,7 +76,7 @@
  
  
@@ -201,9 +186,8 @@ diff -uNr samba-4.14.4/source3/utils/interact.c samba-4.14.4.mod/source3/utils/i
  	char buf[128];
  	char* ret = NULL;
  	FILE* file;
-diff -uNr samba-4.14.4/source3/utils/net_rpc_samsync.c samba-4.14.4.mod/source3/utils/net_rpc_samsync.c
---- samba-4.14.4/source3/utils/net_rpc_samsync.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source3/utils/net_rpc_samsync.c	2021-05-06 11:30:43.342213897 +0000
+--- a/source3/utils/net_rpc_samsync.c
++++ b/source3/utils/net_rpc_samsync.c
 @@ -47,7 +47,7 @@
  		   "\t to pull accounts from a remote PDC where we are a BDC\n"
  		   "\t\t no args puts accounts in local passdb from smb.conf\n"
@@ -213,26 +197,24 @@ diff -uNr samba-4.14.4/source3/utils/net_rpc_samsync.c samba-4.14.4.mod/source3/
  		   "\t\t keytab - put account passwords in krb5 keytab "
  		   "(defaults to system keytab)\n"));
  
-diff -uNr samba-4.14.4/source3/winbindd/winbindd_pam.c samba-4.14.4.mod/source3/winbindd/winbindd_pam.c
---- samba-4.14.4/source3/winbindd/winbindd_pam.c	2021-02-04 08:24:37.000000000 +0000
-+++ samba-4.14.4.mod/source3/winbindd/winbindd_pam.c	2021-05-06 11:30:43.342213897 +0000
-@@ -573,11 +573,11 @@
- 	if (uid != -1) {
- 		if (strequal(type, "FILE")) {
- 			gen_cc = talloc_asprintf(
--				mem_ctx, "FILE:/tmp/krb5cc_%d", uid);
-+				mem_ctx, "FILE:@TERMUX_PREFIX@/tmp/krb5cc_%d", uid);
- 		}
- 		if (strequal(type, "WRFILE")) {
- 			gen_cc = talloc_asprintf(
--				mem_ctx, "WRFILE:/tmp/krb5cc_%d", uid);
-+				mem_ctx, "WRFILE:@TERMUX_PREFIX@/tmp/krb5cc_%d", uid);
- 		}
- 		if (strequal(type, "KEYRING")) {
- 			gen_cc = talloc_asprintf(
-diff -uNr samba-4.14.4/source4/librpc/tests/binding_string.c samba-4.14.4.mod/source4/librpc/tests/binding_string.c
---- samba-4.14.4/source4/librpc/tests/binding_string.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/librpc/tests/binding_string.c	2021-05-06 11:30:43.346213897 +0000
+--- a/source3/winbindd/winbindd_pam.c
++++ b/source3/winbindd/winbindd_pam.c
+@@ -749,11 +749,11 @@
+ 	 */
+ 	if (strequal(type, "FILE")) {
+ 		gen_cc = talloc_asprintf(mem_ctx,
+-					 "FILE:/tmp/krb5cc_%u",
++					 "FILE:@TERMUX_PREFIX@/tmp/krb5cc_%u",
+ 					 (unsigned int)uid);
+ 	} else if (strequal(type, "WRFILE")) {
+ 		gen_cc = talloc_asprintf(mem_ctx,
+-					 "WRFILE:/tmp/krb5cc_%u",
++					 "WRFILE:@TERMUX_PREFIX@/tmp/krb5cc_%u",
+ 					 (unsigned int)uid);
+ 	} else if (strequal(type, "KEYRING")) {
+ 		gen_cc = talloc_asprintf(mem_ctx,
+--- a/source4/librpc/tests/binding_string.c
++++ b/source4/librpc/tests/binding_string.c
 @@ -127,9 +127,9 @@
  	"ncadg_ip_udp:",
  	"308FB580-1EB2-11CA-923B-08002B1075A7@ncacn_np:localhost",
@@ -245,9 +227,8 @@ diff -uNr samba-4.14.4/source4/librpc/tests/binding_string.c samba-4.14.4.mod/so
  	"ncacn_ip_tcp:127.0.0.1[75,target_hostname=port75.example.com,target_principal=host/port75.example.com]",
  	"ncacn_ip_tcp:127.0.0.1[75,connect,target_hostname=port75.example.com,target_principal=host/port75.example.com,assoc_group_id=0x01234567]",
  	"ncacn_ip_tcp:127.0.0.1[75,packet,target_hostname=port75.example.com,target_principal=host/port75.example.com,assoc_group_id=0x01234567]",
-diff -uNr samba-4.14.4/source4/param/tests/share.c samba-4.14.4.mod/source4/param/tests/share.c
---- samba-4.14.4/source4/param/tests/share.c	2021-01-21 13:20:40.000000000 +0000
-+++ samba-4.14.4.mod/source4/param/tests/share.c	2021-05-06 11:30:43.346213897 +0000
+--- a/source4/param/tests/share.c
++++ b/source4/param/tests/share.c
 @@ -50,7 +50,7 @@
  	bool found = false;
  	struct share_info inf[] = { 
@@ -275,9 +256,8 @@ diff -uNr samba-4.14.4/source4/param/tests/share.c samba-4.14.4.mod/source4/para
  	};
  	NTSTATUS status;
  
-diff -uNr samba-4.14.4/testsuite/nsswitch/getgrent_r.c samba-4.14.4.mod/testsuite/nsswitch/getgrent_r.c
---- samba-4.14.4/testsuite/nsswitch/getgrent_r.c	2021-01-21 13:20:41.000000000 +0000
-+++ samba-4.14.4.mod/testsuite/nsswitch/getgrent_r.c	2021-05-06 11:30:43.346213897 +0000
+--- a/testsuite/nsswitch/getgrent_r.c
++++ b/testsuite/nsswitch/getgrent_r.c
 @@ -14,12 +14,12 @@
  void dump_grent(char *id)
  {
@@ -293,9 +273,8 @@ diff -uNr samba-4.14.4/testsuite/nsswitch/getgrent_r.c samba-4.14.4.mod/testsuit
  
      if ((fptr = fopen(fname, "w")) == NULL) {
          fprintf(stderr, "ERROR: could not open file %s: %s\n", fname,
-diff -uNr samba-4.14.4/testsuite/nsswitch/getpwent_r.c samba-4.14.4.mod/testsuite/nsswitch/getpwent_r.c
---- samba-4.14.4/testsuite/nsswitch/getpwent_r.c	2021-01-21 13:20:41.000000000 +0000
-+++ samba-4.14.4.mod/testsuite/nsswitch/getpwent_r.c	2021-05-06 11:30:43.346213897 +0000
+--- a/testsuite/nsswitch/getpwent_r.c
++++ b/testsuite/nsswitch/getpwent_r.c
 @@ -14,12 +14,12 @@
  void dump_pwent(char *id)
  {
@@ -311,10 +290,9 @@ diff -uNr samba-4.14.4/testsuite/nsswitch/getpwent_r.c samba-4.14.4.mod/testsuit
  
      if ((fptr = fopen(fname, "w")) == 0) {
          fprintf(stderr, "ERROR: could not open file %s: %s\n", fname,
-diff -uNr samba-4.14.4/testsuite/unittests/test_krb5_samba.c samba-4.14.4.mod/testsuite/unittests/test_krb5_samba.c
---- samba-4.14.4/testsuite/unittests/test_krb5_samba.c	2021-01-21 13:20:41.000000000 +0000
-+++ samba-4.14.4.mod/testsuite/unittests/test_krb5_samba.c	2021-05-06 11:30:43.346213897 +0000
-@@ -37,7 +37,7 @@
+--- a/testsuite/unittests/test_krb5_samba.c
++++ b/testsuite/unittests/test_krb5_samba.c
+@@ -38,7 +38,7 @@
  	krb5_context context = *state;
  	krb5_keytab keytab = NULL;
  	krb5_error_code code;
@@ -323,7 +301,7 @@ diff -uNr samba-4.14.4/testsuite/unittests/test_krb5_samba.c samba-4.14.4.mod/te
  	int fd;
  
  	fd = mkstemp(keytab_template);
-@@ -59,7 +59,7 @@
+@@ -60,7 +60,7 @@
  	krb5_context context = *state;
  	krb5_keytab keytab = NULL;
  	krb5_error_code code;
@@ -332,10 +310,9 @@ diff -uNr samba-4.14.4/testsuite/unittests/test_krb5_samba.c samba-4.14.4.mod/te
  	char keytab_file[6 + strlen(keytab_template)];
  	int fd;
  
-diff -uNr samba-4.14.4/third_party/pam_wrapper/pam_wrapper.c samba-4.14.4.mod/third_party/pam_wrapper/pam_wrapper.c
---- samba-4.14.4/third_party/pam_wrapper/pam_wrapper.c	2021-01-21 13:20:41.000000000 +0000
-+++ samba-4.14.4.mod/third_party/pam_wrapper/pam_wrapper.c	2021-05-06 11:30:43.346213897 +0000
-@@ -1158,7 +1158,7 @@
+--- a/third_party/pam_wrapper/pam_wrapper.c
++++ b/third_party/pam_wrapper/pam_wrapper.c
+@@ -1016,7 +1016,7 @@
  
  static void pwrap_init(void)
  {

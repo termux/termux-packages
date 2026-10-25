@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.14.6"
 TERMUX_PKG_SRCURL=https://www.cairographics.org/releases/cairomm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7e0d5c7f29175d573a03ab5c45aef63f48dd91a5caf335a404cd763e4b7cea4a
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++, libcairo, libsigc++-2.0"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbuild-examples=false

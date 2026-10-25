@@ -2,10 +2,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/gitui-org/gitui
 TERMUX_PKG_DESCRIPTION="Blazing fast terminal-ui for git written in rust"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.28.1"
-TERMUX_PKG_SRCURL=https://github.com/gitui-org/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL="https://github.com/gitui-org/gitui/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=0400cbf59605490b5fb8779f9af41fa4d7a1bb748093ca0e13156a5dff31c7aa
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libgit2, libssh2, openssl, zlib"

@@ -1,0 +1,16 @@
+mlock2() was added to bionic in API level 30, but Termux builds with API level 24.
+
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11235,9 +11235,8 @@ static abi_long do_syscall1(CPUArchState *cpu_env, int num, abi_long arg1,
+         if (arg3 & ~TARGET_MLOCK_ONFAULT) {
+             return -TARGET_EINVAL;
+         }
+-        return get_errno(mlock2(g2h(cpu, arg1), arg2,
+-                                 (arg3 & TARGET_MLOCK_ONFAULT) ?
+-                                 MLOCK_ONFAULT : 0));
++        return get_errno(syscall(__NR_mlock2, g2h(cpu, arg1), arg2,
++                                 (arg3 & TARGET_MLOCK_ONFAULT) ? 1 : 0));
+ #endif
+ #ifdef TARGET_NR_munlock
+     case TARGET_NR_munlock:

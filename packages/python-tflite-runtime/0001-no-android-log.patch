@@ -1,6 +1,6 @@
 --- a/tensorflow/lite/CMakeLists.txt
 +++ b/tensorflow/lite/CMakeLists.txt
-@@ -233,7 +233,7 @@
+@@ -278,7 +278,7 @@
      list(APPEND TFLITE_TARGET_PRIVATE_OPTIONS "-Wa,-mbig-obj")
    endif()
  endif()
@@ -9,7 +9,7 @@
    find_library(ANDROID_LOG_LIB log)
    list(APPEND TFLITE_TARGET_DEPENDENCIES
      log
-@@ -263,7 +263,7 @@
+@@ -302,7 +302,7 @@
  
  # Handle TFLite logging source.
  list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*minimal_logging_.*\\.cc$")
@@ -20,7 +20,7 @@
    list(APPEND TFLITE_SRCS ${TFLITE_SOURCE_DIR}/minimal_logging_ios.cc)
 --- a/tensorflow/lite/tools/benchmark/CMakeLists.txt
 +++ b/tensorflow/lite/tools/benchmark/CMakeLists.txt
-@@ -78,7 +78,6 @@
+@@ -84,7 +84,6 @@
      )
    endif()  # _TFLITE_ENABLE_NNAPI
    list(APPEND TFLITE_BENCHMARK_LIBS

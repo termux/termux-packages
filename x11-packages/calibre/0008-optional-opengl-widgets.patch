@@ -1,0 +1,27 @@
+diff --git a/src/calibre/gui2/__init__.py b/src/calibre/gui2/__init__.py
+index 5a81f3afee..e5e46331f2 100644
+--- a/src/calibre/gui2/__init__.py
++++ b/src/calibre/gui2/__init__.py
+@@ -1392,12 +1392,18 @@ def setup_to_run_webengine():
+     # Allow import of webengine after construction of QApplication on new enough PyQt
+     QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+     # this import is needed to have Qt call qt_registerDefaultPlatformBackingStoreOpenGLSupport
+-    from qt.core import QOpenGLWidget
++    try:
++        from qt.core import QOpenGLWidget
+ 
+-    del QOpenGLWidget
+-    from qt.core import QQuickWindow, QSGRendererInterface
++        del QOpenGLWidget
++    except Exception:
++        pass
++    try:
++        from qt.core import QQuickWindow, QSGRendererInterface
+ 
+-    QQuickWindow.setGraphicsApi(QSGRendererInterface.GraphicsApi.OpenGL)
++        QQuickWindow.setGraphicsApi(QSGRendererInterface.GraphicsApi.OpenGL)
++    except Exception:
++        pass
+ 
+ 
+ class Application(QApplication):

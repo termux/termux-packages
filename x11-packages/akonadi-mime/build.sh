@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/pim/akonadi-mime"
 TERMUX_PKG_DESCRIPTION="Libraries and daemons to implement basic email handling"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/akonadi-mime-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="7bad7bfc07672635ba0ead6ab66f031f2b3a800be021d5b0c069997cdc83f58b"
+TERMUX_PKG_SHA256=1f260c099b01ff5eefcba3c9d706b7ece17b251a5719afa43d8f40cdef0daaf5
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="akonadi, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kio, kf6-kwidgetsaddons, kf6-kxmlgui, kmime, libc++, qt6-qtbase"
+TERMUX_PKG_DEPENDS="akonadi, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kio, kf6-kwidgetsaddons, kf6-kxmlgui, kf6-kmime, libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, qt6-qtdeclarative"
 # akonadi depends on qt6-qtwebengine
 # qt6-qtwebengine is not supported on the i686 architecture

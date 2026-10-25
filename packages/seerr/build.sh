@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://github.com/seerr-team/seerr"
 TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jellyfin/Emby"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.4.1"
+TERMUX_PKG_VERSION="3.5.1"
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=38bb1f2c90ea648a327244352d5b4b13b19526e384655be8779bbfe7f6a8f447
+TERMUX_PKG_SHA256=08be110365b520d8bfa227278b6d84c9d6104a2c838decf68669ab127f622b11
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
-TERMUX_PKG_DEPENDS="nodejs, libvips, termux-services"
+TERMUX_PKG_DEPENDS="nodejs | nodejs-lts, libvips, termux-services"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # Uncomment the line below to avoid file conflicts when building on-device

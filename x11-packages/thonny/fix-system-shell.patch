@@ -1,0 +1,22 @@
+diff --git a/thonny/terminal.py b/thonny/terminal.py
+index c3e641eb..b140181b 100644
+--- a/thonny/terminal.py
++++ b/thonny/terminal.py
+@@ -15,7 +15,7 @@ def run_in_terminal(cmd, cwd, env_overrides={}, keep_open=True, title=None):
+ 
+     if sys.platform == "win32":
+         _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title)
+-    elif sys.platform == "linux":
++    elif sys.platform in ("linux", "android"):
+         _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
+     elif sys.platform == "darwin":
+         _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open)
+@@ -33,7 +33,7 @@ def open_system_shell(cwd, env_overrides={}):
+     elif sys.platform == "win32":
+         cmd = "start cmd"
+         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
+-    elif sys.platform == "linux":
++    elif sys.platform in ("linux", "android"):
+         cmd = _get_linux_terminal_command()
+         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
+     else:

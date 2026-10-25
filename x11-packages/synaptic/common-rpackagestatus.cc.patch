@@ -1,0 +1,17 @@
+--- a/common/rpackagestatus.cc
++++ b/common/rpackagestatus.cc
+@@ -131,14 +131,6 @@
+          supportedComponents.push_back(s);
+       }
+    }
+-
+-   // init the static release once
+-   FILE *fp = popen("lsb_release -c -s", "r");
+-   if (fp) {
+-      fgets((char *)RPackageStatus::release, 255, fp);
+-      pclose(fp);
+-      _strstrip(release);
+-   }
+ }
+ 
+ bool RPackageStatus::isSupported(RPackage *pkg)

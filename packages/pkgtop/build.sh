@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Interactive package manager and resource monitor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.5.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/orhun/pkgtop/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3d8f1cd812fd2243fbf749ab03201bb86b9967cefd5d58cea456cdfcccfd416e
 TERMUX_PKG_BUILD_IN_SRC=true

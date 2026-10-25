@@ -1,17 +1,15 @@
-diff -uNr tinc-1.0.35/doc/sample-config/tinc.conf tinc-1.0.35.mod/doc/sample-config/tinc.conf
---- tinc-1.0.35/doc/sample-config/tinc.conf	2018-09-22 18:36:01.000000000 +0300
-+++ tinc-1.0.35.mod/doc/sample-config/tinc.conf	2019-06-20 21:20:43.561237994 +0300
+--- a/doc/sample-config/tinc.conf
++++ b/doc/sample-config/tinc.conf
 @@ -18,5 +18,5 @@
  # The tap device tinc will use.
- # /dev/tap0 for ethertap, FreeBSD or OpenBSD
+ # /dev/tap0 for FreeBSD or OpenBSD
  # /dev/tun0 for Solaris
 -# /dev/net/tun for Linux tun/tap
 -Device = /dev/net/tun
 +# /dev/tun for Linux tun/tap
 +Device = /dev/tun
-diff -uNr tinc-1.0.35/doc/tinc.conf.5.in tinc-1.0.35.mod/doc/tinc.conf.5.in
---- tinc-1.0.35/doc/tinc.conf.5.in	2018-09-22 18:36:01.000000000 +0300
-+++ tinc-1.0.35.mod/doc/tinc.conf.5.in	2019-06-20 21:20:52.547895168 +0300
+--- a/doc/tinc.conf.5.in
++++ b/doc/tinc.conf.5.in
 @@ -26,7 +26,7 @@
  .Pp
  The effect of this is that the daemon will set its configuration root to
@@ -85,7 +83,7 @@ diff -uNr tinc-1.0.35/doc/tinc.conf.5.in tinc-1.0.35.mod/doc/tinc.conf.5.in
  .Va Name
  starts with a
  .Li $ ,
-@@ -601,7 +601,7 @@
+@@ -595,7 +595,7 @@
  .Pp
  The scripts are started without command line arguments, but can make use of certain environment variables.
  Under UNIX like operating systems the names of environment variables must be preceded by a
@@ -94,9 +92,8 @@ diff -uNr tinc-1.0.35/doc/tinc.conf.5.in tinc-1.0.35.mod/doc/tinc.conf.5.in
  in scripts.
  Under Windows, in
  .Pa .bat
-diff -uNr tinc-1.0.35/doc/tinc.info tinc-1.0.35.mod/doc/tinc.info
---- tinc-1.0.35/doc/tinc.info	2018-10-06 18:28:40.000000000 +0300
-+++ tinc-1.0.35.mod/doc/tinc.info	2019-06-20 21:20:07.714609331 +0300
+--- a/doc/tinc.info
++++ b/doc/tinc.info
 @@ -517,7 +517,7 @@
     If you use Linux and do not have udev installed, you may need to
  create the following device file if it does not exist:
@@ -106,9 +103,8 @@ diff -uNr tinc-1.0.35/doc/tinc.info tinc-1.0.35.mod/doc/tinc.info
  
  
  File: tinc.info,  Node: Other files,  Prev: Device files,  Up: System files
-diff -uNr tinc-1.0.35/doc/tinc.texi tinc-1.0.35.mod/doc/tinc.texi
---- tinc-1.0.35/doc/tinc.texi	2018-10-05 15:36:35.000000000 +0300
-+++ tinc-1.0.35.mod/doc/tinc.texi	2019-06-20 21:21:03.604550169 +0300
+--- a/doc/tinc.texi
++++ b/doc/tinc.texi
 @@ -564,7 +564,7 @@
  you may need to create the following device file if it does not exist:
  
@@ -118,15 +114,14 @@ diff -uNr tinc-1.0.35/doc/tinc.texi tinc-1.0.35.mod/doc/tinc.texi
  @end example
  
  
-diff -uNr tinc-1.0.35/src/linux/device.c tinc-1.0.35.mod/src/linux/device.c
---- tinc-1.0.35/src/linux/device.c	2018-09-23 18:29:09.000000000 +0300
-+++ tinc-1.0.35.mod/src/linux/device.c	2019-06-20 21:21:10.351209726 +0300
-@@ -22,7 +22,7 @@
+--- a/src/linux/device.c
++++ b/src/linux/device.c
+@@ -21,7 +21,7 @@
+ #include "../system.h"
  
- #ifdef HAVE_LINUX_IF_TUN_H
  #include <linux/if_tun.h>
 -#define DEFAULT_DEVICE "/dev/net/tun"
 +#define DEFAULT_DEVICE "/dev/tun"
- #else
- #define DEFAULT_DEVICE "/dev/tap0"
- #endif
+ 
+ #include "../conf.h"
+ #include "../device.h"

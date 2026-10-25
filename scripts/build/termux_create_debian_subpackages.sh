@@ -87,6 +87,7 @@ termux_create_debian_subpackages() {
 		SUB_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
 		# Clean up DEBIAN metadata directory from previous runs to prevent bundling it in data.tar.xz on continued builds.
 		rm -rf DEBIAN
+		XZ_OPT="-T$TERMUX_PKG_MAKE_PROCESSES" \
 		tar --sort=name \
 			--mtime="@${SOURCE_DATE_EPOCH}" \
 			--owner=0 --group=0 --numeric-owner \

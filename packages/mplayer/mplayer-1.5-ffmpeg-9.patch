@@ -1,0 +1,27 @@
+--- a/libmpcodecs/ae_lavc.c
++++ b/libmpcodecs/ae_lavc.c
+@@ -177,10 +177,12 @@ int mpae_init_lavc(audio_encoder_t *encoder)
+ 	lavc_actx->codec_id = lavc_acodec->id;
+ 	// put sample parameters
+ 	lavc_actx->sample_fmt = AV_SAMPLE_FMT_S16;
+-	if (lavc_acodec->sample_fmts) {
++	const enum AVSampleFormat *sample_fmts = NULL;
++	avcodec_get_supported_config(NULL, lavc_acodec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void **)&sample_fmts, NULL);
++	if (sample_fmts) {
+ 		const enum AVSampleFormat *fmts;
+-		lavc_actx->sample_fmt = lavc_acodec->sample_fmts[0]; // fallback to first format
+-		for (fmts = lavc_acodec->sample_fmts; *fmts != AV_SAMPLE_FMT_NONE; fmts++) {
++		lavc_actx->sample_fmt = sample_fmts[0]; // fallback to first format
++		for (fmts = sample_fmts; *fmts != AV_SAMPLE_FMT_NONE; fmts++) {
+ 			if (samplefmt2affmt(av_get_packed_sample_fmt(*fmts)) == encoder->params.sample_format) { // preferred format found
+ 				lavc_actx->sample_fmt = *fmts;
+ 				break;
+@@ -192,7 +194,7 @@ int mpae_init_lavc(audio_encoder_t *encoder)
+             mp_msg(MSGT_MENCODER,MSGL_ERR, "Audio encoder requires unknown or unsupported input format\n");
+             return 0;
+ 	}
+-	lavc_actx->ch_layout.nb_channels = encoder->params.channels;
++	av_channel_layout_default(&lavc_actx->ch_layout, encoder->params.channels);
+ 	lavc_actx->sample_rate = encoder->params.sample_rate;
+ 	lavc_actx->time_base.num = 1;
+ 	lavc_actx->time_base.den = encoder->params.sample_rate;

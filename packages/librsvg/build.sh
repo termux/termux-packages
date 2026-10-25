@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/action/show/Projects/LibRsvg
 TERMUX_PKG_DESCRIPTION="Library to render SVG files using cairo"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.62.3"
+TERMUX_PKG_VERSION="2.63.4"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/librsvg/${TERMUX_PKG_VERSION%.*}/librsvg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2
+TERMUX_PKG_SHA256=31f07d9350dad3f8964fd613c31309ac160fdef13dfac59df6fd082de78d6e8f
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, glib, harfbuzz, libcairo, libdav1d, libpng, libxml2, pango"
 # Note: Do not add valac which prevents bootstrapping due to cyclic dependency (#27567)

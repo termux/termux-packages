@@ -1,11 +1,11 @@
 --- a/tools/shell/shell.cpp
 +++ b/tools/shell/shell.cpp
-@@ -2962,7 +2962,7 @@
+@@ -1751,7 +1751,7 @@ void ShellState::NewTempFile(const char *zSuffix) {
  #ifdef _WIN32
- 			zTemp = "\\tmp";
+ 		zTemp = "\\tmp";
  #else
--			zTemp = "/tmp";
-+			zTemp = "@TERMUX_PREFIX@/tmp";
+-		zTemp = "/tmp";
++		zTemp = "@TERMUX_PREFIX@/tmp";
  #endif
- 		}
- 		zTempFile = sqlite3_mprintf("%s/temp%llx.%s", zTemp, r, zSuffix);
+ 	}
+ 	zTempFile = StringUtil::Format("%s/temp%llx.%s", zTemp, r, zSuffix);

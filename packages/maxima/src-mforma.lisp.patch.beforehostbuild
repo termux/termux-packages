@@ -1,0 +1,11 @@
+--- a/src/mforma.lisp
++++ b/src/mforma.lisp
+@@ -76,7 +76,7 @@
+ 	     ((null v) l)
+ 	     (do ((conds (cdr (car v)) (cdr conds)))
+ 		 ((null conds))
+-	       (push (car conds) l)))
++	       (pushnew (car conds) l :key #'car)))
+     ,@body))
+ 
+ (defmacro pop-mformat-string ()

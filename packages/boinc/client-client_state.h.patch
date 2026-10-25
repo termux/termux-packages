@@ -1,0 +1,14 @@
+BOINC 8+ has broken swap estimation for tasks
+causing tasks not to start
+
+--- a/client/client_state.h
++++ b/client/client_state.h
+@@ -727,7 +727,7 @@
+ // says that every process is at least 33 GB.
+ //
+ inline bool is_swap_defined() {
+-#ifdef __APPLE__
++#if defined(__APPLE__) || defined(__ANDROID__)
+     return false;
+ #else
+     return gstate.host_info.m_swap > 0;

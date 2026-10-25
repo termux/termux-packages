@@ -1,0 +1,18 @@
+--- libbsd-0.12.2/src/progname.c	2024-02-11 21:30:03.000000000 +0300
++++ libbsd-0.12.2/src/progname.c.patch	2026-09-07 19:29:37.773966336 +0300
+@@ -55,6 +55,7 @@
+ static const char *__progname = NULL;
+ #endif
+ 
++#if !defined(__BIONIC__)
+ const char *
+ getprogname(void)
+ {
+@@ -143,6 +144,7 @@
+ 
+ 	return __progname;
+ }
++#endif
+ 
+ void
+ setprogname(const char *progname)

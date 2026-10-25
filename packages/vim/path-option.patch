@@ -1,0 +1,91 @@
+diff --git a/runtime/autoload/hare.vim b/runtime/autoload/hare.vim
+index d85a05b..4fcac69 100644
+--- a/runtime/autoload/hare.vim
++++ b/runtime/autoload/hare.vim
+@@ -15,7 +15,7 @@ export def GetPath(): string
+   else
+     path = ParsePath()
+     if empty(path)
+-      return '/usr/src/hare/stdlib,/usr/src/hare/third-party'
++      return '@TERMUX_PREFIX@/src/hare/stdlib,@TERMUX_PREFIX@/src/hare/third-party'
+     endif
+   endif
+   return map(path, (_, n) => escape(n, ' ,;'))->join(',')
+diff --git a/runtime/ftplugin/astro.vim b/runtime/ftplugin/astro.vim
+index 856b96f..b27ad50 100644
+--- a/runtime/ftplugin/astro.vim
++++ b/runtime/ftplugin/astro.vim
+@@ -120,7 +120,7 @@ setlocal formatoptions-=t
+ setlocal formatoptions+=croql
+ 
+ " Remove irrelevant part of 'path'.
+-setlocal path-=/usr/include
++setlocal path-=@TERMUX_PREFIX@/include
+ 
+ " Seed 'path' with default directories for :find, gf, etc.
+ setlocal path+=src/**
+diff --git a/runtime/ftplugin/j.vim b/runtime/ftplugin/j.vim
+index 8335ea0..a479583 100644
+--- a/runtime/ftplugin/j.vim
++++ b/runtime/ftplugin/j.vim
+@@ -18,7 +18,7 @@ setlocal comments=:NB.
+ setlocal commentstring=NB.\ %s
+ setlocal formatoptions-=t
+ setlocal matchpairs=(:)
+-setlocal path-=/usr/include
++setlocal path-=@TERMUX_PREFIX@/include
+ 
+ " Includes. To make the shorthand form "require 'web/cgi'" work, double the
+ " last path component. Also strip off leading folder names like "~addons/".
+diff --git a/runtime/ftplugin/javascript.vim b/runtime/ftplugin/javascript.vim
+index 455b794..e1e590e 100644
+--- a/runtime/ftplugin/javascript.vim
++++ b/runtime/ftplugin/javascript.vim
+@@ -51,7 +51,7 @@ setlocal suffixes+=.snap
+ 
+ " Remove irrelevant part of 'path'.
+ " User is expected to augment it with contextually-relevant paths
+-setlocal path-=/usr/include
++setlocal path-=@TERMUX_PREFIX@/include
+ 
+ " Matchit configuration
+ if exists("loaded_matchit")
+diff --git a/runtime/ftplugin/ruby.vim b/runtime/ftplugin/ruby.vim
+index 8a63dce..9f495c4 100644
+--- a/runtime/ftplugin/ruby.vim
++++ b/runtime/ftplugin/ruby.vim
+@@ -102,7 +102,7 @@ endfunction
+ 
+ function! s:build_path(path) abort
+   let path = join(map(copy(a:path), 'v:val ==# "." ? "" : v:val'), ',')
+-  if &g:path =~# '\v^%(\.,)=%(/%(usr|emx)/include,)=,$'
++  if &g:path =~# '\v^%(\.,)=%(%(@TERMUX_PREFIX@|/emx)/include,)=,$'
+     let path = path . ',.,,'
+   elseif &g:path =~# ',\.,,$'
+     let path = &g:path[0:-4] . path . ',.,,'
+diff --git a/runtime/ftplugin/vim.vim b/runtime/ftplugin/vim.vim
+index 9c57399..7b8f435 100644
+--- a/runtime/ftplugin/vim.vim
++++ b/runtime/ftplugin/vim.vim
+@@ -135,7 +135,7 @@ if &tw == 0
+ endif
+ 
+ " set 'path' to common Vim directories
+-setlocal path-=/usr/include
++setlocal path-=@TERMUX_PREFIX@/include
+ setlocal path+=pack/**,runtime/**,autoload/**,colors/**,compiler/**,ftplugin/**,indent/**,keymap/**,macros/**,plugin/**,syntax/**,after/**,python/**
+ 
+ if !exists("no_plugin_maps") && !exists("no_vim_maps")
+diff --git a/src/optiondefs.h b/src/optiondefs.h
+index 03acec5..5d871a0 100644
+--- a/src/optiondefs.h
++++ b/src/optiondefs.h
+@@ -1964,7 +1964,7 @@ static struct vimoption options[] =
+ #if defined(AMIGA) || defined(MSWIN)
+ 			    (char_u *)".,,",
+ #else
+-			    (char_u *)".,/usr/include,,",
++			    (char_u *)".,@TERMUX_PREFIX@/include,,",
+ #endif
+ 				(char_u *)0L} SCTX_INIT},
+     {"perldll",     NULL,   P_STRING|P_EXPAND|P_VI_DEF|P_SECURE,

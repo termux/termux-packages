@@ -1,0 +1,14 @@
+On aarch64 Android heap pointers carry a tag in the top byte (0xb4...), so they
+are greater than INTPTR_MAX and ptr_overflow() always reports an overflow,
+which makes msrpc_parse() reject every NTLMSSP challenge.
+
+--- a/lib/util/overflow.h
++++ b/lib/util/overflow.h
+@@ -52,6 +52,6 @@
+ *         False pointer would not overflow
+ */
+ #define ptr_overflow(ptr, offset, type) \
+-	offset_outside_range((ptr), ((type*)INTPTR_MAX), (offset))
++	((uintptr_t)(offset) > UINTPTR_MAX - (uintptr_t)(ptr))
+ 
+ #endif

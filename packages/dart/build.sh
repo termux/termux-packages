@@ -4,9 +4,9 @@ TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE=sdk/LICENSE
 TERMUX_PKG_MAINTAINER=@0x1ACA663
-TERMUX_PKG_VERSION="3.12.2"
-TERMUX_PKG_SRCURL=https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e84861c0a725990b6efbec1ec3be7cbf38352983871f8e74c3d42bc259a0a0d8
+TERMUX_PKG_VERSION="3.13.7"
+TERMUX_PKG_SRCURL="https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=cd2a1450f33cfeb35f180d33b836ab92a663d1335ee7f953ae3ebcb20308c99d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES=i686
@@ -39,7 +39,17 @@ termux_step_get_source() {
 		--unmanaged \
 		${src_url}
 
-	gclient sync
+	local -i attempt
+	for attempt in 1 2 3 4 5; do
+		if gclient sync --jobs 4; then
+			break
+		fi
+		if ((attempt == 5)); then
+			termux_error_exit "gclient sync failed after ${attempt} attempts."
+		fi
+		echo "WARN: gclient sync failed (attempt ${attempt}/5), retrying after backoff..."
+		sleep $((attempt * 30))
+	done
 }
 
 termux_step_make_install() {

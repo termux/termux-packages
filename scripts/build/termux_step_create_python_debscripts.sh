@@ -29,10 +29,11 @@ termux_step_create_python_debscripts() {
 
 	# add the internal 'pip'-facing name of the package to the 'pip install' dependencies if it exists
 	# in the 'METADATA' file and the 'METADATA' file also marks the package as depending
-	# on any other 'pip'-facing packages, which will install all the 'pip'-facing dependencies
+	# on any other non-optional 'pip'-facing packages, which will install all the non-optional 'pip'-facing dependencies
 	# the software marks itself as depending on from PyPi that are not already installed from other Termux packages.
 	# if more than one 'METADATA' file is detected, this condition will evaluate false so nothing will happen.
-	if [[ -f "$pip_metadata_file" ]] && grep -q '^Requires-Dist' "$pip_metadata_file"; then
+	if [[ -f "$pip_metadata_file" ]] && \
+		grep '^Requires-Dist:' "$pip_metadata_file" | grep -E -v -q ';[[:space:]]*.*\<extra[[:space:]]*=='; then
 		local package_pip_name="$(grep 'Name:' "$pip_metadata_file" | cut -d' ' -f2)"
 		_package_python_deps+=" $package_pip_name"
 	fi

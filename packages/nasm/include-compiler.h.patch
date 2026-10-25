@@ -1,0 +1,32 @@
+--- a/include/compiler.h
++++ b/include/compiler.h
+@@ -93,6 +93,14 @@
+ #define PRIzx PRIz "x"
+ #define PRIzX PRIz "X"
+ 
++#ifdef HAVE_ENDIAN_H
++# include <endian.h>
++#elif defined(HAVE_SYS_ENDIAN_H)
++# include <sys/endian.h>
++#elif defined(HAVE_MACHINE_ENDIAN_H)
++# include <machine/endian.h>
++#endif
++
+ #ifdef HAVE_STDBIT_H
+ 
+ # include <stdbit.h>
+@@ -107,14 +115,6 @@
+ 
+ #else  /* No <stdbit.h> */
+ 
+-# ifdef HAVE_ENDIAN_H
+-#  include <endian.h>
+-# elif defined(HAVE_SYS_ENDIAN_H)
+-#  include <sys/endian.h>
+-# elif defined(HAVE_MACHINE_ENDIAN_H)
+-#  include <machine/endian.h>
+-# endif
+-
+ /*
+  * If we have BYTE_ORDER defined, or the compiler provides
+  * __BIG_ENDIAN__ or __LITTLE_ENDIAN__, trust it over what autoconf

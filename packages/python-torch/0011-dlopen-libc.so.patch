@@ -3,9 +3,9 @@ Prevents OSError: dlopen failed: library "libc.so.6" not found
 
 --- a/torch/distributed/elastic/multiprocessing/redirects.py
 +++ b/torch/distributed/elastic/multiprocessing/redirects.py
-@@ -31,7 +31,7 @@ def get_libc():
+@@ -47,7 +47,7 @@
+             "msvcr110, msvcr100). Redirects cannot function without a CRT."
          )
-         return None
      else:
 -        return ctypes.CDLL("libc.so.6")
 +        return ctypes.CDLL("libc.so")

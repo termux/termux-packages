@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=26.4.0
+TERMUX_PKG_VERSION=26.12.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9eceb3621024069d91035b5471d2ebe86aa04d22dbeba72a782eaf36ff9183ac
+TERMUX_PKG_SHA256=053e3b296859b6d8d93f99ef97fa9cec1c4ee171c72968100c649978c1dbd38c
 # thunder-coding: don't try to autoupdate nodejs, that thing takes 2 whole hours to build for a single arch, and requires a lot of patch updates everytime. Also I run tests everytime I update it to ensure least bugs
 TERMUX_PKG_AUTO_UPDATE=false
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -168,6 +168,12 @@ termux_step_configure() {
 	fi
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	# When building with ninja, build.ninja is generated for both Debug and Release builds.
+	# Make node-gyp use the headers installed with this package
+	# ($TERMUX_PREFIX/include/node) instead of downloading the official ones
+	# from nodejs.org. The installed headers are patched by common.gypi.patch;
+	# without this flag node-gyp pulls the upstream common.gypi whose android
+	# branch references an undefined android_ndk_path variable and breaks
+	# every native module build ("gyp: Undefined variable android_ndk_path").
 	./configure \
 		--prefix=$TERMUX_PREFIX \
 		--dest-cpu=$DEST_CPU \
@@ -176,10 +182,12 @@ termux_step_configure() {
 		--shared-cares \
 		--shared-ffi \
 		--shared-openssl \
+		--openssl-use-def-ca-store \
 		--shared-sqlite \
 		--shared-zlib \
 		--with-intl=system-icu \
 		--cross-compiling \
+		--use-prefix-to-find-headers \
 		--ninja \
 		"${_DEBUG[@]}"
 

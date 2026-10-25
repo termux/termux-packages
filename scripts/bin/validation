@@ -32,8 +32,9 @@ BIG_PACKAGES_IN_SEPARATE_BATCH=false
 
 case "${2}" in
 	golang)
-		readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh --exclude-dir=golang "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 || :) || :
-		STRATEGY=(100)
+		# chromium is updated separately and takes too long to build within a validation batch.
+		readarray -t PACKAGES < <(grep -rl termux_setup_golang --include=build.sh --exclude-dir=golang "${TERMUX_PACKAGE_DIRECTORIES[@]}" | cut -d/ -f1,2 | sort -u | cut -d/ -f2 | grep -vxE 'chromium|chromium-host-tools' || :) || :
+		STRATEGY=(50 50)
 		EXCLUDE_BIG_PACKAGES=true
 		BIG_PACKAGES_IN_SEPARATE_BATCH=true
 		;;
@@ -210,8 +211,10 @@ maybe_cleanup() {
 # 2. Build them.
 # 3. Create a CI summary containing only build logs of failed build attempts.
 
+REPORT_PATH="${TMPDIR:-/tmp}/${2}-validation-report.txt"
+
 [[ -z "$CI" ]] && echo "INFO: Not running in CI environment, cleanup will not be performed."
-echo "INFO: Rebuild list: ${PACKAGES[*]}" | tee "${GITHUB_STEP_SUMMARY}"
+echo "INFO: Rebuild list: ${PACKAGES[*]}" | tee "${REPORT_PATH}" "${GITHUB_STEP_SUMMARY}"
 
 output=""
 declare -A failed=()
@@ -232,7 +235,7 @@ for package in "${PACKAGES[@]}"; do
 		exit "$status"
 	)" || failed["${package} ${ARCH}"]="${output}"
 done
-echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable "$(date +%10s%3N)" "$start_building_arch")" | tee -a "${GITHUB_STEP_SUMMARY}"
+echo "INFO: Building all packages for ${ARCH} took $(ms_to_human_readable "$(date +%10s%3N)" "$start_building_arch")" | tee -a "${REPORT_PATH}" "${GITHUB_STEP_SUMMARY}"
 echo # newline
 
 if (( ${#failed[@]} > 0 )); then
@@ -241,6 +244,7 @@ if (( ${#failed[@]} > 0 )); then
 fi
 
 for entry in "${!failed[@]}"; do
+	echo "${failed["${entry}"]}" >> "${REPORT_PATH}"
 	echo "${failed["${entry}"]}" >> "${GITHUB_STEP_SUMMARY}"
 	{
 	echo "<details><summary><code>${entry% *}</code></summary><p>"

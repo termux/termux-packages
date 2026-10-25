@@ -1,0 +1,54 @@
+diff --git a/setup/build.py b/setup/build.py
+index cde5249b68..6335ffd6a1 100644
+--- a/setup/build.py
++++ b/setup/build.py
+@@ -711,6 +711,20 @@ def create_sip_build_skeleton(self, src_dir, ext):
+         abi_version = ''
+         if pyqt_sip_abi_version():
+             abi_version = f'abi-version = "{pyqt_sip_abi_version()}"'
++        sip_inc_dirs = []
++        try:
++            import PyQt6
++            if getattr(PyQt6, '__file__', None):
++                sip_inc_dirs.append(os.path.join(os.path.dirname(PyQt6.__file__), 'bindings'))
++        except Exception:
++            pass
++        termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++        for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
++            tp = os.path.join(termux_prefix, 'lib', pyver, 'site-packages', 'PyQt6', 'bindings')
++            if os.path.isdir(tp) and tp not in sip_inc_dirs:
++                sip_inc_dirs.append(tp)
++        sip_include_dirs_str = f'sip-include-dirs = {sip_inc_dirs}' if sip_inc_dirs else ''
++
+         sipf = ext.sip_files[0]
+         needs_exceptions = 'true' if ext.needs_exceptions else 'false'
+         with open(os.path.join(src_dir, 'pyproject.toml'), 'w') as f:
+@@ -724,6 +738,7 @@ def create_sip_build_skeleton(self, src_dir, ext):
+ 
+ [tool.sip.project]
+ sip-files-dir = "."
++{sip_include_dirs_str}
+ {abi_version}
+ 
+ [project]
+@@ -737,6 +752,7 @@ def create_sip_build_skeleton(self, src_dir, ext):
+     """QMAKE_CFLAGS += {shlex.join(self.env.base_cflags)}""",
+     """QMAKE_CXXFLAGS += {shlex.join(self.env.base_cxxflags)}""",
+     """QMAKE_LFLAGS += {shlex.join(self.env.base_ldflags)}""",
++    """QMAKE_LIBS += -lpython{sys.version_info.major}.{sys.version_info.minor}""",
+ ]
+ 
+ [tool.sip.bindings.{ext.name}]
+@@ -765,6 +781,12 @@ def get_sip_commands(self, ext):
+             self.create_sip_build_skeleton(src_dir, ext)
+             cwd = src_dir
+             cmd = [sys.executable, '-m', 'sipbuild.tools.build', '--verbose', '--no-make', '--qmake', QMAKE]
++            termux_prefix = os.environ.get('TERMUX_PREFIX', '/data/data/com.termux/files/usr')
++            for pyver in [f'python{sys.version_info.major}.{sys.version_info.minor}', 'python3.14']:
++                target_dir = os.path.join(termux_prefix, 'lib', pyver, 'site-packages')
++                if os.path.isdir(target_dir):
++                    cmd += ['--target-dir', target_dir]
++                    break
+         return cmd, sbf, cwd
+ 
+     def build_pyqt_extension(self, ext, sbf):

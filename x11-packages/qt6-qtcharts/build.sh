@@ -2,18 +2,31 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Provides a set of easy to use chart components"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.11.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.12.0"
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtcharts-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=3fe3ed318c2a86d1417c5c29cf7494275e8fd4b537cd37453f5599c57365515c
+TERMUX_PKG_SHA256=dc5e0599455c78729248a1bb95824fe6a3420e860b8cabc5ac0c7a93c2062bfb
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION})"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP='v\d+\.\d+\.\d+(?!-)'
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
 -DCMAKE_SYSTEM_NAME=Linux
 "
+
+termux_pkg_auto_update() {
+	# use GitHub API for Qt packages because Repology is unreliable for Qt
+	# All Qt updates are published by upstream simultaneously, so the qtbase
+	# repository can be used for all Qt packages
+	local latest_tags
+	latest_tags="$(
+		TERMUX_PKG_SRCURL="https://github.com/qt/qtbase" \
+		termux_github_api_get_tag
+	)"
+
+	termux_pkg_upgrade_version "${latest_tags}"
+}
 
 termux_step_host_build() {
 	termux_setup_cmake

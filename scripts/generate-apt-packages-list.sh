@@ -84,6 +84,9 @@ for arch in "aarch64" "arm" "i686" "x86_64"; do
 								fi
 							done
 							if [[ "$subpkg_excluded" != true ]]; then
+								case "${TERMUX_SUBPKG_REPO:-}" in
+									main|x11|root) repo_name="termux-$TERMUX_SUBPKG_REPO" ;;
+								esac
 								echo "$(basename "$subpkg" .subpackage.sh) $repo_name $APT_VERSION false"
 							fi
 						)

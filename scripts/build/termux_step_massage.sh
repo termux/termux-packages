@@ -122,8 +122,6 @@ termux_step_massage() {
 	# Mostly specific to X11-related packages.
 	rm -f ./${ADDING_PREFIX}share/icons/hicolor/icon-theme.cache
 
-	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
-
 	find . -type d -empty -delete # Remove empty directories
 
 	if [ -d ./${ADDING_PREFIX}share/man ]; then
@@ -141,6 +139,8 @@ termux_step_massage() {
 			ln -s $_link_value.gz $file.gz
 		done < <(find ./${ADDING_PREFIX}share/man -type l ! -iname \*.gz -print0)
 	fi
+
+	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
 	# Remove python-glibc package files that are created
 	# due to its launch during package compilation.
@@ -232,7 +232,7 @@ termux_step_massage() {
 	fi
 
 	# Check so that package is not affected by
-	# https://github.com/android/ndk/issues/1614, or
+	# https://github.com/android/ndk/issues/1614
 	# https://github.com/termux/termux-packages/issues/9944
 	if [[ "${TERMUX_PACKAGE_LIBRARY}" == "bionic" ]]; then
 		echo "INFO: READELF=${READELF} ... $(command -v ${READELF})"
@@ -243,7 +243,7 @@ termux_step_massage() {
 		SYMBOLS+=" $(echo libandroid_{sem_{open,close,unlink},shm{ctl,get,at,dt}})"
 		SYMBOLS+=" $(grep "^    [_a-zA-Z0-9]*;" ${TERMUX_SCRIPTDIR}/scripts/lib{c,dl,m}.map.txt | cut -d":" -f2 | sed -e "s/^    //" -e "s/;.*//")"
 		SYMBOLS+=" ${TERMUX_PKG_EXTRA_UNDEF_SYMBOLS_TO_CHECK}"
-		SYMBOLS=$(echo $SYMBOLS | tr " " "\n" | sort | uniq)
+		SYMBOLS=$(echo $SYMBOLS | tr " " "\n" | sort -u)
 		create_grep_pattern_undef ${SYMBOLS} > "${pattern_file_undef}"
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
@@ -258,50 +258,55 @@ termux_step_massage() {
 		export LIBOMP_SO_SYMBOLS='' LIBOMP_A_SYMBOLS='' LIBOMP_SYMBOLS=''
 		[[ -n "${LIBOMP_SO}" ]] && LIBOMP_SO_SYMBOLS=$(${READELF} -s "${LIBOMP_SO}" | grep -E "GLOBAL[[:space:]]+DEFAULT" | grep -vE "[[:space:]]UND[[:space:]]" | grep -vE "[[:space:]]sizes$" | awk '{ print $8 }')
 		[[ -n "${LIBOMP_A}" ]] && LIBOMP_A_SYMBOLS=$(${READELF} -s "${LIBOMP_A}" | grep -E "GLOBAL[[:space:]]+DEFAULT" | grep -vE "[[:space:]]UND[[:space:]]" | grep -vE "[[:space:]]sizes$" | awk '{ print $8 }')
-		LIBOMP_SYMBOLS=$(echo -e "${LIBOMP_SO_SYMBOLS}\n${LIBOMP_A_SYMBOLS}" | sort | uniq)
+		LIBOMP_SYMBOLS=$(echo -e "${LIBOMP_SO_SYMBOLS}\n${LIBOMP_A_SYMBOLS}" | sort -u)
 		create_grep_pattern_openmp ${LIBOMP_SYMBOLS} > "${pattern_file_openmp}"
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
 		echo "INFO: Total OpenMP symbols $(echo ${LIBOMP_SYMBOLS} | wc -w)"
 
-		local nproc=$(nproc)
-		echo "INFO: Identifying files with nproc=${nproc}"
+		echo "INFO: Identifying files"
 		local t0=$(get_epoch)
-		local files; files="$(IFS=; find . -type f -print0 | \
-			while read -r -d '' file; do
+		local files="" valid=""
+		files="$(find . -type f)"
+		valid="$(IFS=; echo "${files}" | \
+			while read -r file; do
 				# Find files with ELF or static library signature in the first 4 bytes bytes
 				read -rN4 hdr < "$file" || continue
 				[[ $hdr == $'\x7fELF' || $hdr == '!<ar' ]] && printf '%s\n' "$file" || :
 			done
 		)"
-		# use bash to see if llvm-readelf crash
-		# https://github.com/llvm/llvm-project/issues/89534
-		local valid=$(echo "${files}" | xargs -P"${nproc}" -i bash -c 'if ${READELF} -h "{}" &>/dev/null; then echo "{}"; fi')
 		local t1=$(get_epoch)
 		echo "INFO: Done ... $((t1-t0))s"
-		local numberOfFiles=$(echo "${files}" | wc -l)
-		local numberOfValid=$(echo "${valid}" | wc -l)
-		echo "INFO: Found ${numberOfValid} / ${numberOfFiles} files"
+		local numberOfFiles=0 numberOfValid=0
+		[[ -n "${files}" ]] && numberOfFiles="$(echo "${files}" | wc -l)"
+		[[ -n "${valid}" ]] && numberOfValid="$(echo "${valid}" | wc -l)"
+		echo "INFO: Found ${numberOfValid} ELF files / ${numberOfFiles} total files"
 		if [[ "${numberOfValid}" -gt "${numberOfFiles}" ]]; then
 			termux_error_exit "${numberOfValid} > ${numberOfFiles}"
 		fi
 
-		echo "INFO: Running symbol checks on ${numberOfValid} files with nproc=${nproc}"
-		local t0=$(get_epoch)
-		local undef=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_undef}"')
-		local openmp=$(echo "${valid}" | xargs -P"${nproc}" -i sh -c '${READELF} -s "{}" | grep -Ef "${pattern_file_openmp}"')
-		local depend_libomp_so=$(echo "${valid}" | xargs -P$(nproc) -n1 ${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so)
-		local t1=$(get_epoch)
-		echo "INFO: Done ... $((t1-t0))s"
+		local nproc=$(nproc)
+		local undef="" openmp="" depend_libomp_so=""
+		if [[ "${numberOfValid}" != 0 ]]; then
+			echo "INFO: Running symbol checks on ${numberOfValid} ELF files with nproc=${nproc}"
+			local t0=$(get_epoch)
+			undef=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -s 2>/dev/null | grep -Ef "${pattern_file_undef}" || :)
+			openmp=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -s 2>/dev/null | grep -Ef "${pattern_file_openmp}" || :)
+			depend_libomp_so=$(echo "${valid}" | xargs -r -P"${nproc}" -n "$(( nproc * 2 ))" -d '\n' \
+				${READELF} -d 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | grep libomp.so || :)
+			local t1=$(get_epoch)
+			echo "INFO: Done ... $((t1-t0))s"
+		fi
 
-		[[ -n "${undef}" ]] && echo "INFO: Found files with undefined symbols"
+		[[ -n "${undef}" ]] && echo "INFO: Found ELF files with undefined symbols"
 		if [[ "${TERMUX_PKG_UNDEF_SYMBOLS_FILES}" == "all" ]]; then
 			echo "INFO: Skipping output result as TERMUX_PKG_UNDEF_SYMBOLS_FILES=all"
 			undef=""
 		fi
 
 		if [[ -n "${undef}" ]]; then
-			echo "INFO: Showing result"
 			local t0=$(get_epoch)
 			# e: bit0 valid file, bit1 error handling
 			local e=0
@@ -331,7 +336,7 @@ termux_step_massage() {
 						echo -e "ERROR: ${file} contains undefined symbols:\n${undef_sym}" >&2
 						(( e |= 2 )) || :
 					else
-						local undef_symu=$(echo "${undef_sym}" | awk '{ print $8 }' | sort | uniq)
+						local undef_symu=$(echo "${undef_sym}" | awk '{ print $8 }' | sort -u)
 						local undef_symu_len=$(echo ${undef_symu} | wc -w)
 						echo "SKIP: ${file} contains undefined symbols: ${undef_symu_len}" >&2
 					fi
@@ -339,14 +344,13 @@ termux_step_massage() {
 			done < <(echo "${valid_s}")
 			local t1=$(get_epoch)
 			echo "INFO: Done ... $((t1-t0))s"
-			echo "INFO: Found ${c} files with undefined symbols after exclusion"
+			echo "INFO: Found ${c} ELF files with undefined symbols after exclusion"
 			[[ "${c}" -gt "${numberOfValid}" ]] && termux_error_exit "${c} > ${numberOfValid}"
 			[[ $(( e & 2 )) != 0 ]] && termux_error_exit "Refer above"
 		fi
 
 		if [[ -n "${openmp}" ]]; then
-			echo "INFO: Found files with OpenMP symbols"
-			echo "INFO: Showing result"
+			echo "INFO: Found ELF files with OpenMP symbols"
 			local t0=$(get_epoch)
 			# e: bit0 valid file, bit1 error handling
 			local e=0
@@ -372,17 +376,16 @@ termux_step_massage() {
 			done < <(echo "${valid_s}")
 			local t1=$(get_epoch)
 			echo "INFO: Done ... $((t1-t0))s"
-			echo "INFO: Found ${c} files with OpenMP symbols after exclusion"
+			echo "INFO: Found ${c} ELF files with OpenMP symbols after exclusion"
 			[[ "${c}" -gt "${numberOfValid}" ]] && termux_error_exit "${c} > ${numberOfValid}"
 		fi
 		if [[ -n "${depend_libomp_so}" && "${TERMUX_PKG_NO_OPENMP_CHECK}" != "true" ]]; then
-			echo "ERROR: Found files depend on libomp.so" >&2
-			echo "ERROR: Showing result" >&2
+			echo "ERROR: Found ELF files depend on libomp.so" >&2
 			local t0=$(get_epoch)
 			local valid_s=$(echo "${valid}" | sort)
 			{
 				while IFS= read -r file; do
-					local needed_file=$(${READELF} -d "${file}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort | uniq | tr "\n" " " | sed -e "s/ /, /g")
+					local needed_file=$(${READELF} -d "${file}" 2>/dev/null | sed -ne "s|.*NEEDED.*\[\(.*\)\].*|\1|p" | sort -u | tr "\n" " " | sed -e "s/ /, /g")
 					echo "ERROR: ${file}: ${needed_file%, }"
 				done < <(echo "${valid_s}")
 			} | grep libomp.so >&2

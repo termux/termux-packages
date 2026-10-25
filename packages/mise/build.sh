@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://mise.jdx.dev/
 TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.8.4"
+TERMUX_PKG_VERSION="2026.10.19"
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=87c85e60b2334b2ad93f0ebe9ddedd36c311639b98c22ae36824ed3e5c444e89
+TERMUX_PKG_SHA256=01e180b643c462180a408f8715f52e57bebea206881650ab3f3f93e6e09ef4a1
 TERMUX_PKG_DEPENDS="bzip2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE=latest-release-tag
 
@@ -14,12 +15,16 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_rust
 
+	# jitterentropy needs -O0, which -Oz in CFLAGS overrides
+	export AWS_LC_SYS_NO_JITTER_ENTROPY=1
+
 	# Dummy CMake toolchain file to workaround build error:
 	# error: failed to run custom build command for `libz-ng-sys v1.1.29`
 	# ...
 	# CMake Error at /home/builder/.termux-build/_cache/cmake-4.4.0/share/cmake-4.4/Modules/Platform/Android-Determine.cmake:217 (message):
 	# Android: Neither the NDK or a standalone toolchain was found.
 	export TARGET_CMAKE_TOOLCHAIN_FILE="${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
+	export CARGO_TARGET_DIR="$(dirname "$TERMUX_PKG_SRCDIR")/cargo-target"
 	touch "${TERMUX_PKG_BUILDDIR}/android.toolchain.cmake"
 
 	# Vendor cargo deps to ./vendor-termux/ - not ./vendor/ - because mise's
@@ -31,12 +36,18 @@ termux_step_pre_configure() {
 	find ./vendor-termux \
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor-termux/cc \
+		! -wholename ./vendor-termux/decmpfs \
 		! -wholename ./vendor-termux/sonic-rs \
 		! -wholename ./vendor-termux/sonic-simd \
 		-exec rm -rf '{}' \;
 
 	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
 	local dir="vendor-termux/cc"
+	echo "Applying patch: $patch"
+	patch -p1 -d "$dir" < "$patch"
+
+	patch="$TERMUX_PKG_BUILDER_DIR/decmpfs-android-libc.diff"
+	dir="vendor-termux/decmpfs"
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
@@ -54,6 +65,7 @@ termux_step_pre_configure() {
 
 		[patch.crates-io]
 		cc = { path = "./vendor-termux/cc" }
+		decmpfs = { path = "./vendor-termux/decmpfs" }
 		sonic-rs = { path = "./vendor-termux/sonic-rs" }
 		sonic-simd = { path = "./vendor-termux/sonic-simd" }
 	EOL
@@ -78,7 +90,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	# mise binary
-	install -vDm755 "target/${CARGO_TARGET_NAME}/release/${TERMUX_PKG_NAME}" \
+	install -vDm755 "$CARGO_TARGET_DIR/${CARGO_TARGET_NAME}/release/${TERMUX_PKG_NAME}" \
 		-t "$TERMUX_PREFIX/bin"
 	# man page
 	install -vDm644 "man/man1/mise.1" \

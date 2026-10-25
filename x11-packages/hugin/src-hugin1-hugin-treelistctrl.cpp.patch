@@ -1,0 +1,15 @@
+--- a/src/hugin1/hugin/treelistctrl.cpp
++++ b/src/hugin1/hugin/treelistctrl.cpp
+@@ -4277,11 +4277,10 @@ void wxTreeListMainWindow::OnScroll (wxScrollWinEvent& event) {
+     if (m_owner->GetEventHandler()->ProcessEvent(event)) return; // handled (and not skipped) in user code
+ 
+     // TODO
+-    HandleOnScroll( event );
++    event.Skip();
+ 
+     if(event.GetOrientation() == wxHORIZONTAL) {
+         m_owner->GetHeaderWindow()->Refresh();
+-        m_owner->GetHeaderWindow()->Update();
+     }
+ }
+ 

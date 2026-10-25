@@ -1,6 +1,6 @@
 --- a/env.c
 +++ b/env.c
-@@ -40,8 +40,8 @@
+@@ -40,8 +40,8 @@ static int fork_command(const char *command)
              if (p[1] != 1 && p[1] != 2)
                  close(p[1]);
              close(p[0]);
@@ -13,8 +13,8 @@
          default:
 --- a/execute.c
 +++ b/execute.c
-@@ -163,7 +163,7 @@
-         char *outfname_full;
+@@ -162,7 +162,7 @@ static void run_child(int fd_send_filename)
+         char *outfname_full, *errfname_full;
  
          if (tmpdir == NULL)
 -            tmpdir = "/tmp";
@@ -24,7 +24,7 @@
          outfname_full = (char *)malloc(lname);
 --- a/list.c
 +++ b/list.c
-@@ -19,7 +19,7 @@
+@@ -19,7 +19,7 @@ char * joblistdump_headers()
      char * line;
  
      line = malloc(600);
@@ -35,7 +35,7 @@
              "# The finished commands are listed first.\n"
 --- a/mail.c
 +++ b/mail.c
-@@ -36,7 +36,7 @@
+@@ -36,7 +36,7 @@ static int run_sendmail(const char *dest)
              close(2);
  	    close(p[1]);
              dup2(p[0], 0);
@@ -46,7 +46,7 @@
              error("fork sendmail");
 --- a/server_start.c
 +++ b/server_start.c
-@@ -51,7 +51,7 @@
+@@ -51,7 +51,7 @@ void create_socket_path(char **path)
      /* Create the path */
      tmpdir = getenv("TMPDIR");
      if (tmpdir == NULL)
@@ -57,7 +57,7 @@
  
 --- a/ts.1
 +++ b/ts.1
-@@ -70,7 +70,7 @@
+@@ -70,7 +70,7 @@ Mail the results of the command (output and exit code) to
  , or to the
  .B $USER
  using
@@ -66,7 +66,7 @@
  Look at
  .B ENVIRONMENT.
  .TP
-@@ -237,7 +237,7 @@
+@@ -237,7 +237,7 @@ As the program output and the unix socket are thought to be stored in a
  temporary directory, 
  .B TMPDIR
  will be used if defined, or
@@ -75,7 +75,7 @@
  otherwise.
  .TP
  .B "TS_SOCKET"
-@@ -261,7 +261,7 @@
+@@ -261,7 +261,7 @@ Otherwise, they are sent to
  or if not defined,
  .B nobody.
  The system
@@ -84,7 +84,7 @@
  is used. The
  job outputs are not sent as an attachment, so understand the consequences if you
  use the
-@@ -281,12 +281,12 @@
+@@ -281,12 +281,12 @@ by this environment variable - for example, at system shutdown.
  .TP
  .B "TS_ENV"
  This has a command to be run at enqueue time through
@@ -99,7 +99,7 @@
  if
  .B ts
  finds any internal problem, you should find an error report there.
-@@ -304,7 +304,7 @@
+@@ -304,7 +304,7 @@ You can use them inside the
  in order to set redirections to the command run.
  
  If an internal problem is found in runtime, a file

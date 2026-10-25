@@ -1,14 +1,13 @@
-diff -uNr sqlite-src-3500100.orig/src/os_unix.c sqlite-src-3500100/src/os_unix.c
---- sqlite-src-3500100.orig/src/os_unix.c	2025-06-17 23:33:40.887824600 +0200
-+++ sqlite-src-3500100/src/os_unix.c	2025-06-17 23:36:57.168258236 +0200
-@@ -5975,9 +5975,7 @@
- static const char *azTempDirs[] = {
-   0,
-   0,
--  "/var/tmp",
--  "/usr/tmp",
--  "/tmp",
-+  "@TERMUX_PREFIX@/tmp",
-   "."
- };
- 
+--- a/src/os_unix.c
++++ b/src/os_unix.c
+@@ -6264,9 +6264,7 @@
+       case 0:  zDir = sqlite3_temp_directory;   break;
+       case 1:  zDir = getenv("SQLITE_TMPDIR");  break;
+       case 2:  zDir = getenv("TMPDIR");         break;
+-      case 3:  zDir = "/var/tmp";               break;
+-      case 4:  zDir = "/usr/tmp";               break;
+-      case 5:  zDir = "/tmp";                   break;
++      case 3:  zDir = "@TERMUX_PREFIX@/tmp";    break;
+       default: zDir = ".";                      break;
+     }
+     if( zDir!=0

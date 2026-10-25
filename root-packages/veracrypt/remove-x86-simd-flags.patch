@@ -1,0 +1,23 @@
+--- a/Makefile
++++ b/Makefile
+@@ -213,8 +213,8 @@
+ 	endif
+
+ 	ifeq "$(SIMD_SUPPORTED)" "1"
+-		CFLAGS += -msse2
+-		CXXFLAGS += -msse2
++		# CFLAGS += -msse2
++		# CXXFLAGS += -msse2
+
+ 		GCC_GTEQ_440 := $(shell expr `$(CC) -dumpversion | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/' -e 's/^[0-9]\{1,2\}$$/&0000/'` \>= 40400)
+ 		GCC_GTEQ_430 := $(shell expr `$(CC) -dumpversion | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$$/&00/' -e 's/^[0-9]\{1,2\}$$/&0000/'` \>= 40300)
+@@ -226,8 +226,8 @@
+ 			CXXFLAGS += -mno-aes -DCRYPTOPP_DISABLE_AESNI
+ 		else
+ 			ifeq "$(GCC_GTEQ_440)" "1"
+-				CFLAGS += -maes
+-				CXXFLAGS += -maes
++				# CFLAGS += -maes
++				# CXXFLAGS += -maes
+ 			endif
+ 		endif

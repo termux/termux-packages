@@ -1,0 +1,59 @@
+Use the installed libpng, libcurl, freetype and mupdf instead of building
+them or installing them with apt, and accept any installed Qt not older than
+6.8.3 instead of exactly 6.8.3.
+
+--- a/xmake/requires.lua
++++ b/xmake/requires.lua
+@@ -16,19 +16,13 @@ end
+ 
+ add_requires("libjpeg")
+ -- libpng：apt系统用系统包，其他发行版用源码构建
+-if is_plat("linux") and (linuxos.name() == "ubuntu" or linuxos.name() == "debian" or linuxos.name() == "uos") then
+-    add_requires("apt::libpng-dev", {alias="libpng"})
+-elseif is_plat("linux") and (linuxos.name() == "fedora" or linuxos.name() == "rhel" or linuxos.name() == "centos" or linuxos.name() == "rocky" or linuxos.name() == "almalinux" or linuxos.name() == "ol") then
+-    add_requires("libpng", {system=true})
+-else
+-    add_requires("libpng", {system=false})
+-end
++add_requires("libpng", {system=true})
+ -- libcurl：全平台统一用仓库内 3rdparty/curl-8.21.0 源码构建（xmake/packages/l/libcurl）。
+ -- 不能用系统 libcurl：cpr(ssl=true) 会同时链入 xmake 的静态 openssl 1.1.1，其导出
+ -- 符号被系统 libcurl 依赖的动态 OpenSSL 3 调用时 ABI 不匹配，HTTPS 直接段错误
+ -- （见 devel/2092.md）。
+ if not is_plat("wasm") then
+-    add_requires("libcurl", {system=false})
++    add_requires("libcurl", {system=true})
+ end
+ -- macOS：openssl3 默认会被 xmake 解析为 Homebrew 系统包（pkg-config 命中
+ -- brew 的 openssl@3），goldfish 因此动态链接 /opt/homebrew 下的
+@@ -53,25 +47,19 @@ end
+ 
+ if has_config("pdfhummus") then
+     add_requires("liii-pdfhummus", {system=false,configs={libpng=true,libjpeg=true}})
+-    add_requires("freetype "..FREETYPE_VERSION, {system=false, configs={png=true}})
+-    add_requireconfs("liii-pdfhummus.freetype", {version = FREETYPE_VERSION, system = false, configs={png=true}, override=true})
++    add_requires("freetype", {system=true})
++    add_requireconfs("liii-pdfhummus.freetype", {system = true, override=true})
+ end
+ 
+ add_requires("argh v1.3.2")
+ 
+ if has_config("qt_frontend") then
+     QT6_VERSION="6.8.3"
+-    add_requires("qt6widgets "..QT6_VERSION)
++    add_requires("qt6widgets >="..QT6_VERSION)
+ elseif not is_plat("wasm") then -- WASM GLFW is in EMCC
+     add_requires("glfw")
+ end
+ 
+ if has_config("mupdf") then
+-    if (linuxos.name() == "debian" and linuxos.version():major() >= CURRENT_DEBIAN_VERSION) or
+-       (linuxos.name() == "ubuntu" and linuxos.version():major() >= CURRENT_UBUNTU_VERSION)
+-    then
+-        add_requires("apt::libmupdf-dev", {alias="mupdf"})
+-    else
+-        add_requires("mupdf", {system=false})
+-    end
++    add_requires("mupdf", {system=true})
+ end
+\ No newline at end of file

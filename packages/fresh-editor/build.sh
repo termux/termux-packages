@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://getfresh.dev/
 TERMUX_PKG_DESCRIPTION="Text editor for your terminal: easy, powerful and fast"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.4.7"
+TERMUX_PKG_VERSION="0.5.4"
 TERMUX_PKG_SRCURL="https://github.com/sinelaw/fresh/releases/download/v$TERMUX_PKG_VERSION/fresh-editor-$TERMUX_PKG_VERSION-source.tar.gz"
-TERMUX_PKG_SHA256=e313fdf0eb01aa8b5c024218241a153999ec9c8ba538ad1ba41f407c884b22c0
+TERMUX_PKG_SHA256=be86a8152a676f211415471405aa5719be2cd0555a1763af11cbb0feb4126668
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -68,8 +68,8 @@ termux_step_pre_configure() {
 	# error: function-like macro '__GLIBC_USE' is not defined
 	export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
 	case "${TERMUX_ARCH}" in
-	arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi" ;;
-	*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android" ;;
+	arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
+	*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
 	esac
 }
 
@@ -112,7 +112,7 @@ termux_step_make_install() {
 	fi
 
 	# Keymaps
-	cp -r crates/fresh-editor/keymaps "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/"
+	cp -r crates/fresh-editor-core/keymaps "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/"
 }
 
 termux_step_post_make_install() {

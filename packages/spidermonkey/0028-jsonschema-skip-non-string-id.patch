@@ -1,0 +1,11 @@
+--- a/third_party/python/jsonschema/jsonschema/validators.py
++++ b/third_party/python/jsonschema/jsonschema/validators.py
+@@ -875,6 +875,8 @@ class RefResolver:
+             return None
+         uri, fragment = urldefrag(url)
+         for subschema in subschemas:
++            if not isinstance(subschema["$id"], str):
++                continue
+             target_uri = self._urljoin_cache(
+                 self.resolution_scope, subschema["$id"],
+             )

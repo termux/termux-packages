@@ -1,0 +1,13 @@
+diff --git a/utils/build/build.js b/utils/build/build.js
+index 2a8d24c..6f622e6 100644
+--- a/utils/build/build.js
++++ b/utils/build/build.js
+@@ -559,7 +559,7 @@ const dynamicImportToRequirePlugin = {
+   setup(build) {
+     build.onLoad({ filter: /\.ts$/ }, async (args) => {
+       let contents = await fs.promises.readFile(args.path, 'utf8');
+-      const isPlaywrightSrc = args.path.includes(`${path.sep}playwright${path.sep}src${path.sep}`);
++      const isPlaywrightSrc = args.path.includes(`${path.sep}packages${path.sep}playwright${path.sep}src${path.sep}`);
+       const hasAlias = isPlaywrightSrc && (contents.includes("'@isomorphic/") || contents.includes("'@utils/"));
+       let hasVendored = false;
+       for (const pkg of VENDORED_PACKAGES) {

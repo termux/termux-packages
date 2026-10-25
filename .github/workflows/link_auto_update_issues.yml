@@ -1,0 +1,141 @@
+name: Link auto-update issues
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions: {} # none
+
+concurrency:
+  group: link-auto-update-issues-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  link-auto-update-issues:
+    if: github.repository == 'termux/termux-packages'
+    runs-on: ubuntu-slim
+    steps:
+      - name: Link the auto-update issues resolved by the pull request
+        continue-on-error: true # auxiliary, must not fail CI
+        env:
+          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          python3 <<'EOF'
+          import json, os, re, subprocess, sys, time
+
+          def report_error(kind, error, traceback):
+              # Shows the error as a workflow warning and exits successfully: linking issues is not critical.
+              message = f"{kind.__name__}: {error}".replace("\r", "").replace("\n", "%0A")
+              print(f"::warning title=Linking auto-update issues failed::{message}")
+              sys.stdout.flush()
+              os._exit(0)
+
+          sys.excepthook = report_error
+
+          MAX_ITEMS = 20 # packages per pull request and issue links per run
+
+          repo = os.environ["REPO"]
+          pr_number = int(os.environ["PR_NUMBER"])
+          owner, name = repo.split("/")
+
+          last_request = float("-inf")
+
+          def gh_api(*args, payload=None):
+              # Runs `gh api` and returns its stdout, waiting so that requests are at least a second apart.
+              global last_request
+              time.sleep(max(0, last_request + 1 - time.monotonic())) # at most one request per second
+              result = subprocess.run(["gh", "api", *args], input=payload, capture_output=True, text=True)
+              if result.returncode:
+                  raise RuntimeError(f"gh api {args[0] if args[0] == 'graphql' else args[-1]} failed: {result.stdout}{result.stderr}")
+              last_request = time.monotonic()
+              return result.stdout
+
+          def graphql(query, variables):
+              # Sends one GraphQL document and returns its "data".
+              return json.loads(gh_api("graphql", "--input", "-", payload=json.dumps({"query": query, "variables": variables})))["data"]
+
+          def is_at_least(version, target):
+              # True if version is not older than target, by dpkg rules (the epoch of version is ignored).
+              return subprocess.run(["dpkg", "--compare-versions", version.split(":", 1)[-1], "ge", target], capture_output=True).returncode == 0
+
+          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages)/([^/]+)/build\.sh$")
+          version_re = re.compile(r"^\+TERMUX_PKG_VERSION=[\"'(]*([^\"'\s]+)[\"']?\s*$", re.M)
+
+          # 1. Find packages whose TERMUX_PKG_VERSION is changed by the pull request.
+          diff = gh_api("-H", "Accept: application/vnd.github.v3.diff", f"repos/{repo}/pulls/{pr_number}")
+
+          updates = {}
+          for section in re.split(r"^diff --git ", diff, flags=re.M)[1:]:
+              path = re.match(r"a/\S+ b/(\S+)", section).group(1)
+              match = build_sh_re.match(path)
+              version = version_re.search(section)
+              if match and version:
+                  updates[match.group(1)] = version.group(1)
+          updates = dict(list(updates.items())[:MAX_ITEMS])
+
+          # 2. Fetch the open "Auto update failing" issue of each updated package and the pull request's current issue links.
+          link_event = "... on %s { actor { login } subject { ... on Issue { number } } }"
+          searches = "".join(f"issue{i}: search(query: $query{i}, type: ISSUE, first: 5) {{ nodes {{ ... on Issue {{ id number title body }} }} }}\n" for i in range(len(updates)))
+          declarations = "".join(f", $query{i}: String!" for i in range(len(updates)))
+          data = graphql("""
+              query($owner: String!, $name: String!, $number: Int!%s) {
+                viewer { login }
+                repository(owner: $owner, name: $name) {
+                  pullRequest(number: $number) {
+                    id
+                    closingIssuesReferences(first: 50) { nodes { id number } }
+                    timelineItems(last: 100, itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT]) {
+                      nodes { __typename %s %s }
+                    }
+                  }
+                }
+                %s
+              }""" % (declarations, link_event % "ConnectedEvent", link_event % "DisconnectedEvent", searches),
+              {"owner": owner, "name": name, "number": pr_number,
+               **{f"query{i}": f'repo:{repo} is:issue is:open label:"auto update failing" in:title "Auto update failing for {package}"' for i, package in enumerate(updates)}})
+
+          me = data["viewer"]["login"].removesuffix("[bot]") # timeline events name bot actors without the suffix
+          pull_request = data["repository"]["pullRequest"]
+          linked = {node["number"]: node["id"] for node in pull_request["closingIssuesReferences"]["nodes"]}
+
+          last_link_event = {}
+          for event in pull_request["timelineItems"]["nodes"]:
+              if event.get("subject"):
+                  last_link_event[event["subject"]["number"]] = (event["__typename"], event["actor"]["login"])
+
+          issues = {}
+          for i in range(len(updates)):
+              for issue in data[f"issue{i}"]["nodes"]:
+                  title = re.fullmatch(r"Auto update failing for (.+)", issue["title"])
+                  if title:
+                      issues[title.group(1)] = issue
+
+          print(f"Package updates in the pull request: {updates}")
+
+          # 3. Pick issues the pull request resolves: the new version is not older than the one the updater tried.
+          wanted = {}
+          for package, version in updates.items():
+              issue = issues.get(package)
+              if not issue:
+                  continue
+              target = re.search(r"^INFO: package being updated to (\S+?)\.?\s*$", issue["body"], re.M)
+              if not target or is_at_least(version, target.group(1)):
+                  wanted[issue["number"]] = issue["id"]
+
+          # 4. Link missing issues and unlink those this workflow linked earlier and no longer applies.
+          # Links made by users (or by "Fixes" keywords) are left alone.
+          unlinked_by_user = {number for number, (event, actor) in last_link_event.items() if event == "DisconnectedEvent" and actor != me}
+          to_add = [node_id for number, node_id in wanted.items() if number not in linked and number not in unlinked_by_user]
+          to_remove = [node_id for number, node_id in linked.items()
+                       if number not in wanted and last_link_event.get(number) == ("ConnectedEvent", me)]
+
+          actions = ([("addCloseIssueReferences", issue_id) for issue_id in to_add] + [("removeCloseIssueReferences", issue_id) for issue_id in to_remove])[:MAX_ITEMS]
+          print(f"Linking issues: {to_add}, unlinking issues: {to_remove}")
+          if actions:
+              variables = {"pr": pull_request["id"], **{f"issue{i}": issue_id for i, (_, issue_id) in enumerate(actions)}}
+              mutations = [f"m{i}: {field}(input: {{issueId: $issue{i}, pullRequestIds: [$pr]}}) {{ clientMutationId }}" for i, (field, _) in enumerate(actions)]
+              declarations = "".join(f", $issue{i}: ID!" for i in range(len(actions)))
+              graphql(f"mutation($pr: ID!{declarations}) {{ {' '.join(mutations)} }}", variables)
+          EOF

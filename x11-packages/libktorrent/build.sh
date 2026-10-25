@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://invent.kde.org/network/libktorrent"
 TERMUX_PKG_DESCRIPTION="A BitTorrent protocol implementation"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.04.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="26.08.2"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/libktorrent-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=d059d3f82a4fca9292cd97d1138e30c22b5875d0a9a593a4211d2f02552e8361
+TERMUX_PKG_SHA256=140a8e90b2b0d2f91ad12a9d0ff9687aceac44ede0c06e00d7f41ca999340b5e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="kf6-karchive, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kio, libc++, libgmp, openssl, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="boost, extra-cmake-modules"
@@ -14,3 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "
+
+termux_step_pre_configure() {
+	CXXFLAGS+=" -Wno-c++11-narrowing"
+}

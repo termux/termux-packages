@@ -91,9 +91,18 @@
 @@ -6,7 +6,7 @@
  import("//net/features.gni")
  
- # Generates a header file based on the real preload list.
+ # Generates a header file based on the real HSTS preload list.
 -compiled_action("generate_transport_security_state") {
 +compiled_action_prebuilt("generate_transport_security_state") {
+   tool = "//net/tools/transport_security_state_generator"
+ 
+   # Inputs in order expected by the command line of the tool.
+@@ -20,7 +20,7 @@
+ }
+ 
+ # Generates a header file based on the real static PKP list.
+-compiled_action("generate_transport_security_state_pins") {
++compiled_action_prebuilt("generate_transport_security_state_pins") {
    tool = "//net/tools/transport_security_state_generator"
  
    # Inputs in order expected by the command line of the tool.

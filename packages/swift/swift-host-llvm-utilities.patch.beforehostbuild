@@ -1,12 +1,25 @@
+diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+index 744dca10fca..7b5932882f2 100644
+--- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
++++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+@@ -625,7 +625,7 @@ class BuildScriptInvocation(object):
+         # Swift still needs a few LLVM targets like tblgen to be built for it to be
+         # configured. Instead, handle this in the product for now.
+         builder.add_product(products.LLVM,
+-                            is_enabled=self.args.build_llvm or self.args.build_swift or self.args.build_lldb)
++                            is_enabled=self.args.build_llvm or self.args._build_llvm or self.args.build_swift or self.args.build_lldb)
+ 
+         builder.add_product(products.StaticSwiftLinuxConfig,
+                             is_enabled=self.args.install_static_linux_config)
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/llvm.py b/swift/utils/swift_build_support/swift_build_support/products/llvm.py
 index 744dca10fca..7b5932882f2 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/llvm.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/llvm.py
-@@ -231,6 +231,7 @@ class LLVM(cmake_product.CMakeProduct):
- 
-         if self.args.skip_build or not self.args.build_llvm:
+@@ -258,6 +258,7 @@ class LLVM(cmake_product.CMakeProduct):
+             # We can't skip the build completely because the standalone
+             # build of Swift depends on these.
              build_targets = ['llvm-tblgen', 'clang-resource-headers',
-+                             'clang-pseudo-gen', 'clang-tidy-confusable-chars-gen',
++                             'clang-tidy-confusable-chars-gen',
                               'intrinsics_gen', 'clang-tablegen-targets']
-             if not self.args.build_toolchain_only:
-                 build_targets.extend([
+ 
+             # If we are not performing a toolchain-only build, then we

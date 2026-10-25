@@ -1,5 +1,5 @@
 #include <dlfcn.h>
-#include <stdatomic.h>
+#include <pthread.h>
 
 #include "platform-ns.h"
 #include <android/asset_manager.h>
@@ -23,6 +23,9 @@
 #include <android/surface_texture_jni.h>
 #include <android/trace.h>
 
+struct native_handle;
+const struct native_handle* AHardwareBuffer_getNativeHandle(const AHardwareBuffer* buffer);
+
 #ifdef __LP64__
 #define LIB "/system/lib64/libandroid.so"
 #else
@@ -40,7 +43,8 @@
     f(AHardwareBuffer_lock) \
     f(AHardwareBuffer_unlock) \
     f(AHardwareBuffer_sendHandleToUnixSocket) \
-    f(AHardwareBuffer_recvHandleFromUnixSocket)
+    f(AHardwareBuffer_recvHandleFromUnixSocket) \
+    f(AHardwareBuffer_getNativeHandle)
 #else
 #define AHardwareBuffer_API26_FUNCTIONS_1(f)
 #endif
@@ -327,10 +331,9 @@ static struct {
 } stubs;
 #undef STUB
 
-static void ensure_loaded() {
-    static atomic_flag tried = ATOMIC_FLAG_INIT;
-    if (atomic_flag_test_and_set(&tried))
-        return;
+static pthread_once_t loaded_once = PTHREAD_ONCE_INIT;
+
+static void load_stubs(void) {
 
     void* handle = platform_dlopen(LIB, RTLD_LOCAL);
     // Nothing bad happened, normal case for termux-docker.
@@ -339,6 +342,10 @@ static void ensure_loaded() {
 #define LOAD(s) stubs.s = dlsym(handle, #s);
     FUNCTIONS(LOAD)
 #undef LOAD
+}
+
+static inline void ensure_loaded(void) {
+    pthread_once(&loaded_once, load_stubs);
 }
 
 #define CALL(f, def, ...) ensure_loaded(); if (!stubs.f) return def; else return (stubs.f)(__VA_ARGS__)
@@ -658,6 +665,10 @@ int AHardwareBuffer_sendHandleToUnixSocket(const AHardwareBuffer* _Nonnull buffe
 
 int AHardwareBuffer_recvHandleFromUnixSocket(int socketFd, AHardwareBuffer* _Nullable* _Nonnull outBuffer) {
     CALL(AHardwareBuffer_recvHandleFromUnixSocket, 0, socketFd, outBuffer);
+}
+
+const struct native_handle* AHardwareBuffer_getNativeHandle(const AHardwareBuffer* buffer) {
+    CALL(AHardwareBuffer_getNativeHandle, NULL, buffer);
 }
 #endif
 

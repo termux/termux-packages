@@ -1,0 +1,18 @@
+--- a/au3/libraries/au3-wx-wrappers/CMakeLists.txt
++++ b/au3/libraries/au3-wx-wrappers/CMakeLists.txt
+@@ -27,7 +27,7 @@
+       FileDialog/mac/FileDialogPrivate.mm
+       FileDialog/mac/FileDialogPrivate.h
+    >
+-   $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,CYGWIN>:
++   $<$<PLATFORM_ID:Android,Linux,FreeBSD,OpenBSD,CYGWIN>:
+       FileDialog/gtk/FileDialogPrivate.cpp
+       FileDialog/gtk/FileDialogPrivate.h
+    >
+@@ -45,5 +45,5 @@
+ 
+ audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}"
+    ""
+-   "$<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:PkgConfig::GTK>"
++   "$<$<PLATFORM_ID:Android,Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:PkgConfig::GTK>"
+ )

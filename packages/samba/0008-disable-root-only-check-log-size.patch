@@ -1,15 +1,15 @@
 --- a/lib/util/debug.c
 +++ b/lib/util/debug.c
-@@ -1465,6 +1465,7 @@
- 	 *  loop check do a new check as root.
- 	 */
+@@ -1509,6 +1509,7 @@
+ {
+ 	off_t maxlog;
  
 +#ifndef __ANDROID__
- #if _SAMBA_BUILD_ == 3
- 	if (geteuid() != sec_initial_uid())
- #else
-@@ -1477,6 +1478,7 @@
- 		 * make test or the build farm */
+ 	if (geteuid() != 0) {
+ 		/*
+ 		 * We need to be root to change the log file (tests use a fake
+@@ -1518,6 +1519,7 @@
+ 		 */
  		return;
  	}
 +#endif

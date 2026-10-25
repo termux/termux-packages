@@ -1,13 +1,18 @@
 Prevents error:
 libpng-config: --libdir option is disabled in Debian/Ubuntu
 
+sys.platform is "android" when cross-compiling, which made find_libpng() look for
+pngfix as on Windows.
+
 --- a/setup.py
 +++ b/setup.py
-@@ -204,7 +204,7 @@ def make_C_extension():
+@@ -234,8 +234,8 @@
+ 
  def find_libpng():
      # Returns (found, include dir, library dir, library name)
-     if sys.platform in ("linux", "darwin", "aix"):
+-    if sys.platform in ("linux", "darwin", "aix"):
 -        libpng_config = shutil.which("libpng-config")
++    if sys.platform in ("linux", "darwin", "aix", "android"):
 +        libpng_config = "@TERMUX_PREFIX@/bin/libpng-config"
          if libpng_config is None:
              warnings.warn("libpng-config not found")

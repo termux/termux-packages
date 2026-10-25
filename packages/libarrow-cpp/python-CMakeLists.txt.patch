@@ -1,18 +1,18 @@
 --- a/python/CMakeLists.txt
 +++ b/python/CMakeLists.txt
-@@ -256,6 +256,7 @@
+@@ -276,6 +276,7 @@
  
  # Python and Numpy libraries
  find_package(Python3Alt REQUIRED)
 +include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
- message(STATUS "Found NumPy version: ${Python3_NumPy_VERSION}")
- message(STATUS "NumPy include dir: ${NUMPY_INCLUDE_DIRS}")
- 
-@@ -460,7 +461,6 @@
+ if(Python3_NumPy_VERSION AND Python3_NumPy_VERSION VERSION_LESS "2.0")
+   message(FATAL_ERROR "PyArrow requires NumPy 2.0 or newer, found ${Python3_NumPy_VERSION}"
+   )
+@@ -527,7 +528,6 @@
  else()
    target_link_libraries(arrow_python PRIVATE ${PYARROW_CPP_LINK_LIBS})
  endif()
 -target_link_libraries(arrow_python PUBLIC Python3::NumPy)
  target_compile_definitions(arrow_python PRIVATE ARROW_PYTHON_EXPORTING)
- install(TARGETS arrow_python
-         ARCHIVE DESTINATION .
+ if(CMAKE_CONFIGURATION_TYPES)
+   target_compile_definitions(arrow_python PRIVATE PYARROW_BUILD_TYPE="$<CONFIG>")

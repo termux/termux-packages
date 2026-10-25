@@ -1,14 +1,14 @@
 --- a/build/gulpfile.vscode.ts
 +++ b/build/gulpfile.vscode.ts
-@@ -44,6 +44,7 @@
- const rcedit = promisify(rceditCallback);
- const root = path.dirname(import.meta.dirname);
- const commit = getVersion(root);
+@@ -49,6 +49,7 @@
+ if (packageJson.copilotRuntimeVersion !== copilotRuntimeVersion) {
+ 	throw new Error(`package.json declares Copilot runtime ${packageJson.copilotRuntimeVersion}, but @github/copilot-sdk bundles ${copilotRuntimeVersion}.`);
+ }
 +const buildRoot = path.join(root, "package-build-root");
  
- // Build
- const vscodeEntryPoints = [
-@@ -321,7 +322,7 @@
+ function getLockedPackageVersion(packageName: string): string {
+ 	const version = packageLock.packages?.[`node_modules/${packageName}`]?.version;
+@@ -127,7 +128,7 @@
  }
  
  function packageTask(platform: string, arch: string, sourceFolderName: string, destinationFolderName: string, _opts?: { stats?: boolean }) {
@@ -17,7 +17,7 @@
  	platform = platform || process.platform;
  
  	const task = () => {
-@@ -655,7 +656,7 @@
+@@ -505,7 +506,7 @@
  }
  
  function patchWin32DependenciesTask(destinationFolderName: string) {
@@ -26,7 +26,7 @@
  
  	return async () => {
  		const versionedResourcesFolder = util.getVersionedResourcesFolder('win32', commit!);
-@@ -691,7 +692,7 @@
+@@ -546,7 +547,7 @@
  }
  
  function prepareCopilotRipgrepShimTask(platform: string, arch: string, destinationFolderName: string) {
@@ -35,8 +35,17 @@
  
  	return async () => {
  		// On Windows with win32VersionedUpdate, app resources live under a
-@@ -708,8 +709,6 @@
- 	};
+@@ -563,7 +564,7 @@
+ }
+ 
+ function generateNodeCompileCacheTask(platform: string, destinationFolderName: string) {
+-	const outputDirectory = path.join(path.dirname(root), destinationFolderName);
++	const outputDirectory = path.join(buildRoot, destinationFolderName);
+ 
+ 	return () => generateNodeCompileCache(
+ 		platform,
+@@ -573,8 +574,6 @@
+ 	);
  }
  
 -const buildRoot = path.dirname(root);

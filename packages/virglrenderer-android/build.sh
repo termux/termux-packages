@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="1.3.0"
 _LIBEPOXY_VERSION="1.5.10"
+TERMUX_PKG_REVISION=1
 
 TERMUX_PKG_SRCURL=(
 	https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-${TERMUX_PKG_VERSION}/virglrenderer-virglrenderer-${TERMUX_PKG_VERSION}.tar.gz
@@ -74,6 +75,7 @@ termux_step_host_build() {
 		--cross-file $TERMUX_MESON_CROSSFILE \
 		--prefix=$_INSTALL_PREFIX \
 		--libdir lib \
+		-Dvenus=true \
 		-Dplatforms=egl
 	ninja -C virglrenderer-build install -j $TERMUX_PKG_MAKE_PROCESSES
 

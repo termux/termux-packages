@@ -1,8 +1,8 @@
---- ../configure.orig	2019-10-24 10:43:06.176633836 +0200
-+++ ./configure	2019-10-24 10:53:21.301377723 +0200
-@@ -3402,8 +3402,8 @@
- rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- 
+--- a/configure	2026-09-30 23:53:36.903910196 +0300
++++ b/configure	2026-09-30 23:53:36.908678261 +0300
+@@ -4071,8 +4071,8 @@
+ 	    #
+ 	    ac_lbl_cc_force_warning_errors=-Werror
      else
 -	    V_INCLS="$V_INCLS -I/usr/local/include"
 -	    LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -11,16 +11,16 @@
  
  	    case "$host_os" in
  
-@@ -4962,7 +4962,7 @@
-   $EGREP "yes" >/dev/null 2>&1; then :
+@@ -5785,7 +5785,7 @@
+ then :
    ipv6type=$i;
  				ipv6lib=inet6;
 -				ipv6libdir=/usr/local/v6/lib;
 +				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib;
  				ipv6trylibc=yes
  fi
- rm -f conftest*
-@@ -4984,7 +4984,7 @@
+ rm -rf conftest*
+@@ -5808,7 +5808,7 @@
  
  			;;
  		linux-libinet6)
@@ -29,16 +29,16 @@
  				ipv6type=$i
  				ipv6lib=inet6
  				ipv6libdir=/usr/inet6/lib
-@@ -5004,7 +5004,7 @@
-   $EGREP "yes" >/dev/null 2>&1; then :
+@@ -5829,7 +5829,7 @@
+ then :
    ipv6type=$i;
  				ipv6lib=inet6;
 -				ipv6libdir=/usr/local/v6/lib
 +				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib
  fi
- rm -f conftest*
+ rm -rf conftest*
  
-@@ -5012,7 +5012,7 @@
+@@ -5837,7 +5837,7 @@
  		v6d)
  			cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
@@ -47,8 +47,8 @@
  #ifdef __V6D__
  yes
  #endif
-@@ -5021,8 +5021,8 @@
-   $EGREP "yes" >/dev/null 2>&1; then :
+@@ -5847,8 +5847,8 @@
+ then :
    ipv6type=$i;
  				ipv6lib=v6;
 -				ipv6libdir=/usr/local/v6/lib;
@@ -56,21 +56,21 @@
 +				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib;
 +				CFLAGS="-I@TERMUX_PREFIX@/local/v6/include $CFLAGS"
  fi
- rm -f conftest*
+ rm -rf conftest*
  
-@@ -5039,7 +5039,7 @@
-   $EGREP "yes" >/dev/null 2>&1; then :
+@@ -5866,7 +5866,7 @@
+ then :
    ipv6type=$i;
  				ipv6lib=inet6;
 -				ipv6libdir=/usr/local/v6/lib
 +				ipv6libdir=@TERMUX_PREFIX@/local/v6/lib
  fi
- rm -f conftest*
+ rm -rf conftest*
  
-@@ -5586,12 +5586,12 @@
+@@ -6846,12 +6846,12 @@
                  fi
-                                                                                                                                                                                                                                                                                                                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
- $as_echo_n "checking for extraneous pcap header directories... " >&6; }
+                                                                                                                                                                                                                                                                                                                                 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for extraneous pcap header directories" >&5
+ printf %s "checking for extraneous pcap header directories... " >&6; }
 -                if test \( ! -r /usr/local/include/pcap.h \) -a \
 -                        \( ! -r /usr/include/pcap.h \); then
 -                    if test -r /usr/local/include/pcap/pcap.h; then

@@ -1,0 +1,60 @@
+diff --git a/packages/playwright-core/src/server/firefox/firefox.ts b/packages/playwright-core/src/server/firefox/firefox.ts
+index 3e0b505..2d85071 100644
+--- a/packages/playwright-core/src/server/firefox/firefox.ts
++++ b/packages/playwright-core/src/server/firefox/firefox.ts
+@@ -42,13 +42,13 @@ export class Firefox extends BrowserType {
+   }
+ 
+   override launch(progress: Progress, options: types.LaunchOptions, protocolLogger?: types.ProtocolLogger): Promise<Browser> {
+-    if (options.channel?.startsWith('moz-'))
++    if (options.channel?.startsWith('moz-') || process.platform === 'android')
+       return this._bidiFirefox.launch(progress, options, protocolLogger);
+     return super.launch(progress, options, protocolLogger);
+   }
+ 
+   override async launchPersistentContext(progress: Progress, userDataDir: string, options: channels.BrowserTypeLaunchPersistentContextOptions & { internalIgnoreHTTPSErrors?: boolean, socksProxyPort?: number }): Promise<BrowserContext> {
+-    if (options.channel?.startsWith('moz-'))
++    if (options.channel?.startsWith('moz-') || process.platform === 'android')
+       return this._bidiFirefox.launchPersistentContext(progress, userDataDir, options);
+     return super.launchPersistentContext(progress, userDataDir, options);
+   }
+diff --git a/packages/playwright-core/src/server/registry/index.ts b/packages/playwright-core/src/server/registry/index.ts
+index cc4ad62..8e9755d 100644
+--- a/packages/playwright-core/src/server/registry/index.ts
++++ b/packages/playwright-core/src/server/registry/index.ts
+@@ -507,6 +507,8 @@ interface ExecutableImpl extends Executable {
+ const TERMUX_EXECUTABLES: Partial<Record<string, string>> = {
+   'chromium': '@TERMUX_PREFIX@/bin/chromium-browser',
+   'chromium-headless-shell': '@TERMUX_PREFIX@/bin/headless_shell',
++  // Stock Firefox, driven over WebDriver BiDi (Playwright's patched Juggler build does not exist for Android)
++  'firefox': '@TERMUX_PREFIX@/bin/firefox',
+   'ffmpeg': '@TERMUX_PREFIX@/bin/ffmpeg',
+ };
+ 
+@@ -527,7 +529,7 @@ export class Registry {
+       const installCommand = buildPlaywrightCLICommand(sdkLanguage, `install${installByDefault ? '' : ' ' + name}`);
+       if (!canAccessFile(e)) {
+         if (process.platform === 'android')
+-          throw new Error(`Executable doesn't exist at ${e}\nInstall it with: pkg install ${name === 'ffmpeg' ? 'ffmpeg' : 'chromium'}`);
++          throw new Error(`Executable doesn't exist at ${e}\nInstall it with: pkg install ${name === 'ffmpeg' || name === 'firefox' ? name : 'chromium'}`);
+         const currentDockerVersion = readDockerVersionSync();
+         const preferredDockerVersion = currentDockerVersion ? dockerVersion(currentDockerVersion.dockerImageNameTemplate) : null;
+         const isOutdatedDockerImage = currentDockerVersion && preferredDockerVersion && currentDockerVersion.dockerImageName !== preferredDockerVersion.dockerImageName;
+@@ -865,7 +867,7 @@ export class Registry {
+ 
+   private _createBidiFirefoxChannel(name: string, lookAt: Record<'linux' | 'darwin' | 'win32', string>, install?: () => Promise<void>): ExecutableImpl {
+     const executablePath = (sdkLanguage: string, shouldThrow: boolean) => {
+-      const suffix = lookAt[process.platform as 'linux' | 'darwin' | 'win32'];
++      const suffix = process.platform === 'android' ? (name === 'moz-firefox' ? '@TERMUX_PREFIX@/bin/firefox' : '') : lookAt[process.platform as 'linux' | 'darwin' | 'win32'];
+       if (!suffix) {
+         if (shouldThrow)
+           throw new Error(`Firefox distribution '${name}' is not supported on ${process.platform}`);
+@@ -944,7 +946,7 @@ export class Registry {
+   async install(executablesToInstall: Executable[], options?: { force?: boolean, gc?: boolean }) {
+     if (process.platform === 'android') {
+       // eslint-disable-next-line no-restricted-properties
+-      process.stderr.write('Browsers are provided by Termux packages (chromium, ffmpeg); nothing to download.\n');
++      process.stderr.write('Browsers are provided by Termux packages (chromium, firefox, ffmpeg); nothing to download.\n');
+       return;
+     }
+     const executables = this._dedupe(executablesToInstall);

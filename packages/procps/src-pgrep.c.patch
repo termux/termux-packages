@@ -1,0 +1,12 @@
+--- a/src/pgrep.c
++++ b/src/pgrep.c
+@@ -1419,7 +1419,9 @@
+     case PKILL:
+         for (i = 0; i < num; i++) {
+             int pidfd = -1;
++#ifndef __ANDROID__
+             pidfd = pidfd_open(procs[i].num, 0);
++#endif
+             if (opt_mrelease && pidfd < 0)
+                 err(EXIT_FAILURE, _("pidfd_open for process %ld failed"), procs[i].num);
+             if (execute_kill (pidfd, procs[i].num, opt_signal) != -1) {

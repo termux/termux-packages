@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/sqlcipher/sqlcipher
 TERMUX_PKG_DESCRIPTION="SQLCipher is an SQLite extension that provides 256 bit AES encryption of database files"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.17.0"
+TERMUX_PKG_VERSION="4.19.0"
 TERMUX_PKG_SRCURL="https://github.com/sqlcipher/sqlcipher/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=79c0e164b9c059e7487bf8f29272f601cca5f3312cc267461f81e349962a5058
+TERMUX_PKG_SHA256=7075f96cbabe45b4ecfc2e6b1745a625f856f695b0827a5506ce9ed85b906aa0
 TERMUX_PKG_DEPENDS="libedit, openssl"
 TERMUX_PKG_BUILD_DEPENDS="tcl"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 # will overwrite libsqlite during installation
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 # --enable-editline --disable-readline
@@ -60,20 +60,4 @@ termux_step_configure() {
 		--sbindir="$TERMUX_PREFIX/bin" \
 		--disable-static \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-}
-
-termux_step_post_massage() {
-	# Rename files from sqlite3 to sqlcipher to prevent file collisons
-	# based on the precedent being set by LigurOS, NixOS
-	# https://gitlab.com/liguros/liguros-repo/-/blob/2406209f428ab349fc33209834caf1a7a0477fda/dev-db/sqlcipher/sqlcipher-4.12.0.ebuild#L70
-	local sql_version="$(cat "$TERMUX_PKG_SRCDIR"/VERSION)"
-	mv bin/{sqlite3,sqlcipher}
-	mv include/{sqlite3,sqlcipher}.h
-	mv include/{sqlite3ext,sqlcipherext}.h
-	mv lib/lib{sqlite3,sqlcipher}.so
-	mv lib/lib{sqlite3,sqlcipher}.so.0
-	mv lib/lib{sqlite3,sqlcipher}.so."$sql_version"
-	mv lib/pkgconfig/{sqlite3,sqlcipher}.pc
-	mv share/man/man1/{sqlite3,sqlcipher}.1.gz
-	sed -i s/-lsqlite3/-lsqlcipher/ lib/pkgconfig/sqlcipher.pc
 }

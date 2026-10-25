@@ -1,6 +1,6 @@
 termux_setup_protobuf() {
 	local _PROTOBUF_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/libprotobuf/build.sh; echo \${TERMUX_PKG_VERSION#*:}")
-	local _PROTOBUF_SHA256=6930ebf62bd4ea607b98fff052596c6ee564b9835b4ce172c75a3f53ae9d91b7
+	local _PROTOBUF_SHA256=121f6c7afe1d4d0e3ea6aab9432038599250134cbf4474cb1167d2c7decd4278
 	local _PROTOBUF_ZIP="protoc-$_PROTOBUF_VERSION-linux-x86_64.zip"
 	local _PROTOBUF_FOLDER
 

@@ -8,11 +8,9 @@
   </fundamental>
   <fundamental name="GskCairoNode" get-type="gsk_cairo_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
-  <fundamental name="GskRenderNode" get-type="gsk_render_node_get_type" abstract="1" instantiatable="1">
-  </fundamental>
   <class name="GskRenderer" get-type="gsk_renderer_get_type" parents="GObject" abstract="1">
-    <property name="realized" type="gboolean" flags="1073742049" default-value="FALSE"/>
-    <property name="surface" type="GdkSurface" flags="1073742049"/>
+    <property name="realized" type="gboolean" flags="1073741857" default-value="FALSE"/>
+    <property name="surface" type="GdkSurface" flags="1073741857"/>
   </class>
   <class name="GskCairoRenderer" get-type="gsk_cairo_renderer_get_type" parents="GskRenderer,GObject">
   </class>
@@ -27,6 +25,8 @@
   </fundamental>
   <fundamental name="GskCompositeNode" get-type="gsk_composite_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
+  <fundamental name="GskRenderNode" get-type="gsk_render_node_get_type" abstract="1" instantiatable="1">
+  </fundamental>
   <fundamental name="GskConicGradientNode" get-type="gsk_conic_gradient_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
   <fundamental name="GskContainerNode" get-type="gsk_container_node_get_type" instantiatable="1" parents="GskRenderNode">
@@ -40,8 +40,8 @@
   <fundamental name="GskFillNode" get-type="gsk_fill_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
   <class name="GskGLShader" get-type="gsk_gl_shader_get_type" parents="GObject">
-    <property name="source" type="GBytes" flags="235"/>
-    <property name="resource" type="gchararray" flags="235" default-value="NULL"/>
+    <property name="source" type="GBytes" flags="43"/>
+    <property name="resource" type="gchararray" flags="43" default-value="NULL"/>
   </class>
   <boxed name="GskShaderArgsBuilder" get-type="gsk_shader_args_builder_get_type"/>
   <fundamental name="GskGLShaderNode" get-type="gsk_gl_shader_node_get_type" instantiatable="1" parents="GskRenderNode">
@@ -70,6 +70,7 @@
   </fundamental>
   <fundamental name="GskRepeatingRadialGradientNode" get-type="gsk_repeating_radial_gradient_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
+  <pointer name="GskRenderReplay" get-type="gsk_render_replay_get_type"/>
   <fundamental name="GskRepeatNode" get-type="gsk_repeat_node_get_type" instantiatable="1" parents="GskRenderNode">
   </fundamental>
   <fundamental name="GskRoundedClipNode" get-type="gsk_rounded_clip_node_get_type" instantiatable="1" parents="GskRenderNode">
@@ -137,6 +138,7 @@
     <member name="GSK_ISOLATION_NODE" nick="isolation-node" value="35"/>
     <member name="GSK_DISPLACEMENT_NODE" nick="displacement-node" value="36"/>
     <member name="GSK_ARITHMETIC_NODE" nick="arithmetic-node" value="37"/>
+    <member name="GSK_TURBULENCE_NODE" nick="turbulence-node" value="38"/>
   </enum>  <enum name="GskScalingFilter" get-type="gsk_scaling_filter_get_type">
     <member name="GSK_SCALING_FILTER_LINEAR" nick="linear" value="0"/>
     <member name="GSK_SCALING_FILTER_NEAREST" nick="nearest" value="1"/>
@@ -176,6 +178,11 @@
     <member name="GSK_CORNER_TOP_RIGHT" nick="top-right" value="1"/>
     <member name="GSK_CORNER_BOTTOM_RIGHT" nick="bottom-right" value="2"/>
     <member name="GSK_CORNER_BOTTOM_LEFT" nick="bottom-left" value="3"/>
+  </enum>  <enum name="GskSide" get-type="gsk_side_get_type">
+    <member name="GSK_SIDE_TOP" nick="top" value="0"/>
+    <member name="GSK_SIDE_RIGHT" nick="right" value="1"/>
+    <member name="GSK_SIDE_BOTTOM" nick="bottom" value="2"/>
+    <member name="GSK_SIDE_LEFT" nick="left" value="3"/>
   </enum>  <enum name="GskFillRule" get-type="gsk_fill_rule_get_type">
     <member name="GSK_FILL_RULE_WINDING" nick="winding" value="0"/>
     <member name="GSK_FILL_RULE_EVEN_ODD" nick="even-odd" value="1"/>
@@ -231,6 +238,11 @@
     <member name="GSK_MASK_MODE_INVERTED_ALPHA" nick="inverted-alpha" value="1"/>
     <member name="GSK_MASK_MODE_LUMINANCE" nick="luminance" value="2"/>
     <member name="GSK_MASK_MODE_INVERTED_LUMINANCE" nick="inverted-luminance" value="3"/>
+  </enum>  <enum name="GskSnapDirection" get-type="gsk_snap_direction_get_type">
+    <member name="GSK_SNAP_NONE" nick="none" value="0"/>
+    <member name="GSK_SNAP_FLOOR" nick="floor" value="1"/>
+    <member name="GSK_SNAP_CEIL" nick="ceil" value="2"/>
+    <member name="GSK_SNAP_ROUND" nick="round" value="3"/>
   </enum>  <flags name="GskPathForeachFlags" get-type="gsk_path_foreach_flags_get_type">
     <member name="GSK_PATH_FOREACH_ALLOW_ONLY_LINES" nick="only-lines" value="0"/>
     <member name="GSK_PATH_FOREACH_ALLOW_QUAD" nick="quad" value="1"/>

@@ -1,0 +1,20 @@
+--- a/database-builder.cpp
++++ b/database-builder.cpp
+@@ -488,7 +488,7 @@ DatabaseBuilder::DatabaseBuilder(const char *outfile, gid_t owner, int block_siz
+ 		path = ".";
+ 	}
+ 	int fd = -1;
+-#ifdef O_TMPFILE
++#if defined(O_TMPFILE) && !defined(__ANDROID__)
+ 	fd = open(path.c_str(), O_WRONLY | O_TMPFILE, 0640);
+ 	if (fd == -1 && errno != EOPNOTSUPP && errno != EISDIR) {
+ 		perror(path.c_str());
+@@ -694,7 +694,7 @@ void DatabaseBuilder::finish_corpus()
+ 			exit(1);
+ 		}
+ 	} else {
+-#ifdef O_TMPFILE
++#if defined(O_TMPFILE) && !defined(__ANDROID__)
+ 		// Give the file a proper name, making it visible in the file system.
+ 		// TODO: It would be nice to be able to do this atomically, like with rename.
+ 		unlink(outfile.c_str());

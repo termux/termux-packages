@@ -17,7 +17,7 @@
 -                        .unwrap_or(&gettext("<filename containing invalid UTF-8 codepoint>")),
 +                        .unwrap_or("<filename containing invalid UTF-8 codepoint>"),
                      reason.to_string()
-                 ))
+                 ));
              }
 @@ -74,10 +73,10 @@
              if let Err(reason) = file.set_len(0).and_then(|_| file.write_all(pid.as_bytes())) {

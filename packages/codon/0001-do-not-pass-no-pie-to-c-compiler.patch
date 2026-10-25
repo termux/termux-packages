@@ -15,15 +15,15 @@
  
 --- a/codon/cir/llvm/optimize.cpp
 +++ b/codon/cir/llvm/optimize.cpp
-@@ -37,7 +37,11 @@
+@@ -35,7 +35,11 @@
  
-   return std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(
-       triple.getTriple(), cpuStr, featuresStr, options,
+   auto *tm = target->createTargetMachine(
+       triple.getTriple(), cpuStr, featuresStr, targetOptions,
 +#ifndef __ANDROID__
        pic ? llvm::Reloc::Model::PIC_ : llvm::codegen::getExplicitRelocModel(),
 +#else
 +      llvm::Reloc::Model::PIC_,
 +#endif
-       llvm::codegen::getExplicitCodeModel(), llvm::CodeGenOptLevel::Aggressive));
- }
- 
+       llvm::codegen::getExplicitCodeModel(), llvm::CodeGenOptLevel::Aggressive);
+   if (!tm)
+     compilationError("could not create LLVM target machine");
