@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://tealdeer-rs.github.io/tealdeer/
 TERMUX_PKG_DESCRIPTION="A very fast implementation of tldr in Rust"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.9.0"
+TERMUX_PKG_VERSION="1.9.1"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=https://github.com/tealdeer-rs/tealdeer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=1387a04ddba714668ff0925377a2de0d0ab14533d44dd0766d673fbbd71e3119
+TERMUX_PKG_SHA256=78e7dbfcc2c8975c143a9746b073a3af875cdee72819bc383fbd411bae2c553c
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
