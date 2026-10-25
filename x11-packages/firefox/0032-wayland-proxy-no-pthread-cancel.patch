@@ -1,0 +1,14 @@
+bionic does not have pthread_cancel().
+
+--- a/third_party/wayland-proxy/wayland-proxy.cpp
++++ b/third_party/wayland-proxy/wayland-proxy.cpp
+@@ -1103,7 +1103,9 @@
+   if (mThreadRunning) {
+     Info("thread is still running, terminating.\n");
+     mThreadRunning = false;
++#ifndef __TERMUX__
+     pthread_cancel(mThread);
++#endif
+     pthread_join(mThread, nullptr);
+   }
+   if (mProxyServerSocket != -1) {

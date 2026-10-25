@@ -1,0 +1,24 @@
+Firefox links libxul against stub Wayland symbols (libmozwayland) and relies on
+dlopen() order so that the real libwayland-client, loaded earlier through GTK,
+takes precedence over the stubs. The Android linker resolves symbols through
+each library's own DT_NEEDED entries instead, so libxul ends up calling the
+stubs, which return NULL, and crashes as soon as it is started on a Wayland
+display. Link the real libraries directly instead.
+
+--- a/toolkit/library/moz.build
++++ b/toolkit/library/moz.build
+@@ -183,8 +183,12 @@ if CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk":
+     OS_LIBS += CONFIG["MOZ_GTK3_LIBS"]
+ 
+ if CONFIG["MOZ_WAYLAND"]:
+-    USE_LIBS += [
+-        "mozwayland",
++    # The Android linker does not honour the dlopen() order trick described
++    # above, so link the real libraries instead of the mozwayland stubs.
++    OS_LIBS += [
++        "wayland-client",
++        "wayland-egl",
++        "xkbcommon",
+     ]
+ 
+ if CONFIG["MOZ_WIDGET_TOOLKIT"] == "gtk" or CONFIG["MOZ_TREE_FREETYPE"]:
