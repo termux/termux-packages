@@ -1,0 +1,78 @@
+diff --git a/src/mesa/meson.build b/src/mesa/meson.build
+--- a/src/mesa/meson.build
++++ b/src/mesa/meson.build
+@@ -12,6 +12,7 @@
+   'util/u_cpu_detect.c',
+   'util/u_debug.c',
+   'util/u_math.c',
++  'util/vrend_mode.c',
+ )
+ 
+ if not with_host_windows
+diff --git a/src/mesa/util/vrend_mode.c b/src/mesa/util/vrend_mode.c
+--- a/src/mesa/util/vrend_mode.c
++++ b/src/mesa/util/vrend_mode.c
+@@ -0,0 +1,30 @@
++/*
++ * SPDX-License-Identifier: MIT
++ */
++
++#include "vrend_mode.h"
++
++#include <libgen.h>
++#include <string.h>
++
++bool g_vrend_android_mode = false;
++
++void
++vrend_mode_init(const char *argv0)
++{
++   /* basename() may modify its argument on some platforms; work off a
++    * copy so we don't touch the caller's argv[0]. */
++   char buf[256];
++   const char *base;
++
++   if (!argv0) {
++      g_vrend_android_mode = false;
++      return;
++   }
++
++   strncpy(buf, argv0, sizeof(buf) - 1);
++   buf[sizeof(buf) - 1] = '\0';
++   base = basename(buf);
++
++   g_vrend_android_mode = (strcmp(base, "virgl_test_server_android") == 0);
++}
+diff --git a/src/mesa/util/vrend_mode.h b/src/mesa/util/vrend_mode.h
+--- a/src/mesa/util/vrend_mode.h
++++ b/src/mesa/util/vrend_mode.h
+@@ -0,0 +1,29 @@
++/*
++ * SPDX-License-Identifier: MIT
++ *
++ * Single process-wide mode flag distinguishing the Android/ANGLE runtime
++ * mode from the normal Termux (glvnd/Mesa) one. Set once in main() from
++ * argv[0], busybox-style; read directly everywhere else.
++ */
++
++#ifndef VREND_MODE_H_
++#define VREND_MODE_H_
++
++#include <stdbool.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++extern bool g_vrend_android_mode;
++
++/* Inspects argv[0] and sets g_vrend_android_mode. Call once, at the very
++ * top of main(), before anything else touches EGL/GLES/Vulkan/GBM.
++ */
++void vrend_mode_init(const char *argv0);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* VREND_MODE_H_ */
