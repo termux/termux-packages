@@ -1,0 +1,11 @@
+--- a/modules/lwjgl/core/src/generated/c/org_lwjgl_system_libc_LibCStdlib.c
++++ b/modules/lwjgl/core/src/generated/c/org_lwjgl_system_libc_LibCStdlib.c
+@@ -12,7 +12,7 @@
+     #if defined(__USE_ISOC11) && !defined(LWJGL_LINUX)
+         #define __aligned_alloc aligned_alloc
+     #else
+-        inline void* __aligned_alloc(size_t alignment, size_t size) {
++        static inline void* __aligned_alloc(size_t alignment, size_t size) {
+             void *p;
+             return posix_memalign(&p, alignment, size) ? NULL : p;
+         }
