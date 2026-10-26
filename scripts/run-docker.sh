@@ -152,12 +152,19 @@ load_apparmor_profile() {
 
 __change_builder_uid_gid() {
 	if [ "$UNAME" != Darwin ]; then
-		if [ $(id -u) -ne 1001 -a $(id -u) -ne 0 ]; then
-			echo "Changed builder uid/gid... (this may take a while)"
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) $CONTAINER_HOME_DIR
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R $(id -u):$(id -g) /data
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u $(id -u) builder
-			$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g $(id -g) builder
+		local host_uid host_gid
+		host_uid=$(id -u)
+		host_gid=$(id -g)
+		if [ "$host_uid" -ne 1001 -a "$host_uid" -ne 0 ]; then
+			local current_builder_uid
+			current_builder_uid=$($SUDO docker exec $CONTAINER_NAME id -u builder 2>/dev/null || echo "1001")
+			if [ "$current_builder_uid" -ne "$host_uid" ]; then
+				echo "Changing builder uid/gid to ${host_uid}:${host_gid}... (this may take a while)"
+				$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R "${host_uid}:${host_gid}" $CONTAINER_HOME_DIR
+				$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo chown -R "${host_uid}:${host_gid}" /data
+				$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo usermod -u "$host_uid" builder
+				$SUDO docker exec $DOCKER_TTY $TERMUX_DOCKER_EXEC_EXTRA_ARGS $CONTAINER_NAME sudo groupmod -g "$host_gid" builder
+			fi
 		fi
 	fi
 }
