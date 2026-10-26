@@ -1,0 +1,58 @@
+--- a/modules/lwjgl/core/src/generated/c/linux/org_lwjgl_system_linux_UIO.c
++++ b/modules/lwjgl/core/src/generated/c/linux/org_lwjgl_system_linux_UIO.c
+@@ -6,6 +6,37 @@
+ #include "common_tools.h"
+ #include <sys/uio.h>
+ #include <errno.h>
++#include <unistd.h>
++#include <sys/syscall.h>
++
++/*
++ * Bionic only declares preadv2()/pwritev2() for API level 33+, but the
++ * Termux toolchain targets API 24. Fall back to preadv()/pwritev() when no
++ * flags are requested, and to the raw syscall otherwise.
++ */
++static ssize_t lwjgl_termux_preadv2(int fd, const struct iovec *iov, int count, off_t offset, int flags) {
++    if (flags == 0 && offset != -1) {
++        return preadv(fd, iov, count, offset);
++    }
++#if defined(__NR_preadv2)
++    return syscall(__NR_preadv2, fd, iov, count, (long)offset, (long)(((uint64_t)offset) >> 32), flags);
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
++}
++
++static ssize_t lwjgl_termux_pwritev2(int fd, const struct iovec *iov, int count, off_t offset, int flags) {
++    if (flags == 0 && offset != -1) {
++        return pwritev(fd, iov, count, offset);
++    }
++#if defined(__NR_pwritev2)
++    return syscall(__NR_pwritev2, fd, iov, count, (long)offset, (long)(((uint64_t)offset) >> 32), flags);
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
++}
+ 
+ EXTERN_C_ENTER
+ 
+@@ -49,7 +80,7 @@
+     struct iovec const *__iovec = (struct iovec const *)(uintptr_t)__iovecAddress;
+     jlong __result;
+     UNUSED_PARAMS(__env, clazz)
+-    __result = (jlong)preadv2(__fd, __iovec, __count, (off_t)__offset, __flags);
++    __result = (jlong)lwjgl_termux_preadv2(__fd, __iovec, __count, (off_t)__offset, __flags);
+     saveErrno();
+     return __result;
+ }
+@@ -58,7 +89,7 @@
+     struct iovec const *__iovec = (struct iovec const *)(uintptr_t)__iovecAddress;
+     jlong __result;
+     UNUSED_PARAMS(__env, clazz)
+-    __result = (jlong)pwritev2(__fd, __iovec, __count, (off_t)__offset, __flags);
++    __result = (jlong)lwjgl_termux_pwritev2(__fd, __iovec, __count, (off_t)__offset, __flags);
+     saveErrno();
+     return __result;
+ }
