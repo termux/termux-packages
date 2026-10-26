@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cloudflare/cloudflared
 TERMUX_PKG_DESCRIPTION="A tunneling daemon that proxies traffic from the Cloudflare network to your origins"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.10.3"
+TERMUX_PKG_VERSION="2026.10.4"
 TERMUX_PKG_SRCURL=https://github.com/cloudflare/cloudflared/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=68d298c522aef45fe8412e0ccf8f21ff12a6ad768aa69cbc23e10eac688ac8c8
+TERMUX_PKG_SHA256=9e13353772430d29dd3a492ff55fb20d013f97dc79f4a24c306a834f3464bbba
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
