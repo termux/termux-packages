@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance neural network inference framework op
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20260526"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Tencent/ncnn/releases/download/${TERMUX_PKG_VERSION}/ncnn-${TERMUX_PKG_VERSION}-full-source.zip"
 TERMUX_PKG_SHA256=754659d6fe65545cf2ef4483ffb84526fea631f8764c44b150f1601d0fb4004b
 TERMUX_PKG_AUTO_UPDATE=false
