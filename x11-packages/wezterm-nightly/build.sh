@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and mul
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20261010+ge2a98e1b"
-TERMUX_PKG_SRCURL=git+https://github.com/wezterm/wezterm
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="git+https://github.com/wezterm/wezterm"
 TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
 TERMUX_PKG_RECOMMENDS="ncurses, ttf-nerd-fonts-symbols"
@@ -182,5 +183,22 @@ termux_step_make_install() {
 	install -Dm644 assets/shell-completion/bash "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME//-nightly/}"
 	install -Dm644 assets/shell-completion/fish "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME//-nightly/}.fish"
 	install -Dm644 assets/shell-completion/zsh "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME//-nightly/}"
-	install -Dm644 assets/shell-integration/${TERMUX_PKG_NAME//-nightly/}.sh -t "${TERMUX_PREFIX}/etc/profile.d"
+	# Ship the shell integration as data, not directly in etc/profile.d: every
+	# login shell sources that directory, so installing it there unguarded would
+	# apply the integration inside kitty, xfce4-terminal, etc. too (and makes PS1
+	# grow on each prompt there).
+	install -Dm644 assets/shell-integration/wezterm.sh -t "${TERMUX_PREFIX}/share/wezterm/shell-integration"
+
+	# Source it from profile.d only when the shell was started by wezterm-gui.
+	# Reading /proc/$PPID/comm avoids a dependency on ps and is POSIX sh compatible.
+	mkdir -p "${TERMUX_PREFIX}/etc/profile.d"
+	cat > "${TERMUX_PREFIX}/etc/profile.d/wezterm.sh" <<-EOF
+		if [ -r "/proc/\$PPID/comm" ]; then
+			read -r _wezterm_parent < "/proc/\$PPID/comm"
+			if [ "\$_wezterm_parent" = "wezterm-gui" ]; then
+				. "${TERMUX_PREFIX}/share/wezterm/shell-integration/wezterm.sh"
+			fi
+			unset _wezterm_parent
+		fi
+	EOF
 }

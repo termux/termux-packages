@@ -1,0 +1,36 @@
+Honour the shell chosen with `chsh` in Termux instead of always forcing bash.
+
+Termux's `chsh` records the login shell in ~/.termux/shell (a symlink to the
+chosen shell). Other terminals end up using that shell, but the old patch
+here hard-coded @TERMUX_PREFIX@/bin/bash, so wezterm always started bash
+(and exported SHELL=bash) for people whose default shell is zsh/fish/etc.
+
+Order of preference when $SHELL is not set/usable:
+  1. ~/.termux/shell (if target is executable)
+  2. @TERMUX_PREFIX@/bin/bash
+(/etc/passwd is skipped on purpose: on Android it points at /system/bin/sh)
+
+--- a/pty/src/cmdbuilder.rs
++++ b/pty/src/cmdbuilder.rs
+@@ -43,6 +43,21 @@
+     use std::ffi::CStr;
+     use std::str;
+ 
++    if let Ok(home) = std::env::var("HOME") {
++        let termux_shell = Path::new(&home).join(".termux").join("shell");
++        // ~/.termux/shell is a symlink, and a symlink itself always reports
++        // 0777, so resolve it first and check the executable bit on the target.
++        if let Ok(resolved) = std::fs::canonicalize(&termux_shell) {
++            if access(resolved.as_path(), AccessFlags::X_OK).is_ok() {
++                if let Some(resolved) = resolved.to_str() {
++                    return resolved.to_owned();
++                }
++            }
++        }
++    }
++
++    return "@TERMUX_PREFIX@/bin/bash".into();
++
+     let ent = unsafe { libc::getpwuid(libc::getuid()) };
+     if !ent.is_null() {
+         let shell = unsafe { CStr::from_ptr((*ent).pw_shell) };
