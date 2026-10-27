@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Portrait background removal/virtual green-screen and low
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/royshil/obs-backgroundremoval/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3ebc0ef66ef7603e8cf564e7e84a412e552abc21cf548c1653074ed03175f213
 TERMUX_PKG_AUTO_UPDATE=true
@@ -11,12 +12,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_OUT_OF_TREE=ON
 -DCMAKE_SYSTEM_NAME=Linux
 -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
--DOpenCV_DIR=${TERMUX_PREFIX}/lib/cmake/opencv4
+-DOpenCV_DIR=${TERMUX_PREFIX}/lib/cmake/opencv5
 "
 
 termux_step_pre_configure() {
 	# Ensuring the compiler can find OpenCV headers in the Termux prefix
-	CXXFLAGS+=" -I${TERMUX_PREFIX}/include/opencv4"
+	CXXFLAGS+=" -I${TERMUX_PREFIX}/include/opencv5"
 
 	# XNNPACK's generate-microkernels.py fails under 32-bit bionic cross-compilation.
 	# Disable XNNPACK on 32-bit architectures to fall back to the generic CPU provider.
