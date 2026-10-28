@@ -1,8 +1,8 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -11,10 +11,9 @@
- from importlib.metadata import distribution, PackageNotFoundError
- from pathlib import Path
+@@ -12,10 +12,9 @@ from pathlib import Path
+ 
+ import setuptools.command.bdist_wheel
  
 -import torch
  from packaging.version import parse as parse_version
@@ -12,7 +12,7 @@
  
  FORCE_CUDA = os.getenv("FORCE_CUDA", "0") == "1"
  FORCE_MPS = os.getenv("FORCE_MPS", "0") == "1"
-@@ -32,8 +31,8 @@
+@@ -33,8 +32,8 @@ TORCHVISION_LIBRARY = TORCHVISION_LIBRARY.split(os.pathsep) if TORCHVISION_LIBRA
  
  ROOT_DIR = Path(__file__).absolute().parent
  CSRS_DIR = ROOT_DIR / "torchvision/csrc"
@@ -23,7 +23,7 @@
  
  package_name = os.getenv("TORCHVISION_PACKAGE_NAME", "torchvision")
  
-@@ -169,10 +168,10 @@
+@@ -168,10 +167,10 @@ def get_macros_and_flags():
              # The jpeg decode .cpp also calls these shims (incl.
              # torch_get_cuda_stream_from_pool), so cxx needs USE_CUDA too.
              extra_compile_args["cxx"].append("-DUSE_CUDA")
@@ -36,7 +36,7 @@
  
  
  _HIPIFIED = False
-@@ -219,7 +218,7 @@
+@@ -218,7 +217,7 @@ def make_C_stable_extension():
          sources += cuda_sources
      else:
          Extension = CppExtension
@@ -45,7 +45,7 @@
              sources += mps_sources
  
      define_macros, extra_compile_args = get_macros_and_flags()
-@@ -372,7 +371,7 @@
+@@ -373,7 +372,7 @@ def make_image_stable_extension():
          else:
              warnings.warn("Building torchvision without WEBP support")
  
@@ -54,11 +54,11 @@
          nvjpeg_found = CUDA_HOME is not None and (Path(CUDA_HOME) / "include/nvjpeg.h").exists()
          if nvjpeg_found:
              print("Building torchvision with NVJPEG image support")
-@@ -441,7 +440,6 @@
+@@ -453,7 +452,6 @@ if __name__ == "__main__":
          ext_modules=extensions,
          python_requires=">=3.10,!=3.14.1",
          cmdclass={
 -            "build_ext": BuildExtension.with_options(no_python_abi_suffix=True),
+             "bdist_wheel": bdist_wheel,
              "clean": clean,
          },
-     )
