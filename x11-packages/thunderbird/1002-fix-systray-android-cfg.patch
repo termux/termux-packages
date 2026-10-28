@@ -1,0 +1,34 @@
+The sys_tray crate is only built for target_os = "linux", but Termux builds
+Rust for the android target, so the crate stays empty while components.conf
+still registers nsLinuxSysTrayHandlerConstructor:
+ld.lld: error: undefined symbol: nsLinuxSysTrayHandlerConstructor
+
+--- a/comm/rust/sys_tray/Cargo.toml
++++ b/comm/rust/sys_tray/Cargo.toml
+@@ -16,7 +16,7 @@ unic-langid = "0.9"
+ xpcom = { path = "../../../xpcom/rust/xpcom" }
+ fluent-ffi = { path = "../../../intl/l10n/rust/fluent-ffi" }
+ 
+-[target.'cfg(target_os = "linux")'.dependencies]
++[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+ ksni = "0.2.2"
+ png = { version = "0.18.1" }
+ 
+--- a/comm/rust/sys_tray/src/lib.rs
++++ b/comm/rust/sys_tray/src/lib.rs
+@@ -2,11 +2,11 @@
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub mod actions;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub mod linux;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub use actions::*;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub mod locales;
