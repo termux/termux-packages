@@ -63,8 +63,8 @@ check_package_name() {
 		return 1
 	fi
 
-	if ! dpkg --validate-pkgname "${pkg_name}" &> /dev/null; then
-		echo "INVALID ($(dpkg --validate-pkgname "${pkg_name}"))"
+	if ! [[ "$pkg_name" =~ [a-z0-9][a-z0-9+.-]* ]]; then
+		echo "INVALID (must start with a-z or 0-9 and contain only a-z, 0-9, '+', '-', '.')"
 		return 1
 	fi
 
@@ -79,6 +79,14 @@ check_indentation() {
 	local heredoc_regex="[^\(/%#]<{2}-?[[:space:]]*(['\"]?([[:alnum:]_]*(\\\.)?)*['\"]?)"
 	# We don't wanna hit version constraints "(<< x.y.z)" with this, so don't match "(<<".
 	# We also wouldn't wanna hit parameter expansions "${var/<<}", ${var%<<}, ${var#<<}
+
+	# Skip parsing files that don't have tab/space issues.
+	local content
+	content="$(< "$pkg_script")"
+	case "$content" in
+		' '*|*$'\n '*|*$'\t '*) ;;
+		*) return 0 ;;
+	esac
 
 	# parse leading whitespace
 	while IFS=$'\n' read -r line; do
@@ -270,10 +278,11 @@ check_version() {
 }
 
 lint_package() {
-	local package_script package_name
+	local package_script package_dir package_name
 
 	package_script="$1"
-	package_name="$(basename "$(dirname "$package_script")")"
+	package_dir="${package_script%/*}"
+	package_name="${package_dir##*/}"
 
 	echo "================================================================"
 	echo
@@ -301,21 +310,22 @@ lint_package() {
 
 	check_package_name "$package_name" || return 1
 	local subpkg_script subpkg_name
-	for subpkg_script in "$(dirname "$package_script")"/*.subpackage.sh; do
+	for subpkg_script in "$package_dir"/*.subpackage.sh; do
 		[[ ! -f "$subpkg_script" ]] && continue
-		subpkg_name="$(basename "${subpkg_script%.subpackage.sh}")"
+		subpkg_name="${subpkg_script##*/}"
+		subpkg_name="${subpkg_name%.subpackage.sh}"
 		check_package_name "$subpkg_name" || return 1
 	done
 
 	echo -n "End of line check: "
-	local last2octet
-	read -r _ last2octet _ < <(xxd -s -2 "$package_script")
-	if [[ "$last2octet" == "0a0a" ]]; then
+	local content
+	IFS= read -rd '' content < "$package_script" || :
+	if [[ "$content" == *$'\n\n' ]]; then
 		echo -e "FAILED (duplicate newlines at the end)\n"
 		tail -n5 "$package_script" | sed -e "s|^|  |" -e "5s|^  |>>|"
 		return 1
 	fi
-	if [[ "$last2octet" != *"0a" ]]; then
+	if [[ "$content" != *$'\n' ]]; then
 		echo -e "FAILED (no newline terminated)\n"
 		xxd -s -2 "$package_script"
 		return 1
@@ -334,7 +344,7 @@ lint_package() {
 
 	echo -n "Indentation check: "
 	local script
-	for script in "$package_script" "$(dirname "$package_script")"/*.subpackage.sh; do
+	for script in "$package_script" "$package_dir"/*.subpackage.sh; do
 		[[ ! -f "$script" ]] && continue
 		check_indentation "$script" || return 1
 	done
