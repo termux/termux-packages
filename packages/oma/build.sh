@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="oma is an attempt at reworking APT's interface"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/AOSC-Dev/oma/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=a8ff8fd0424c6de287b429c8c7af2c3a6e7a1572ab62c82c90fd9e452bd6da41
 TERMUX_PKG_DEPENDS="libnettle, apt"
