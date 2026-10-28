@@ -4,10 +4,10 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
 
 --- a/dom/ipc/ContentParent.cpp
 +++ b/dom/ipc/ContentParent.cpp
-@@ -153,7 +153,9 @@
- #include "mozilla/hal_sandbox/PHalParent.h"
+@@ -154,7 +154,9 @@
  #ifndef ANDROID
  #  include "mozilla/hwinference/HWInferenceParent.h"
+ #  include "mozilla/hwinference/HWInferenceProcess.h"
 -#  include "mozilla/hwinference/PSpeechRecognitionChild.h"
 +#  ifdef MOZ_WEBSPEECH
 +#    include "mozilla/hwinference/PSpeechRecognitionChild.h"
@@ -15,7 +15,7 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
  #endif  // !ANDROID
  #include "mozilla/intl/L10nRegistry.h"
  #include "mozilla/intl/LocaleService.h"
-@@ -5190,6 +5192,7 @@ mozilla::ipc::IPCResult ContentParent::RecvAcquireHWInferenceProcess() {
+@@ -5207,6 +5209,7 @@ mozilla::ipc::IPCResult ContentParent::RecvAcquireHWInferenceProcess() {
    return IPC_OK();
  }
  
@@ -23,8 +23,8 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
  mozilla::ipc::IPCResult ContentParent::RecvCreateSpeechRecognition(
      Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint) {
    if (!mHWInferenceConnections) {
-@@ -5208,6 +5211,7 @@ mozilla::ipc::IPCResult ContentParent::RecvCreateSpeechRecognition(
-       std::move(aEndpoint), mChildID);
+@@ -5226,6 +5229,7 @@ mozilla::ipc::IPCResult ContentParent::RecvCreateSpeechRecognition(
+       ->StartContentSpeechRecognition(std::move(aEndpoint), mChildID);
    return IPC_OK();
  }
 +#endif  // MOZ_WEBSPEECH
@@ -33,7 +33,7 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
    if (mHWInferenceConnections == 0) {
 --- a/dom/ipc/ContentParent.h
 +++ b/dom/ipc/ContentParent.h
-@@ -1125,8 +1125,10 @@ class ContentParent final : public PContentParent,
+@@ -1131,8 +1131,10 @@ class ContentParent final : public PContentParent,
  
    mozilla::ipc::IPCResult RecvAcquireHWInferenceProcess();
  
@@ -56,7 +56,7 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
  #endif  // !ANDROID
  include protocol PRemoteWorkerDebuggerManager;
  include protocol PRemoteWorkerService;
-@@ -1202,7 +1204,9 @@ parent:
+@@ -1203,7 +1205,9 @@ parent:
  
  #ifndef ANDROID
      async AcquireHWInferenceProcess();
@@ -80,9 +80,9 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
      FINAL_LIBRARY = "xul"
 --- a/toolkit/components/ml/ipc/HWInferenceChild.cpp
 +++ b/toolkit/components/ml/ipc/HWInferenceChild.cpp
-@@ -5,7 +5,9 @@
- 
+@@ -6,7 +6,9 @@
  #include "HWInferenceChild.h"
+ #include "mozilla/hwinference/TextGenerationChild.h"
  #include "mozilla/Logging.h"
 +#ifdef MOZ_WEBSPEECH
  #include "mozilla/hwinference/SpeechRecognitionParent.h"
@@ -90,27 +90,27 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
  
  namespace mozilla::hwinference {
  
-@@ -17,6 +19,7 @@ LazyLogModule gHWInferenceLog("HWInference");
- 
- void HWInferenceChild::Shutdown() { PHWInferenceChild::Close(); }
+@@ -16,6 +18,7 @@ LazyLogModule gHWInferenceLog("HWInference");
+ #define LOGE(fmt, ...) \
+   MOZ_LOG_FMT(gHWInferenceLog, LogLevel::Error, fmt, ##__VA_ARGS__)
  
 +#ifdef MOZ_WEBSPEECH
  ipc::IPCResult HWInferenceChild::RecvNewContentSpeechRecognition(
      Endpoint<hwinference::PSpeechRecognitionParent>&& aEndpoint,
      const dom::ContentParentId& aContentId) {
-@@ -35,6 +38,7 @@ ipc::IPCResult HWInferenceChild::RecvNewContentSpeechRecognition(
+@@ -34,6 +37,7 @@ ipc::IPCResult HWInferenceChild::RecvNewContentSpeechRecognition(
         fmt::ptr(this), __func__, static_cast<uint64_t>(aContentId));
    return IPC_OK();
  }
 +#endif  // MOZ_WEBSPEECH
  
- RefPtr<HWInferenceChild::IsModelAvailablePromise>
- HWInferenceChild::SendIsModelAvailable(const nsCString& aTask,
+ ipc::IPCResult HWInferenceChild::RecvNewTextGeneration(
+     Endpoint<hwinference::PTextGenerationChild>&& aEndpoint,
 --- a/toolkit/components/ml/ipc/HWInferenceChild.h
 +++ b/toolkit/components/ml/ipc/HWInferenceChild.h
-@@ -22,9 +22,11 @@ class HWInferenceChild final : public PHWInferenceChild {
+@@ -20,9 +20,11 @@ class HWInferenceChild final : public PHWInferenceChild {
  
-   void Shutdown();
+   HWInferenceChild() = default;
  
 +#ifdef MOZ_WEBSPEECH
    mozilla::ipc::IPCResult RecvNewContentSpeechRecognition(
@@ -118,43 +118,41 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
        const dom::ContentParentId& aContentId);
 +#endif  // MOZ_WEBSPEECH
  
-   RefPtr<IsModelAvailablePromise> SendIsModelAvailable(const nsCString& aTask,
-                                                        const nsCString& aId);
+   mozilla::ipc::IPCResult RecvNewTextGeneration(
+       Endpoint<hwinference::PTextGenerationChild>&& aEndpoint,
 --- a/toolkit/components/ml/ipc/HWInferenceParent.cpp
 +++ b/toolkit/components/ml/ipc/HWInferenceParent.cpp
-@@ -202,6 +202,7 @@ RefPtr<HWInferenceParent> HWInferenceParent::GetSingleton() {
-   return sInstance;
+@@ -184,6 +184,7 @@ void HWInferenceParent::SendWhenReady(Send&& aSend) {
+       []() { LOGD("HWInference never came up: dropping the endpoint"); });
  }
  
 +#ifdef MOZ_WEBSPEECH
- /* static */
  void HWInferenceParent::StartContentSpeechRecognition(
      Endpoint<PSpeechRecognitionParent>&& aEndpoint,
-@@ -219,6 +220,7 @@ void HWInferenceParent::StartContentSpeechRecognition(
-         LOGD("HWInference never came up: dropping the speech endpoint");
-       });
+     dom::ContentParentId aChildId) {
+@@ -192,6 +193,7 @@ void HWInferenceParent::StartContentSpeechRecognition(
+     return aSelf.SendNewContentSpeechRecognition(std::move(endpoint), aChildId);
+   });
  }
 +#endif  // MOZ_WEBSPEECH
  
- void HWInferenceParent::ActorDestroy(ActorDestroyReason aReason) {
-   LOGD("{}", __func__);
+ void HWInferenceParent::StartTextGeneration(
+     Endpoint<PTextGenerationChild>&& aEndpoint,
 --- a/toolkit/components/ml/ipc/HWInferenceParent.h
 +++ b/toolkit/components/ml/ipc/HWInferenceParent.h
-@@ -49,12 +49,14 @@ class HWInferenceParent final : public PHWInferenceParent {
-   // process goes away before it can be.
+@@ -50,10 +50,12 @@ class HWInferenceParent final : public PHWInferenceParent {
+   // Resolved once bound, rejected if the process dies or never comes up.
    RefPtr<GenericNonExclusivePromise> WhenReady() { return mReadyPromise; }
  
 +#ifdef MOZ_WEBSPEECH
-   // Forwards aEndpoint to the HWInference process once its actor is ready. The
-   // caller must hold a keep-alive, see
-   // UtilityProcessManager::AcquireContentHWInferenceProcess().
-   static void StartContentSpeechRecognition(
+   // Sends aEndpoint once bound. The caller must hold a keep-alive.
+   void StartContentSpeechRecognition(
        Endpoint<PSpeechRecognitionParent>&& aEndpoint,
        dom::ContentParentId aChildId);
 +#endif  // MOZ_WEBSPEECH
  
-   static RefPtr<HWInferenceParent> GetSingleton();
- 
+   // Same for a text generator; aModel is the model file the parent opened.
+   void StartTextGeneration(Endpoint<PTextGenerationChild>&& aEndpoint,
 --- a/toolkit/components/ml/ipc/PHWInference.ipdl
 +++ b/toolkit/components/ml/ipc/PHWInference.ipdl
 @@ -3,7 +3,9 @@
@@ -164,25 +162,24 @@ recognition directory is only built when MOZ_WEBSPEECH is set.
 +#ifdef MOZ_WEBSPEECH
  include protocol PSpeechRecognition;
 +#endif
+ include protocol PTextGeneration;
+ include protocol PUtilityProcess;
  
- using mozilla::dom::ContentParentId from "mozilla/dom/ipc/IdType.h";
- using mozilla::hwinference::ModelInstallResult from "mozilla/hwinference/HWInferenceTypes.h";
-@@ -68,9 +70,11 @@ protocol PHWInference
-     async GetModelFile(nsCString task,
+@@ -75,8 +77,10 @@ protocol PHWInference
                         nsCString id) returns (GetModelFileResult result);
  
-+#ifdef MOZ_WEBSPEECH
    child:
++#ifdef MOZ_WEBSPEECH
      async NewContentSpeechRecognition(Endpoint<PSpeechRecognitionParent> endpoint,
                                        ContentParentId contentId);
 +#endif
- };
  
- } // namespace hwinference
+     // The model file is resolved and opened by the parent, the utility never
+     // learns its path.
 --- a/toolkit/components/ml/ipc/moz.build
 +++ b/toolkit/components/ml/ipc/moz.build
-@@ -18,7 +18,7 @@ UNIFIED_SOURCES += [
-     "HWInferenceParent.cpp",
+@@ -23,7 +23,7 @@ UNIFIED_SOURCES += [
+     "ModelFileUtils.cpp",
  ]
  
 -IPDL_SOURCES = [
