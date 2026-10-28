@@ -1,6 +1,6 @@
 --- a/build/compiled_action.gni
 +++ b/build/compiled_action.gni
-@@ -120,6 +120,52 @@
+@@ -138,6 +138,52 @@ template("compiled_action") {
    }
  }
  
@@ -55,7 +55,7 @@
    assert(defined(invoker.tool), "tool must be defined for $target_name")
 --- a/chrome/browser/new_tab_page/chrome_colors/BUILD.gn
 +++ b/chrome/browser/new_tab_page/chrome_colors/BUILD.gn
-@@ -20,7 +20,7 @@
+@@ -43,7 +43,7 @@ executable("generate_colors_info") {
    ]
  }
  
@@ -66,15 +66,15 @@
    args = rebase_path(outputs, root_build_dir)
 --- a/third_party/blink/renderer/platform/BUILD.gn
 +++ b/third_party/blink/renderer/platform/BUILD.gn
-@@ -117,7 +117,7 @@
+@@ -131,7 +131,7 @@ blink_python_runner("color_data") {
    ]
  }
  
 -compiled_action("character_data") {
 +compiled_action_prebuilt("character_data") {
    tool = ":character_data_generator"
-   outputs = [ "$blink_platform_output_dir/character_property_data.cc" ]
-   args = rebase_path(outputs, root_build_dir)
+   inputs = [ "$root_build_dir/icudtl.dat" ]
+   outputs = [
 --- a/net/data/ssl/chrome_root_store/BUILD.gn
 +++ b/net/data/ssl/chrome_root_store/BUILD.gn
 @@ -4,7 +4,7 @@
@@ -88,7 +88,7 @@
    inputs = [
 --- a/net/http/BUILD.gn
 +++ b/net/http/BUILD.gn
-@@ -6,7 +6,7 @@
+@@ -6,7 +6,7 @@ import("//build/compiled_action.gni")
  import("//net/features.gni")
  
  # Generates a header file based on the real HSTS preload list.
@@ -97,7 +97,7 @@
    tool = "//net/tools/transport_security_state_generator"
  
    # Inputs in order expected by the command line of the tool.
-@@ -20,7 +20,7 @@
+@@ -20,7 +20,7 @@ compiled_action("generate_transport_security_state") {
  }
  
  # Generates a header file based on the real static PKP list.
@@ -108,7 +108,7 @@
    # Inputs in order expected by the command line of the tool.
 --- a/components/url_formatter/spoof_checks/top_domains/BUILD.gn
 +++ b/components/url_formatter/spoof_checks/top_domains/BUILD.gn
-@@ -36,7 +36,7 @@
+@@ -38,7 +38,7 @@ executable("top_domain_generator") {
    }
  }
  
@@ -117,9 +117,9 @@
    tool = ":top_domain_generator"
  
    # Inputs in order expected by the command line of the tool.
-@@ -118,7 +118,7 @@
+@@ -126,7 +126,7 @@ jumbo_source_set("unit_tests") {
  
- # TODO(crbug/915921): Combine this and the previous one into a
+ # TODO(crbug.com/41432246): Combine this and the previous one into a
  # compiled_action_foreach target.
 -compiled_action("generate_top_domain_list_variables_file") {
 +compiled_action_prebuilt("generate_top_domain_list_variables_file") {
