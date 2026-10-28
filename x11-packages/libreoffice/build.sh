@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Free and open source cross-platform office suite"
 TERMUX_PKG_LICENSE="MPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.8.2.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.documentfoundation.org/libreoffice/src/${TERMUX_PKG_VERSION%.*}/libreoffice-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=f0012302d9cc70955bd55890d3aaccf6c55677c4a6a46e1003f996b1b0dae8e7
 TERMUX_PKG_AUTO_UPDATE=true
