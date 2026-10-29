@@ -1,0 +1,215 @@
+Adds the Android (bionic) target support to gcc, based on crystax android-toolchain-gcc-6 and its-pointless gcc_termux.
+Defaults to -fexceptions/-frtti to match libc++ and adds -z relro/now/noexecstack.
+
+--- a/gcc/config/aarch64/aarch64-linux-android.h
++++ b/gcc/config/aarch64/aarch64-linux-android.h
+@@ -0,0 +1,60 @@
++/* Machine description for AArch64 architecture.
++   Copyright (C) 2014 Free Software Foundation, Inc.
++
++   This file is part of GCC.
++
++   GCC is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3, or (at your option)
++   any later version.
++
++   GCC is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with GCC; see the file COPYING3.  If not see
++   <http://www.gnu.org/licenses/>.  */
++
++#ifndef GCC_AARCH64_LINUX_ANDROID_H
++#define GCC_AARCH64_LINUX_ANDROID_H
++
++
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()		\
++  do						\
++    {						\
++	GNU_USER_TARGET_OS_CPP_BUILTINS();	\
++	ANDROID_TARGET_OS_CPP_BUILTINS();	\
++    }						\
++  while (0)
++
++#undef  LINK_SPEC
++#define LINK_SPEC							\
++  LINUX_OR_ANDROID_LD (LINUX_TARGET_LINK_SPEC,				\
++		       LINUX_TARGET_LINK_SPEC " " ANDROID_LINK_SPEC)
++
++#undef  CC1_SPEC
++#define CC1_SPEC							\
++  LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC,			\
++		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC("-fpic"))
++
++#undef CC1PLUS_SPEC
++#define CC1PLUS_SPEC \
++  LINUX_OR_ANDROID_CC ("", ANDROID_CC1PLUS_SPEC)
++
++#undef  LIB_SPEC
++#define LIB_SPEC							\
++  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_LIB_SPEC,			\
++		    GNU_USER_TARGET_NO_PTHREADS_LIB_SPEC " " ANDROID_LIB_SPEC)
++
++#undef	STARTFILE_SPEC
++#define STARTFILE_SPEC \
++  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_STARTFILE_SPEC, ANDROID_STARTFILE_SPEC)
++
++#undef	ENDFILE_SPEC
++#define ENDFILE_SPEC \
++  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_ENDFILE_SPEC, ANDROID_ENDFILE_SPEC)
++
++#endif
+--- a/gcc/config/aarch64/aarch64-linux.h
++++ b/gcc/config/aarch64/aarch64-linux.h
+@@ -26,6 +26,9 @@
+ #undef MUSL_DYNAMIC_LINKER
+ #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
+ 
++#undef BIONIC_DYNAMIC_LINKER
++#define BIONIC_DYNAMIC_LINKER "/system/bin/linker64"
++
+ #undef  ASAN_CC1_SPEC
+ #define ASAN_CC1_SPEC "%{%:sanitize(address):-funwind-tables}"
+ 
+--- a/gcc/config/arm/elf.h
++++ b/gcc/config/arm/elf.h
+@@ -56,8 +56,7 @@
+ #undef SUBSUBTARGET_EXTRA_SPECS
+ #define SUBSUBTARGET_EXTRA_SPECS
+ 
+-#ifndef ASM_SPEC
+-#define ASM_SPEC "\
++#define DEFAULT_ASM_SPEC "\
+ %{mbig-endian:-EB} \
+ %{mlittle-endian:-EL} \
+ %(asm_cpu_spec) \
+@@ -66,6 +65,8 @@
+ %{mthumb-interwork:-mthumb-interwork} \
+ %{mfloat-abi=*} %{!mfpu=auto: %{mfpu=*}} \
+ %(subtarget_extra_asm_spec)"
++#ifndef ASM_SPEC
++#define ASM_SPEC DEFAULT_ASM_SPEC
+ #endif
+ 
+ /* The ARM uses @ are a comment character so we need to redefine
+--- a/gcc/config/arm/linux-eabi.h
++++ b/gcc/config/arm/linux-eabi.h
+@@ -108,11 +108,16 @@
+   LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC " " ASAN_CC1_SPEC " "	\
+ 		       FDPIC_CC1_SPEC,					\
+ 		       GNU_USER_TARGET_CC1_SPEC " " ASAN_CC1_SPEC " "	\
+-		       ANDROID_CC1_SPEC)
++		       ANDROID_CC1_SPEC("-fpic"))
+ 
+ #define CC1PLUS_SPEC \
+   LINUX_OR_ANDROID_CC ("", ANDROID_CC1PLUS_SPEC)
+ 
++#undef ASM_SPEC
++#define ASM_SPEC \
++  LINUX_OR_ANDROID_CC (DEFAULT_ASM_SPEC, \
++                       DEFAULT_ASM_SPEC  " " ANDROID_ASM_SPEC)
++
+ #undef  LIB_SPEC
+ #define LIB_SPEC							\
+   LINUX_OR_ANDROID_LD (GNU_USER_TARGET_LIB_SPEC,			\
+--- a/gcc/config/i386/gnu-user.h
++++ b/gcc/config/i386/gnu-user.h
+@@ -59,9 +59,13 @@
+    When the -shared link option is used a final link is not being
+    done.  */
+ 
++#undef ANDROID_TARGET_CC1_SPEC
++#define ANDROID_TARGET_CC1_SPEC \
++  " -mssse3 -fno-short-enums " \
++
+ #undef  ASM_SPEC
+ #define ASM_SPEC \
+-  "--32 %{msse2avx:%{!mavx:-msse2avx}}"
++  "--32 %{msse2avx:%{!mavx:-msse2avx}}" LINUX_OR_ANDROID_CC ("", ANDROID_ASM_SPEC)
+ 
+ #undef  SUBTARGET_EXTRA_SPECS
+ #define SUBTARGET_EXTRA_SPECS \
+--- a/gcc/config/i386/gnu-user64.h
++++ b/gcc/config/i386/gnu-user64.h
+@@ -46,6 +46,11 @@
+ #define SPEC_X32 "mx32"
+ #endif
+ 
++#undef ANDROID_TARGET_CC1_SPEC
++#define ANDROID_TARGET_CC1_SPEC \
++  "%{m32:-mssse3 -fno-short-enums}" \
++  "%{!m32:-msse4.2 -mpopcnt}"
++
+ #undef ASM_SPEC
+ #define ASM_SPEC "%{" SPEC_32 ":--32} \
+  %{" SPEC_64 ":--64} \
+--- a/gcc/config/i386/linux-common.h
++++ b/gcc/config/i386/linux-common.h
+@@ -30,7 +30,13 @@
+ #undef CC1_SPEC
+ #define CC1_SPEC \
+   LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC, \
+-		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC)
++                       GNU_USER_TARGET_CC1_SPEC \
++                       ANDROID_TARGET_CC1_SPEC \
++                       " " \
++                       ANDROID_CC1_SPEC("-fPIC"))
++
++#define CC1PLUS_SPEC \
++  LINUX_OR_ANDROID_CC ("", ANDROID_CC1PLUS_SPEC)
+ 
+ #undef	LINK_SPEC
+ #define LINK_SPEC \
+--- a/gcc/config/linux-android.h
++++ b/gcc/config/linux-android.h
+@@ -38,15 +38,18 @@
+   "%{" NOANDROID "|tno-android-ld:" LINUX_SPEC ";:" ANDROID_SPEC "}"
+ 
+ #define ANDROID_LINK_SPEC \
+-  "%{shared: -Bsymbolic}"
++  "%{shared: -Bsymbolic} -z noexecstack -z relro -z now"
+ 
+-#define ANDROID_CC1_SPEC						\
++#define ANDROID_CC1_SPEC(ANDROID_PIC_DEFAULT)				\
+   "%{!mglibc:%{!muclibc:%{!mbionic: -mbionic}}} "			\
+-  "%{!fno-pic:%{!fno-PIC:%{!fpic:%{!fPIC: -fPIC}}}}"
++  "%{!fno-pic:%{!fno-PIC:%{!fpic:%{!fPIC: " ANDROID_PIC_DEFAULT "}}}}"
+ 
+ #define ANDROID_CC1PLUS_SPEC						\
+-  "%{!fexceptions:%{!fno-exceptions: -fno-exceptions}} "		\
+-  "%{!frtti:%{!fno-rtti: -fno-rtti}}"
++  "%{!fexceptions:%{!fno-exceptions: -fexceptions}} "		\
++  "%{!frtti:%{!fno-rtti: -frtti}}"
++
++#define ANDROID_ASM_SPEC \
++  "--noexecstack"
+ 
+ #define ANDROID_LIB_SPEC \
+   "%{!static: -ldl}"
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -1287,14 +1287,18 @@
+ 	extra_options="${extra_options} netbsd.opt netbsd-elf.opt"
+ 	;;
+ aarch64*-*-linux*)
+-	tm_file="${tm_file} elfos.h gnu-user.h linux.h glibc-stdint.h"
++	tm_file="${tm_file} elfos.h gnu-user.h linux.h linux-android.h glibc-stdint.h"
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-linux.h"
++	extra_options="${extra_options} linux-android.opt"
+ 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-linux"
+ 	tm_defines="${tm_defines}  TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
+ 	case $target in
+ 	aarch64_be-*)
+ 		tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
+ 		;;
++	aarch64*-*-linux-android*)
++		tm_file="${tm_file} aarch64/aarch64-linux-android.h"
++		;;
+ 	esac
+ 	aarch64_multilibs="${with_multilib_list}"
+ 	if test "$aarch64_multilibs" = "default"; then

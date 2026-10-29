@@ -1,0 +1,25 @@
+Avoid the C23 fixed-underlying-type enum syntax that GCC rejects in older language modes.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/bionic_multibyte_result.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/bionic_multibyte_result.h
+@@ -45,6 +45,7 @@
+  * Refer to C23 7.30.1 Restartable multibyte/wide character conversion functions
+  * for more details.
+  */
++#ifdef __clang__
+ enum : size_t {
+   /// @brief An encoding error occurred. The bytes read are not a valid unicode
+   /// character, nor are they a partially valid character.
+@@ -64,5 +65,12 @@
+   BIONIC_MULTIBYTE_RESULT_NO_BYTES_CONSUMED = -3UL,
+ #define BIONIC_MULTIBYTE_RESULT_NO_BYTES_CONSUMED BIONIC_MULTIBYTE_RESULT_NO_BYTES_CONSUMED
+ };
++#else
++#define BIONIC_MULTIBYTE_RESULT_ILLEGAL_SEQUENCE (size_t(-1UL))
++
++#define BIONIC_MULTIBYTE_RESULT_INCOMPLETE_SEQUENCE (size_t(-2UL))
++
++#define BIONIC_MULTIBYTE_RESULT_NO_BYTES_CONSUMED (size_t(-3UL))
++#endif
+ 
+ __END_DECLS

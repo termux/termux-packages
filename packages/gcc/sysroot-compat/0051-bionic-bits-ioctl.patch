@@ -1,0 +1,14 @@
+Make bionic's bits/ioctl.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/ioctl.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/ioctl.h
+@@ -42,7 +42,8 @@
+  */
+ int ioctl(int __fd, int __op, ...);
+
+-#if !defined(BIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
++#if defined(__clang__) && __has_extension(overloadable_unmarked) && \
++    !defined(BIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
+ /*
+  * Work around unsigned -> signed conversion warnings: many common ioctl
+  * constants are unsigned.

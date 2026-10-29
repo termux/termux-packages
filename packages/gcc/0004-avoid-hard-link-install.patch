@@ -1,0 +1,24 @@
+Hard links are not usable on Android, so install through symlinks instead.
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -85,7 +85,7 @@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_SCRIPT = @INSTALL_SCRIPT@
+ INSTALL_DATA = @INSTALL_DATA@
+-LN = @LN@
++LN = @LN_S@
+ LN_S = @LN_S@
+ MAINT = @MAINT@
+ MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -341,7 +341,7 @@
+ INSTALL = @INSTALL@
+ # Some systems may be missing symbolic links, regular links, or both.
+ # Allow configure to check this and use "ln -s", "ln", or "cp" as appropriate.
+-LN=@LN@
++LN=@LN_S@
+ LN_S=@LN_S@
+ # These permit overriding just for certain files.
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@

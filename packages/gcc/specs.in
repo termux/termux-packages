@@ -1,0 +1,20 @@
+# Termux specs: PIE by default, libc++ headers first, compat headers before the NDK ones.
+# Android 5+ requires PIE; -fPIC and -pie are added unless the user opts out.
+
+*cc1:
++ %{Oz:-Os} %>Oz %>Werror=unguarded-availability-new %{static-openmp:-fopenmp} %>static-openmp
+
+*cc1_options:
++ %{!fpie: %{!fPIE: %{!fpic: %{!fPIC: %{!fno-pic:-fPIC}}}}} %{!fno-common:-fcommon}
+
+*cc1plus:
++ -I@COMPAT_DIR@/c++/v1 -I@TERMUX_PREFIX@/include/c++/v1 %{!fpie: %{!fPIE: %{!fpic: %{!fPIC: %{!fno-pic:-fPIC}}}}} %{!frtti: %{!fno-rtti: -frtti}}
+
+*link:
++ -L@TERMUX_PREFIX@/lib/gcc/@TERMUX_HOST_PLATFORM@/@TERMUX_PKG_VERSION@ -L@TERMUX_PREFIX@/lib %{!nopie: %{!static: %{!shared: %{!nostdlib: %{!nostartfiles: %{!fno-PIE: %{!fno-pie: -pie}}}}}}} --enable-new-dtags --eh-frame-hdr -rpath=@TERMUX_PREFIX@/lib
+
+*cc1:
++ -I@COMPAT_DIR@/@TERMUX_HOST_PLATFORM@ -I@COMPAT_DIR@ -I@TERMUX_PREFIX@/include/@TERMUX_HOST_PLATFORM@ -I@TERMUX_PREFIX@/include
+
+*link_gomp: -lgomp %{static: -ldl }
+@ARCH_PLACEHOLDER@

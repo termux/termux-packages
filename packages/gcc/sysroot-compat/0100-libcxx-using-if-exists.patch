@@ -1,0 +1,75 @@
+Restore the libc++ fallback for compilers without the using_if_exists attribute.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__config
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__config
+@@ -551,6 +551,24 @@
+ #    define _LIBCPP_USING_DEV_RANDOM
+ #  endif
+ 
++#if __has_attribute(using_if_exists)
++# define _LIBCPP_HAS_TIMESPEC_GET
++# define _LIBCPP_HAS_ALIGNED_ALLOC
++# define _LIBCPP_HAS_TOWCTRANS
++# define _LIBCPP_HAS_WCTRANS
++#elif defined(__BIONIC__)
++#  if __ANDROID_API__ >= 26
++#    define _LIBCPP_HAS_TOWCTRANS
++#    define _LIBCPP_HAS_WCTRANS
++#  endif
++#  if __ANDROID_API__ >= 28
++#    define _LIBCPP_HAS_ALIGNED_ALLOC
++#  endif
++#  if __ANDROID_API__ >= 29
++#    define _LIBCPP_HAS_TIMESPEC_GET
++#  endif
++#endif
++
+ #  ifndef _LIBCPP_CXX03_LANG
+ 
+ #    define _LIBCPP_ALIGNOF(_Tp) alignof(_Tp)
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstdlib
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cstdlib
+@@ -148,7 +148,7 @@
+ using ::at_quick_exit _LIBCPP_USING_IF_EXISTS;
+ using ::quick_exit _LIBCPP_USING_IF_EXISTS;
+ #  endif
+-#  if _LIBCPP_STD_VER >= 17
++#  if _LIBCPP_STD_VER >= 17 && defined(_LIBCPP_HAS_ALIGNED_ALLOC)
+ using ::aligned_alloc _LIBCPP_USING_IF_EXISTS;
+ #  endif
+ 
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/ctime
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/ctime
+@@ -68,7 +68,7 @@
+ using ::clock_t _LIBCPP_USING_IF_EXISTS;
+ using ::time_t _LIBCPP_USING_IF_EXISTS;
+ using ::tm _LIBCPP_USING_IF_EXISTS;
+-#  if _LIBCPP_STD_VER >= 17
++#  if _LIBCPP_STD_VER >= 17 && defined(_LIBCPP_HAS_TIMESPEC_GET)
+ using ::timespec _LIBCPP_USING_IF_EXISTS;
+ #  endif
+ using ::clock _LIBCPP_USING_IF_EXISTS;
+@@ -80,7 +80,7 @@
+ using ::gmtime _LIBCPP_USING_IF_EXISTS;
+ using ::localtime _LIBCPP_USING_IF_EXISTS;
+ using ::strftime _LIBCPP_USING_IF_EXISTS;
+-#  if _LIBCPP_STD_VER >= 17
++#  if _LIBCPP_STD_VER >= 17 && defined(_LIBCPP_HAS_TIMESPEC_GET)
+ using ::timespec_get _LIBCPP_USING_IF_EXISTS;
+ #  endif
+ 
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cwctype
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/cwctype
+@@ -91,8 +91,12 @@
+ using ::wctype _LIBCPP_USING_IF_EXISTS;
+ using ::towlower _LIBCPP_USING_IF_EXISTS;
+ using ::towupper _LIBCPP_USING_IF_EXISTS;
++#    if defined(_LIBCPP_HAS_TOWCTRANS)
+ using ::towctrans _LIBCPP_USING_IF_EXISTS;
++#    endif
++#    if defined(_LIBCPP_HAS_WCTRANS)
+ using ::wctrans _LIBCPP_USING_IF_EXISTS;
++#    endif
+ #  endif // _LIBCPP_INCLUDED_C_LIBRARY_WCTYPE_H
+ 
+ _LIBCPP_END_NAMESPACE_STD

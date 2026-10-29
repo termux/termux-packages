@@ -1,0 +1,13 @@
+Always chain to the system <limits.h> from the gcc one.
+
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -586,7 +586,7 @@
+ STMP_FIXINC = @STMP_FIXINC@
+ 
+ # Test to see whether <limits.h> exists in the system header files.
+-LIMITS_H_TEST = [ -f $(BUILD_SYSTEM_HEADER_DIR)/limits.h ]
++LIMITS_H_TEST = [ -e /dev/null ]
+ 
+ # Directory for prefix to system directories, for
+ # each of $(system_prefix)/usr/include, $(system_prefix)/usr/lib, etc.

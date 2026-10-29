@@ -1,0 +1,27 @@
+Make __INTRODUCED_IN() work under GCC, which has no __availability__ attribute.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/versioning.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/versioning.h
+@@ -16,6 +16,16 @@
+ 
+ #pragma once
+ 
++#if !defined(__clang__)
++
++#define __BIONIC_AVAILABILITY_GUARD(api_level) (__ANDROID_API__ >= (api_level))
++#define __INTRODUCED_IN(api_level) __attribute__((__annotate__("introduced_in=" #api_level)))
++#define __DEPRECATED_IN(api_level, msg) __attribute__((__annotate__("deprecated_in=" #api_level)))
++#define __REMOVED_IN(api_level, msg) __attribute__((__annotate__("obsoleted_in=" #api_level)))
++#define __INTRODUCED_IN_32(api_level) __attribute__((__annotate__("introduced_in_32=" #api_level)))
++#define __INTRODUCED_IN_64(api_level) __attribute__((__annotate__("introduced_in_64=" #api_level)))
++
++#else
+ /**
+  * @def __ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__
+  *
+@@ -80,3 +90,5 @@
+ #define __INTRODUCED_IN_32(api_level)
+ #define __INTRODUCED_IN_64(api_level) __BIONIC_AVAILABILITY(introduced=api_level)
+ #endif
++
++#endif // !defined(__clang__)

@@ -1,0 +1,15 @@
+Pass CXXFLAGS/CPPFLAGS for the build machine to libcpp so host flags do not leak into it.
+
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -181,7 +181,9 @@
+ # built for the build system to override those in BASE_FLAGS_TO_PASS.
+ EXTRA_BUILD_FLAGS = \
+ 	CFLAGS="$(CFLAGS_FOR_BUILD)" \
+-	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
++	LDFLAGS="$(LDFLAGS_FOR_BUILD)" \
++	CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
++	CPPFLAGS="$(CPPFLAGS_FOR_BUILD)"
+ 
+ # This is the list of directories to built for the host system.
+ SUBDIRS = @configdirs@

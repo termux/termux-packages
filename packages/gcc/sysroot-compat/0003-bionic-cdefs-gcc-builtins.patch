@@ -1,0 +1,89 @@
+Define the clang-only attributes and builtins used by bionic's <sys/cdefs.h> for GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h
+@@ -42,6 +42,31 @@
+  */
+ #define __BIONIC__ 1
+ 
++#ifndef __has_extension
++#define __has_extension         __has_feature
++#endif
++#ifndef __has_feature
++#define __has_feature(x)        0
++#endif
++#ifndef __has_include
++#define __has_include(x)        0
++#endif
++#ifndef __has_include_next
++#define __has_include_next(x)   0
++#endif
++#ifndef __has_builtin
++#define __has_builtin(x)        0
++#endif
++#ifndef __has_attribute
++#define __has_attribute(x)      0
++#endif
++
++#if !defined(__clang__)
++#define _Nonnull
++#define _Nullable
++#define _Null_unspecified
++#endif
++
+ #if defined(__cplusplus)
+ #define __BEGIN_DECLS extern "C" {
+ #define __END_DECLS }
+@@ -142,9 +167,14 @@
+ #define __nodiscard __attribute__((__warn_unused_result__))
+ #define __wur __nodiscard
+ 
++#ifdef __clang__
+ #define __enable_if(cond, msg) __attribute__((__enable_if__(cond, msg)))
+ #define __clang_error_if(cond, msg) __attribute__((__diagnose_if__(cond, msg, "error")))
+ #define __clang_warning_if(cond, msg) __attribute__((__diagnose_if__(cond, msg, "warning")))
++#else
++#  define __clang_error_if(cond, msg)
++#  define __clang_warning_if(cond, msg)
++#endif
+ 
+ #if defined(ANDROID_STRICT)
+ /*
+@@ -251,6 +281,7 @@
+ 
+ #if defined(__BIONIC_FORTIFY)
+ #  define __bos0(s) __bosn((s), 0)
++#if defined(__clang__)
+ #  if _FORTIFY_SOURCE >= 3
+ #    define __pass_object_size_n(n) __attribute__((__pass_dynamic_object_size__(n)))
+ #  else
+@@ -280,6 +311,12 @@
+ /* Error functions don't have bodies, so they can just be static. */
+ #  define __BIONIC_ERROR_FUNCTION_VISIBILITY static __unused
+ #else
++#  define __pass_object_size_n(n)
++#  define __call_bypassing_fortify(fn) (fn)
++#  define __BIONIC_FORTIFY_INLINE extern __inline__ __always_inline __attribute__((gnu_inline)) __attribute__((__artificial__))
++#  define __BIONIC_FORTIFY_VARIADIC __BIONIC_FORTIFY_INLINE
++#endif
++#else
+ /* Further increase sharing for some inline functions */
+ #  define __pass_object_size_n(n)
+ #endif
+@@ -308,7 +345,16 @@
+ #  define __BIONIC_INCLUDE_FORTIFY_HEADERS 1
+ #endif
+ 
++#if !defined(__clang__) && defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
++#undef __BIONIC_INCLUDE_FORTIFY_HEADERS
++#warning "Fortify headers are not supported and will not used without clang."
++#endif
++
++#if defined(__clang__)
+ #define __overloadable __attribute__((__overloadable__))
++#else
++#define __overloadable
++#endif
+ 
+ #define __diagnose_as_builtin(...) __attribute__((__diagnose_as_builtin__(__VA_ARGS__)))
+ 

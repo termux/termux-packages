@@ -1,0 +1,24 @@
+Include <new> explicitly to get the sized operator delete on 32-bit arm.
+
+--- a/gcc/input.cc
++++ b/gcc/input.cc
+@@ -26,6 +26,8 @@
+ #include "selftest.h"
+ #include "cpplib.h"
+ 
++#include <new>
++
+ #ifndef HAVE_ICONV
+ #define HAVE_ICONV 0
+ #endif
+--- a/gcc/mem-stats.h
++++ b/gcc/mem-stats.h
+@@ -21,6 +21,8 @@
+ #ifndef GCC_MEM_STATS_H
+ #define GCC_MEM_STATS_H
+ 
++#include <new>
++
+ /* Forward declaration.  */
+ template<typename Key, typename Value,
+ 	 typename Traits = simple_hashmap_traits<default_hash_traits<Key>,

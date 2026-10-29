@@ -1,0 +1,16 @@
+Make bionic's malloc.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/malloc.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/malloc.h
+@@ -31,7 +31,11 @@
+ 
+ __BEGIN_DECLS
+ 
++#if defined(__clang__) && !__has_attribute(alloc_size)
++#define __BIONIC_ALLOC_SIZE(...)
++#else
+ #define __BIONIC_ALLOC_SIZE(...) __attribute__((__alloc_size__(__VA_ARGS__)))
++#endif
+ 
+ /**
+  * [malloc(3)](http://man7.org/linux/man-pages/man3/malloc.3.html) allocates

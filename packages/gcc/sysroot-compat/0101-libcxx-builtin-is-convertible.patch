@@ -1,0 +1,139 @@
+The __is_convertible builtin only exists since g++ 13, so keep a fallback.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__type_traits/is_convertible.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__type_traits/is_convertible.h
+@@ -10,7 +10,16 @@
+ #define _LIBCPP___TYPE_TRAITS_IS_CONVERTIBLE_H
+ 
+ #include <__config>
++#include <__type_traits/conjunction.h>
++#include <__type_traits/disjunction.h>
+ #include <__type_traits/integral_constant.h>
++#include <__type_traits/is_array.h>
++#include <__type_traits/is_convertible.h>
++#include <__type_traits/is_function.h>
++#include <__type_traits/is_void.h>
++#include <__type_traits/lazy.h>
++#include <__type_traits/remove_reference.h>
++#include <__utility/declval.h>
+ 
+ #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+ #  pragma GCC system_header
+@@ -18,22 +27,116 @@
+ 
+ _LIBCPP_BEGIN_NAMESPACE_STD
+ 
++#if __has_builtin(__is_convertible)
++
+ template <class _T1, class _T2>
+ struct _LIBCPP_NO_SPECIALIZATIONS is_convertible : integral_constant<bool, __is_convertible(_T1, _T2)> {};
+ 
++#else  // __has_builtin(__is_convertible)
++
++namespace __is_convertible_imp
++{
++template <class _Tp> void  __test_convert(_Tp);
++
++template <class _From, class _To, class = void>
++struct __is_convertible_test : public false_type {};
++
++template <class _From, class _To>
++struct __is_convertible_test<_From, _To,
++    decltype(__is_convertible_imp::__test_convert<_To>(std::declval<_From>()))> : public true_type
++{};
++
++template <class _Tp, bool _IsArray =    is_array<_Tp>::value,
++                     bool _IsFunction = is_function<_Tp>::value,
++                     bool _IsVoid =     is_void<_Tp>::value>
++                     struct __is_array_function_or_void                          {enum {value = 0};};
++template <class _Tp> struct __is_array_function_or_void<_Tp, true, false, false> {enum {value = 1};};
++template <class _Tp> struct __is_array_function_or_void<_Tp, false, true, false> {enum {value = 2};};
++template <class _Tp> struct __is_array_function_or_void<_Tp, false, false, true> {enum {value = 3};};
++}
++
++template <class _Tp,
++    unsigned = __is_convertible_imp::__is_array_function_or_void<__libcpp_remove_reference_t<_Tp> >::value>
++struct __is_convertible_check
++{
++    static const size_t __v = 0;
++};
++
++template <class _Tp>
++struct __is_convertible_check<_Tp, 0>
++{
++    static const size_t __v = sizeof(_Tp);
++};
++
++template <class _T1, class _T2,
++    unsigned _T1_is_array_function_or_void = __is_convertible_imp::__is_array_function_or_void<_T1>::value,
++    unsigned _T2_is_array_function_or_void = __is_convertible_imp::__is_array_function_or_void<_T2>::value>
++struct __is_convertible
++    : public integral_constant<bool,
++        __is_convertible_imp::__is_convertible_test<_T1, _T2>::value
++    >
++{};
++
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 0, 1> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 1, 1> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 2, 1> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 3, 1> : public false_type {};
++
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 0, 2> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 1, 2> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 2, 2> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 3, 2> : public false_type {};
++
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 0, 3> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 1, 3> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 2, 3> : public false_type {};
++template <class _T1, class _T2> struct __is_convertible<_T1, _T2, 3, 3> : public true_type {};
++
++template <class _T1, class _T2> struct _LIBCPP_NO_SPECIALIZATIONS is_convertible
++    : public __is_convertible<_T1, _T2>
++{
++    static const size_t __complete_check1 = __is_convertible_check<_T1>::__v;
++    static const size_t __complete_check2 = __is_convertible_check<_T2>::__v;
++};
++
++#endif // __has_builtin(__is_convertible)
++
+ #if _LIBCPP_STD_VER >= 17
+ template <class _From, class _To>
+-_LIBCPP_NO_SPECIALIZATIONS inline constexpr bool is_convertible_v = __is_convertible(_From, _To);
++_LIBCPP_NO_SPECIALIZATIONS inline constexpr bool is_convertible_v = is_convertible<_From, _To>::value;
+ #endif
+ 
+ #if _LIBCPP_STD_VER >= 20
+ 
++#if __has_builtin(__is_nothrow_convertible)
++
+ template <class _Tp, class _Up>
+ struct _LIBCPP_NO_SPECIALIZATIONS is_nothrow_convertible : bool_constant<__is_nothrow_convertible(_Tp, _Up)> {};
+ 
+ template <class _Tp, class _Up>
+ _LIBCPP_NO_SPECIALIZATIONS inline constexpr bool is_nothrow_convertible_v = __is_nothrow_convertible(_Tp, _Up);
+ 
++#else  // __has_builtin(__is_nothrow_convertible)
++
++template <typename _Tp>
++void __test_noexcept(_Tp) noexcept;
++
++template <typename _Fm, typename _To>
++bool_constant<noexcept(std::__test_noexcept<_To>(std::declval<_Fm>()))> __is_nothrow_convertible_test();
++
++template <typename _Fm, typename _To>
++struct __is_nothrow_convertible_helper : decltype(std::__is_nothrow_convertible_test<_Fm, _To>()) {};
++
++template <typename _Fm, typename _To>
++struct is_nothrow_convertible
++    : _Or<_And<is_void<_To>, is_void<_Fm>>,
++          _Lazy<_And, is_convertible<_Fm, _To>, __is_nothrow_convertible_helper<_Fm, _To> > >::type {};
++
++template <typename _Fm, typename _To>
++inline constexpr bool is_nothrow_convertible_v = is_nothrow_convertible<_Fm, _To>::value;
++
++#endif // __has_builtin(__is_nothrow_convertible)
++
+ #endif // _LIBCPP_STD_VER >= 20
+ 
+ _LIBCPP_END_NAMESPACE_STD

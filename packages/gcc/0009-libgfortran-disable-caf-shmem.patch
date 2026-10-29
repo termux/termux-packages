@@ -1,0 +1,24 @@
+Bionic has no usable shared-memory coarray backend, so disable it in libgfortran.
+
+--- a/libgfortran/configure
++++ b/libgfortran/configure
+@@ -18396,7 +18396,7 @@
+ # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+ if test "x$ax_pthread_ok" = "xyes"; then
+ 
+-  enable_caf_shmem=true
++  enable_caf_shmem=false
+   CAF_SHMEM_CFLAGS="$PTHREAD_CFLAGS"
+   CAF_SHMEM_LIBS="$PTHREAD_LIBS"
+ 
+--- a/libgfortran/configure.ac
++++ b/libgfortran/configure.ac
+@@ -345,7 +345,7 @@
+ 
+ # Check for existing and usable pthreads.
+ AX_PTHREAD([
+-  enable_caf_shmem=true
++  enable_caf_shmem=false
+   CAF_SHMEM_CFLAGS="$PTHREAD_CFLAGS"
+   CAF_SHMEM_LIBS="$PTHREAD_LIBS"
+   ], [

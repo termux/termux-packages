@@ -1,0 +1,13 @@
+Make bionic's string.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/string.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/string.h
+@@ -239,7 +239,7 @@
+ #endif
+ 
+ /* Const-correct overloads. Placed after FORTIFY so we call those functions, if possible. */
+-#if defined(__cplusplus)
++#if defined(__cplusplus) && defined(__clang__)
+ /* libcxx tries to provide these. Suppress that, since libcxx's impl doesn't respect FORTIFY. */
+ #define __CORRECT_ISO_CPP_STRING_H_PROTO
+ /* Used to make these preferable over regular <string.h> signatures for overload resolution. */

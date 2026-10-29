@@ -1,0 +1,20 @@
+Make bionic's sys/mman.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/mman.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/mman.h
+@@ -50,7 +50,14 @@
+  * Returns the address of the mapping on success,
+  * and returns `MAP_FAILED` and sets `errno` on failure.
+  */
+-void* _Nonnull mmap(void* _Nullable __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset) __RENAME(mmap64);
++void* _Nonnull mmap(void* _Nullable __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset)
++#  if !defined(__clang__) && __ANDROID_API__ < 21
++      __attribute__((error("mmap is not available with _FILE_OFFSET_BITS=64 when using GCC until "
++                           "android-21. Either raise your minSdkVersion, disable "
++                           "_FILE_OFFSET_BITS=64, or switch to Clang.")));
++#  else
++    __RENAME(mmap64);
++#  endif
+ #else
+ void* _Nonnull mmap(void* _Nullable __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset);
+ #endif

@@ -1,0 +1,13 @@
+Relax the __ANDROID_API__ sanity check in <sys/cdefs.h>.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h
+@@ -418,7 +418,7 @@
+ #include <android/api-level.h>
+ #if __has_include(<android/ndk-version.h>)
+ #include <android/ndk-version.h>
+-#if !defined(__ANDROID_MIN_SDK_VERSION__)
++#if !defined(__ANDROID_MIN_SDK_VERSION__) && !defined(__ANDROID_API__)
+ #error Unversioned target triples are not supported!
+ #endif
+ #endif

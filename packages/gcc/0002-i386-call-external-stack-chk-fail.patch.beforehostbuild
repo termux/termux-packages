@@ -1,0 +1,15 @@
+Bionic no longer exports __stack_chk_fail_local on x86, so always call __stack_chk_fail.
+
+--- a/gcc/config/i386/i386.cc
++++ b/gcc/config/i386/i386.cc
+@@ -25586,9 +25586,7 @@
+ static tree ATTRIBUTE_UNUSED
+ ix86_stack_protect_fail (void)
+ {
+-  return TARGET_64BIT
+-	 ? default_external_stack_protect_fail ()
+-	 : default_hidden_stack_protect_fail ();
++  return default_external_stack_protect_fail ();
+ }
+ 
+ /* Select a format to encode pointers in exception handling data.  CODE

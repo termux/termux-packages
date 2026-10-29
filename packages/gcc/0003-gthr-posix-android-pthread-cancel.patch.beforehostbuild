@@ -1,0 +1,33 @@
+pthread_cancel is missing on Android, so test __ANDROID__ together with __BIONIC__ in libgcc.
+
+--- a/libgcc/gthr-posix.h
++++ b/libgcc/gthr-posix.h
+@@ -129,7 +129,7 @@
+ __gthrw(pthread_equal)
+ __gthrw(pthread_self)
+ __gthrw(pthread_detach)
+-#ifndef __BIONIC__
++#if ! (defined (__BIONIC__)  || defined (__ANDROID__))
+ __gthrw(pthread_cancel)
+ #endif
+ __gthrw(sched_yield)
+@@ -275,7 +275,7 @@
+ 	 __pthread_key_create,
+ 	 pthread_key_create)
+ # define GTHR_ACTIVE_PROXY	__gthrw_(__pthread_key_create)
+-#elif defined (__BIONIC__)
++#elif defined (__BIONIC__) || defined (__ANDROID__)
+ # define GTHR_ACTIVE_PROXY	__gthrw_(pthread_create)
+ #else
+ # define GTHR_ACTIVE_PROXY	__gthrw_(pthread_cancel)
+--- a/libgcc/unwind-dw2-fde-dip.c
++++ b/libgcc/unwind-dw2-fde-dip.c
+@@ -53,7 +53,7 @@
+ #endif
+ 
+ #if !defined(inhibit_libc) && defined(HAVE_LD_EH_FRAME_HDR) \
+-    && defined(__BIONIC__)
++    && (defined(__BIONIC__) || defined (__ANDROID__))
+ # define USE_PT_GNU_EH_FRAME
+ #endif
+ 

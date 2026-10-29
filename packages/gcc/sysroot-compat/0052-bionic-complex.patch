@@ -1,0 +1,20 @@
+Make bionic's complex.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/complex.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/complex.h
+@@ -44,9 +44,15 @@
+ #define	I		_Complex_I
+ 
+ #if __STDC_VERSION__ >= 201112L
++#ifdef __clang__
+ #define	CMPLX(x, y)	((double complex){ x, y })
+ #define	CMPLXF(x, y)	((float complex){ x, y })
+ #define	CMPLXL(x, y)	((long double complex){ x, y })
++#else
++#define	CMPLX(x, y)	__builtin_complex((double)(x), (double)(y))
++#define	CMPLXF(x, y)	__builtin_complex((float)(x), (float)(y))
++#define	CMPLXL(x, y)	__builtin_complex((long double)(x), (long double)(y))
++#endif
+ #endif
+ 
+ __BEGIN_DECLS

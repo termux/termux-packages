@@ -1,0 +1,14 @@
+Only chain to the next <stddef.h> when one exists.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/stddef.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/stddef.h
+@@ -35,7 +35,9 @@
+ 
+ // Note: This include is outside of header guards because we sometimes get included multiple times
+ //       with different defines and the underlying <stddef.h> will know how to deal with that.
++#  if __has_include_next(<stddef.h>)
+ #  include_next <stddef.h>
++#  endif
+ 
+ #  ifndef _LIBCPP_STDDEF_H
+ #    define _LIBCPP_STDDEF_H

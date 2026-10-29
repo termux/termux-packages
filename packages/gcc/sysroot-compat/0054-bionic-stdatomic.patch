@@ -1,0 +1,18 @@
+Make bionic's stdatomic.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdatomic.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdatomic.h
+@@ -32,8 +32,12 @@
+ 
+ #include <sys/cdefs.h>
+ 
+ #if defined(__cplusplus) && __cplusplus >= 201103L && __has_include(<atomic>)
+-# if __has_feature(cxx_atomic)
++# ifdef __clang__
++#  if __has_feature(cxx_atomic)
++#   define _STDATOMIC_HAVE_ATOMIC
++#  endif
++# else /* gcc */
+ #  define _STDATOMIC_HAVE_ATOMIC
+ # endif
+ #endif

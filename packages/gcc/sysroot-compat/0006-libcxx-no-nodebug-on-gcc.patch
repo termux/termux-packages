@@ -1,0 +1,16 @@
+_LIBCPP_NODEBUG is not handled well by GCC, so leave it empty.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__config
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__config
+@@ -1118,7 +1118,11 @@
+ // Optional attributes - these are useful for a better QoI, but not required to be available
+ 
+ #  define _LIBCPP_NOALIAS __attribute__((__malloc__))
++#  if !defined(_LIBCPP_COMPILER_GCC) || _LIBCPP_GCC_VER >= 1300
+ #  define _LIBCPP_NODEBUG [[__gnu__::__nodebug__]]
++#  else
++#  define _LIBCPP_NODEBUG
++#  endif
+ #  define _LIBCPP_NO_SANITIZE(...) __attribute__((__no_sanitize__(__VA_ARGS__)))
+ #  define _LIBCPP_INIT_PRIORITY_MAX __attribute__((__init_priority__(100)))
+ #  define _LIBCPP_ATTRIBUTE_FORMAT(archetype, format_string_index, first_format_arg_index)                             \

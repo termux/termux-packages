@@ -1,0 +1,14 @@
+Make bionic's time.h usable from GCC.
+
+--- a/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h
++++ b/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h
+@@ -255,7 +255,9 @@
+ /**
+  * Equivalent to strptime() on Android where only C/POSIX locales are available.
+  */
++#if __BIONIC_AVAILABILITY_GUARD(28)
+ char* _Nullable strptime_l(const char* _Nonnull __s, const char* _Nonnull __fmt, struct tm* _Nonnull __tm, locale_t _Nonnull __l) __strftimelike(2) __RENAME(strptime);
++#endif
+ 
+ /**
+  * [strftime(3)](https://man7.org/linux/man-pages/man3/strftime.3.html) formats
