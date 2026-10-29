@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-featured framework for image processing"
 TERMUX_PKG_LICENSE="CeCILL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.0.7"
+TERMUX_PKG_REVISION=1
 # https://gmic.eu/files/source/gmic_$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SRCURL="https://github.com/GreycLab/gmic/releases/download/v.${TERMUX_PKG_VERSION}/gmic_${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f84b215f40cb00de37bff5ec801103af211679794c3602d39c5430dab76005de
