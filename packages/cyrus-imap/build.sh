@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL="https://github.com/cyrusimap/cyrus-imapd/releases/download/cy
 TERMUX_PKG_SHA256=87a39e27208d9019f00608483d532eb05bd0d71394a6f3f8bb05a72833ad8d91
 TERMUX_PKG_DEPENDS="libsasl,bison,flex,libjansson,libical"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_MAKE_PROCESSES=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=$TERMUX_PREFIX/etc
 "
