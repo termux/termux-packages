@@ -295,7 +295,7 @@ __termux_build_props__set_termux_builder__repo_root_dir() {
 }
 __termux_build_props__set_termux_builder__repo_root_dir "/.." || exit $?
 unset __termux_build_props__set_termux_builder__repo_root_dir
-TERMUX_SCRIPTDIR="${TERMUX_SCRIPTDIR:-TERMUX_PKGS__BUILD__REPO_ROOT_DIR}" # Deprecated alternative variable for `TERMUX_PKGS__BUILD__REPO_ROOT_DIR`
+TERMUX_SCRIPTDIR="${TERMUX_SCRIPTDIR:-$TERMUX_PKGS__BUILD__REPO_ROOT_DIR}" # Deprecated alternative variable for `TERMUX_PKGS__BUILD__REPO_ROOT_DIR`
 
 
 
