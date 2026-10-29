@@ -824,7 +824,7 @@ if (( $# )); then
 	linter_main "$@"
 	unset package_counter
 else
-	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_SCRIPTDIR/repo.json"); do
+	for repo_dir in $(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_SCRIPTDIR/scripts/repo.json"); do
 		linter_main "$repo_dir"/*/build.sh
 	done
 	unset package_counter

@@ -13,7 +13,7 @@ ENV LANG=en_US.UTF-8
 RUN rm -rf /tmp/termux-packages
 RUN mkdir -p /tmp/termux-packages
 RUN mkdir -p /tmp/termux-packages/scripts
-COPY ./llvm-snapshot.gpg.key ./properties.sh ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh /tmp/termux-packages/scripts/
+COPY ./llvm-snapshot.gpg.key ./properties.sh ./repo.json ./setup-android-sdk.sh ./setup-cgct.sh ./setup-ubuntu.sh /tmp/termux-packages/scripts/
 RUN mkdir -p /tmp/termux-packages/scripts/build
 COPY ./build/termux_download.sh /tmp/termux-packages/scripts/build/
 
