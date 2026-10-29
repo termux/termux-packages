@@ -1,0 +1,12 @@
+--- a/build/gulpfile.vscode.ts
++++ b/build/gulpfile.vscode.ts
+@@ -610,9 +610,6 @@ BUILD_TARGETS.forEach(buildTarget => {
+ 		if (platform === 'win32') {
+ 			packageTasks.push(patchWin32DependenciesTask(destinationFolderName));
+ 		}
+-		if (shouldGenerateNodeCompileCache(platform, arch, product)) {
+-			packageTasks.push(generateNodeCompileCacheTask(platform, destinationFolderName));
+-		}
+ 
+ 		const vscodeTaskCI = task.define(`vscode${dashed(platform)}${dashed(arch)}${dashed(minified)}-ci`, task.series(...packageTasks));
+ 		task.task(vscodeTaskCI);
