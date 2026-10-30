@@ -4,9 +4,9 @@
 +#include <unistd.h>
  #include "SCardLoader.h"
  #include "PCSCException.h"
-
-@@ -87,7 +88,10 @@
-
+ 
+@@ -113,7 +114,10 @@ namespace VeraCrypt
+ 
  		if (pcscPath == "")
  		{
 -			pcscPath = "libpcsclite.so";
@@ -15,5 +15,5 @@
 +			if (access(pcscPath.c_str(), F_OK) != 0)
 +				pcscPath = "@TERMUX_PREFIX@/lib/libpcsclite.so";
  		}
-
+ 		
  		return pcscPath;
