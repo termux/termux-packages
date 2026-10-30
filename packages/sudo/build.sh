@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/agnostic-apollo/sudo
 TERMUX_PKG_DESCRIPTION="A wrapper script to drop to the supported shells or execute shell script files or their text passed as an argument as the root (superuser) user in the Termux app"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@agnostic-apollo"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL=https://github.com/agnostic-apollo/sudo/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=dd1f27172bb31885bcb865d1ff20ea4ce84799504bf38ddc1056d440bc0be6a0
