@@ -1,21 +1,21 @@
 --- a/codon/cir/llvm/llvisitor.cpp
 +++ b/codon/cir/llvm/llvisitor.cpp
-@@ -563,10 +563,12 @@
+@@ -631,10 +631,12 @@ void LLVMVisitor::writeToExecutable(const std::string &filename,
        command.push_back(uflag.str());
    }
  
 +#ifndef __ANDROID__
-   // Avoid "relocation R_X86_64_32 against `.bss' can not be used when making a PIE
-   // object" complaints by gcc when it is built with --enable-default-pie
+   // PIE links require the PIC object generated above. Otherwise retain -no-pie
+   // for default-PIE GCC to avoid R_X86_64_32 relocations against .bss.
    if (!library)
-     command.push_back("-no-pie");
+     command.push_back(pie ? "-pie" : "-no-pie");
 +#endif
  
    executeCommand(command);
  
 --- a/codon/cir/llvm/optimize.cpp
 +++ b/codon/cir/llvm/optimize.cpp
-@@ -35,7 +35,11 @@
+@@ -35,7 +35,11 @@ getTargetMachine(llvm::Triple triple, llvm::StringRef cpuStr,
  
    auto *tm = target->createTargetMachine(
        triple.getTriple(), cpuStr, featuresStr, targetOptions,
