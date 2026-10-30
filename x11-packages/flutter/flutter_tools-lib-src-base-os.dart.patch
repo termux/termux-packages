@@ -1,0 +1,17 @@
+dart:ffi Abi.current() returns androidArm64/androidX64/... on Termux, which
+falls into the default branch and throws "Unsupported host platform". Map the
+Android ABIs to the matching linux host platforms so cache directories
+(linux-arm64, linux-x64) are resolved the same way as on desktop Linux.
+
+--- a/packages/flutter_tools/lib/src/base/os.dart	2026-10-30 03:44:14.991864565 +0000
++++ b/packages/flutter_tools/lib/src/base/os.dart	2026-10-30 03:44:18.668359981 +0000
+@@ -151,6 +151,9 @@
+       Abi.linuxX64 => HostPlatform.linux_x64,
+       Abi.linuxArm64 => HostPlatform.linux_arm64,
+       Abi.linuxRiscv64 => HostPlatform.linux_riscv64,
++      Abi.androidArm64 => HostPlatform.linux_arm64,
++      Abi.androidX64 => HostPlatform.linux_x64,
++      Abi.androidRiscv64 => HostPlatform.linux_riscv64,
+       Abi.windowsX64 => HostPlatform.windows_x64,
+       Abi.windowsArm64 => HostPlatform.windows_arm64,
+       _ => throw UnsupportedError('Unsupported host platform: $_currentAbi'),
