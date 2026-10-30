@@ -1,0 +1,21 @@
+Link the valgrind and vgdb launchers dynamically on Android. A statically
+linked bionic aborts in arc4random init on kernels older than 4.14.
+
+--- a/coregrind/Makefile.am
++++ b/coregrind/Makefile.am
+@@ -74,7 +74,6 @@ endif
+ endif
+ # On Android we must ask for non-executable stack, not sure why.
+ if VGCONF_PLATVARIANT_IS_ANDROID
+-valgrind_CFLAGS += -static
+ valgrind_LDFLAGS   += -Wl,-z,noexecstack
+ endif
+ if VGCONF_OS_IS_SOLARIS
+@@ -108,7 +107,6 @@ vgdb_CFLAGS    = $(AM_CFLAGS_PRI) $(LTO_CFLAGS) -fhosted
+ vgdb_CCASFLAGS = $(AM_CCASFLAGS_PRI)
+ vgdb_LDFLAGS   = $(AM_CFLAGS_PRI) @LIB_UBSAN@
+ if VGCONF_PLATVARIANT_IS_ANDROID
+-vgdb_CFLAGS    += -static
+ endif
+ if VGCONF_OS_IS_SOLARIS
+ vgdb_LDADD     = -lsocket
