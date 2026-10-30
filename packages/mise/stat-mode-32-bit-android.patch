@@ -118,7 +118,7 @@
      let plist = plist::Value::from_reader(std::fs::File::from(fd))?;
 --- a/crates/mise-system-packages/src/brew/cask/mod.rs
 +++ b/crates/mise-system-packages/src/brew/cask/mod.rs
-@@ -2733,9 +2733,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
+@@ -2745,9 +2745,14 @@ fn copy_cask_artifact_at<Fd: std::os::fd::AsFd>(
      use std::os::unix::fs::PermissionsExt;
  
      let metadata = from.symlink_metadata()?;
@@ -133,7 +133,7 @@
      if metadata.file_type().is_symlink() {
          nix::unistd::symlinkat(&std::fs::read_link(from)?, parent, name)?;
      } else if metadata.is_dir() {
-@@ -2972,6 +2977,7 @@ fn open_trusted_directory(
+@@ -2984,6 +2989,7 @@ fn open_trusted_directory(
              || current_groups.contains(&stat.st_gid);
          let writable_by_untrusted = stat.st_mode & 0o002 != 0
              || (stat.st_mode & 0o020 != 0 && (!allow_current_user || !trusted_group));
@@ -141,7 +141,7 @@
          if !SFlag::from_bits_truncate(stat.st_mode).contains(SFlag::S_IFDIR)
              || !trusted_owner
              || writable_by_untrusted
-@@ -2981,6 +2987,17 @@ fn open_trusted_directory(
+@@ -2993,6 +2999,17 @@ fn open_trusted_directory(
                  directory.display()
              );
          }
@@ -159,7 +159,7 @@
          Ok(())
      };
      let mut directory = resolved_root.to_path_buf();
-@@ -3495,9 +3512,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
+@@ -3507,9 +3524,14 @@ fn ditto_into<Fd: std::os::fd::AsFd>(from: &Path, dir: Fd, name: &std::ffi::OsSt
      // Restore the bundle's own permissions, which the private staging mode hid.
      if let Ok(metadata) = from.symlink_metadata() {
          use std::os::unix::fs::PermissionsExt;
