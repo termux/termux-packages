@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Version 42, Host Tools)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 _CHROMIUM_VERSION=148.0.7778.280
 TERMUX_PKG_VERSION=42.11.12
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
