@@ -10,8 +10,6 @@ Subject: [PATCH] linux-capture-switch-to-AHardwareBuffer-DRI3
  plugins/linux-capture/xshm-input.c       | 178 ++++++++++++++++++++++-
  4 files changed, 341 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/linux-capture/CMakeLists.txt b/plugins/linux-capture/CMakeLists.txt
-index 5a504c0e4..79b085166 100644
 --- a/plugins/linux-capture/CMakeLists.txt
 +++ b/plugins/linux-capture/CMakeLists.txt
 @@ -26,6 +26,7 @@ target_sources(
@@ -22,8 +20,6 @@ index 5a504c0e4..79b085166 100644
  )
  
  set_target_properties_obs(linux-capture PROPERTIES FOLDER plugins PREFIX "")
-diff --git a/plugins/linux-capture/xcomposite-input.c b/plugins/linux-capture/xcomposite-input.c
-index 174b794a8..4874464e9 100644
 --- a/plugins/linux-capture/xcomposite-input.c
 +++ b/plugins/linux-capture/xcomposite-input.c
 @@ -22,6 +22,30 @@
@@ -231,8 +227,6 @@ index 174b794a8..4874464e9 100644
  	if (s->show_cursor) {
  		xcb_xcursor_update(conn, s->cursor);
  
-diff --git a/plugins/linux-capture/xhelpers.c b/plugins/linux-capture/xhelpers.c
-index c5ffd9353..91a52ed7d 100644
 --- a/plugins/linux-capture/xhelpers.c
 +++ b/plugins/linux-capture/xhelpers.c
 @@ -278,8 +278,11 @@ xcb_shm_t *xshm_xcb_attach(xcb_connection_t *xcb, const int w, const int h)
@@ -264,8 +258,6 @@ index c5ffd9353..91a52ed7d 100644
  xcb_screen_t *xcb_get_screen(xcb_connection_t *xcb, int screen)
  {
  	xcb_screen_iterator_t iter;
-diff --git a/plugins/linux-capture/xshm-input.c b/plugins/linux-capture/xshm-input.c
-index c927209d0..8a186be26 100644
 --- a/plugins/linux-capture/xshm-input.c
 +++ b/plugins/linux-capture/xshm-input.c
 @@ -28,6 +28,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
