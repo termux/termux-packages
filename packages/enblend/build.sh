@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION="4.2.0p20161007"
 TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL="https://dev.gentoo.org/~soap/distfiles/enblend-${TERMUX_PKG_VERSION//p/_p}.tar.xz"
 TERMUX_PKG_SHA256=4fe05af3d697bd6b2797facc8ba5aeabdc91e233156552301f1c7686232ff4c3
+TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%p*}"
 TERMUX_PKG_DEPENDS="gsl, libandroid-glob, libc++, libtiff, libvigra, littlecms"
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers, libjpeg-turbo, libpng, zlib"
 
