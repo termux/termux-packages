@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://android.googlesource.com/platform/bionic/+/refs/head
 TERMUX_PKG_DESCRIPTION="A shared library providing libm complex math functions"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="0.2"
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_AUTO_UPDATE=false
