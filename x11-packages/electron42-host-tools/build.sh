@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Version 42, Host Tools)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 _CHROMIUM_VERSION=148.0.7778.280
-TERMUX_PKG_VERSION=42.11.12
+TERMUX_PKG_VERSION=42.11.18
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libnotify, libffi-static"
@@ -14,6 +13,23 @@ TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_NO_STRIP=true
 TERMUX_PKG_NO_ELF_CLEANER=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
+# Electron 42 has reached EOL since 2026-10-20.
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
+
+termux_pkg_auto_update() {
+	local api_url="https://api.github.com/repos/electron/electron/git/refs/tags"
+	local latest_refs_tags=$(
+		curl -s "$api_url" | jq -r .[].ref | cut -d'/' -f 3 |
+			grep "^v42\." | grep -v -E "(rc)|(beta)|(pre)|(nightly)"
+	)
+	if [[ -z "${latest_refs_tags}" ]]; then
+		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+		return
+	fi
+	local latest_version=$(echo "${latest_refs_tags}" | sed -e 's|^v||g' | sort -V | tail -n1)
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 __setup_depot_tools() {
 	export DEPOT_TOOLS_UPDATE=0
