@@ -104,6 +104,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_pkg_config_wrapper.sh
 # shellcheck source=scripts/build/setup/termux_setup_crystal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_crystal.sh"
 
+# Utility function for setting up Dart SDK.
+# shellcheck source=scripts/build/setup/termux_setup_dart.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_dart.sh"
+
 # Utility function for setting up DotNet toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_dotnet.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_dotnet.sh"
