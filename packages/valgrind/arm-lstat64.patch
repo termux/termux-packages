@@ -1,0 +1,19 @@
+Use lstat64 instead of lstat on 32-bit arm. The Android seccomp filter
+kills processes calling __NR_lstat there.
+
+--- a/coregrind/m_libcfile.c
++++ b/coregrind/m_libcfile.c
+@@ -686,6 +686,13 @@ struct vki_stat buf;
+ 
+ #if defined(__NR_newfstatat)
+    res = VG_(do_syscall4)(__NR_newfstatat, VKI_AT_FDCWD, (UWord)file_name, (UWord)&buf, VKI_AT_SYMLINK_NOFOLLOW);
++#elif defined(VGP_arm_linux)
++   { struct vki_stat64 buf64;
++     res = VG_(do_syscall2)(__NR_lstat64, (UWord)file_name, (UWord)&buf64);
++     if (!sr_isError(res))
++        TRANSLATE_TO_vg_stat(vgbuf, &buf64);
++     return res;
++   }
+ #else
+    res = VG_(do_syscall2)(__NR_lstat, (UWord)file_name, (UWord)&buf);
+ #endif

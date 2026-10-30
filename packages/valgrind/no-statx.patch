@@ -1,24 +1,24 @@
 --- a/coregrind/m_aspacemgr/aspacemgr-common.c
 +++ b/coregrind/m_aspacemgr/aspacemgr-common.c
-@@ -262,7 +262,7 @@
- 
+@@ -264,7 +264,7 @@ SysRes ML_(am_do_relocate_nooverlap_mapping_NO_NOTIFY)(
  SysRes ML_(am_open) ( const HChar* pathname, Int flags, Int mode )
  {
--#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux)
-+#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) || defined(__ANDROID__)
-    /* ARM64 wants to use __NR_openat rather than __NR_open. */
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    /* More recent Linux platforms have only __NR_openat and no __NR_open. */
     SysRes res = VG_(do_syscall4)(__NR_openat,
                                   VKI_AT_FDCWD, (UWord)pathname, flags, mode);
-@@ -291,7 +291,7 @@
- Int ML_(am_readlink)(const HChar* path, HChar* buf, UInt bufsiz)
+@@ -294,7 +294,7 @@ Int ML_(am_readlink)(const HChar* path, HChar* buf, UInt bufsiz)
  {
     SysRes res;
--#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux)
-+#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) || defined(__ANDROID__)
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
     res = VG_(do_syscall4)(__NR_readlinkat, VKI_AT_FDCWD,
                                             (UWord)path, (UWord)buf, bufsiz);
  #  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
-@@ -330,6 +330,7 @@
+@@ -339,6 +339,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd,
  #  if defined(VGO_linux) || defined(VGO_darwin)
     SysRes          res;
  #  if defined(VGO_linux)
@@ -26,7 +26,7 @@
     /* First try with statx. */
     struct vki_statx bufx;
     const char* file_name = "";
-@@ -341,6 +342,7 @@
+@@ -350,6 +351,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd,
        *mode = (UInt)bufx.stx_mode;
        return True;
     }
@@ -36,16 +36,16 @@
  #  if defined(VGO_linux) && defined(__NR_fstat64)
 --- a/coregrind/m_libcfile.c
 +++ b/coregrind/m_libcfile.c
-@@ -290,7 +290,7 @@
- 
+@@ -292,7 +292,7 @@ SysRes VG_(mknod) ( const HChar* pathname, Int mode, UWord dev )
  SysRes VG_(open) ( const HChar* pathname, Int flags, Int mode )
  {
--#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux)
-+#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) || defined(__ANDROID__)
-    /* ARM64 wants to use __NR_openat rather than __NR_open. */
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    /* More recent Linux platforms have only __NR_openat and no __NR_open. */
     SysRes res = VG_(do_syscall4)(__NR_openat,
                                   VKI_AT_FDCWD, (UWord)pathname, flags, mode);
-@@ -511,7 +511,7 @@
+@@ -514,7 +514,7 @@ SysRes VG_(stat) ( const HChar* file_name, struct vg_stat* vgbuf )
     SysRes res;
     VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
  
@@ -54,7 +54,7 @@
     /* On Linux, first try with statx. If that doesn't work out, fall back to
        the stat64 or vanilla version. */
     { struct vki_statx buf;
-@@ -546,6 +546,12 @@
+@@ -549,6 +549,12 @@ SysRes VG_(stat) ( const HChar* file_name, struct vg_stat* vgbuf )
  #    if defined(VGP_arm64_linux)
       res = VG_(do_syscall3)(__NR3264_fstatat, VKI_AT_FDCWD,
                                                (UWord)file_name, (UWord)&buf);
@@ -67,7 +67,7 @@
  #    else
       res = VG_(do_syscall2)(__NR_stat, (UWord)file_name, (UWord)&buf);
  #    endif
-@@ -595,7 +601,7 @@
+@@ -602,7 +608,7 @@ Int VG_(fstat) ( Int fd, struct vg_stat* vgbuf )
     SysRes res;
     VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
  
@@ -76,12 +76,12 @@
     /* On Linux, first try with statx. If that doesn't work out, fall back to
        the fstat64 or vanilla version. */
     { struct vki_statx buf;
-@@ -994,9 +1000,9 @@
-    UWord w = (irusr ? VKI_R_OK : 0)
+@@ -1046,9 +1052,9 @@ Int VG_(access) ( const HChar* path, Bool irusr, Bool iwusr, Bool ixusr )
               | (iwusr ? VKI_W_OK : 0)
               | (ixusr ? VKI_X_OK : 0);
--#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux)
-+#  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) || defined(__ANDROID__)
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
     SysRes res = VG_(do_syscall3)(__NR_faccessat, VKI_AT_FDCWD, (UWord)path, w);
 -#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
 +#  elif defined(VGO_linux) && !defined(__ANDROID__) || defined(VGO_darwin) || defined(VGO_freebsd)
