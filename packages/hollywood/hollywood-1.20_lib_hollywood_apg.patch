@@ -11,7 +11,7 @@
 +	_HAS_CCZE=true
 +fi
  
- trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ trap "pkill -9 -f lib/hollywood/ >/dev/null 2>&1; exit" INT
  while true; do
 -	apg -qlt -c /dev/urandom -n 1 -m 4 | ccze -A -c default=$(printf "red\ngreen\nyellow\nblue\nmagenta\ncyan" | sort -R | head -n1)
 +	if ${_HAS_CCZE}; then
