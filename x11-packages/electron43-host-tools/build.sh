@@ -17,16 +17,37 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 
 termux_pkg_auto_update() {
+	local e=0
 	local api_url="https://api.github.com/repos/electron/electron/git/refs/tags"
+	local api_url_r=$(curl -s "${api_url}")
 	local latest_refs_tags=$(
-		curl -s "$api_url" | jq -r .[].ref | cut -d'/' -f 3 |
+		echo "${api_url_r}" | jq -r .[].ref | cut -d'/' -f 3 |
 			grep "^v43\." | grep -v -E "(rc)|(beta)|(pre)|(nightly)"
 	)
-	if [[ -z "${latest_refs_tags}" ]]; then
-		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+	local latest_version=$(echo "${latest_refs_tags}" | sed -e 's|^v||g' | sort -V | tail -n1)
+	[[ -z "${api_url_r}" ]] && e=1
+	[[ -z "${latest_version}" ]] && e=1
+
+	local uptime_now=$(cat /proc/uptime)
+	local uptime_s="${uptime_now//.*}"
+	local uptime_h_limit=2
+	local uptime_s_limit=$((uptime_h_limit*60*60))
+	[[ -z "${uptime_s}" ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" == 0 ]] && [[ "$(uname -o)" != "Android" ]] && e=1
+	[[ "${uptime_s}" -gt "${uptime_s_limit}" ]] && e=1
+
+	if [[ "${e}" != 0 ]]; then
+		cat <<- EOL >&2
+		WARN: Auto update failure!
+		api_url_r=${api_url_r}
+		latest_version=${latest_version}
+		uptime_now=${uptime_now}
+		uptime_s=${uptime_s}
+		uptime_s_limit=${uptime_s_limit}
+		EOL
 		return
 	fi
-	local latest_version=$(echo "${latest_refs_tags}" | sed -e 's|^v||g' | sort -V | tail -n1)
+
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
