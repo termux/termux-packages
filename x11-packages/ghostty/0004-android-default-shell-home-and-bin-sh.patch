@@ -1,16 +1,16 @@
 --- a/src/config/Config.zig
 +++ b/src/config/Config.zig
-@@ -3481,7 +3481,8 @@
+@@ -3716,7 +3716,8 @@ keybind: Keybinds = .{},
  ///   * `always` - Always use cgroups.
  ///   * `single-instance` - Enable cgroups only for Ghostty instances launched
  ///     as single-instance applications (see gtk-single-instance).
--@"linux-cgroup": LinuxCgroup = if (builtin.os.tag == .linux)
-+@"linux-cgroup": LinuxCgroup = if (builtin.os.tag == .linux and
+-@"linux-cgroup": LinuxCgroup = if (builtin.target.os.tag == .linux)
++@"linux-cgroup": LinuxCgroup = if (builtin.target.os.tag == .linux and
 +    !builtin.target.abi.isAndroid())
      .@"single-instance"
  else
      .never,
-@@ -4523,7 +4524,8 @@
+@@ -4799,7 +4800,8 @@ pub fn finalize(self: *Config) !void {
      }
  
      // The default for the working directory depends on the system.
@@ -20,7 +20,7 @@
          .inherit
      else
          .home;
-@@ -4535,6 +4537,33 @@
+@@ -4811,6 +4813,35 @@ pub fn finalize(self: *Config) !void {
          (comptime !builtin.is_test))
      {
          if (self.command == null or wd == .home) command: {
@@ -29,11 +29,13 @@
 +            // "launched from desktop" heuristic ignores $SHELL and $HOME.
 +            if (comptime builtin.target.abi.isAndroid()) {
 +                if (self.command == null) {
-+                    if (std.process.getEnvVarOwned(alloc, "SHELL")) |value| shell: {
-+                        std.fs.accessAbsolute(value, .{}) catch break :shell;
++                    shell: {
++                        const value = global.environ().getAlloc(alloc, "SHELL") catch break :shell;
++                        defer alloc.free(value);
++                        std.Io.Dir.accessAbsolute(global.io(), value, .{}) catch break :shell;
 +                        log.info("default shell src=env value={s}", .{value});
-+                        self.command = .{ .shell = try alloc.dupeZ(u8, value) };
-+                    } else |_| {}
++                        self.command = .{ .shell = try alloc.dupeSentinel(u8, value, 0) };
++                    }
 +
 +                    if (self.command == null) {
 +                        log.info("default shell src=termux value=@TERMUX_PREFIX@/bin/login", .{});
@@ -42,7 +44,7 @@
 +                }
 +
 +                if (wd == .home) {
-+                    wd = if (std.process.getEnvVarOwned(alloc, "HOME")) |home|
++                    wd = if (global.environ().getAlloc(alloc, "HOME")) |home|
 +                        .{ .path = home }
 +                    else |_|
 +                        .{ .path = "@TERMUX_HOME@" };
@@ -54,7 +56,7 @@
              // First look up the command using the SHELL env var if needed.
              // We don't do this in flatpak because SHELL in Flatpak is always
              // set to /bin/sh.
-@@ -5038,6 +5067,16 @@
+@@ -5342,6 +5373,16 @@ pub const ChangeIterator = struct {
      }
  };
  
@@ -63,9 +65,9 @@
 +fn androidLaunchedFromLauncher() bool {
 +    if (comptime !builtin.target.abi.isAndroid()) return false;
 +    if (internal_os.launchedFromDesktop()) return true;
-+    var buf: [std.fs.max_path_bytes]u8 = undefined;
-+    const cwd = std.posix.getcwd(&buf) catch return false;
-+    return std.mem.eql(u8, cwd, "/");
++    var buf: [std.Io.Dir.max_path_bytes]u8 = undefined;
++    const len = std.process.currentPath(global.io(), &buf) catch return false;
++    return std.mem.eql(u8, buf[0..len], "/");
 +}
 +
  /// This runs a heuristic to determine if we are likely running
@@ -73,7 +75,7 @@
  /// We should keep the set of behaviors that depend on this as small
 --- a/src/termio/Exec.zig
 +++ b/src/termio/Exec.zig
-@@ -1569,7 +1569,11 @@
+@@ -2014,7 +2014,11 @@ fn execCommand(
                  // Additionally, some environments (NixOS, I found) use /bin/sh
                  // to setup some environment variables that are important to
                  // have set.
