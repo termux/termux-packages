@@ -1,7 +1,6 @@
-diff --git a/build/cmake/modules/megacmd_libraries.cmake b/build/cmake/modules/megacmd_libraries.cmake
 --- a/build/cmake/modules/megacmd_libraries.cmake
 +++ b/build/cmake/modules/megacmd_libraries.cmake
-@@ -2,8 +2,8 @@
+@@ -2,8 +2,8 @@ macro(load_megacmdserver_libraries)
  
      if(VCPKG_ROOT)
          if(USE_PCRE)
@@ -12,7 +11,7 @@ diff --git a/build/cmake/modules/megacmd_libraries.cmake b/build/cmake/modules/m
              set(USE_PCRE 1)
          endif()
  
-@@ -16,8 +16,8 @@
+@@ -16,8 +16,8 @@ macro(load_megacmdserver_libraries)
          find_package(PkgConfig REQUIRED) # For libraries loaded using pkg-config
  
          if(USE_PCRE) #TODO: UNTESTED!
@@ -23,10 +22,9 @@ diff --git a/build/cmake/modules/megacmd_libraries.cmake b/build/cmake/modules/m
              set(USE_PCRE 1)
          endif()
      endif()
-diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
 --- a/src/megacmdutils.cpp
 +++ b/src/megacmdutils.cpp
-@@ -20,7 +20,8 @@
+@@ -21,7 +21,8 @@
  #include "mega/types.h"
  
  #ifdef USE_PCRE
@@ -36,7 +34,7 @@ diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
  #elif __cplusplus >= 201103L && !defined(__MINGW32__)
  #include <regex>
  #endif
-@@ -937,6 +938,31 @@
+@@ -960,6 +961,31 @@ bool getMinAndMaxSize(string sizestring, int64_t *minSize, int64_t *maxSize)
  }
  
  
@@ -68,7 +66,7 @@ diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
  bool isRegExp(string what)
  {
  #ifdef USE_PCRE
-@@ -975,7 +990,7 @@
+@@ -998,7 +1024,7 @@ bool isRegExp(string what)
      replaceAll(what, "/./", "/");
      replaceAll(what, "/", "");
  
@@ -77,7 +75,7 @@ diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
      string ns = s;
      replaceAll(ns, "\\\\\\", "\\");
      bool isregex = strcmp(what.c_str(), ns.c_str());
-@@ -1013,7 +1028,7 @@
+@@ -1036,7 +1062,7 @@ string unquote(string what)
          }
      }
  
@@ -86,7 +84,7 @@ diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
      string ns = s;
      replaceAll(ns, "\\\\\\", "\\");
  
-@@ -1077,25 +1092,41 @@
+@@ -1100,25 +1126,41 @@ bool patternMatches(const char *what, const char *pattern, bool usepcre)
      if (usepcre)
      {
  #ifdef USE_PCRE
@@ -115,12 +113,13 @@ diff --git a/src/megacmdutils.cpp b/src/megacmdutils.cpp
 +        if (re)
          {
 -            bool toret = re.FullMatch(what);
+-
 +            pcre2_match_data *matchData = pcre2_match_data_create_from_pattern(re, nullptr);
 +            int result = pcre2_match(re, reinterpret_cast<PCRE2_SPTR>(what), PCRE2_ZERO_TERMINATED,
 +                                     0, PCRE2_ANCHORED, matchData, nullptr);
 +            PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(matchData);
 +            bool toret = result >= 0 && ovector[0] == 0 && ovector[1] == string(what).size();
- 
++
 +            pcre2_match_data_free(matchData);
 +            pcre2_code_free(re);
              return toret;

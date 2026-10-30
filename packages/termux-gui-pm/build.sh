@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE="https://github.com/tareksander/termux-gui-pm"
 TERMUX_PKG_DESCRIPTION="A graphical package manager for various package formats for Termux and proot-distro distros"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@tareksander"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="1.0.0"
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_DEPENDS="python, python-pip"

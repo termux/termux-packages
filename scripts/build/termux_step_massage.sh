@@ -129,7 +129,7 @@ termux_step_massage() {
 		find ./${ADDING_PREFIX}share/man -mindepth 1 -maxdepth 1 -type d ! -name man\* | xargs -r rm -rf
 
 		# Compress man pages with gzip:
-		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip -9 -n
+		find ./${ADDING_PREFIX}share/man -type f ! -iname \*.gz -print0 | xargs -r -0 -P "$TERMUX_PKG_MAKE_PROCESSES" gzip -9 -n
 
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
 		while IFS= read -r -d '' file; do

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-services/
 TERMUX_PKG_DESCRIPTION="Service daemon for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=0.13
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-services/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz

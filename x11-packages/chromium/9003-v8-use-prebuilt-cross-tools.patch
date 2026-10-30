@@ -1,6 +1,6 @@
 --- a/v8/BUILD.gn
 +++ b/v8/BUILD.gn
-@@ -2139,7 +2139,9 @@
+@@ -2718,7 +2718,9 @@ template("run_torque") {
        "tools/gcmole/:*",
      ]
  
@@ -8,9 +8,9 @@
      deps = [ ":torque($toolchain)" ]
 +}
  
-     script = "tools/run.py"
- 
-@@ -2181,8 +2183,14 @@
+     if (is_msan) {
+       configs = [
+@@ -2760,8 +2762,14 @@ template("run_torque") {
        ]
      }
  
@@ -26,7 +26,7 @@
                get_label_info(":torque($toolchain)", "root_out_dir") + "/torque",
                root_build_dir),
        "-o",
-@@ -2343,9 +2351,18 @@
+@@ -2976,9 +2984,18 @@ v8_cluster_source_set("torque_generated_definitions") {
  action("generate_bytecode_builtins_list") {
    script = "tools/run.py"
    outputs = [ "$target_gen_dir/builtins-generated/bytecodes-builtins-list.h" ]
@@ -46,9 +46,9 @@
              get_label_info(
                      ":bytecode_builtins_list_generator($v8_generator_toolchain)",
                      "root_out_dir") + "/bytecode_builtins_list_generator",
-@@ -2373,12 +2390,16 @@
-     suffix = "_$name"
+@@ -3007,12 +3024,16 @@ template("run_mksnapshot") {
    }
+ 
    action("run_mksnapshot_" + name) {
 +if (false) {
      deps = [ ":mksnapshot($v8_snapshot_toolchain)" ]
@@ -61,9 +61,9 @@
 +    deps = []
 +}
  
-     script = "tools/run.py"
- 
-@@ -2405,6 +2424,7 @@
+     if (is_msan) {
+       configs = [
+@@ -3050,6 +3071,7 @@ template("run_mksnapshot") {
  
      args = []
  
@@ -71,7 +71,7 @@
      if (v8_verify_deterministic_mksnapshot) {
        # Output redirection must be the first argument to run.py. We capture
        # output when verifying snapshot determinism for debugging.
-@@ -2415,9 +2435,16 @@
+@@ -3060,9 +3082,16 @@ template("run_mksnapshot") {
        ]
        data += [ "$root_out_dir/mksnapshot_output${suffix}.log" ]
      }
@@ -89,7 +89,7 @@
                                          "root_out_dir") + "/mksnapshot",
                           root_build_dir),
        "--turbo_instruction_scheduling",
-@@ -7458,14 +7485,22 @@
+@@ -8571,14 +8600,22 @@ if (v8_enable_i18n_support) {
  
      script = "tools/run.py"
  

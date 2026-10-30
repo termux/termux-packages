@@ -3,18 +3,17 @@ TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python com
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	"0.20.2"
+	"0.20.5"
 	"20.1.7"
 )
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/exaloop/codon/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/exaloop/codon/releases/download/v${TERMUX_PKG_VERSION[0]}/codon-linux-x86_64.tar.gz"
 	"https://github.com/exaloop/llvm-project/archive/refs/tags/codon-${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	c704392e80470a8df9144bd6d4341cb5142674f37c91a49c9857abbeea98cfc3
-	739e3c52f08bcb7ddd20277b63d72e11ae31d4e8fdae29b1c6458f8d65d7794d
+	67631a0f8e71068b280e179771b63e138bca8bde533db176ecf5c5fba0fc6bdb
+	936953873ec280045d08270d46e426be0843a12596c82a32ddfa5ea3ea9d528e
 	d0f613f3e63b1f1f1c8c75822bf2b83caed48e8973c35d13bf4148d343bc8645
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
@@ -177,6 +176,7 @@ termux_step_post_make_install() {
 #!$TERMUX_PREFIX/bin/env sh
 
 export PATH="$TERMUX_PREFIX/opt/codon/bin:\$PATH"
+export CODON_PYTHON="\${CODON_PYTHON:-$TERMUX_PREFIX/lib/libpython3.so}"
 exec $TERMUX_PREFIX/opt/codon/bin/codon "\$@"
 
 EOF
