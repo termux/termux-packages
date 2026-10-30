@@ -1,0 +1,38 @@
+--- a/src/base/SecureFileUnix.cpp
++++ b/src/base/SecureFileUnix.cpp
+@@ -100,12 +100,29 @@
+   if (makePrivate && path == path.root_path()) {
+     fail(path, "cannot use a filesystem root as private storage");
+   }
+-  FileDescriptor current(::open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC));
+-  if (current.get() < 0) fail(path, strerror(errno));
+-  fs::path traversed = "/";
+-  fs::path resolved = "/";
+-  verifyAncestor(inspect(current.get(), traversed), traversed);
+-  for (const auto& component : path.relative_path()) {
++  // Termux: an Android app can neither open nor own the system directories
++  // above its sandbox (/data and /data/data are mode 771 and owned by system),
++  // so walking from "/" always fails with "Permission denied". Paths inside
++  // the app's files directory start the walk there instead: only this app's
++  // uid can write inside it. Everything below it is still verified.
++  const fs::path termuxBase = "@TERMUX_BASE_DIR@";
++  const auto inBase =
++      std::mismatch(termuxBase.begin(), termuxBase.end(), path.begin(),
++                    path.end());
++  const bool underTermux = inBase.first == termuxBase.end();
++  FileDescriptor current(::open(underTermux ? termuxBase.c_str() : "/",
++                                O_RDONLY | O_DIRECTORY | O_CLOEXEC));
++  if (current.get() < 0) fail(underTermux ? termuxBase : path, strerror(errno));
++  fs::path traversed = underTermux ? termuxBase : fs::path("/");
++  fs::path resolved = traversed;
++  fs::path remaining;
++  if (underTermux) {
++    for (auto it = inBase.second; it != path.end(); ++it) remaining /= *it;
++  } else {
++    remaining = path.relative_path();
++    verifyAncestor(inspect(current.get(), traversed), traversed);
++  }
++  for (const auto& component : remaining) {
+     if (component == "." || component.empty()) continue;
+     const string name = component.string();
+     const struct stat parent = inspect(current.get(), traversed);
