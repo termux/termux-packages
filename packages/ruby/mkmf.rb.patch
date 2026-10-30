@@ -1,7 +1,6 @@
-diff -u -r ../ruby-2.4.1/lib/mkmf.rb ./lib/mkmf.rb
---- ../ruby-2.4.1/lib/mkmf.rb	2017-03-11 19:46:17.000000000 +0100
-+++ ./lib/mkmf.rb	2017-08-21 01:04:18.918432148 +0200
-@@ -500,7 +500,7 @@
+--- a/lib/mkmf.rb
++++ b/lib/mkmf.rb
+@@ -578,7 +578,7 @@ MSG
      if $universal and (arch_flag = conf['ARCH_FLAG']) and !arch_flag.empty?
        conf['ARCH_FLAG'] = arch_flag.gsub(/(?:\G|\s)-arch\s+\S+/, '')
      end
@@ -10,7 +9,7 @@ diff -u -r ../ruby-2.4.1/lib/mkmf.rb ./lib/mkmf.rb
                       conf)
    end
  
-@@ -1894,7 +1894,7 @@
+@@ -2084,7 +2084,7 @@ SRC
      vpath = $VPATH.dup
      CONFIG["hdrdir"] ||= $hdrdir
      mk << %{
@@ -18,4 +17,4 @@ diff -u -r ../ruby-2.4.1/lib/mkmf.rb ./lib/mkmf.rb
 +SHELL = @TERMUX_PREFIX@/bin/sh
  
  # V=0 quiet, V=1 verbose.  other values don't work.
- V = 0
+ V = #{verbose}
