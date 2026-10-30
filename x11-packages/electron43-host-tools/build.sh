@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Version 43, Host Tools)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 _CHROMIUM_VERSION=150.0.7871.250
 TERMUX_PKG_VERSION=43.7.11
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
@@ -14,6 +13,22 @@ TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_NO_STRIP=true
 TERMUX_PKG_NO_ELF_CLEANER=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
+
+termux_pkg_auto_update() {
+	local api_url="https://api.github.com/repos/electron/electron/git/refs/tags"
+	local latest_refs_tags=$(
+		curl -s "$api_url" | jq -r .[].ref | cut -d'/' -f 3 |
+			grep "^v43\." | grep -v -E "(rc)|(beta)|(pre)|(nightly)"
+	)
+	if [[ -z "${latest_refs_tags}" ]]; then
+		echo "WARN: Unable to get latest refs tags from upstream. Try again later." >&2
+		return
+	fi
+	local latest_version=$(echo "${latest_refs_tags}" | sed -e 's|^v||g' | sort -V | tail -n1)
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 __setup_depot_tools() {
 	export DEPOT_TOOLS_UPDATE=0
