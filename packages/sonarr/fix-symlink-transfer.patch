@@ -1,32 +1,10 @@
---- a/src/NzbDrone.Common/Disk/TransferMode.cs
-+++ b/src/NzbDrone.Common/Disk/TransferMode.cs
-@@ -10,7 +10,9 @@
-         Move = 1,
-         Copy = 2,
-         HardLink = 4,
-+        SymbolicLink = 8,
- 
--        HardLinkOrCopy = Copy | HardLink
-+        HardLinkOrCopy = Copy | HardLink,
-+        SymbolicLinkOrCopy = Copy | SymbolicLink
-     }
- }
---- a/src/NzbDrone.Common/Disk/IDiskProvider.cs
-+++ b/src/NzbDrone.Common/Disk/IDiskProvider.cs
-@@ -35,6 +35,8 @@
-         bool TryRenameFile(string source, string destination);
-         bool TryCreateHardLink(string source, string destination);
-         bool TryCreateRefLink(string source, string destination);
-+        bool TryCreateSymbolicLink(string source, string destination);
-+        bool IsSymbolicLink(string path);
-         void DeleteFolder(string path, bool recursive);
-         string ReadAllText(string filePath);
-         void WriteAllText(string filename, string contents);
+diff --git a/src/NzbDrone.Common/Disk/DiskProviderBase.cs b/src/NzbDrone.Common/Disk/DiskProviderBase.cs
+index c9ff528d64..2dc56875ee 100644
 --- a/src/NzbDrone.Common/Disk/DiskProviderBase.cs
 +++ b/src/NzbDrone.Common/Disk/DiskProviderBase.cs
-@@ -312,6 +312,32 @@
-             return false;
-         }
+@@ -305,6 +305,32 @@ public virtual bool TryRenameFile(string source, string destination)
+ 
+         public abstract bool TryCreateHardLink(string source, string destination);
  
 +        public virtual bool TryCreateSymbolicLink(string source, string destination)
 +        {
@@ -57,9 +35,11 @@
          public void DeleteFolder(string path, bool recursive)
          {
              Ensure.That(path, () => path).IsValidPath(PathValidationType.CurrentOs);
+diff --git a/src/NzbDrone.Common/Disk/DiskTransferService.cs b/src/NzbDrone.Common/Disk/DiskTransferService.cs
+index bc4b5e59bd..ab67e6e956 100644
 --- a/src/NzbDrone.Common/Disk/DiskTransferService.cs
 +++ b/src/NzbDrone.Common/Disk/DiskTransferService.cs
-@@ -272,7 +272,7 @@
+@@ -272,7 +272,7 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
  
              if (sourcePath.PathEquals(targetPath, StringComparison.InvariantCultureIgnoreCase))
              {
@@ -68,22 +48,20 @@
                  {
                      throw new IOException(string.Format("Source and destination can't be the same {0}", sourcePath));
                  }
-@@ -324,12 +324,34 @@
-                     return TransferMode.HardLink;
-                 }
+@@ -326,6 +326,12 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
  
--                if (!mode.HasFlag(TransferMode.Copy))
-+                if (mode.HasFlag(TransferMode.Copy))
-+                {
+                 if (mode.HasFlag(TransferMode.Copy))
+                 {
 +                    var createdSymbolicLink = _diskProvider.TryCreateSymbolicLink(sourcePath, targetPath);
 +                    if (createdSymbolicLink)
 +                    {
 +                        return TransferMode.SymbolicLink;
 +                    }
-+                }
-+                else
-                 {
-                     throw new IOException("Hardlinking from '" + sourcePath + "' to '" + targetPath + "' failed.");
++
+                     _logger.Warn("Hardlinking from '{0}' to '{1}' failed, fallback to copy.", sourcePath, targetPath);
+                 }
+                 else
+@@ -334,6 +340,20 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
                  }
              }
  
@@ -104,9 +82,45 @@
              // Adjust the transfer mode depending on the filesystems
              var sourceMount = _diskProvider.GetMount(sourcePath);
              var targetMount = _diskProvider.GetMount(targetPath);
+diff --git a/src/NzbDrone.Common/Disk/IDiskProvider.cs b/src/NzbDrone.Common/Disk/IDiskProvider.cs
+index bbad1e6e8b..b0cc2e017d 100644
+--- a/src/NzbDrone.Common/Disk/IDiskProvider.cs
++++ b/src/NzbDrone.Common/Disk/IDiskProvider.cs
+@@ -36,6 +36,8 @@ public interface IDiskProvider
+         void MoveFolder(string source, string destination);
+         bool TryRenameFile(string source, string destination);
+         bool TryCreateHardLink(string source, string destination);
++        bool TryCreateSymbolicLink(string source, string destination);
++        bool IsSymbolicLink(string path);
+         void DeleteFolder(string path, bool recursive);
+         string ReadAllText(string filePath);
+         void WriteAllText(string filename, string contents);
+diff --git a/src/NzbDrone.Common/Disk/TransferMode.cs b/src/NzbDrone.Common/Disk/TransferMode.cs
+index f1f6cab48c..d91240ef09 100644
+--- a/src/NzbDrone.Common/Disk/TransferMode.cs
++++ b/src/NzbDrone.Common/Disk/TransferMode.cs
+@@ -1,4 +1,4 @@
+-﻿using System;
++using System;
+ 
+ namespace NzbDrone.Common.Disk
+ {
+@@ -10,7 +10,9 @@ public enum TransferMode
+         Move = 1,
+         Copy = 2,
+         HardLink = 4,
++        SymbolicLink = 8,
+ 
+-        HardLinkOrCopy = Copy | HardLink
++        HardLinkOrCopy = Copy | HardLink,
++        SymbolicLinkOrCopy = Copy | SymbolicLink
+     }
+ }
+diff --git a/src/NzbDrone.Mono/Disk/DiskProvider.cs b/src/NzbDrone.Mono/Disk/DiskProvider.cs
+index 9d9026ec21..620802c40f 100644
 --- a/src/NzbDrone.Mono/Disk/DiskProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-@@ -459,6 +459,32 @@
+@@ -455,6 +455,32 @@ public override bool TryCreateHardLink(string source, string destination)
              }
          }
  
@@ -136,6 +150,6 @@
 +            }
 +        }
 +
-         private uint GetUserId(string user)
+         private static int GetUserId(string user)
          {
-             if (user.IsNullOrWhiteSpace())
+             if (string.IsNullOrWhiteSpace(user))
