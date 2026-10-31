@@ -1,0 +1,73 @@
+--- a/coregrind/m_debuginfo/debuginfo.c
++++ b/coregrind/m_debuginfo/debuginfo.c
+@@ -649,6 +649,54 @@ static void discard_DebugInfos_which_overlap_with ( DebugInfo* diRef )
+ }
+ 
+ 
++/* Forget read-only mappings of |di| which are no longer mapped from its
++   file.  The Android linker maps and unmaps ELF fragments transiently,
++   and stale entries make the overlap check discard unrelated debuginfo. */
++static void drop_stale_ro_mappings ( DebugInfo* di )
++{
++   Word i = 0;
++   while (i < VG_(sizeXA)(di->fsm.maps)) {
++      const DebugInfoMapping* map = VG_(indexXA)(di->fsm.maps, i);
++      Bool stale = False;
++      if (map->ro && !map->rx && !map->rw) {
++         const NSegment* seg = VG_(am_find_nsegment)(map->avma);
++         const HChar* segname = seg ? VG_(am_get_filename)(seg) : NULL;
++         stale = seg == NULL
++                 || (seg->kind != SkFileC && seg->kind != SkFileV)
++                 || seg->start > map->avma
++                 || seg->end + 1 < map->avma + map->size
++                 || segname == NULL
++                 || VG_(strcmp)(segname, di->fsm.filename) != 0;
++      }
++      if (stale)
++         VG_(removeIndexXA)(di->fsm.maps, i);
++      else
++         i++;
++   }
++}
++
++
++/* Forget read-only mappings lying within the just unmapped range. */
++static void drop_ro_mappings_in_range ( Addr start, SizeT length )
++{
++   DebugInfo* di;
++   for (di = debugInfo_list; di; di = di->next) {
++      Word i = 0;
++      if (is_DebugInfo_archived(di))
++         continue;
++      while (i < VG_(sizeXA)(di->fsm.maps)) {
++         const DebugInfoMapping* map = VG_(indexXA)(di->fsm.maps, i);
++         if (map->ro && !map->rx && !map->rw
++             && map->avma >= start
++             && map->avma + map->size <= start + length)
++            VG_(removeIndexXA)(di->fsm.maps, i);
++         else
++            i++;
++      }
++   }
++}
++
++
+ /* Find the existing DebugInfo for |filename| or if not found, create
+    one.  In the latter case |filename| is strdup'd into VG_AR_DINFO,
+    and the new DebugInfo is added to debugInfo_list. */
+@@ -979,6 +1027,7 @@ static ULong di_notify_ACHIEVE_ACCEPT_STATE ( struct _DebugInfo* di )
+       get rid of any other DebugInfos which overlap any of those
+       ranges (to avoid total confusion).  But only those valid in
+      the current epoch.  We don't want to discard archived DebugInfos. */
++   drop_stale_ro_mappings( di );
+    discard_DebugInfos_which_overlap_with( di );
+ 
+    /* The DebugInfoMappings that now exist in the FSM may involve
+@@ -1529,6 +1578,7 @@ void VG_(di_notify_munmap)( Addr a, SizeT len )
+ {
+    Bool anyFound;
+    if (0) VG_(printf)("DISCARD %#lx %#lx\n", a, a+len);
++   drop_ro_mappings_in_range(a, len);
+    anyFound = discard_syms_in_range(a, len);
+    if (anyFound) {
+       caches__invalidate();
