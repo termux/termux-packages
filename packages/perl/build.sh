@@ -105,4 +105,11 @@ termux_step_post_make_install() {
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX}/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX%%/usr}",'g' Config_heavy.pl.new > Config_heavy.pl
 	rm Config_heavy.pl.new
+
+	# Make Termux headers discoverable to CPAN modules via Config.
+	sed -i \
+		-e "s|^locincpth=.*$|locincpth='$TERMUX_PREFIX/include'|" \
+		-e "s|^usrinc=.*$|usrinc='$TERMUX_PREFIX/include'|" \
+		-e "/^locincpth=/a incpth='$TERMUX_PREFIX/include'" \
+		Config_heavy.pl
 }
