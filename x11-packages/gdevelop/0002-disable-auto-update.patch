@@ -1,0 +1,30 @@
+diff --git a/newIDE/electron-app/app/main.js b/newIDE/electron-app/app/main.js
+index e8f1f3c..1838f72 100644
+--- a/newIDE/electron-app/app/main.js
++++ b/newIDE/electron-app/app/main.js
+@@ -744,19 +744,17 @@ app.on('ready', function() {
+     // This will immediately download an update, then install when the
+     // app quits.
+     isExplicitUpdateCheck = !!explicit;
+-    log.info('Starting check for updates (with auto-download if any)');
+-    autoUpdater.autoDownload = true;
+-    autoUpdater.checkForUpdatesAndNotify().catch(err => {
+-      log.error('Error checking for updates:', err);
++    sendUpdateStatus({
++      message: 'Update not available.',
++      status: 'update-not-available',
+     });
+   });
+ 
+   ipcMain.on('updates-check', (event, { explicit } = {}) => {
+     isExplicitUpdateCheck = !!explicit;
+-    log.info('Starting check for updates (without auto-download)');
+-    autoUpdater.autoDownload = false;
+-    autoUpdater.checkForUpdates().catch(err => {
+-      log.error('Error checking for updates:', err);
++    sendUpdateStatus({
++      message: 'Update not available.',
++      status: 'update-not-available',
+     });
+   });
+ 
