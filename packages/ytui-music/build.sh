@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://github.com/sudipghimire533/ytui-music/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=43deb6b3cb9eb836b7122ac2542106f46519f240f99a0af67eecdfa5b200cca7
 TERMUX_PKG_DEPENDS="libsqlite, mpv, openssl, python-yt-dlp"
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

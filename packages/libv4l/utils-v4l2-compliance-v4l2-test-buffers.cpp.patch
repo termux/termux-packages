@@ -1,0 +1,47 @@
+--- a/utils/v4l2-compliance/v4l2-test-buffers.cpp
++++ b/utils/v4l2-compliance/v4l2-test-buffers.cpp
+@@ -2953,6 +2953,14 @@
+ /* Android does not have support for pthread_cancel */
+ #ifndef ANDROID
+ 
++#ifdef __ANDROID__
++static void
++threadSignalHandler(int signum)
++{
++	pthread_exit(0);
++}
++#endif
++
+ /*
+  * This class wraps a pthread in such a way that it simplifies passing
+  * parameters, checking completion, gracious halting, and aggressive
+@@ -2997,7 +3005,11 @@
+ 		 * artillery and cancel the thread.
+ 		 */
+ 		if (!done) {
++#ifndef __ANDROID__
+ 			pthread_cancel(thread);
++#else
++			pthread_kill(thread, SIGUSR2);
++#endif
+ 			sleep(1);
+ 		}
+ 
+@@ -3012,8 +3024,17 @@
+ 	{
+ 		auto self = static_cast<BlockingThread *>(arg);
+ 
++#ifndef __ANDROID__
+ 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+ 		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, nullptr);
++#else
++		struct sigaction actions;
++		memset(&actions, 0, sizeof(actions));
++		sigemptyset(&actions.sa_mask);
++		actions.sa_flags = 0;
++		actions.sa_handler = threadSignalHandler;
++		sigaction(SIGUSR2, &actions, NULL);
++#endif
+ 
+ 		self->run();
+ 

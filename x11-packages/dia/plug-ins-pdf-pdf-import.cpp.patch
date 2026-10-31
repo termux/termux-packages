@@ -1,0 +1,58 @@
+--- a/plug-ins/pdf/pdf-import.cpp
++++ b/plug-ins/pdf/pdf-import.cpp
+@@ -93,8 +93,13 @@ public :
+                       (Annot *annot, void *user_data) G_GNUC_UNUSED,
+                   void   *annotDisplayDecideCbkData   G_GNUC_UNUSED)
+   {
++#if POPPLER_VERSION_MAJOR > 26 || (POPPLER_VERSION_MAJOR == 26 && POPPLER_VERSION_MINOR >= 10)
++    const PDFRectangle *mediaBox = &page->getMediaBox();
++    const PDFRectangle *clipBox = &page->getCropBox ();
++#else
+     const PDFRectangle *mediaBox = page->getMediaBox();
+     const PDFRectangle *clipBox = page->getCropBox ();
++#endif
+ 
+     if (page->isOk()) {
+       real w1 = (clipBox->x2 - clipBox->x1);
+@@ -438,8 +443,10 @@ public :
+   void restoreState(GfxState *state)
+   {
+     // just restore the matrix for now
+-    this->matrices.pop_back();
+-    this->matrix = this->matrices.back();
++    if (!this->matrices.empty()) {
++      this->matrix = this->matrices.back();
++      this->matrices.pop_back();
++    }
+     // should contain all of our update*() methods?
+     updateLineWidth(state);
+     updateLineDash(state);
+@@ -456,7 +463,11 @@ public :
+   void fill (GfxState *state);
+   void eoFill (GfxState *state);
+ 
++#if POPPLER_VERSION_MAJOR > 26 || (POPPLER_VERSION_MAJOR == 26 && POPPLER_VERSION_MINOR >= 10)
++  void drawString(GfxState *, const std::string &);
++#else
+   void drawString(GfxState *, GooString *);
++#endif
+ 
+   void drawImage(GfxState *state, Object *ref, Stream *str,
+ 		 int width, int height, GfxImageColorMap *colorMap,
+@@ -777,9 +788,16 @@ DiaOutputDev::eoFill (GfxState *state)
+  * \todo Check alignment options - it's just guessed yet.
+  */
+ void
++#if POPPLER_VERSION_MAJOR > 26 || (POPPLER_VERSION_MAJOR == 26 && POPPLER_VERSION_MINOR >= 10)
++DiaOutputDev::drawString(GfxState *state, const std::string &str)
++#else
+ DiaOutputDev::drawString(GfxState *state, GooString *s)
++#endif
+ {
+   Color text_color = this->fill_color;
++#if POPPLER_VERSION_MAJOR > 26 || (POPPLER_VERSION_MAJOR == 26 && POPPLER_VERSION_MINOR >= 10)
++  const std::string *s = &str;
++#endif
+ #if POPPLER_VERSION_MAJOR > 25 || (POPPLER_VERSION_MAJOR == 25 && POPPLER_VERSION_MINOR >= 10)
+   int len = s->size();
+ #else

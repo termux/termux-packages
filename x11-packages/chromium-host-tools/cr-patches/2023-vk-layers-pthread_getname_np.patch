@@ -1,0 +1,19 @@
+--- a/third_party/vulkan-validation-layers/src/layers/thread_tracker/thread_safety_validation.cpp
++++ b/third_party/vulkan-validation-layers/src/layers/thread_tracker/thread_safety_validation.cpp
+@@ -55,9 +55,16 @@
+ // Get thread name on Linux, Android (API >= 26) and Mac
+ #if defined(__linux__) || defined(__APPLE__)
+ #include <pthread.h>
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++#include <sys/prctl.h>
++#endif
+ static std::string GetPThreadName() {
+     char name[64] = {};  // on linux only 16 bytes are used, on Mac it can be more
++#if !defined(__ANDROID__) || __ANDROID_API__ >= 26
+     if (pthread_getname_np(pthread_self(), name, sizeof(name)) != 0) {
++#else
++    if (prctl(PR_GET_NAME, name) != 0) {
++#endif
+         return {};
+     }
+     // On Linux unnamed thread goes with default name (executable).

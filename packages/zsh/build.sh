@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENCE"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION=5.9.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://www.zsh.org/pub/zsh-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=36fa734374b44783582cec09bcd67822e2f992c779ec1624ab5596df078d2f81
 TERMUX_PKG_DEPENDS="libandroid-support, libcap, ncurses, termux-tools, pcre2"
@@ -41,7 +41,10 @@ etc/zshrc
 TERMUX_PKG_BUILD_IN_SRC=true
 # Remove hard link to bin/zsh as Android does not support hard links.
 # We replace this with a symlink to offer the same functionality:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
+TERMUX_PKG_RM_AFTER_INSTALL="
+	bin/zsh-${TERMUX_PKG_VERSION}
+	share/zsh/functions/Completion/Unix/_chsh
+"
 
 termux_step_pre_configure() {
 	autoreconf -fi

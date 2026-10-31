@@ -1,0 +1,146 @@
+diff --git a/cmake/external/glib/cppgir/gi/string.hpp b/cmake/external/glib/cppgir/gi/string.hpp
+--- a/cmake/external/glib/cppgir/gi/string.hpp
++++ b/cmake/external/glib/cppgir/gi/string.hpp
+@@ -203,6 +203,8 @@ public:
+   // custom
+   constexpr const_pointer gobj_() const { return data_; }
+ 
++  operator std::string() const { return data_ ? std::string(data_) : std::string(); }
++
+   explicit constexpr operator bool() const { return data_; }
+ 
+   _member_type *release_()
+diff --git a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp b/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
+--- a/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
++++ b/Telegram/lib_webview/webview/platform/linux/webview_linux_webkitgtk.cpp
+@@ -2807,7 +2807,7 @@ void Instance::registerMasterMethodHandlers() {
+ 	_master.signal_handle_navigation_policy().connect([=](
+ 			Master,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &uri,
++			const gi::cstring_v uri,
+ 			bool newWindow) {
+ 		if (newWindow) {
+ 			if (_navigationPolicyHandler
+@@ -2820,7 +2820,7 @@ void Instance::registerMasterMethodHandlers() {
+ 				QDesktopServices::openUrl(QString::fromStdString(uri));
+ 			}
+ 			_master.complete_navigation_policy(invocation, false);
+-		} else if (!uri.starts_with(dataDomain())
++		} else if (!std::string(uri).starts_with(dataDomain())
+ 				&& _navigationPolicyHandler
+ 				&& !_navigationPolicyHandler(uri, false)) {
+ 			_master.complete_navigation_policy(invocation, false);
+@@ -2845,8 +2845,8 @@ void Instance::registerMasterMethodHandlers() {
+ 			Master,
+ 			Gio::DBusMethodInvocation invocation,
+ 			int type,
+-			const std::string &text,
+-			const std::string &value) {
++			const gi::cstring_v text,
++			const gi::cstring_v value) {
+ 		if (!_dialogHandler) {
+ 			return false;
+ 		}
+@@ -2954,7 +2954,7 @@ int Instance::exec() {
+ 	_master.signal_data_server_started().connect([=](
+ 			Master,
+ 			std::uint16_t port,
+-			const std::string &password) {
++			const gi::cstring_v password) {
+ 		_dataPort = port;
+ 		_dataPassword = password;
+ 	});
+@@ -2998,10 +2998,10 @@ void Instance::registerHelperMethodHandlers() {
+ 			int g,
+ 			int b,
+ 			int a,
+-			const std::string &path,
++			const gi::cstring_v path,
+ 			int mode,
+ 			int windowStyle,
+-			const std::string &shellMessageToken,
++			const gi::cstring_v shellMessageToken,
+ 			int marginLeft,
+ 			int marginRight,
+ 			int marginTop,
+@@ -3009,8 +3009,8 @@ void Instance::registerHelperMethodHandlers() {
+ 			int initialWidth,
+ 			int initialHeight,
+ 			bool allowThirdPartyCookies,
+-			const std::string &restrictedOrigin,
+-			const std::string &restrictedContentSecurityPolicy) {
++			const gi::cstring_v restrictedOrigin,
++			const gi::cstring_v restrictedContentSecurityPolicy) {
+ 		if (!create({
+ 			.opaqueBg = QColor(r, g, b, a),
+ 			.userDataPath = path,
+@@ -3053,7 +3053,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_navigate().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &url) {
++			const gi::cstring_v url) {
+ 		navigate(url);
+ 		_helper.complete_navigate(invocation);
+ 		return true;
+@@ -3062,8 +3062,8 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_load_html().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &html,
+-			const std::string &baseUrl) {
++			const gi::cstring_v html,
++			const gi::cstring_v baseUrl) {
+ 		loadHtml(html, baseUrl);
+ 		_helper.complete_load_html(invocation);
+ 		return true;
+@@ -3109,7 +3109,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_init().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &js) {
++			const gi::cstring_v js) {
+ 		init(js);
+ 		_helper.complete_init(invocation);
+ 		return true;
+@@ -3118,7 +3118,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_init_all_frames().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &js) {
++			const gi::cstring_v js) {
+ 		initAllFrames(js);
+ 		_helper.complete_init_all_frames(invocation);
+ 		return true;
+@@ -3127,7 +3127,7 @@ void Instance::registerHelperMethodHandlers() {
+ 	_helper.signal_handle_eval().connect([=](
+ 			Helper,
+ 			Gio::DBusMethodInvocation invocation,
+-			const std::string &js) {
++			const gi::cstring_v js) {
+ 		eval(js);
+ 		_helper.complete_eval(invocation);
+ 		return true;
+@@ -3184,8 +3184,8 @@ void Instance::registerHelperMethodHandlers() {
+ void Instance::registerHelperSignalHandlers() {
+ 	_helper.signal_message_received().connect([=](
+ 			Helper,
+-			const std::string &message,
+-			const std::string &sourceUrl) {
++			const gi::cstring_v message,
++			const gi::cstring_v sourceUrl) {
+ 		if (_messageHandler) {
+ 			_messageHandler(Message{
+ 				.text = message,
+@@ -3214,8 +3214,8 @@ void Instance::registerHelperSignalHandlers() {
+ 
+ 	_helper.signal_navigation_state_update().connect([=](
+ 			Helper,
+-			const std::string &url,
+-			const std::string &title,
++			const gi::cstring_v url,
++			const gi::cstring_v title,
+ 			bool canGoBack,
+ 			bool canGoForward) {
+ 		_navigationHistoryState = NavigationHistoryState{

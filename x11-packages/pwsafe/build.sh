@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Popular secure and convenient password manager"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.72.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/pwsafe/pwsafe/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=792e31534638b1b9216edd35f8af7e73f7e0b45106424516ffe87219f34ea8f5
 TERMUX_PKG_DEPENDS="libmagic, libqrencode, wxwidgets, xerces-c"

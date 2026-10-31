@@ -6,10 +6,23 @@ TERMUX_PKG_VERSION=5.1.5
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL="https://www.lua.org/ftp/lua-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=2640fc56a795f29d28ef15e13c34a47e223960b0240e8cb0a82d9b0738695333
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="readline"
 TERMUX_PKG_BREAKS="liblua51"
 TERMUX_PKG_REPLACES="liblua51"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_pkg_auto_update() {
+	local latest_version
+	latest_version="$(curl --silent https://www.lua.org/ftp/ | grep -oP 'lua-\K5\.1\.[0-9]+(?=\.tar\.gz)' | sort -V | tail -n1)"
+
+	if [[ -z "${latest_version}" ]]; then
+		echo "WARN: Unable to get the latest version." >&2
+		return
+	fi
+
+	termux_pkg_upgrade_version "${latest_version}"
+}
 
 termux_step_pre_configure() {
 	OLDAR="$AR"

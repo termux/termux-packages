@@ -1,11 +1,29 @@
 --- a/third_party/libsync/src/include/ndk/sync.h
 +++ b/third_party/libsync/src/include/ndk/sync.h
-@@ -32,7 +32,7 @@
+@@ -64,7 +64,7 @@
+  *
+  * Available since API level 26.
+  */
+-int32_t sync_merge(const char* name, int32_t fd1, int32_t fd2) __INTRODUCED_IN(26);
++int32_t sync_merge(const char* name, int32_t fd1, int32_t fd2);
  
- __BEGIN_DECLS
+ /**
+  * Retrieve detailed information about a sync file and its fences.
+@@ -73,7 +73,7 @@
+  *
+  * Available since API level 26.
+  */
+-struct sync_file_info* sync_file_info(int32_t fd) __INTRODUCED_IN(26);
++struct sync_file_info* sync_file_info(int32_t fd);
  
--#if __ANDROID_API__ >= __ANDROID_API_O__
-+#if __ANDROID_API__ >= __ANDROID_API_O__ || defined(__TERMUX__)
+ /**
+  * Get the array of fence infos from the sync file's info.
+@@ -97,7 +97,7 @@
+  *
+  * Available since API level 26.
+  */
+-void sync_file_info_free(struct sync_file_info* info) __INTRODUCED_IN(26);
++void sync_file_info_free(struct sync_file_info* info);
  
- /* Fences indicate the status of an asynchronous task. They are initially
-  * in unsignaled state (0), and make a one-time transition to either signaled
+ __END_DECLS
+ 

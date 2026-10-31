@@ -54,7 +54,6 @@ IGNORE_LIST_TEXT = """
 //components/safe_browsing/content/renderer/phishing_classifier
 //components/spellcheck/renderer
 //chrome/browser/ui/color
-//chrome/browser/glic:glic
 //chrome/browser/ui/views/tabs/projects
 """
 

@@ -27,8 +27,7 @@ TERMUX_REPOLOGY_DATA_FILE="$(mktemp -t termux-repology.XXXXXX)" # File to store 
 export TERMUX_SCRIPTDIR
 TERMUX_SCRIPTDIR=$(realpath "$(dirname "$0")/../..") # Root of repository.
 
-export TERMUX_PACKAGES_DIRECTORIES
-TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
+readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "${TERMUX_SCRIPTDIR}"/repo.json)
 
 # Define few more variables used by scripts.
 # shellcheck source=scripts/properties.sh
@@ -488,9 +487,10 @@ _should_update() {
 
 	# `[[ "$(<"$file")" =~ regex ]]` is bash builtin solution for `grep -q` without spawning extra process
 	# it is needed to pre-fetch and filter packages as fast as possible (it is 6.5 times faster than `grep`)
+	local build_sh=$'\n'"$(<"$pkg_dir/build.sh")"$'\n'
 	case "${PACKAGES_OPT_OUT:-}" in
-		"true") [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* ]] || return 1 ;; # Skip.
-			*) [[ $'\n'"$(<"$pkg_dir/build.sh")"$'\n' == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
+		"true") [[ "$build_sh" != *$'\n'TERMUX_PKG_AUTO_UPDATE=false$'\n'* && ( "$build_sh" != *$'\n'TERMUX_PKG_ESSENTIAL=true$'\n'* || "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ) ]] || return 1 ;; # Skip.
+			*) [[ "$build_sh" == *$'\n'TERMUX_PKG_AUTO_UPDATE=true$'\n'* ]] || return 1 ;; # Skip.
 	esac
 
 	if [[ " ${!_ALREADY_SEEN[*]} ${!_FAILED_UPDATES[*]} " == *" ${pkg_dir##*/} "* ]]; then
@@ -514,7 +514,6 @@ _update_dependencies() {
 		"${pkg_dir}"/+(build|*.subpackage).sh; then
 		return 0
 	fi
-	# shellcheck disable=SC2086 # Allow splitting of TERMUX_PACKAGES_DIRECTORIES.
 	while read -r dep dep_dir; do
 		if [[ -z "${dep}" ]]; then
 			continue
@@ -522,7 +521,7 @@ _update_dependencies() {
 			termux_error_exit "Obtaining update order failed for ${pkg_dir##*/}"
 		fi
 		_should_update "${dep_dir}" && ! _check_updated "${dep_dir}" && _run_update "${dep_dir}"
-	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
+	done < <("${TERMUX_SCRIPTDIR}"/scripts/buildorder.py "${pkg_dir}" "${TERMUX_PACKAGES_DIRECTORIES[@]}" || echo "ERROR")
 }
 
 echo "INFO: Running updates for: $*"
@@ -532,16 +531,30 @@ echo "INFO: Running updates for: $*"
 if [[ -n "$GITHUB_TOKEN" ]] && command -v gh &> /dev/null; then
 	_start_time="$(date +%10s%3N)"
 
-	while read -r number title; do
-		_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
-	done < <(
-		gh issue list \
-			--limit 10000 \
-			--label "auto update failing" --label "bot" \
-			--state open \
-			--search "Auto update failing for in:title type:issue" \
-			--json number,title | jq -r '.[] | "\(.number) \(.title)"' | sort | uniq
-	)
+	_issues_fetched=false
+	for _attempt in 1 2 3; do
+		if _issues_json="$(
+			gh issue list \
+				--limit 10000 \
+				--label "auto update failing" --label "bot" \
+				--state open \
+				--search "Auto update failing for in:title type:issue" \
+				--json number,title
+		)"; then
+			_issues_fetched=true
+			break
+		fi
+		sleep 60
+	done
+
+	if [[ "${_issues_fetched}" == "true" ]]; then
+		while read -r number title; do
+			_CACHED_ISSUES["$number"]="'${title}'" # An extra quote ('') is added to avoid false positive matches.
+		done < <(jq -r '.[] | "\(.number) \(.title)"' <<< "${_issues_json}" | sort | uniq)
+	else
+		echo "::error::Failed to cache existing issues. Disabling issue creation to avoid duplicates."
+		CREATE_ISSUE=false
+	fi
 	printf "Cached %s existing issues - took %s\n" \
 		"${#_CACHED_ISSUES[*]}" \
 		"$(ms_to_human_readable "$(date +%10s%3N)" "$_start_time")"

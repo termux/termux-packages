@@ -1,0 +1,187 @@
+diff --git a/webrtc/api/audio/audio_processing.h b/webrtc/api/audio/audio_processing.h
+index dca75f2..653a2a8 100644
+--- a/webrtc/api/audio/audio_processing.h
++++ b/webrtc/api/audio/audio_processing.h
+@@ -635,11 +635,11 @@ class RTC_EXPORT AudioProcessing : public RefCountInterface {
+   virtual bool CreateAndAttachAecDump(
+       absl::string_view file_name,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue) = 0;
++      TaskQueueBase* absl_nonnull worker_queue) = 0;
+   virtual bool CreateAndAttachAecDump(
+-      absl::Nonnull<FILE*> handle,
++      FILE* absl_nonnull handle,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue) = 0;
++      TaskQueueBase* absl_nonnull worker_queue) = 0;
+ 
+   // TODO(webrtc:5298) Deprecated variant.
+   // Attaches provided webrtc::AecDump for recording debugging
+diff --git a/webrtc/api/make_ref_counted.h b/webrtc/api/make_ref_counted.h
+index b5f4e99..b28bf98 100644
+--- a/webrtc/api/make_ref_counted.h
++++ b/webrtc/api/make_ref_counted.h
+@@ -86,7 +86,7 @@ template <
+     typename std::enable_if<std::is_convertible_v<T*, RefCountInterface*> &&
+                                 std::is_abstract_v<T>,
+                             T>::type* = nullptr>
+-absl::Nonnull<scoped_refptr<T>> make_ref_counted(Args&&... args) {
++scoped_refptr<T> absl_nonnull make_ref_counted(Args&&... args) {
+   return scoped_refptr<T>(new RefCountedObject<T>(std::forward<Args>(args)...));
+ }
+ 
+@@ -99,7 +99,7 @@ template <
+         !std::is_convertible_v<T*, RefCountInterface*> &&
+             webrtc_make_ref_counted_internal::HasAddRefAndRelease<T>::value,
+         T>::type* = nullptr>
+-absl::Nonnull<scoped_refptr<T>> make_ref_counted(Args&&... args) {
++scoped_refptr<T> absl_nonnull make_ref_counted(Args&&... args) {
+   return scoped_refptr<T>(new T(std::forward<Args>(args)...));
+ }
+ 
+@@ -113,7 +113,7 @@ template <
+             !webrtc_make_ref_counted_internal::HasAddRefAndRelease<T>::value,
+ 
+         T>::type* = nullptr>
+-absl::Nonnull<scoped_refptr<FinalRefCountedObject<T>>> make_ref_counted(
++scoped_refptr<FinalRefCountedObject<T>> absl_nonnull make_ref_counted(
+     Args&&... args) {
+   return scoped_refptr<FinalRefCountedObject<T>>(
+       new FinalRefCountedObject<T>(std::forward<Args>(args)...));
+diff --git a/webrtc/api/scoped_refptr.h b/webrtc/api/scoped_refptr.h
+index c6fb560..951869e 100644
+--- a/webrtc/api/scoped_refptr.h
++++ b/webrtc/api/scoped_refptr.h
+@@ -79,7 +79,7 @@ class ABSL_NULLABILITY_COMPATIBLE scoped_refptr {
+   scoped_refptr() : ptr_(nullptr) {}
+   scoped_refptr(std::nullptr_t) : ptr_(nullptr) {}  // NOLINT(runtime/explicit)
+ 
+-  explicit scoped_refptr(absl::Nullable<T*> p) : ptr_(p) {
++  explicit scoped_refptr(T* absl_nullable p) : ptr_(p) {
+     if (ptr_)
+       ptr_->AddRef();
+   }
+@@ -122,7 +122,7 @@ class ABSL_NULLABILITY_COMPATIBLE scoped_refptr {
+     return retVal;
+   }
+ 
+-  scoped_refptr<T>& operator=(absl::Nullable<T*> p) {
++  scoped_refptr<T>& operator=(T* absl_nullable p) {
+     // AddRef first so that self assignment should work
+     if (p)
+       p->AddRef();
+@@ -152,7 +152,7 @@ class ABSL_NULLABILITY_COMPATIBLE scoped_refptr {
+     return *this;
+   }
+ 
+-  void swap(absl::Nonnull<T**> pp) noexcept {
++  void swap(T** absl_nonnull pp) noexcept {
+     T* p = ptr_;
+     ptr_ = *pp;
+     *pp = p;
+diff --git a/webrtc/modules/audio_processing/aec_dump/aec_dump_factory.h b/webrtc/modules/audio_processing/aec_dump/aec_dump_factory.h
+index 0d258a9..89435d6 100644
+--- a/webrtc/modules/audio_processing/aec_dump/aec_dump_factory.h
++++ b/webrtc/modules/audio_processing/aec_dump/aec_dump_factory.h
+@@ -29,18 +29,18 @@ class RTC_EXPORT AecDumpFactory {
+   // The AecDump takes responsibility for `handle` and closes it in the
+   // destructor. A non-null return value indicates that the file has been
+   // sucessfully opened.
+-  static absl::Nullable<std::unique_ptr<AecDump>> Create(
++  static std::unique_ptr<AecDump> absl_nullable Create(
+       FileWrapper file,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue);
+-  static absl::Nullable<std::unique_ptr<AecDump>> Create(
++      TaskQueueBase* absl_nonnull worker_queue);
++  static std::unique_ptr<AecDump> absl_nullable Create(
+       absl::string_view file_name,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue);
+-  static absl::Nullable<std::unique_ptr<AecDump>> Create(
+-      absl::Nonnull<FILE*> handle,
++      TaskQueueBase* absl_nonnull worker_queue);
++  static std::unique_ptr<AecDump> absl_nullable Create(
++      FILE* absl_nonnull handle,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue);
++      TaskQueueBase* absl_nonnull worker_queue);
+ };
+ 
+ }  // namespace webrtc
+diff --git a/webrtc/modules/audio_processing/aec_dump/null_aec_dump_factory.cc b/webrtc/modules/audio_processing/aec_dump/null_aec_dump_factory.cc
+index 63929af..2902c1b 100644
+--- a/webrtc/modules/audio_processing/aec_dump/null_aec_dump_factory.cc
++++ b/webrtc/modules/audio_processing/aec_dump/null_aec_dump_factory.cc
+@@ -16,24 +16,24 @@
+ 
+ namespace webrtc {
+ 
+-absl::Nullable<std::unique_ptr<AecDump>> AecDumpFactory::Create(
++std::unique_ptr<AecDump> absl_nullable AecDumpFactory::Create(
+     FileWrapper file,
+     int64_t max_log_size_bytes,
+-    absl::Nonnull<TaskQueueBase*> worker_queue) {
++    TaskQueueBase* absl_nonnull worker_queue) {
+   return nullptr;
+ }
+ 
+-absl::Nullable<std::unique_ptr<AecDump>> AecDumpFactory::Create(
++std::unique_ptr<AecDump> absl_nullable AecDumpFactory::Create(
+     absl::string_view file_name,
+     int64_t max_log_size_bytes,
+-    absl::Nonnull<TaskQueueBase*> worker_queue) {
++    TaskQueueBase* absl_nonnull worker_queue) {
+   return nullptr;
+ }
+ 
+-absl::Nullable<std::unique_ptr<AecDump>> AecDumpFactory::Create(
+-    absl::Nonnull<FILE*> handle,
++std::unique_ptr<AecDump> absl_nullable AecDumpFactory::Create(
++    FILE* absl_nonnull handle,
+     int64_t max_log_size_bytes,
+-    absl::Nonnull<TaskQueueBase*> worker_queue) {
++    TaskQueueBase* absl_nonnull worker_queue) {
+   return nullptr;
+ }
+ }  // namespace webrtc
+diff --git a/webrtc/modules/audio_processing/audio_processing_impl.cc b/webrtc/modules/audio_processing/audio_processing_impl.cc
+index a1cba51..f1420ce 100644
+--- a/webrtc/modules/audio_processing/audio_processing_impl.cc
++++ b/webrtc/modules/audio_processing/audio_processing_impl.cc
+@@ -1787,7 +1787,7 @@ void AudioProcessingImpl::UpdateRecommendedInputVolumeLocked() {
+ bool AudioProcessingImpl::CreateAndAttachAecDump(
+     absl::string_view file_name,
+     int64_t max_log_size_bytes,
+-    absl::Nonnull<TaskQueueBase*> worker_queue) {
++    TaskQueueBase* absl_nonnull worker_queue) {
+   std::unique_ptr<AecDump> aec_dump =
+       AecDumpFactory::Create(file_name, max_log_size_bytes, worker_queue);
+   if (!aec_dump) {
+@@ -1801,7 +1801,7 @@ bool AudioProcessingImpl::CreateAndAttachAecDump(
+ bool AudioProcessingImpl::CreateAndAttachAecDump(
+     FILE* handle,
+     int64_t max_log_size_bytes,
+-    absl::Nonnull<TaskQueueBase*> worker_queue) {
++    TaskQueueBase* absl_nonnull worker_queue) {
+   std::unique_ptr<AecDump> aec_dump =
+       AecDumpFactory::Create(handle, max_log_size_bytes, worker_queue);
+   if (!aec_dump) {
+diff --git a/webrtc/modules/audio_processing/audio_processing_impl.h b/webrtc/modules/audio_processing/audio_processing_impl.h
+index ecdc055..713b5ee 100644
+--- a/webrtc/modules/audio_processing/audio_processing_impl.h
++++ b/webrtc/modules/audio_processing/audio_processing_impl.h
+@@ -74,11 +74,11 @@ class AudioProcessingImpl : public AudioProcessing {
+   bool CreateAndAttachAecDump(
+       absl::string_view file_name,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue) override;
++      TaskQueueBase* absl_nonnull worker_queue) override;
+   bool CreateAndAttachAecDump(
+       FILE* handle,
+       int64_t max_log_size_bytes,
+-      absl::Nonnull<TaskQueueBase*> worker_queue) override;
++      TaskQueueBase* absl_nonnull worker_queue) override;
+   // TODO(webrtc:5298) Deprecated variant.
+   void AttachAecDump(std::unique_ptr<AecDump> aec_dump) override;
+   void DetachAecDump() override;

@@ -4,11 +4,11 @@ TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.7.0"
+TERMUX_PKG_VERSION="3.7.1"
 TERMUX_PKG_SRCURL="https://github.com/DCMTK/dcmtk/archive/refs/tags/DCMTK-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=5bb3ec8317dc465788bed2ca789e76d03ae5848c9381cce3b14c1a3f8b6aca56
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SHA256=38ac8fceebe201921f6c101493e9611ba12fb5c597db7311df26e95d6d6bf39a
 TERMUX_PKG_DEPENDS="libc++, libiconv, libpng, libtiff, libxml2, openssl, zlib"
+TERMUX_PKG_AUTO_UPDATE=true
 # As of 3.6.9, libsndfile and openjpeg are detected but not linked against
 TERMUX_PKG_BUILD_DEPENDS="libsndfile, openjpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -30,5 +30,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	# Do not forget to bump revision of reverse dependencies and rebuild them
+	# after SOVERSION is changed.
+	local _SOVERSION=21
+
+	local v=$(sed -En 's/^set\(DCMTK_ABI_VERSION ([0-9]+)\)/\1/p' \
+		"$TERMUX_PKG_SRCDIR"/CMake/dcmtkPrepare.cmake)
+
+	if [[ "${v}" != "${_SOVERSION}" ]]; then
+		termux_error_exit "SOVERSION guard check failed."
+	fi
+
 	cp "$TERMUX_PKG_BUILDER_DIR/arith.h/$TERMUX_ARCH.h" "$TERMUX_PKG_SRCDIR/config/include/dcmtk/config/arith.h"
 }

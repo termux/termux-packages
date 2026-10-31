@@ -1,8 +1,6 @@
-diff --git a/meson.build b/meson.build
-index e602b84..2baf475 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -267,6 +267,14 @@ endif
+@@ -297,6 +297,14 @@ endif
  # Check if a minimal SpiderMonkey program compiles, links, and runs. If not,
  # it's most likely the case that SpiderMonkey was configured incorrectly, for
  # example by building mozglue as a shared library.
@@ -16,8 +14,8 @@ index e602b84..2baf475 100644
 +else
  minimal_program = cxx.run('''
  #include <js/Initialization.h>
- int main(void) {
-@@ -278,22 +286,16 @@ int main(void) {
+ int main() {
+@@ -308,22 +316,16 @@ int main() {
      args: debug_arg, dependencies: spidermonkey,
      name: 'SpiderMonkey sanity check')
  
@@ -39,5 +37,5 @@ index e602b84..2baf475 100644
  endif
 +endif
  
- have_printf_alternative_int = cc.compiles('''
- #include <stdio.h>
+ ### Check for external programs ################################################
+ 

@@ -1,0 +1,18 @@
+Fix build failure on 32-bit targets (arm, i686): on Android's bionic
+32-bit ABI, libc::S_IFMT / libc::S_IFREG are typed as u16 while
+stat.st_mode is u32 (the same class of libc-crate cross-platform
+footgun as rust-lang/libc#3161, previously only hit on Windows/macOS
+code paths, see upstream fix in uutils/coreutils#12140). Widen the
+constants to u32 so the comparison type-checks on every arch.
+
+--- a/src/uu/tail/src/args.rs
++++ b/src/uu/tail/src/args.rs
+@@ -346,7 +346,7 @@
+         if self.follow.is_some() && self.has_stdin() {
+             #[cfg(unix)]
+             let stdin_is_regular = rustix::fs::fstat(std::io::stdin())
+-                .is_ok_and(|stat| stat.st_mode & libc::S_IFMT == libc::S_IFREG);
++                .is_ok_and(|stat| stat.st_mode & u32::from(libc::S_IFMT) == u32::from(libc::S_IFREG));
+             #[cfg(not(unix))]
+             let stdin_is_regular = true;
+             let blocking_stdin = self.pid.unwrap_or_default() == 0

@@ -1,6 +1,6 @@
 --- a/toolkit/components/extensions/storage/moz.build
 +++ b/toolkit/components/extensions/storage/moz.build
-@@ -11,7 +11,7 @@
+@@ -9,7 +9,7 @@ with Files("**"):
  # a delegate for consumers to use instead. Android Components can then provide
  # an implementation of the delegate that's backed by the Rust component. For
  # details, please see bug 1626506, comment 4.
@@ -11,7 +11,7 @@
      ]
 --- a/toolkit/library/rust/shared/Cargo.toml
 +++ b/toolkit/library/rust/shared/Cargo.toml
-@@ -133,10 +133,10 @@ gecko-trace = { path = "../../../components/gecko-trace" }
+@@ -135,10 +135,10 @@ gecko-trace = { path = "../../../components/gecko-trace" }
  
  sitecategories = { path = "../../../components/sitecategories" }
  
@@ -22,11 +22,11 @@
 -[target.'cfg(not(target_os = "android"))'.dependencies]
 +[target.'cfg(target_os = "android")'.dependencies]
  gkrust-uniffi-components = { path = "../../../components/uniffi-bindgen-gecko-js/components/", features = ["xpcom", "mozbuild"] }
+ remotecerts = {  path = "../../../../security/manager/ssl/remotecerts" }
  uniffi-bindgen-gecko-js-test-fixtures = { path = "../../../components/uniffi-bindgen-gecko-js/test-fixtures/", optional = true }
- viaduct = "0.1"
 --- a/toolkit/library/rust/shared/lib.rs
 +++ b/toolkit/library/rust/shared/lib.rs
-@@ -95,22 +95,18 @@
+@@ -102,25 +102,20 @@ extern crate qwac_trust_anchors;
  extern crate trust_anchors;
  
  #[cfg(any(
@@ -36,6 +36,9 @@
      all(target_os = "windows", not(target_arch = "aarch64"))
  ))]
  extern crate osclientcerts;
+ 
+-#[cfg(not(target_os = "android"))]
+ extern crate remotecerts;
  
 -#[cfg(not(target_os = "android"))]
  extern crate gkrust_uniffi_components;
@@ -50,7 +53,7 @@
  extern crate viaduct_necko;
  
  extern crate gecko_logger;
-@@ -170,7 +166,6 @@
+@@ -188,7 +183,6 @@ pub extern "C" fn GkRust_Init() {
      let _ = GeckoLogger::init();
      // Initialize tracing.
      gecko_tracing::initialize_tracing();

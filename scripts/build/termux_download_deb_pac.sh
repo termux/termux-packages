@@ -113,6 +113,16 @@ termux_download_deb_pac() {
 	done
 
 	if [ "$PKG_HASH" = "" ] || [ "$PKG_HASH" = "null" ]; then
+		local cache_file="${TERMUX_COMMON_CACHEDIR}-${PACKAGE_ARCH}/${PKG_FILE}"
+		local output_file="${TERMUX_OUTPUT_DIR}/${PKG_FILE}"
+		if [[ "${TERMUX_PKGS__BUILD__REUSE_BUILT_PACKAGES:-}" == "true" ]]; then
+			if [[ -f "${output_file}" ]]; then
+				ln -sf "${output_file}" "${cache_file}"
+				echo "Found ${PACKAGE} in ${TERMUX_OUTPUT_DIR}"
+				return 0
+			fi
+		fi
+		[[ ! -L "${cache_file}" ]] || rm -f "${cache_file}"
 		return 1
 	fi
 

@@ -4,11 +4,11 @@ TERMUX_PKG_HOMEPAGE=https://bazel.build/
 TERMUX_PKG_DESCRIPTION="Correct, reproducible, and fast builds for everyone"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="9.2.0"
+TERMUX_PKG_VERSION="9.3.1"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/bazelbuild/bazel/releases/download/$TERMUX_PKG_VERSION/bazel-$TERMUX_PKG_VERSION-dist.zip"
-TERMUX_PKG_SHA256=81af02b33128ec1922c6b60212df3fb6150baa96bb33d32ffa020e5fed47fefc
-TERMUX_PKG_DEPENDS="libarchive, openjdk-21, patch, unzip, zip"
+TERMUX_PKG_SHA256=6169ed42d506f3466fac899cc0a1ffa05718dece512cde9c2cd5eebf4e9ff4c3
+TERMUX_PKG_DEPENDS="ca-certificates, libarchive, openjdk-21, patch, unzip, zip"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, patch, unzip, zip"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="openjdk-21"
 TERMUX_PKG_BREAKS="openjdk-17"
@@ -119,6 +119,8 @@ termux_step_post_get_source() {
 	rm -rf third_party/termux-patches/
 	mkdir -p third_party/termux-patches/
 	cp -Rfv $TERMUX_PKG_BUILDER_DIR/dep-patches/* third_party/termux-patches/
+	sed -i -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		third_party/termux-patches/*
 }
 
 termux_step_configure() {

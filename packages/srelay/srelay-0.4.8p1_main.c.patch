@@ -1,7 +1,6 @@
-diff -uNr srelay-0.4.8p1/main.c srelay-0.4.8p1.mod/main.c
---- srelay-0.4.8p1/main.c	2017-12-25 05:10:37.000000000 +0200
-+++ srelay-0.4.8p1.mod/main.c	2018-06-26 00:55:42.539288734 +0300
-@@ -33,6 +33,7 @@
+--- a/main.c
++++ b/main.c
+@@ -33,6 +33,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
  
  #include <sys/stat.h>
@@ -9,3 +8,22 @@ diff -uNr srelay-0.4.8p1/main.c srelay-0.4.8p1.mod/main.c
  #include "srelay.h"
  
  /* prototypes */
+@@ -731,9 +732,6 @@ int main(int ac, char **av)
+       if (setrlimit(RLIMIT_NOFILE, &rl) != 0)
+         msg_out(warn, "cannot set rlimit(max_fd)");
+ 
+-    setregid(-1, PROCGID);
+-    setreuid(-1, PROCUID);
+-
+     pthread_mutex_init(&mutex_select, NULL);
+     pthread_attr_init(&attr);
+     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+@@ -751,8 +749,6 @@ int main(int ac, char **av)
+   } else {
+ #endif
+     setsignal(SIGCHLD, reapchild);
+-    setregid(-1, PROCGID);
+-    setreuid(-1, PROCUID);
+     msg_out(norm, "Starting: MAX_CH(%d)", max_child);
+     serv_loop();
+ #ifdef USE_THREAD

@@ -1,0 +1,213 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,7 +41,7 @@
+ 
+ option(FLATPAK "Produce a flatpak optimized build" OFF)
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/mk/cmake)
+-if(ANDROID)
++if(0)
+   include(SuperTux/Android)
+ endif()
+ 
+@@ -117,14 +117,14 @@
+ option(SUPERTUX_LTO "Use link-time optimizations (Takes more RAM at compilation, gives smaller and faster executables)" OFF)
+ 
+ # Mobile builds
+-if(ANDROID)
++if(0)
+   option(HIDE_NONMOBILE_OPTIONS "Hide options that are impractical on mobile devices (e. g. changing screen resolution)" ON)
+ else()
+   option(HIDE_NONMOBILE_OPTIONS "Hide options that are impractical on mobile devices (e. g. changing screen resolution)" OFF)
+ endif()
+ 
+ ## Determine whether static linking for SimpleSquirrel should be defaulted to
+-if(MSVC OR ANDROID)
++if(MSVC OR 0)
+   option(USE_STATIC_SIMPLESQUIRREL "Statically link the SimpleSquirrel library" ON)
+ else()
+   option(USE_STATIC_SIMPLESQUIRREL "Statically link the SimpleSquirrel library" OFF)
+@@ -244,7 +244,7 @@
+ set(HAVE_EPOXY NO)
+ if(NOT ENABLE_OPENGL)
+   message(STATUS "OpenGL support is disabled, as requested.")
+-elseif(ANDROID)
++elseif(0)
+   # SDL already adds OpenGLES to the linker command
+   set(HAVE_OPENGL YES)
+   set(USE_OPENGLES2 YES)
+@@ -308,7 +308,7 @@
+ include(SuperTux/CompileAmalgation)
+ 
+ ## Add target for supertux binary
+-if(ANDROID)
++if(0)
+   add_library(supertux2 SHARED ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_C} ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_SOURCES_HXX} src/main.cpp)
+ else()
+   add_executable(supertux2 ${SUPERTUX_WIN32_OPTION} ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_C} ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_SOURCES_HXX} ${SUPERTUX_RESOURCES} src/main.cpp)
+@@ -460,7 +460,7 @@
+     set(HAVE_CURL YES)
+   endif()
+ 
+-  if(HAVE_OPENGL AND NOT ANDROID)
++  if(HAVE_OPENGL AND NOT 0)
+     target_link_libraries(supertux2 PUBLIC OpenGL::GL)
+     if(USE_GL_LIBRARY STREQUAL "glew")
+       target_link_libraries(supertux2 PUBLIC GLEW)
+@@ -474,7 +474,7 @@
+   endif()
+ endif()
+ 
+-if(ANDROID)
++if(0)
+   target_link_libraries(supertux2 PUBLIC log)
+   target_compile_definitions(supertux2 PUBLIC -D__ANDROID__ -DANDROID)
+ endif()
+@@ -486,7 +486,7 @@
+ configure_file(config.h.in ${CMAKE_BINARY_DIR}/config.h)
+ 
+ # Make android data.zip
+-if(ANDROID)
++if(0)
+   set(ANDROID_PROJECT_DIR "${PROJECT_SOURCE_DIR}/mk/android/" CACHE PATH
+           "Path to the root of the root of the android project")
+   set(ANDROID_ASSETS_DIR "${ANDROID_PROJECT_DIR}/assetpack/src/main/assets")
+--- a/src/util/log.cpp
++++ b/src/util/log.cpp
+@@ -18,7 +18,7 @@
+ #include "util/log.hpp"
+ 
+ #include <iostream>
+-#ifdef __ANDROID__
++#if 0
+ #include <android/log.h>
+ #endif
+ 
+@@ -27,7 +27,7 @@
+ #include "supertux/gameconfig.hpp"
+ #include "supertux/globals.hpp"
+ 
+-#ifdef __ANDROID__
++#if 0
+ // To print only SuperTux logs in Android logcat output, use command:
+ // adb logcat -s 'SuperTux:V' 'SDL:V' 'DEBUG:V'
+ class _android_debugbuf: public std::streambuf
+@@ -105,7 +105,7 @@
+   if (ConsoleBuffer::current() && use_console_buffer)
+     return (ConsoleBuffer::output);
+   else
+-#ifdef __ANDROID__
++#if 0
+     return android_logcat;
+ #else
+     return (std::cerr);
+--- a/src/video/sdl/sdl_video_system.cpp
++++ b/src/video/sdl/sdl_video_system.cpp
+@@ -86,7 +86,7 @@
+   apply_video_mode();
+ 
+   { // apply_viewport
+-#ifndef __ANDROID__
++#if 1
+     Size target_size = (g_config->use_fullscreen && g_config->fullscreen_size != Size(0, 0)) ?
+       g_config->fullscreen_size :
+       g_config->window_size;
+--- a/src/video/sdlbase_video_system.cpp
++++ b/src/video/sdlbase_video_system.cpp
+@@ -31,11 +31,11 @@
+   m_desktop_size(),
+   m_last_fullscreen_state(g_config->use_fullscreen)
+ {
+-//#ifdef __ANDROID__
++//#if 0
+   // FIXME: SDL_GetDesktopDisplayMode gives a "video system not initialised" error. I don't know why.
+ //  SDL_VideoInit(nullptr);
+ //#endif
+-#ifndef __ANDROID__
++#if 1
+   SDL_DisplayMode mode;
+   if (SDL_GetDesktopDisplayMode(0, &mode) != 0)
+   {
+@@ -110,7 +110,7 @@
+ #if SDL_VERSION_ATLEAST(2,0,10)
+   SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+   SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
+-#elif defined(__ANDROID__)
++#elif 0
+ #warning Android needs SDL_HINT_MOUSE_TOUCH_EVENTS to work properly, but the   \
+          SDL version is too old. Please use SDL >= 2.0.10 to compile for       \
+          Android.
+--- a/src/video/gl/gl_video_system.cpp
++++ b/src/video/gl/gl_video_system.cpp
+@@ -311,7 +311,7 @@
+ 
+   m_viewport = Viewport::from_size(target_size, m_desktop_size);
+ 
+-#ifdef __ANDROID__
++#if 0
+   // SDL2 on Android reports display resolution size including the camera cutout,
+   // however it will not draw inside the cutout, so we must use the window size here
+   // instead of the display resolution, or the video will be rendered partly outside of the screen.
+--- a/src/supertux/gameconfig.cpp
++++ b/src/supertux/gameconfig.cpp
+@@ -47,7 +47,7 @@
+   fit_window(true),
+ #endif
+   magnification(0.0f),
+-#ifdef __ANDROID__
++#if 0
+   use_fullscreen(true),
+ #else
+   use_fullscreen(false),
+@@ -86,7 +86,7 @@
+   transitions_enabled(true),
+   confirmation_dialog(false),
+   pause_on_focusloss(true),
+-#ifdef __ANDROID__
++#if 0
+   custom_mouse_cursor(false),
+ #else
+   custom_mouse_cursor(true),
+--- a/src/supertux/menu/addon_menu.cpp
++++ b/src/supertux/menu/addon_menu.cpp
+@@ -161,7 +161,7 @@
+ #ifdef NETWORKING
+   add_entry(MNID_BROWSE, m_langpacks_only ? _("Browse language packs") : _("Browse Add-ons"));
+ #endif
+-#ifndef __ANDROID__
++#if 1
+   add_entry(MNID_INSTALL_FROM_FILE, _("Install from file"));
+ #endif
+   add_hl();
+--- a/src/supertux/error_handler.cpp
++++ b/src/supertux/error_handler.cpp
+@@ -33,7 +33,7 @@
+ 
+ #include "util/file_system.hpp"
+ 
+-#if (defined(__unix__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)) && !(defined(__EMSCRIPTEN__) || defined(__ANDROID__))
++#if (defined(__unix__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)) && !(defined(__EMSCRIPTEN__) || 0)
+ #define UNIX
+ #endif
+ 
+--- a/external/findlocale/findlocale.c
++++ b/external/findlocale/findlocale.c
+@@ -439,7 +439,7 @@
+       }
+     }
+   }
+-#elif defined(__ANDROID__)
++#elif 0
+   // normal method will always give default guess
+   // use JNI instead
+ 
+--- a/external/findlocale/findlocale.h
++++ b/external/findlocale/findlocale.h
+@@ -1,7 +1,7 @@
+ #ifndef __findlocale_h_
+ #define __findlocale_h_
+ 
+-#ifdef __ANDROID__
++#if 0
+ #include <jni.h>
+ #include <android/log.h>
+ 

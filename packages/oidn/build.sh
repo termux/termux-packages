@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.openimagedenoise.org
 TERMUX_PKG_DESCRIPTION="Intel® Open Image Denoise library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.4.1"
+TERMUX_PKG_VERSION="2.5.1"
 TERMUX_PKG_SRCURL="https://github.com/OpenImageDenoise/oidn/releases/download/v$TERMUX_PKG_VERSION/oidn-$TERMUX_PKG_VERSION.src.tar.gz"
-TERMUX_PKG_SHA256=9c7c77ae0d57e004479cddb7aaafd405c2cc745153bed4805413c21be610e17b
-TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SHA256=e71fd043a70f1cc80e301d1b90df6c1f536098c4dd94baa612742f6db3369c36
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libllvm, libtbb"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_PLATFORM_NO_VERSIONED_SONAME=OFF"
 # OIDN supports 64-bit platforms only,
 # see https://github.com/OpenImageDenoise/oidn/#prerequisites.
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"

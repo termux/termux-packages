@@ -1,6 +1,6 @@
 --- a/engine/config.go
 +++ b/engine/config.go
-@@ -188,7 +188,7 @@
+@@ -192,7 +192,7 @@
  
  // New creates a new server configuration based using the default values
  func New(versionString, description string) (*Config, error) {
@@ -9,7 +9,7 @@
  	ac := &Config{
  		curlSupport: true,
  
-@@ -222,7 +222,7 @@
+@@ -226,7 +226,7 @@
  		defaultLogFile: filepath.Join(tmpdir, "algernon.log"),
  
  		// List of configuration filenames to check
@@ -18,7 +18,7 @@
  
  		// Compression speed over compactness
  		cacheCompressionSpeed: true,
-@@ -254,7 +254,7 @@
+@@ -258,7 +258,7 @@
  		return nil, err
  	}
  	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
@@ -29,7 +29,7 @@
  	// File stat cache
 --- a/engine/flags.go
 +++ b/engine/flags.go
-@@ -230,9 +230,9 @@
+@@ -269,9 +269,9 @@
  	switch {
  	case ac.productionMode:
  		// Use system directories
@@ -42,17 +42,17 @@
  		ac.cacheMode = cachemode.Production
  		ac.serverMode = true
  	case ac.devMode:
---- a/engine/serve.go
-+++ b/engine/serve.go
-@@ -132,7 +132,7 @@
- // configureCertMagic sets CertMagic package-level defaults from ac.
- // If $XDG_CONFIG_DIR is not set, uses $HOME, then $TMPDIR, then /tmp for cert storage.
- func (ac *Config) configureCertMagic() {
--	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "/tmp"))
-+	certStorageDir := env.StrAlt("XDG_CONFIG_DIR", "HOME", env.Str("TMPDIR", "@TERMUX_PREFIX@/tmp"))
- 	defaultEmail := env.StrAlt("LOGNAME", "USER", "root") + "@localhost"
- 	if len(ac.serve.certMagicDomains) > 0 {
- 		defaultEmail = "webmaster@" + ac.serve.certMagicDomains[0]
+--- a/engine/certstorage.go
++++ b/engine/certstorage.go
+@@ -22,7 +22,7 @@
+ 
+ 	// systemCertStorageDir is used when there is no home directory,
+ 	// like when running as a system service
+-	systemCertStorageDir = "/var/lib/algernon"
++	systemCertStorageDir = "@TERMUX_PREFIX@/var/lib/algernon"
+ )
+ 
+ // certStorageDir returns the directory where Let's Encrypt certificates are kept.
 --- a/vendor/github.com/caddyserver/certmagic/dnsutil.go
 +++ b/vendor/github.com/caddyserver/certmagic/dnsutil.go
 @@ -376,4 +376,4 @@

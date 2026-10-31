@@ -1,0 +1,65 @@
+--- a/net/base/address_tracker_linux.cc
++++ b/net/base/address_tracker_linux.cc
+@@ -240,9 +240,18 @@ void AddressTrackerLinux::Init() {
+     rv = bind(netlink_fd_.get(), reinterpret_cast<struct sockaddr*>(&addr),
+               sizeof(addr));
+     if (rv < 0) {
++#ifdef __TERMUX__
++      // Android SELinux denies subscribing to NETLINK_ROUTE multicast groups
++      // from the Termux app context. Keep the socket and do a one-shot address
++      // dump below; this is enough for consumers such as WebRTC to discover
++      // local interfaces, even though live network-change notifications are
++      // unavailable.
++      PLOG(WARNING) << "Could not bind NETLINK socket for notifications";
++#else
+       PLOG(ERROR) << "Could not bind NETLINK socket";
+       AbortAndForceOnline();
+       return;
++#endif
+     }
+   }
+ 
+@@ -373,6 +382,20 @@ void AddressTrackerLinux::DumpInitialAddressesAndWatch() {
+   bool tunnel_changed;
+   ReadMessages(&address_change_type, &link_changed, &tunnel_changed);
+ 
++#ifdef __TERMUX__
++  // Android SELinux denies RTM_GETLINK to apps targeting recent Android
++  // releases. Treat interfaces with assigned non-loopback addresses as online
++  // so GetNetworkListImpl() can still return useful interfaces.
++  {
++    AddressMap address_map = GetAddressMap();
++    AddressTrackerAutoLock lock(*this, online_links_lock_);
++    for (const auto& [address, ifaddr] : address_map) {
++      if (!address.IsLoopback())
++        online_links_.insert(ifaddr.ifa_index);
++    }
++  }
++  UpdateCurrentConnectionType();
++#else
+   // Request dump of link state
+   request.header.nlmsg_type = RTM_GETLINK;
+ 
+@@ -387,12 +410,14 @@ void AddressTrackerLinux::DumpInitialAddressesAndWatch() {
+ 
+   // Consume pending message to populate links_online_, but don't notify.
+   ReadMessages(&address_change_type, &link_changed, &tunnel_changed);
++#endif
+   {
+     AddressTrackerAutoLock lock(*this, connection_type_lock_);
+     connection_type_initialized_ = true;
+     connection_type_initialized_cv_.Broadcast();
+   }
+ 
++#ifndef __TERMUX__
+   if (tracking_) {
+     DCHECK(!sequenced_task_runner_ ||
+            sequenced_task_runner_->RunsTasksInCurrentSequence());
+@@ -402,6 +427,7 @@ void AddressTrackerLinux::DumpInitialAddressesAndWatch() {
+         base::BindRepeating(&AddressTrackerLinux::OnFileCanReadWithoutBlocking,
+                             base::Unretained(this)));
+   }
++#endif
+ }
+ 
+ void AddressTrackerLinux::ReadMessages(

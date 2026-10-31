@@ -79,23 +79,25 @@ termux_setup_dotnet() {
 	# usually causes build failure on unofficial supported RID, eg: linux-bionic-x86
 	# so we need to point latest version to what old version we have
 	local dotnet_runtime_versions=$(dotnet --list-runtimes | awk '{ print $2 }' | sort -Vu)
-	local latest_dotnet8_version=$(echo "${dotnet_runtime_versions}" | grep "^8.0." | tail -n1)
-	local latest_dotnet9_version=$(echo "${dotnet_runtime_versions}" | grep "^9.0." | tail -n1)
 	for targeting_pack in "${HOME}"/.dotnet/packs/*; do
 		if [[ -d "$(basename "${targeting_pack}")" ]]; then
 			pushd "$(basename "${targeting_pack}")"
-			for version in "${targeting_pack}"/*; do
-				if [[ "$(basename "${version}")" == "8.0."* ]]; then
-					if [[ -n "${latest_dotnet8_version}" && "$(basename "${version}")" != "${latest_dotnet8_version}" ]]; then
-						rm -fr "${latest_dotnet8_version}"
-						ln -fsvT "$(basename "${version}")" "${latest_dotnet8_version}"
-					fi
+			local available_versions=$(for v in *; do [[ -e "${v}" ]] && echo "${v}"; done | sort -Vu)
+			local major_minors=$(echo "${available_versions}" | cut -d. -f1,2 | sort -Vu)
+			local mm
+			for mm in ${major_minors}; do
+				[[ -z "${mm}" ]] && continue
+				local latest_runtime_version=$(echo "${dotnet_runtime_versions}" | grep "^${mm}\." | tail -n1)
+				[[ -z "${latest_runtime_version}" ]] && continue
+				# Do not overwrite real installed pack directories or symlinks to matching pack version
+				if [[ -e "${latest_runtime_version}" && "$(basename "$(readlink -f "${latest_runtime_version}")")" == "${latest_runtime_version}" ]]; then
+					continue
 				fi
-				if [[ "$(basename "${version}")" == "9.0."* ]]; then
-					if [[ -n "${latest_dotnet9_version}" && "$(basename "${version}")" != "${latest_dotnet9_version}" ]]; then
-						rm -fr "${latest_dotnet9_version}"
-						ln -fsvT "$(basename "${version}")" "${latest_dotnet9_version}"
-					fi
+				# Select the newest fallback pack version for this major.minor
+				local newest_pack_version=$(echo "${available_versions}" | grep "^${mm}\." | grep -v "^${latest_runtime_version}$" | tail -n1)
+				if [[ -n "${newest_pack_version}" ]]; then
+					rm -fr "${latest_runtime_version}"
+					ln -fsvT "${newest_pack_version}" "${latest_runtime_version}"
 				fi
 			done
 			popd

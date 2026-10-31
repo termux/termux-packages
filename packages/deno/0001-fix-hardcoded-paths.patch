@@ -1,10 +1,8 @@
-diff --git a/ext/node/polyfills/os.ts b/ext/node/polyfills/os.ts
-index edc89ed2c..ae24b53a1 100644
 --- a/ext/node/polyfills/os.ts
 +++ b/ext/node/polyfills/os.ts
-@@ -287,7 +287,7 @@ export function tmpdir(): string | null {
+@@ -212,7 +212,7 @@ function tmpdir() {
      return temp;
-   } else { // !isWindows
+   } else {
      let temp = Deno.env.get("TMPDIR") || Deno.env.get("TMP") ||
 -      Deno.env.get("TEMP") || "/tmp";
 +      Deno.env.get("TEMP") || "@TERMUX_PREFIX@/tmp";

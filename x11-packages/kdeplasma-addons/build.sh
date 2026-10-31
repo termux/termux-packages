@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="All kind of addons to improve your Plasma experience"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.7.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION}/kdeplasma-addons-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=1bc1c861487733f4944695d509c81f19b90a4d80c5825cc6df633b0313e3e8cc
 TERMUX_PKG_AUTO_UPDATE=true

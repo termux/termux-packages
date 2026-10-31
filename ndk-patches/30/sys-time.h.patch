@@ -1,0 +1,32 @@
+--- a/usr/include/sys/time.h
++++ b/usr/include/sys/time.h
+@@ -46,15 +46,15 @@
+ 
+ int utimes(const char* _Nonnull __path, const struct timeval __times[_Nullable 2]);
+ 
+-#if defined(__USE_BSD) && __BIONIC_AVAILABILITY_GUARD(26)
+-int futimes(int __fd, const struct timeval __times[_Nullable 2]) __INTRODUCED_IN(26);
++#if defined(__USE_BSD)
++int futimes(int __fd, const struct timeval __times[_Nullable 2]);
+ #endif
+ 
+-#if defined(__USE_BSD) && __BIONIC_AVAILABILITY_GUARD(26)
+-int lutimes(const char* _Nonnull __path, const struct timeval __times[_Nullable 2]) __INTRODUCED_IN(26);
++#if defined(__USE_BSD)
++int lutimes(const char* _Nonnull __path, const struct timeval __times[_Nullable 2]);
+ #endif
+ 
+-#if defined(__USE_GNU) && __BIONIC_AVAILABILITY_GUARD(26)
++#if defined(__USE_GNU)
+ /**
+  * [futimesat(2)](https://man7.org/linux/man-pages/man2/futimesat.2.html) sets
+  * file timestamps.
+@@ -68,7 +68,7 @@
+  *
+  * Available since API level 26 when compiling with `_GNU_SOURCE`.
+  */
+-int futimesat(int __dir_fd, const char* __BIONIC_COMPLICATED_NULLNESS __path, const struct timeval __times[_Nullable 2]) __INTRODUCED_IN(26);
++int futimesat(int __dir_fd, const char* __BIONIC_COMPLICATED_NULLNESS __path, const struct timeval __times[_Nullable 2]);
+ #endif
+ 
+ #define timerclear(a)   \

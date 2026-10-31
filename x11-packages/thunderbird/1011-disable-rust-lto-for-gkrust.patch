@@ -1,0 +1,13 @@
+Disable Rust LTO for gkrust to avoid out-of-memory failures on ARM builds.
+
+--- a/toolkit/library/rust/moz.build
++++ b/toolkit/library/rust/moz.build
+@@ -4,7 +4,7 @@
+ 
+ include("gkrust-features.mozbuild")
+ 
+-RustLibrary("gkrust", gkrust_features, is_gkrust=True)
++RustLibrary("gkrust", gkrust_features, is_gkrust=True, lto=False)
+ 
+ for feature in gkrust_features:
+     # We don't want to enable refcount logging during rusttests, since the

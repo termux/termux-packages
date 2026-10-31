@@ -1,7 +1,36 @@
 --- a/sshd-auth.c
 +++ b/sshd-auth.c
-@@ -680,7 +680,18 @@
-
+@@ -439,7 +439,7 @@
+ 	struct ssh *ssh = NULL;
+ 	extern char *optarg;
+ 	extern int optind;
+-	int r, opt, have_key = 0;
++	int devnull, r, opt, have_key = 0;
+ 	int sock_in = -1, sock_out = -1, rexeced_flag = 0;
+ 	u_int i;
+ 	mode_t new_umask;
+@@ -448,6 +448,19 @@
+ 	uint64_t timing_secret = 0;
+ 
+ 	closefrom(PRIVSEP_MIN_FREE_FD);
++	/*
++	 * Keep the fds freed by closefrom() occupied, as sshd-session does.
++	 * With the BIONIC atrace tag enabled the bionic linker has already
++	 * opened trace_marker into one of them and keeps writing its markers
++	 * to that number. Otherwise the client socket dup()ed below takes it
++	 * and the markers end up in the SSH stream.
++	 */
++	if ((devnull = open(_PATH_DEVNULL, O_RDWR)) == -1)
++		fatal("open %s: %s", _PATH_DEVNULL, strerror(errno));
++	while (devnull < PRIVSEP_MIN_FREE_FD) {
++		if ((devnull = dup(devnull)) == -1)
++			fatal("dup %s: %s", _PATH_DEVNULL, strerror(errno));
++	}
+ 	sigemptyset(&sigmask);
+ 	sigprocmask(SIG_SETMASK, &sigmask, NULL);
+ 
+@@ -627,7 +640,18 @@
+ 
  	/* Store privilege separation user for later use if required. */
  	privsep_chroot = (getuid() == 0 || geteuid() == 0);
 +#ifdef __ANDROID__

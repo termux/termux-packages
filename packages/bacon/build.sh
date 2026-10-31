@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://dystroy.org/bacon
 TERMUX_PKG_DESCRIPTION="A background code checker for Rust, designed for minimal interaction"
 TERMUX_PKG_LICENSE="AGPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="3.25.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.26.0"
 TERMUX_PKG_SRCURL="https://github.com/Canop/bacon/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=6657e968d189dd5c165dd6c9b97f667140baea87d126d765a2d5f1e97b007b26
+TERMUX_PKG_SHA256=d86249d01175f83ce30c7d52d36ed3422855c7eef00907161e673d490955702d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 

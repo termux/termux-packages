@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/directvt/vtm
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with TUI window manager and multi-party session sharing"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.07.30"
+TERMUX_PKG_VERSION="2026.10.12"
 TERMUX_PKG_SRCURL="https://github.com/directvt/vtm/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=c3da8b3dd3757a6ab6dd2f7757df6365c2122ed64a43645157bcbff48ab0f3e7
+TERMUX_PKG_SHA256=48ef3b8cbd5a9479049791378787bd31ab28621c842f8997391240109d40e72d
 TERMUX_PKG_DEPENDS="freetype, harfbuzz, libc++, lua54, lunasvg"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn, stb"
 TERMUX_PKG_AUTO_UPDATE=true

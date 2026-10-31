@@ -1,0 +1,20 @@
+Backport of upstream CFE-4427 (https://github.com/cfengine/core/pull/6225, fe76460ec):
+report sys.os_name_human as "Termux" instead of warning "Operating System not
+properly recognized" on every run. It landed after the 3.28.0 tag; drop this patch
+when updating to 3.29.0.
+
+--- a/libenv/sysinfo.c
++++ b/libenv/sysinfo.c
+@@ -3815,6 +3815,12 @@ static void SysOSNameHuman(EvalContext *ctx)
+                                       "Alpine", CF_DATA_TYPE_STRING,
+                                       "source=agent,derived-from=alpine");
+     }
++    else if (EvalContextClassGet(ctx, NULL, "termux") != NULL)
++    {
++        EvalContextVariablePutSpecial(ctx, SPECIAL_SCOPE_SYS, lval,
++                                      "Termux", CF_DATA_TYPE_STRING,
++                                      "source=agent,derived-from=termux");
++    }
+     else if (EvalContextClassGet(ctx, NULL, "gentoo") != NULL)
+     {
+         EvalContextVariablePutSpecial(ctx, SPECIAL_SCOPE_SYS, lval,

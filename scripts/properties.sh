@@ -295,7 +295,7 @@ __termux_build_props__set_termux_builder__repo_root_dir() {
 }
 __termux_build_props__set_termux_builder__repo_root_dir "/.." || exit $?
 unset __termux_build_props__set_termux_builder__repo_root_dir
-TERMUX_SCRIPTDIR="${TERMUX_SCRIPTDIR:-TERMUX_PKGS__BUILD__REPO_ROOT_DIR}" # Deprecated alternative variable for `TERMUX_PKGS__BUILD__REPO_ROOT_DIR`
+TERMUX_SCRIPTDIR="${TERMUX_SCRIPTDIR:-$TERMUX_PKGS__BUILD__REPO_ROOT_DIR}" # Deprecated alternative variable for `TERMUX_PKGS__BUILD__REPO_ROOT_DIR`
 
 
 
@@ -305,7 +305,7 @@ TERMUX_ANDROID_BUILD_TOOLS_VERSION=37.0.0
 # change TERMUX_PKG_VERSION (and remove TERMUX_PKG_REVISION if necessary) in:
 #   apksigner, d8
 # and trigger rebuild of them
-: "${TERMUX_NDK_VERSION_NUM:="29"}"
+: "${TERMUX_NDK_VERSION_NUM:="30"}"
 : "${TERMUX_NDK_REVISION:=""}"
 TERMUX_NDK_VERSION="${TERMUX_NDK_VERSION_NUM}${TERMUX_NDK_REVISION}"
 # when changing the above:
@@ -2205,8 +2205,7 @@ if [[ ! -f "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json" ]]; then
         exit 1
     fi
 else
-    export TERMUX_PACKAGES_DIRECTORIES
-    TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json")
+    readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json")
 
     for url in $(jq -r 'del(.pkg_format) | .[] | .url' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json"); do
         TERMUX_REPO_URL+=("$url")

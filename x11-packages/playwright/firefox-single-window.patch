@@ -1,0 +1,49 @@
+--- a/packages/playwright-core/src/server/bidi/bidiBrowser.ts
++++ b/packages/playwright-core/src/server/bidi/bidiBrowser.ts
+@@ -44,6 +44,8 @@
+   readonly _bidiPages = new Map<bidi.BrowsingContext.BrowsingContext, BidiPage>();
+   private readonly _eventListeners: RegisteredListener[];
+   private _cacheBehavior: bidi.Network.SetCacheBehaviorParameters['cacheBehavior'] = 'default';
++  // Top-level browsing contexts that Firefox opened on its own at startup.
++  private _startupContexts: bidi.BrowsingContext.BrowsingContext[] = [];
+ 
+   static async connect(parent: SdkObject, transport: ConnectionTransport, options: BrowserOptions): Promise<BidiBrowser> {
+     const browser = new BidiBrowser(parent, transport, options);
+@@ -77,6 +79,14 @@
+       ],
+     });
+ 
++    // Firefox opens its own initial window on startup. Playwright cannot adopt it,
++    // so remember it and close it once Playwright has opened its own window.
++    try {
++      const { contexts } = await browser._browserSession.send('browsingContext.getTree', {});
++      browser._startupContexts = contexts.map(c => c.context);
++    } catch {
++    }
++
+     await browser._browserSession.send('network.addIntercept', { phases: [bidi.Network.InterceptPhase.AuthRequired] });
+ 
+     await browser._browserSession.send('network.addDataCollector', {
+@@ -105,6 +115,14 @@
+     ];
+   }
+ 
++  async _closeStartupWindows() {
++    const contexts = this._startupContexts;
++    this._startupContexts = [];
++    // Only called after Playwright has its own window, so this never closes the last window.
++    await Promise.all(contexts.map(context =>
++      this._browserSession.sendMayFail('browsingContext.close', { context, promptUnload: false })));
++  }
++
+   _onDisconnect() {
+     this.didClose();
+   }
+@@ -278,6 +296,7 @@
+     const page = this._browser._bidiPages.get(context)!._page;
+     page.frameManager.frameLifecycleEvent(context, 'domcontentloaded');
+     page.frameManager.frameLifecycleEvent(context, 'load');
++    await this._browser._closeStartupWindows();
+     return page;
+   }
+ 

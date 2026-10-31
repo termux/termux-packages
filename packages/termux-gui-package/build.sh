@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE="https://github.com/tareksander/termux-gui-package"
 TERMUX_PKG_DESCRIPTION="A Termux package containing utilities for Termux:GUI"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@tareksander"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="0.1.6"
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_DEPENDS="python, python-pip"

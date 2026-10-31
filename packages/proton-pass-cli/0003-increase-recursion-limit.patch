@@ -12,17 +12,20 @@ aarch64) with:
 The `#[async_trait(?Send)]` usage in secret_resolver.rs, combined with
 the crate's other async trait objects, produces a deeply nested type
 that exceeds rustc's default query recursion limit (128) when
-computing layout in a release (non-incremental) build. Follow rustc's
-own suggestion and raise the limit.
+computing layout in a release (non-incremental) build.
+
+Upstream added `#![recursion_limit = "256"]` in 2.4.2, so instead of
+adding a second attribute (which would be a duplicate), raise the
+existing value to the 512 that Termux has been building with.
 
 --- a/pass-cli/src/main.rs
 +++ b/pass-cli/src/main.rs
-@@ -15,6 +15,8 @@
+@@ -17,7 +17,7 @@
   *
   */
  
+-#![recursion_limit = "256"]
 +#![recursion_limit = "512"]
-+
+ 
  #[macro_use]
  extern crate tracing;
- 

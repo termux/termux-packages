@@ -1,0 +1,11 @@
+--- a/Platform/Unix/Process.cpp
++++ b/Platform/Unix/Process.cpp
+@@ -361,7 +361,7 @@ namespace VeraCrypt
+ #elif TC_OPENBSD
+ 		const char* defaultDirs[] = {"/sbin", "/bin", "/usr/sbin", "/usr/bin", "/usr/X11R6/bin", "/usr/local/sbin", "/usr/local/bin"};
+ #else
+-		const char* defaultDirs[] = {"/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin"};
++		const char* defaultDirs[] = {"@TERMUX_PREFIX@/bin", "/system/bin"};
+ #endif
+ 		const size_t defaultDirCount = sizeof(defaultDirs) / sizeof(defaultDirs[0]);
+ 

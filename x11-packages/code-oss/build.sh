@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.131.0"
+TERMUX_PKG_VERSION="1.144.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
-TERMUX_PKG_DEPENDS="electron-for-code-oss, libx11, libxkbfile, libsecret, ripgrep"
-TERMUX_PKG_BUILD_DEPENDS="electron-headers-for-code-oss"
-TERMUX_PKG_ANTI_BUILD_DEPENDS="electron-for-code-oss"
+TERMUX_PKG_DEPENDS="electron43, libx11, libxkbfile, libsecret, ripgrep"
+TERMUX_PKG_BUILD_DEPENDS="electron43-headers"
+TERMUX_PKG_ANTI_BUILD_DEPENDS="electron43"
+TERMUX_PKG_CONFLICTS="electron-for-code-oss (<= 42.7.0)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_NO_STRIP=true
@@ -19,7 +20,7 @@ TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 _setup_nodejs_24() {
-	local NODEJS_VERSION=24.18.0
+	local NODEJS_VERSION=24.22.2
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
 	if [ ! -x "$NODEJS_FOLDER/bin/node" ]; then
@@ -27,7 +28,7 @@ _setup_nodejs_24() {
 		local NODEJS_TAR_FILE=$TERMUX_PKG_TMPDIR/nodejs-$NODEJS_VERSION.tar.xz
 		termux_download https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz \
 			"$NODEJS_TAR_FILE" \
-			55aa7153f9d88f28d765fcdad5ae6945b5c0f98a36881703817e4c450fa76742
+			48cc0e21e048790e54c0cf5749c2725005313d652651c40b7a21feb9697aaf75
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
@@ -40,11 +41,17 @@ termux_step_post_get_source() {
 		termux_error_exit "Version mismatch: Expected 24, got $_node_version."
 	fi
 
-	# Check whether the prebuilt electron version matches the electron version from package.json
-	local _electron_verion="$(jq -r '.devDependencies.electron' $TERMUX_PKG_SRCDIR/package.json)"
-	local _header_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron-host-tools-for-code-oss/build.sh; echo $TERMUX_PKG_VERSION)"
-	if [ "$_electron_verion" != "$_header_version" ]; then
-		termux_error_exit "Version mismatch: version in package.json is $_electron_verion, prebuilt electron version $_header_version."
+	# Check whether the prebuilt electron's major version matches the electron major version from package.json
+	local _want_electron_major="$(jq -r \
+		'.registrations[] | select(.component.git.name == "electron") | .component.git.tag' \
+		$TERMUX_PKG_SRCDIR/cgmanifest.json | cut -d. -f1 -)"
+	local _prebuilt_electron_major=43
+	if [ "$_want_electron_major" != "$_prebuilt_electron_major" ]; then
+		termux_error_exit "
+			Major version mismatch:
+			version in cgmanifest.json is $_want_electron_major,
+			prebuilt electron version is $_prebuilt_electron_major.
+		"
 	fi
 
 	# Use custom node-native-keymap
@@ -59,6 +66,11 @@ termux_step_post_get_source() {
 	# Replace package.json
 	jq ".dependencies.\"native-keymap\" = \"file:./node-native-keymap-src\"" package.json > package.json.tmp && mv package.json.tmp package.json
 	jq ".dependencies.\"node-ovsx-sign\" = \"^1.2.0\"" package.json > package.json.tmp && mv package.json.tmp package.json
+
+	# Disable sourcemap as it takes much space
+	# https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/commit/e050d3e8120e052cd7af19d2f67bcd36dc52e436
+	sed -r "s/\bsourcemap:\s*[\"'](inline|linked)[\"']/sourcemap: 'external'/" -i \
+		build/next/index.ts
 }
 
 termux_step_host_build() {
@@ -90,7 +102,7 @@ termux_step_make() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 	export npm_config_arch=$NPM_CONFIG_ARCH
-	export npm_config_nodedir=$TERMUX_PREFIX/lib/code-oss/node_headers
+	export npm_config_nodedir=$TERMUX_PREFIX/opt/electron43-host-tools/node_headers
 
 	export CXX="$CXX -v -L$TERMUX_PREFIX/lib"
 	export CXXFLAGS="$CXXFLAGS -DSPDLOG_USE_STD_FORMAT=1"
@@ -107,6 +119,25 @@ termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/lib/code-oss/resources/
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/resources/
 	cp -r --no-preserve=ownership --preserve=mode package-build-root/VSCode-linux-$CODE_ARCH/resources/* $TERMUX_PREFIX/lib/code-oss/resources/
+
+	# Clean up sourcemaps
+	echo "Removed $(find ""$TERMUX_PREFIX/lib/code-oss/resources -name '*.map' -print -delete | wc -l) sourcemaps"
+
+	# Clean extensions that are compiled for gnu libc
+	pushd $TERMUX_PREFIX/lib/code-oss/resources
+	rm -rf app/extensions/copilot
+	rm -rf app/node_modules.asar.unpacked/\@github/copilot-sdk-linux-*
+	rm -rf app/node_modules.asar.unpacked/\@microsoft/mxc-sdk
+	rm -rf app/node_modules.asar.unpacked/\@vscode/vsce-sign
+	rm -rf app/node_modules/\@vscode/sandbox-runtime
+	popd # $TERMUX_PREFIX/lib/code-oss/resources
+
+	# Install the dummy code-oss binary
+	ln -sf $TERMUX_PREFIX/lib/electron43/electron $TERMUX_PREFIX/lib/code-oss/code-oss
+
+	# Install the code.mjs wrapper, taken from ArchLinux repo
+	cp -f $TERMUX_PKG_BUILDER_DIR/code.mjs $TERMUX_PREFIX/lib/code-oss/
+	sed "1s|.*|#!$TERMUX_PREFIX/lib/electron43/electron|" -i $TERMUX_PREFIX/lib/code-oss/code.mjs
 
 	# Install the start script
 	mkdir -p $TERMUX_PREFIX/lib/code-oss/bin

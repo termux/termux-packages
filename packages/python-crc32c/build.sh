@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="Python package implementing the crc32c checksum algorith
 TERMUX_PKG_LICENSE="LGPL-2.1-or-later, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.google-crc32c, LICENSE.slice-by-8"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.9.post0"
-TERMUX_PKG_SRCURL="https://github.com/ICRAR/crc32c/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=06b355c3e4bf128927ad5f88730fbee01163422acfdfb999049b57a681a47a63
+TERMUX_PKG_VERSION="2.9.post0+really2.8"
+TERMUX_PKG_SRCURL="https://github.com/ICRAR/crc32c/archive/refs/tags/v${TERMUX_PKG_VERSION#*really}.tar.gz"
+TERMUX_PKG_SHA256=1495beffd55781e41f915132085eda6a169d849cb69e434fced89f85ccea1497
 TERMUX_PKG_DEPENDS="python, python-pip"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
+TERMUX_PKG_AUTO_UPDATE=false
 
 termux_step_configure() {
 	# Upstream enables the ARMv8 CRC and crypto (PMULL) intrinsics on

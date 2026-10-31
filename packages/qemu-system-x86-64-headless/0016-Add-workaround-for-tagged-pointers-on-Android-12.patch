@@ -12,18 +12,17 @@ Co-authored-by: dev-bz <32380878+dev-bz@users.noreply.github.com>
  system/vl.c | 28 ++++++++++++++++++++++++++++
  1 file changed, 28 insertions(+)
 
-diff --git a/system/vl.c b/system/vl.c
-index ec93988..0d0942a 100644
 --- a/system/vl.c
 +++ b/system/vl.c
-@@ -140,6 +140,32 @@
- #include "qemu/guest-random.h"
+@@ -145,6 +145,34 @@
  #include "qemu/keyval.h"
+ #include "memory-internal.h"
  
 +#ifdef __TERMUX__
 +#include <stdbool.h>
 +#include <dlfcn.h>
-+static void android_disable_tags() {
++static void android_disable_tags(void)
++{
 +    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
 +    if (lib_handle) {
 +        if (android_get_device_api_level() >= 31) {
@@ -33,23 +32,24 @@ index ec93988..0d0942a 100644
 +            }
 +            return;
 +        }
-+        /* android_get_device_api_level() < 31 */
-+        bool (*android_mallopt)(int opcode, void* arg, size_t arg_size) = dlsym(lib_handle, "android_mallopt");
++        bool (*android_mallopt)(int opcode, void *arg, size_t arg_size) =
++            dlsym(lib_handle, "android_mallopt");
 +        if (android_mallopt) {
 +            int android_malloc_tag_level = 0;
-+            android_mallopt(8, &android_malloc_tag_level, sizeof(android_malloc_tag_level));
++            android_mallopt(8, &android_malloc_tag_level,
++                            sizeof(android_malloc_tag_level));
 +        }
 +        dlclose(lib_handle);
 +    }
 +}
 +#else
-+static void android_disable_tags(){}
++static void android_disable_tags(void) {}
 +#endif
 +
  #define MAX_VIRTIO_CONSOLES 1
  
  typedef struct BlockdevOptionsQueueEntry {
-@@ -2848,6 +2874,8 @@ void qemu_init(int argc, char **argv)
+@@ -2861,6 +2889,8 @@ void qemu_init(int argc, char **argv)
      bool userconfig = true;
      FILE *vmstate_dump_file = NULL;
  

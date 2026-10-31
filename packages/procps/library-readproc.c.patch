@@ -1,6 +1,7 @@
---- a/library/readproc.c
-+++ b/library/readproc.c
-@@ -1301,6 +1301,15 @@ static proc_t *simple_readproc(PROCTAB *restrict const PT, proc_t *restrict cons
+diff -uNr procps-ng-4.0.7/library/readproc.c procps-ng-4.0.7.mod/library/readproc.c
+--- procps-ng-4.0.7/library/readproc.c	2026-07-07 08:30:50.000000000 +0000
++++ procps-ng-4.0.7.mod/library/readproc.c	2026-09-19 13:14:57.235565496 +0000
+@@ -1301,6 +1301,21 @@
      if(p->nlwp > 1)
        p->wchan = ~0ul;
  
@@ -9,7 +10,13 @@
 +    // /system/bin/linker64.
 +    char** cmdline_vec = file2strvec(PT->pidfd, "cmdline");
 +    if (cmdline_vec) {
-+        snprintf(p->cmd, sizeof(p->cmd), "%s", cmdline_vec[0]);
++        if (cmdline_vec[0] && *cmdline_vec[0]) {
++            char *argv0 = strdup(cmdline_vec[0]);
++            if (argv0) {
++                free(p->cmd);
++                p->cmd = argv0;
++            }
++        }
 +        free(*cmdline_vec);
 +    }
 +

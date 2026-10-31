@@ -1,0 +1,27 @@
+fdsan fix: bionic aborts when fclose() closes a descriptor that a newer
+fdopen() has already claimed, which reopen_standard_stream() does for
+stdin/stdout/stderr. On Android close the old stream first and fdopen()
+the restored descriptor afterwards.
+
+--- a/lib/log/log.c
++++ b/lib/log/log.c
+@@ -190,6 +190,19 @@ int reopen_standard_stream(FILE **stream, const char *mode)
+ 		return 0;
+ 	}
+ 
++#ifdef __ANDROID__
++	ret = fclose(old_stream);
++	new_fd = dup2(fd_copy, fd);
++	close(fd_copy);
++	if (new_fd != fd || !(new_stream = fdopen(fd, mode)))
++		return 0;
++	_check_and_replace_standard_log_streams(old_stream, new_stream);
++	*stream = new_stream;
++	if (ret)
++		log_sys_error("fclose", name);
++	return 1;
++#endif
++
+ 	if (!(new_stream = fdopen(fd, mode))) {
+ 		log_sys_error("fdopen", name);
+ 		if (close(fd_copy) < 0)

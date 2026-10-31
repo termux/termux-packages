@@ -275,6 +275,7 @@ LIBC {
     clock_nanosleep;
     clock_settime;
     clone;
+    clone3; # introduced=38
     close;
     closedir;
     closelog;
@@ -377,6 +378,8 @@ LIBC {
     fputws;
     fread;
     free;
+    free_sized; # introduced=37
+    free_aligned_sized; # introduced=37
     freeaddrinfo;
     freelocale;
     fremovexattr;
@@ -844,7 +847,6 @@ LIBC {
     pwrite;
     pwrite64;
     qsort;
-    qsort_r; # introduced=36
     quick_exit;
     raise;
     rand;
@@ -1608,6 +1610,26 @@ LIBC_V { # introduced=35
     wcsrtombs_l;
     __system_properties_zygote_reload; # apex
 } LIBC_U;
+
+LIBC_36 { # introduced=36
+  global:
+    lchmod;
+    mseal;
+    pthread_getaffinity_np;
+    pthread_setaffinity_np;
+    qsort_r;
+    sig2str;
+    str2sig;
+} LIBC_V;
+
+LIBC_37 { # introduced=37
+  global:
+    sched_getattr;
+    sched_setattr;
+} LIBC_36;
+
+# Per API-level lists are no longer used.  Add new symbols to the `LIBC` list
+# and add the appropriate `# introduced=<LEVEL>` annotation.
 
 LIBC_PRIVATE {
   global:

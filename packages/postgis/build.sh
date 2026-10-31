@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://postgis.net
 TERMUX_PKG_DESCRIPTION="Spatial database extender for PostgreSQL object-relational database"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.6.4"
+TERMUX_PKG_VERSION="3.7.0"
 TERMUX_PKG_SRCURL="https://download.osgeo.org/postgis/source/postgis-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=ed8dc6679f1e06f7b113592b04cde2a7e00f1b1e681294c8ca2204058990cec6
+TERMUX_PKG_SHA256=832bbf50f2b6f57fab053bc9676b3bfe641e5bf966cdcb28c7926f8d4b3c5e04
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdal, json-c, libc++, libgeos, libiconv, libprotobuf-c, libxml2, pcre2, postgresql, proj"
 

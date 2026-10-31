@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://bun.com
 TERMUX_PKG_DESCRIPTION="Incredibly fast JavaScript runtime, bundler, test runner, and package manager"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.4.2"
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=git+https://github.com/oven-sh/bun
+TERMUX_PKG_VERSION="1.4.4"
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="git+https://github.com/oven-sh/bun"
 TERMUX_PKG_GIT_BRANCH="bun-v$TERMUX_PKG_VERSION"
+TERMUX_PKG_DEPENDS="libicu"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -21,20 +22,36 @@ termux_pkg_auto_update() {
 		return
 	fi
 
+	# Get the SHA256 checksum from the release artifacts
+	local TERMUX_BUN_SHA256
+	TERMUX_BUN_SHA256="$(
+		curl -sL \
+			-H "X-GitHub-Api-Version: 2026-03-10" \
+			-H "Accept: application/vnd.github+json" \
+			-A "Termux update checker 1.1 (github.com/termux/termux-packages)" \
+			"https://api.github.com/repos/oven-sh/bun/releases/tags/${latest_tag}" |
+			jq -r '.[].[]? | select(.name? == "bun-linux-x64.zip") | .digest | ltrimstr("sha256:")'
+	)"
+
+	if [[ ! "${TERMUX_BUN_SHA256:-}" =~ [0-9a-f]{64} ]]; then
+		printf '%s\n' \
+			"Could not fetch valid SHA256 sum from upstream release artifacts." \
+			"Got: '${TERMUX_BUN_SHA256:-}'" >&2
+		return
+	fi
+
+	printf '%s\n' \
+		"" \
+		"Toolchain:" \
+		"bun-linux-x64.zip  $TERMUX_BUN_SHA256" \
+		""
+
 	if [[ "${BUILD_PACKAGES}" == "false" ]]; then
 		echo "INFO: package needs to be updated to ${latest_version}."
 		return
 	fi
 
 	# Update the version and checksum in termux_setup_bun
-	local TERMUX_BUN_ZIP
-	TERMUX_BUN_ZIP="$(mktemp)"
-	curl -Ls "https://github.com/oven-sh/bun/releases/download/bun-v${latest_version}/bun-linux-x64.zip" \
-		-o "${TERMUX_BUN_ZIP}"
-	local TERMUX_BUN_SHA256
-	TERMUX_BUN_SHA256="$(sha256sum "${TERMUX_BUN_ZIP}" | cut -d" " -f1)"
-	rm -f "${TERMUX_BUN_ZIP}"
-
 	sed \
 		-e "s|local TERMUX_BUN_VERSION=.*|local TERMUX_BUN_VERSION=\"\${TERMUX_BUN_VERSION:-${latest_version}}\"|" \
 		-e "s|local TERMUX_BUN_SHA256=.*|local TERMUX_BUN_SHA256=\"${TERMUX_BUN_SHA256}\"|" \
@@ -43,8 +60,30 @@ termux_pkg_auto_update() {
 	termux_pkg_upgrade_version "${latest_version}"
 }
 
+termux_step_post_get_source() {
+	local _wk_ver
+	_wk_ver="$(sed -nE 's/.*WEBKIT_VERSION = "([^"]+)".*/\1/p' "$TERMUX_PKG_SRCDIR/scripts/build/deps/webkit.ts")"
+	if [[ -z "${_wk_ver}" ]]; then
+		termux_error_exit "Failed to determine WEBKIT_VERSION from Bun source"
+	fi
+	local _wk_tag="${_wk_ver}"
+	if [[ "${_wk_tag}" != autobuild-* ]]; then
+		_wk_tag="autobuild-${_wk_tag}"
+	fi
+
+	if [[ ! -d "$TERMUX_PKG_SRCDIR/vendor/WebKit" ]]; then
+		echo "Fetching WebKit source for Bun from tag ${_wk_tag}..."
+		mkdir -p "$TERMUX_PKG_SRCDIR/vendor"
+		git clone \
+			--depth 1 \
+			--branch "${_wk_tag}" \
+			--single-branch \
+			https://github.com/oven-sh/WebKit.git \
+			"$TERMUX_PKG_SRCDIR/vendor/WebKit"
+	fi
+}
+
 termux_step_make() {
-	# Bun needs to build without Termux's toolchain, although it is not recommended anyway...
 	termux_setup_cmake
 	termux_setup_ninja
 	termux_setup_rust
@@ -58,11 +97,16 @@ termux_step_make() {
 		_bun_arch="x64"
 	fi
 
+	export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
+	export CARGO_BUILD_JOBS=$(nproc)
+	export BUN_ANDROID_ICU_ROOT="$TERMUX_PREFIX"
+
 	rustup toolchain install
 	bun run build:release \
 		--abi=android \
 		--arch="$_bun_arch" \
 		--android-ndk="$NDK" \
+		--webkit=local \
 		--canary=false \
 		--lto=on
 }

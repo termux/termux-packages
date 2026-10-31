@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://librewolf.net/
 TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="155.0.1-1"
+TERMUX_PKG_VERSION="159.0-1"
 TERMUX_PKG_SRCURL="https://librewolf.dev/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
-TERMUX_PKG_SHA256=824b084991313f6a980ff64d7af14fd67357fd3f15a7ad338d0cca87c5133208
+TERMUX_PKG_SHA256=c2119c24ffbf22dcc998ac399bd95b97e8fdc785f1e57776847b468f3f9928cb
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
-TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwayland, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxkbcommon, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,14 +16,6 @@ termux_step_post_get_source() {
 	local f="media/ffvpx/config_unix_aarch64.h"
 	echo "Applying sed substitution to ${f}"
 	sed -E '/^#define (CONFIG_LINUX_PERF|HAVE_SYSCTL) /s/1$/0/' -i ${f}
-
-	# Update Cargo.toml to use the patched cc
-	sed -i 's|^\(\[patch\.crates-io\]\)$|\1\ncc = { path = "third_party/rust/cc" }|g' \
-		Cargo.toml
-	(
-		termux_setup_rust
-		cargo update -p cc
-	)
 }
 
 termux_step_pre_configure() {
@@ -56,6 +48,10 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
+	fi
+
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		CXXFLAGS+=" -DLIBYUV_DISABLE_X86"
 	fi
 }
 

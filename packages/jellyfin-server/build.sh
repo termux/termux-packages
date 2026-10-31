@@ -3,19 +3,18 @@ TERMUX_PKG_DESCRIPTION="A free media system for organizing and streaming media (
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	12.1
-	8.1.2.5
+	12.4
+	8.1.3.1
 )
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/jellyfin/jellyfin/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.zip"
 	"https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v${TERMUX_PKG_VERSION[1]%.*}-${TERMUX_PKG_VERSION[1]##*.}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	b78b5103c51596dd9fd1cab6c2d5dae1bb3d5c0e70581894cc4f838c7867dcae
-	cccced259a1ef75e7a7495ca1d71dc163200e8639cc033cbe5b563ad80832d4c
-	2d871248eb86f15ce54dad8d57787cf2c098b5c675b556d1f40025b1ae53acd0
+	6a7c08811cabe6cd3f3ea5fc953f4b082f22ad40b7525f6cf44a786a4c7346ef
+	1551acc789457de32e84a594215fa166bade9541d2b75d84a406ea73f081ab7b
+	87bedcefc860cd234cdeddbebdcd3ce45aeedc81d0fbb258ed839ff778be3140
 )
 TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libskiasharp (>= 3.119), libskiasharp (<< 4), libesqlite3, jellyfin-ffmpeg"
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, libcairo, pango, libjpeg-turbo, giflib, librsvg"

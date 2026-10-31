@@ -1,5 +1,3 @@
-diff --git a/lib/param/loadparm.h b/lib/param/loadparm.h
-index a979a8a..2a9bed8 100644
 --- a/lib/param/loadparm.h
 +++ b/lib/param/loadparm.h
 @@ -31,6 +31,7 @@
@@ -10,8 +8,6 @@ index a979a8a..2a9bed8 100644
  
  struct parmlist_entry {
  	struct parmlist_entry *prev, *next;
-diff --git a/lib/replace/getifaddrs.c b/lib/replace/getifaddrs.c
-index a55ef7e..3f4f920 100644
 --- a/lib/replace/getifaddrs.c
 +++ b/lib/replace/getifaddrs.c
 @@ -44,6 +44,7 @@
@@ -22,7 +18,7 @@ index a55ef7e..3f4f920 100644
  void rep_freeifaddrs(struct ifaddrs *ifp)
  {
  	if (ifp != NULL) {
-@@ -55,6 +56,7 @@ void rep_freeifaddrs(struct ifaddrs *ifp)
+@@ -55,6 +56,7 @@
  		free(ifp);
  	}
  }
@@ -30,7 +26,7 @@ index a55ef7e..3f4f920 100644
  
  static struct sockaddr *sockaddr_dup(struct sockaddr *sa)
  {
-@@ -374,6 +376,12 @@ int rep_getifaddrs(struct ifaddrs **ifap)
+@@ -374,6 +376,12 @@
  
  #define _FOUND_IFACE_ANY
  #endif /* HAVE_IFACE_AIX */
@@ -43,9 +39,6 @@ index a55ef7e..3f4f920 100644
  #ifndef _FOUND_IFACE_ANY
  int rep_getifaddrs(struct ifaddrs **ifap)
  {
-diff --git a/lib/replace/netlink_ifaddrs.c b/lib/replace/netlink_ifaddrs.c
-new file mode 100644
-index 0000000..4b0456b
 --- /dev/null
 +++ b/lib/replace/netlink_ifaddrs.c
 @@ -0,0 +1,271 @@
@@ -320,11 +313,9 @@ index 0000000..4b0456b
 +    free(cur);
 +  }
 +}
-diff --git a/lib/replace/replace.c b/lib/replace/replace.c
-index dd07e6c..80b37eb 100644
 --- a/lib/replace/replace.c
 +++ b/lib/replace/replace.c
-@@ -1131,6 +1131,20 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[])
+@@ -1131,6 +1131,20 @@
  }
  #endif
  
@@ -345,11 +336,9 @@ index dd07e6c..80b37eb 100644
  #ifndef HAVE_MEMSET_EXPLICIT
  void *rep_memset_explicit(void *block, int c, size_t size)
  {
-diff --git a/lib/replace/replace.h b/lib/replace/replace.h
-index d3e1fd9..653468c 100644
 --- a/lib/replace/replace.h
 +++ b/lib/replace/replace.h
-@@ -1006,6 +1006,11 @@ void rep_setproctitle(const char *fmt, ...) PRINTF_ATTRIBUTE(1, 2);
+@@ -1032,6 +1032,11 @@
  void rep_setproctitle_init(int argc, char *argv[], char *envp[]);
  #endif
  
@@ -361,11 +350,9 @@ index d3e1fd9..653468c 100644
  #ifndef HAVE_MEMSET_EXPLICIT
  #define memset_explicit rep_memset_explicit
  void *rep_memset_explicit(void *block, int c, size_t size);
-diff --git a/lib/socket/interfaces.c b/lib/socket/interfaces.c
-index 2426ce2..e73bd1a 100644
 --- a/lib/socket/interfaces.c
 +++ b/lib/socket/interfaces.c
-@@ -126,6 +126,10 @@ void make_net(struct sockaddr_storage *pss_out,
+@@ -126,6 +126,10 @@
  }
  
  #ifdef HAVE_ETHTOOL
@@ -376,11 +363,9 @@ index 2426ce2..e73bd1a 100644
  static void query_iface_speed_from_name(const char *name, uint64_t *speed)
  {
  	int ret = 0;
-diff --git a/lib/util/util_pw.c b/lib/util/util_pw.c
-index 398932a..08f7acf 100644
 --- a/lib/util/util_pw.c
 +++ b/lib/util/util_pw.c
-@@ -37,7 +37,6 @@ struct passwd *tcopy_passwd(TALLOC_CTX *mem_ctx,
+@@ -37,7 +37,6 @@
  
  	len += strlen(from->pw_name)+1;
  	len += strlen(from->pw_passwd)+1;
@@ -388,7 +373,7 @@ index 398932a..08f7acf 100644
  	len += strlen(from->pw_dir)+1;
  	len += strlen(from->pw_shell)+1;
  
-@@ -51,7 +50,6 @@ struct passwd *tcopy_passwd(TALLOC_CTX *mem_ctx,
+@@ -51,7 +50,6 @@
  	ret->pw_passwd = talloc_strdup(ret, from->pw_passwd);
  	ret->pw_uid = from->pw_uid;
  	ret->pw_gid = from->pw_gid;
@@ -396,8 +381,6 @@ index 398932a..08f7acf 100644
  	ret->pw_dir = talloc_strdup(ret, from->pw_dir);
  	ret->pw_shell = talloc_strdup(ret, from->pw_shell);
  
-diff --git a/librpc/ndr/util.c b/librpc/ndr/util.c
-index 472f44a..2a232f6 100644
 --- a/librpc/ndr/util.c
 +++ b/librpc/ndr/util.c
 @@ -20,8 +20,8 @@
@@ -410,11 +393,9 @@ index 472f44a..2a232f6 100644
  #include "lib/util/util_net.h"
  
  _PUBLIC_ void ndr_print_sockaddr_storage(struct ndr_print *ndr, const char *name, const struct sockaddr_storage *ss)
-diff --git a/nsswitch/libwbclient/wbc_pwd.c b/nsswitch/libwbclient/wbc_pwd.c
-index 4e83fbf..6f78927 100644
 --- a/nsswitch/libwbclient/wbc_pwd.c
 +++ b/nsswitch/libwbclient/wbc_pwd.c
-@@ -46,7 +46,6 @@ static void wbcPasswdDestructor(void *ptr)
+@@ -46,7 +46,6 @@
  	struct passwd *pw = (struct passwd *)ptr;
  	free(pw->pw_name);
  	free(pw->pw_passwd);
@@ -422,7 +403,7 @@ index 4e83fbf..6f78927 100644
  	free(pw->pw_shell);
  	free(pw->pw_dir);
  }
-@@ -68,10 +67,6 @@ static struct passwd *copy_passwd_entry(struct winbindd_pw *p)
+@@ -68,10 +67,6 @@
  	if (pw->pw_passwd == NULL) {
  		goto fail;
  	}
@@ -433,11 +414,9 @@ index 4e83fbf..6f78927 100644
  	pw->pw_shell = strdup(p->pw_shell);
  	if (pw->pw_shell == NULL) {
  		goto fail;
-diff --git a/nsswitch/libwbclient/wbc_sid.c b/nsswitch/libwbclient/wbc_sid.c
-index 50f3f24..c63555c 100644
 --- a/nsswitch/libwbclient/wbc_sid.c
 +++ b/nsswitch/libwbclient/wbc_sid.c
-@@ -1078,7 +1078,7 @@ wbcErr wbcCtxGetDisplayName(struct wbcContext *ctx,
+@@ -1078,7 +1078,7 @@
  
  		wbcFreeMemory(name);
  
@@ -446,11 +425,9 @@ index 50f3f24..c63555c 100644
  		wbcFreeMemory(pwd);
  		BAIL_ON_PTR_ERROR(name, wbc_status);
  	}
-diff --git a/nsswitch/winbind_struct_protocol.h b/nsswitch/winbind_struct_protocol.h
-index 269f017..11336a6 100644
 --- a/nsswitch/winbind_struct_protocol.h
 +++ b/nsswitch/winbind_struct_protocol.h
-@@ -23,6 +23,10 @@ typedef char fstring[FSTRING_LEN];
+@@ -23,6 +23,10 @@
  #ifndef _WINBINDD_NTDOM_H
  #define _WINBINDD_NTDOM_H
  
@@ -461,11 +438,9 @@ index 269f017..11336a6 100644
  #define WINBINDD_SOCKET_NAME "pipe"            /* Name of PF_UNIX socket */
  
  /* We let the build environment set the public winbindd socket
-diff --git a/source3/lib/dumpcore.c b/source3/lib/dumpcore.c
-index 3ed6b89..ee59536 100644
 --- a/source3/lib/dumpcore.c
 +++ b/source3/lib/dumpcore.c
-@@ -320,7 +320,7 @@ void dump_core_setup(const char *progname, const char *log_file)
+@@ -320,7 +320,7 @@
  		}
  	}
  
@@ -474,11 +449,9 @@ index 3ed6b89..ee59536 100644
  	dbgflush();
  
  #if defined(HAVE_PRCTL) && defined(PR_SET_DUMPABLE)
-diff --git a/source3/lib/username.c b/source3/lib/username.c
-index 280285e..5ef953c 100644
 --- a/source3/lib/username.c
 +++ b/source3/lib/username.c
-@@ -158,6 +158,8 @@ static struct passwd *Get_Pwnam_internals(TALLOC_CTX *mem_ctx,
+@@ -158,6 +158,8 @@
  done:
  	DEBUG(5,("Get_Pwnam_internals %s find user [%s]!\n",ret ?
  		 "did":"didn't", user));
@@ -487,11 +460,9 @@ index 280285e..5ef953c 100644
  
  	return ret;
  }
-diff --git a/source3/passdb/passdb.c b/source3/passdb/passdb.c
-index 297c6d0..b59edf4 100644
 --- a/source3/passdb/passdb.c
 +++ b/source3/passdb/passdb.c
-@@ -117,6 +117,7 @@ static int count_commas(const char *str)
+@@ -117,6 +117,7 @@
  {
  	int num_commas = 0;
  	const char *comma = str;
@@ -499,8 +470,6 @@ index 297c6d0..b59edf4 100644
  
  	while ((comma = strchr(comma, ',')) != NULL) {
  		comma += 1;
-diff --git a/source4/lib/socket/socket.c b/source4/lib/socket/socket.c
-index ef54029..5df402e 100644
 --- a/source4/lib/socket/socket.c
 +++ b/source4/lib/socket/socket.c
 @@ -20,9 +20,9 @@

@@ -16,16 +16,13 @@ index c947778..0c1f519 100644
  
  
  #include "csm-system.h"
-@@ -49,6 +52,7 @@
+@@ -45,18 +47,24 @@
  
  struct _CsmConsolekitPrivate
  {
 +#ifndef FAKE_CONSOLEKIT
          GDBusProxy      *ck_proxy;
          GDBusProxy      *ck_session_proxy;
- #ifdef HAVE_OLD_UPOWER
-@@ -56,14 +60,19 @@ struct _CsmConsolekitPrivate
- #endif
          char            *session_id;
          gchar           *session_path;
 +#endif
@@ -44,7 +41,7 @@ index c947778..0c1f519 100644
  };
  
  enum {
-@@ -77,6 +86,7 @@ G_DEFINE_TYPE_WITH_CODE (CsmConsolekit, csm_consolekit, G_TYPE_OBJECT,
+@@ -70,6 +78,7 @@ G_DEFINE_TYPE_WITH_CODE (CsmConsolekit, csm_consolekit, G_TYPE_OBJECT,
                           G_IMPLEMENT_INTERFACE (CSM_TYPE_SYSTEM,
                                                  csm_consolekit_system_init))
  
@@ -52,7 +49,7 @@ index c947778..0c1f519 100644
  static void
  drop_system_inhibitor (CsmConsolekit *manager)
  {
-@@ -98,22 +99,27 @@ drop_delay_inhibitor (CsmConsolekit *manager)
+@@ -89,22 +98,27 @@ drop_delay_inhibitor (CsmConsolekit *manager)
                  manager->priv->delay_inhibit_fd = -1;
          }
  }
@@ -80,7 +77,7 @@ index c947778..0c1f519 100644
  
  
          G_OBJECT_CLASS (csm_consolekit_parent_class)->finalize (object);
-@@ -171,6 +187,7 @@ csm_consolekit_class_init (CsmConsolekitClass *manager_class)
+@@ -161,6 +175,7 @@ csm_consolekit_class_init (CsmConsolekitClass *manager_class)
          g_type_class_add_private (manager_class, sizeof (CsmConsolekitPrivate));
  }
  
@@ -88,7 +85,7 @@ index c947778..0c1f519 100644
  static void ck_session_proxy_signal_cb (GDBusProxy  *proxy,
                                          const gchar *sender_name,
                                          const gchar *signal_name,
-@@ -214,18 +231,22 @@ ck_pid_get_session (CsmConsolekit *manager,
+@@ -204,18 +219,22 @@ ck_pid_get_session (CsmConsolekit *manager,
          g_variant_get (res, "(o)", session_id);
          g_variant_unref (res);
  }
@@ -111,30 +108,25 @@ index c947778..0c1f519 100644
          manager->priv->inhibit_fd = -1;
          manager->priv->delay_inhibit_fd = -1;
  
-@@ -286,6 +307,12 @@ csm_consolekit_init (CsmConsolekit *manager)
- #endif
+@@ -272,8 +291,15 @@ csm_consolekit_init (CsmConsolekit *manager)
+ 
  
          g_object_unref (bus);
 +#else
 +        g_debug ("CsmConsolekit: Termux dummy implementation initialized");
-+        
++
 +        /* In Termux, we're always "active" since there's no session switching */
 +        manager->priv->is_active = TRUE;
 +#endif
- }
- 
- static void
-@@ -332,6 +359,7 @@ emit_stop_complete (CsmConsolekit *manager,
-         }
  }
  
 +#ifndef FAKE_CONSOLEKIT
  static void
  restart_done (GObject      *source,
                GAsyncResult *result,
-@@ -353,12 +381,14 @@ restart_done (GObject      *source,
-                 g_variant_unref (res);
-         }
+@@ -297,12 +323,14 @@ restart_done (GObject      *source,
+ 
+         g_signal_emit_by_name (manager, "shutdown-prepared", success);
  }
 +#endif
  
@@ -147,21 +139,12 @@ index c947778..0c1f519 100644
          /* Use Restart instead of Reboot because it will work on
           * both CK and CK2 */
          g_dbus_proxy_call (manager->priv->ck_proxy,
-@@ -369,8 +399,21 @@ csm_consolekit_attempt_restart (CsmSystem *system)
+@@ -313,8 +341,12 @@ csm_consolekit_attempt_restart (CsmSystem *system)
                             NULL,
                             restart_done,
                             manager);
 +#else
-+        GError *error;
-+
 +        g_debug ("CsmConsolekit: Termux restart attempt - not supported");
-+        
-+        /* In Termux, we can't actually restart the system, so we just signal completion */
-+        error = g_error_new_literal (CSM_SYSTEM_ERROR,
-+                                     CSM_SYSTEM_ERROR_RESTARTING,
-+                                     "System restart not supported in Termux");
-+        emit_restart_complete (manager, error);
-+        g_error_free (error);
 +#endif
  }
  
@@ -169,9 +152,9 @@ index c947778..0c1f519 100644
  static void
  stop_done (GObject      *source,
             GAsyncResult *result,
-@@ -392,13 +435,15 @@ stop_done (GObject      *source,
-                 g_variant_unref (res);
-         }
+@@ -338,12 +370,14 @@ stop_done (GObject      *source,
+ 
+         g_signal_emit_by_name (manager, "shutdown-prepared", success);
  }
 +#endif
  
@@ -180,27 +163,16 @@ index c947778..0c1f519 100644
  {
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
  
--        /* Use Stop insetad of PowerOff because it will work with
 +#ifndef FAKE_CONSOLEKIT
-+        /* Use Stop instead of PowerOff because it will work with
+         /* Use Stop insetad of PowerOff because it will work with
           * Ck and CK2. */
          g_dbus_proxy_call (manager->priv->ck_proxy,
-                            "Stop",
-@@ -408,14 +453,27 @@ csm_consolekit_attempt_stop (CsmSystem *system)
+@@ -354,14 +388,18 @@ csm_consolekit_attempt_stop (CsmSystem *system)
                             NULL,
                             stop_done,
                             manager);
 +#else
-+        GError *error;
-+
 +        g_debug ("CsmConsolekit: Termux stop attempt - not supported");
-+        
-+        /* In Termux, we can't actually stop the system, so we just signal completion */
-+        error = g_error_new_literal (CSM_SYSTEM_ERROR,
-+                                     CSM_SYSTEM_ERROR_STOPPING,
-+                                     "System shutdown not supported in Termux");
-+        emit_stop_complete (manager, error);
-+        g_error_free (error);
 +#endif
  }
  
@@ -215,7 +187,7 @@ index c947778..0c1f519 100644
          g_debug ("Updating consolekit idle status: %d", is_idle);
          g_dbus_proxy_call_sync (manager->priv->ck_session_proxy,
                                  "SetIdleHint",
-@@ -423,8 +481,13 @@ csm_consolekit_set_session_idle (CsmSystem *system,
+@@ -369,8 +407,13 @@ csm_consolekit_set_session_idle (CsmSystem *system,
                                  0,
                                  G_MAXINT,
                                  NULL, NULL);
@@ -229,7 +201,7 @@ index c947778..0c1f519 100644
  static void
  ck_session_get_seat (CsmConsolekit *manager,
                       gchar        **seat)
-@@ -482,10 +545,12 @@ ck_seat_can_multi_session (CsmConsolekit *manager,
+@@ -428,10 +471,12 @@ ck_seat_can_multi_session (CsmConsolekit *manager,
  
          return can_activate == TRUE ? 1 : 0;
  }
@@ -242,7 +214,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          gchar *seat;
          gint ret;
-@@ -495,11 +560,17 @@ csm_consolekit_can_switch_user (CsmSystem *system)
+@@ -441,11 +486,17 @@ csm_consolekit_can_switch_user (CsmSystem *system)
          free (seat);
  
          return ret > 0;
@@ -260,7 +232,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          GVariant *res;
          gboolean can_restart;
-@@ -521,11 +592,17 @@ csm_consolekit_can_restart (CsmSystem *system)
+@@ -467,11 +518,17 @@ csm_consolekit_can_restart (CsmSystem *system)
          g_variant_unref (res);
  
          return can_restart;
@@ -278,7 +250,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          GVariant *res;
          gboolean can_stop;
-@@ -547,8 +624,14 @@ csm_consolekit_can_stop (CsmSystem *system)
+@@ -493,8 +550,14 @@ csm_consolekit_can_stop (CsmSystem *system)
          g_variant_unref (res);
  
          return can_stop;
@@ -293,7 +265,7 @@ index c947778..0c1f519 100644
  /* returns -1 on failure, 0 on success */
  static gint
  ck_session_get_class (CsmConsolekit *manager,
-@@ -574,10 +657,12 @@ ck_session_get_class (CsmConsolekit *manager,
+@@ -520,10 +583,12 @@ ck_session_get_class (CsmConsolekit *manager,
  
          return 0;
  }
@@ -306,7 +278,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          int res;
          gboolean ret;
-@@ -662,11 +668,17 @@ csm_consolekit_is_login_session (CsmSystem *system)
+@@ -544,11 +609,17 @@ csm_consolekit_is_login_session (CsmSystem *system)
          g_free (session_class);
  
          return ret;
@@ -324,7 +296,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          gchar *rv;
          GVariant *res;
-@@ -694,11 +706,17 @@ csm_consolekit_can_suspend (CsmSystem *system)
+@@ -576,11 +647,17 @@ csm_consolekit_can_suspend (CsmSystem *system)
          g_free (rv);
  
          return can_suspend;
@@ -342,7 +314,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
          gchar *rv;
          GVariant *res;
-@@ -726,8 +744,14 @@ csm_consolekit_can_hibernate (CsmSystem *system)
+@@ -608,11 +685,17 @@ csm_consolekit_can_hibernate (CsmSystem *system)
          g_free (rv);
  
          return can_hibernate;
@@ -353,41 +325,47 @@ index c947778..0c1f519 100644
 +#endif
  }
  
+ static gboolean
+ csm_consolekit_can_hybrid_sleep (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+         gchar *rv;
+         GVariant *res;
+@@ -640,6 +723,11 @@ csm_consolekit_can_hybrid_sleep (CsmSystem *system)
+         g_free (rv);
+ 
+         return can_hybrid_sleep;
++#else
++        g_debug ("CsmConsolekit: Termux can_hybrid_sleep - FALSE");
++        /* Hibernate is not supported in Termux */
++        return FALSE;
++#endif
+ }
+ 
+ static gboolean
+@@ -649,6 +737,7 @@ csm_consolekit_can_suspend_then_hibernate (CsmSystem *system)
+         return FALSE;
+ }
+ 
 +#ifndef FAKE_CONSOLEKIT
  static void
  suspend_done (GObject      *source,
                GAsyncResult *result,
-@@ -765,10 +789,12 @@ hibernate_done (GObject      *source,
+@@ -686,10 +775,12 @@ hibernate_done (GObject      *source,
                  g_variant_unref (res);
          }
  }
 +#endif
  
  static void
- csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+ csm_consolekit_suspend (CsmSystem *system)
  {
 +#ifndef FAKE_CONSOLEKIT
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
  
-         gchar *method = "Suspend";
-@@ -728,11 +833,11 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
- #else
-         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
- 
--	gchar *method = "Suspend";
--	if (suspend_then_hibernate && csm_consolekit_can_suspend (system) && csm_consolekit_can_hibernate (system)) {
--		method = "SuspendThenHibernate";
--	}
--	g_debug ("Suspend using: %s", method);
-+        gchar *method = "Suspend";
-+        if (suspend_then_hibernate && csm_consolekit_can_suspend (system) && csm_consolekit_can_hibernate (system)) {
-+                method = "SuspendThenHibernate";
-+        }
-+        g_debug ("Suspend using: %s", method);
- 
          g_dbus_proxy_call (manager->priv->ck_proxy,
-                            method,
-@@ -785,11 +811,16 @@ csm_consolekit_suspend (CsmSystem *system, gboolean suspend_then_hibernate)
+@@ -700,8 +791,13 @@ csm_consolekit_suspend (CsmSystem *system)
                             NULL,
                             suspend_done,
                             manager);
@@ -397,6 +375,34 @@ index c947778..0c1f519 100644
 +#endif
  }
  
++#ifndef FAKE_CONSOLEKIT
+ static void
+ hybrid_sleep_done (GObject      *source,
+                    GAsyncResult *result,
+@@ -720,10 +816,12 @@ hybrid_sleep_done (GObject      *source,
+                 g_variant_unref (res);
+         }
+ }
++#endif
+ 
+ static void
+ csm_consolekit_hybrid_sleep (CsmSystem *system)
+ {
++#ifndef FAKE_CONSOLEKIT
+         CsmConsolekit *manager = CSM_CONSOLEKIT (system);
+ 
+         g_dbus_proxy_call (manager->priv->ck_proxy,
+@@ -734,6 +832,9 @@ csm_consolekit_hybrid_sleep (CsmSystem *system)
+                            NULL,
+                            hybrid_sleep_done,
+                            manager);
++#else
++        g_debug ("CsmConsolekit: Termux hybrid_sleep - not supported");
++#endif
+ }
+ 
+ static void
+@@ -746,6 +847,7 @@ csm_consolekit_suspend_then_hibernate (CsmSystem *system)
  static void
  csm_consolekit_hibernate (CsmSystem *system)
  {
@@ -404,7 +410,7 @@ index c947778..0c1f519 100644
          CsmConsolekit *manager = CSM_CONSOLEKIT (system);
  
          g_dbus_proxy_call (manager->priv->ck_proxy,
-@@ -800,8 +832,13 @@ csm_consolekit_hibernate (CsmSystem *system)
+@@ -756,8 +858,13 @@ csm_consolekit_hibernate (CsmSystem *system)
                             NULL,
                             hibernate_done,
                             manager);
@@ -418,7 +424,7 @@ index c947778..0c1f519 100644
  static void
  inhibit_done (GObject      *source,
                GAsyncResult *result,
-@@ -805,6 +920,7 @@ inhibit_done (GObject      *source,
+@@ -791,6 +898,7 @@ inhibit_done (GObject      *source,
                  drop_system_inhibitor (manager);
          }
  }
@@ -426,7 +432,7 @@ index c947778..0c1f519 100644
  
  static void
  csm_consolekit_add_inhibitor (CsmSystem        *system,
-@@ -816,6 +932,7 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
+@@ -802,6 +910,7 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
          if ((flag & CSM_INHIBITOR_FLAG_SUSPEND) == 0)
                  return;
  
@@ -434,7 +440,7 @@ index c947778..0c1f519 100644
          if (manager->priv->inhibitors == NULL) {
                  g_debug ("Adding system inhibitor");
                  g_dbus_proxy_call_with_unix_fd_list (manager->priv->ck_proxy,
-@@ -832,6 +949,10 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
+@@ -818,6 +927,10 @@ csm_consolekit_add_inhibitor (CsmSystem        *system,
                                                       inhibit_done,
                                                       manager);
          }
@@ -445,7 +451,7 @@ index c947778..0c1f519 100644
          manager->priv->inhibitors = g_slist_prepend (manager->priv->inhibitors, g_strdup (id));
  }
  
-@@ -848,15 +969,26 @@ csm_consolekit_remove_inhibitor (CsmSystem   *system,
+@@ -834,15 +947,26 @@ csm_consolekit_remove_inhibitor (CsmSystem   *system,
  
          g_free (l->data);
          manager->priv->inhibitors = g_slist_delete_link (manager->priv->inhibitors, l);
@@ -471,8 +477,8 @@ index c947778..0c1f519 100644
 +#endif
  }
  
- static void
-@@ -883,11 +1015,15 @@ csm_consolekit_new (void)
+ static gchar *
+@@ -880,11 +1004,15 @@ csm_consolekit_new (void)
  {
          CsmConsolekit *manager;
  
@@ -488,7 +494,7 @@ index c947778..0c1f519 100644
  static void
  ck_proxy_signal_cb (GDBusProxy  *proxy,
                      const gchar *sender_name,
-@@ -942,3 +1078,4 @@ ck_session_proxy_signal_cb (GDBusProxy  *proxy,
+@@ -939,3 +1067,4 @@ ck_session_proxy_signal_cb (GDBusProxy  *proxy,
                  g_object_notify (G_OBJECT (consolekit), "active");
          }
  }

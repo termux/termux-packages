@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-apt-repo
 TERMUX_PKG_DESCRIPTION="Script to create Termux apt repositories"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="0.5"
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL="https://github.com/termux/termux-apt-repo/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"

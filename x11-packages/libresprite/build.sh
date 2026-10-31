@@ -2,15 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://libresprite.github.io/
 TERMUX_PKG_DESCRIPTION="Free and open source program for creating and animating sprites"
 TERMUX_PKG_LICENSE="GPL-2.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.3"
 TERMUX_PKG_SRCURL="https://github.com/LibreSprite/LibreSprite/releases/download/v$TERMUX_PKG_VERSION/SOURCE.CODE.+.submodules.tar.gz"
-TERMUX_PKG_SHA256=38a2387694df9d5725244622d1c2e6cae8aced06b19c19cfbeab96afb13523c0
+TERMUX_PKG_SHA256=21e149950cc15a551be303440d7721fc180561ffb0918e8aee95ee370b9bf47b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_HOSTBUILD=true
 # Unlike most SDL2 programs, it appears to actually work only with the real sdl2, not sdl2-compat
 # error: "Failed loading SDL3 library.""
-TERMUX_PKG_DEPENDS="freetype, giflib, libarchive, libjpeg-turbo, libpixman, libpng, libtinyxml2, libwebp, libxi, sdl2, sdl2-image, xdg-utils, zlib"
+TERMUX_PKG_DEPENDS="freetype, giflib, libandroid-spawn, libarchive, libjpeg-turbo, libpixman, libpng, libtinyxml2, libwebp, libxi, sdl2, sdl2-image, xdg-utils, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 -DWITH_WEBP_SUPPORT=ON
@@ -51,4 +50,6 @@ termux_step_pre_configure() {
 		echo "Applying patch: $patch"
 		patch -p1 -d "$TERMUX_PKG_SRCDIR" < "${patch}"
 	fi
+
+	LDFLAGS+=" -landroid-spawn"
 }

@@ -1,0 +1,12 @@
+--- a/src/java/org/lwjgl/util/generator/GeneratorVisitor.java
++++ b/src/java/org/lwjgl/util/generator/GeneratorVisitor.java
+@@ -300,7 +300,8 @@
+ 			}
+ 
+ 			// TODO: Back-port LWJGL 3's generation file handling (generate in-memory and avoid touching files if nothing has changed)
+-			java_writer = new PrintWriter(env.getFiler().createSourceFile(Utils.getQualifiedClassName(e), env.getElementUtils().getPackageOf(e)).openWriter());
++			outputJava.getParentFile().mkdirs();
++			java_writer = new PrintWriter(outputJava);
+ 			generateJavaSource(e, java_writer);
+ 
+ 			if ( methods.size() > 0 ) {

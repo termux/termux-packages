@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE="https://github.com/OSGeo/libgeotiff"
 TERMUX_PKG_DESCRIPTION="Library for handling TIFF for georeferenced raster imagery"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.7.4"
 TERMUX_PKG_REVISION=2

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ProtonDriveApps/sdk
 TERMUX_PKG_DESCRIPTION="Official command-line client for Proton Drive"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_VERSION="0.9.0"
 TERMUX_PKG_SRCURL="https://github.com/ProtonDriveApps/sdk/archive/refs/tags/cli/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=8963fd2e6d20b637cee17c9e6d76bd5cb92412035e9208359046e4deb0f67f44
+TERMUX_PKG_SHA256=90f901e9962d031d7ec91dc7acf37c49ac1cb4cb6f87745bd8b5889d2225bf83
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="^cli/v\K[0-9]+\.[0-9]+\.[0-9]+$"
 TERMUX_PKG_DEPENDS="bun"
@@ -21,6 +21,7 @@ termux_step_make() {
 	bun install
 	CLI_APP_VERSION_NAME="cli-drive-termux" \
 	CLI_VERSION="$TERMUX_PKG_VERSION" \
+	JS_VERSION="$TERMUX_PKG_VERSION" \
 		bun run build:bundle
 }
 

@@ -1,0 +1,11 @@
+--- libpciaccess-0.19/src/meson.build
++++ libpciaccess-0.19.mod/src/meson.build
+@@ -20,7 +20,7 @@
+ 
+ host = host_machine.system()
+ _pci_access_host_files = []
+-if host == 'linux'
++if host == 'linux' or host == 'android'
+   _pci_access_host_files += ['linux_sysfs.c', 'linux_devmem.c', 'common_vgaarb.c']
+ elif ['freebsd', 'dragonfly'].contains(host)
+   _pci_access_host_files += ['freebsd_pci.c', 'common_vgaarb_stub.c']

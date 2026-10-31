@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Universal Command Line Interface for Amazon Web Services
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, exe/assets/THIRD_PARTY_LICENSES"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.36.49"
+TERMUX_PKG_VERSION="2.39.2"
 TERMUX_PKG_SRCURL="https://github.com/aws/aws-cli/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=3f38755e093ec8cf111bcbe2d215ecea131bf4ff05e5e9832983c5de98d4363e
+TERMUX_PKG_SHA256=376cd885ead60a11229e5b379c44655be9f87b81670acecff7a59c67a8ec783c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+.\d+.\d+"
 TERMUX_PKG_DEPENDS="libandroid-posix-semaphore, libandroid-support, mandoc"
@@ -74,7 +74,7 @@ termux_step_pre_configure() {
 	STRIP=$STRIP \
 	NM=$NM \
 	CXXFILT=$CXXFILT \
-	CFLAGS='$CFLAGS -I$PYTHON_INCLUDE' \
+	CFLAGS='$CFLAGS -I$PYTHON_INCLUDE -Wno-error=deprecated-declarations' \
 	CPPFLAGS='$CPPFLAGS -I$PYTHON_INCLUDE' \
 	CXXFLAGS='$CXXFLAGS' \
 	LDFLAGS='$LDFLAGS' \

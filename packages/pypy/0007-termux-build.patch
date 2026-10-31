@@ -1,6 +1,6 @@
 --- a/rpython/config/translationoption.py
 +++ b/rpython/config/translationoption.py
-@@ -40,6 +40,10 @@
+@@ -39,6 +39,10 @@ CACHE_DIR = os.path.realpath(os.path.join(MAINDIR, '_cache', MACHINE))
  PLATFORMS = [
      'host',
      'arm',
@@ -9,9 +9,9 @@
 +    'termux-x86_64',
 +    'termux-i686',
  ]
-
+ 
  translation_optiondescription = OptionDescription(
-@@ -285,8 +289,17 @@
+@@ -264,8 +268,17 @@ translation_optiondescription = OptionDescription(
      ChoiceOption("platform",
                   "target platform", ['host'] + PLATFORMS, default='host',
                   cmdline='--platform',
@@ -28,22 +28,21 @@
 +                            "termux-i686": [("translation.gcrootfinder", "shadowstack"),
 +                                            ("translation.jit_backend", "auto")],
 +                        }),
-
+ 
      BoolOption("split_gc_address_space",
                 "Ensure full separation of GC and non-GC pointers", default=False),
-
 --- a/rpython/translator/platform/__init__.py
 +++ b/rpython/translator/platform/__init__.py
-@@ -332,6 +332,8 @@
+@@ -350,6 +350,8 @@ elif sys.platform == 'cygwin':
  else:
      raise ValueError('unknown sys.platform "%s"', sys.platform)
-
+ 
 +# Android always requires compiling with -fPIC
 +host_factory = Linux
  platform = host = host_factory()
-
+ 
  def pick_platform(new_platform, cc):
-@@ -340,6 +342,18 @@
+@@ -358,6 +360,18 @@ def pick_platform(new_platform, cc):
      elif new_platform == 'arm':
          from rpython.translator.platform.arm import ARM
          return ARM(cc)
@@ -61,4 +60,4 @@
 +        return Termux_IA32(cc)
      else:
          raise ValueError("platform = %s" % (new_platform,))
-
+ 

@@ -3,14 +3,16 @@ TERMUX_PKG_DESCRIPTION="A free and open source cross-platform C++ framework for 
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="docs/gpl.txt, docs/lgpl.txt, docs/licence.txt, docs/licendoc.txt, docs/preamble.txt"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.3.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.3.4"
 TERMUX_PKG_SRCURL="https://github.com/wxWidgets/wxWidgets/releases/download/v${TERMUX_PKG_VERSION}/wxWidgets-${TERMUX_PKG_VERSION}.tar.bz2"
-TERMUX_PKG_SHA256=f936c8d694f9c49a367a376f99c751467150a4ed7cbf8f4723ef19b2d2d9998d
-TERMUX_PKG_DEPENDS="fontconfig, gdk-pixbuf, glib, glu, gtk3, libandroid-execinfo, libc++, libcairo, libcurl, libexpat, libiconv, libjpeg-turbo, libnotify, libpng, libsecret, libsm, libtiff, libx11, libxtst, libxxf86vm, opengl, pango, pcre2, sdl2 | sdl2-compat, webkit2gtk-4.1, zlib"
+TERMUX_PKG_SHA256=815c16cafa4fcbfcf25c5c0a3418309c62257b8a3b6f91d85a1367a134f98c98
+TERMUX_PKG_DEPENDS="fontconfig, gdk-pixbuf, glib, glu, gtk3, libandroid-execinfo, libc++, libcairo, libcurl, libexpat, libiconv, libjpeg-turbo, libnotify, libpng, libsecret, libsm, libtiff, libwayland, libx11, libxtst, libxxf86vm, opengl, pango, pcre2, sdl2 | sdl2-compat, webkit2gtk-4.1, zlib"
+TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner, libwayland-protocols"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="sdl2-compat"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DCMAKE_INSTALL_INCLUDEDIR=include
+-DCMAKE_INSTALL_LIBDIR=lib
 -DwxUSE_MEDIACTRL=OFF
 -DwxUSE_WEBVIEW=ON
 -DwxUSE_LIBSDL=ON
@@ -21,6 +23,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	termux_setup_wayland_cross_pkg_config_wrapper
+
 	_WX_RELEASE=$(awk '/^WX_RELEASE =/ { print $3 }' "$TERMUX_PKG_SRCDIR"/Makefile.in)
 
 	# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=273753:
