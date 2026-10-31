@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE=sdk/LICENSE
 TERMUX_PKG_MAINTAINER=@0x1ACA663
 TERMUX_PKG_VERSION="3.13.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/dart-lang/sdk/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=cd2a1450f33cfeb35f180d33b836ab92a663d1335ee7f953ae3ebcb20308c99d
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -20,7 +21,41 @@ termux_pkg_auto_update() {
 	case ${version} in
 		null) termux_error_exit "Failed to get latest version." ;;
 		${TERMUX_PKG_VERSION}) echo "INFO: No update needed. Already at version '${TERMUX_PKG_VERSION}'." ;;
-		*) termux_pkg_upgrade_version ${version} ;;
+		*)
+			local TERMUX_SETUP_DART="${TERMUX_SCRIPTDIR}/scripts/build/setup/termux_setup_dart.sh"
+			local TERMUX_DART_SHA256
+			TERMUX_DART_SHA256="$(
+				curl --fail --silent --show-error --location \
+					"https://storage.googleapis.com/dart-archive/channels/stable/release/${version}/sdk/dartsdk-linux-x64-release.zip.sha256sum" |
+					cut -d' ' -f1
+			)"
+
+			if [[ ! "${TERMUX_DART_SHA256:-}" =~ ^[0-9a-f]{64}$ ]]; then
+				printf '%s\n' \
+					"Could not fetch valid SHA256 sum from upstream release artifacts." \
+					"Got: '${TERMUX_DART_SHA256:-}'" >&2
+				return
+			fi
+
+			printf '%s\n' \
+				"" \
+				"Toolchain:" \
+				"dartsdk-linux-x64-release.zip  ${TERMUX_DART_SHA256}" \
+				""
+
+			if [[ "${BUILD_PACKAGES}" == "false" ]]; then
+				echo "INFO: package needs to be updated to ${version}."
+				return
+			fi
+
+			# Update the version and checksum in termux_setup_dart
+			sed \
+				-e "s|local TERMUX_DART_VERSION=.*|local TERMUX_DART_VERSION=\"\${TERMUX_DART_VERSION:-${version}}\"|" \
+				-e "s|local TERMUX_DART_SHA256=.*|local TERMUX_DART_SHA256=\"${TERMUX_DART_SHA256}\"|" \
+				-i "${TERMUX_SETUP_DART}"
+
+			termux_pkg_upgrade_version ${version}
+			;;
 	esac
 }
 
