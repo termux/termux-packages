@@ -6,16 +6,16 @@ package with only 2 lines of changes keeps the patch file small.
 
 --- a/predict.c
 +++ b/predict.c
-@@ -38,7 +38,7 @@
- #include "predict.h"
+@@ -40,7 +40,7 @@
+ #include <curl/curl.h>
  
  #if defined __has_include
 -  #if __has_include(<alsa/asoundlib.h>)
 +  #if __has_include(<alsa/asoundlib.h>) && !defined(__ANDROID__)
  	#include <alsa/asoundlib.h>
+ 	#define SOUNDCARD 1
    #elif defined (__ANDROID__)
- 	char wavestring[1024];
-@@ -269,7 +269,7 @@ tle_t tle;
+@@ -276,7 +276,7 @@ tle_t tle;
  /* "Vocalizer" functions for Linux/Unix */
  
  #if defined __has_include
