@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=http://www.lxde.org
+TERMUX_PKG_DESCRIPTION="A metapackage that installs all parts of the LXDE desktop environment"
+TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION="0.99.4"
+TERMUX_PKG_AUTO_UPDATE=false
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_DEPENDS="gpicview, lxappearance, lxappearance-obconf, lxde-common, lxde-icon-theme, lxhotkey, lxinput, lxlauncher, lxpanel, lxrandr, lxsession, lxtask, lxterminal, openbox, pcmanfm"
+TERMUX_PKG_SUGGESTS="l3afpad, xarchiver"
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true

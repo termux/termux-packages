@@ -1,0 +1,11 @@
+--- a/plugins/volumealsa/volumealsa.c
++++ b/plugins/volumealsa/volumealsa.c
+@@ -80,7 +80,7 @@
+ #define ICONS_VOLUME_LOW    "volume-low"
+ #define ICONS_MUTE          "mute"
+
+-#ifdef __UCLIBC__
++#if defined(__UCLIBC__) || defined(__ANDROID__)
+ /* 10^x = 10^(log e^x) = (e^x)^log10 = e^(x * log 10) */
+ # define M_LN10		2.30258509299404568402	/* log_e 10 */
+ #define exp10(x) (exp((x) * log(10)))
