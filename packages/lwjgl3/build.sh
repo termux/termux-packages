@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="Lightweight Java Game Library 3 (LWJGL 3), all versions 
 TERMUX_PKG_LICENSE="BSD 3-Clause, ISC"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="3.4.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/LWJGL/lwjgl3/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=039b5c4b9ef1927d56f6e63909ef3cbfba130d9f0294af37440d831048d2e724
 TERMUX_PKG_AUTO_UPDATE=false
 # Every version is a subpackage (see the lwjgl3-*.subpackage.sh files),
 # this package only pulls them all in.
 TERMUX_PKG_DEPENDS="lwjgl3-3.2.1, lwjgl3-3.2.2, lwjgl3-3.3.1, lwjgl3-3.3.2, lwjgl3-3.3.3, lwjgl3-3.3.6, lwjgl3-3.4.1, lwjgl3-3.4.2, lwjgl3-3.4.3"
-TERMUX_PKG_BUILD_DEPENDS="libffi"
+TERMUX_PKG_BUILD_DEPENDS="libffi, xorgproto"
 TERMUX_PKG_RECOMMENDS="openal-soft"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -205,6 +206,7 @@ _lwjgl_build_native() {
 }
 
 termux_step_make() {
+	CFLAGS+=" -I$TERMUX_PREFIX/include"
 	_LWJGL_ROOT="$TERMUX_PKG_BUILDDIR/_out"
 	rm -rf "$_LWJGL_ROOT"
 	_lwjgl_build_stubs
