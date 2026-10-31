@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Chromium web browser"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_VERSION="156.0.8078.79"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/$TERMUX_PKG_VERSION/chromium-$TERMUX_PKG_VERSION-linux.tar.xz"
 TERMUX_PKG_SHA256=362f7f0f21e69431540757b69044c4581146f23c9afec8e6b0a6abe1037bd351
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
@@ -449,6 +450,9 @@ termux_step_make_install() {
 		-e 's/@@usr_bin_symlink_name/chromium-browser/g' \
 		-e 's|@@uri_scheme|x-scheme-handler/chromium;|g' \
 		-e 's/@@extra_desktop_entries//g' \
+		-e "s|@@desktop_exec|$TERMUX_PREFIX/bin/chromium-browser|g" \
+		-e 's|@@startup_wm_class|Chromium-browser|g' \
+		-e 's|@@desktop_icon|chromium|g' \
 		-e "s|Exec=/usr/bin|Exec=$TERMUX_PREFIX/bin|g" \
 		"$TERMUX_PREFIX/share/applications/chromium.desktop" \
 		"$TERMUX_PREFIX/share/man/man1/chromium.1"
