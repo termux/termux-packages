@@ -7,11 +7,11 @@
 +#include <wlr/config.h>
 +#if WLR_HAS_LIBINPUT_BACKEND
  #include <libinput.h>
+ #include <libxml/tree.h>
  #include <string.h>
- #include <wayland-server-core.h>
-@@ -43,4 +45,5 @@ const char *libinput_device_type_name(enum lab_libinput_device_type type);
- struct libinput_category *libinput_category_create(void);
- struct libinput_category *libinput_category_get_default(void);
+@@ -62,4 +64,5 @@ bool libinput_curve_parse(xmlNode *node, struct lab_accel_curve *curve);
+ struct libinput_config_accel *libinput_custom_accel_create(
+ 	const struct libinput_category *category);
  
 +#endif
  #endif /* LABWC_LIBINPUT_H */
@@ -102,14 +102,14 @@
  static void
  libinput_category_init(struct libinput_category *l)
  {
-@@ -96,3 +97,4 @@ libinput_category_get_default(void)
+@@ -98,3 +99,4 @@ libinput_category_get_default(void)
  	}
  	return NULL;
  }
 +#endif
 --- a/src/config/rcxml.c
 +++ b/src/config/rcxml.c
-@@ -703,6 +703,7 @@ fill_tablet_button_map(xmlNode *node)
+@@ -704,6 +704,7 @@ fill_tablet_button_map(xmlNode *node)
  	tablet_button_mapping_add(map_from, map_to);
  }
  
@@ -117,7 +117,7 @@
  static int
  get_accel_profile(const char *s)
  {
-@@ -938,6 +939,7 @@ fill_libinput_category(xmlNode *node)
+@@ -976,6 +977,7 @@ fill_libinput_category(xmlNode *node)
  		}
  	}
  }
@@ -125,7 +125,7 @@
  
  static void
  set_font_attr(struct font *font, const char *nodename, const char *content)
-@@ -1111,8 +1113,10 @@ entry(xmlNode *node, char *nodename, char *content)
+@@ -1149,8 +1151,10 @@ entry(xmlNode *node, char *nodename, char *content)
  		fill_mouse_context(node);
  	} else if (!strcasecmp(nodename, "touch")) {
  		fill_touch(node);
@@ -136,7 +136,7 @@
  	} else if (!strcasecmp(nodename, "regions")) {
  		fill_regions(node);
  	} else if (!strcasecmp(nodename, "fields.windowSwitcher")) {
-@@ -1860,6 +1864,7 @@ post_processing(void)
+@@ -1910,6 +1914,7 @@ post_processing(void)
  	if (!rc.font_osd.name) {
  		rc.font_osd.name = xstrdup("sans");
  	}
@@ -144,7 +144,7 @@
  	if (!libinput_category_get_default()) {
  		/* So we set default values of <tap> and <scrollFactor> */
  		struct libinput_category *l = libinput_category_create();
-@@ -1876,6 +1881,7 @@ post_processing(void)
+@@ -1926,6 +1931,7 @@ post_processing(void)
  			l->scroll_factor = mouse_scroll_factor;
  		}
  	}
@@ -152,7 +152,7 @@
  
  	int nr_workspaces = wl_list_length(&rc.workspace_config.workspaces);
  	if (nr_workspaces < rc.workspace_config.min_nr_workspaces) {
-@@ -2104,12 +2110,14 @@ rcxml_finish(void)
+@@ -2154,12 +2160,14 @@ rcxml_finish(void)
  		zfree(touch_config);
  	}
  
@@ -167,3 +167,21 @@
  
  	struct workspace_config *w, *w_tmp;
  	wl_list_for_each_safe(w, w_tmp, &rc.workspace_config.workspaces, link) {
+--- a/src/config/accel.c
++++ b/src/config/accel.c
+@@ -8,6 +8,7 @@
+ #include "common/parse-double.h"
+ #include "common/xml.h"
+ 
++#if WLR_HAS_LIBINPUT_BACKEND
+ static bool
+ parse_points(const char *content, struct lab_accel_curve *curve)
+ {
+@@ -70,7 +71,6 @@ libinput_curve_parse(xmlNode *node, struct lab_accel_curve *curve)
+ 	return true;
+ }
+ 
+-#if WLR_HAS_LIBINPUT_BACKEND
+ struct libinput_config_accel *
+ libinput_custom_accel_create(const struct libinput_category *category)
+ {
