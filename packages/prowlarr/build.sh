@@ -24,15 +24,6 @@ termux_step_pre_configure() {
 	termux_setup_dotnet
 	termux_setup_nodejs
 
-	# Clone, patch, and build custom AngleSharp to avoid JIT optimization bug on ARM64
-	local anglesharp_dir="$TERMUX_PKG_BUILDDIR/AngleSharp-src"
-	rm -rf "$anglesharp_dir"
-	git clone --depth 1 --branch 1.5.2 https://github.com/AngleSharp/AngleSharp.git "$anglesharp_dir"
-	cd "$anglesharp_dir"
-	patch -p1 <"$TERMUX_PKG_BUILDER_DIR/anglesharp-jit-fix.diff"
-	dotnet build -c Release -f net10.0 src/AngleSharp/AngleSharp.Core.csproj
-	cd "$TERMUX_PKG_SRCDIR"
-
 	# Create a host wrapper for yarn since the one in $TERMUX_PREFIX/bin
 	# has a shebang pointing to the target node
 	local bin="$TERMUX_PKG_BUILDDIR/_bin"
@@ -56,6 +47,9 @@ termux_step_pre_configure() {
 	# Force all projects to target .NET 10.0
 	find src -name "*.csproj" -exec sed -i 's/<TargetFrameworks>.*<\/TargetFrameworks>/<TargetFrameworks>net10.0<\/TargetFrameworks>/g' {} +
 	find src -name "*.csproj" -exec sed -i 's/<TargetFramework>.*<\/TargetFramework>/<TargetFramework>net10.0<\/TargetFramework>/g' {} +
+
+	# Bump AngleSharp to 1.6.0 (contains official ARM64 JIT/Android fix #1252)
+	find src -name "*.csproj" -exec sed -i 's/Include="AngleSharp" Version="[0-9.]*"/Include="AngleSharp" Version="1.6.0"/g' {} +
 
 	# Update Microsoft.Extensions and specific System packages to 10.0.0 for compatibility with .NET 10.0
 	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.Extensions\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.Extensions.\1" Version="10.0.0"/g' {} +
@@ -101,9 +95,6 @@ termux_step_make() {
 
 	# Prowlarr.Mono is dynamically loaded at runtime on Linux/macOS
 	dotnet publish src/NzbDrone.Mono/Prowlarr.Mono.csproj "${COMMON_ARGS[@]}"
-
-	# Overwrite NuGet downloaded AngleSharp.dll with our JIT-patch-compiled one
-	cp -f "$TERMUX_PKG_BUILDDIR/AngleSharp-src/src/AngleSharp/bin/Release/net10.0/AngleSharp.dll" build/
 
 	# Lower required .NET version in runtimeconfig.json to allow running on older .NET 10.0.x runtimes
 	find build -name "*.runtimeconfig.json" -exec sed -i 's/"version": "10.0.[0-9]*"/"version": "10.0.0"/g' {} +
