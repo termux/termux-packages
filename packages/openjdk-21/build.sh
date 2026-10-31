@@ -3,14 +3,15 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="21.0.13"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz"
 TERMUX_PKG_SHA256=a10eb756f12542b530db90e15aff44c72cd572ba02c47496affb5e3510814935
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='21\.\d+\.\d+(?=-ga)'
-TERMUX_PKG_DEPENDS="libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
+TERMUX_PKG_DEPENDS="ca-certificates-java, libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libxrandr, libxt, xorgproto, alsa-lib"
 # openjdk-21-x is recommended because X11 separation is still very experimental.
-TERMUX_PKG_RECOMMENDS="ca-certificates-java, openjdk-21-x, resolv-conf"
+TERMUX_PKG_RECOMMENDS="openjdk-21-x, resolv-conf"
 TERMUX_PKG_SUGGESTS="cups"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
@@ -123,6 +124,12 @@ termux_step_post_make_install() {
 	if [[ "$failure" = true ]]; then
 		termux_error_exit "openjdk-21.alternatives is not up to date, please update it."
 	fi
+
+	# Use System CA certificates
+	local opendk21_cacerts="$TERMUX_PREFIX/lib/jvm/java-21-openjdk/lib/security/cacerts"
+	local ca_certificates_cacerts="$TERMUX_PREFIX/etc/tls/certs/java/cacerts"
+	rm "$opendk21_cacerts"
+	ln -s "$ca_certificates_cacerts" "$opendk21_cacerts"
 }
 
 termux_step_create_debscripts() {
