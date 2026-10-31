@@ -1,0 +1,12 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/seb-m/pyinotify
+TERMUX_PKG_DESCRIPTION="Python module for watching filesystems changes"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION=0.9.6
+TERMUX_PKG_SRCURL=https://files.pythonhosted.org/packages/e3/c0/fd5b18dde17c1249658521f69598f3252f11d9d7a980c5be8619970646e1/pyinotify-0.9.6.tar.gz
+TERMUX_PKG_SHA256=9c998a5d7606ca835065cdabc013ae6c66eb9ea76a00a1e3bc6e0cfe2b4f71f4
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="python"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_IN_SRC=true
