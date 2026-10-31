@@ -1,0 +1,11 @@
+--- a/libnemo-private/nemo-malloc-utils.c
++++ b/libnemo-private/nemo-malloc-utils.c
+@@ -58,7 +58,7 @@
+ {
+     heap_trim_timeout_id = 0;
+ 
+-#if HAVE_MALLOC_H
++#if defined(HAVE_MALLOC_H) && !defined(__ANDROID__)
+     malloc_trim (0);
+ #endif
+ 
