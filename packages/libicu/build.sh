@@ -27,7 +27,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_post_massage() {
-	local _GUARD_FILE="lib/libicuuc.so.78"
+	local _GUARD_FILE="lib/libicuuc.so.${TERMUX_PKG_VERSION%%.*}"
 	if [[ ! -e "${_GUARD_FILE}" ]]; then
 		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi
