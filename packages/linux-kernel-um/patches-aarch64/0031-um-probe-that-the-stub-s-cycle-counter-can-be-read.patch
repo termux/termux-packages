@@ -1,0 +1,134 @@
+From 72cc9b79bb1f037ba1306fc607e3770d20b2bf98 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 18:46:24 +0200
+Subject: [PATCH] um: probe that the stub's cycle counter can be read
+
+The bounded spin added with the handoff-wake elision budgets itself against
+CNTVCT_EL0, and userspace may only read that register when Linux has set
+CNTKCTL_EL1.EL0VCTEN. Linux does, because its own vDSO needs it -- but that
+is a statement about Linux and not about the host actually underneath us,
+which may be an emulator or a hypervisor that traps the register. Getting
+it wrong costs a SIGILL raised inside the stub, where nothing is listening
+and the boot dies with no message naming the instruction.
+
+Ask a child instead, next to the other capability probes, and let a host
+without a readable counter simply not spin. The probe runs before the mode
+is chosen because the SECCOMP path returns without reaching check_ptrace().
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/shared/skas/skas.h |  1 +
+ arch/um/os-Linux/skas/process.c    |  9 ++++-
+ arch/um/os-Linux/start_up.c        | 53 ++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+), 1 deletion(-)
+
+diff --git a/arch/um/include/shared/skas/skas.h b/arch/um/include/shared/skas/skas.h
+index f2ed6800bc697..5f69d0cecf06a 100644
+--- a/arch/um/include/shared/skas/skas.h
++++ b/arch/um/include/shared/skas/skas.h
+@@ -17,6 +17,7 @@ extern int using_seccomp;
+  */
+ extern int have_ptrace_sysemu;
+ extern int syscall_cancel_nr;
++extern int have_stub_cycles;
+ 
+ extern void new_thread_handler(void);
+ extern void handle_syscall(struct uml_pt_regs *regs);
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index 5da5fe8e59ce6..0ba1d21fad22e 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -551,6 +551,7 @@ int using_seccomp;
+  */
+ int have_ptrace_sysemu = 1;
+ int syscall_cancel_nr = -1;
++int have_stub_cycles;
+ 
+ /**
+  * start_userspace() - prepare a new userspace process
+@@ -605,7 +606,13 @@ int start_userspace(struct mm_id *mm_id)
+ 		 * counter is available (x86), which disables the spin but
+ 		 * keeps the waiter-bit protocol.
+ 		 */
+-		proc_data->spin_ticks = seccomp_spin_us * stub_cycles_per_us();
++		/*
++	 * No usable cycle counter means no bounded spin: the budget would be
++	 * meaningless and the register read is not even guaranteed to be legal.
++	 * See check_stub_cycles().
++	 */
++	proc_data->spin_ticks = have_stub_cycles ?
++		seccomp_spin_us * stub_cycles_per_us() : 0;
+ 	}
+ 
+ 	mm_id->pid = clone(userspace_tramp, (void *) sp,
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 40d9810e65b20..6f0a2669c8a93 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -434,6 +434,53 @@ static void __init check_sysemu(void)
+ 	      "intercept guest syscalls without one of them.\n");
+ }
+ 
++/*
++ * Is the cycle counter the stub's adaptive spin is budgeted against readable?
++ *
++ * On arm64 that is CNTVCT_EL0/CNTFRQ_EL0, and userspace may only read them when
++ * CNTKCTL_EL1.EL0VCTEN is set. Linux sets it because its own vDSO needs it --
++ * but that is a statement about Linux, not about the host actually underneath
++ * us, which may be an emulator or a hypervisor that traps the register. Getting
++ * it wrong costs a SIGILL raised inside the stub, where nothing is listening
++ * and the boot dies with no message naming the instruction.
++ *
++ * A child pays for the answer, so an illegal instruction costs one process
++ * rather than the boot. A host without one simply does not spin.
++ */
++static void __init check_stub_cycles(void)
++{
++	int pid, n, status;
++
++	os_info("Checking the stub's cycle counter...");
++
++	pid = fork();
++	if (pid == 0) {
++		/* Both are read on the hot path; probe both. */
++		if (!stub_cycles_per_us())
++			_exit(1);
++		stub_cycles();
++		_exit(0);
++	}
++	if (pid < 0)
++		fatal_perror("check_stub_cycles: fork failed");
++
++	CATCH_EINTR(n = waitpid(pid, &status, 0));
++	if (n < 0)
++		fatal_perror("check_stub_cycles: wait failed");
++
++	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
++		have_stub_cycles = 1;
++		os_info("OK\n");
++		return;
++	}
++
++	if (WIFSIGNALED(status))
++		os_info("unreadable (signal %d); stub spin disabled\n",
++			WTERMSIG(status));
++	else
++		os_info("no usable rate; stub spin disabled\n");
++}
++
+ static void __init check_ptrace(void)
+ {
+ 	int pid, n, status;
+@@ -913,6 +960,12 @@ void __init os_early_checks(void)
+ 	 */
+ 	check_tmpexec();
+ 
++	/*
++	 * Before either mode is chosen: the spin this gates belongs to SECCOMP
++	 * mode, and that path returns below without reaching check_ptrace().
++	 */
++	check_stub_cycles();
++
+ 	if (seccomp_config) {
+ 		if (init_seccomp()) {
+ 			using_seccomp = 1;

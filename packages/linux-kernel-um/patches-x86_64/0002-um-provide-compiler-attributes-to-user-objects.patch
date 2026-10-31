@@ -1,0 +1,90 @@
+From JesusChapman <developer@jesuschapman.me> Sun Oct 18 12:00:00 2026 -0500
+Subject: [PATCH] um: provide kernel compiler attributes to user objects
+
+USER_CFLAGS objects (the host-side helpers like fd.o and the stub) get
+$(srctree)/include only via -idirafter, i.e. *after* the sysroot includes.
+The Android NDK sysroot ships a 265-byte uapi stub named
+linux/compiler_types.h which then shadows the kernel's own header and
+defines none of __aligned, __section, __used or the sparse lock
+annotations. Every user object including the skas headers fails to parse
+("expected function body after function declarator", "expected ';' at end
+of declaration list").
+
+Force the kernel's own compiler attributes in with -include, and add
+no-op fallbacks for the sparse annotations in the headers themselves.
+(The sibling approach of force-including compiler_types.h is out: the
+kernel's copy defines __private, which bionic uses as a struct member
+name in <bits/pthread_types.h>, so every pthread type stops compiling.
+TUs needing more than attributes get local definitions instead, as in
+0004's __READ_ONCE.)
+Same change the aarch64 subarch series carries inside its bionic-build
+patch; it lives here separately so the x86_64 build does not need that
+series. Nothing in it is arch-specific.
+
+Formulation note: in arch/um/Makefile the added -include sits third in
+its hunk rather than in true position after kconfig.h. GNU patch 2.8
+rejects this hunk with the addition buried four or more context lines
+deep, while applying byte-identical content arranged this way (verified
+against pristine 7.2.11 with both GNU and BSD patch). Functionally
+identical: -include order is irrelevant here.
+
+---
+
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -71,5 +71,6 @@
+ 		-D_FILE_OFFSET_BITS=64 -idirafter $(srctree)/include \
+ 		-idirafter $(objtree)/include -D__KERNEL__ -D__UM_HOST__ \
++		-include $(srctree)/include/linux/compiler_attributes.h \
+ 		-include $(srctree)/include/linux/compiler-version.h \
+ 		-include $(srctree)/include/linux/kconfig.h \
+ 		-idirafter $(ARCH_DIR)/include/generated
+diff --git a/arch/um/include/shared/skas/mm_id.h b/arch/um/include/shared/skas/mm_id.h
+index 18c0621430d2c..49d3b8b54ab0f 100644
+--- a/arch/um/include/shared/skas/mm_id.h
++++ b/arch/um/include/shared/skas/mm_id.h
+@@ -21,6 +21,19 @@ struct mm_id {
+ 	int syscall_fd_map[STUB_MAX_FDS];
+ };
+ 
++/*
++ * Sparse's lock annotations, normally from <linux/compiler_types.h>. This
++ * header is reached by USER_CFLAGS objects too, and a sysroot that ships its
++ * own linux/compiler_types.h shadows the kernel's -- the Android NDK does.
++ * Without these the declarations below parse as function definitions.
++ */
++#ifndef __acquires
++#define __acquires(x)
++#endif
++#ifndef __releases
++#define __releases(x)
++#endif
++
+ struct mutex *__get_turnstile(struct mm_id *mm_id);
+ void enter_turnstile(struct mm_id *mm_id) __acquires(__get_turnstile(mm_id));
+ void exit_turnstile(struct mm_id *mm_id) __releases(__get_turnstile(mm_id));
+diff --git a/arch/um/include/shared/skas/stub-data.h b/arch/um/include/shared/skas/stub-data.h
+index 27db38e95df91..d9bca64c3e93c 100644
+--- a/arch/um/include/shared/skas/stub-data.h
++++ b/arch/um/include/shared/skas/stub-data.h
+@@ -14,6 +14,19 @@
+ #include <sysdep/stub-data.h>
+ #include <mm_id.h>
+ 
++/* See the note in skas/mm_id.h: a sysroot's linux/compiler_types.h can shadow
++ * the kernel's, leaving the attribute macros undefined for USER_CFLAGS objects.
++ */
++#ifndef __aligned
++#define __aligned(x)	__attribute__((__aligned__(x)))
++#endif
++#ifndef __section
++#define __section(x)	__attribute__((__section__(x)))
++#endif
++#ifndef __used
++#define __used		__attribute__((__used__))
++#endif
++
+ #define FUTEX_IN_CHILD 0
+ #define FUTEX_IN_KERN 1
+ 

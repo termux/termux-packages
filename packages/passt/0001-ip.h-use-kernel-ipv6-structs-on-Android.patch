@@ -1,0 +1,25 @@
+diff --git a/ip.h b/ip.h
+index aab9b86..49c4847 100644
+--- a/ip.h
++++ b/ip.h
+@@ -64,6 +64,12 @@
+ 		.daddr		= IN6ADDR_ANY_INIT,			\
+ 	}
+ 
++#ifdef __ANDROID__
++/* Bionic has no glibc-style libc-compat shim: linux/ipv6.h always defines
++ * these, so use the kernel structs (layout and member names match) instead
++ * of redefining them. */
++#include <linux/ipv6.h>
++#else
+ struct ipv6hdr {
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+@@ -92,6 +98,7 @@ struct ipv6_opt_hdr {
+ 	 * TLV encoded option data follows.
+ 	 */
+ } __attribute__((packed));	/* required for some archs */
++#endif /* __ANDROID__ */
+ 
+ /**
+  * ip6_set_flow_lbl() - Set flow label in an IPv6 header

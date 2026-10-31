@@ -1,0 +1,175 @@
+From 86ad39c37ac223168733d6711da9c2f38b49c4cd Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 11:28:15 +0200
+Subject: [PATCH] um: arm64: update the README for the three fixes found on
+ hardware
+
+Records what running the port on two phones turned up: pointer
+authentication left enabled in the stub, FP/SIMD state never crossing a
+signal in SECCOMP mode, and PTRS_PER_PTE not following PAGE_SHIFT. Also
+corrects the rss-counter entry, which was listed as unexplained and is a
+consequence of the last of those.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ README.md | 60 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
+
+diff --git a/README.md b/README.md
+index 76e55d493d99a..b0343e8b031e7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,8 +1,5 @@
+ # Linux/UML on arm64
+ 
+-*This is a Linux fork. The upstream kernel's own README is in
+-[`README`](README); this file describes what was added on top of it.*
+-
+ `ARCH=um SUBARCH=arm64` — a Linux kernel running as an ordinary aarch64 userspace
+ process, so that a phone can run a real kernel without root, KVM or a hypervisor.
+ 
+@@ -27,19 +24,40 @@ Not working, or not finished:
+ - **`wlan0` association is untested.** The radio comes up, the firmware loads and
+   scanning returns real APs with signal levels. Associating needs credentials
+   that were not available; nothing beyond scan has been exercised.
+-- **`BUG: Bad rss-counter state ... type:MM_FILEPAGES val:1`**, one page per
+-  exiting process. Appears with the Debian image, not with Alpine, on the same
+-  kernel — so it is workload-dependent, not a universal accounting leak. Unexplained.
++- **`BUG: Bad rss-counter state ... type:MM_FILEPAGES val:1`** used to print
++  once per exiting process. It is absent at 16 KB pages once `PTRS_PER_PTE`
++  follows `PAGE_SHIFT`, under a workload that produced it reliably before.
++  Whether the 4 KB build is also clean is untested: the mechanism fixed there
++  cannot occur at 4 KB, so if it still appears it has another cause.
+ - **No cpuset controller.** `CONFIG_CPUSETS` depends on `SMP` and UML is
+   uniprocessor. `docker info` warns and runs; there is nothing to pin to.
+ - Guest vDSO time (`clock_gettime` without a host syscall) is written but not
+   merged: it does not fit a 4 KB page and needs `GENERIC_VDSO_OVERFLOW_PROTECT`,
+   without which guest time wraps after tens of minutes.
+ 
++Three bugs worth naming, all found by running the port on phones rather than by
++reading it, and all fixed on this branch:
++
++- **Pointer authentication stayed enabled in the stub.** One stub per guest mm
++  means a guest `fork()` starts a new stub, and starting a stub is an
++  `execve()`, which on arm64 generates fresh PAC keys. The child returns into a
++  stub whose `APIAKey` did not sign the return addresses on its stack, and
++  glibc's `_Fork` is `paciasp` / `svc #0` / `autiasp` — so with FEAT_FPAC the
++  child dies inside `_Fork` having printed nothing. NOPs on pre-Armv8.3
++  hardware, fatal on Armv9. It breaks every container built with branch
++  protection, on every fork.
++- **Guest FP/SIMD state was never saved or restored across a signal in SECCOMP
++  mode**, because the guard compared `host_fp_size` against
++  `sizeof(struct user_fpsimd_state)` (528) rather than the payload actually
++  copied (520). Go's `SIGURG` preemption then corrupted its own AES-GCM state,
++  and every TLS transfer past a few megabytes died with `bad record MAC`.
++- **`PTRS_PER_PTE` was a literal 512** where it has to be `PMD_SIZE >>
++  PAGE_SHIFT`: right at 4 KB, four times too large at 16 KB, letting generic mm
++  write PTEs past the window a PMD owns.
++
+ Tested on:
+ 
+-- **Xiaomi Poco F3** (`M2012K11AG`/`alioth`, Snapdragon 870, SM8250), Android 15,
+-  host kernel `4.19.246`, 4 KB pages.
++- **Xiaomi Mi 11** (Snapdragon 888), Android 15, host kernel `4.19.246`, 4 KB pages.
+   That host has no `PTRACE_SYSEMU` — arm64 gained it in 5.3 — which is why the
+   cancellation and substitution paths exist and are exercised daily rather than
+   theoretically.
+@@ -51,7 +69,7 @@ Both interception fallbacks can be forced anywhere with `nosysemu` and
+ ## Base
+ 
+ - Base: **Linux 7.2-rc4** (`origin/next`, the uml tree).
+-- Branch: **`um-arm64`**, 33 commits on top. There is no other branch; the
++- Branch: **`um-arm64`**, 38 commits on top. There is no other branch; the
+   history is linear and each commit is one change.
+ - Roughly a third of the series is not arm64-specific — x86 and generic `um/`
+   fixes found on the way — and those stand on their own.
+@@ -69,12 +87,12 @@ make ARCH=um SUBARCH=arm64 LLVM=1 defconfig
+ make ARCH=um SUBARCH=arm64 LLVM=1 -j$(nproc)
+ ```
+ 
+-or `tools/um-arm64/harness/build.sh`, which adds ccache and publishes the binary the gates run.
++or `harness/build.sh`, which adds ccache and publishes the binary the gates run.
+ 
+ **bionic** (Android NDK, what an app can exec):
+ 
+ ```sh
+-NDK=/path/to/android-ndk-r27c tools/um-arm64/harness/build-bionic.sh
++NDK=/path/to/android-ndk-r27c harness/build-bionic.sh
+ ```
+ 
+ The kernel notices bionic by asking the compiler whether `__ANDROID__` is
+@@ -85,7 +103,7 @@ execute from its own native library directory.
+ Extra config fragments:
+ 
+ ```sh
+-EXTRA_CONFIG="tools/um-arm64/config/usb-wifi.config tools/um-arm64/config/docker.config" tools/um-arm64/harness/build-bionic.sh
++EXTRA_CONFIG="config/usb-wifi.config config/docker.config" harness/build-bionic.sh
+ ```
+ 
+ ## Run
+@@ -93,14 +111,10 @@ EXTRA_CONFIG="tools/um-arm64/config/usb-wifi.config tools/um-arm64/config/docker
+ One command, one shell:
+ 
+ ```sh
+-./linux mem=512M ubd0=<image.ext4> root=/dev/ubda rw \
++./linux mem=512M ubd0=rootfs/alpine.ext4 root=/dev/ubda rw \
+         init=/bin/sh con=null con0=fd:0,fd:1
+ ```
+ 
+-Disk images are not in this repository. Any aarch64 root filesystem works --
+-an Alpine minirootfs written into an ext4 file is enough --
+-and `tools/um-arm64/harness/mkdebian.sh` builds the Debian one used here.
+-
+ `con0=fd:0,fd:1` puts the guest console on this terminal. Use `con0=null,fd:1`
+ when stdin is not pollable — UML registers console descriptors with epoll, and
+ `epoll_ctl` on a regular file fails with `EPERM`, after which the console stops
+@@ -128,7 +142,7 @@ and a truncated log is indistinguishable from a kernel that stopped.
+ 
+ ```sh
+ GATE=g3 MARKER=UMARM_BOOT_OK INIT=/gate3-init \
+-  UBD0=/path/to/alpine.ext4 EXTRA_ARGS="rw seccomp=on" tools/um-arm64/harness/boot.sh
++  UBD0=$PWD/rootfs/alpine.ext4 EXTRA_ARGS="rw seccomp=on" harness/boot.sh
+ ```
+ 
+ It prints `verdict=PASS|FAIL|SIGNAL`, the artifact directory, and
+@@ -139,27 +153,27 @@ rss-counter BUG rode along inside a green gate.
+ The gate matrix, including the expensive ones sampled every N iterations:
+ 
+ ```sh
+-N=20 tools/um-arm64/harness/loop.sh            # g2mini g2alpine g3 g5 g3noaslr g4 fp fpnoaslr
++N=20 harness/loop.sh            # g2mini g2alpine g3 g5 g3noaslr g4 fp fpnoaslr
+ ```
+ 
+ On a phone over adb, same interface:
+ 
+ ```sh
+ PUSH=1 BIN=$PWD/artifacts/linux-bionic GATE=g3 INIT=/gate3-init \
+-  UBD0=alpine.ext4 EXTRA_ARGS="seccomp=on" tools/um-arm64/harness/android.sh
++  UBD0=alpine.ext4 EXTRA_ARGS="seccomp=on" harness/android.sh
+ ```
+ 
+ Output is captured **on the device** and pulled afterwards, never streamed:
+ streaming loses the tail, and every gate that "failed" on that phone before this
+ change was actually passing.
+ 
+-Related probes worth knowing about: `tools/um-arm64/harness/probe/vethprobe.c` creates a veth
++Related probes worth knowing about: `harness/probe/vethprobe.c` creates a veth
+ pair over rtnetlink, because busybox's `ip` does not know the veth link type and
+ fails identically whether or not `CONFIG_VETH` is set — useless as a test.
+ 
+ ## Benchmarks
+ 
+-Measured on the Poco F3, `adb shell`, guest running `perfbench`. All three kernels
++Measured on the Mi 11, `adb shell`, guest running `perfbench`. All three kernels
+ are conditions **inside one interleaved run**, so a difference between them
+ cannot be thermal drift or governor state.
+ 
+@@ -207,7 +221,7 @@ the code and not the machine: that change touches only the seccomp path.)
+ Reproduce:
+ 
+ ```sh
+-KERNELS="base=... waiter=... fault=..." ROUNDS=7 tools/um-arm64/harness/verifybench.sh
++KERNELS="base=... waiter=... fault=..." ROUNDS=7 harness/verifybench.sh
+ ```
+ 
+ It writes `manifest.txt` (git HEAD, md5 and `file(1)` of every binary, device
