@@ -1,23 +1,8 @@
 diff --git a/src/NzbDrone.Mono/Disk/DiskProvider.cs b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-index a44966b..ee3a390 100644
+index 1506cbd17..5ad6daafe 100644
 --- a/src/NzbDrone.Mono/Disk/DiskProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-@@ -21,13 +21,11 @@ namespace NzbDrone.Mono.Disk
-         private readonly Logger _logger;
-         private readonly IProcMountProvider _procMountProvider;
-         private readonly ISymbolicLinkResolver _symLinkResolver;
--        private readonly ICreateRefLink _createRefLink;
- 
--        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, ICreateRefLink createRefLink, Logger logger)
-+        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, Logger logger)
-         {
-             _procMountProvider = procMountProvider;
-             _symLinkResolver = symLinkResolver;
--            _createRefLink = createRefLink;
-             _logger = logger;
-         }
- 
-@@ -179,6 +177,16 @@ namespace NzbDrone.Mono.Disk
+@@ -175,6 +175,16 @@ protected override List<IMount> GetAllMounts()
                  _logger.Warn(e, $"Unable to get mounts: {e.Message}");
              }
  
@@ -34,40 +19,8 @@ index a44966b..ee3a390 100644
              try
              {
                  mounts.AddRange(GetDriveInfoMounts()
-@@ -234,19 +242,6 @@ namespace NzbDrone.Mono.Disk
-             return mount?.TotalSize;
-         }
- 
--        protected override void CloneFileInternal(string source, string destination, bool overwrite)
--        {
--            if (!File.Exists(destination) && !UnixFileSystemInfo.GetFileSystemEntry(source).IsSymbolicLink)
--            {
--                if (_createRefLink.TryCreateRefLink(source, destination))
--                {
--                    return;
--                }
--            }
--
--            CopyFileInternal(source, destination, overwrite);
--        }
--
-         protected override void CopyFileInternal(string source, string destination, bool overwrite)
-         {
-             var sourceInfo = UnixFileSystemInfo.GetFileSystemEntry(source);
-@@ -464,11 +459,6 @@ namespace NzbDrone.Mono.Disk
-             }
-         }
- 
--        public override bool TryCreateRefLink(string source, string destination)
--        {
--            return _createRefLink.TryCreateRefLink(source, destination);
--        }
--
-         private uint GetUserId(string user)
-         {
-             if (user.IsNullOrWhiteSpace())
 diff --git a/src/NzbDrone.Mono/Disk/ProcMount.cs b/src/NzbDrone.Mono/Disk/ProcMount.cs
-index f800a02..2e92f91 100644
+index f800a0290..2e92f9141 100644
 --- a/src/NzbDrone.Mono/Disk/ProcMount.cs
 +++ b/src/NzbDrone.Mono/Disk/ProcMount.cs
 @@ -11,7 +11,7 @@ namespace NzbDrone.Mono.Disk
@@ -79,7 +32,7 @@ index f800a02..2e92f91 100644
  
          public ProcMount(DriveType driveType, string name, string mount, string type, MountOptions mountOptions)
          {
-@@ -21,16 +21,51 @@ namespace NzbDrone.Mono.Disk
+@@ -21,16 +21,51 @@ public ProcMount(DriveType driveType, string name, string mount, string type, Mo
              DriveFormat = type;
              MountOptions = mountOptions;
  
@@ -134,7 +87,7 @@ index f800a02..2e92f91 100644
  
          public MountOptions MountOptions { get; private set; }
  
-@@ -44,13 +79,18 @@ namespace NzbDrone.Mono.Disk
+@@ -44,13 +79,18 @@ public long TotalFreeSpace
              {
                  try
                  {
@@ -155,7 +108,7 @@ index f800a02..2e92f91 100644
              }
          }
  
-@@ -60,17 +100,36 @@ namespace NzbDrone.Mono.Disk
+@@ -60,17 +100,36 @@ public long TotalSize
              {
                  try
                  {
@@ -196,10 +149,10 @@ index f800a02..2e92f91 100644
          public string VolumeName
          {
 diff --git a/src/NzbDrone.Mono/Disk/ProcMountProvider.cs b/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
-index 2cce7d8..9218036 100644
+index 2cce7d8b6..9218036c5 100644
 --- a/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
-@@ -130,7 +130,15 @@ namespace NzbDrone.Mono.Disk
+@@ -130,7 +130,15 @@ private IMount ParseLine(string line)
                  driveType = DriveType.Network;
              }
  
