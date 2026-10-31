@@ -1,0 +1,11 @@
+--- a/modules/shepherd/support.scm
++++ b/modules/shepherd/support.scm
+@@ -524,7 +524,7 @@
+ (define %user-runtime-dir
+   ;; Default runtime directory if shepherd is run as a normal user.
+   (string-append (or (getenv "XDG_RUNTIME_DIR")
+-                     (format #f "/run/user/~s" (getuid)))))
++                     (format #f "@TERMUX_PREFIX@/var/run/user/~s" (getuid)))))
+ 
+ (define (make-bare-init-file target)
+   "Return #t if a bare init file was created at TARGET; #f otherwise.

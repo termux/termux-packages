@@ -1,0 +1,8 @@
+--- a/leader/gnome-session/shepherd-socket.scm
++++ b/leader/gnome-session/shepherd-socket.scm
+@@ -12,4 +12,4 @@
+   (let ((xdg-runtime-dir (getenv "XDG_RUNTIME_DIR")))
+     (if xdg-runtime-dir
+         (string-append xdg-runtime-dir "/shepherd/gnome-session-socket")
+-        (string-append "/run/user/" (number->string (getuid)) "/shepherd/gnome-session-socket"))))
++        (string-append "@TERMUX_PREFIX@/var/run/user/" (number->string (getuid)) "/shepherd/gnome-session-socket"))))

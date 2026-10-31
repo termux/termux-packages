@@ -1,0 +1,16 @@
+diff --git a/panels/system/region/cc-format-preview.c b/panels/system/region/cc-format-preview.c
+index 895f063..a79e3ba 100644
+--- a/panels/system/region/cc-format-preview.c
++++ b/panels/system/region/cc-format-preview.c
+@@ -133,7 +133,11 @@ update_format_examples (CcFormatPreview *self)
+   else
+     old_locale = uselocale (locale);
+ 
++#if defined(_NL_MEASUREMENT_MEASUREMENT) && defined(__GLIBC__)
+   fmt = nl_langinfo (_NL_MEASUREMENT_MEASUREMENT);
++#else
++  fmt = "1";
++#endif
+   /* The returned pointer of nl_langinfo could be invalid after switching
+      locale, so we must use it here. */
+   is_imperial = fmt && *fmt == 2;
