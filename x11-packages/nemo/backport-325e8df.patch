@@ -1,0 +1,23 @@
+From 325e8df11e1f39683021c9052729ab9561619f90 Mon Sep 17 00:00:00 2001
+From: Michael Webster <miketwebster@gmail.com>
+Date: Fri, 30 Oct 2026 11:40:34 -0400
+Subject: [PATCH] nemo-desktop-application.c: Fix build break
+
+ref: 2dd8d211a0466fca9f355119d4d372c7eb5f6c82
+---
+ src/nemo-desktop-application.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/nemo-desktop-application.c b/src/nemo-desktop-application.c
+index c2fe0710d..4b72ce921 100644
+--- a/src/nemo-desktop-application.c
++++ b/src/nemo-desktop-application.c
+@@ -254,7 +254,7 @@ nemo_desktop_application_local_command_line (GApplication *application,
+ 
+     const GOptionEntry options[] = {
+         { "version", '\0', 0, G_OPTION_ARG_NONE, &version,
+-          "Show the version of the program."), NULL },
++          "Show the version of the program.", NULL },
+         { "debug", 0, 0, G_OPTION_ARG_NONE, &debug,
+           "Enable debugging code.  Example usage: 'NEMO_DEBUG=Desktop,Actions nemo-desktop --debug'.  Use NEMO_DEBUG=all for more topics.", NULL },
+         { "quit", 'q', 0, G_OPTION_ARG_NONE, &kill_shell, 
