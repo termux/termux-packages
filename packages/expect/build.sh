@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://core.tcl.tk/expect/index
+TERMUX_PKG_HOMEPAGE="https://core.tcl-lang.org/expect/index"
 TERMUX_PKG_DESCRIPTION="Tool for automating interactive terminal applications"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
