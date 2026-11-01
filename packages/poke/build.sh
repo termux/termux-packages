@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.jemarch.net/poke.html
+TERMUX_PKG_HOMEPAGE="https://www.jemarch.net/poke.html"
 TERMUX_PKG_DESCRIPTION="Interactive, extensible editor for binary data."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
