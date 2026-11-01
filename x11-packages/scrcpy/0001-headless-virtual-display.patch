@@ -1,0 +1,470 @@
+diff --git a/app/meson.build b/app/meson.build
+index 1c2021a8..0382869c 100644
+--- a/app/meson.build
++++ b/app/meson.build
+@@ -189,7 +189,8 @@ check_functions = [
+ ]
+
+ foreach f : check_functions
+-  if cc.has_function(f)
++  has_function = f == 'reallocarray' ? cc.has_header_symbol('malloc.h', f) : cc.has_function(f)
++  if has_function
+     define = 'HAVE_' + f.underscorify().to_upper()
+     conf.set(define, true)
+   endif
+diff --git a/app/src/cli.c b/app/src/cli.c
+index c751ec86..000e7f04 100644
+--- a/app/src/cli.c
++++ b/app/src/cli.c
+@@ -379,7 +379,9 @@ static const struct sc_option options[] = {
+                 "display.\n"
+                 "\"fallback\" means that the IME should appear on a fallback "
+                 "display (the default display).\n"
+-                "\"hide\" means that the IME should be hidden.",
++                "\"hide\" means that the IME should be hidden.\n"
++                "Default is \"local\" for --new-display; otherwise the "
++                "existing display policy is unchanged.",
+     },
+     {
+         .longopt_id = OPT_DISPLAY_ORIENTATION,
+@@ -3213,10 +3215,6 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
+             return false;
+         }
+
+-        if (!opts->video) {
+-            LOGE("--new-display is incompatible with --no-video");
+-            return false;
+-        }
+     }
+
+     if (opts->render_fit == SC_RENDER_FIT_AUTO) {
+@@ -3372,6 +3370,11 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
+         opts->window_aspect_ratio_lock = false;
+     }
+
++    if (opts->new_display
++            && opts->display_ime_policy == SC_DISPLAY_IME_POLICY_UNDEFINED) {
++        opts->display_ime_policy = SC_DISPLAY_IME_POLICY_LOCAL;
++    }
++
+     if (opts->display_ime_policy != SC_DISPLAY_IME_POLICY_UNDEFINED
+             && opts->display_id == 0 && !opts->new_display) {
+         LOGE("--display-ime-policy is only supported on a secondary display");
+@@ -3516,10 +3519,6 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
+             LOGE("Cannot request power off on close if control is disabled");
+             return false;
+         }
+-        if (opts->start_app) {
+-            LOGE("Cannot start an Android app if control is disabled");
+-            return false;
+-        }
+         if (opts->keep_active) {
+             LOGE("Cannot keep device active if control is disabled");
+             return false;
+diff --git a/app/src/scrcpy.c b/app/src/scrcpy.c
+index 0967e5da..2e18af3e 100644
+--- a/app/src/scrcpy.c
++++ b/app/src/scrcpy.c
+@@ -449,7 +449,9 @@ scrcpy(struct scrcpy_options *options) {
+         .screen_off_timeout = options->screen_off_timeout,
+         .capture_orientation = options->capture_orientation,
+         .capture_orientation_lock = options->capture_orientation_lock,
+-        .control = options->control,
++        // App startup is a one-shot setup request and remains available with
++        // --no-control. In that mode, no desktop input processors are created.
++        .control = options->control || options->start_app,
+         .display_id = options->display_id,
+         .new_display = options->new_display,
+         .display_ime_policy = options->display_ime_policy,
+@@ -651,7 +653,7 @@ scrcpy(struct scrcpy_options *options) {
+     struct sc_mouse_processor *mp = NULL;
+     struct sc_gamepad_processor *gp = NULL;
+
+-    if (options->control) {
++    if (options->control || options->start_app) {
+         static const struct sc_controller_callbacks controller_cbs = {
+             .on_ended = sc_controller_on_ended,
+         };
+@@ -663,7 +665,12 @@ scrcpy(struct scrcpy_options *options) {
+         controller_initialized = true;
+
+         controller = &s->controller;
++    }
++
++    struct sc_uhid_devices *uhid_devices = NULL;
++    struct sc_keyboard_uhid *uhid_keyboard = NULL;
+
++    if (options->control) {
+ #ifdef HAVE_USB
+         bool use_keyboard_aoa =
+             options->keyboard_input_mode == SC_KEYBOARD_INPUT_MODE_AOA;
+@@ -761,8 +768,6 @@ aoa_complete:
+         assert(options->mouse_input_mode != SC_MOUSE_INPUT_MODE_AOA);
+ #endif
+
+-        struct sc_keyboard_uhid *uhid_keyboard = NULL;
+-
+         if (options->keyboard_input_mode == SC_KEYBOARD_INPUT_MODE_SDK) {
+             sc_keyboard_sdk_init(&s->keyboard_sdk, &s->controller,
+                                  options->key_inject_mode,
+@@ -795,12 +800,13 @@ aoa_complete:
+             gp = &s->gamepad_uhid.gamepad_processor;
+         }
+
+-        struct sc_uhid_devices *uhid_devices = NULL;
+         if (uhid_keyboard) {
+             sc_uhid_devices_init(&s->uhid_devices, uhid_keyboard);
+             uhid_devices = &s->uhid_devices;
+         }
++    }
+
++    if (controller) {
+         sc_controller_configure(&s->controller, acksync, uhid_devices);
+
+         if (!sc_controller_start(&s->controller)) {
+@@ -809,15 +815,15 @@ aoa_complete:
+         controller_started = true;
+     }
+
+-    // There is a controller if and only if control is enabled
+-    assert(options->control == !!controller);
++    // A controller is also used for the one-shot --start-app request.
++    assert((options->control || options->start_app) == !!controller);
+
+     if (options->window) {
+         struct sc_screen_params screen_params = {
+             .video = options->video_playback,
+             .camera = options->video_source == SC_VIDEO_SOURCE_CAMERA,
+             .flex_display = options->flex_display,
+-            .controller = controller,
++            .controller = options->control ? controller : NULL,
+             .fp = fp,
+             .kp = kp,
+             .mp = mp,
+@@ -1017,7 +1023,7 @@ aoa_complete:
+         init_sdl_gamepads();
+     }
+
+-    if (options->control && options->start_app) {
++    if (options->start_app) {
+         assert(controller);
+
+         char *name = strdup(options->start_app);
+diff --git a/app/tests/test_cli.c b/app/tests/test_cli.c
+index de605cb9..072d3497 100644
+--- a/app/tests/test_cli.c
++++ b/app/tests/test_cli.c
+@@ -106,6 +106,7 @@ static void test_options2(void) {
+     char *argv[] = {
+         "scrcpy",
+         "--no-control",
++        "--start-app", "com.termux",
+         "--no-playback",
+         "--record", "file.mp4", // cannot enable --no-playback without recording
+     };
+@@ -115,12 +116,38 @@ static void test_options2(void) {
+
+     const struct scrcpy_options *opts = &args.opts;
+     assert(!opts->control);
++    assert(!strcmp(opts->start_app, "com.termux"));
+     assert(!opts->video_playback);
+     assert(!opts->audio_playback);
+     assert(!strcmp(opts->record_filename, "file.mp4"));
+     assert(opts->record_format == SC_RECORD_FORMAT_MP4);
+ }
+
++static void test_display_ime_policy(void) {
++    struct {
++        char *argv[5];
++        int argc;
++        enum sc_display_ime_policy expected;
++    } cases[] = {
++        {{"scrcpy"}, 1, SC_DISPLAY_IME_POLICY_UNDEFINED},
++        {{"scrcpy", "--display-id=1"}, 2, SC_DISPLAY_IME_POLICY_UNDEFINED},
++        {{"scrcpy", "--new-display"}, 2, SC_DISPLAY_IME_POLICY_LOCAL},
++        {{"scrcpy", "--new-display", "--no-window", "--record=test.mkv"},
++            4, SC_DISPLAY_IME_POLICY_LOCAL},
++        {{"scrcpy", "--new-display", "--display-ime-policy=fallback"},
++            3, SC_DISPLAY_IME_POLICY_FALLBACK},
++        {{"scrcpy", "--new-display", "--display-ime-policy=hide"},
++            3, SC_DISPLAY_IME_POLICY_HIDE},
++    };
++
++    for (size_t i = 0; i < ARRAY_LEN(cases); ++i) {
++        struct scrcpy_cli_args args = {.opts = scrcpy_options_default};
++        bool ok = scrcpy_parse_args(&args, cases[i].argc, cases[i].argv);
++        assert(ok);
++        assert(args.opts.display_ime_policy == cases[i].expected);
++    }
++}
++
+ static void test_parse_shortcut_mods(void) {
+     uint8_t mods;
+     bool ok;
+@@ -157,6 +184,7 @@ int main(int argc, char *argv[]) {
+     test_flag_help();
+     test_options();
+     test_options2();
++    test_display_ime_policy();
+     test_parse_shortcut_mods();
+     return 0;
+ }
+diff --git a/doc/virtual-display.md b/doc/virtual-display.md
+index 3bfe6f71..47e52829 100644
+--- a/doc/virtual-display.md
++++ b/doc/virtual-display.md
+@@ -65,6 +65,14 @@ For example:
+ scrcpy --new-display=1920x1080 --start-app=org.videolan.vlc
+ ```
+
++To start an app while keeping desktop input disabled, combine
++`--start-app` with `--no-control`. The app launch is a one-time setup request;
++scrcpy will not forward keyboard, mouse, or touch input:
++
++```bash
++scrcpy --new-display --start-app=com.termux --no-control
++```
++
+ The app may itself be a launcher. For example, to run the open source [Fossify
+ Launcher]:
+
+@@ -104,7 +112,8 @@ scrcpy --new-display --no-vd-destroy-content
+
+ ## Display IME policy
+
+-By default, the virtual display IME appears on the default display.
++New virtual displays show the IME locally by default, including when no host
++window is shown (`--no-window`). Existing displays keep their current policy.
+
+ To make it appear on the local display, use `--display-ime-policy=local`:
+
+@@ -112,3 +121,6 @@ To make it appear on the local display, use `--display-ime-policy=local`:
+ scrcpy --display-id=1 --display-ime-policy=local
+ scrcpy --new-display --display-ime-policy=local
+ ```
++
++Use `--display-ime-policy=fallback` to show it on the default display, or
++`--display-ime-policy=hide` to suppress it.
+diff --git a/server/scripts/build-wrapper.sh b/server/scripts/build-wrapper.sh
+index 7e16dc94..9291a011 100755
+--- a/server/scripts/build-wrapper.sh
++++ b/server/scripts/build-wrapper.sh
+@@ -21,9 +21,9 @@ GRADLE=${GRADLE:-$PROJECT_ROOT/../gradlew}
+
+ if [[ "$BUILDTYPE" == debug ]]
+ then
+-    "$GRADLE" -p "$PROJECT_ROOT" assembleDebug
++    "$GRADLE" -p "$PROJECT_ROOT" assembleDebug --no-configuration-cache
+     cp "$PROJECT_ROOT/build/outputs/apk/debug/server-debug.apk" "$OUTPUT"
+ else
+-    "$GRADLE" -p "$PROJECT_ROOT" assembleRelease
++    "$GRADLE" -p "$PROJECT_ROOT" assembleRelease --no-configuration-cache
+     cp "$PROJECT_ROOT/build/outputs/apk/release/server-release-unsigned.apk" "$OUTPUT"
+ fi
+diff --git a/server/src/main/java/com/genymobile/scrcpy/Options.java b/server/src/main/java/com/genymobile/scrcpy/Options.java
+index 26a6ba9a..5386a5d3 100644
+--- a/server/src/main/java/com/genymobile/scrcpy/Options.java
++++ b/server/src/main/java/com/genymobile/scrcpy/Options.java
+@@ -40,6 +40,7 @@ public class Options {
+     private boolean tunnelForward;
+     private Rect crop;
+     private boolean control = true;
++    private boolean displayOnly;
+     private int displayId;
+     private String cameraId;
+     private Size cameraSize;
+@@ -103,6 +104,10 @@ public class Options {
+         return audio;
+     }
+
++    public boolean getDisplayOnly() {
++        return displayOnly;
++    }
++
+     public int getMaxSize() {
+         return maxSize;
+     }
+@@ -422,6 +427,9 @@ public class Options {
+                 case "control":
+                     options.control = Boolean.parseBoolean(value);
+                     break;
++                case "display_only":
++                    options.displayOnly = Boolean.parseBoolean(value);
++                    break;
+                 case "display_id":
+                     options.displayId = Integer.parseInt(value);
+                     break;
+diff --git a/server/src/main/java/com/genymobile/scrcpy/Server.java b/server/src/main/java/com/genymobile/scrcpy/Server.java
+index d7d1a76b..e138785f 100644
+--- a/server/src/main/java/com/genymobile/scrcpy/Server.java
++++ b/server/src/main/java/com/genymobile/scrcpy/Server.java
+@@ -102,9 +102,15 @@ public final class Server {
+
+         List<AsyncProcessor> asyncProcessors = new ArrayList<>();
+
+-        DesktopConnection connection = DesktopConnection.open(scid, tunnelForward, video, audio, control, sendDummyByte);
++        boolean displayOnly = options.getDisplayOnly();
++        if (displayOnly && (video || audio || control || options.getNewDisplay() == null)) {
++            throw new ConfigurationException("display_only requires new_display and disables video, audio, and control");
++        }
++        DesktopConnection connection = displayOnly ? null
++                : DesktopConnection.open(scid, tunnelForward, video, audio, control, sendDummyByte);
++        NewDisplayCapture displayOnlyCapture = null;
+         try {
+-            if (options.getSendDeviceMeta()) {
++            if (!displayOnly && options.getSendDeviceMeta()) {
+                 connection.sendDeviceMeta(Device.getDeviceName());
+             }
+
+@@ -159,7 +165,12 @@ public final class Server {
+                 }
+             }
+
+-            Completion completion = new Completion(asyncProcessors.size());
++            if (!video && options.getNewDisplay() != null) {
++                displayOnlyCapture = new NewDisplayCapture(controller, options);
++                displayOnlyCapture.startDisplayOnly();
++            }
++
++            Completion completion = new Completion(asyncProcessors.size() + (displayOnlyCapture != null ? 1 : 0));
+             for (AsyncProcessor asyncProcessor : asyncProcessors) {
+                 asyncProcessor.start((fatalError) -> {
+                     completion.addCompleted(fatalError);
+@@ -174,8 +185,13 @@ public final class Server {
+             for (AsyncProcessor asyncProcessor : asyncProcessors) {
+                 asyncProcessor.stop();
+             }
++            if (displayOnlyCapture != null) {
++                displayOnlyCapture.release();
++            }
+
+-            connection.shutdown();
++            if (connection != null) {
++                connection.shutdown();
++            }
+
+             try {
+                 if (cleanUp != null) {
+@@ -190,7 +206,9 @@ public final class Server {
+                 // ignore
+             }
+
+-            connection.close();
++            if (connection != null) {
++                connection.close();
++            }
+         }
+     }
+
+diff --git a/server/src/main/java/com/genymobile/scrcpy/video/NewDisplayCapture.java b/server/src/main/java/com/genymobile/scrcpy/video/NewDisplayCapture.java
+index 5ed4c732..794e349d 100644
+--- a/server/src/main/java/com/genymobile/scrcpy/video/NewDisplayCapture.java
++++ b/server/src/main/java/com/genymobile/scrcpy/video/NewDisplayCapture.java
+@@ -3,6 +3,7 @@ package com.genymobile.scrcpy.video;
+ import com.genymobile.scrcpy.AndroidVersions;
+ import com.genymobile.scrcpy.Options;
+ import com.genymobile.scrcpy.control.PositionMapper;
++import com.genymobile.scrcpy.device.Device;
+ import com.genymobile.scrcpy.display.DisplayInfo;
+ import com.genymobile.scrcpy.display.DisplayMonitor;
+ import com.genymobile.scrcpy.display.DisplayProperties;
+@@ -18,9 +19,14 @@ import com.genymobile.scrcpy.util.AffineMatrix;
+ import com.genymobile.scrcpy.util.Ln;
+ import com.genymobile.scrcpy.wrappers.ServiceManager;
+
++import android.graphics.PixelFormat;
+ import android.graphics.Rect;
++import android.media.Image;
++import android.media.ImageReader;
+ import android.hardware.display.VirtualDisplay;
+ import android.os.Build;
++import android.os.Handler;
++import android.os.Looper;
+ import android.view.Surface;
+
+ import java.io.IOException;
+@@ -73,6 +79,7 @@ public class NewDisplayCapture extends SurfaceCapture {
+     private DisplayResizeDebouncer debouncer;
+
+     private int dpi;
++    private ImageReader displayOnlyImageReader;
+
+     public NewDisplayCapture(VirtualDisplayListener vdListener, Options options) {
+         this.vdListener = vdListener;
+@@ -208,6 +215,46 @@ public class NewDisplayCapture extends SurfaceCapture {
+         displayTransform = AffineMatrix.multiplyAll(displayRotationMatrix, eventTransform);
+     }
+
++    public void startDisplayOnly() {
++        displaySize = newDisplay.getSize();
++        dpi = newDisplay.getDpi();
++        if (displaySize == null || dpi == 0) {
++            DisplayInfo displayInfo = ServiceManager.getDisplayManager().getDisplayInfo(0);
++            if (displayInfo != null) {
++                if (displaySize == null) {
++                    mainDisplaySize = displayInfo.getSize();
++                    if ((displayInfo.getRotation() % 2) != 0) {
++                        mainDisplaySize = mainDisplaySize.rotate();
++                    }
++                    displaySize = mainDisplaySize;
++                }
++                if (dpi == 0) {
++                    mainDisplayDpi = displayInfo.getDpi();
++                }
++            }
++        }
++        if (displaySize == null) {
++            displaySize = new Size(1920, 1080);
++        }
++        if (dpi == 0) {
++            dpi = mainDisplaySize != null ? scaleDpi(mainDisplaySize, mainDisplayDpi, displaySize) : 240;
++        }
++        displayOnlyImageReader = ImageReader.newInstance(displaySize.getWidth(), displaySize.getHeight(),
++                PixelFormat.RGBA_8888, 3);
++        displayOnlyImageReader.setOnImageAvailableListener(reader -> {
++            Image image = reader.acquireLatestImage();
++            if (image != null) {
++                image.close();
++            }
++        }, new Handler(Looper.getMainLooper()));
++        startNew(displayOnlyImageReader.getSurface());
++        Device.setDisplayPower(virtualDisplay.getDisplay().getDisplayId(), true);
++        if (vdListener != null) {
++            PositionMapper positionMapper = PositionMapper.create(displaySize, null, displaySize);
++            vdListener.onNewVirtualDisplay(virtualDisplay.getDisplay().getDisplayId(), positionMapper);
++        }
++    }
++
+     public void startNew(Surface surface) {
+         try {
+             int flags = VIRTUAL_DISPLAY_FLAG_PUBLIC
+@@ -241,7 +288,8 @@ public class NewDisplayCapture extends SurfaceCapture {
+                 ServiceManager.getWindowManager().setDisplayImePolicy(virtualDisplayId, displayImePolicy);
+             }
+
+-            displayMonitor.start(virtualDisplayId, (props) -> {
++            if (getCaptureControl() != null) {
++                displayMonitor.start(virtualDisplayId, (props) -> {
+                 int reason;
+                 if (flexDisplay) {
+                     boolean isClientResize = tracker.onChanged(props);
+@@ -257,6 +305,7 @@ public class NewDisplayCapture extends SurfaceCapture {
+                 }
+                 getCaptureControl().reset(reason);
+             });
++            }
+         } catch (Exception e) {
+             Ln.e("Could not create display", e);
+             throw new AssertionError("Could not create display");
+@@ -300,6 +349,11 @@ public class NewDisplayCapture extends SurfaceCapture {
+             debouncer.stop();
+         }
+
++        if (displayOnlyImageReader != null) {
++            displayOnlyImageReader.close();
++            displayOnlyImageReader = null;
++        }
++
+         if (virtualDisplay != null) {
+             // synchronized with triggerResize()
+             synchronized (this) {
