@@ -76,7 +76,7 @@
     /* On Linux, first try with statx. If that doesn't work out, fall back to
        the fstat64 or vanilla version. */
     { struct vki_statx buf;
-@@ -1046,9 +1052,9 @@ Int VG_(access) ( const HChar* path, Bool irusr, Bool iwusr, Bool ixusr )
+@@ -1039,9 +1045,9 @@ Int VG_(access) ( const HChar* path, Bool irusr, Bool iwusr, Bool ixusr )
               | (iwusr ? VKI_W_OK : 0)
               | (ixusr ? VKI_X_OK : 0);
  #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
