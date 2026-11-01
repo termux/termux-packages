@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://lftp.tech/
+TERMUX_PKG_HOMEPAGE="https://lftp.yar.ru/"
 TERMUX_PKG_DESCRIPTION="FTP/HTTP client and file transfer program"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
