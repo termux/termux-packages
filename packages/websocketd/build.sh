@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://websocketd.com/
+TERMUX_PKG_HOMEPAGE="https://websocketd.com/"
 TERMUX_PKG_DESCRIPTION="Turn any program that uses STDIN/STDOUT into a WebSocket server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
