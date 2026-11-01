@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://search.cpan.org/~pederst/rename/
+TERMUX_PKG_HOMEPAGE="https://metacpan.org/dist/rename"
 TERMUX_PKG_DESCRIPTION="renames multiple files using perl expressions."
 TERMUX_PKG_LICENSE="Artistic-License-2.0, GPL-2.0" # https://metacpan.org/pod/Software::License::Perl_5
 TERMUX_PKG_MAINTAINER="@termux"
