@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://wiki.linuxquestions.org/wiki/Corkscrew
+TERMUX_PKG_HOMEPAGE="https://github.com/patpadgett/corkscrew"
 TERMUX_PKG_DESCRIPTION="A tool for tunneling SSH through HTTP proxies"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
