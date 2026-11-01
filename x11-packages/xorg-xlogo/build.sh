@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X Window System logo display demo"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="1.0.7"
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xlogo-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=8a3f67b20407a53286a7de1a04dbda12d272234d59ef35e68ecfaf7633d83624
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="libx11, libxaw, libxt, libxrender, libxft, libxmu, libsm, libxext"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
