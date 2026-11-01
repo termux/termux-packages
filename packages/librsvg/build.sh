@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/action/show/Projects/LibRsvg
+TERMUX_PKG_HOMEPAGE="https://gitlab.gnome.org/GNOME/librsvg"
 TERMUX_PKG_DESCRIPTION="Library to render SVG files using cairo"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
