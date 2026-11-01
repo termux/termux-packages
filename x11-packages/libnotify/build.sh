@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/notification-spec/
+TERMUX_PKG_HOMEPAGE="https://gitlab.gnome.org/GNOME/libnotify"
 TERMUX_PKG_DESCRIPTION="Library for sending desktop notifications"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
