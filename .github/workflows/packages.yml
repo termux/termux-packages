@@ -143,7 +143,7 @@ jobs:
                     echo "$(basename "${file%%.subpackage.sh}")" >> ./built_$(subpkg_repo_name "$file" "$repo")_subpackages.txt
                   done
                 else
-                  echo "$pkg" >> ./deleted_${repo}_packages
+                  echo "$pkg" >> ./deleted_${repo}_packages.txt
                 fi
               fi
             done<<<${CHANGED_FILES}
@@ -459,6 +459,7 @@ jobs:
 
           # Upload file to temporary directory.
           uploaded_files=false
+          removed_packages=false
           shopt -s nullglob
 
           if [ -f debs/built_${REPOSITORY_NAME}_packages.txt ]; then
@@ -471,26 +472,37 @@ jobs:
             done
             shopt -u nullglob
 
-            # Publishing repository changes.
             if [ "$uploaded_files" = "true" ]; then
               if ! aptly_add_to_repo; then
                 exit 1
               fi
 
               # Usually temporary directory is deleted automatically, but in certain cases it is left.
-              aptly_delete_dir
-
               # Final part to make changes appear in web root.
-              if ! aptly_publish_repo; then
+              if ! aptly_publish_repo_and_staging; then
+                exit 1
+              fi
+            fi
+          fi
+
+          # Remove packages that were deleted or moved out of the repo directory,
+          # after new packages have been added.
+          if [ -f debs/deleted_${REPOSITORY_NAME}_packages.txt ]; then
+            while read -r pkg; do
+              if grep -qxF "$pkg" debs/built_${REPOSITORY_NAME}_packages.txt 2>/dev/null; then
+                continue
+              fi
+
+              if ! aptly_remove_package "$pkg"; then
                 exit 1
               fi
 
-              # Publish to staging repo if we haven't already
-              if [[ "$REPOSITORY_DISTRIBUTION" != "staging" ]]; then
-                REPOSITORY_DISTRIBUTION=staging
-                if ! aptly_publish_repo; then
-                  exit 1
-                fi
+              removed_packages=true
+            done < debs/deleted_${REPOSITORY_NAME}_packages.txt
+
+            if [ "$removed_packages" = "true" ]; then
+              if ! aptly_publish_repo_and_staging; then
+                exit 1
               fi
             fi
           fi
