@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.clamav.net/
+TERMUX_PKG_HOMEPAGE="https://github.com/Cisco-Talos/clamav"
 TERMUX_PKG_DESCRIPTION="Anti-virus toolkit for Unix"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
