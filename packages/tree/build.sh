@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mama.indstate.edu/users/ice/tree/
+TERMUX_PKG_HOMEPAGE="https://gitlab.com/OldManProgrammer/unix-tree"
 TERMUX_PKG_DESCRIPTION="Recursive directory lister producing a depth indented listing of files"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
