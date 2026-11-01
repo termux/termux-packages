@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://dicom.offis.de/dcmtk"
+TERMUX_PKG_HOMEPAGE="https://github.com/DCMTK/dcmtk"
 TERMUX_PKG_DESCRIPTION="A collection of libraries and applications implementing large parts the DICOM standard"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
