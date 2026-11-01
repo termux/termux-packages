@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
+TERMUX_PKG_HOMEPAGE="https://www.tcl-lang.org/"
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.terms"
