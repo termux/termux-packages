@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://clucene.sourceforge.net/"
+TERMUX_PKG_HOMEPAGE="https://clucene.sourceforge.net/"
 TERMUX_PKG_DESCRIPTION="C++ port of the high-performance text search engine Lucene"
 TERMUX_PKG_LICENSE="Apache-2.0, LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
