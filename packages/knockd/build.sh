@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://zeroflux.org/projects/knock
+TERMUX_PKG_HOMEPAGE="https://github.com/jvinet/knock"
 TERMUX_PKG_DESCRIPTION="A port-knocking daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
