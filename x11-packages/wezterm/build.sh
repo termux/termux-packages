@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GPU-accelerated cross-platform terminal emulator and mul
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20240203-110809-5046fc22"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/wezterm/wezterm/releases/download/$TERMUX_PKG_VERSION/wezterm-$TERMUX_PKG_VERSION-src.tar.gz"
 TERMUX_PKG_SHA256=df60b1081d402b5a9239cc4cef16fc699eab68bbbeac9c669cb5d991a6010b2c
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, harfbuzz, hicolor-icon-theme, libpng, libssh2, libx11, libxcb, libxkbcommon, openssl, ttf-jetbrains-mono, xdg-utils, xcb-util, xcb-util-image, zlib, zstd"
@@ -119,5 +119,22 @@ termux_step_make_install() {
 	install -Dm644 assets/shell-completion/bash "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
 	install -Dm644 assets/shell-completion/fish "${TERMUX_PREFIX}/share/fish/vendor_completions.d/${TERMUX_PKG_NAME}.fish"
 	install -Dm644 assets/shell-completion/zsh "${TERMUX_PREFIX}/share/zsh/site-functions/_${TERMUX_PKG_NAME}"
-	install -Dm644 assets/shell-integration/${TERMUX_PKG_NAME}.sh -t "${TERMUX_PREFIX}/etc/profile.d"
+	# Ship the shell integration as data, not directly in etc/profile.d: every
+	# login shell sources that directory, so installing it there unguarded would
+	# apply the integration inside kitty, xfce4-terminal, etc. too (and makes PS1
+	# grow on each prompt there).
+	install -Dm644 assets/shell-integration/wezterm.sh -t "${TERMUX_PREFIX}/share/wezterm/shell-integration"
+
+	# Source it from profile.d only when the shell was started by wezterm-gui.
+	# Reading /proc/$PPID/comm avoids a dependency on ps and is POSIX sh compatible.
+	mkdir -p "${TERMUX_PREFIX}/etc/profile.d"
+	cat > "${TERMUX_PREFIX}/etc/profile.d/wezterm.sh" <<-EOF
+		if [ -r "/proc/\$PPID/comm" ]; then
+			read -r _wezterm_parent < "/proc/\$PPID/comm"
+			if [ "\$_wezterm_parent" = "wezterm-gui" ]; then
+				. "${TERMUX_PREFIX}/share/wezterm/shell-integration/wezterm.sh"
+			fi
+			unset _wezterm_parent
+		fi
+	EOF
 }
