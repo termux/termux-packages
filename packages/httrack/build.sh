@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.httrack.com
+TERMUX_PKG_HOMEPAGE="https://www.httrack.com/"
 TERMUX_PKG_DESCRIPTION="It allows you to download a World Wide Web site from the Internet"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
