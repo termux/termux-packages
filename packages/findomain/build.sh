@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://findomain.app/
+TERMUX_PKG_HOMEPAGE="https://github.com/Findomain/Findomain"
 TERMUX_PKG_DESCRIPTION="Findomain is the fastest subdomain enumerator and the only one written in Rust"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
