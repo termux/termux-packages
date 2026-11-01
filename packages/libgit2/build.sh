@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://libgit2.github.com/
+TERMUX_PKG_HOMEPAGE="https://libgit2.org/"
 TERMUX_PKG_DESCRIPTION="C library implementing Git core methods"
 # License: GPL-2.0 with linking exception
 TERMUX_PKG_LICENSE="GPL-2.0"
