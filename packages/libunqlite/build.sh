@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://unqlite.org/
+TERMUX_PKG_HOMEPAGE="https://github.com/symisc/unqlite"
 TERMUX_PKG_DESCRIPTION="Transactional embedded database engine"
 TERMUX_PKG_LICENSE="BSD 2-Clause, Sleepycat"
 TERMUX_PKG_LICENSE_FILE="LICENSE, src/jx9_license.txt"
