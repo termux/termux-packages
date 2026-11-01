@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.storj.io/integrations/uplink-cli
+TERMUX_PKG_HOMEPAGE="https://github.com/storj/storj"
 TERMUX_PKG_DESCRIPTION="Storj DCS Uplink CLI"
 TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
