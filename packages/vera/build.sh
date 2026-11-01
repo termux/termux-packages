@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://bitbucket.org/verateam/vera
+TERMUX_PKG_HOMEPAGE="https://github.com/verateam/vera"
 TERMUX_PKG_DESCRIPTION="A programmable tool for verification, analysis and transformation of C++ source code"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
