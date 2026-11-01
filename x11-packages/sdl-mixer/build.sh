@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_mixer/release-1.2.html
+TERMUX_PKG_HOMEPAGE="https://github.com/libsdl-org/SDL_mixer"
 TERMUX_PKG_DESCRIPTION="A simple multi-channel audio mixer"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
