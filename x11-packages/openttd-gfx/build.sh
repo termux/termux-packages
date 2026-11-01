@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://dev.openttdcoop.org/projects/opengfx
+TERMUX_PKG_HOMEPAGE="https://github.com/OpenTTD/OpenGFX"
 TERMUX_PKG_DESCRIPTION="A free graphics set for openttd"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
