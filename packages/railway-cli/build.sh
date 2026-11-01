@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://railway.app
+TERMUX_PKG_HOMEPAGE="https://railway.com/"
 TERMUX_PKG_DESCRIPTION="This is the command line interface for Railway"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
