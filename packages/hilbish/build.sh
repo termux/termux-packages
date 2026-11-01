@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://rosettea.github.io/Hilbish/
+TERMUX_PKG_HOMEPAGE="https://github.com/sammy-ette/Hilbish"
 TERMUX_PKG_DESCRIPTION="The Moon-powered shell! A comfy and extensible shell for Lua fans!"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
