@@ -1997,7 +1997,7 @@ diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/b
 index f6ed40ba9a..37690396d0 100644
 --- a/content/browser/renderer_host/render_frame_host_impl.cc
 +++ b/content/browser/renderer_host/render_frame_host_impl.cc
-@@ -860,8 +860,8 @@ base::TimeDelta GetSubframeProcessShutdownDelay(BrowserContext* browser_context,
+@@ -865,8 +865,8 @@
      return kZeroDelay;
    }
  
@@ -2008,7 +2008,7 @@ index f6ed40ba9a..37690396d0 100644
    }
  
    return kSubframeProcessShutdownDelay;
-@@ -912,7 +912,7 @@ GURL GetLastDocumentURL(
+@@ -917,7 +917,7 @@
  // Return true when `mode` is enabled for kAvoidUnnecessaryBeforeUnloadCheckSync
  // feature (see: https://crbug.com/396998476).
  bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -2017,7 +2017,7 @@ index f6ed40ba9a..37690396d0 100644
    if (!GetContentClient()
             ->browser()
             ->SupportsAvoidUnnecessaryBeforeUnloadCheckSync()) {
-@@ -920,11 +920,11 @@ bool IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
+@@ -925,11 +925,11 @@
    }
  
    if (!base::FeatureList::IsEnabled(
@@ -2031,7 +2031,7 @@ index f6ed40ba9a..37690396d0 100644
  }
  
  // Returns true if `host` has the Window Management permission granted.
-@@ -2700,7 +2700,7 @@ RenderFrameHostImpl::RenderFrameHostImpl(
+@@ -2686,7 +2686,7 @@
      set_nav_entry_id(parent_->nav_entry_id());
    }
  
@@ -2040,7 +2040,7 @@ index f6ed40ba9a..37690396d0 100644
      CreateBrokerHolder();
    }
  
-@@ -2839,7 +2839,7 @@ RenderFrameHostImpl::~RenderFrameHostImpl() {
+@@ -2827,7 +2827,7 @@
    MaybeResetBoostRenderProcessForLoading();
  
    if (is_main_frame() &&
@@ -2049,7 +2049,7 @@ index f6ed40ba9a..37690396d0 100644
      // The main frame RenderWidgetHost sets is_discarding of RenderWidgetHost to
      // true at DiscardFrame(). However, the is_discarding state is not reset if
      // the renderer process terminates before sending a response to
-@@ -4623,7 +4623,7 @@ bool RenderFrameHostImpl::CreateRenderFrame(
+@@ -4627,7 +4627,7 @@
         (navigation_request->commit_params()
              .is_cross_site_cross_browsing_context_group &&
          base::FeatureList::IsEnabled(
@@ -2058,7 +2058,7 @@ index f6ed40ba9a..37690396d0 100644
          GetContentClient()
              ->browser()
              ->IsClearWindowNameForNewBrowsingContextGroupAllowed(context)));
-@@ -5260,7 +5260,7 @@ void RenderFrameHostImpl::DidNavigate(
+@@ -5266,7 +5266,7 @@
    SetLastCommittedUrl(params.url);
    // The origin is only updated for cross-document navigations.
    if (!was_within_same_document ||
@@ -2067,7 +2067,7 @@ index f6ed40ba9a..37690396d0 100644
      SetLastCommittedOrigin(params.origin,
                             params.has_potentially_trustworthy_unique_origin);
    }
-@@ -6141,7 +6141,7 @@ bool RenderFrameHostImpl::VerifyFencedFrameFocusChange(
+@@ -6175,7 +6175,7 @@
    // TODO(crbug.com/40274134): We will later badmessage the renderer, but, for
    // now, we will dump without crashing to monitor if any legitimate cases are
    // reaching this point.
@@ -2076,7 +2076,7 @@ index f6ed40ba9a..37690396d0 100644
      bad_message::ReceivedBadMessage(
          GetProcess(), bad_message::RFH_FOCUS_ACROSS_FENCED_BOUNDARY);
    } else {
-@@ -6838,7 +6838,7 @@ void RenderFrameHostImpl::SwapOuterDelegateFrame(
+@@ -6873,7 +6873,7 @@
    // `devtools_frame_token`) to indicate to DevTools clients that the guest has
    // been attached to this placeholder iframe.
    const bool should_swap_devtools_frame_token =
@@ -2085,7 +2085,16 @@ index f6ed40ba9a..37690396d0 100644
    GetMojomFrameInRenderer()->Unload(
        /*is_loading=*/false,
        browsing_context_state_->current_replication_state().Clone(),
-@@ -9008,7 +9008,7 @@ bool RenderFrameHostImpl::IsInactiveAndDisallowActivation(uint64_t reason) {
+@@ -7406,7 +7406,7 @@
+ 
+   // Check if this frame could legally display a dialog.
+   if (base::FeatureList::IsEnabled(
+-          features::kEnforceUserActivationForBeforeUnload) &&
++          ::features::kEnforceUserActivationForBeforeUnload) &&
+       !CouldDisplayBeforeUnloadDialog()) {
+     SendInterventionReport(
+         "BeforeUnloadNoGesture",
+@@ -9082,7 +9082,7 @@
        // continue to process accessibility location changes unless
        // kDoNotEvictOnAXLocationChange is off.
        if (base::FeatureList::IsEnabled(
@@ -2094,7 +2103,7 @@ index f6ed40ba9a..37690396d0 100644
          CHECK_NE(reason, kAXLocationChange);
        }
        BackForwardCacheCanStoreDocumentResult can_store_flat;
-@@ -9479,7 +9479,7 @@ void RenderFrameHostImpl::MaybeIsolateForUserActivation() {
+@@ -9590,7 +9590,7 @@
      // the isolation eligibility checks, such as having the corresponding
      // feature enabled or satisfying memory requirements.
      CHECK(base::FeatureList::IsEnabled(
@@ -2103,7 +2112,7 @@ index f6ed40ba9a..37690396d0 100644
  
      bool is_same_origin_activation =
          GetParent() ? GetMainFrame()->GetLastCommittedOrigin().IsSameOriginWith(
-@@ -9840,7 +9840,7 @@ void RenderFrameHostImpl::SetCloseListener(
+@@ -9957,7 +9957,7 @@
  void RenderFrameHostImpl::BindBrowserInterfaceBrokerReceiver(
      mojo::PendingReceiver<blink::mojom::BrowserInterfaceBroker> receiver) {
    // TODO(crbug.com/458719426): Move this call to SetUpMojoConnection.
@@ -2112,7 +2121,7 @@ index f6ed40ba9a..37690396d0 100644
      CreateBrokerHolder();
    }
  
-@@ -9868,7 +9868,7 @@ bool RenderFrameHostImpl::ResetBrowserInterfaceBrokerReceiverForTesting() {
+@@ -9985,7 +9985,7 @@
      return true;
    }
    bool is_valid = broker_holder_->broker_receiver().Unbind().is_valid();
@@ -2121,7 +2130,7 @@ index f6ed40ba9a..37690396d0 100644
      broker_holder_.reset();
    }
    return is_valid;
-@@ -11913,7 +11913,7 @@ void RenderFrameHostImpl::HandleAXLocationChanges(
+@@ -11869,7 +11869,7 @@
      return;
    }
  
@@ -2130,7 +2139,7 @@ index f6ed40ba9a..37690396d0 100644
      // If the flag is off, we should evict the back/forward cache entry.
      if (IsInactiveAndDisallowActivation(
              DisallowActivationReasonId::kAXLocationChange)) {
-@@ -11993,7 +11993,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
+@@ -11949,7 +11949,7 @@
    }
  
    // Same-document navigations cannot change origins.
@@ -2139,7 +2148,7 @@ index f6ed40ba9a..37690396d0 100644
        is_same_document_navigation && origin != GetLastCommittedOrigin()) {
      LogCanCommitOriginAndUrlFailureReason("cross_origin_same_document");
      return CanCommitStatus::CANNOT_COMMIT_ORIGIN;
-@@ -12029,7 +12029,7 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
+@@ -11994,7 +11994,7 @@
    // TODO(crbug.com/40580002): Remove this block in favor of the enforcement
    // above once kEnforceSameDocumentOriginInvariants and
    // kTreatMhtmlInitialDocumentLoadsAsCrossDocument finish launching.
@@ -2148,7 +2157,7 @@ index f6ed40ba9a..37690396d0 100644
      if (is_same_document_navigation && origin != GetLastCommittedOrigin()) {
        LogCanCommitOriginAndUrlFailureReason("cross_origin_same_document");
        return CanCommitStatus::CANNOT_COMMIT_ORIGIN;
-@@ -12384,7 +12384,7 @@ RenderFrameHostImpl::CheckOrDispatchBeforeUnloadForFrame(
+@@ -12351,7 +12351,7 @@
    const bool run_beforeunload_for_legacy_frame =
        rfh == this && !rfh->has_before_unload_handler_ &&
        !IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -2157,7 +2166,7 @@ index f6ed40ba9a..37690396d0 100644
                kWithoutSendBeforeUnload);
  
    const bool should_run_beforeunload =
-@@ -12462,7 +12462,7 @@ RenderFrameHostImpl::CheckOrDispatchBeforeUnloadForFrame(
+@@ -12429,7 +12429,7 @@
  bool RenderFrameHostImpl::ShouldRunBeforeUnloadAsynchronously(
      bool subframes_only,
      bool send_ipc) {
@@ -2166,7 +2175,7 @@ index f6ed40ba9a..37690396d0 100644
        !send_ipc || !unload_ack_is_for_navigation_ ||
        !frame_tree_node_->navigation_request()) {
      return false;
-@@ -14512,7 +14512,7 @@ void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
+@@ -14495,7 +14495,7 @@
  
  void RenderFrameHostImpl::CreateWebUsbService(
      mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
@@ -2175,7 +2184,7 @@ index f6ed40ba9a..37690396d0 100644
      return;
    }
    if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kUsb)) {
-@@ -14719,7 +14719,7 @@ FrameTreeNode* RenderFrameHostImpl::GetPrerenderOuterMostMainFrame() {
+@@ -14702,7 +14702,7 @@
  
  bool RenderFrameHostImpl::CancelPrerenderingForLoadingError(
      int32_t loading_error_code) {
@@ -2184,7 +2193,7 @@ index f6ed40ba9a..37690396d0 100644
      return CancelPrerendering(
          PrerenderCancellationReason::BuildForLoadingError(loading_error_code));
    }
-@@ -16007,7 +16007,7 @@ bool RenderFrameHostImpl::DidCommitNavigationInternal(
+@@ -16023,7 +16023,7 @@
    // policy must be identical to the values that were already present in the
    // FrameTreeNode / RenderFrameHost before this commit.
    if (is_same_document_navigation &&
@@ -2192,8 +2201,17 @@ index f6ed40ba9a..37690396d0 100644
 +      ::features::IsEnforceSameDocumentOriginInvariantsEnabled()) {
      if (params->insecure_request_policy !=
          frame_tree_node_->current_replication_state().insecure_request_policy) {
-       bad_message::ReceivedBadMessage(
-@@ -17313,7 +17313,7 @@ void RenderFrameHostImpl::DidCommitNavigation(
+       // Log crash keys to diagnose the mismatch direction.
+@@ -16198,7 +16198,7 @@
+     if (is_synchronous_about_blank_commit &&
+         params->origin.scheme() != url::kFileScheme &&
+         (!frame_tree_->is_guest() ||
+-         !base::FeatureList::IsEnabled(features::kGuestViewMPArch))) {
++         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch))) {
+       bool origin_matches = false;
+       if (last_committed_origin_.opaque()) {
+         // When the browser-derived origin is opaque, the renderer-reported
+@@ -17429,7 +17429,7 @@
    }
  
    if (interface_params) {
@@ -2202,7 +2220,7 @@ index f6ed40ba9a..37690396d0 100644
        // Reset the broker holder so it is entirely re-created in
        // BindBrowserInterfaceBrokerReceiver.
        broker_holder_.reset();
-@@ -17537,7 +17537,7 @@ void RenderFrameHostImpl::ContinueNavigationAfterBeforeUnloadCheck(
+@@ -17653,7 +17653,7 @@
            ->SupportsAvoidUnnecessaryBeforeUnloadCheckSync();
    if (is_eligible_for_avoid_unnecessary_beforeunload &&
        IsAvoidUnnecessaryBeforeUnloadCheckSyncEnabledFor(
@@ -2211,7 +2229,7 @@ index f6ed40ba9a..37690396d0 100644
                kWithSendBeforeUnload)) {
      std::move(continue_navigation_closure).Run();
      return;
-@@ -18093,7 +18093,7 @@ bool ShouldVerify(const std::string& param) {
+@@ -18211,7 +18211,7 @@
    // For other params, default to disable checking the param. However, it's
    // possible to force-enable checking the param via the VerifyDidCommitParams
    // flag's param.
@@ -2220,7 +2238,7 @@ index f6ed40ba9a..37690396d0 100644
                                             param, false);
  #endif
  }
-@@ -18153,7 +18153,7 @@ void RenderFrameHostImpl::
+@@ -18271,7 +18271,7 @@
  #if !DCHECK_IS_ON()
    // Only check for the flag if DCHECK is not enabled, so that we will always
    // verify the params for tests.
@@ -2229,7 +2247,7 @@ index f6ed40ba9a..37690396d0 100644
      return;
    }
  #endif
-@@ -19491,14 +19491,14 @@ void RenderFrameHostImpl::SetFrameTreeNode(FrameTreeNode& frame_tree_node) {
+@@ -19624,14 +19624,14 @@
    // the new functionality for swapping BrowsingContext on cross
    // BrowsingInstance navigations, the BrowsingContextState is the only field
    // that will need to be swapped.
@@ -2247,7 +2265,7 @@ index f6ed40ba9a..37690396d0 100644
                kSwapForCrossBrowsingInstanceNavigations):
        // TODO(crbug.com/40205442): implement functionality for swapping on cross
        // browsing instance navigations as needed. This will likely be removed
-@@ -19714,7 +19714,7 @@ void RenderFrameHostImpl::CookieChangeListener::OnCookieChange(
+@@ -19849,7 +19849,7 @@
    // - INSERTED_NO_CHANGE_OVERWRITE and INSERTED_NO_VALUE_CHANGE_OVERWRITE:
    // because there is no cookie value change.
    if (base::FeatureList::IsEnabled(
@@ -2538,28 +2556,6 @@ index db280b0576..66fd0c8244 100644
            IsForTopChromeWebUI());
  }
  
-diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
-index 3f171553b2..4140d63f95 100644
---- a/content/browser/renderer_host/render_frame_host_impl.cc
-+++ b/content/browser/renderer_host/render_frame_host_impl.cc
-@@ -7406,7 +7406,7 @@ void RenderFrameHostImpl::RunBeforeUnloadConfirm(
- 
-   // Check if this frame could legally display a dialog.
-   if (base::FeatureList::IsEnabled(
--          features::kEnforceUserActivationForBeforeUnload) &&
-+          ::features::kEnforceUserActivationForBeforeUnload) &&
-       !CouldDisplayBeforeUnloadDialog()) {
-     SendInterventionReport(
-         "BeforeUnloadNoGesture",
-@@ -16126,7 +16126,7 @@ bool RenderFrameHostImpl::DidCommitNavigationInternal(
-     if (is_synchronous_about_blank_commit &&
-         params->origin.scheme() != url::kFileScheme &&
-         (!frame_tree_->is_guest() ||
--         !base::FeatureList::IsEnabled(features::kGuestViewMPArch)) &&
-+         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch)) &&
-         !params->origin.opaque() &&
-         !params->origin.CanBeDerivedFrom(last_committed_origin_.GetURL())) {
-       bad_message::ReceivedBadMessage(
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
 index 609511baae..f3970f1704 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
