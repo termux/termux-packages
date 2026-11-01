@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://yasm.tortall.net/
+TERMUX_PKG_HOMEPAGE="https://github.com/yasm/yasm"
 TERMUX_PKG_DESCRIPTION="Assembler supporting the x86 and AMD64 instruction sets"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
