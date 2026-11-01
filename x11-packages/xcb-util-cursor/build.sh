@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://cgit.freedesktop.org/xcb/util-cursor
+TERMUX_PKG_HOMEPAGE="https://gitlab.freedesktop.org/xorg/lib/libxcb-cursor"
 TERMUX_PKG_DESCRIPTION="XCB cursor library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
