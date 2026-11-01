@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An indexer manager/proxy built on the popular arr stack 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.7.0.5723"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Prowlarr/Prowlarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=6c26e6cb9a57087e883b0afc4c8b9c0ffd57726f2595c89b02c68c1770a7f0e4
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
