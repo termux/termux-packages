@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.isthe.com/chongo/tech/comp/calc/
+TERMUX_PKG_HOMEPAGE="https://www.isthe.com/chongo/tech/comp/calc/"
 TERMUX_PKG_DESCRIPTION="Arbitrary precision console calculator"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
