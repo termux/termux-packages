@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://e-x-a.org/codecrypt/
+TERMUX_PKG_HOMEPAGE="https://github.com/exaexa/codecrypt"
 TERMUX_PKG_DESCRIPTION="The post-quantum cryptography tool"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
