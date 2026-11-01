@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://lib.rs/cavif"
+TERMUX_PKG_HOMEPAGE="https://github.com/kornelski/cavif-rs"
 TERMUX_PKG_DESCRIPTION="AVIF image creator in pure Rust"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
