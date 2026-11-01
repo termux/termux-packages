@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://mate-desktop.mate-desktop.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/mate-desktop/mate-desktop"
 TERMUX_PKG_DESCRIPTION="mate-desktop contains the libmate-desktop library, the mate-about program as well as some desktop-wide documents."
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
