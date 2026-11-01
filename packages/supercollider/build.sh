@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://supercollider.github.io/
+TERMUX_PKG_HOMEPAGE="https://supercollider.github.io/"
 TERMUX_PKG_DESCRIPTION="A platform for audio synthesis and algorithmic composition"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@rene-descartes2021"
