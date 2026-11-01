@@ -62,17 +62,15 @@ termux_setup_dotnet() {
 	# point to use our own SDK
 	local targeting_pack version
 	for targeting_pack in "${_DOTNET_ROOT}"/packs/*; do
-		if [[ -d "$(basename "${targeting_pack}")" ]]; then
-			pushd "$(basename "${targeting_pack}")"
-			for version in "${targeting_pack}"/*; do
-				if [[ ! -e "$(basename "${version}")" ]]; then
-					ln -fsv "${version}" .
-				fi
-			done
-			popd
-		else
-			ln -fsv "${targeting_pack}" .
-		fi
+		[[ -L "$(basename "${targeting_pack}")" ]] && rm -f "$(basename "${targeting_pack}")"
+		mkdir -p "$(basename "${targeting_pack}")"
+		pushd "$(basename "${targeting_pack}")"
+		for version in "${targeting_pack}"/*; do
+			if [[ ! -e "$(basename "${version}")" ]]; then
+				ln -fsv "${version}" .
+			fi
+		done
+		popd
 	done
 
 	# ours (older) SDK sometimes out of sync with Microsoft (newer) SDK
