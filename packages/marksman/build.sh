@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="LSP language server for editing Markdown files"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 TERMUX_PKG_VERSION="2026.02.08"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/artempyanykh/marksman/archive/refs/tags/${TERMUX_PKG_VERSION//\./-}.tar.gz"
 TERMUX_PKG_SHA256=a3ba5f8ef5be5d7ede2ec5ae9f303d2d776f476734ff66254be8e6df0e0f090e
 TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-9.0"
@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	dotnet publish \
+	dotnet publish Marksman/Marksman.fsproj \
 	--framework "net${TERMUX_DOTNET_VERSION}" \
 	--no-self-contained \
 	--runtime "$DOTNET_TARGET_NAME" \
