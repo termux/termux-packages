@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/electron/electron
 TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML, and CSS (Version 43)"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
-_CHROMIUM_VERSION=148.0.7778.280
+_CHROMIUM_VERSION=150.0.7871.250
 TERMUX_PKG_VERSION=43.7.11
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
@@ -11,6 +11,20 @@ TERMUX_PKG_BUILD_DEPENDS="electron43-host-tools, libnotify, libffi-static"
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
+TERMUX_PKG_AUTO_UPDATE=true
+
+termux_pkg_auto_update() {
+	local latest_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron43-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})"
+
+	if ! termux_pkg_is_update_needed \
+		"${TERMUX_PKG_VERSION#*:}" "${latest_version}"; then
+		echo "INFO: No update needed. Already at version '${latest_version}'."
+		return 0
+	fi
+
+	termux_error_exit \
+		"Electron 43 version ${latest_version} is available. Please update manually."
+}
 
 __tur_setup_depot_tools() {
 	export DEPOT_TOOLS_UPDATE=0
@@ -48,6 +62,12 @@ termux_step_get_source() {
 }
 
 termux_step_post_get_source() {
+	# Version guard
+	local version_tools=$(. $TERMUX_SCRIPTDIR/x11-packages/electron43-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})
+	if [ "${version_tools}" != "${TERMUX_PKG_VERSION}" ]; then
+		termux_error_exit "Version mismatch between electron43-host-tools and electron43."
+	fi
+
 	# Remove all the .git folders to save space
 	find . -type d -name ".git" -exec rm -rf {} +
 
