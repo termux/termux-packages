@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://trunkrs.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/trunk-rs/trunk"
 TERMUX_PKG_DESCRIPTION="Build, bundle & ship your Rust WASM application to the web"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="@termux"
