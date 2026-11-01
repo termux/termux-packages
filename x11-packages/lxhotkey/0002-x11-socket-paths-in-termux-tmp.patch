@@ -1,0 +1,13 @@
+--- a/src/lxhotkey.c
++++ b/src/lxhotkey.c
+@@ -181,8 +181,8 @@
+         /* invalid environment */
+         return FALSE;
+     Xnum = atoi(&display[1]);
+-    snprintf(lockfile, sizeof(lockfile), "/tmp/.X%d-lock", Xnum);
+-    snprintf(socket, sizeof(socket), "/tmp/.X11-unix/X%d", Xnum);
++    snprintf(lockfile, sizeof(lockfile), "@TERMUX_PREFIX@/tmp/.X%d-lock", Xnum);
++    snprintf(socket, sizeof(socket), "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", Xnum);
+     return g_file_test(lockfile, G_FILE_TEST_IS_REGULAR) ||
+            (g_file_test(socket, G_FILE_TEST_EXISTS) &&
+            !g_file_test(socket, G_FILE_TEST_IS_REGULAR));
