@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://dickey.his.com/cdk/cdk.html
+TERMUX_PKG_HOMEPAGE="https://invisible-island.net/cdk/"
 TERMUX_PKG_DESCRIPTION="Curses Development Kit"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
