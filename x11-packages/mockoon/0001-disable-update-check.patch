@@ -1,0 +1,21 @@
+diff --git a/packages/app/src/main/libs/main-window.ts b/packages/app/src/main/libs/main-window.ts
+index ebd8f4c..e6da6b2 100644
+--- a/packages/app/src/main/libs/main-window.ts
++++ b/packages/app/src/main/libs/main-window.ts
+@@ -5,7 +5,6 @@ import { argv } from 'process';
+ import { parseProtocolArgs } from 'src/main/libs/custom-protocol';
+ import { createMenu } from 'src/main/libs/menu';
+ import { getRuntimeArg } from 'src/main/libs/runtime-args';
+-import { checkForUpdate } from 'src/main/libs/update';
+ 
+ declare const IS_DEV: boolean;
+ 
+@@ -76,8 +75,6 @@ export const initMainWindow = () => {
+   // when main page finished loading, show the main window
+   mainWindow.webContents.on('dom-ready', () => {
+     showMainWindow(mainWindowState);
+-
+-    checkForUpdate(mainWindow);
+   });
+ 
+   mainWindow.loadFile(`${__dirname}/renderer/index.html`);
