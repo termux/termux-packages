@@ -1,0 +1,20 @@
+diff --git a/packages/insomnia/src/entry.main.ts b/packages/insomnia/src/entry.main.ts
+index 5659b71..ace1667 100644
+--- a/packages/insomnia/src/entry.main.ts
++++ b/packages/insomnia/src/entry.main.ts
+@@ -1 +1,2 @@
++import { execFile } from 'node:child_process';
+ import fs from 'node:fs/promises';
+@@ -5,3 +6,3 @@ import path from 'node:path';
+ 
+-import electron, { app, BrowserWindow, net, session } from 'electron';
++import electron, { app, BrowserWindow, net, session, shell } from 'electron';
+ import contextMenu from 'electron-context-menu';
+@@ -48,2 +49,7 @@
+ import * as windowUtils from './main/window-utils';
++
++shell.openExternal = url =>
++  new Promise<void>((resolve, reject) => {
++    execFile('xdg-utils-xdg-open', [url], err => (err ? reject(err) : resolve()));
++  });
+ 
