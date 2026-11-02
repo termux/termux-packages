@@ -7,7 +7,7 @@ TERMUX_SCRIPTDIR=$(cd "$(realpath "$(dirname "$0")")"; cd ..; pwd)
 : ${TERMUX_DOCKER_RUN_EXTRA_ARGS:=}
 : ${TERMUX_DOCKER_EXEC_EXTRA_ARGS:=}
 BUILDSCRIPT_NAME=build-package.sh
-CONTAINER_HOME_DIR=/home/builder
+: ${CONTAINER_HOME_DIR:=/home/builder}
 
 _show_usage() {
 	echo "Usage: $0 [OPTIONS] [COMMAND]"
