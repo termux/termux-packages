@@ -1,0 +1,19 @@
+diff --git a/src/electron/electron/keychain.cljs b/src/electron/electron/keychain.cljs
+index ca66af5..9ba0504 100644
+--- a/src/electron/electron/keychain.cljs
++++ b/src/electron/electron/keychain.cljs
+@@ -1,11 +1,13 @@
+ (ns electron.keychain
+   "Helper functions for storing E2EE secrets inside the OS keychain."
+   (:require ["electron" :refer [app]]
+-            ["keytar" :as keytar]
+             [clojure.string :as string]
+             [electron.logger :as logger]
+             [promesa.core :as p]))
+ 
++(def ^:private ^js keytar
++  (try (js/require "keytar") (catch :default _ nil)))
++
+ (defonce ^:private service-name
+   (delay
+     (let [app-name (try (.getName app)
