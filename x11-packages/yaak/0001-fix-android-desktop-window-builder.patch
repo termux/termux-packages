@@ -1,0 +1,46 @@
+--- a/crates-tauri/yaak-window/src/window.rs
++++ b/crates-tauri/yaak-window/src/window.rs
+@@ -56,10 +56,14 @@
+             .title(config.title)
+             .resizable(true)
+             .visible(!config.hidden)
+-            .fullscreen(false)
+-            .maximized(maximized)
+             .min_inner_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
+ 
++    // fullscreen()/maximized() are desktop-only on tauri, unavailable on android
++    #[cfg(not(target_os = "android"))]
++    {
++        win_builder = win_builder.fullscreen(false).maximized(maximized);
++    }
++
+     if let Some(script) = config.initialization_script {
+         win_builder = win_builder.initialization_script(script);
+     }
+@@ -93,7 +97,15 @@
+     if let Some((x, y)) = position {
+         win_builder = win_builder.position(x, y);
+     } else {
+-        win_builder = win_builder.center();
++        // center() is desktop-only on android, use a fixed fallback position
++        #[cfg(not(target_os = "android"))]
++        {
++            win_builder = win_builder.center();
++        }
++        #[cfg(target_os = "android")]
++        {
++            win_builder = win_builder.position(100.0, 100.0);
++        }
+     }
+ 
+     if let Some(tx) = config.navigation_tx {
+@@ -113,7 +125,8 @@
+             use tauri::TitleBarStyle;
+             win_builder = win_builder.hidden_title(true).title_bar_style(TitleBarStyle::Overlay);
+         }
+-        #[cfg(not(target_os = "macos"))]
++        // decorations() is desktop-only, also skip on android
++        #[cfg(not(any(target_os = "macos", target_os = "android")))]
+         {
+             win_builder = win_builder.decorations(false);
+         }

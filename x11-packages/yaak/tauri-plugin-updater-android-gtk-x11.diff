@@ -1,0 +1,12 @@
+diff -ruN tauri-plugin-updater-src-orig/src/updater.rs tauri-plugin-updater-src/src/updater.rs
+--- tauri-plugin-updater-src-orig/src/updater.rs	2026-09-21 14:13:20.000000000 +0000
++++ tauri-plugin-updater-src/src/updater.rs	2026-09-21 14:13:35.000000000 +0000
+@@ -767,7 +767,7 @@
+         self.install(bytes)
+     }
+ 
+-    #[cfg(mobile)]
++    #[cfg(any(mobile, target_os = "android"))]
+     fn install_inner(&self, _bytes: &[u8]) -> Result<()> {
+         Ok(())
+     }

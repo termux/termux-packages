@@ -1,0 +1,28 @@
+diff -ruN tauri-plugin-dialog-src-orig/Cargo.toml tauri-plugin-dialog-src/Cargo.toml
+--- tauri-plugin-dialog-src-orig/Cargo.toml	2026-09-21 14:13:20.000000000 +0000
++++ tauri-plugin-dialog-src/Cargo.toml	2026-09-21 14:13:35.000000000 +0000
+@@ -98,10 +98,10 @@
+ version = "2.5"
+ features = ["build"]
+ 
+-[target.'cfg(any(target_os = "macos", windows, target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.raw-window-handle]
++[target.'cfg(any(target_os = "macos", windows, target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "android"))'.dependencies.raw-window-handle]
+ version = "0.6"
+ 
+-[target.'cfg(any(target_os = "macos", windows, target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.rfd]
++[target.'cfg(any(target_os = "macos", windows, target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", target_os = "android"))'.dependencies.rfd]
+ version = "0.16"
+ features = ["common-controls-v6"]
+ default-features = false
+diff -ruN tauri-plugin-dialog-src-orig/src/lib.rs tauri-plugin-dialog-src/src/lib.rs
+--- tauri-plugin-dialog-src-orig/src/lib.rs	2026-09-21 14:13:20.000000000 +0000
++++ tauri-plugin-dialog-src/src/lib.rs	2026-09-21 14:13:35.000000000 +0000
+@@ -190,7 +190,7 @@
+     let mut builder = Builder::new("dialog");
+ 
+     // Dialogs are implemented natively on Android
+-    #[cfg(not(target_os = "android"))]
++    #[cfg(any(not(target_os = "android"), target_os = "android"))]
+     {
+         builder = builder.js_init_script(include_str!("init-iife.js").to_string());
+     }
