@@ -1,0 +1,24 @@
+--- a/sh/Makefile.orig	2022-08-18 18:38:26 UTC
++++ b/sh/Makefile
+@@ -7,10 +7,8 @@ include		$(SRCROOT)/$(RULESDIR)/rules.top
+ 
+ INSDIR=		bin
+ 					# Shell
+-TARGET=		sh
+-SYMLINKS=	pfsh			# Profile Bourne Shell
+-SYMLINKS +=	bosh			# Bourne Shell
+-SYMLINKS +=	jsh			# Job control Bourne Shell
++TARGET=		bosh
++SYMLINKS +=	jbosh			# Job control Bourne Shell
+ HARDLINKS +=	../xpg4/bin/sh		# POSIX Bourne Shell
+ 
+ ##CPPOPTS +=	-DNO_USER_MALLOC	# Do not use our own malloc()
+@@ -196,7 +194,7 @@ LIBS=		$(LIB_SECDB) -lshedit -lxtermcap -lgetopt \
+ 		$(LIB_ACL_TEST) \
+ 		$(LIB_INTL) $(LIB_DL)
+ #LIBS=		-lgen -lsecdb 
+-XMK_FILE=	Makefile.dot Makefile.man bosh.mk1 jsh.mk1 pfsh.mk1
++XMK_FILE=	Makefile.dot Makefile.man bosh.mk1 jsh.mk1
+ 
+ signames.c abbrev.c abbrev.h:
+ 	@echo "	==> MAKING SYMLINKS in ."; sh ./MKLINKS
