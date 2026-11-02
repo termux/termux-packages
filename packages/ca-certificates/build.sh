@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:2026.10.20"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://curl.se/ca/cacert-$(sed 's/\./-/g' <<< ${TERMUX_PKG_VERSION:2}).pem
 TERMUX_PKG_SHA256=796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe
 TERMUX_PKG_AUTO_UPDATE=true
@@ -40,12 +40,12 @@ termux_step_make_install() {
 		$KEYUTIL_JAR \
 		18f1d2c82839d84949b1ad015343c509e81ef678c24db6112acc6c0761314610
 
-	local JAVA_KEYSTORE_DIR=$TERMUX_PREFIX/lib/jvm/java-17-openjdk/lib/security
+	local JAVA_KEYSTORE_DIR=$CERTDIR/certs/java
 	mkdir -p $JAVA_KEYSTORE_DIR
 
 	java -jar $KEYUTIL_JAR \
 		--import \
-		--new-keystore $JAVA_KEYSTORE_DIR/jssecacerts \
+		--new-keystore $JAVA_KEYSTORE_DIR/cacerts \
 		--password changeit \
 		--force-new-overwrite \
 		--import-pem-file $CERTFILE
