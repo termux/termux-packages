@@ -1,0 +1,30 @@
+diff --git a/src/main/electron.js b/src/main/electron.js
+index 05f56f2..4158506 100644
+--- a/src/main/electron.js
++++ b/src/main/electron.js
+@@ -2,7 +2,7 @@ import fs from 'fs';
+ import { promises as fsProm } from 'fs';
+ import path from 'path';
+ import url from 'url';
+-import {Menu as menu, shell, dialog, session, screen, ClipboardItem, 
++import {Menu as menu, shell, dialog, session, screen, 
+ 		clipboard, nativeImage, nativeTheme, ipcMain, app, BrowserWindow} from 'electron';
+ import crc from 'crc';
+ import zlib from 'zlib';
+@@ -4279,12 +4279,11 @@ function clipboardAction(method, data)
+ 	}
+ 	else if (method == 'writeImage')
+ 	{
+-		return clipboard.write([new ClipboardItem({
+-			'image/png': new Blob([nativeImage.createFromDataURL(data.dataUrl).toPNG()],
+-				{type: 'image/png'}),
+-			'text/html': '<img src="' + data.dataUrl + '" width="' + data.w +
++		return clipboard.write({
++			image: nativeImage.createFromDataURL(data.dataUrl),
++			html: '<img src="' + data.dataUrl + '" width="' + data.w +
+ 				'" height="' + data.h + '">'
+-		})]);
++		});
+ 	}
+ }
+ 
