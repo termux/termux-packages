@@ -1,0 +1,63 @@
+Patch-Source: https://github.com/musescore/muse_deps/pull/56
+From 03ed80079bfef7ae08aa559160a980516b052c26 Mon Sep 17 00:00:00 2001
+From: Knyllahsyhn <kex1.jml@gmail.com>
+Date: Thu, 29 Oct 2026 14:34:28 +0100
+Subject: [PATCH] Fix libid3tag SYSTEM mode lookup of distro library
+
+The libid3tag recipe sets DEP_LIBS to "libid3tag" because Audacity's fork
+names its CMake target that way, so the bundled build produces
+liblibid3tag.a. In SYSTEM mode the same name is passed to find_library,
+which then looks for liblibid3tag.so and never finds the distro library
+(libid3tag.so).
+
+Add DEP_SYSTEM_LIBS to override the library names used in SYSTEM mode,
+analogous to DEP_LIBS_WINDOWS, and set it to "id3tag" for libid3tag.
+---
+ README.md                    | 1 +
+ buildtools/resolve.cmake     | 8 +++++++-
+ recipes/libid3tag/meta.cmake | 1 +
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/muse_deps/README.md b/muse_deps/README.md
+index 086970f..5ea6d2f 100644
+--- a/muse_deps/README.md
++++ b/muse_deps/README.md
+@@ -84,6 +84,7 @@ Keys:
+ - `DEP_TARGET`: imported target for a single-target library.
+ - `DEP_LIBS`: base library names on Unix, without `lib` prefix or extension.
+ - `DEP_LIBS_WINDOWS`: Windows base names when they differ.
++- `DEP_SYSTEM_LIBS`: Unix base names for `SYSTEM` mode when they differ from `DEP_LIBS`.
+ - `DEP_TARGETS`: multiple targets from one prefix, as `"Target::name|lib1 lib2"`.
+ - `DEP_INCLUDE_SUBDIRS`: extra include dirs below `<prefix>/include`.
+ - `DEP_SYSTEM_HEADER`: header used to validate `SYSTEM` mode.
+diff --git a/muse_deps/buildtools/resolve.cmake b/muse_deps/buildtools/resolve.cmake
+index 36c2d5e..4414377 100644
+--- a/muse_deps/buildtools/resolve.cmake
++++ b/muse_deps/buildtools/resolve.cmake
+@@ -179,7 +179,13 @@ function(_extdeps_resolve_system name)
+     foreach(_subdir ${DEP_INCLUDE_SUBDIRS})
+         list(APPEND _include_dirs "${${name}_INC}/${_subdir}")
+     endforeach()
+-    _extdeps_target_entries("${DEP_LIBS}" _entries)
++    # System lib names can differ from the bundled build's (e.g. libid3tag fork vs. distro id3tag)
++    if(DEFINED DEP_SYSTEM_LIBS)
++        set(_system_lib_names "${DEP_SYSTEM_LIBS}")
++    else()
++        set(_system_lib_names "${DEP_LIBS}")
++    endif()
++    _extdeps_target_entries("${_system_lib_names}" _entries)
+     set(_primary_libs "")
+     set(_first TRUE)
+     foreach(_entry ${_entries})
+diff --git a/muse_deps/recipes/libid3tag/meta.cmake b/muse_deps/recipes/libid3tag/meta.cmake
+index ce37a42..ebb7ca3 100644
+--- a/muse_deps/recipes/libid3tag/meta.cmake
++++ b/muse_deps/recipes/libid3tag/meta.cmake
+@@ -1,6 +1,7 @@
+ # Audacity's fork only builds static on Windows; keep it static everywhere
+ set(DEP_TARGET libid3tag::libid3tag)
+ set(DEP_LIBS libid3tag)
++set(DEP_SYSTEM_LIBS id3tag)   # distro builds (e.g. Arch's 0.16.x) ship libid3tag.so
+ set(DEP_STATIC ON)
+ set(DEP_LINK_DEPS zlib::zlib)
+ set(DEP_SYSTEM_HEADER id3tag.h)
