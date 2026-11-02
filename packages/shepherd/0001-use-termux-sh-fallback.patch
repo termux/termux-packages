@@ -1,0 +1,11 @@
+--- a/modules/shepherd/service.scm
++++ b/modules/shepherd/service.scm
+@@ -1937,7 +1937,7 @@
+ 
+ This is similar to Guile's @code{system} procedure but does not block while
+ waiting for the shell to terminate."
+-  (spawn-command (list (or (getenv "SHELL") "/bin/sh")
++  (spawn-command (list (or (getenv "SHELL") "@TERMUX_PREFIX@/bin/sh")
+                        "-c" command)
+                  #:directory (getcwd)))
+ 
