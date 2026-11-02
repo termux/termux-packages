@@ -1,0 +1,56 @@
+The engine tools downloaded into bin/cache/artifacts/engine (impellerc,
+flutter_tester, font-subset, gen_snapshot) are linked against glibc and fail
+to start on Termux with "No such file or directory" because the glibc loader
+is missing. Run them through grun from glibc-runner (glibc-repo). All process
+launches of the tool go through ErrorHandlingProcessManager, so wrapping
+there covers every caller. If grun is not installed the command is left
+unchanged.
+
+--- a/packages/flutter_tools/lib/src/base/error_handling_io.dart	2026-10-30 03:54:13.077053981 +0000
++++ b/packages/flutter_tools/lib/src/base/error_handling_io.dart	2026-10-30 10:13:45.048139472 +0000
+@@ -1196,6 +1196,18 @@
+   final Platform _platform;
+   final Analytics Function() _analytics;
+ 
++  List<Object> _withGlibcRunner(List<Object> command) {
++    const grun = '@TERMUX_PREFIX@/bin/grun';
++    if (command.isEmpty ||
++        !command.first.toString().startsWith(
++          '@TERMUX_PREFIX@/opt/flutter/bin/cache/artifacts/engine/',
++        ) ||
++        !io.File(grun).existsSync()) {
++      return command;
++    }
++    return <Object>[grun, ...command];
++  }
++
+   @override
+   bool canRun(dynamic executable, {String? workingDirectory}) {
+     return _runSync(
+@@ -1256,7 +1268,7 @@
+     return _run(
+       () {
+         return _delegate.run(
+-          command,
++          _withGlibcRunner(command),
+           workingDirectory: workingDirectory,
+           environment: _propagateAnalyticsEnvironment(environment),
+           includeParentEnvironment: includeParentEnvironment,
+@@ -1282,7 +1294,7 @@
+     return _run(
+       () {
+         return _delegate.start(
+-          command,
++          _withGlibcRunner(command),
+           workingDirectory: workingDirectory,
+           environment: _propagateAnalyticsEnvironment(environment),
+           includeParentEnvironment: includeParentEnvironment,
+@@ -1308,7 +1320,7 @@
+     return _runSync(
+       () {
+         return _delegate.runSync(
+-          command,
++          _withGlibcRunner(command),
+           workingDirectory: workingDirectory,
+           environment: _propagateAnalyticsEnvironment(environment),
+           includeParentEnvironment: includeParentEnvironment,

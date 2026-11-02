@@ -1,0 +1,26 @@
+Termux ships Chromium (chromium-browser) and no Google Chrome, so look for
+chromium-browser by default; CHROME_EXECUTABLE still overrides it. Chromium
+on Termux has no working sandbox (setuid and seccomp-bpf are blocked by
+Android), so pass --no-sandbox for headed launches as well, not only headless.
+
+--- a/packages/flutter_tools/lib/src/web/chrome.dart	2026-10-30 03:54:13.110080061 +0000
++++ b/packages/flutter_tools/lib/src/web/chrome.dart	2026-10-30 03:54:17.579371954 +0000
+@@ -25,7 +25,7 @@
+ const kEdgeEnvironment = 'EDGE_ENVIRONMENT';
+ 
+ /// The expected executable name on linux.
+-const kLinuxExecutable = 'google-chrome';
++const kLinuxExecutable = 'chromium-browser';
+ 
+ /// The expected executable name on macOS.
+ const kMacOSExecutable = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+@@ -246,7 +246,8 @@
+       // See: https://github.com/flutter/flutter/issues/153928
+       '--disable-search-engine-choice-screen',
+ 
+-      if (headless) ...<String>['--no-sandbox', '--headless', '--window-size=2400,1800'],
++      '--no-sandbox',
++      if (headless) ...<String>['--headless', '--window-size=2400,1800'],
+       ...webBrowserFlags,
+       url,
+     ];

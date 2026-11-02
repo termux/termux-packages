@@ -1,0 +1,24 @@
+Flutter downloads a glibc Dart SDK from storage.googleapis.com which cannot
+run on Android/bionic. Use the Dart SDK shipped by the Termux dart package
+instead. The package version of dart must match the Dart revision pinned in
+flutter's DEPS (dart_revision), otherwise AOT/JIT snapshots will not load.
+The early exit keeps the original download code untouched so that upstream
+changes below it do not break this patch on version bumps.
+
+--- a/bin/internal/update_dart_sdk.sh	2026-10-30 03:44:12.752814312 +0000
++++ b/bin/internal/update_dart_sdk.sh	2026-10-30 03:44:18.667875078 +0000
+@@ -25,6 +25,14 @@
+ ENGINE_REALM=$(< "$FLUTTER_ROOT/bin/cache/engine.realm")
+ ENGINE_REALM="${ENGINE_REALM//[[:space:]]/}"
+ 
++SYSTEM_DART_SDK="@TERMUX_PREFIX@/lib/dart-sdk"
++if [ "$(readlink "$DART_SDK_PATH" 2>/dev/null)" != "$SYSTEM_DART_SDK" ]; then
++  rm -rf -- "$DART_SDK_PATH" "$DART_SDK_PATH_OLD"
++  ln -s "$SYSTEM_DART_SDK" "$DART_SDK_PATH"
++fi
++echo "$ENGINE_VERSION" > "$ENGINE_STAMP"
++exit 0
++
+ if [ ! -f "$ENGINE_STAMP" ] || [ "$ENGINE_VERSION" != "$(< "$ENGINE_STAMP")" ]; then
+   command -v curl > /dev/null 2>&1 || {
+     >&2 echo
