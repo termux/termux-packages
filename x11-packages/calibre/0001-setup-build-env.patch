@@ -12,10 +12,10 @@ index 486249dd1f..cde5249b68 100644
      def dest(self, ext, env):
          return os.path.join(self.output_dir, getattr(ext, 'name', ext)) + env.dest_ext
 diff --git a/setup/build_environment.py b/setup/build_environment.py
-index e39e128d00..3128729cc3 100644
+index 498b4f5..b48fc0d 100644
 --- a/setup/build_environment.py
 +++ b/setup/build_environment.py
-@@ -9,6 +9,7 @@
+@@ -9,6 +9,7 @@ import os
  import re
  import shutil
  import subprocess
@@ -23,7 +23,7 @@ index e39e128d00..3128729cc3 100644
  from functools import lru_cache
  
  from setup import isfreebsd, ishaiku, islinux, ismacos, iswindows
-@@ -18,10 +19,19 @@
+@@ -18,10 +19,19 @@ NMAKE = RC = msvc = MT = win_inc = win_lib = win_cc = win_ld = None
  
  @lru_cache(maxsize=2)
  def pyqt_sip_abi_version():
@@ -45,7 +45,7 @@ index e39e128d00..3128729cc3 100644
          if os.path.exists(bindings_path):
              with open(bindings_path) as f:
                  raw = f.read()
-@@ -127,8 +137,8 @@ def readvar(name):
+@@ -127,8 +137,8 @@ freetype_lib_dirs = []
  freetype_libs = []
  freetype_inc_dirs = []
  
@@ -56,7 +56,7 @@ index e39e128d00..3128729cc3 100644
  
  usb_library = 'usb' if isfreebsd else 'usb-1.0'
  
-@@ -156,6 +166,7 @@ def readvar(name):
+@@ -156,6 +166,7 @@ uchardet_inc_dirs, uchardet_lib_dirs, uchardet_libs = [], [], ['uchardet']
  openssl_inc_dirs, openssl_lib_dirs = [], []
  
  piper_inc_dirs, piper_lib_dirs, piper_libs = [], [], []
@@ -64,9 +64,9 @@ index e39e128d00..3128729cc3 100644
  
  ICU = sw = ''
  
-@@ -206,28 +217,28 @@ def readvar(name):
-     piper_lib_dirs = [sw_lib_dir]
-     piper_libs = ['espeak-ng', 'onnxruntime']
+@@ -212,31 +223,31 @@ elif ismacos:
+     libavif_lib_dirs = [sw_lib_dir]
+     libavif_libs = ['avif']
  else:
 -    freetype_inc_dirs = pkgconfig_include_dirs('freetype2', 'FT_INC_DIR', '/usr/include/freetype2')
 -    freetype_lib_dirs = pkgconfig_lib_dirs('freetype2', 'FT_LIB_DIR', '/usr/lib')
@@ -95,6 +95,11 @@ index e39e128d00..3128729cc3 100644
 +    piper_inc_dirs = pkgconfig_include_dirs('espeak-ng', '', '') + pkgconfig_include_dirs('libonnxruntime', '', '')
 +    piper_lib_dirs = pkgconfig_lib_dirs('espeak-ng', '', '') + pkgconfig_lib_dirs('libonnxruntime', '', '')
      piper_libs = pkgconfig_libs('espeak-ng', '', 'espeak-ng') + pkgconfig_libs('libonnxruntime', '', 'onnxruntime')
+-    libavif_inc_dirs = pkgconfig_include_dirs('libavif', 'LIBAVIF_INC_DIR', '/usr/include')
+-    libavif_lib_dirs = pkgconfig_lib_dirs('libavif', 'LIBAVIF_LIB_DIR', '/usr/lib')
++    libavif_inc_dirs = pkgconfig_include_dirs('libavif', 'LIBAVIF_INC_DIR', '')
++    libavif_lib_dirs = pkgconfig_lib_dirs('libavif', 'LIBAVIF_LIB_DIR', '')
+     libavif_libs = pkgconfig_libs('libavif', '', 'avif')
      for x in ('libavcodec', 'libavformat', 'libavdevice', 'libavfilter', 'libavutil', 'libpostproc', 'libswresample', 'libswscale'):
 -        for inc in pkgconfig_include_dirs(x, '', '/usr/include'):
 +        for inc in pkgconfig_include_dirs(x, '', ''):
@@ -154,23 +159,23 @@ index 574105aa0a..a07162ad03 100644
      def add_options(self, parser):
          parser.add_option('--prefix', help='Installation prefix.')
 diff --git a/setup/resources.py b/setup/resources.py
-index bccb1626b5..3f04d90f61 100644
+index fd8c464..2658dba 100644
 --- a/setup/resources.py
 +++ b/setup/resources.py
-@@ -116,7 +116,7 @@ def run(self, opts):
+@@ -116,7 +116,7 @@ class RapydScript(Command):  # {{{
  
  class Resources(Command):  # {{{
      description = 'Compile various needed calibre resources'
 -    sub_commands = ['liberation_fonts', 'mathjax', 'rapydscript', 'hyphenation', 'piper_voices']
 +    sub_commands = []
+     SYSTEM_CAMOUFOX_PATH = os.path.join(Command.RESOURCES, 'system-camoufox.json')
  
-     def run(self, opts):
-         from calibre.utils.serialize import msgpack_dumps
+     def add_options(self, parser):
 diff --git a/setup/translations.py b/setup/translations.py
-index 48f83c1aac..3b299dd3aa 100644
+index e57c792..5b76d4f 100644
 --- a/setup/translations.py
 +++ b/setup/translations.py
-@@ -27,6 +27,17 @@
+@@ -27,6 +27,17 @@ from setup import Command, __appname__, __version__, build_cache_dir, dump_json,
  from setup.iso_codes import iso_data
  from setup.parallel_build import batched_parallel_jobs
  
@@ -188,7 +193,7 @@ index 48f83c1aac..3b299dd3aa 100644
  
  def serialize_msgid(text):
      """Serialize a string in the format used by msgid in GNU POT files."""
-@@ -429,7 +440,7 @@ def action_per_file(f):
+@@ -431,7 +442,7 @@ class Translations(POT):  # {{{
              if ln in lcdata:
                  ld = lcdata[ln]
                  lcdest = self.j(self.d(dest), 'lcdata.calibre_msgpack')
@@ -197,7 +202,7 @@ index 48f83c1aac..3b299dd3aa 100644
  
                  with open(lcdest, 'wb') as lcf:
                      lcf.write(msgpack_dumps(ld))
-@@ -524,7 +535,7 @@ def handle_stats(f, data):
+@@ -523,7 +534,7 @@ class Translations(POT):  # {{{
          except OSError as err:
              if err.errno != errno.EEXIST:
                  raise
@@ -206,7 +211,7 @@ index 48f83c1aac..3b299dd3aa 100644
  
          with open(dest, 'wb') as f:
              f.write(msgpack_dumps(stats))
-@@ -905,7 +916,7 @@ def run(self, opts):
+@@ -904,7 +915,7 @@ class ISO639(Command):  # {{{
              nm[base_name] = threeb
  
          x = {'by_2': by_2, 'by_3': by_3, 'codes2': codes2, 'codes3': codes3, '2to3': m2to3, '3to2': m3to2, 'name_map': nm}
@@ -215,7 +220,7 @@ index 48f83c1aac..3b299dd3aa 100644
  
          with open(dest, 'wb') as f:
              f.write(msgpack_dumps(x))
-@@ -945,7 +956,7 @@ def run(self, opts):
+@@ -944,7 +955,7 @@ class ISO3166(ISO639):  # {{{
              if three:
                  three_map[str(three)] = two
          x = {'names': name_map, 'codes': frozenset(codes), 'three_map': three_map}
