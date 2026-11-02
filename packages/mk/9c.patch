@@ -1,0 +1,56 @@
+--- a/bin/9c
++++ b/bin/9c
+@@ -3,7 +3,7 @@
+ test -f "$PLAN9/config" && . "$PLAN9/config"
+ usegcc()
+ {
+-	cc=${CC9:-gcc}
++	cc=$CC
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -29,7 +29,7 @@ usegcc()
+ 	# want to put -fno-optimize-sibling-calls here but
+ 	# that option only works with gcc3+ it seems
+ 	cflags="$cflags -ggdb"
+-	cflags="$cflags $CC9FLAGS"
++	cflags="$cflags $CFLAGS"
+ }
+ 
+ quiet()
+@@ -64,7 +64,7 @@ quiet()
+ 
+ useclang()
+ {
+-	cc=${CC9:-clang}
++	cc=$CC
+ 	cflags=" \
+ 		-O2 \
+ 		-c \
+@@ -88,7 +88,7 @@ useclang()
+ 		-fno-common \
+ 	"
+ 	cflags="$cflags -g"
+-	cflags="$cflags $CC9FLAGS"
++	cflags="$cflags $CFLAGS"
+ }
+ 
+ usexlc()
+@@ -118,7 +118,7 @@ case "$tag" in
+ 		cflags="$cflags -g3 -m64"
+ 		;;
+ *HP-UX*)	cc=${CC9:-cc}; cflags="-g -O -c -Ae" ;;
+-*Linux*)	usegcc
++*Linux*)	useclang
+ 		case "${CC9:-gcc}" in
+ 		tcc)
+ 			cc=tcc
+@@ -150,7 +150,7 @@ case "$tag" in
+ esac
+ 
+ # Must use temp file to avoid pipe; pipe loses status.
+-xtmp=${TMPDIR-/tmp}/9c.$$.$USER.out
++xtmp=${TMPDIR-@TERMUX_PREFIX@/tmp}/9c.$$.$USER.out
+ $cc -DPLAN9PORT -I"$PLAN9/include" $cflags "$@" 2>"$xtmp"
+ status=$?
+ quiet "$xtmp"
