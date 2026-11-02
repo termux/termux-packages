@@ -1,0 +1,55 @@
+diff --git a/scripts/build-native.mjs b/scripts/build-native.mjs
+index 94f2853..ab92c0f 100755
+--- a/scripts/build-native.mjs
++++ b/scripts/build-native.mjs
+@@ -16,6 +16,10 @@ if (process.platform === 'win32' || process.platform === 'linux') {
+ 
+ let lifecycles = []
+ let builds = []
++if (process.env.TABBY_SKIP_NATIVE_REBUILD) {
++    process.exit(0)
++}
++
+ for (let dir of ['app', 'tabby-core', 'tabby-local', 'tabby-ssh', 'tabby-terminal']) {
+     const build = rebuild({
+         buildPath: path.resolve(__dirname, '../' + dir),
+diff --git a/scripts/prepackage-plugins.mjs b/scripts/prepackage-plugins.mjs
+index 65073c1..3696e51 100755
+--- a/scripts/prepackage-plugins.mjs
++++ b/scripts/prepackage-plugins.mjs
+@@ -26,7 +26,8 @@ vars.builtinPlugins.forEach(plugin => {
+ 
+ 
+     log.info('rebuild', 'native')
+-    if (fs.existsSync('node_modules')) {
++    // Native modules are already built against the right headers by the package build
++    if (fs.existsSync('node_modules') && !process.env.TABBY_SKIP_NATIVE_REBUILD) {
+         rebuild({
+             buildPath: path.resolve('.'),
+             electronVersion: vars.electronVersion,
+diff --git a/scripts/vars.mjs b/scripts/vars.mjs
+index 1366049..fc8c271 100755
+--- a/scripts/vars.mjs
++++ b/scripts/vars.mjs
+@@ -10,12 +10,16 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+ 
+ const electronInfo = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../node_modules/electron/package.json')))
+ 
+-export let version = childProcess.execSync('git describe --tags', { encoding:'utf-8' })
+-version = version.substring(1).trim()
+-version = version.replace('-', '-c')
++// The release tarball has no git history, so allow passing the version explicitly
++export let version = process.env.TABBY_VERSION
++if (!version) {
++    version = childProcess.execSync('git describe --tags', { encoding:'utf-8' })
++    version = version.substring(1).trim()
++    version = version.replace('-', '-c')
+ 
+-if (version.includes('-c')) {
+-    version = semver.inc(version, 'prepatch').replace('-0', `-nightly.${process.env.REV ?? 0}`)
++    if (version.includes('-c')) {
++        version = semver.inc(version, 'prepatch').replace('-0', `-nightly.${process.env.REV ?? 0}`)
++    }
+ }
+ 
+ export const builtinPlugins = [
