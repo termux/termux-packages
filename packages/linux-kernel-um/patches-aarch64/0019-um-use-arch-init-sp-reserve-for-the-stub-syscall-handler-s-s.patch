@@ -1,0 +1,66 @@
+From c5733109470bcf1839e2f0aee2a232ea9557c8f9 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 07:54:14 +0200
+Subject: [PATCH] um: use ARCH_INIT_SP_RESERVE for the stub syscall handler's
+ stack too
+
+init_syscall_regs() builds the register set used to run the stub's
+mmap/munmap batch handler, and computed its stack pointer as "top of
+sigstack minus one word". sigstack[] is page-aligned and page-sized, so
+that lands exactly 8 mod 16.
+
+This is the same defect already fixed in new_thread() and
+start_idle_thread(), at a site the earlier change missed: right on x86,
+where the reserved word stands in for the return address CALL pushes, and a
+violation of AAPCS64, which requires SP to be 16-byte aligned at all times
+and has SCTLR_EL1.SA0 checking behind it.
+
+Nothing observable today -- the current stub_syscall_handler has no
+SP-relative accesses at all, and TCG does not implement the alignment check
+-- which is exactly why it is worth fixing rather than leaving. The
+likelier failure is not a fault but a miscompile: the same class of bug
+produced an "orr xN, xN, #8" where an add was needed, silently, once
+already. Any added local, spill or new switch arm reintroduces it, and no
+test here can catch it.
+
+x86 defines ARCH_INIT_SP_RESERVE as sizeof(void *), so its codegen is
+unchanged.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/os-Linux/skas/mem.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/arch/um/os-Linux/skas/mem.c b/arch/um/os-Linux/skas/mem.c
+index 85762db06da4a..4d6946061a6a5 100644
+--- a/arch/um/os-Linux/skas/mem.c
++++ b/arch/um/os-Linux/skas/mem.c
+@@ -17,6 +17,7 @@
+ #include <registers.h>
+ #include <skas.h>
+ #include <sysdep/ptrace.h>
++#include <sysdep/archsetjmp.h>
+ #include <sysdep/stub.h>
+ #include "../internal.h"
+ 
+@@ -74,10 +75,19 @@ static int __init init_syscall_regs(void)
+ 	syscall_regs[REGS_IP_INDEX] = STUB_CODE +
+ 		((unsigned long) stub_syscall_handler -
+ 		 (unsigned long) __syscall_stub_start);
++	/*
++	 * Same ABI question as a fresh kernel stack, and the same answer: how
++	 * much to leave below the top is per-architecture. sigstack[] is
++	 * page-aligned and page-sized, so subtracting a word unconditionally
++	 * would hand the stub an SP that is 8 mod 16 -- fine on x86, where it
++	 * stands in for the return address CALL pushes, and a violation of
++	 * AAPCS64, which wants 16-byte alignment at all times and has hardware
++	 * checking behind it.
++	 */
+ 	syscall_regs[REGS_SP_INDEX] = STUB_DATA +
+ 		offsetof(struct stub_data, sigstack) +
+ 		sizeof(((struct stub_data *) 0)->sigstack) -
+-		sizeof(void *);
++		ARCH_INIT_SP_RESERVE;
+ 
+ 	return 0;
+ }

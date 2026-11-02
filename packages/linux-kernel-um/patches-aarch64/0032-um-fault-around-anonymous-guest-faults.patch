@@ -1,0 +1,415 @@
+From d2219a3ded9d91c8e727baa72f3b411890d087e7 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 18:56:54 +0200
+Subject: [PATCH] um: fault around anonymous guest faults
+
+A guest page fault is not expensive because of handle_mm_fault; it is
+expensive because of the round trip. The stub takes SIGSEGV, hands the CPU
+to the kernel thread, and a second handoff resumes it -- 18.9us in seccomp
+mode and 41.0us under ptrace on the reference device, essentially all of it
+those two voluntary context switches.
+
+The stub's mmap transport is already batched: um_tlb_sync() walks the
+marked PTE range and queues one stub syscall per page, and the queue is
+executed in the same handoff that resumes the guest. Installing K extra
+PTEs while we are already here therefore costs one handoff rather than K.
+
+Restricted to vma_is_anonymous() && pte_none() && !userfaultfd_armed():
+file faults can do I/O and have their own fault-around, a non-none PTE may
+be a swap entry whose fault can block or return VM_FAULT_RETRY, and
+userfaultfd has to see real faults. The window ramps 0 -> 4 -> 16 -> 32
+pages behind a sequential detector, so random access never pays for pages
+it will not touch. The cap is in bytes rather than pages ("prefault=",
+default 128K, 0 disables) because PAGE_SIZE is parametric here -- a page
+count would silently mean a 512K window on a 16K-page guest.
+
+Measured on the same phone, medians of 7 interleaved rounds, validator at
+0.7% and the native and proot control columns unchanged:
+
+  fault, seccomp   18.891 us -> 10.749 us  (-43%)
+  fault, ptrace    40.968 us -> 13.703 us  (-67%)
+
+Every other row moved by less than 2%, which is what a change aimed at
+faults should look like.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/asm/mmu.h   |  13 ++
+ arch/um/include/shared/os.h |   1 +
+ arch/um/kernel/skas/mmu.c   |   7 +
+ arch/um/kernel/trap.c       | 249 ++++++++++++++++++++++++++++++++++++
+ arch/um/os-Linux/skas/mem.c |  19 +++
+ arch/um/os-Linux/start_up.c |   1 +
+ 6 files changed, 290 insertions(+)
+
+diff --git a/arch/um/include/asm/mmu.h b/arch/um/include/asm/mmu.h
+index 07d48738b402b..e88b8155b70b4 100644
+--- a/arch/um/include/asm/mmu.h
++++ b/arch/um/include/asm/mmu.h
+@@ -21,6 +21,19 @@ typedef struct mm_context {
+ 	spinlock_t sync_tlb_lock;
+ 	unsigned long sync_tlb_range_from;
+ 	unsigned long sync_tlb_range_to;
++
++	/*
++	 * Anonymous fault-around state (arch/um/kernel/trap.c). A fault costs a
++	 * full stub handoff (~51us measured on-device in seccomp mode), so
++	 * sequential fault streams are detected and additional pages are
++	 * prefaulted into the same handoff. prefault_next is the page a
++	 * sequential stream would fault next (end of the last window);
++	 * prefault_level indexes the ramp. Purely a heuristic: fields are
++	 * accessed racily (READ_ONCE/WRITE_ONCE only) under mmap_read_lock,
++	 * a lost update just mispredicts one window.
++	 */
++	unsigned long prefault_next;
++	unsigned int prefault_level;
+ } mm_context_t;
+ 
+ #define INIT_MM_CONTEXT(mm)						\
+diff --git a/arch/um/include/shared/os.h b/arch/um/include/shared/os.h
+index a682bd20fab91..9b828648361a7 100644
+--- a/arch/um/include/shared/os.h
++++ b/arch/um/include/shared/os.h
+@@ -281,6 +281,7 @@ extern long long os_nsecs(void);
+ int syscall_stub_flush(struct mm_id *mm_idp);
+ struct stub_syscall *syscall_stub_alloc(struct mm_id *mm_idp);
+ void syscall_stub_dump_error(struct mm_id *mm_idp);
++int syscall_stub_free_slots(struct mm_id *mm_idp);
+ 
+ int map(struct mm_id *mm_idp, unsigned long virt,
+ 	unsigned long len, int prot, int phys_fd,
+diff --git a/arch/um/kernel/skas/mmu.c b/arch/um/kernel/skas/mmu.c
+index 004739ee3ed71..b62eee6ec65c7 100644
+--- a/arch/um/kernel/skas/mmu.c
++++ b/arch/um/kernel/skas/mmu.c
+@@ -49,6 +49,13 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
+ 	mutex_init(&mm->context.turnstile);
+ 	spin_lock_init(&mm->context.sync_tlb_lock);
+ 
++	/*
++	 * Fault-around detector starts cold: prefault_level is used as an
++	 * array index in trap.c, so it must never be garbage.
++	 */
++	mm->context.prefault_next = 0;
++	mm->context.prefault_level = 0;
++
+ 	stack = __get_free_pages(GFP_KERNEL | __GFP_ZERO, ilog2(STUB_DATA_PAGES));
+ 	if (stack == 0) {
+ 		printk(KERN_ERR "%s: failed to allocate %d stub data pages\n",
+diff --git a/arch/um/kernel/trap.c b/arch/um/kernel/trap.c
+index b730a63d4b2eb..5a49f3324ffec 100644
+--- a/arch/um/kernel/trap.c
++++ b/arch/um/kernel/trap.c
+@@ -7,7 +7,9 @@
+ #include <linux/sched/signal.h>
+ #include <linux/hardirq.h>
+ #include <linux/module.h>
++#include <linux/sizes.h>
+ #include <linux/uaccess.h>
++#include <linux/userfaultfd_k.h>
+ #include <linux/sched/debug.h>
+ #include <asm/current.h>
+ #include <asm/tlbflush.h>
+@@ -133,6 +135,242 @@ um_lock_mm_and_find_vma(struct mm_struct *mm,
+ 	return NULL;
+ }
+ 
++/*
++ * Anonymous fault-around.
++ *
++ * Every guest page fault costs a full stub handoff: SIGSEGV in the child,
++ * futex/ptrace transfer to the UML kernel thread, and a second transfer back
++ * to resume -- 18.9us (seccomp) / 41.0us (ptrace) per fault on the reference
++ * device, dominated entirely by the two voluntary context switches, not by
++ * handle_mm_fault. The stub mmap transport, however, is already a
++ * batch: um_tlb_sync walks the marked PTE range and queues one stub_syscall
++ * per page, and the whole queue is executed in the *same* handoff that
++ * resumes the guest (see userspace() in os-Linux/skas/process.c). So if we
++ * install K extra PTEs while we are here anyway, K pages ride one handoff
++ * instead of costing K.
++ *
++ * This helps only paths where each page really would fault separately, i.e.
++ * the guest touching fresh anonymous memory. It does NOT help copy_to_user
++ * and friends: uaccess runs in the kernel address space and takes no per-page
++ * stub handoff in the first place.
++ *
++ * The speculation is restricted to vma_is_anonymous() && pte_none() &&
++ * !userfaultfd_armed():
++ *  - file-backed faults can do I/O and have their own fault-around upstream;
++ *  - a non-none PTE may be a swap entry, and do_swap_page can block or
++ *    return VM_FAULT_RETRY -- pte_none keeps us on the do_anonymous_page
++ *    path only;
++ *  - userfaultfd must see real faults, not speculative ones.
++ *
++ * The window ramps 0 -> 4 -> 16 -> 32 pages driven by a sequential-stream
++ * detector, so a random-access workload never pays for pages it will not
++ * touch; only a stream that keeps faulting exactly past the previous window
++ * earns a bigger one. The size cap is expressed in BYTES ("prefault="
++ * command-line option, default 128K, 0 disables) because PAGE_SIZE is
++ * parametric here: with the page-count cap a 16K-page guest would silently
++ * speculate a 512K window.
++ */
++static const unsigned int um_prefault_ramp[] = {0, 4, 16, 32};
++#define UM_PREFAULT_LEVEL_MAX (ARRAY_SIZE(um_prefault_ramp) - 1)
++
++static unsigned long um_prefault_bytes __read_mostly = SZ_128K;
++
++static int __init um_prefault_setup(char *str)
++{
++	um_prefault_bytes = memparse(str, &str);
++	return 1;
++}
++__setup("prefault=", um_prefault_setup);
++
++/*
++ * Count the leading run of pte_none() pages in [addr, seg_end), where the
++ * caller guarantees the range does not cross a PMD (or folded-level)
++ * boundary, so a single PTE table covers it. Sets *stop if the scan hit
++ * something that ends the speculation window (a populated PTE, a swap entry,
++ * or a PTE table we cannot map).
++ */
++static unsigned int um_prefault_scan(struct mm_struct *mm, unsigned long addr,
++				     unsigned long seg_end, bool *stop)
++{
++	unsigned int max = (seg_end - addr) >> PAGE_SHIFT;
++	unsigned int nr = 0;
++	pgd_t *pgd;
++	p4d_t *p4d;
++	pud_t *pud;
++	pmd_t *pmd;
++	pte_t *pte;
++
++	/*
++	 * A missing table at any level means every PTE below it is none, and
++	 * that is the common case for a fresh allocation: the whole segment
++	 * is prefaultable and handle_mm_fault will build the tables.
++	 */
++	pgd = pgd_offset(mm, addr);
++	if (pgd_none(*pgd))
++		return max;
++	if (unlikely(pgd_bad(*pgd)))
++		goto stop;
++
++	p4d = p4d_offset(pgd, addr);
++	if (p4d_none(*p4d))
++		return max;
++	if (unlikely(p4d_bad(*p4d)))
++		goto stop;
++
++	pud = pud_offset(p4d, addr);
++	if (pud_none(*pud))
++		return max;
++	if (unlikely(pud_bad(*pud)))
++		goto stop;
++
++	pmd = pmd_offset(pud, addr);
++	if (pmd_none(*pmd))
++		return max;
++	if (unlikely(pmd_bad(*pmd)))
++		goto stop;
++
++	/*
++	 * pte_offset_map() may return NULL (racing table teardown). We are
++	 * purely speculative, so any ambiguity just ends the window.
++	 */
++	pte = pte_offset_map(pmd, addr);
++	if (!pte)
++		goto stop;
++
++	while (nr < max && pte_none(pte[nr]))
++		nr++;
++	pte_unmap(pte);
++
++	if (nr < max)
++		*stop = true;
++	return nr;
++
++stop:
++	*stop = true;
++	return 0;
++}
++
++/*
++ * Called with mmap_read_lock held, right after the primary fault succeeded
++ * and before the single handoff that will publish it to the stub.
++ *
++ * Returns false only if handle_mm_fault dropped the mmap lock (the caller
++ * must then skip its unlock). With the flags we pass that is a can't-happen,
++ * but see the comment at the VM_FAULT_RETRY check -- silently guessing wrong
++ * about lock ownership here is either a double-unlock or a leaked lock.
++ */
++static bool um_prefault_around(struct mm_struct *mm, struct vm_area_struct *vma,
++			       unsigned long address, unsigned int flags)
++{
++	unsigned long addr, end;
++	unsigned int level = 0, nr;
++	int slots;
++
++	if (!um_prefault_bytes)
++		return true;
++
++	if (!vma_is_anonymous(vma) || userfaultfd_armed(vma))
++		return true;
++
++	address &= PAGE_MASK;
++
++	/*
++	 * Sequential-stream detector: a stream that consumed its previous
++	 * window faults exactly at prefault_next. Anything else resets the
++	 * ramp, so the first fault of any stream (and every fault of a random
++	 * workload) prefaults nothing.
++	 */
++	if (address == READ_ONCE(mm->context.prefault_next)) {
++		level = READ_ONCE(mm->context.prefault_level);
++		level = min_t(unsigned int, level + 1, UM_PREFAULT_LEVEL_MAX);
++	}
++	WRITE_ONCE(mm->context.prefault_level, level);
++
++	nr = um_prefault_ramp[level];
++	nr = min_t(unsigned long, nr, um_prefault_bytes >> PAGE_SHIFT);
++
++	/*
++	 * Anonymous pages land at arbitrary physmem offsets, so map() almost
++	 * never merges them: budget one syscall_data slot per page, plus one
++	 * for the primary fault, and never overflow the batch -- an overflow
++	 * flushes mid-batch, which is exactly the extra handoff this code
++	 * exists to avoid.
++	 */
++	slots = syscall_stub_free_slots(&mm->context.id) - 1;
++	if (slots < 0)
++		slots = 0;
++	nr = min_t(unsigned int, nr, slots);
++
++	addr = address + PAGE_SIZE;
++	end = addr + (unsigned long)nr * PAGE_SIZE;
++	if (end > vma->vm_end)
++		end = vma->vm_end;
++	if (end < addr)
++		end = addr;
++
++	/* Next fault of a sequential stream lands one page past the window. */
++	WRITE_ONCE(mm->context.prefault_next, end);
++
++	/*
++	 * FAULT_FLAG_ALLOW_RETRY must go: VM_FAULT_RETRY releases the mmap
++	 * lock, and our caller still owns a read lock it will unlock exactly
++	 * once. KILLABLE/INTERRUPTIBLE must go with it -- they are only valid
++	 * with retry, and a speculative fault has no business aborting on a
++	 * signal that the (already-satisfied) primary fault will handle.
++	 */
++	flags &= ~(FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE |
++		   FAULT_FLAG_INTERRUPTIBLE | FAULT_FLAG_TRIED);
++
++	while (addr < end) {
++		unsigned long seg_end;
++		unsigned int i, pages;
++		bool stop = false;
++
++		/*
++		 * Clamp the scan to one PTE table. Cascading through every
++		 * level's addr_end keeps this correct whichever levels are
++		 * folded (2-level and 4-level layouts both build here).
++		 */
++		seg_end = pgd_addr_end(addr, end);
++		seg_end = p4d_addr_end(addr, seg_end);
++		seg_end = pud_addr_end(addr, seg_end);
++		seg_end = pmd_addr_end(addr, seg_end);
++
++		pages = um_prefault_scan(mm, addr, seg_end, &stop);
++
++		for (i = 0; i < pages; i++, addr += PAGE_SIZE) {
++			vm_fault_t fault;
++
++			fault = handle_mm_fault(vma, addr, flags, NULL);
++
++			/*
++			 * Cannot happen for a pte_none anonymous fault with
++			 * ALLOW_RETRY stripped; if the mm core ever breaks
++			 * that contract, both codes mean it dropped the mmap
++			 * lock, so tell the caller instead of double-
++			 * unlocking.
++			 */
++			if (WARN_ON_ONCE(fault &
++					 (VM_FAULT_RETRY | VM_FAULT_COMPLETED)))
++				return false;
++
++			/*
++			 * Speculative failure (e.g. OOM) must not surface:
++			 * the primary fault already succeeded, the guest will
++			 * come back for this page if it really wants it.
++			 */
++			if (fault & VM_FAULT_ERROR)
++				return true;
++		}
++
++		if (stop)
++			break;
++		addr = seg_end;
++	}
++
++	return true;
++}
++
+ /*
+  * Note this is constrained to return 0, -EFAULT, -EACCES, -ENOMEM by
+  * segv().
+@@ -207,6 +445,17 @@ int handle_page_fault(unsigned long address, unsigned long ip,
+ 		pte = pte_offset_kernel(pmd, address);
+ 	} while (!pte_present(*pte));
+ 	err = 0;
++
++	/*
++	 * The fault is resolved but not yet published to the stub -- that
++	 * happens in one batched handoff on the way back to userspace. Piggy-
++	 * back a fault-around window onto that same handoff. Guest faults
++	 * only: a kernel-mode fault (uaccess) pays no per-page handoff, so
++	 * there is nothing to save.
++	 */
++	if (is_user && !um_prefault_around(mm, vma, address, flags))
++		goto out_nosemaphore;
++
+ 	/*
+ 	 * The below warning was added in place of
+ 	 *	pte_mkyoung(); if (is_write) pte_mkdirty();
+diff --git a/arch/um/os-Linux/skas/mem.c b/arch/um/os-Linux/skas/mem.c
+index 4d6946061a6a5..66eaddc0599e5 100644
+--- a/arch/um/os-Linux/skas/mem.c
++++ b/arch/um/os-Linux/skas/mem.c
+@@ -185,6 +185,25 @@ struct stub_syscall *syscall_stub_alloc(struct mm_id *mm_idp)
+ 	return sc;
+ }
+ 
++/*
++ * How many more stub syscalls fit into the current batch without forcing a
++ * flush. The fault-around code in trap.c uses this to cap its window: a
++ * prefault that overflowed the batch would trigger a mid-batch handoff in
++ * do_syscall_stub, i.e. exactly the extra round trip prefaulting exists to
++ * avoid. Worst case each prefaulted page costs one slot (anonymous pages have
++ * arbitrary physmem offsets, so map() can rarely merge them).
++ */
++int syscall_stub_free_slots(struct mm_id *mm_idp)
++{
++	struct stub_data *proc_data = (void *)mm_idp->stack;
++
++	/* Batch is in an error state; report no room. */
++	if (mm_idp->syscall_data_len < 0)
++		return 0;
++
++	return ARRAY_SIZE(proc_data->syscall_data) - mm_idp->syscall_data_len;
++}
++
+ static struct stub_syscall *syscall_stub_get_previous(struct mm_id *mm_idp,
+ 						      int syscall_type,
+ 						      unsigned long virt)
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 6f0a2669c8a93..bf2f9375a0ddb 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -13,6 +13,7 @@
+ #include <sched.h>
+ #include <signal.h>
+ #include <string.h>
++#include <time.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>

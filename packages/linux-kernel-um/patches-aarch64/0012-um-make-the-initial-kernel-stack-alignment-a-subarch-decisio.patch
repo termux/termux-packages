@@ -1,0 +1,84 @@
+From 6836d815410db45d5a6395e87183d4681753e1f5 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 02:00:10 +0200
+Subject: [PATCH] um: make the initial kernel stack alignment a subarch
+ decision
+
+new_thread() and start_idle_thread() both set a fresh kernel thread's stack
+pointer to the top of the stack minus one word. On x86 that word is
+deliberate: the SysV ABI wants the stack pointer congruent to 8 mod 16 at
+function entry, because `call` has just pushed an 8-byte return address, so
+reserving a word puts the callee's prologue on a 16-byte boundary.
+
+aarch64 has no pushed return address -- the link register carries it -- and
+AAPCS64 requires the stack pointer to be 16-byte aligned at all times, not
+merely after a prologue. The same reservation therefore leaves every kernel
+thread running 8 mod 16 out of alignment, which is not
+cosmetic: the compiler derives alignment facts from it. In
+lib/tests/list-test.c clang computes &entries[0].list as "orr x10, x10,
+0x8" rather than an add, valid only because it can prove bit 3 of the
+address is clear. With a misaligned stack pointer the OR is a no-op, the
+list entries are built at the wrong offsets, and list_for_each_entry()
+reads a stack address where a counter should be --
+list_test_list_for_each_entry and its _reverse twin fail, and nothing else
+does.
+
+Move the reservation into <sysdep/archsetjmp.h> as ARCH_INIT_SP_RESERVE.
+x86 keeps sizeof(void *) and is unchanged; arm64 reserves nothing.
+
+With this, the arm64 KUnit run goes from 341 ok / 2 not ok to 343 ok / 0
+not ok, matching an x86_64 UML run of the same configuration exactly.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/archsetjmp.h | 18 ++++++++++++++++++
+ arch/x86/um/shared/sysdep/archsetjmp.h   | 11 +++++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/arch/arm64/um/shared/sysdep/archsetjmp.h b/arch/arm64/um/shared/sysdep/archsetjmp.h
+index 5c7b33dc2e700..60f46508ca227 100644
+--- a/arch/arm64/um/shared/sysdep/archsetjmp.h
++++ b/arch/arm64/um/shared/sysdep/archsetjmp.h
+@@ -50,4 +50,22 @@ unsigned long get_thread_reg(int reg, jmp_buf *buf);
+ #define JB_IP __x30
+ #define JB_SP __sp
+ 
++/*
++ * Bytes to leave below the top of a fresh kernel stack: none.
++ *
++ * x86 reserves one word to emulate the return address `call` pushes, so the
++ * callee sees the alignment its ABI expects. aarch64 has no pushed return
++ * address -- the link register carries it -- and AAPCS64 requires SP to be
++ * 16-byte aligned at *all* times, not merely after a prologue. Reserving 8
++ * bytes leaves every kernel thread running on a stack that is 8 mod 16, which
++ * is not cosmetic: the compiler derives alignment facts from it.
++ *
++ * Observed symptom: in lib/tests/list-test.c clang computes &entries[0].list as
++ * "orr x10, x10, #8" rather than an add, which is valid only because it can
++ * prove bit 3 of the address is clear. With a misaligned SP the OR is a no-op,
++ * the list entries are built at the wrong offsets, and list_for_each_entry()
++ * reads a stack address where a counter should be.
++ */
++#define ARCH_INIT_SP_RESERVE	0
++
+ #endif /* _KLIBC_ARCHSETJMP_H */
+diff --git a/arch/x86/um/shared/sysdep/archsetjmp.h b/arch/x86/um/shared/sysdep/archsetjmp.h
+index 8c81d1a604a94..ef72cfc336f5e 100644
+--- a/arch/x86/um/shared/sysdep/archsetjmp.h
++++ b/arch/x86/um/shared/sysdep/archsetjmp.h
+@@ -10,4 +10,15 @@
+ 
+ unsigned long get_thread_reg(int reg, jmp_buf *buf);
+ 
++
++/*
++ * Bytes to leave below the top of a fresh kernel stack.
++ *
++ * The x86 SysV ABI wants the stack pointer congruent to 8 mod 16 *at function
++ * entry*, because `call` has just pushed an 8-byte return address. Reserving one
++ * word here reproduces that state, so the callee's prologue lands on a 16-byte
++ * boundary.
++ */
++#define ARCH_INIT_SP_RESERVE	sizeof(void *)
++
+ #endif /* __X86_UM_SYSDEP_ARCHSETJMP_H */

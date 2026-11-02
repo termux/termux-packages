@@ -1,0 +1,18 @@
+--- a/netlink.c
++++ b/netlink.c
+@@ -104,7 +104,15 @@ void nl_sock_init(const struct ctx *c, bool ns)
+ 		if (nl_sock_ns == -1)
+ 			goto fail;
+ 	} else {
+ 		nl_sock_init_do(NULL);
++		if (nl_sock == -1) {
++			/* Binding is denied without CAP_NET_ADMIN, Android app
++			 * sandboxes for example: interface, route and DNS
++			 * discovery are unavailable. Callers configured
++			 * explicitly with -a, -g, -D and -i do not need them. */
++			warn("Cannot bind netlink socket, continuing without discovery");
++			return;
++		}
+ 	}
+ 
+ 	if (nl_sock == -1)

@@ -1,0 +1,490 @@
+From a364bdc133ac6bb1fb05a1668ce30ab4fccf5cfb Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 15:51:20 +0200
+Subject: [PATCH] um: intercept guest syscalls where -1 cannot be written
+
+An Android app process is started with a seccomp filter already installed,
+and arm64 reports the ptrace syscall-entry stop *before* running that
+filter. The number the tracer writes is therefore the number the filter
+screens: -1 is not on any allowlist, so cancelling a syscall the documented
+way gets the tracee killed with SIGSYS. This is exactly the host that also
+has no PTRACE_SYSEMU -- 4.19 predates it on arm64 -- so UML had no way left
+to stop a guest syscall from running and refused to boot.
+
+Substitute a harmless syscall instead. The guest's call still does not run,
+which is the entire requirement, and getppid(2) is a number the filter
+already
+permits: no arguments, no side effects, and among the cheapest calls the
+host
+has. Probe for it rather than deriving it from a version number, and prefer
+-1 where the host accepts it.
+
+The substitution probe needs two children where cancellation needs one. A
+cancelled syscall leaves -ENOSYS behind, which is neither pid nor ppid, so
+one child distinguishes "did not run" from "return value not written". A
+substituted getppid() leaves the parent's pid -- the same value a working
+write would store -- so the two halves are checked separately: once with no
+write, where the child seeing its parent's pid proves the substitution
+took, and once writing the child's own pid, the one value the substitute
+cannot produce.
+
+nocancel forces this path on a host that does not need it, so it can be
+exercised anywhere rather than only where it is hardest to debug.
+
+Fixes, found on the way to a booting app:
+
+  * make_umid() ignored make_uml_dir() failing, and every use of uml_dir
+    below it is a plain dereference. The first, strscpy() of a NULL source,
+    panics as "Segfault with no mm" pointing at make_umid and not at the
+    mkdir that failed four lines earlier. The default uml_dir is under $HOME,
+    and a read-only home is ordinary on a phone or under a service manager
+    that runs UML with HOME=/.
+
+  * .data..page_aligned and .data..cacheline_aligned were orphan sections --
+    named by RW_DATA() on every other architecture but not by uml.lds.S, so
+    where they landed was the linker's choice. bfd ld put them after .data.
+    lld puts them with the read-only data, inside __start_rodata..__end_rodata,
+    so mark_rodata_ro() mprotects bit_wait_table read-only and the first task
+    to wait on a buffer dies writing to it. Name them.
+
+  * The three kernel-mode fault panics printed no fault address at all, which
+    is most of why the above took as long as it did to find.
+
+Verified: gate 3 boots to userspace on all three interception paths
+(PTRACE_SYSEMU, cancellation, substitution) on the run domain, and with the
+bionic build on the phone. Debian 12 boots to an interactive shell inside
+an unprivileged Android app, where substitution is the path taken.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/ptrace_user.h |  13 ++
+ arch/um/include/shared/skas/skas.h        |   1 +
+ arch/um/kernel/trap.c                     |   9 +-
+ arch/um/kernel/uml.lds.S                  |  21 +++
+ arch/um/os-Linux/skas/process.c           |   9 +-
+ arch/um/os-Linux/start_up.c               | 169 +++++++++++++++++-----
+ arch/um/os-Linux/umid.c                   |  22 ++-
+ 7 files changed, 205 insertions(+), 39 deletions(-)
+
+diff --git a/arch/arm64/um/shared/sysdep/ptrace_user.h b/arch/arm64/um/shared/sysdep/ptrace_user.h
+index d7091288191ed..7d416abfbbe74 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace_user.h
++++ b/arch/arm64/um/shared/sysdep/ptrace_user.h
+@@ -21,6 +21,19 @@
+ #define REGS_IP_INDEX HOST_PC
+ #define REGS_SP_INDEX HOST_SP
+ 
++/*
++ * The instruction that enters the kernel, for hosts without PTRACE_SYSEMU.
++ *
++ * arm64 gained PTRACE_SYSEMU in 5.3; UML has to run on hosts older than that
++ * (a phone can pair a current Android with a 4.19 kernel), and there the guest
++ * syscall is intercepted by cancelling it at a PTRACE_SYSCALL stop instead.
++ * That covers every case but one: while the guest is being single-stepped, a
++ * PTRACE_SINGLESTEP over an SVC would execute the guest's syscall on the host
++ * before any stop could cancel it. UML therefore looks at the instruction it is
++ * about to step and takes a syscall stop for that one.
++ */
++#define UM_SYSCALL_TRAP_INSN	0xd4000001U	/* svc #0 */
++
+ /*
+  * arm64 makes one general-purpose register unusable at a ptrace syscall stop.
+  *
+diff --git a/arch/um/include/shared/skas/skas.h b/arch/um/include/shared/skas/skas.h
+index b2374c7938a70..f2ed6800bc697 100644
+--- a/arch/um/include/shared/skas/skas.h
++++ b/arch/um/include/shared/skas/skas.h
+@@ -16,6 +16,7 @@ extern int using_seccomp;
+  * check_sysemu(). Set once at boot, before any stub exists.
+  */
+ extern int have_ptrace_sysemu;
++extern int syscall_cancel_nr;
+ 
+ extern void new_thread_handler(void);
+ extern void handle_syscall(struct uml_pt_regs *regs);
+diff --git a/arch/um/kernel/trap.c b/arch/um/kernel/trap.c
+index f00e3c657ba8d..b730a63d4b2eb 100644
+--- a/arch/um/kernel/trap.c
++++ b/arch/um/kernel/trap.c
+@@ -332,11 +332,13 @@ unsigned long segv(struct faultinfo fi, unsigned long ip, int is_user,
+ 	else if (current->pagefault_disabled) {
+ 		if (!mc) {
+ 			show_regs(container_of(regs, struct pt_regs, regs));
+-			panic("Segfault with pagefaults disabled but no mcontext");
++			panic("Segfault with pagefaults disabled but no mcontext: addr 0x%lx, ip 0x%lx, %s",
++			      address, ip, is_write ? "write" : "read");
+ 		}
+ 		if (!current->thread.segv_continue) {
+ 			show_regs(container_of(regs, struct pt_regs, regs));
+-			panic("Segfault without recovery target");
++			panic("Segfault without recovery target: addr 0x%lx, ip 0x%lx, %s",
++			      address, ip, is_write ? "write" : "read");
+ 		}
+ 		mc_set_rip(mc, current->thread.segv_continue);
+ 		current->thread.segv_continue = NULL;
+@@ -344,7 +346,8 @@ unsigned long segv(struct faultinfo fi, unsigned long ip, int is_user,
+ 	}
+ 	else if (current->mm == NULL) {
+ 		show_regs(container_of(regs, struct pt_regs, regs));
+-		panic("Segfault with no mm");
++		panic("Segfault with no mm: addr 0x%lx, ip 0x%lx, %s",
++			      address, ip, is_write ? "write" : "read");
+ 	}
+ 	else if (!is_user && address > PAGE_SIZE && address < TASK_SIZE) {
+ 		show_regs(container_of(regs, struct pt_regs, regs));
+diff --git a/arch/um/kernel/uml.lds.S b/arch/um/kernel/uml.lds.S
+index 46d775924144c..131fe20058519 100644
+--- a/arch/um/kernel/uml.lds.S
++++ b/arch/um/kernel/uml.lds.S
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #include <asm/vmlinux.lds.h>
+ #include <asm/page.h>
++#include <asm/cache.h>
+ 
+ OUTPUT_FORMAT(ELF_FORMAT)
+ OUTPUT_ARCH(ELF_ARCH)
+@@ -137,9 +138,29 @@ SECTIONS
+   }
+   .fini_array     : { *(.fini_array) }
+ 
++  /*
++   * The alignment-specific data sections are named here for the same reason
++   * RW_DATA() names them on every other architecture: left out, they are
++   * orphans, and where an orphan lands is the linker's choice rather than this
++   * script's.
++   *
++   * The two linkers do not choose alike. bfd ld put them after .data, which is
++   * writable and correct. lld puts them with the read-only data, which places
++   * them inside __start_rodata..__end_rodata -- so mark_rodata_ro() mprotects
++   * bit_wait_table and friends read-only, and the first process to wait on a
++   * buffer dies on the write with "Segfault with no mm" and a backtrace
++   * pointing at prepare_to_wait, which has nothing to do with the cause.
++   *
++   * DATA_DATA already claims .data..once, .data..do_once and
++   * .data..shared_aligned, so only these need adding.
++   */
+   .data    :
+   {
+     INIT_TASK_DATA(KERNEL_STACK_SIZE)
++    NOSAVE_DATA
++    PAGE_ALIGNED_DATA(PAGE_SIZE)
++    CACHELINE_ALIGNED_DATA(L1_CACHE_BYTES)
++    READ_MOSTLY_DATA(L1_CACHE_BYTES)
+     DATA_DATA
+     *(.gnu.linkonce.d*)
+     CONSTRUCTORS
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index 6c55031800728..3ff04e71ccc75 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -468,6 +468,7 @@ int using_seccomp;
+  * architecture sees; arm64 hosts older than 5.3 flip it to 0.
+  */
+ int have_ptrace_sysemu = 1;
++int syscall_cancel_nr = -1;
+ 
+ /**
+  * start_userspace() - prepare a new userspace process
+@@ -835,9 +836,15 @@ void userspace(struct uml_pt_regs *regs)
+ 				 * read above, so the syscall number UML needs
+ 				 * has already been taken and overwriting it
+ 				 * here loses nothing.
++					 *
++					 * syscall_cancel_nr is -1, the documented
++					 * "run nothing" value, unless the probe found
++					 * the host refuses it -- in which case it names
++					 * a harmless syscall to run in the guest call's
++					 * place. See check_sysemu().
+ 				 */
+ 				if (!have_ptrace_sysemu &&
+-				    ptrace_set_syscall_nr(pid, -1)) {
++				    ptrace_set_syscall_nr(pid, syscall_cancel_nr)) {
+ 					printk(UM_KERN_ERR "%s - failed to cancel a guest syscall, errno = %d\n",
+ 					       __func__, errno);
+ 					fatal_sigsegv();
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 98f22a1014747..0f8eb3ba0cae6 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -34,7 +34,6 @@
+ #include <sysdep/stub.h>
+ #include <registers.h>
+ #include <skas.h>
+-#include <skas.h>
+ #include "internal.h"
+ 
+ static void ptrace_child(void)
+@@ -220,32 +219,53 @@ static int __init try_sysemu(void)
+  * arrived in 5.3. That gap is not academic: phones ship a current Android on a
+  * years-old kernel, and 4.19 is a live target.
+  *
+- * Probing it rather than deriving it from a version number is deliberate. This
+- * has to be true of the host actually underneath us -- which may be a container,
+- * an emulator or a vendor kernel with its own patches -- and a probe that runs
+- * the whole sequence end to end is the only thing that establishes that.
++ * -1 is not always accepted, though. arm64 reports the ptrace stop and *then*
++ * runs the seccomp filter, so a filter that screens syscall numbers sees the
++ * number the tracer just wrote. Under an Android app sandbox -1 is not on the
++ * allowlist and the filter kills the tracee with SIGSYS -- syscall cancellation
++ * is unavailable in precisely the environment that also lacks PTRACE_SYSEMU.
++ *
++ * Substituting a harmless syscall for the guest's works there: the guest's call
++ * still does not run, which is the whole requirement, and the substitute is a
++ * number the filter already permits. getppid(2) is the natural choice -- no
++ * arguments, no side effects, and among the cheapest calls the host has.
+  *
+- * The sequence is exactly what userspace() will do per syscall: stop at entry,
++ * Probing rather than deriving this from a version number is deliberate. It has
++ * to be true of the host actually underneath us -- which may be a container, an
++ * emulator, a vendor kernel with its own patches, or a sandbox someone else
++ * installed a filter into -- and running the whole sequence end to end is the
++ * only thing that establishes that.
++ */
++enum cancel_ret { RET_LEAVE, RET_PARENT_PID, RET_CHILD_PID };
++
++/*
++ * Run, once, exactly what userspace() will do per guest syscall: stop at entry,
+  * cancel, step off the stop, then set the return value the guest sees.
++ *
++ * ptrace_child() exits 1 if it saw its own pid from os_getpid() and 0 if it saw
++ * its parent's, so what the child does with the value is what tells the caller
++ * whether each half of that took effect. Which of the two is the pass depends
++ * on the probe; see try_syscall_cancel().
+  */
+-static int __init try_syscall_cancel(void)
++static int __init run_cancel_probe(int cancel_nr, enum cancel_ret ret_mode,
++				   int expect_exit)
+ {
+-	int pid, n, status;
++	int pid, n, status, sig;
+ 
+ 	pid = start_ptraced_child();
+ 
+ 	if (ptrace(PTRACE_SETOPTIONS, pid, 0, (void *)PTRACE_O_TRACESYSGOOD) < 0)
+-		fatal_perror("check_sysemu: PTRACE_SETOPTIONS failed");
++		fatal_perror("try_syscall_cancel: PTRACE_SETOPTIONS failed");
+ 
+ 	if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0)
+ 		goto fail;
+ 	CATCH_EINTR(n = waitpid(pid, &status, WUNTRACED));
+ 	if (n < 0)
+-		fatal_perror("check_sysemu: wait failed");
++		fatal_perror("try_syscall_cancel: wait failed");
+ 	if (!WIFSTOPPED(status) || WSTOPSIG(status) != (SIGTRAP | 0x80))
+ 		goto fail;
+ 
+-	if (ptrace_set_syscall_nr(pid, -1) < 0)
++	if (ptrace_set_syscall_nr(pid, cancel_nr) < 0)
+ 		goto fail;
+ 
+ 	if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0) < 0)
+@@ -254,16 +274,23 @@ static int __init try_syscall_cancel(void)
+ 	if (n < 0 || !WIFSTOPPED(status))
+ 		goto fail;
+ 
+-	if (ptrace_set_syscall_ret(pid, os_getpid()) < 0)
+-		goto fail;
+-
+ 	/*
+-	 * ptrace_child() exits 0 only if the syscall returned the *parent's*
+-	 * pid, which can only happen if the call never ran and the value above
+-	 * is what the child saw. A cancel that silently did not take shows up
+-	 * here as the child's own pid, i.e. exit code 1, not as a pass.
++	 * A seccomp filter that rejected the number written above reports here,
++	 * as a SIGSYS the tracer is asked to deliver. Treat any stop that is not
++	 * the step as a failure rather than passing the signal on: continuing
++	 * would suppress the SIGSYS and let a host that cannot do this look like
++	 * one that can.
+ 	 */
+-	return finish_probe_child(pid, 0);
++	sig = WSTOPSIG(status);
++	if (sig != SIGTRAP && sig != (SIGTRAP | 0x80))
++		goto fail;
++
++	if (ret_mode != RET_LEAVE &&
++	    ptrace_set_syscall_ret(pid, ret_mode == RET_PARENT_PID ?
++					os_getpid() : pid) < 0)
++		goto fail;
++
++	return finish_probe_child(pid, expect_exit);
+ 
+ fail:
+ 	kill(pid, SIGKILL);
+@@ -271,7 +298,35 @@ static int __init try_syscall_cancel(void)
+ 	return 0;
+ }
+ 
++static int __init try_syscall_cancel(int cancel_nr)
++{
++	if (cancel_nr < 0)
++		/*
++		 * A cancelled syscall leaves -ENOSYS in the return register,
++		 * which is neither pid nor ppid, so one child covers both
++		 * halves: the child can only exit 0 if the call did not run
++		 * *and* the write below replaced what it left behind.
++		 */
++		return run_cancel_probe(cancel_nr, RET_PARENT_PID, 0);
++
++	/*
++	 * A substituted getppid() leaves the parent's pid there by itself,
++	 * which is the same value a working return-value write would store --
++	 * so one child cannot tell the two apart, and each half gets its own.
++	 *
++	 * First: substitute and write nothing. The child sees its parent's pid
++	 * only if getppid() ran in place of its os_getpid(), so exit 0 means
++	 * the guest's syscall was really replaced.
++	 *
++	 * Second: substitute and write the child's own pid, the one value the
++	 * substitute cannot produce. Exit 1 means the write took.
++	 */
++	return run_cancel_probe(cancel_nr, RET_LEAVE, 0) &&
++	       run_cancel_probe(cancel_nr, RET_CHILD_PID, 1);
++}
++
+ static int force_no_sysemu __initdata;
++static int force_no_cancel __initdata;
+ 
+ static int __init uml_nosysemu(char *line, int *add)
+ {
+@@ -293,19 +348,70 @@ __uml_setup("nosysemu", uml_nosysemu,
+ "    With it, every existing test can run against it on any machine.\n\n"
+ );
+ 
++/*
++ * Settle on a way to keep a guest syscall from running, and report which.
++ * Returns 0 if the host offers none.
++ */
++static int __init pick_cancel_method(void)
++{
++	os_info("Checking syscall cancellation instead...");
++	if (force_no_cancel) {
++		os_info("skipped (nocancel)\n");
++	} else if (try_syscall_cancel(-1)) {
++		syscall_cancel_nr = -1;
++		os_info("OK\n");
++		os_info("Host lacks PTRACE_SYSEMU; using PTRACE_SYSCALL with "
++			"syscall cancellation (one extra ptrace call per guest "
++			"syscall)\n");
++		return 1;
++	} else {
++		os_info("refused\n");
++	}
++
++	os_info("Checking syscall substitution instead...");
++	if (try_syscall_cancel(__NR_getppid)) {
++		syscall_cancel_nr = __NR_getppid;
++		os_info("OK\n");
++		os_info("Host lacks PTRACE_SYSEMU and rejects a cancelled (-1) "
++			"syscall, so a seccomp filter is screening syscall "
++			"numbers -- an Android app sandbox does this. Running "
++			"getppid(2) in place of each guest syscall instead.\n");
++		return 1;
++	}
++	os_info("missing\n");
++	return 0;
++}
++
++static int __init uml_nocancel(char *line, int *add)
++{
++	*add = 0;
++	force_no_cancel = 1;
++	return 0;
++}
++
++__uml_setup("nocancel", uml_nocancel,
++"nocancel\n"
++"    Pretend the host rejects a cancelled (-1) syscall and substitute a\n"
++"    harmless call for each guest syscall instead. Implies nosysemu.\n"
++"\n"
++"    That is what an Android app sandbox forces, because arm64 runs the\n"
++"    seccomp filter after the ptrace stop and the filter then screens the\n"
++"    number the tracer wrote. Without this option the substitution path can\n"
++"    only be reached on a host that has such a filter installed, which is\n"
++"    the environment that is hardest to debug on.\n\n"
++);
++
+ static void __init check_sysemu(void)
+ {
+-	if (force_no_sysemu) {
++	if (force_no_sysemu || force_no_cancel) {
+ 		os_info("Checking syscall emulation for ptrace...");
+ 		os_info("skipped (nosysemu)\n");
+-		os_info("Checking syscall cancellation instead...");
+-		if (try_syscall_cancel()) {
++		if (pick_cancel_method()) {
+ 			have_ptrace_sysemu = 0;
+-			os_info("OK\n");
+ 			return;
+ 		}
+-		fatal("missing\n\nnosysemu was requested but this host cannot "
+-		      "cancel a syscall from a tracer.\n");
++		fatal("\nnosysemu was requested but this host can neither "
++		      "cancel nor substitute a syscall from a tracer.\n");
+ 	}
+ 
+ 	os_info("Checking syscall emulation for ptrace...");
+@@ -316,19 +422,14 @@ static void __init check_sysemu(void)
+ 	}
+ 	os_info("missing\n");
+ 
+-	os_info("Checking syscall cancellation instead...");
+-	if (try_syscall_cancel()) {
++	if (pick_cancel_method()) {
+ 		have_ptrace_sysemu = 0;
+-		os_info("OK\n");
+-		os_info("Host lacks PTRACE_SYSEMU; using PTRACE_SYSCALL with "
+-			"syscall cancellation (one extra ptrace call per guest "
+-			"syscall)\n");
+ 		return;
+ 	}
+ 
+-	fatal("missing\n\nThis host provides neither PTRACE_SYSEMU nor a "
+-	      "working syscall cancellation, and UML cannot intercept guest "
+-	      "syscalls without one of them.\n");
++	fatal("\nThis host provides neither PTRACE_SYSEMU nor any way for a "
++	      "tracer to stop a guest syscall from running, and UML cannot "
++	      "intercept guest syscalls without one of them.\n");
+ }
+ 
+ static void __init check_ptrace(void)
+diff --git a/arch/um/os-Linux/umid.c b/arch/um/os-Linux/umid.c
+index 6b488be2c545e..705c09c86f1c1 100644
+--- a/arch/um/os-Linux/umid.c
++++ b/arch/um/os-Linux/umid.c
+@@ -30,6 +30,14 @@ static int __init make_uml_dir(void)
+ 	char dir[512] = { '\0' };
+ 	int len, err;
+ 
++	/*
++	 * A previous call failed and freed it. Say so rather than dereferencing
++	 * it below: make_umid() retries with a random umid, so this is reached
++	 * whenever the first attempt failed.
++	 */
++	if (uml_dir == NULL)
++		return -ENOENT;
++
+ 	if (*uml_dir == '~') {
+ 		char *home = getenv("HOME");
+ 
+@@ -258,7 +266,19 @@ static int __init make_umid(void)
+ 	if (umid_setup)
+ 		return 0;
+ 
+-	make_uml_dir();
++	/*
++	 * Failing this leaves uml_dir NULL, and every use of it below is a
++	 * plain dereference -- the first, strscpy() of a NULL source, panics
++	 * the kernel as "Segfault with no mm" with make_umid in the backtrace
++	 * and nothing pointing at the real cause a few lines above.
++	 *
++	 * It is not a hypothetical. The default uml_dir is under $HOME, and a
++	 * read-only or absent home directory is ordinary on a phone, in a
++	 * container, or under any service manager that runs UML with HOME=/.
++	 */
++	err = make_uml_dir();
++	if (err)
++		goto err;
+ 
+ 	if (*umid == '\0') {
+ 		strscpy(tmp, uml_dir);

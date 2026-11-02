@@ -1,0 +1,120 @@
+From 761702e2157ffa11920af17406dbe65533fc2ea2 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 08:32:16 +0200
+Subject: [PATCH] um: arm64: stop leaking -ENOSYS into the first syscall
+ argument
+
+handle_syscall() seeded the return register with -ENOSYS before calling the
+tracehooks. On x86 that is faithful: the return register is not an argument
+register, and native x86 really does leave -ENOSYS in RAX at a
+syscall-entry stop.
+
+On arm64 the return value and the first argument are both x0. A guest
+tracer reading the classic register view therefore saw 0xffffffffffffffda
+as argument 1 of *every* syscall, and a value it wrote to x0 at the stop
+was discarded, because dispatch took the argument from a synthetic slot the
+tracer cannot reach. gdb shows the wrong first argument for every call.
+Modern strace escapes only because PTRACE_GET_SYSCALL_INFO routes through
+syscall_get_arguments().
+
+Native arm64 seeds -ENOSYS before the stop in exactly one case: when the
+incoming number is already NO_SYSCALL, so that a tracer which skips the
+call without setting x0 gets an error rather than a stale argument. Match
+that with a subarch hook, defaulting to the previous unconditional
+behaviour so x86 is untouched, and read argument 1 from x0 again now that
+nothing clobbers it before the arguments are read. ORIG_X0 stays, because
+restarting a syscall still needs the value from before the return value
+overwrote it.
+
+Also stop clobbering the return register when a tracer cancels the call: a
+tracer that skips a syscall is expected to have set the value it wants
+userspace to see, and on an architecture where that register is also an
+argument register, overwriting it destroys what the tracer just wrote.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/ptrace.h | 23 ++++++++++++++++++++++-
+ arch/um/kernel/skas/syscall.c        | 26 ++++++++++++++++++++++++--
+ 2 files changed, 46 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/um/shared/sysdep/ptrace.h b/arch/arm64/um/shared/sysdep/ptrace.h
+index 5bf8d56579b7d..68d490661161f 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace.h
++++ b/arch/arm64/um/shared/sysdep/ptrace.h
+@@ -44,7 +44,28 @@
+  * get_host_regs() and get_regs_from_mc() both capture x0 into HOST_ORIG_X0 at
+  * the point the guest trapped, which is the value the ABI actually passed.
+  */
+-#define UPT_SYSCALL_ARG1(r) UPT_ORIG_X0(r)
++#define UPT_SYSCALL_ARG1(r) UPT_X(r, HOST_X0)
++
++/*
++ * When to seed the return register with -ENOSYS.
++ *
++ * x86 does it unconditionally before the syscall-entry stop, and that is
++ * faithful there: native x86 really does leave -ENOSYS in RAX at an entry stop,
++ * and RAX is not an argument register.
++ *
++ * On arm64 the return value and the first argument are both x0, so seeding
++ * early overwrites the argument -- and a guest tracer reading the classic
++ * register view then sees 0xffffffffffffffda as argument 1 of every syscall.
++ * gdb shows the wrong argument for every call; only tracers using
++ * PTRACE_GET_SYSCALL_INFO escape, because that routes through
++ * syscall_get_arguments().
++ *
++ * Native arm64 seeds it before the stop in exactly one case: when the incoming
++ * number is already NO_SYSCALL, so that a tracer which skips the call without
++ * setting x0 still gets an error rather than a stale argument
++ * (arch/arm64/kernel/syscall.c). Match that.
++ */
++#define UM_SEED_ENOSYS_BEFORE_TRACE(r)	((long)UPT_SYSCALL_NR(r) < 0)
+ #define UPT_SYSCALL_ARG2(r) UPT_X(r, HOST_X1)
+ #define UPT_SYSCALL_ARG3(r) UPT_X(r, HOST_X2)
+ #define UPT_SYSCALL_ARG4(r) UPT_X(r, HOST_X3)
+diff --git a/arch/um/kernel/skas/syscall.c b/arch/um/kernel/skas/syscall.c
+index 6611fba6a6e68..98b590ee27479 100644
+--- a/arch/um/kernel/skas/syscall.c
++++ b/arch/um/kernel/skas/syscall.c
+@@ -14,6 +14,18 @@
+ #include <asm/unistd.h>
+ #include <asm/delay.h>
+ 
++/*
++ * Seed the return register with -ENOSYS before the syscall-entry stop.
++ *
++ * Unconditional unless a subarch says otherwise, which preserves the x86
++ * behaviour: there the return register is not an argument register and native
++ * x86 genuinely leaves -ENOSYS in it at an entry stop. See the arm64 override
++ * in <sysdep/ptrace.h> for why that is wrong when the two alias.
++ */
++#ifndef UM_SEED_ENOSYS_BEFORE_TRACE
++#define UM_SEED_ENOSYS_BEFORE_TRACE(r)	1
++#endif
++
+ void handle_syscall(struct uml_pt_regs *r)
+ {
+ 	struct pt_regs *regs = container_of(r, struct pt_regs, regs);
+@@ -21,11 +33,21 @@ void handle_syscall(struct uml_pt_regs *r)
+ 
+ 	/* Initialize the syscall number and default return value. */
+ 	UPT_SYSCALL_NR(r) = PT_SYSCALL_NR(r->gp);
+-	PT_REGS_SET_SYSCALL_RETURN(regs, -ENOSYS);
++	if (UM_SEED_ENOSYS_BEFORE_TRACE(r))
++		PT_REGS_SET_SYSCALL_RETURN(regs, -ENOSYS);
+ 
+ 
+-	if (syscall_trace_enter(regs))
++	if (syscall_trace_enter(regs)) {
++		/*
++		 * The tracer cancelled the call. Leave the return register
++		 * alone: a tracer that skips a syscall is expected to have set
++		 * the value it wants userspace to see, and on architectures
++		 * where that register is also an argument register, clobbering
++		 * it here would destroy an argument the tracer may have just
++		 * written.
++		 */
+ 		goto out;
++	}
+ 
+ 	/* Do the seccomp check after ptrace; failures should be fast. */
+ 	if (secure_computing() == -1)
