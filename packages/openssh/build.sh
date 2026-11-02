@@ -155,6 +155,11 @@ termux_step_create_debscripts() {
 	echo "echo \"using 'sv-enable ssh-agent'\""
 	echo "echo \"You can also enable sshd to autostart\""
 	echo "echo \"using 'sv-enable sshd'\""
+	echo "echo \"\""
+	echo "echo \"sshd can now auto default to port 22 instead of 8022\""
+	echo "echo \"on next run if your device qualify\""
+	echo "echo \"Refer link below for more information:\""
+	echo "echo \"https://github.com/termux/termux-packages/issues/30246\""
 	echo "exit 0"
 	} > postinst
 	chmod 0700 postinst
