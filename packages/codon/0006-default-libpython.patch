@@ -1,0 +1,11 @@
+--- a/stdlib/internal/python.codon
++++ b/stdlib/internal/python.codon
+@@ -1166,7 +1166,7 @@ def setup_python(python_loaded: bool):
+         py_handle = dlopen("", RTLD_LOCAL | RTLD_NOW)
+     else:
+         import os
+-        LD = os.getenv("CODON_PYTHON", default="libpython." + dlext())
++        LD = os.getenv("CODON_PYTHON", default="@TERMUX_PREFIX@/lib/libpython3.so")
+         py_handle = dlopen(LD, RTLD_LOCAL | RTLD_NOW)
+ 
+     init_handles_dlopen(py_handle)
