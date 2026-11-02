@@ -1,0 +1,68 @@
+diff --git a/src/gui/MainApplication.cpp b/src/gui/MainApplication.cpp
+index 994ae2771..9afa20a71 100644
+--- a/src/gui/MainApplication.cpp
++++ b/src/gui/MainApplication.cpp
+@@ -35,6 +35,19 @@ MainApplication::MainApplication(int& argc, char** argv) :
+ 	QApplication(argc, argv),
+ 	m_queuedFile()
+ {
++#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
++	// Work around a bug of KXmlGui < 5.55
++	// which breaks the recent files menu
++	// https://bugs.kde.org/show_bug.cgi?id=337491
++	for (auto child : children())
++	{
++		if (child->inherits("KCheckAcceleratorsInitializer"))
++		{
++			delete child;
++		}
++	}
++#endif
++
+ #if defined(LMMS_BUILD_WIN32) && QT_VERSION >= 0x050000
+ 	installNativeEventFilter(this);
+ #endif
+diff --git a/src/gui/MainWindow.cpp b/src/gui/MainWindow.cpp
+index e6971f96d..26532eb5b 100644
+--- a/src/gui/MainWindow.cpp
++++ b/src/gui/MainWindow.cpp
+@@ -33,7 +33,6 @@
+ #include <QMenuBar>
+ #include <QMessageBox>
+ #include <QShortcut>
+-#include <QLibrary>
+ #include <QSplitter>
+ #include <QUrl>
+ #include <QWhatsThis>
+@@ -65,21 +64,6 @@
+ 
+ #include "lmmsversion.h"
+ 
+-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+-//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
+-void disableAutoKeyAccelerators(QWidget* mainWindow)
+-{
+-	using DisablerFunc = void(*)(QWidget*);
+-	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
+-	DisablerFunc setNoAccelerators = 
+-			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+-	if(setNoAccelerators)
+-	{
+-		setNoAccelerators(mainWindow);
+-	}
+-	kf5WidgetsAddon.unload();
+-}
+-#endif
+ 
+ 
+ MainWindow::MainWindow() :
+@@ -92,9 +76,6 @@ MainWindow::MainWindow() :
+ 	m_metronomeToggle( 0 ),
+ 	m_session( Normal )
+ {
+-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+-	disableAutoKeyAccelerators(this);
+-#endif
+ 	setAttribute( Qt::WA_DeleteOnClose );
+ 
+ 	QWidget * main_widget = new QWidget( this );
