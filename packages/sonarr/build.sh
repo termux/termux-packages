@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://sonarr.tv"
 TERMUX_PKG_DESCRIPTION="A PVR for Usenet and BitTorrent users (server)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="5.0.0.2907"
+TERMUX_PKG_VERSION="5.0.0.2941"
 TERMUX_PKG_SRCURL="https://github.com/Sonarr/Sonarr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=848939933162a461c46024018a4142309a3ed8baeb8d34512705b49ffcd881aa
+TERMUX_PKG_SHA256=dc7cb3e249029af62d374ebfc8d74060c8250510a424488640285f34df1b3e81
 TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0, nodejs, yarn"
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, mono, libesqlite3, libcurl, ffmpeg"
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0, libesqlite3, libcurl, ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"sonarr"
@@ -43,22 +43,6 @@ termux_step_pre_configure() {
 	sed -i 's/<GenerateDocumentationFile>true<\/GenerateDocumentationFile>/<GenerateDocumentationFile>false<\/GenerateDocumentationFile>/g' src/Directory.Build.props
 	sed -i '/<NoWarn>$(NoWarn);CS1591<\/NoWarn>/a \    <NoWarn>$(NoWarn);NU1901;NU1902;NU1903;NU1904;NU1605</NoWarn>' src/Directory.Build.props
 	sed -i '/<PropertyGroup>/a \    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>' src/Directory.Build.props
-
-	# Force all projects to target .NET 10.0
-	find src -name "*.csproj" -exec sed -i 's/<TargetFrameworks>.*<\/TargetFrameworks>/<TargetFrameworks>net10.0<\/TargetFrameworks>/g' {} +
-	find src -name "*.csproj" -exec sed -i 's/<TargetFramework>.*<\/TargetFramework>/<TargetFramework>net10.0<\/TargetFramework>/g' {} +
-
-	# Update Microsoft.Extensions and specific System packages to 10.0.0 for compatibility with .NET 10.0
-	find src -name "*.csproj" -exec sed -i 's/Include="Microsoft\.Extensions\.\([^"]*\)" Version="[0-9.]*"/Include="Microsoft.Extensions.\1" Version="10.0.0"/g' {} +
-	find src -name "*.csproj" -exec sed -i 's/Include="System\.ServiceProcess\.ServiceController" Version="[0-9.]*"/Include="System.ServiceProcess.ServiceController" Version="10.0.0"/g' {} +
-
-	# Remove obsolete System.* package references that are built into .NET 10.0
-	find src -name "*.csproj" -exec sed -i '/Include="System\.\(ValueTuple\|Memory\|Runtime\.Loader\|Threading\.Tasks\.Extensions\)"/d' {} +
-
-	# Fix ambiguous IPNetwork reference under .NET 10.0
-	if ! grep -q "using IPNetwork =" src/NzbDrone.Host/Startup.cs; then
-		sed -i 's/\bIPNetwork\b/Microsoft.AspNetCore.HttpOverrides.IPNetwork/g' src/NzbDrone.Host/Startup.cs
-	fi
 
 	# Build UI
 	export NODE_OPTIONS="--max-old-space-size=4096"
@@ -100,7 +84,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	# Remove bundled native libs that we want to use from system
+	# Remove bundled native libs (we use system sqlite and provide Android bionic libMono.Unix)
 	rm -f build/{libe_sqlite3,libMono.Unix}.so*
 
 	rm -rf "${TERMUX_PREFIX}/lib/sonarr"
@@ -109,8 +93,19 @@ termux_step_make_install() {
 	# Copy build artifacts
 	cp -r build/* "${TERMUX_PREFIX}/lib/sonarr/"
 
-	# Symlink libMono.Unix.so to system libMonoPosixHelper.so (provided by mono)
-	ln -sf "${TERMUX_PREFIX}/lib/libMonoPosixHelper.so" "${TERMUX_PREFIX}/lib/sonarr/libMono.Unix.so"
+	# Install native Android libMono.Unix.so bundled in Openur.Mono.Unix NuGet package
+	local nuget_packages_dir="${NUGET_PACKAGES:-$HOME/.nuget/packages}"
+	local mono_arch
+	case "${TERMUX_ARCH}" in
+		aarch64) mono_arch="android-arm64" ;;
+		i686)    mono_arch="android-x86" ;;
+		x86_64)  mono_arch="android-x64" ;;
+	esac
+
+	local nuget_mono_so
+	nuget_mono_so=$(find "${nuget_packages_dir}/openur.mono.unix" -path "*/runtimes/${mono_arch}/native/libMono.Unix.so" | head -n1)
+	[ -f "${nuget_mono_so}" ] || termux_error_exit "libMono.Unix.so not found for ${mono_arch}"
+	cp "${nuget_mono_so}" "${TERMUX_PREFIX}/lib/sonarr/libMono.Unix.so"
 
 	# Copy UI files
 	mkdir -p "${TERMUX_PREFIX}/lib/sonarr/UI"
