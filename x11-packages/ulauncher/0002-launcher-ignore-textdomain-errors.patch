@@ -1,0 +1,15 @@
+--- a/bin/ulauncher
++++ b/bin/ulauncher
+@@ -8,7 +8,11 @@
+ import os
+
+ import locale
+-locale.textdomain('ulauncher')
++try:
++    locale.textdomain('ulauncher')
++except OSError:
++    # textdomain() is not functional on Android (bionic)
++    pass
+
+ if sys.version_info.major < 3:
+     raise Exception("Ulauncher should be run with Python 3")

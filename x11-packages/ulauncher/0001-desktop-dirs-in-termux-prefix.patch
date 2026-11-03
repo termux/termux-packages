@@ -1,0 +1,11 @@
+--- a/ulauncher/config.py
++++ b/ulauncher/config.py
+@@ -24,7 +24,7 @@
+ CONFIG_DIR = os.path.join(xdg_config_home, 'ulauncher')
+ SETTINGS_FILE_PATH = os.path.join(CONFIG_DIR, 'settings.json')
+ # spec: https://specifications.freedesktop.org/menu-spec/latest/ar01s02.html
+-DESKTOP_DIRS = list(filter(os.path.exists, [os.path.join(dir, "applications") for dir in xdg_data_dirs]))
++DESKTOP_DIRS = list(filter(os.path.exists, ["@TERMUX_PREFIX@/share/applications"] + [os.path.join(dir, "applications") for dir in xdg_data_dirs]))
+ EXTENSIONS_DIR = os.path.join(DATA_DIR, 'extensions')
+ EXT_PREFERENCES_DIR = os.path.join(CONFIG_DIR, 'ext_preferences')
+ ULAUNCHER_APP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
