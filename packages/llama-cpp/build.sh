@@ -29,8 +29,8 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 # Enable subprocess support on Android without requiring API 34.
 # Use fork + exec for subprocess working-directory handling.
 termux_step_pre_configure() {
-        CFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
-        CXXFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
+	CFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
+	CXXFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
 
 	export PATH="$NDK/shader-tools/linux-x86_64:$PATH"
 	LDFLAGS+=" -landroid-spawn"
