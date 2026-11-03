@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://pip.pypa.io/
 TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="26.2.2"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="26.3"
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b505949bb27827b32f54c9f1f5ca660a6fae3fde61cbe0a971975a3ed34a7ee1
+TERMUX_PKG_SHA256=fb51108c23d88269d37da5813d97b5b27395c824b751ba1141a5cf408bcdd658
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+(?:\.\d+){1,2}(?!b)' # matches '25.3', '25.3.1' but not '26.0b1'
@@ -30,8 +29,9 @@ termux_step_post_make_install() {
 	install -vDm 644 docs/build/man/*.1 -t "$TERMUX_PREFIX/share/man/man1/"
 	install -vDm 644 {NEWS,README}.rst -t "$TERMUX_PREFIX/share/doc/python-pip/"
 
-	"$TERMUX_PREFIX"/bin/pip completion --bash | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
-	"$TERMUX_PREFIX"/bin/pip completion --fish | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
+	local pip_cmd=(python -c "import sys; sys.path.insert(0, '$TERMUX_PYTHON_HOME/site-packages'); from pip._internal.cli.main import main; sys.exit(main(sys.argv[1:]))")
+	"${pip_cmd[@]}" completion --bash | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
+	"${pip_cmd[@]}" completion --fish | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
 
 	# replace certifi's CA certificates with our copy
 	local pip_certifi_ca_path="${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/site-packages/pip/_vendor/certifi/cacert.pem"
