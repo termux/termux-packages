@@ -29,8 +29,12 @@ termux_step_post_make_install() {
 	install -vDm 644 docs/build/man/*.1 -t "$TERMUX_PREFIX/share/man/man1/"
 	install -vDm 644 {NEWS,README}.rst -t "$TERMUX_PREFIX/share/doc/python-pip/"
 
-	"$TERMUX_PREFIX"/bin/pip completion --bash | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
-	"$TERMUX_PREFIX"/bin/pip completion --fish | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
+	# crossenv's build-site pip can be older than the installed pip package.
+	local host_python="$TERMUX_BUILD_PYTHON_DIR/host-build-prefix/bin/python${TERMUX_PYTHON_VERSION}"
+	PYTHONPATH="$TERMUX_PKG_SRCDIR/src" "$host_python" -m pip completion --bash |
+		install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
+	PYTHONPATH="$TERMUX_PKG_SRCDIR/src" "$host_python" -m pip completion --fish |
+		install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
 
 	# replace certifi's CA certificates with our copy
 	local pip_certifi_ca_path="${TERMUX_PREFIX}/lib/python${TERMUX_PYTHON_VERSION}/site-packages/pip/_vendor/certifi/cacert.pem"
