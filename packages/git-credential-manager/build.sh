@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Cross-platform Git credential storage for multiple hosti
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.0.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/git-ecosystem/git-credential-manager/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=561cd3c664a314e20dec9fad504c50bba6975b29aaf68c342daf1820130fa8bc
+TERMUX_PKG_BUILD_DEPENDS="dotnet-targeting-pack-10.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_DOTNET_VERSION=10.0
 TERMUX_PKG_DEPENDS="dotnet-host, dotnet-runtime-10.0"
@@ -17,12 +18,16 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	local runtime_version
+	runtime_version="$(basename "${TERMUX_PREFIX}"/lib/dotnet/packs/Microsoft.NETCore.App.Ref/*)"
+
 	dotnet publish src/git-credential-manager/git-credential-manager.csproj \
 	--framework "net${TERMUX_DOTNET_VERSION}" \
 	--no-self-contained \
 	--runtime "$DOTNET_TARGET_NAME" \
 	--configuration Release \
 	-p:PublishTrimmed=false \
+	-p:RuntimeFrameworkVersion="${runtime_version}" \
 	-p:AssemblyVersion="${TERMUX_PKG_VERSION}" \
 	-p:FileVersion="${TERMUX_PKG_VERSION}" \
 	-p:InformationalVersion="${TERMUX_PKG_VERSION}" \
