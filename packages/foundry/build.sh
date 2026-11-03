@@ -17,7 +17,11 @@ TERMUX_PKG_SOLC_VERSIONS=(
 	0.8.36
 	0.8.37
 )
-TERMUX_PKG_SOLC_SHA256=(
+TERMUX_PKG_SRCURL=(
+	"https://github.com/foundry-rs/foundry/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	05a736ab9b35a16ee2abde6e31d3f04452e139cb86cb62456c83a006d347fe87
 	ec756e30f26a5a38d028fd6f401ef0a7f5cfbf4a1ce71f76c2e3e1ffb8730672
 	fe76237f513b7d6727a93cd5b83f92747650c8dc5f8f89457a41e8f54119ed38
 	5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d
@@ -29,16 +33,9 @@ TERMUX_PKG_SOLC_SHA256=(
 	458c525af3a7bc1b5599e1a125cce960631ab8b3e7110c7ed4c9bbf34157fb86
 	705306af6d6e0f4da04b4de7be22a5d7b87a90af0901170e726d8d97b342fcf8
 )
-TERMUX_PKG_SRCURL=(
-	"https://github.com/foundry-rs/foundry/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-)
-TERMUX_PKG_SHA256=(
-	05a736ab9b35a16ee2abde6e31d3f04452e139cb86cb62456c83a006d347fe87
-)
 for _solc_version in "${TERMUX_PKG_SOLC_VERSIONS[@]}"; do
 	TERMUX_PKG_SRCURL+=("https://github.com/argotorg/solidity/releases/download/v${_solc_version}/solidity_${_solc_version}.tar.gz")
 done
-TERMUX_PKG_SHA256+=("${TERMUX_PKG_SOLC_SHA256[@]}")
 unset _solc_version
 TERMUX_PKG_DEPENDS="libiconv, ca-certificates, zlib, openssl, libssh2, pcre2, libgit2, boost, libc++"
 TERMUX_PKG_AUTO_UPDATE=true
