@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://gputils.sourceforge.io/
+TERMUX_PKG_DESCRIPTION="Development utilities for Microchip (TM) PIC microcontrollers"
+TERMUX_PKG_GROUPS="devel"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_MAINTAINER="Daniel <danielpdiamon@gmail.com>"
+TERMUX_PKG_VERSION="1.5.2"
+TERMUX_PKG_SRCURL="https://downloads.sourceforge.net/project/gputils/gputils/1.5.0/gputils-${TERMUX_PKG_VERSION}.tar.bz2"
+TERMUX_PKG_SHA256="8fb8820b31d7c1f7c776141ccb3c4f06f40af915da6374128d752d1eee3addf2"
+TERMUX_PKG_AUTO_UPDATE=true
