@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 termux_setup_electron() {
-	local electron_major="${TERMUX_ELECTRON_MAJOR:-42}"
+	local electron_major="${TERMUX_ELECTRON_MAJOR:-43}"
 	local electron_host_tools="electron${electron_major}-host-tools"
 
 	termux_setup_nodejs
