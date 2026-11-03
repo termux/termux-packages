@@ -1,0 +1,16 @@
+--- a/src/cmd/vbackup/vbackup.c
++++ b/src/cmd/vbackup/vbackup.c
+@@ -252,10 +252,10 @@ threadmain(int argc, char **argv)
+ 		 */
+ 		if((tmp = getenv("TMP")) != nil){
+ 			/* okay, good */
+-		}else if(access("/var/tmp", 0) >= 0)
+-			tmp = "/var/tmp";
++		}else if(access("@TERMUX_PREFIX@/var/tmp", 0) >= 0)
++			tmp = "@TERMUX_PREFIX@/var/tmp";
+ 		else
+-			tmp = "/tmp";
++			tmp = "@TERMUX_PREFIX@/tmp";
+ 		tmpnam = smprint("%s/vbackup.XXXXXX", tmp);
+ 		if(tmpnam == nil)
+ 			sysfatal("smprint: %r");

@@ -1,0 +1,23 @@
+--- a/src/cmd/idiff.c
++++ b/src/cmd/idiff.c
+@@ -25,7 +25,7 @@ void
+ main(int argc, char **argv)
+ {
+ 	int fd, ofd;
+-	char diffout[40], idiffout[40];
++	char diffout[40 * 2], idiffout[40 * 2];
+ 	Biobuf *b1, *b2, bdiff, bout, bstdout;
+ 	Dir *d;
+ 
+@@ -59,9 +59,9 @@ main(int argc, char **argv)
+ 	if((b2 = Bopen(argv[1], OREAD)) == nil)
+ 		sysfatal("open %s: %r", argv[1]);
+ 
+-	strcpy(diffout, "/tmp/idiff.XXXXXX");
++	strcpy(diffout, "@TERMUX_PREFIX@/tmp/idiff.XXXXXX");
+ 	fd = opentemp(diffout, ORDWR|ORCLOSE);
+-	strcpy(idiffout, "/tmp/idiff.XXXXXX");
++	strcpy(idiffout, "@TERMUX_PREFIX@/tmp/idiff.XXXXXX");
+ 	ofd = opentemp(idiffout, ORDWR|ORCLOSE);
+ 	rundiff(argv[0], argv[1], fd);
+ 	seek(fd, 0, 0);
