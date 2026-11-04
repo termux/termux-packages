@@ -1,0 +1,20 @@
+--- a/src/apprt/gtk/class/application.zig
++++ b/src/apprt/gtk/class/application.zig
+@@ -3306,6 +3306,17 @@ fn setGtkEnv(config: *const CoreConfig) std.Io.Writer.Error!void {
+         _ = setenv("GDK_DISABLE", @ptrCast(value[0 .. value.len - 1 :0]), 1);
+     }
+ 
++    {
++        // Termux: GTK's GL renderer (GSK ngl) and Ghostty's EGL context
++        // cannot coexist on Termux:X11 with Mesa. eglMakeCurrent fails
++        // with EGL_BAD_ACCESS and the surface never initializes. Default
++        // GTK to the software renderer on Android. An explicit
++        // GSK_RENDERER value still wins.
++        if (comptime builtin.target.abi == .android) {
++            _ = setenv("GSK_RENDERER", "cairo", 0);
++        }
++    }
++
+     // Sync environ after altering system env
+     global.syncEnviron();
+ }
