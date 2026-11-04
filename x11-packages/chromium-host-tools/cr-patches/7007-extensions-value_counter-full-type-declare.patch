@@ -1,0 +1,22 @@
+--- a/extensions/common/value_counter.h
++++ b/extensions/common/value_counter.h
+@@ -47,7 +47,7 @@
+   size_t total_count() const { return total_count_; }
+ 
+   // Returns the number of distinct values being counted.
+-  size_t distinct_count() const { return entries_.size(); }
++  size_t distinct_count() const;
+ 
+  private:
+   struct Entry;
+--- a/extensions/common/value_counter.cc
++++ b/extensions/common/value_counter.cc
+@@ -58,4 +58,8 @@
+   return false;  // Nothing to remove.
+ }
+ 
++size_t ValueCounter::distinct_count() const {
++  return entries_.size();
++}
++
+ }  // namespace extensions

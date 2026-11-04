@@ -1418,3 +1418,30 @@ index 462f58b62b..9ee7a8df35 100644
  }  // namespace network
 +
 +#undef kReportTo
+--- a/gpu/ipc/service/gpu_init_2.cc
++++ b/gpu/ipc/service/gpu_init_2.cc
+@@ -103,6 +103,13 @@
+ #include "third_party/dawn/include/dawn/webgpu_cpp.h"  // nogncheck
+ #endif
+ 
++#define CollectGraphicsInfo CollectGraphicsInfo_gpu_init_2
++#define InitializeDawnProcs InitializeDawnProcs_gpu_init_2
++#define InitializePlatformOverlaySettings InitializePlatformOverlaySettings_gpu_init_2
++#define CanAccessDeviceFile CanAccessDeviceFile_gpu_init_2
++#define DisableInProcessGpuVulkan DisableInProcessGpuVulkan_gpu_init_2
++#define MatchGLInfo MatchGLInfo_gpu_init_2
++
+ namespace gpu {
+ 
+ namespace {
+@@ -1474,3 +1481,10 @@
+ }
+ 
+ }  // namespace gpu
++
++#undef CollectGraphicsInfo
++#undef InitializeDawnProcs
++#undef InitializePlatformOverlaySettings
++#undef CanAccessDeviceFile
++#undef DisableInProcessGpuVulkan
++#undef MatchGLInfo

@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Chromium web browser (Host tools)"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
-TERMUX_PKG_VERSION="156.0.8078.79"
+TERMUX_PKG_VERSION="157.0.8103.38"
 TERMUX_PKG_SRCURL="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/$TERMUX_PKG_VERSION/chromium-$TERMUX_PKG_VERSION-linux.tar.xz"
-TERMUX_PKG_SHA256=362f7f0f21e69431540757b69044c4581146f23c9afec8e6b0a6abe1037bd351
+TERMUX_PKG_SHA256=29904f34e47900e96b595e744a91ed23afc5f3060bf0e9f65817a043957ce7ad
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pipewire, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libffi-static"
 # Chromium doesn't support i686 on Linux.
@@ -314,7 +314,7 @@ use_jumbo_build = true
 # Compile pdfium as a static library
 pdf_is_complete_lib = true
 # Disable v8's metagen
-v8_use_metagen_instance_types = false
+v8_use_metagen = false
 " > $_common_args_file
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then

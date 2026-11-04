@@ -462,97 +462,97 @@ diff --git a/third_party/blink/renderer/bindings/scripts/bind_gen/callback_inter
 index dccf917762..bb11d3c783 100644
 --- a/third_party/blink/renderer/bindings/scripts/bind_gen/callback_interface.py
 +++ b/third_party/blink/renderer/bindings/scripts/bind_gen/callback_interface.py
-@@ -185,6 +185,7 @@ def generate_callback_interface(callback_interface_identifier):
-          cg_context,
-          FN_INSTALL_INTERFACE_TEMPLATE,
-          class_name=class_name,
-+         api_class_name=class_name,
-          trampoline_var_name=None,
-          constructor_entries=[],
-          supplemental_install_node=SequenceNode(),
+@@ -206,6 +206,7 @@
+         cg_context,
+         FN_INSTALL_INTERFACE_TEMPLATE,
+         class_name=class_name,
++        api_class_name=class_name,
+         trampoline_var_name=None,
+         constructor_entries=[],
+         supplemental_install_node=SequenceNode(),
 diff --git a/third_party/blink/renderer/bindings/scripts/bind_gen/dictionary.py b/third_party/blink/renderer/bindings/scripts/bind_gen/dictionary.py
 index 3ca42542b5..409c3941cc 100644
 --- a/third_party/blink/renderer/bindings/scripts/bind_gen/dictionary.py
 +++ b/third_party/blink/renderer/bindings/scripts/bind_gen/dictionary.py
-@@ -708,7 +708,7 @@ def make_properties_array(cg_context):
-         for member in cg_context.dictionary.own_members
-     ])
-     return ListNode([
--        T("const std::string_view kOwnPropertyNames[] = {"),
-+        T("const std::string_view kOwnPropertyNames_{}[] = {{".format(cg_context.class_name)),
-         properties,
-         T("};"),
-         EmptyNode(),
-@@ -740,9 +740,9 @@ def make_fill_template_properties_function(cg_context):
- 
-     if cg_context.dictionary.own_members:
-         body.extend([
--            T("static_assert(std::size(kOwnPropertyNames) "
-+            T("static_assert(std::size(kOwnPropertyNames_{}) ".format(cg_context.class_name) +
-               "== kOwnPropertyCount);"),
--            T("properties.append_range(kOwnPropertyNames);"),
-+            T("properties.append_range(kOwnPropertyNames_{});".format(cg_context.class_name)),
-             T("DCHECK_EQ(properties.size(), kTotalPropertyCount);")
-         ])
- 
-@@ -996,7 +996,7 @@ def make_v8_own_member_names_function(cg_context):
-     body.extend([
-         TextNode("return V8PerIsolateData::From(${isolate})"
-                  "->FindOrCreateEternalNameCache"
--                 "(kOwnPropertyNames, kOwnPropertyNames);"),
-+                 "(kOwnPropertyNames_${class_name}, kOwnPropertyNames_${class_name});"),
-     ])
- 
-     return func_decl, func_def
+@@ -786,7 +786,7 @@
+     )
+     return ListNode(
+         [
+-            T("const std::string_view kOwnPropertyNames[] = {"),
++            T("const std::string_view kOwnPropertyNames_{}[] = {{".format(cg_context.class_name)),
+             properties,
+             T("};"),
+             EmptyNode(),
+@@ -825,10 +825,10 @@
+         body.extend(
+             [
+                 T(
+-                    "static_assert(std::size(kOwnPropertyNames) "
++                    "static_assert(std::size(kOwnPropertyNames_{}) ".format(cg_context.class_name) +
+                     "== kOwnPropertyCount);"
+                 ),
+-                T("properties.append_range(kOwnPropertyNames);"),
++                T("properties.append_range(kOwnPropertyNames_{});".format(cg_context.class_name)),
+                 T("DCHECK_EQ(properties.size(), kTotalPropertyCount);"),
+             ]
+         )
+@@ -1156,7 +1156,7 @@
+             TextNode(
+                 "return V8PerIsolateData::From(${isolate})"
+                 "->FindOrCreateEternalNameCache"
+-                "(kOwnPropertyNames, kOwnPropertyNames);"
++                "(kOwnPropertyNames_${class_name}, kOwnPropertyNames_${class_name});"
+             ),
+         ]
+     )
 diff --git a/third_party/blink/renderer/bindings/scripts/bind_gen/interface.py b/third_party/blink/renderer/bindings/scripts/bind_gen/interface.py
 index d490a10187..7984abf490 100644
 --- a/third_party/blink/renderer/bindings/scripts/bind_gen/interface.py
 +++ b/third_party/blink/renderer/bindings/scripts/bind_gen/interface.py
-@@ -5305,7 +5305,7 @@ ${prototype_object}->Delete(
-     return SequenceNode(nodes) if nodes else None
- 
- 
--def make_install_interface_template(cg_context, function_name, class_name,
-+def make_install_interface_template(cg_context, function_name, class_name, api_class_name,
-                                     trampoline_var_name, constructor_entries,
-                                     supplemental_install_node,
-                                     install_unconditional_func_name,
-@@ -5438,7 +5438,7 @@ def make_install_interface_template(cg_context, function_name, class_name,
-     for entry in constructor_entries:
+@@ -6635,6 +6635,7 @@
+     cg_context,
+     function_name,
+     class_name,
++    api_class_name,
+     trampoline_var_name,
+     constructor_entries,
+     supplemental_install_node,
+@@ -6798,7 +6799,7 @@
          nodes = [
-             FormatNode("${interface_function_template}->SetCallHandler({});",
--                       entry.ctor_callback_name),
-+                       api_class_name + "Callbacks::" + entry.ctor_callback_name),
-             FormatNode("${interface_function_template}->SetLength({});",
-                        entry.ctor_func_length),
              FormatNode(
-@@ -5486,7 +5486,7 @@ def make_install_interface_template(cg_context, function_name, class_name,
+                 "${interface_function_template}->SetCallHandler({});",
+-                entry.ctor_callback_name,
++                api_class_name + "Callbacks::" + entry.ctor_callback_name
+             ),
+             FormatNode(
+                 "${interface_function_template}->SetLength({});",
+@@ -6857,7 +6858,7 @@
              T("""\
  // HTMLAllCollection-specific settings
  // https://html.spec.whatwg.org/C/#the-htmlallcollection-interface
 -${instance_template}->SetCallAsFunctionHandler(ItemOperationCallback);
 +${instance_template}->SetCallAsFunctionHandler(${class_name}Callbacks::ItemOperationCallback);
  ${instance_template}->MarkAsUndetectable();
- """))
- 
-@@ -5776,6 +5776,7 @@ ${instance_object} = ${v8_context}->Global();\
-         if unconditional_entries:
+ """)
+         )
+@@ -7204,6 +7205,7 @@
              body.append(
-                 CxxBlockNode([
-+                    TextNode("using namespace ${class_name}Callbacks;"),
-                     make_table_func(table_name, unconditional_entries),
-                     TextNode(installer_call_text),
-                 ]))
-@@ -5785,6 +5786,7 @@ ${instance_object} = ${v8_context}->Global();\
-                 CxxLikelyIfNode(cond=conditional,
-                                 attribute=None,
-                                 body=[
-+                                    TextNode("using namespace ${class_name}Callbacks;"),
-                                     make_table_func(table_name, entries),
-                                     TextNode(installer_call_text),
-                                 ]))
-@@ -5963,6 +5965,8 @@ def make_indexed_and_named_property_callbacks_and_install_node(cg_context):
-                 map(lambda flag: "int32_t({})".format(flag), flags))))
+                 CxxBlockNode(
+                     [
++                        TextNode("using namespace ${class_name}Callbacks;"),
+                         make_table_func(table_name, unconditional_entries),
+                         TextNode(installer_call_text),
+                     ]
+@@ -7216,6 +7218,7 @@
+                     cond=conditional,
+                     attribute=None,
+                     body=[
++                        TextNode("using namespace ${class_name}Callbacks;"),
+                         make_table_func(table_name, entries),
+                         TextNode(installer_call_text),
+                     ],
+@@ -7483,6 +7486,8 @@
+         )
          pattern = """\
  // Named interceptors
 +{{
@@ -560,7 +560,7 @@ index d490a10187..7984abf490 100644
  {interceptor_template}->SetHandler(
      v8::NamedPropertyHandlerConfiguration(
          {impl_bridge}::NamedPropertyGetterCallback,
-@@ -5983,7 +5987,9 @@ interface.indexed_and_named_properties.named_getter.extended_attributes:
+@@ -7503,7 +7508,9 @@
          {impl_bridge}::NamedPropertyDefinerCallback,
          {impl_bridge}::NamedPropertyDescriptorCallback,
          v8::Local<v8::Value>(),
@@ -569,9 +569,9 @@ index d490a10187..7984abf490 100644
 +}}
 +"""
          install_node.append(
-             F(pattern,
-               interceptor_template=interceptor_template,
-@@ -6030,6 +6036,8 @@ interface.indexed_and_named_properties.named_getter.extended_attributes:
+             F(
+                 pattern,
+@@ -7595,6 +7602,8 @@
          property_handler_flags = flags[0]
          pattern = """\
  // Indexed interceptors
@@ -580,18 +580,18 @@ index d490a10187..7984abf490 100644
  {interceptor_template}->SetHandler(
      v8::IndexedPropertyHandlerConfiguration(
          {impl_bridge}::IndexedPropertyGetterCallback,
-@@ -6044,7 +6052,8 @@ interface.indexed_and_named_properties.named_getter.extended_attributes:
-         {impl_bridge}::IndexedPropertyDefinerCallback,
-         {impl_bridge}::IndexedPropertyDescriptorCallback,
+@@ -7619,7 +7628,8 @@
+         nullptr,  // iterable_to_list
+ % endif
          v8::Local<v8::Value>(),
 -        {property_handler_flags}));"""
 +        {property_handler_flags}));
 +}}"""
          install_node.append(
-             F(pattern,
-               interceptor_template=interceptor_template,
-@@ -6200,6 +6209,8 @@ def make_cross_origin_property_callbacks_and_install_node(
- 
+             F(
+                 pattern,
+@@ -7820,6 +7830,8 @@
+
      text = """\
  // Cross origin properties
 +{{
@@ -599,47 +599,47 @@ index d490a10187..7984abf490 100644
  ${instance_template}->SetAccessCheckCallbackAndHandler(
      CrossOriginAccessCheckCallback,
      v8::NamedPropertyHandlerConfiguration(
-@@ -6222,6 +6233,7 @@ ${instance_template}->SetAccessCheckCallbackAndHandler(
-         CrossOriginIndexedDescriptorCallback,
+@@ -7844,6 +7856,7 @@
+         nullptr,  // iterable_to_list
          v8::Local<v8::Value>(),
          v8::PropertyHandlerFlags::kNone));
 +}}
  """
      install_node.append(TextNode(text))
      install_node.accumulate(
-@@ -6418,6 +6430,7 @@ def make_wrapper_type_info(cg_context, function_name,
-         ]))
- 
+@@ -8136,6 +8149,7 @@
+     )
+
      pattern = """\
 +namespace ${class_name}Callbacks {{ }}
  // Construction of WrapperTypeInfo may require non-trivial initialization due
  // to cross-component address resolution in order to load the pointer to the
  // parent interface's WrapperTypeInfo.  We ignore this issue because the issue
-@@ -6617,6 +6630,7 @@ def _make_v8_context_snapshot_get_reference_table_function(
-                                                                            )),
-             filter(None, callback_names)))
-     table_node = ListNode([
-+        TextNode("using namespace ${class_name}Callbacks;"),
-         TextNode("static const intptr_t kReferenceTable[] = {"),
-         ListNode(entry_nodes),
-         TextNode("};"),
-@@ -6995,6 +7009,7 @@ def generate_class_like(class_like,
-          cg_context,
-          FN_INSTALL_INTERFACE_TEMPLATE,
-          class_name=impl_class_name,
-+         api_class_name=api_class_name,
-          trampoline_var_name=tp_install_interface_template,
-          constructor_entries=constructor_entries,
-          supplemental_install_node=supplemental_install_node,
-@@ -7244,7 +7259,7 @@ def generate_class_like(class_like,
-                                                     class_like.identifier)
-     impl_source_blink_ns.body.extend([
-         CxxNamespaceNode(
--            name="",
-+            name=api_class_name + "Callbacks",
-             body=[
-                 # Enclose the implementations with a namespace just in order to
-                 # include the class_like name in a stacktrace, such as
+@@ -8399,6 +8413,7 @@
+     )
+     table_node = ListNode(
+         [
++            TextNode("using namespace ${class_name}Callbacks;"),
+             TextNode("static const intptr_t kReferenceTable[] = {"),
+             ListNode(entry_nodes),
+             TextNode("};"),
+@@ -8868,6 +8867,7 @@
+         cg_context,
+         FN_INSTALL_INTERFACE_TEMPLATE,
+         class_name=impl_class_name,
++        api_class_name=api_class_name,
+         trampoline_var_name=tp_install_interface_template,
+         constructor_entries=constructor_entries,
+         supplemental_install_node=supplemental_install_node,
+@@ -9195,7 +9211,7 @@
+     impl_source_blink_ns.body.extend(
+         [
+             CxxNamespaceNode(
+-                name="",
++                name=api_class_name + "Callbacks",
+                 body=[
+                     # Enclose the implementations with a namespace just in order to
+                     # include the class_like name in a stacktrace, such as
 diff --git a/third_party/blink/renderer/controller/BUILD.gn b/third_party/blink/renderer/controller/BUILD.gn
 index 79cad3a8f1..de6cdc9825 100644
 --- a/third_party/blink/renderer/controller/BUILD.gn
@@ -888,18 +888,18 @@ index c885691ed0..3d7826c905 100644
  import("//third_party/blink/renderer/config.gni")
  
  blink_core_output_dir = "$root_gen_dir/third_party/blink/renderer/core"
-@@ -53,9 +54,9 @@ core_config_add += blink_symbols_config
- #      Normal meaning if defined. If undefined, defaults to everything in core.
- template("blink_core_sources") {
-   if (is_component_build) {
+@@ -58,9 +59,9 @@ core_config_add += blink_symbols_config
+   if (is_component_build ||
+       (defined(invoker.sources) &&
+        filter_exclude(invoker.sources, [ "*.h" ]) == [])) {
 -    target_type = "source_set"
 +    target_type = "jumbo_source_set"
    } else {
 -    target_type = "static_library"
 +    target_type = "jumbo_static_library"
    }
+ 
    target(target_type, target_name) {
-     # The visibility will get overridden by forward_variables_from below if the
 diff --git a/third_party/blink/renderer/core/css/background_color_paint_image_generator.cc b/third_party/blink/renderer/core/css/background_color_paint_image_generator.cc
 index 0891416a55..96872813e5 100644
 --- a/third_party/blink/renderer/core/css/background_color_paint_image_generator.cc
@@ -2702,30 +2702,6 @@ index 2e4b14e097..ab20f6efde 100644
    ]
 +  jumbo_excluded_sources = [ "permission_utils.cc" ]
  }
-diff --git a/third_party/blink/renderer/modules/shared_storage/shared_storage_worklet.cc b/third_party/blink/renderer/modules/shared_storage/shared_storage_worklet.cc
-index aeb8343ed4..5ac248c26c 100644
---- a/third_party/blink/renderer/modules/shared_storage/shared_storage_worklet.cc
-+++ b/third_party/blink/renderer/modules/shared_storage/shared_storage_worklet.cc
-@@ -34,6 +34,11 @@
- #include "third_party/blink/renderer/platform/wtf/text/strcat.h"
- #include "url/origin.h"
- 
-+#ifdef __clang__
-+#pragma clang diagnostic push
-+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
-+#endif
-+
- namespace blink {
- 
- namespace {
-@@ -789,3 +794,7 @@ void SharedStorageWorklet::RunInternal(
- }
- 
- }  // namespace blink
-+
-+#ifdef __clang__
-+#pragma clang diagnostic pop
-+#endif
 diff --git a/third_party/blink/renderer/modules/storage/BUILD.gn b/third_party/blink/renderer/modules/storage/BUILD.gn
 index def668aa11..056722af5f 100644
 --- a/third_party/blink/renderer/modules/storage/BUILD.gn
