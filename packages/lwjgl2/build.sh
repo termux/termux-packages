@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="doc/LICENSE"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="2.9.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/LWJGL/lwjgl/archive/refs/tags/lwjgl${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9a4ffd8aed04209cb7ee0450902fbd177106128d2d5e3ab65632942df9dacc17
 TERMUX_PKG_AUTO_UPDATE=false
@@ -11,6 +12,8 @@ TERMUX_PKG_DEPENDS="libx11, libxcursor, libxext, libxrandr, libxxf86vm"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_RECOMMENDS="openal-soft"
 TERMUX_PKG_BUILD_IN_SRC=true
+# On-device build has a problem and that's why it must be disabled.
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # The annotation processors run on the host JDK; javac -h stands in for javah.
 _lwjgl2_generate() {

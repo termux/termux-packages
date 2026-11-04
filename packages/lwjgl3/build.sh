@@ -3,16 +3,18 @@ TERMUX_PKG_DESCRIPTION="Lightweight Java Game Library 3 (LWJGL 3), all versions 
 TERMUX_PKG_LICENSE="BSD 3-Clause, ISC"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="3.4.3"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/LWJGL/lwjgl3/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=039b5c4b9ef1927d56f6e63909ef3cbfba130d9f0294af37440d831048d2e724
 TERMUX_PKG_AUTO_UPDATE=false
 # Every version is a subpackage (see the lwjgl3-*.subpackage.sh files),
 # this package only pulls them all in.
 TERMUX_PKG_DEPENDS="lwjgl3-3.2.1, lwjgl3-3.2.2, lwjgl3-3.3.1, lwjgl3-3.3.2, lwjgl3-3.3.3, lwjgl3-3.3.6, lwjgl3-3.4.1, lwjgl3-3.4.2, lwjgl3-3.4.3"
-TERMUX_PKG_BUILD_DEPENDS="libffi, libx11"
+TERMUX_PKG_BUILD_DEPENDS="libffi, libx11, spirv-headers, spirv-tools, vulkan-headers"
 TERMUX_PKG_RECOMMENDS="openal-soft"
 TERMUX_PKG_BUILD_IN_SRC=true
+# On-device build has a problem and that's why it must be disabled.
+TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
 # To add a new LWJGL 3 version:
 #   1. add it to _LWJGL3_VERSIONS and to the checksum table in termux_step_post_get_source,
@@ -22,6 +24,22 @@ TERMUX_PKG_BUILD_IN_SRC=true
 _LWJGL3_VERSIONS=(3.2.1 3.2.2 3.3.1 3.3.2 3.3.3 3.3.6 3.4.1 3.4.2 3.4.3)
 _LWJGL_DYNCALL_COMMIT=3bcebd526fe16f0aa520e32597ff3dbfbf30b1e4
 _LWJGL_DYNCALL_SHA256=5ac91f490383557c9809da978ca2909754271ab03a977b2acad353c07063952a
+# Core module must be built first so assimp module won't fail.
+# GLFW module fails without OpenGL (and maybe OpenGLES) and Vulkan modules,
+# so they are also being built first.
+# Also OpenGLES fails without EGL.
+_LWJGL_MODULES=(
+	core vulkan opengl egl opengles
+	assimp bgfx freetype glfw harfbuzz
+	hwloc jawt jemalloc ktx libdivide
+	llvm lmdb lz4 meow meshoptimizer
+	mimalloc msdfgen nanovg nfd nuklear
+	odbc openal opencl openvr openxr
+	opus par remotery renderdoc rpmalloc
+	sdl shaderc spng spvc sse
+	stb tinyexr tinyfd tootle vma
+	xxhash yoga zstd
+)
 
 termux_step_post_get_source() {
 	declare -A sha256=(
@@ -75,7 +93,16 @@ _lwjgl_compile() {
 	jobs="$TERMUX_PKG_MAKE_PROCESSES"
 	mkdir -p "$objdir"
 	for f in "$@"; do
-		$CC $flags $CPPFLAGS $CFLAGS ${_LWJGL_LATE_CFLAGS:-} -c "$f" -o "$objdir/$(echo "$f" | cksum | cut -d' ' -f1)_$(basename "$f").o" &
+	# C++ sources need the C++ driver and a C++ standard (gnu11 is rejected for C++).
+		local cc="$CC" cc_flags="$flags" cc_cflags="$CFLAGS"
+		case "$f" in
+			*.cpp|*.cc)
+				cc="$CXX"
+				cc_flags="${flags//-std=gnu11/-std=gnu++2a}"
+				cc_cflags="$CXXFLAGS"
+				;;
+		esac
+		$cc $cc_flags $CPPFLAGS $cc_cflags ${_LWJGL_LATE_CFLAGS:-} -c "$f" -o "$objdir/$(echo "$f" | cksum | cut -d' ' -f1)_$(basename "$f").o" &
 		pids+=($!)
 		if (( ${#pids[@]} >= jobs )); then
 			wait "${pids[0]}"
@@ -90,7 +117,11 @@ _lwjgl_compile() {
 _lwjgl_link() {
 	local name="$1"
 	shift
-	$CC -shared $CFLAGS $LDFLAGS -o "$_LWJGL_OUT/lib/lib$name.so" "$_LWJGL_OUT/obj/$name"/*.o \
+	local cc="$CC"
+	if compgen -G "$_LWJGL_OUT/obj/$name/*.cpp.o" > /dev/null; then
+		cc="$CXX"
+	fi
+	$cc -shared $CFLAGS $LDFLAGS -o "$_LWJGL_OUT/lib/lib$name.so" "$_LWJGL_OUT/obj/$name"/*.o \
 		-Wl,--no-undefined -Wl,--version-script,"$_LWJGL_SRC/config/linux/version.script" \
 		-Wl,-z,noexecstack "$@"
 }
@@ -119,9 +150,17 @@ _lwjgl_build_stubs() {
 _lwjgl_build_java() {
 	local modules_dir="$_LWJGL_SRC/modules/lwjgl"
 	local cp="$_LWJGL_ROOT/stub" m
-	for m in core egl opengl opengles vulkan glfw jemalloc openal stb tinyfd; do
+	for m in ${_LWJGL_MODULES[@]}; do
+		local src_dirs=()
+		[[ -d "$modules_dir/$m/src/main/java" ]] && src_dirs+=("$modules_dir/$m/src/main/java")
+		[[ -d "$modules_dir/$m/src/generated/java" ]] && src_dirs+=("$modules_dir/$m/src/generated/java")
+
+		if [ ${#src_dirs[@]} -eq 0 ]; then
+			continue
+		fi
+
 		mkdir -p "$_LWJGL_OUT/classes/$m"
-		find "$modules_dir/$m/src/main/java" "$modules_dir/$m/src/generated/java" -name '*.java' 2> /dev/null > "$_LWJGL_OUT/$m.list" || true
+		find "${src_dirs[@]}" -name '*.java' 2> /dev/null > "$_LWJGL_OUT/$m.list" || true
 		javac -nowarn -source 8 -target 8 -encoding UTF-8 -XDignore.symbol.file -proc:none \
 			-cp "$cp" -d "$_LWJGL_OUT/classes/$m" @"$_LWJGL_OUT/$m.list"
 		cp="$cp:$_LWJGL_OUT/classes/$m"
@@ -203,6 +242,9 @@ _lwjgl_build_native() {
 	_lwjgl_compile "$_LWJGL_OUT/obj/lwjgl_tinyfd" "-I$modules_dir/tinyfd/src/main/c $base" \
 		"$modules_dir/tinyfd/src/main/c/tinyfiledialogs.c" "$modules_dir"/tinyfd/src/generated/c/*.c
 	_lwjgl_link lwjgl_tinyfd
+
+	_lwjgl_compile "$_LWJGL_OUT/obj/lwjgl_vma" "-I$modules_dir/vma/src/main/c $base" \
+		"$modules_dir"/vma/src/generated/c/*.cpp
 }
 
 termux_step_make() {
