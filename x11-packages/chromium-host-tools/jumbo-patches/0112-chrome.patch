@@ -634,58 +634,6 @@ index 57bb7b883d..d558433d14 100644
  }  // namespace enterprise_connectors
 +
 +#undef kKeyVersion
-diff --git a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
-index fdc8e7eb1f..929ba3facc 100644
---- a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
-+++ b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.cc
-@@ -24,6 +24,9 @@
- #include "components/prefs/pref_service.h"
- #include "components/version_info/version_info.h"
- 
-+#define GetCBCMController       GetCBCMController_TelomereReportingContext
-+#define GetNewReports           GetNewReports_TelomereReportingContext
-+
- namespace enterprise_connectors {
- 
- namespace {
-@@ -70,7 +73,7 @@ void ReportTelomereLogs() {
-   base::ThreadPool::PostTaskAndReplyWithResult(
-       FROM_HERE, {base::MayBlock()},
-       base::BindOnce(&GetNewReports, latest_creation_time),
--      base::BindOnce(&UploadToReportingServer,
-+      base::BindOnce(&UploadToReportingServer2,
-                      reporting_client->AsWeakPtrImpl(),
-                      g_browser_process->local_state()));
- }
-@@ -137,7 +140,7 @@ void SetLatestTelomereReportTime(PrefService* local_state, time_t timestamp) {
-   local_state->SetInt64(kLatestTelomereReportCreationTime, timestamp);
- }
- 
--void UploadToReportingServer(
-+void UploadToReportingServer2(
-     base::WeakPtr<RealtimeReportingClient> reporting_client,
-     PrefService* local_state,
-     std::vector<std::pair<std::string, time_t>> reports) {
-@@ -231,3 +234,6 @@ void TelomereReportingContext::RemoveProfile(TelomereEventRouter* router) {
- TelomereReportingContext::~TelomereReportingContext() = default;
- 
- }  // namespace enterprise_connectors
-+
-+#undef GetCBCMController
-+#undef GetNewReports
-diff --git a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.h b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.h
-index a1c9bd816d..5f6ef60efc 100644
---- a/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.h
-+++ b/chrome/browser/enterprise/connectors/reporting/telomere_reporting_context.h
-@@ -65,7 +65,7 @@ time_t GetLatestTelomereReportTime(PrefService* local_state);
- // Upload a telomere event to the reporting server if available and update
- // latest telomere upload timestamp if one or more such events are uploaded.
- // Included in header for testing.
--void UploadToReportingServer(
-+void UploadToReportingServer2(
-     base::WeakPtr<RealtimeReportingClient> reporting_client,
-     PrefService* local_state,
-     std::vector<std::pair<std::string, time_t>> reports);
 diff --git a/chrome/browser/enterprise/identifiers/profile_id_service_factory.h b/chrome/browser/enterprise/identifiers/profile_id_service_factory.h
 index cde7321e65..98bd721175 100644
 --- a/chrome/browser/enterprise/identifiers/profile_id_service_factory.h
@@ -790,14 +738,14 @@ index 7c555cfd5f..e8a3466654 100644
      OnTabAdded(tab_list, tabs[i], i);
    }
 @@ -389,7 +389,7 @@ void TabsEventRouter::DispatchEvent(
- }
- 
- void TabsEventRouter::UpdateTabIndices(TabListInterface& tab_list) {
--  std::vector<tabs::TabInterface*> tabs = tab_list.GetAllTabs();
-+  std::vector<::tabs::TabInterface*> tabs = tab_list.GetAllTabs();
-   for (size_t i = 0; i < tabs.size(); ++i) {
+
+ void TabsEventRouter::UpdateTabIndices(TabListInterface& tab_list,
+                                        int first_index) {
+-  const std::vector<tabs::TabInterface*> tabs = tab_list.GetAllTabs();
++  const std::vector<::tabs::TabInterface*> tabs = tab_list.GetAllTabs();
+   for (size_t i = static_cast<size_t>(std::max(first_index, 0));
+        i < tabs.size(); ++i) {
      content::WebContents* web_contents = tabs[i]->GetContents();
-     CHECK(web_contents);
 @@ -405,7 +405,7 @@ void TabsEventRouter::UpdateTabIndices(TabListInterface& tab_list) {
  }
  
@@ -886,15 +834,15 @@ diff --git a/chrome/browser/extensions/extension_view_host_factory.cc b/chrome/b
 index 01021f4f4b..557a7e6ff4 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.cc
 +++ b/chrome/browser/extensions/extension_view_host_factory.cc
-@@ -271,7 +271,7 @@ ExtensionViewHostFactory::CreateSidePanelHost(
+@@ -280,7 +280,7 @@ ExtensionViewHostFactory::CreateSidePanelHost(
      const Extension& extension,
      const GURL& url,
      BrowserWindowInterface* browser,
 -    tabs::TabInterface* tab_interface) {
 +    ::tabs::TabInterface* tab_interface) {
-   DCHECK(browser == nullptr ^ tab_interface == nullptr);
+   CHECK(browser == nullptr ^ tab_interface == nullptr,
+         base::NotFatalUntil::M161);
  
-   Profile* profile =
 diff --git a/chrome/browser/extensions/extension_view_host_factory.h b/chrome/browser/extensions/extension_view_host_factory.h
 index 8eca87e4b9..a6cbfded24 100644
 --- a/chrome/browser/extensions/extension_view_host_factory.h
@@ -3793,14 +3741,14 @@ diff --git a/chrome/browser/policy/BUILD.gn b/chrome/browser/policy/BUILD.gn
 index 10bb528ee3..8edeef64d8 100644
 --- a/chrome/browser/policy/BUILD.gn
 +++ b/chrome/browser/policy/BUILD.gn
-@@ -905,6 +905,7 @@ jumbo_source_set("impl") {
-     "value_provider/value_provider_util.cc",
+@@ -1273,6 +1273,7 @@ jumbo_source_set("impl") {
+     "webhid_device_policy_handler.cc",
      "webusb_allow_devices_for_urls_policy_handler.cc",
    ]
 +  jumbo_excluded_sources = []
  
-   public_deps = [
-     ":policy",
+   public_deps = [ ":policy" ]
+ 
 @@ -1181,5 +1182,10 @@ jumbo_source_set("impl") {
        "value_provider/extension_install_policies_value_provider.cc",
        "value_provider/extension_policies_value_provider.cc",
@@ -4758,7 +4706,7 @@ diff --git a/chrome/browser/glic/suggestions/glic_cue_target.cc b/chrome/browser
 index 6317969cd3..48249cd2ff 100644
 --- a/chrome/browser/glic/suggestions/glic_cue_target.cc
 +++ b/chrome/browser/glic/suggestions/glic_cue_target.cc
-@@ -77,7 +77,7 @@
+@@ -77,7 +77,7 @@ void GlicCueTarget::Register(tabs::TabInterface& tab) {
        tab.GetTabFeatures()->contextual_cueing_controller();
    CHECK(contextual_cueing_controller);
    contextual_cueing_controller->RegisterCueTarget(
@@ -4767,7 +4715,7 @@ index 6317969cd3..48249cd2ff 100644
        std::make_unique<GlicCueTarget>(
            *glic_keyed_service,
            OptimizationGuideKeyedServiceFactory::GetForProfile(tab.GetProfile()),
-@@ -95,8 +95,8 @@
+@@ -95,8 +95,8 @@ GlicCueTarget::GlicCueTarget(
  
  GlicCueTarget::~GlicCueTarget() = default;
  
@@ -4778,7 +4726,7 @@ index 6317969cd3..48249cd2ff 100644
  }
  
  bool GlicCueTarget::RequiresModelExecution() const {
-@@ -105,7 +105,7 @@
+@@ -105,7 +105,7 @@ bool GlicCueTarget::RequiresModelExecution() const {
  
  void GlicCueTarget::CheckEligibility(
      base::WeakPtr<content::WebContents> web_contents,
@@ -4805,7 +4753,7 @@ index 6317969cd3..48249cd2ff 100644
        passes_shopping = true;
      }
    }
-@@ -166,7 +166,7 @@
+@@ -163,7 +163,7 @@ bool GlicCueTarget::IsPageEligible(
        "GlicCueTarget::IsPageEligible passes_edu=%d passes_shopping=%d",
        passes_edu, passes_shopping));
  
@@ -4814,7 +4762,7 @@ index 6317969cd3..48249cd2ff 100644
        active_web_contents->GetContentsMimeType() == pdf::kPDFMimeType) {
      CUEING_LOG("GlicCueTarget::IsPageEligible discard shopping pdf");
      return passes_edu && !passes_shopping;
-@@ -214,7 +214,7 @@
+@@ -203,7 +203,7 @@ bool GlicCueTarget::IsEligible() const {
  }
  
  void GlicCueTarget::OnAnchoredMessageClicked(
@@ -4823,7 +4771,7 @@ index 6317969cd3..48249cd2ff 100644
    InvokeGlic(std::move(data), base::FeatureList::IsEnabled(
                                    features::kGlicContextualCueingV2AutoSubmit));
  }
-@@ -223,19 +223,19 @@
+@@ -212,19 +212,19 @@ bool GlicCueTarget::SupportsEditPrompt() const {
    return true;
  }
  
@@ -4847,7 +4795,7 @@ index 6317969cd3..48249cd2ff 100644
    Target target(*tab_, NewConversation());
    GlicInvokeOptions options(
        std::move(target),
-@@ -281,10 +281,10 @@
+@@ -270,10 +270,10 @@ ui::ImageModel GlicCueTarget::GetOmniboxChipIcon() const {
  #endif
  }
  
@@ -4932,13 +4880,13 @@ index 9fc77e09a7..b41fa76422 100644
 +#undef GetActiveWebContentsFromBrowser
 --- a/chrome/browser/extensions/extension_context_menu_model.cc
 +++ b/chrome/browser/extensions/extension_context_menu_model.cc
-@@ -1116,7 +1116,7 @@
+@@ -298,7 +298,7 @@
  }
  
- content::WebContents* ExtensionContextMenuModel::GetActiveWebContents() const {
+ content::WebContents* GetActiveTabWebContents(BrowserWindowInterface* browser) {
 -  tabs::TabInterface* active_tab =
 +  ::tabs::TabInterface* active_tab =
-       TabListInterface::From(browser_)->GetActiveTab();
+       TabListInterface::From(browser)->GetActiveTab();
    return active_tab ? active_tab->GetContents() : nullptr;
  }
 --- a/chrome/browser/ui/passwords/remote_actor_selection_dialog_controller.cc
@@ -5068,3 +5016,248 @@ index 9fc77e09a7..b41fa76422 100644
      return nullptr;
    }
    Profile* profile = Profile::FromBrowserContext(context);
+--- a/chrome/browser/extensions/app_tab_helper.cc
++++ b/chrome/browser/extensions/app_tab_helper.cc
+@@ -60,7 +60,7 @@
+ 
+ AppTabHelper::~AppTabHelper() = default;
+ 
+-AppTabHelper::AppTabHelper(tabs::TabInterface& tab,
++AppTabHelper::AppTabHelper(::tabs::TabInterface& tab,
+                            content::WebContents* web_contents)
+     : content::WebContentsObserver(web_contents),
+       profile_(Profile::FromBrowserContext(web_contents->GetBrowserContext())),
+@@ -72,7 +72,7 @@
+ }
+ 
+ // static
+-AppTabHelper* AppTabHelper::From(tabs::TabInterface* tab) {
++AppTabHelper* AppTabHelper::From(::tabs::TabInterface* tab) {
+   return tab ? Get(tab->GetUnownedUserDataHost()) : nullptr;
+ }
+ 
+@@ -82,7 +82,7 @@
+   if (!web_contents) {
+     return nullptr;
+   }
+-  return From(tabs::TabInterface::MaybeGetFromContents(web_contents));
++  return From(::tabs::TabInterface::MaybeGetFromContents(web_contents));
+ }
+ 
+ void AppTabHelper::SetExtensionApp(const Extension* extension) {
+--- a/chrome/browser/extensions/app_tab_helper.h
++++ b/chrome/browser/extensions/app_tab_helper.h
+@@ -32,13 +32,13 @@
+  public:
+   DECLARE_USER_DATA(AppTabHelper);
+ 
+-  AppTabHelper(tabs::TabInterface& tab, content::WebContents* web_contents);
++  AppTabHelper(::tabs::TabInterface& tab, content::WebContents* web_contents);
+   AppTabHelper(const AppTabHelper&) = delete;
+   AppTabHelper& operator=(const AppTabHelper&) = delete;
+ 
+   ~AppTabHelper() override;
+ 
+-  static AppTabHelper* From(tabs::TabInterface* tab);
++  static AppTabHelper* From(::tabs::TabInterface* tab);
+   static AppTabHelper* FromWebContents(content::WebContents* web_contents);
+ 
+   // Sets the extension denoting this as an app. If `extension` is non-null this
+--- a/chrome/browser/actor/tools/file_upload_tool_request.cc
++++ b/chrome/browser/actor/tools/file_upload_tool_request.cc
+@@ -19,6 +19,8 @@
+ #include "components/actor/public/mojom/actor_types.mojom.h"
+ #include "net/base/url_util.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_file_upload_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -143,3 +145,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/find_and_highlight_tool_request.cc
++++ b/chrome/browser/actor/tools/find_and_highlight_tool_request.cc
+@@ -18,6 +18,8 @@
+ #include "chrome/common/actor/action_result.h"
+ #include "components/actor/public/mojom/actor_types.mojom.h"
+ 
++#define kQueryParamDescription kQueryParamDescription_find_and_highlight_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -83,3 +85,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kQueryParamDescription
+--- a/chrome/browser/actor/tools/load_and_extract_content_tool_request.cc
++++ b/chrome/browser/actor/tools/load_and_extract_content_tool_request.cc
+@@ -20,6 +20,8 @@
+ #include "components/sessions/core/session_id.h"
+ #include "url/gurl.h"
+ 
++#define GetActiveWindowId GetActiveWindowId_load_and_extract_content_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -74,3 +76,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef GetActiveWindowId
+--- a/chrome/browser/actor/tools/perform_search_tool_request.cc
++++ b/chrome/browser/actor/tools/perform_search_tool_request.cc
+@@ -30,6 +30,8 @@
+ #include "url/gurl.h"
+ #include "url/origin.h"
+ 
++#define kQueryParamDescription kQueryParamDescription_perform_search_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -139,3 +141,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kQueryParamDescription
+--- a/chrome/browser/actor/tools/click_tool_request.cc
++++ b/chrome/browser/actor/tools/click_tool_request.cc
+@@ -15,6 +15,8 @@
+ #include "content/public/browser/render_widget_host.h"
+ #include "third_party/blink/public/common/input/web_mouse_event.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_click_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -113,3 +115,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/select_tool_request.cc
++++ b/chrome/browser/actor/tools/select_tool_request.cc
+@@ -13,6 +13,8 @@
+ #include "chrome/browser/actor/tools/tool_request_visitor_functor.h"
+ #include "chrome/common/actor.mojom.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_select_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -74,3 +76,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/open_known_page_tool_request.cc
++++ b/chrome/browser/actor/tools/open_known_page_tool_request.cc
+@@ -22,6 +22,8 @@
+ #include "chrome/common/actor/action_result.h"
+ #include "components/sessions/core/session_id.h"
+ 
++#define kQueryParamDescription kQueryParamDescription_open_known_page_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -92,3 +94,5 @@
+ std::string_view OpenKnownPageToolRequest::Name() const { return kName; }
+ 
+ }  // namespace actor
++
++#undef kQueryParamDescription
+--- a/chrome/browser/actor/tools/type_tool_request.cc
++++ b/chrome/browser/actor/tools/type_tool_request.cc
+@@ -17,6 +17,8 @@
+ #include "chrome/common/actor.mojom.h"
+ #include "components/actor/core/actor_features.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_type_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -125,3 +127,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/ai/decision_model_prompt_builder.cc
++++ b/chrome/browser/ai/decision_model_prompt_builder.cc
+@@ -11,6 +11,8 @@
+ #include "base/strings/string_util.h"
+ #include "third_party/blink/public/mojom/ai/ai_decision_model.mojom.h"
+ 
++#define IsBlank IsBlank_decision_model_prompt_builder
++
+ namespace {
+ 
+ // Formats boolean options as "true: yes" / "false: no" instead of the
+@@ -83,3 +85,5 @@
+   prompt += "\nReply with just the letter of the best option.";
+   return prompt;
+ }
++
++#undef IsBlank
+--- a/chrome/browser/context_hub/topics/topic_feedback_conversions.cc
++++ b/chrome/browser/context_hub/topics/topic_feedback_conversions.cc
+@@ -14,6 +14,8 @@
+ #include "base/values.h"
+ #include "chrome/browser/ui/webui/context_hub/context_hub.mojom.h"
+ 
++#define TimesToList TimesToList_topic_feedback_conversions
++
+ namespace context_hub {
+ 
+ namespace {
+@@ -242,3 +244,5 @@
+ }
+ 
+ }  // namespace context_hub
++
++#undef TimesToList
+--- a/chrome/browser/enterprise/signals/profile_signals_collector.cc
++++ b/chrome/browser/enterprise/signals/profile_signals_collector.cc
+@@ -34,7 +34,7 @@
+ 
+ bool GetBuiltInDnsClientEnabled(PrefService* local_state) {
+   CHECK(local_state, base::NotFatalUntil::M161);
+-  return local_state->GetBoolean(prefs::kBuiltInDnsClientEnabled);
++  return local_state->GetBoolean(::prefs::kBuiltInDnsClientEnabled);
+ }
+ 
+ }  // namespace
+--- a/chrome/browser/ui/autofill/payments/offer_notification_bubble_controller_impl.cc
++++ b/chrome/browser/ui/autofill/payments/offer_notification_bubble_controller_impl.cc
+@@ -37,6 +37,8 @@
+ #include "chrome/browser/ui/page_action/page_action_controller.h"
+ #endif  // BUILDFLAG(IS_ANDROID)
+ 
++#define g_ignore_window_activation_for_testing g_ignore_window_activation_for_testing_offer_notification_bubble_controller_impl
++
+ namespace autofill {
+ 
+ namespace {
+@@ -331,3 +333,5 @@
+ WEB_CONTENTS_USER_DATA_KEY_IMPL(OfferNotificationBubbleControllerImpl);
+ 
+ }  // namespace autofill
++
++#undef g_ignore_window_activation_for_testing

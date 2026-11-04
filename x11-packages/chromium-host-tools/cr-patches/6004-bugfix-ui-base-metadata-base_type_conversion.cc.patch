@@ -1,0 +1,12 @@
+--- a/ui/base/metadata/base_type_conversion.cc
++++ b/ui/base/metadata/base_type_conversion.cc
+@@ -442,7 +442,8 @@
+ 
+ std::optional<SkColor> TypeConverter<UNIQUE_TYPE_NAME(SkColor)>::FromString(
+     std::u16string_view source_value) {
+-  return GetNextColor(source_value.cbegin(), source_value.cend());
++  std::u16string sv = std::u16string(source_value.begin(), source_value.end());
++  return GetNextColor(sv.cbegin(), sv.cend());
+ }
+
+ ValidStrings TypeConverter<UNIQUE_TYPE_NAME(SkColor)>::GetValidStrings() {
