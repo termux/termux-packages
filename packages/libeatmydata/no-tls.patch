@@ -1,0 +1,64 @@
+--- a/libeatmydata/libeatmydata.c	2026-11-05 21:48:08.950933291 +0530
++++ b/libeatmydata/libeatmydata.c	2026-11-05 21:54:24.479014238 +0530
+@@ -55,24 +55,25 @@
+ 
+ /* All the following are thread-local, to avoid initialization races between
+  * threads. */
+-static TLS int init_running = 0;
+-static TLS int init_complete = 0;
+-static TLS libc_open_t libc_open= NULL;
++static pthread_once_t init_once = PTHREAD_ONCE_INIT;
++static int init_running = 0;
++static int init_complete = 0;
++static libc_open_t libc_open= NULL;
+ #ifdef HAVE_OPEN64
+-static TLS libc_open64_t libc_open64= NULL;
++static libc_open64_t libc_open64= NULL;
+ #endif
+-static TLS libc_fsync_t libc_fsync= NULL;
+-static TLS libc_sync_t libc_sync= NULL;
+-static TLS libc_fdatasync_t libc_fdatasync= NULL;
+-static TLS libc_msync_t libc_msync= NULL;
++static libc_fsync_t libc_fsync= NULL;
++static libc_sync_t libc_sync= NULL;
++static libc_fdatasync_t libc_fdatasync= NULL;
++static libc_msync_t libc_msync= NULL;
+ #ifdef HAVE_SYNC_FILE_RANGE
+-static TLS libc_sync_file_range_t libc_sync_file_range= NULL;
++static libc_sync_file_range_t libc_sync_file_range= NULL;
+ #endif
+ #ifdef HAVE_SYNCFS
+-static TLS libc_syncfs_t libc_syncfs= NULL;
++static libc_syncfs_t libc_syncfs= NULL;
+ #endif
+ #if defined(F_FULLFSYNC) && defined(__APPLE__)
+-static TLS libc_fcntl_t libc_fcntl= NULL;
++static libc_fcntl_t libc_fcntl= NULL;
+ #endif
+ 
+ #define ASSIGN_DLSYM_OR_DIE(name)			\
+@@ -91,10 +92,15 @@
+ 
+ int LIBEATMYDATA_API msync(void *addr, size_t length, int flags);
+ 
++void eatmydata_init_once(void);
+ void __attribute__ ((constructor)) eatmydata_init(void);
+ 
+ void __attribute__ ((constructor)) eatmydata_init(void)
+ {
++	pthread_once(&init_once, eatmydata_init_once);
++}
++
++void eatmydata_init_once(void) {
+ 	init_running++;
+ 	ASSIGN_DLSYM_OR_DIE(open);
+ #ifdef HAVE_OPEN64
+@@ -121,7 +127,7 @@
+ {
+ 	/* Init here, as it is called before any libc functions */
+ 	if(!init_complete)
+-		eatmydata_init();
++		pthread_once(&init_once, eatmydata_init_once);
+ 
+ #ifdef CHECK_FILE
+ 	static struct stat buf;
