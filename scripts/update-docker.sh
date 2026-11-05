@@ -6,10 +6,15 @@ IMAGE=ghcr.io/termux/package-builder
 
 docker pull $IMAGE
 
+if ! docker container inspect $CONTAINER >/dev/null 2>&1; then
+	echo "Container '$CONTAINER' does not exist yet. It will be created on next run."
+	exit 0
+fi
+
 LATEST=$(docker inspect --format "{{.Id}}" $IMAGE)
 RUNNING=$(docker inspect --format "{{.Image}}" $CONTAINER)
 
-if [ $LATEST = $RUNNING ]; then
+if [ "$LATEST" = "$RUNNING" ]; then
 	echo "Image '$IMAGE' used in the container '$CONTAINER' is already up to date"
 else
 	echo "Image '$IMAGE' used in the container '$CONTAINER' has been updated - removing the outdated container"
