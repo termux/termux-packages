@@ -123,6 +123,49 @@ aptly_add_to_repo() {
   return 0
 }
 
+aptly_remove_package() {
+  ! check_login && return 0
+  local pkg="$1"
+  echo "[$(date +%H:%M:%S)] Removing '$pkg' from repository '$REPOSITORY_NAME'..."
+  curl_response=$(
+    curl \
+      "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
+      --get \
+      --data-urlencode "q=${pkg} | ${pkg}-static" \
+      ${REPOSITORY_URL}/repos/${REPOSITORY_NAME}/packages || true
+  )
+  http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
+
+  if [ "$http_status_code" != "200" ]; then
+    echo "[$(date +%H:%M:%S)] Error: failed to list '$pkg'. Server returned $http_status_code code."
+    return 1
+  fi
+
+  package_refs=$(echo "$curl_response" | cut -d'|' -f1 | jq --compact-output '{PackageRefs: .}')
+  if [ "$(echo "$package_refs" | jq '.PackageRefs | length')" = "0" ]; then
+    echo "[$(date +%H:%M:%S)] '$pkg' is not in the repository."
+    return 0
+  fi
+
+  curl_response=$(
+    curl \
+      "${CURL_COMMON_OPTIONS[@]}" "${CURL_ADDITIONAL_OPTIONS[@]}" \
+      --max-time 300 \
+      --header 'Content-Type: application/json' \
+      --request DELETE \
+      --data "$package_refs" \
+      ${REPOSITORY_URL}/repos/${REPOSITORY_NAME}/packages || true
+  )
+  http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
+
+  if [ "$http_status_code" != "200" ]; then
+    echo "[$(date +%H:%M:%S)] Error: failed to remove '$pkg'. Server returned $http_status_code code."
+    return 1
+  fi
+  echo "[$(date +%H:%M:%S)] Removed: $(echo "$package_refs" | jq -r '.PackageRefs[]' | cut -d' ' -f2-3 | tr '\n' ' ')"
+  return 0
+}
+
 aptly_publish_repo() {
   ! check_login && return 0
   echo "[$(date +%H:%M:%S)] Publishing repository changes..."
@@ -153,4 +196,13 @@ aptly_publish_repo() {
     return 1
   fi
   return 0
+}
+
+aptly_publish_repo_and_staging() {
+  aptly_publish_repo || return 1
+
+  # Publish to staging repo if we haven't already
+  if [[ "$REPOSITORY_DISTRIBUTION" != "staging" ]]; then
+    REPOSITORY_DISTRIBUTION=staging aptly_publish_repo || return 1
+  fi
 }
