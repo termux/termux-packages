@@ -1,0 +1,105 @@
+Origin: https://github.com/sabamdarif/termux-packages/commit/d80f050fe477b598ef7edfb8d70a6ac85841dea8
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 16c6092..6d2a864 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,9 +1,5 @@
+ cmake_minimum_required(VERSION 3.14)
+ 
+-if(NOT ${CMAKE_ANDROID_ARCH_ABI} STREQUAL arm64-v8a)
+-	message(FATAL_ERROR "Unsupported target architecture: ${CMAKE_ANDROID_ARCH_ABI}. Please make an issue on the repo!")
+-endif()
+-
+ project(adrenotools LANGUAGES CXX C)
+ 
+ set(GEN_INSTALL_TARGET OFF CACHE BOOL "")
+Submodule lib/linkernsbypass contains modified content
+diff --git a/lib/linkernsbypass/CMakeLists.txt b/lib/linkernsbypass/CMakeLists.txt
+index c2e92b0..514bbfe 100644
+--- a/lib/linkernsbypass/CMakeLists.txt
++++ b/lib/linkernsbypass/CMakeLists.txt
+@@ -1,9 +1,5 @@
+ cmake_minimum_required(VERSION 3.14)
+ 
+-if(NOT ${CMAKE_ANDROID_ARCH_ABI} STREQUAL arm64-v8a)
+-	message(FATAL_ERROR "Unsupported target architecture: ${CMAKE_ANDROID_ARCH_ABI}. Please make an issue on the repo!")
+-endif()
+-
+ project(linkernsbypass LANGUAGES CXX)
+ 
+ set(SOURCES android_linker_ns.cpp
+diff --git a/lib/linkernsbypass/android_linker_ns.cpp b/lib/linkernsbypass/android_linker_ns.cpp
+index 3bd5899..094f66c 100644
+--- a/lib/linkernsbypass/android_linker_ns.cpp
++++ b/lib/linkernsbypass/android_linker_ns.cpp
+@@ -12,6 +12,7 @@
+ #include <android/log.h>
+ #include <android/api-level.h>
+ #include <sys/mman.h>
++#include <sys/syscall.h>
+ #include "elf_soname_patcher.h"
+ #include "android_linker_ns.h"
+ 
+@@ -73,6 +74,12 @@ void *linkernsbypass_namespace_dlopen(const char *filename, int flags, android_n
+ #ifndef __NR_memfd_create
+     #if defined(__aarch64__)
+         #define __NR_memfd_create 279
++    #elif defined(__arm__)
++        #define __NR_memfd_create 385
++    #elif defined(__i386__)
++        #define __NR_memfd_create 356
++    #elif defined(__x86_64__)
++        #define __NR_memfd_create 319
+     #else
+         #error Unsupported target architecture!
+     #endif
+diff --git a/src/bcenabler.cpp b/src/bcenabler.cpp
+index 1deb41d..6f5af54 100644
+--- a/src/bcenabler.cpp
++++ b/src/bcenabler.cpp
+@@ -7,7 +7,9 @@
+ #include <sys/mman.h>
+ #include <unistd.h>
+ #include <adrenotools/bcenabler.h>
++#ifdef __aarch64__
+ #include "gen/bcenabler_patch.h"
++#endif
+ 
+ enum adrenotools_bcn_type adrenotools_get_bcn_type(uint32_t major, uint32_t minor, uint32_t vendorId) {
+     if (vendorId != 0x5143 || major != 512)
+@@ -19,6 +21,8 @@ enum adrenotools_bcn_type adrenotools_get_bcn_type(uint32_t major, uint32_t mino
+     return ADRENOTOOLS_BCN_PATCH;
+ }
+ 
++#ifdef __aarch64__
++
+ // Searches /proc/self/maps for the first free page after the given address
+ static void *find_free_page(uintptr_t address) {
+     std::ifstream procMaps("/proc/self/maps");
+@@ -133,3 +137,12 @@ bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
+     // Done!
+     return true;
+ }
++
++#else
++
++bool adrenotools_patch_bcn(void *vkGetPhysicalDeviceFormatPropertiesFn) {
++    (void)vkGetPhysicalDeviceFormatPropertiesFn;
++    return false;
++}
++
++#endif
+diff --git a/src/hook/hook_impl.cpp b/src/hook/hook_impl.cpp
+index 50e79a9..79d5357 100644
+--- a/src/hook/hook_impl.cpp
++++ b/src/hook/hook_impl.cpp
+@@ -207,7 +207,8 @@ __attribute__((visibility("default"))) int hook_gsl_memory_free_pure(void *memDe
+             kgsl_fd = open("/dev/kgsl-3d0", O_RDWR);
+ 
+         kgsl_gpumem_get_info info{
+-            .gpuaddr = gslMemDesc->gpuaddr
++            // Fix 32-bit unsigned long
++            .gpuaddr = static_cast<unsigned long>(gslMemDesc->gpuaddr)
+         };
+ 
+         if (ioctl(kgsl_fd, IOCTL_KGSL_GPUMEM_GET_INFO, &info) < 0) {
