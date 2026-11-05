@@ -1,16 +1,25 @@
-diff -u -r ../dpkg-1.18.15/src/configure.c ./src/configure.c
---- ../dpkg-1.18.15/src/configure.c	2016-11-11 22:18:40.000000000 -0500
-+++ ./src/main/configure.c	2016-12-03 16:32:43.719508056 -0500
-@@ -497,8 +497,10 @@
- 			        pkg_name(pkg, pnaw_nonambig), cdr2.buf,
+diff --git a/src/main/configure.c b/src/main/configure.c
+index b869bea..f025cf4 100644
+--- a/src/main/configure.c
++++ b/src/main/configure.c
+@@ -507,11 +507,19 @@ deferred_configure_conffile(struct pkginfo *pkg, struct conffile *conff)
+ 			        pkg_name(pkg, pnaw_nonambig), cdr_old.buf,
  			        strerror(errno));
  		if (!(what & CFOF_USER_DEL))
--			if (link(cdr.buf, cdr2.buf))
--				warning(_("%s: failed to link '%.250s' to '%.250s': %s"),
+-			if (link(cdr.buf, cdr_old.buf))
++		#ifdef __ANDROID__
 +			/** Termux modification: Use rename(2) instead of link(2), to avoid hard
-+			    links which does not work on Android 6.0 or later. */
-+			if (rename(cdr.buf, cdr2.buf))
-+				warning(_("%s: failed to rename '%.250s' to '%.250s': %s"),
- 				        pkg_name(pkg, pnaw_nonambig), cdr.buf,
- 				        cdr2.buf, strerror(errno));
++			links which do not work on Android 6.0 or later. */
++			if (rename(cdr.buf, cdr_old.buf)) {
++				warning(_("%s: failed to rename '%s' to '%s': %s"),
++		#else
++			if (link(cdr.buf, cdr_old.buf)) {
+ 				warning(_("%s: cannot link '%s' to '%s': %s"),
++		#endif
+ 				        pkg_name(pkg, pnaw_nonambig),
+ 				        cdr.buf,
+ 				        cdr_old.buf, strerror(errno));
++			}
  		/* Fall through. */
+ 	case CFO_INSTALL:
+ 		printf(_("Installing new version of config file %s ...\n"),
