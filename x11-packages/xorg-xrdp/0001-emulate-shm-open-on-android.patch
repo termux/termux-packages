@@ -1,0 +1,39 @@
+--- a/module/rdpMisc.c
++++ b/module/rdpMisc.c
+@@ -50,6 +50,36 @@
+ 
+ #include "rdpMisc.h"
+ 
++#ifdef __ANDROID__
++/* Bionic provides no POSIX shm_open/shm_unlink: emulate with tmp files. */
++static int
++shm_unlink(const char *name)
++{
++    char fname[128];
++
++    while (name[0] == '/')
++    {
++        ++name;
++    }
++    snprintf(fname, sizeof(fname), "@TERMUX_PREFIX@/tmp/%s", name);
++    return unlink(fname);
++}
++
++static int
++shm_open(const char *name, int oflag, mode_t mode)
++{
++    char fname[128];
++
++    while (name[0] == '/')
++    {
++        ++name;
++    }
++    snprintf(fname, sizeof(fname), "@TERMUX_PREFIX@/tmp/%s", name);
++    return open(fname, oflag, mode);
++}
++
++#endif
++
+ static const unsigned int g_crc_table[256] =
+ {
+     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
