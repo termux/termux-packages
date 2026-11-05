@@ -36,7 +36,7 @@ else
 		# microsoft-edge-stable already removed by the deps in the above apt purge
 
 	# Directories
-	sudo rm -rf /opt/ghc /opt/az /opt/hostedtoolcache /opt/actionarchivecache /opt/runner-cache
+	sudo rm -rf /opt/ghc /opt/az /opt/hostedtoolcache /opt/actionarchivecache
 	sudo rm -rf /opt/pipx /usr/share/dotnet /usr/share/swift /usr/share/miniconda /usr/share/az_* /usr/share/gradle-* /usr/share/java /home/runner/.rustup
 	sudo rm -rf /etc/skel /home/packer /home/linuxbrew
 	sudo rm -rf /usr/local /usr/src/

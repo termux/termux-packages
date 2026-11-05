@@ -7,9 +7,9 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - vim
 # - vim-gtk
 # - weechat
-TERMUX_PKG_VERSION="4.0.7"
+TERMUX_PKG_VERSION="4.0.9"
 TERMUX_PKG_SRCURL="https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION%.*}/ruby-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=47ef59413f7a4587ba6a6b78b14036eb5e36eec2ec0b90964801e88d56a3d375
+TERMUX_PKG_SHA256=a8057adb39f51ad6dc3106237504c93dd792bb515837b4fe7817ae21ed7e51f4
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config, resolv-conf"

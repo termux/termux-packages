@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://selinuxproject.org
 TERMUX_PKG_DESCRIPTION="Android fork of libselinux, an SELinux userland library"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=14.0.0.11
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://android.googlesource.com/platform/external/selinux

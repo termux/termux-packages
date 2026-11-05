@@ -1,0 +1,20 @@
+--- a/src/base/SecureFileUnix.cpp
++++ b/src/base/SecureFileUnix.cpp
+@@ -100,12 +100,13 @@ FileDescriptor openDirectory(const fs::path& input, bool create,
+   if (makePrivate && path == path.root_path()) {
+     fail(path, "cannot use a filesystem root as private storage");
+   }
+-  FileDescriptor current(::open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC));
++  const fs::path start = path.string().rfind("@TERMUX_BASE_DIR@/", 0) == 0 ? "@TERMUX_BASE_DIR@" : "/";
++  FileDescriptor current(::open(start.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC));
+   if (current.get() < 0) fail(path, strerror(errno));
+-  fs::path traversed = "/";
+-  fs::path resolved = "/";
++  fs::path traversed = start;
++  fs::path resolved = start;
+   verifyAncestor(inspect(current.get(), traversed), traversed);
+-  for (const auto& component : path.relative_path()) {
++  for (const auto& component : path.lexically_relative(start)) {
+     if (component == "." || component.empty()) continue;
+     const string name = component.string();
+     const struct stat parent = inspect(current.get(), traversed);

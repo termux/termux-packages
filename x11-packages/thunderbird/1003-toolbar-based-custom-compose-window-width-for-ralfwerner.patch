@@ -12,7 +12,7 @@ Discussion: https://github.com/termux/termux-packages/pull/23911
 
 --- a/comm/mail/components/compose/content/MsgComposeCommands.js
 +++ b/comm/mail/components/compose/content/MsgComposeCommands.js
-@@ -1261,7 +1261,8 @@ var defaultController = {
+@@ -1266,7 +1266,8 @@ var defaultController = {
          return gMsgCompose && gMsgCompose.composeHTML;
        },
        doCommand() {
@@ -85,12 +85,12 @@ Discussion: https://github.com/termux/termux-packages/pull/23911
 +                     align="center">
 +          <stack id="ColorButtons">
 +            <box class="color-button" id="BackgroundColorButton"
-+                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('', event); }"
++                 onclick="if (!this.hasAttribute('disabled')) { EditorSelectColor('', event); }"
 +                 tooltiptext="&BackgroundColorButton.tooltip;"
 +                 observes="cmd_backgroundColor"
 +                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
 +            <box class="color-button" id="TextColorButton"
-+                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('Text', event); }"
++                 onclick="if (!this.hasAttribute('disabled')) { EditorSelectColor('Text', event); }"
 +                 tooltiptext="&TextColorButton.tooltip;"
 +                 observes="cmd_fontColor"
 +                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
@@ -100,7 +100,7 @@ diff --git a/comm/mail/components/compose/content/editFormatButtons.inc.xhtml b/
 similarity index 73%
 rename from comm/mail/components/compose/content/editFormatButtons.inc.xhtml
 rename to comm/mail/components/compose/content/editFormatButtonsTwo.inc.xhtml
-index bfe7fc9..19b20eb 100644
+index 900d617..19b20eb 100644
 --- a/comm/mail/components/compose/content/editFormatButtons.inc.xhtml
 +++ b/comm/mail/components/compose/content/editFormatButtonsTwo.inc.xhtml
 @@ -3,73 +3,6 @@
@@ -162,12 +162,12 @@ index bfe7fc9..19b20eb 100644
 -                     align="center">
 -          <stack id="ColorButtons">
 -            <box class="color-button" id="BackgroundColorButton"
--                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('', event); }"
+-                 onclick="if (!this.hasAttribute('disabled')) { EditorSelectColor('', event); }"
 -                 tooltiptext="&BackgroundColorButton.tooltip;"
 -                 observes="cmd_backgroundColor"
 -                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
 -            <box class="color-button" id="TextColorButton"
--                 onclick="if (!this.hasAttribute('disabled') || this.getAttribute('disabled') != 'true') { EditorSelectColor('Text', event); }"
+-                 onclick="if (!this.hasAttribute('disabled')) { EditorSelectColor('Text', event); }"
 -                 tooltiptext="&TextColorButton.tooltip;"
 -                 observes="cmd_fontColor"
 -                 oncommand="/* See MsgComposeCommands.js::updateAllItems for why this attribute is needed here. */"/>
@@ -179,7 +179,7 @@ index bfe7fc9..19b20eb 100644
                         tooltiptext="&absoluteFontSizeToolbarCmd.tooltip;"
 --- a/comm/mail/components/compose/content/messengercompose.xhtml
 +++ b/comm/mail/components/compose/content/messengercompose.xhtml
-@@ -2416,12 +2416,22 @@
+@@ -2410,12 +2410,22 @@
        </hbox>
      </toolbar>
  
@@ -324,8 +324,8 @@ index bfe7fc9..19b20eb 100644
    background-color: var(--layout-background-2);
    color: var(--layout-color-1);
    color-scheme: light-dark;
-@@ -472,8 +473,12 @@
-   grid-template-columns: auto;
+@@ -481,8 +482,12 @@
+   grid-template-columns: subgrid;
  }
  
 -#FormatToolbox {
@@ -339,7 +339,7 @@ index bfe7fc9..19b20eb 100644
  }
  
  #headersSplitter {
-@@ -575,7 +580,36 @@
+@@ -584,7 +589,36 @@
  
  /* :::: Format toolbar :::: */
  

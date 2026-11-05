@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://atterer.org/jigdo/
+TERMUX_PKG_HOMEPAGE="https://www.einval.com/~steve/software/jigdo/"
 TERMUX_PKG_DESCRIPTION="Distribute large images by sending and receiving the files that make them up"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -11,7 +11,7 @@
      add_compile_definitions(VK_USE_PLATFORM_METAL_EXT)
 --- a/layers/CMakeLists.txt
 +++ b/layers/CMakeLists.txt
-@@ -592,7 +592,7 @@ else()
+@@ -621,7 +621,7 @@ else()
  endif()
      # Both Apple and IOS
      target_link_options(vvl PRIVATE -exported_symbols_list ${CMAKE_CURRENT_SOURCE_DIR}/${LAYER_NAME}.exp)
@@ -20,9 +20,9 @@
      # Need 16k pages in Android 15
      # When we bump our NDK requirement to r28 we can remove
      # https://developer.android.com/guide/practices/page-sizes#compile-r28
-@@ -653,7 +653,7 @@ endif()
- 
- target_include_directories(vvl SYSTEM PRIVATE external)
+@@ -726,7 +726,7 @@ target_precompile_headers(vvl PRIVATE
+     state_tracker/cmd_buffer_state.h
+ )
  
 -if (ANDROID)
 +if (0 AND ANDROID)

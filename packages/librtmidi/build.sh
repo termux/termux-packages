@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.music.mcgill.ca/~gary/rtmidi/
+TERMUX_PKG_HOMEPAGE="https://github.com/thestk/rtmidi"
 TERMUX_PKG_DESCRIPTION="A set of C++ classes that provides a common API for realtime MIDI input/output"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"

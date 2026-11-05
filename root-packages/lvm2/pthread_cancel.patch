@@ -1,0 +1,47 @@
+--- a/lib/blkio/threads.c
++++ b/lib/blkio/threads.c
+@@ -24,6 +24,28 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++#ifdef __ANDROID__
++#define PTHREAD_CANCEL_ENABLE 0
++#define PTHREAD_CANCEL_DISABLE 1
++
++static void _thread_signal_handler(int signum)
++{
++	pthread_exit(NULL);
++}
++
++static int _android_setcancelstate(int state, int *oldstate)
++{
++	sigset_t set;
++
++	sigemptyset(&set);
++	sigaddset(&set, SIGUSR2);
++	return pthread_sigmask(state == PTHREAD_CANCEL_ENABLE ? SIG_UNBLOCK : SIG_BLOCK, &set, NULL);
++}
++
++#define pthread_setcancelstate _android_setcancelstate
++#define pthread_cancel(thread) pthread_kill((thread), SIGUSR2)
++#endif
++
+ /*----------------------------------------------------------------*/
+ 
+ #define IO_THREADS_STACK_SIZE    (32u * 1024u)
+@@ -150,6 +172,15 @@ static void *_worker_fn(void *arg)
+ 	struct thread_slot *slot = arg;
+ 	struct threads_engine *e = slot->engine;
+ 
++#ifdef __ANDROID__
++	struct sigaction actions;
++
++	memset(&actions, 0, sizeof(actions));
++	sigemptyset(&actions.sa_mask);
++	actions.sa_handler = _thread_signal_handler;
++	sigaction(SIGUSR2, &actions, NULL);
++#endif
++
+ 	/*
+ 	 * All signals are blocked by the creator before pthread_create(),
+ 	 * so every worker inherits the full mask.  Workers only perform I/O

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://git.gavinhoward.com/gavin/bc
+TERMUX_PKG_HOMEPAGE="https://github.com/gavinhoward/bc"
 TERMUX_PKG_DESCRIPTION="Unix dc and POSIX bc with GNU and BSD extensions"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Gavin D. Howard <gavin@gavinhoward.com>"

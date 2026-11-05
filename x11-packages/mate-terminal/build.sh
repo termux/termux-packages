@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://mate-terminal.mate-desktop.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/mate-desktop/mate-terminal"
 TERMUX_PKG_DESCRIPTION="This is the MATE terminal emulator application"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

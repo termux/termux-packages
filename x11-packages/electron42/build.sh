@@ -3,15 +3,29 @@ TERMUX_PKG_DESCRIPTION="Build cross-platform desktop apps with JavaScript, HTML,
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@licy183"
 _CHROMIUM_VERSION=148.0.7778.280
-TERMUX_PKG_VERSION=42.11.12
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=42.11.18
 TERMUX_PKG_SRCURL=git+https://github.com/electron/electron
 TERMUX_PKG_DEPENDS="atk, cups, dbus, fontconfig, gtk3, krb5, libc++, libevdev, libxkbcommon, libminizip, libnss, libx11, mesa, openssl, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="electron42-host-tools, libnotify, libffi-static"
 # Chromium doesn't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_BUILD_IN_SRC=true
+# Electron 42 has reached EOL since 2026-10-20.
+TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
+
+termux_pkg_auto_update() {
+	local latest_version="$(. $TERMUX_SCRIPTDIR/x11-packages/electron42-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})"
+
+	if ! termux_pkg_is_update_needed \
+		"${TERMUX_PKG_VERSION#*:}" "${latest_version}"; then
+		echo "INFO: No update needed. Already at version '${latest_version}'."
+		return 0
+	fi
+
+	termux_error_exit \
+		"Electron 42 version ${latest_version} is available. Please update manually."
+}
 
 __tur_setup_depot_tools() {
 	export DEPOT_TOOLS_UPDATE=0
@@ -49,6 +63,12 @@ termux_step_get_source() {
 }
 
 termux_step_post_get_source() {
+	# Version guard
+	local version_tools=$(. $TERMUX_SCRIPTDIR/x11-packages/electron42-host-tools/build.sh; echo ${TERMUX_PKG_VERSION})
+	if [ "${version_tools}" != "${TERMUX_PKG_VERSION}" ]; then
+		termux_error_exit "Version mismatch between electron42-host-tools and electron42."
+	fi
+
 	# Remove all the .git folders to save space
 	find . -type d -name ".git" -exec rm -rf {} +
 
@@ -419,4 +439,18 @@ termux_step_install_license() {
 termux_step_post_make_install() {
 	# Remove the dummy files
 	rm $TERMUX_PREFIX/lib/lib{{pthread,resolv,ffi_pic}.a,rt.so}
+}
+
+termux_step_create_debscripts() {
+	cat <<-EOF > ./postinst
+		#!$TERMUX_PREFIX/bin/sh
+		echo
+		echo "********"
+		echo "Electron 42 has reached end of life since 2026-10-20 and no longer receives"
+		echo "upstream support or security fixes."
+		echo "Please switch to a newer Electron version, such as electron43."
+		echo "The electron42 package will be removed before 2027-01-01."
+		echo "********"
+		echo
+	EOF
 }

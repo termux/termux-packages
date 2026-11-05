@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
 TERMUX_PKG_VERSION=(
-	"3.14.8"
+	"3.14.10"
 	"f358ab52bf2932ad55b1a72a29c9762169e6ac47"
 )
 TERMUX_PKG_SRCURL=(
@@ -13,8 +13,8 @@ TERMUX_PKG_SRCURL=(
 	"https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${TERMUX_PKG_VERSION[1]}/python3-defaults-${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	"c2215904f02b175596dc49351585104f4bc20341e1c47378b26a2c274360ce73"
-	"3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0"
+	de414a57119abef52784d8993e341d53aed635fc2b05c2607d9f98a2c5b72032
+	3b7a76c144d39f5c4a2c7789fd4beb3266980c2e667ad36167e1e7a357c684b0
 )
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="gdbm, libandroid-posix-semaphore, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib, zstd"

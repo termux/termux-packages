@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://trantor.is/
+TERMUX_PKG_HOMEPAGE="https://gitlab.com/trantor/hummin"
 TERMUX_PKG_DESCRIPTION="Command line client for the imperial library of trantor"
 TERMUX_PKG_LICENSE="WTFPL"
 TERMUX_PKG_MAINTAINER="@termux"

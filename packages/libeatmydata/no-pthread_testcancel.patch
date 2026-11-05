@@ -1,0 +1,56 @@
+--- a/libeatmydata/libeatmydata.c	2026-11-05 20:28:36.208636792 +0530
++++ b/libeatmydata/libeatmydata.c	2026-11-05 20:29:05.563631477 +0530
+@@ -89,8 +89,6 @@
+         libc_##name = (libc_##name##_##t)(intptr_t)dlsym(RTLD_NEXT, #name);			\
+ 						   dlerror();
+ 
+-#pragma weak pthread_testcancel
+-
+ int LIBEATMYDATA_API msync(void *addr, size_t length, int flags);
+ 
+ void __attribute__ ((constructor)) eatmydata_init(void);
+@@ -144,8 +142,6 @@
+ int LIBEATMYDATA_API fsync(int fd)
+ {
+ 	if (eatmydata_is_hungry()) {
+-		if (pthread_testcancel)
+-			pthread_testcancel();
+ 		if (fcntl(fd, F_GETFD) == -1) {
+ 		  return -1;
+ 		}
+@@ -234,8 +230,6 @@
+ int LIBEATMYDATA_API fdatasync(int fd)
+ {
+ 	if (eatmydata_is_hungry()) {
+-		if (pthread_testcancel)
+-			pthread_testcancel();
+ 		if (fcntl(fd, F_GETFD) == -1) {
+ 		  return -1;
+ 		}
+@@ -249,8 +243,6 @@
+ int LIBEATMYDATA_API msync(void *addr, size_t length, int flags)
+ {
+ 	if (eatmydata_is_hungry()) {
+-		if (pthread_testcancel)
+-			pthread_testcancel();
+ 		errno= 0;
+ 		return 0;
+ 	}
+@@ -263,8 +255,6 @@
+ 				     unsigned int flags)
+ {
+ 	if (eatmydata_is_hungry()) {
+-		if (pthread_testcancel)
+-			pthread_testcancel();
+ 		if (fcntl(fd, F_GETFD) == -1) {
+ 		  return -1;
+ 		}
+@@ -280,8 +270,6 @@
+ int LIBEATMYDATA_API syncfs(int fd)
+ {
+ 	if (eatmydata_is_hungry()) {
+-		if (pthread_testcancel)
+-			pthread_testcancel();
+ 		if (fcntl(fd, F_GETFD) == -1) {
+ 		  errno= EBADF;
+ 		  return -1;

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://leenissen.dk/fann/wp"
+TERMUX_PKG_HOMEPAGE="https://github.com/libfann/fann"
 TERMUX_PKG_DESCRIPTION="Fast artificial neural network library"
 TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_LICENSE="LGPL-2.1"

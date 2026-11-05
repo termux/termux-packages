@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.pps.jussieu.fr/~jch/software/polipo/
+TERMUX_PKG_HOMEPAGE="https://www.irif.fr/~jch/software/polipo/"
 TERMUX_PKG_DESCRIPTION="A small and fast caching web proxy"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://cgit.freedesktop.org/mesa/glu/
+TERMUX_PKG_HOMEPAGE="https://gitlab.freedesktop.org/mesa/glu"
 TERMUX_PKG_DESCRIPTION="Mesa OpenGL Utility library"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"

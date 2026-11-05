@@ -1,15 +1,6 @@
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -135,7 +135,7 @@
- CCOPT= ${DEBUG}
- CCMISC=
- LCC= gcc
--CC= ${PURIFY} ${LCC} ${CCWERR}
-+CC?= ${PURIFY} ${LCC} ${CCWERR}
- 
- endif	# ($(target),Linux)
- 
-@@ -357,7 +357,7 @@
+@@ -111,7 +111,7 @@ BLD_TYPE= calc-dynamic-only
  # target specific library parameters
  #
  CC_SHARE= -fPIC
@@ -18,3 +9,12 @@
  LD_SHARE= "-Wl,-rpath,${DEFAULT_LIB_INSTALL_PATH}" \
      "-Wl,-rpath-link,${DEFAULT_LIB_INSTALL_PATH}"
  LIBCALC_SHLIB= -shared "-Wl,-soname,libcalc${LIB_EXT_VERSION}"
+@@ -135,7 +135,7 @@ CCWERR=
+ CCOPT= ${DEBUG}
+ CCMISC=
+ LCC= gcc
+-CC= ${PURIFY} ${LCC} ${CCWERR}
++CC?= ${PURIFY} ${LCC} ${CCWERR}
+ 
+ endif	# ($(target),Linux)
+ 

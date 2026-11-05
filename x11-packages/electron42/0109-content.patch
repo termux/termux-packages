@@ -1,0 +1,11 @@
+--- a/content/browser/renderer_host/render_frame_host_impl.cc
++++ b/content/browser/renderer_host/render_frame_host_impl.cc
+@@ -16307,7 +16307,7 @@
+     if (is_synchronous_about_blank_commit &&
+         params->origin.scheme() != url::kFileScheme &&
+         (!frame_tree_->is_guest() ||
+-         !base::FeatureList::IsEnabled(features::kGuestViewMPArch))) {
++         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch))) {
+       bool origin_matches = false;
+       if (last_committed_origin_.opaque()) {
+         // When the browser-derived origin is opaque, the renderer-reported

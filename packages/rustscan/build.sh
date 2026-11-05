@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://rustscan.github.io/RustScan
+TERMUX_PKG_HOMEPAGE="https://github.com/bee-san/RustScan"
 TERMUX_PKG_DESCRIPTION="The modern,fast,smart and effective port scanner"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Krishna Kanhaiya @kcubeterm"

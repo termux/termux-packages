@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.hping.org/
+TERMUX_PKG_HOMEPAGE="https://github.com/antirez/hping"
 TERMUX_PKG_DESCRIPTION="hping is a command-line oriented TCP/IP packet assembler/analyzer."
 # Same versioning as archlinux:
 TERMUX_PKG_LICENSE="GPL-2.0"

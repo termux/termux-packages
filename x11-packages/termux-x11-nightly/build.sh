@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-x11
 TERMUX_PKG_DESCRIPTION="Termux X11 add-on."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Twaik Yont @twaik"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION="1.03.01"
 TERMUX_PKG_REVISION=6
 # Downloading full JDK to compile 7kb apk seems excessive, let's download a prebuilt.

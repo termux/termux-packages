@@ -1,0 +1,90 @@
+--- a/coregrind/m_aspacemgr/aspacemgr-common.c
++++ b/coregrind/m_aspacemgr/aspacemgr-common.c
+@@ -264,7 +264,7 @@ SysRes ML_(am_do_relocate_nooverlap_mapping_NO_NOTIFY)(
+ SysRes ML_(am_open) ( const HChar* pathname, Int flags, Int mode )
+ {
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    /* More recent Linux platforms have only __NR_openat and no __NR_open. */
+    SysRes res = VG_(do_syscall4)(__NR_openat,
+                                  VKI_AT_FDCWD, (UWord)pathname, flags, mode);
+@@ -294,7 +294,7 @@ Int ML_(am_readlink)(const HChar* path, HChar* buf, UInt bufsiz)
+ {
+    SysRes res;
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    res = VG_(do_syscall4)(__NR_readlinkat, VKI_AT_FDCWD,
+                                            (UWord)path, (UWord)buf, bufsiz);
+ #  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
+@@ -339,6 +339,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd,
+ #  if defined(VGO_linux) || defined(VGO_darwin)
+    SysRes          res;
+ #  if defined(VGO_linux)
++#ifndef __ANDROID__
+    /* First try with statx. */
+    struct vki_statx bufx;
+    const char* file_name = "";
+@@ -350,6 +351,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd,
+       *mode = (UInt)bufx.stx_mode;
+       return True;
+    }
++#endif
+ #  endif // VGO_linux only
+ 
+ #  if defined(VGO_linux) && defined(__NR_fstat64)
+--- a/coregrind/m_libcfile.c
++++ b/coregrind/m_libcfile.c
+@@ -292,7 +292,7 @@ SysRes VG_(mknod) ( const HChar* pathname, Int mode, UWord dev )
+ SysRes VG_(open) ( const HChar* pathname, Int flags, Int mode )
+ {
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    /* More recent Linux platforms have only __NR_openat and no __NR_open. */
+    SysRes res = VG_(do_syscall4)(__NR_openat,
+                                  VKI_AT_FDCWD, (UWord)pathname, flags, mode);
+@@ -514,7 +514,7 @@ SysRes VG_(stat) ( const HChar* file_name, struct vg_stat* vgbuf )
+    SysRes res;
+    VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
+ 
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) && !defined(__ANDROID__)
+    /* On Linux, first try with statx. If that doesn't work out, fall back to
+       the stat64 or vanilla version. */
+    { struct vki_statx buf;
+@@ -549,6 +549,12 @@ SysRes VG_(stat) ( const HChar* file_name, struct vg_stat* vgbuf )
+ #    if defined(VGP_arm64_linux)
+      res = VG_(do_syscall3)(__NR3264_fstatat, VKI_AT_FDCWD,
+                                               (UWord)file_name, (UWord)&buf);
++#    elif defined(__NR_newfstatat)
++     res = VG_(do_syscall3)(__NR_newfstatat, VKI_AT_FDCWD,
++                                              (UWord)file_name, (UWord)&buf);
++#    elif defined(__NR_fstatat64)
++     res = VG_(do_syscall3)(__NR_fstatat64, VKI_AT_FDCWD,
++                                              (UWord)file_name, (UWord)&buf);
+ #    else
+      res = VG_(do_syscall2)(__NR_stat, (UWord)file_name, (UWord)&buf);
+ #    endif
+@@ -602,7 +608,7 @@ Int VG_(fstat) ( Int fd, struct vg_stat* vgbuf )
+    SysRes res;
+    VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
+ 
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) && !defined(__ANDROID__)
+    /* On Linux, first try with statx. If that doesn't work out, fall back to
+       the fstat64 or vanilla version. */
+    { struct vki_statx buf;
+@@ -1039,9 +1045,9 @@ Int VG_(access) ( const HChar* path, Bool irusr, Bool iwusr, Bool ixusr )
+              | (iwusr ? VKI_W_OK : 0)
+              | (ixusr ? VKI_X_OK : 0);
+ #  if defined(VGP_arm64_linux) || defined(VGP_nanomips_linux) \
+-      || defined(VGP_riscv64_linux)
++      || defined(VGP_riscv64_linux) || defined(__ANDROID__)
+    SysRes res = VG_(do_syscall3)(__NR_faccessat, VKI_AT_FDCWD, (UWord)path, w);
+-#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_freebsd)
++#  elif defined(VGO_linux) && !defined(__ANDROID__) || defined(VGO_darwin) || defined(VGO_freebsd)
+    SysRes res = VG_(do_syscall2)(__NR_access, (UWord)path, w);
+ #  elif defined(VGO_solaris)
+    SysRes res = VG_(do_syscall4)(__NR_faccessat, VKI_AT_FDCWD, (UWord)path,

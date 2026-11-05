@@ -1,6 +1,6 @@
 --- a/crates/mise-util/src/file.rs
 +++ b/crates/mise-util/src/file.rs
-@@ -584,7 +584,7 @@ pub fn write_atomic_unsynced<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents:
+@@ -662,7 +662,7 @@ pub fn write_atomic_unsynced<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents:
  /// Makes every write on the filesystem holding `path` durable, for a batch written with
  /// [`write_atomic_unsynced`]. Only Linux can flush one filesystem and wait for it: elsewhere
  /// `sync()` may return before the writes reach the disk, so a batch syncs each file instead.
@@ -11,7 +11,7 @@
      trace!("sync filesystem of {}", display_path(path));
 --- a/crates/mise-system/src/history/store.rs
 +++ b/crates/mise-system/src/history/store.rs
-@@ -1308,7 +1308,7 @@ pub(crate) struct CacheBatch<'a> {
+@@ -1322,7 +1322,7 @@ pub(crate) struct CacheBatch<'a> {
  }
  
  impl<'a> CacheBatch<'a> {
@@ -20,7 +20,7 @@
  
      pub(crate) fn new(state_dir: &'a Path) -> Self {
          Self {
-@@ -1335,7 +1335,7 @@ impl<'a> CacheBatch<'a> {
+@@ -1349,7 +1349,7 @@ impl<'a> CacheBatch<'a> {
      }
  
      pub(crate) fn finish(self) -> Result<()> {

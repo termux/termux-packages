@@ -12,7 +12,7 @@ diff -uNr hollywood-1.20/lib/hollywood/errno hollywood-1.20.mod/lib/hollywood/er
 +	_HAS_CCZE=true
 +fi
  
- trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ trap "pkill -9 -f lib/hollywood/ >/dev/null 2>&1; exit" INT
  while true; do
 -	errno --list | sort -R | ccze -A
 +	if ${_HAS_CCZE}; then

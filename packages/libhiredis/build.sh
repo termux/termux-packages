@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://redis.com/lp/hiredis
+TERMUX_PKG_HOMEPAGE="https://github.com/redis/hiredis"
 TERMUX_PKG_DESCRIPTION="Hiredis is a minimalistic C client library for the Redis database"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"

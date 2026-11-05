@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://curlie.io/
+TERMUX_PKG_HOMEPAGE="https://github.com/rs/curlie"
 TERMUX_PKG_DESCRIPTION="The power of curl, the ease of use of httpie"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"

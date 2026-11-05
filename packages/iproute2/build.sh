@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://wiki.linuxfoundation.org/networking/iproute2
+TERMUX_PKG_HOMEPAGE="https://git.kernel.org/pub/scm/network/iproute2/iproute2.git"
 TERMUX_PKG_DESCRIPTION="Utilities for controlling networking"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

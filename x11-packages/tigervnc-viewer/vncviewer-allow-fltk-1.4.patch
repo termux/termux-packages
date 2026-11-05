@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -305,7 +305,7 @@ if(BUILD_VIEWER)
+     set(CMAKE_REQUIRED_INCLUDES ${FLTK_INCLUDE_DIR})
+     set(CMAKE_REQUIRED_LIBRARIES ${FLTK_LIBRARIES})
+ 
+-    check_cxx_source_compiles("#include <FL/Fl.H>\n#if FL_MAJOR_VERSION != 1 || FL_MINOR_VERSION != 3\n#error Wrong FLTK version\n#endif\nint main(int, char**) { return 0; }" OK_FLTK_VERSION)
++    check_cxx_source_compiles("#include <FL/Fl.H>\n#if FL_MAJOR_VERSION != 1 || (FL_MINOR_VERSION != 3 && FL_MINOR_VERSION != 4)\n#error Wrong FLTK version\n#endif\nint main(int, char**) { return 0; }" OK_FLTK_VERSION)
+     if(NOT OK_FLTK_VERSION)
+       message(FATAL_ERROR "Incompatible version of FLTK")
+     endif()

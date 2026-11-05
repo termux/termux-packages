@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://iverilog.icarus.com/
+TERMUX_PKG_HOMEPAGE="https://steveicarus.github.io/iverilog/"
 TERMUX_PKG_DESCRIPTION="Icarus Verilog compiler and simulation tool"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

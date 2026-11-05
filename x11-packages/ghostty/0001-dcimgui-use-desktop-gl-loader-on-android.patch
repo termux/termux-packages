@@ -1,6 +1,6 @@
 --- a/pkg/dcimgui/build.zig
 +++ b/pkg/dcimgui/build.zig
-@@ -142,10 +142,20 @@
+@@ -157,10 +157,20 @@ pub fn build(b: *std.Build) !void {
              );
          }
          if (backend_opengl3) {
@@ -10,14 +10,14 @@
 +            // Force the desktop GL path for this file.
 +            var gl_flags: std.ArrayList([]const u8) = .empty;
 +            defer gl_flags.deinit(b.allocator);
-+            try gl_flags.appendSlice(b.allocator, flags.items);
++            try gl_flags.appendSlice(b.allocator, all_flags.items);
 +            if (target.result.abi.isAndroid()) {
 +                try gl_flags.append(b.allocator, "-U__ANDROID__");
 +            }
-             lib.addCSourceFiles(.{
+             lib.root_module.addCSourceFiles(.{
                  .root = upstream.path("backends"),
                  .files = &.{"imgui_impl_opengl3.cpp"},
--                .flags = flags.items,
+-                .flags = all_flags.items,
 +                .flags = gl_flags.items,
              });
              lib.installHeadersDirectory(

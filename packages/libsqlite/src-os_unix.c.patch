@@ -1,6 +1,28 @@
+Do not skip truncating files larger than 2GiB on Android. With
+_FILE_OFFSET_BITS=64 (always set here) ftruncate() resolves to ftruncate64()
+on 32-bit targets and is native 64-bit on LP64, so the upstream workaround
+comment about 32-bit offsets no longer applies, and the skip left databases
+unshrunk after VACUUM. Also use $PREFIX/tmp as the only fallback temp dir.
+
 --- a/src/os_unix.c
 +++ b/src/os_unix.c
-@@ -6264,9 +6264,7 @@
+@@ -998,15 +998,6 @@ static int lockTrace(int fd, int op, struct flock *p){
+ */
+ static int robust_ftruncate(int h, sqlite3_int64 sz){
+   int rc;
+-#ifdef __ANDROID__
+-  /* On Android, ftruncate() always uses 32-bit offsets, even if
+-  ** _FILE_OFFSET_BITS=64 is defined. This means it is unsafe to attempt to
+-  ** truncate a file to any size larger than 2GiB. Silently ignore any
+-  ** such attempts.  */
+-  if( sz>(sqlite3_int64)0x7FFFFFFF ){
+-    rc = SQLITE_OK;
+-  }else
+-#endif
+   do{ rc = osFtruncate(h,sz); }while( rc<0 && errno==EINTR );
+   return rc;
+ }
+@@ -6271,9 +6262,7 @@ static const char *unixTempFileDir(void){
        case 0:  zDir = sqlite3_temp_directory;   break;
        case 1:  zDir = getenv("SQLITE_TMPDIR");  break;
        case 2:  zDir = getenv("TMPDIR");         break;

@@ -1,0 +1,13 @@
+Run makestrs from PATH: the target build cannot run the cross-compiled one, so the host-built tool is used.
+
+--- a/lib/Xm/Makefile.am
++++ b/lib/Xm/Makefile.am
+@@ -266,7 +266,7 @@ XmStrDefs.c: Makefile $(XMSTRING_LIST) XmStrDefs.ht XmStrDefsI.ht XmStrDefs.ct $
+ 	test -f XmStrDefs25.ht || $(LN_S) $(srcdir)/XmStrDefs25.ht XmStrDefs25.ht
+ 	test -f XmStrDefsI.ht || $(LN_S) $(srcdir)/XmStrDefsI.ht XmStrDefsI.ht
+ 	test -f XmStrDefs.ct || $(LN_S) $(srcdir)/XmStrDefs.ct XmStrDefs.ct
+-	$(top_builddir)/config/makestrs -f $(XMSTRING_LIST) >XmStrDefs.c
++	makestrs -f $(XMSTRING_LIST) >XmStrDefs.c
+ 
+ if XM_MSGCAT
+ CAT_FILES = Xm.cat XmMsgCatI.h

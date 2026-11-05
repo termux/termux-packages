@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://neurobin.org/projects/softwares/unix/shc/"
+TERMUX_PKG_HOMEPAGE="https://github.com/neurobin/shc"
 TERMUX_PKG_DESCRIPTION="Shell script compiler"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Krishna Kanhaiya @kcubeterm"

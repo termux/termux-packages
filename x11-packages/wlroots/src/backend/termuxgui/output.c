@@ -237,7 +237,7 @@ static int present_complete(int fd, uint32_t mask, void *data) {
         .output = &output->wlr_output,
         .commit_seq = output->wlr_output.commit_seq + 1,
         .presented = true,
-        .when = &t,
+        .when = t,
         .flags = WLR_OUTPUT_PRESENT_ZERO_COPY,
     };
     wlr_output_send_present(&output->wlr_output, &present_event);

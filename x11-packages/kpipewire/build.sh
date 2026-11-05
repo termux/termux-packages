@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Components relating to pipewire use in Plasma"
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.8.0+really6.7.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION#*really}/kpipewire-${TERMUX_PKG_VERSION#*really}.tar.xz"
 TERMUX_PKG_SHA256=20af39d9450d495468c56a50930810d82137f7ccd3a710592e02b6f620758f55
 TERMUX_PKG_AUTO_UPDATE=false

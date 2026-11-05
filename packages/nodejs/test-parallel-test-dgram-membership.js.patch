@@ -1,5 +1,5 @@
---- ./test/parallel/test-dgram-membership.js.orig	2022-06-05 10:44:44.687598191 +0530
-+++ ./test/parallel/test-dgram-membership.js	2022-06-05 10:46:16.867598156 +0530
+--- a/test/parallel/test-dgram-membership.js
++++ b/test/parallel/test-dgram-membership.js
 @@ -3,6 +3,7 @@
  const common = require('../common');
  const assert = require('assert');
@@ -8,7 +8,7 @@
  const multicastAddress = '224.0.0.114';
  
  const setup = dgram.createSocket.bind(dgram, { type: 'udp4', reuseAddr: true });
-@@ -106,11 +107,12 @@
+@@ -106,11 +107,12 @@ const setup = dgram.createSocket.bind(dgram, { type: 'udp4', reuseAddr: true });
  // addSourceSpecificMembership with invalid groupAddress should throw
  {
    const socket = setup();
@@ -23,7 +23,7 @@
    });
    socket.close();
  }
-@@ -144,11 +146,12 @@
+@@ -144,11 +146,12 @@ const setup = dgram.createSocket.bind(dgram, { type: 'udp4', reuseAddr: true });
  // dropSourceSpecificMembership with invalid UDP should throw
  {
    const socket = setup();

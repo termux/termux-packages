@@ -1,6 +1,6 @@
 --- a/meson.build
 +++ b/meson.build
-@@ -577,7 +577,7 @@
+@@ -580,7 +580,7 @@ if not pango.found()
    pangoft2     = dependency('pangoft2',    version: '>='+pango_minver)
  endif
  
@@ -9,7 +9,7 @@
    #include <pango/pango.h>
    #include <string.h>
    #include <stdlib.h>
-@@ -1585,28 +1585,7 @@
+@@ -1582,28 +1582,7 @@ if shmem_choice == 'auto'
  endif
  
  if shmem_choice == 'sysv'
@@ -39,7 +39,7 @@
    conf.set('USE_SYSV_SHM', true)
  elif shmem_choice == 'posix'
    conf.set('USE_POSIX_SHM', true)
-@@ -2037,7 +2016,7 @@
+@@ -2035,7 +2014,7 @@ if get_option('debug-self-in-build')
  endif
  gimp_run_env.set('GIMP_PYTHON_WITH_GI', python.full_path())
  
@@ -50,7 +50,7 @@
    else
 --- a/gimp-data/images/meson.build
 +++ b/gimp-data/images/meson.build
-@@ -7,6 +7,7 @@
+@@ -7,6 +7,7 @@ data_env.append('GIMP_TESTING_PLUG_INS', 'common/file-png', separator: ':')
  
  ## Splash Image and Welcome Dialog ##
  
@@ -58,7 +58,7 @@
  splash = custom_target('gimp-splash.png',
                         input : [ 'export-splash.py' ],
                         output: [ 'gimp-splash.png', ],
-@@ -22,6 +23,9 @@
+@@ -22,6 +23,9 @@ splash = custom_target('gimp-splash.png',
                         env: data_env,
                         install_dir: gimpdatadir / 'images',
                         install: true)

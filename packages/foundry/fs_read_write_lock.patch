@@ -1,6 +1,6 @@
 --- a/crates/common/src/fs.rs
 +++ b/crates/common/src/fs.rs
-@@ -12,6 +12,31 @@
+@@ -12,6 +12,31 @@ use std::{
  #[cfg(unix)]
  use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
  
@@ -32,7 +32,7 @@
  /// The [`fs`](self) result type.
  pub type Result<T> = std::result::Result<T, FsPathError>;
  
-@@ -74,9 +99,17 @@
+@@ -74,9 +99,17 @@ pub fn locked_read(path: impl AsRef<Path>) -> Result<Vec<u8>> {
      let path = path.as_ref();
      let mut file =
          fs::OpenOptions::new().read(true).open(path).map_err(|err| FsPathError::open(err, path))?;
@@ -50,7 +50,7 @@
      Ok(contents)
  }
  
-@@ -151,10 +184,19 @@
+@@ -153,10 +186,19 @@ pub fn locked_write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Resul
          .truncate(false)
          .open(path)
          .map_err(|err| FsPathError::open(err, path))?;
@@ -71,7 +71,7 @@
  }
  
  /// Writes a line in an exclusive locked file.
-@@ -170,9 +212,18 @@
+@@ -172,9 +214,18 @@ pub fn locked_write_line(path: impl AsRef<Path>, line: &str) -> Result<()> {
          .open(path)
          .map_err(|err| FsPathError::open(err, path))?;
  

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.brow.sh/
+TERMUX_PKG_HOMEPAGE="https://www.brow.sh/"
 TERMUX_PKG_DESCRIPTION="A fully-modern text-based browser, rendering to TTY and browsers"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

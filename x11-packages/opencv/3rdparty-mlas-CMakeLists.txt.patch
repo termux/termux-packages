@@ -1,0 +1,13 @@
+Adds the x86 get_pc_thunk source for Android i686 builds: the ANDROID variable is renamed by build.sh before configuring.
+
+--- a/3rdparty/mlas/CMakeLists.txt
++++ b/3rdparty/mlas/CMakeLists.txt
+@@ -134,7 +134,7 @@ if(MLAS_X86)
+   )
+   set_source_files_properties(${MLAS_SRC_DIR}/x86/SgemmKernelSse2.S PROPERTIES COMPILE_FLAGS "-msse2")
+   set_source_files_properties(${MLAS_SRC_DIR}/x86/SgemmKernelAvx.S  PROPERTIES COMPILE_FLAGS "-mavx")
+-  if(ANDROID)
++  if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+     list(APPEND mlas_platform_srcs ${MLAS_SRC_DIR}/x86/x86.get_pc_thunk.S)
+   endif()
+ endif()

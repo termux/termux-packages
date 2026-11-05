@@ -1,11 +1,13 @@
---- a/setup.py
-+++ b/setup.py
-@@ -299,25 +299,25 @@
+diff -uNr a/setup.py b/setup.py
+--- a/setup.py	2026-10-26 10:37:09.000000000 +0530
++++ b/setup.py	2026-10-26 13:32:13.862872591 +0530
+@@ -345,25 +345,26 @@
+     CORE_C_FILES = filter(
          lambda x: "third_party/boringssl" not in x, CORE_C_FILES
      )
-     CORE_C_FILES = filter(lambda x: "src/boringssl" not in x, CORE_C_FILES)
 -    SSL_INCLUDE = (os.path.join("/usr", "include", "openssl"),)
 +    SSL_INCLUDE = (os.path.join("@TERMUX_PREFIX@", "include", "openssl"),)
++
  
  if BUILD_WITH_SYSTEM_ZLIB:
      CORE_C_FILES = filter(lambda x: "third_party/zlib" not in x, CORE_C_FILES)
@@ -31,7 +33,7 @@
  
  EXTENSION_INCLUDE_DIRECTORIES = (
      (PYTHON_STEM,)
-@@ -361,7 +361,7 @@
+@@ -408,7 +409,7 @@
  if BUILD_WITH_SYSTEM_ABSL:
      EXTENSION_LIBRARIES += tuple(
          lib.stem[3:]

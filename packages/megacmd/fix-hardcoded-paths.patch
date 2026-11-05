@@ -1,6 +1,6 @@
 --- a/sdk/src/posix/fs.cpp
 +++ b/sdk/src/posix/fs.cpp
-@@ -1787,10 +1787,10 @@
+@@ -1782,10 +1782,10 @@ void PosixFileSystemAccess::statsid(string *id) const
      uuid_unparse(uuid, uuid_str);
      id->append(uuid_str);
  #else
@@ -15,7 +15,7 @@
              return;
 --- a/src/megacmdcommonutils.cpp
 +++ b/src/megacmdcommonutils.cpp
-@@ -1581,7 +1581,7 @@ std::string PosixDirectories::configDirPath()
+@@ -1541,7 +1541,7 @@ fs::path PosixDirectories::configDirPath()
  
  string PosixDirectories::noHomeFallbackFolder()
  {
@@ -23,4 +23,4 @@
 +    return std::string("@TERMUX_PREFIX@/tmp/megacmd-").append(std::to_string(getuid()));
  }
  
- #ifdef __APPLE__
+ string PosixDirectories::getOrCreateFallbackFolder()

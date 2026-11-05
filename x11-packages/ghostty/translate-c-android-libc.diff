@@ -1,0 +1,23 @@
+--- a/src/main.zig
++++ b/src/main.zig
+@@ -241,6 +241,11 @@ fn translate(
+ 
+     const target = std.zig.resolveTargetQueryOrFatal(io, target_query);
+ 
++    if (environ_map.get("ZIG_ANDROID_API")) |android_api| {
++        try aro_args.append(arena, try std.fmt.allocPrint(arena, "-D__ANDROID_MIN_SDK_VERSION__={s}", .{android_api}));
++        try aro_args.append(arena, "-DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD");
++    }
++
+     if (link_libc) {
+         if (target.isGnuLibC()) {
+             const target_version = target.os.versionRange().gnuLibCVersion().?;
+@@ -311,7 +316,7 @@ fn translate(
+ 
+     const is_native_os = target_query.isNativeOs();
+     const is_native_abi = target_query.isNativeAbi();
+-    const libc_installation = if (libc_paths_file) |libc_file|
++    const libc_installation = if (libc_paths_file orelse environ_map.get("ZIG_LIBC")) |libc_file|
+         std.zig.LibCInstallation.parse(arena, io, libc_file, &target) catch |err| fatal("failed to parse '{s}': {t}", .{ libc_file, err })
+     else
+         null;

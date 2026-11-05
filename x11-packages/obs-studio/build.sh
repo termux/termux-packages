@@ -4,19 +4,18 @@ TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_API_LEVEL=26
 TERMUX_PKG_VERSION=(
-	"32.2.2"
-	"5.7.3"
+	"33.0.1"
+	"5.7.6"
 )
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(
 	"https://github.com/obsproject/obs-studio/archive/refs/tags/${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/obsproject/obs-websocket/archive/refs/tags/${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	35d3cd0979d65664fada7119fdb612eca7c34b61a1623a330caec74bf72626c4
-	5e9f06aae32a8ac0f94886e8caa5947ad7da41670169c9ee1a08e28cf53c65f5
+	9174ee0e3677c92d0d060bdce4c5d44dfee9fd3afddfb6333f098fd029b8de2b
+	15a8287ddb4833821e44b0c3db5b2f0acf3d2b5f0c1efe1fbd821c2bf9aa7d44
 )
-TERMUX_PKG_DEPENDS="ffmpeg, libcurl, libfdk-aac, libjansson, mesa, pulseaudio, qt6-qtbase, qt6-qtsvg, mbedtls, qrcodegen, librnnoise, libx11, libxcb, libxkbcommon, zlib, glib, libuuid, fontconfig, freetype, libx264, vulkan-loader, libxext, libxfixes, libxcomposite, libxinerama, libxrandr, libxrender, libxcursor, libxdamage, libandroid-glob, libandroid-spawn"
+TERMUX_PKG_DEPENDS="ffmpeg, libcurl, libdatachannel, libfdk-aac, libjansson, mesa, pulseaudio, qt6-qtbase, qt6-qtsvg, mbedtls, qrcodegen, librnnoise, libx11, libxcb, libxkbcommon, zlib, glib, libuuid, fontconfig, freetype, libx264, vulkan-loader, libxext, libxfixes, libxcomposite, libxinerama, libxrandr, libxrender, libxcursor, libxdamage, libandroid-glob, libandroid-spawn"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, swig, glslang, pkg-config, nlohmann-json, websocketpp, simde, uthash, libasio, libwayland, vlc-qt, python,libdatachannel, libfdk-aac, luajit, speexdsp, librnnoise, mbedtls-static, libandroid-stub, libandroid-shmem"
 TERMUX_PKG_SUGGESTS="vlc-qt, luajit, python,libdatachannel, librnnoise, libfdk-aac, speexdsp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

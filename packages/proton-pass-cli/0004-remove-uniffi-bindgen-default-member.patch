@@ -1,0 +1,23 @@
+Remove the pass-uniffi-bindgen crate from the workspace default-members.
+
+Since 2.5.0 the workspace Cargo.toml lists "pass-uniffi-bindgen" in
+`default-members`, but that crate is not shipped in the source tarball
+(it is only needed by maturin to generate the Python bindings), so cargo
+refuses to build with:
+
+    error: package `.../src/pass-uniffi-bindgen` is listed in
+    default-members but is not a member for workspace
+
+The crate is irrelevant for the CLI binary, so drop it from the list.
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -8,8 +8,6 @@
+     "pass-fs",
+     "pass",
+     "pass-derive",
+-    # maturin runs its `uniffi-bindgen` bin (in the default members) to generate the Python bindings
+-    "pass-uniffi-bindgen"
+ ]
+ resolver = "2"
+ 

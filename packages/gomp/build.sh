@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://aditya-k2.github.io/gomp/
+TERMUX_PKG_HOMEPAGE="https://github.com/akurdunkar/gomp"
 TERMUX_PKG_DESCRIPTION="MPD client inspired by ncmpcpp with builtin cover-art view and LastFM integration"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

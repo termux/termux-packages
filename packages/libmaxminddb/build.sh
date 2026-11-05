@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://dev.maxmind.com/geoip/geoip2/
+TERMUX_PKG_HOMEPAGE="https://github.com/maxmind/libmaxminddb"
 TERMUX_PKG_DESCRIPTION="MaxMind GeoIP2 database - library and utilities"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

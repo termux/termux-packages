@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer blockchain, handling the efficient creati
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/RavenProject/Ravencoin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9753c290cd42ba127f95f736d4ef478ed72f3843e54ff4f11d09aaa9512b7e8d
 TERMUX_PKG_DEPENDS="boost, libc++, libevent, libzmq, miniupnpc, openssl"

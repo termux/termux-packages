@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://mate-settings-daemon.mate-desktop.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/mate-desktop/mate-settings-daemon"
 TERMUX_PKG_DESCRIPTION="mate-settings-daemon is a fork of gnome-settings-daemon"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

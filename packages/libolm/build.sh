@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://matrix.org/docs/projects/other/olm/
+TERMUX_PKG_HOMEPAGE="https://gitlab.matrix.org/matrix-org/olm"
 TERMUX_PKG_DESCRIPTION="An implementation of the Double Ratchet cryptographic ratchet"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

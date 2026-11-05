@@ -42,7 +42,7 @@ contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
  then
      uname_arch=`adb shell uname -m`
  else
-@@ -472,7 +477,7 @@ then
+@@ -483,7 +483,7 @@ then
      esac
      HOST_TAG=$sbcl_os-x86_64
      TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_TAG
@@ -51,7 +51,7 @@ contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
      echo "CC=$CC; export CC" >> output/build-config
      echo "NDK=$NDK" > output/ndk-config
      echo "HOST_TAG=$HOST_TAG" >> output/ndk-config
-@@ -580,7 +585,7 @@ case "$sbcl_os" in
+@@ -598,7 +598,7 @@ case "$sbcl_os" in
  		printf ' :largefile' >> $ltf
  		;;
          esac
@@ -62,7 +62,7 @@ contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
              link_or_copy $sbcl_arch-android-os.h target-arch-os.h
 --- a/src/code/run-program.lisp
 +++ b/src/code/run-program.lisp
-@@ -1363,19 +1363,16 @@ Users Manual for details about the PROCESS structure.
+@@ -1387,19 +1387,16 @@ Windows specific options:
            (t
             (fail "invalid option: ~S" object))))))
  
@@ -86,7 +86,7 @@ contains some code from https://bugs.launchpad.net/sbcl/+bug/1956852
                                          #+haiku '("-v")
 --- a/src/cold/build-order.lisp-expr
 +++ b/src/cold/build-order.lisp-expr
-@@ -486,10 +486,9 @@
+@@ -497,10 +497,9 @@
   ("src/code/funutils"       :not-host)
  
   #+win32 ("src/code/win32" :not-host)

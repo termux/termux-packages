@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional 
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.54.1"
+TERMUX_PKG_REVISION=1
 _SQLITE_YEAR=2026
 TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-src-$(sed 's/\./''/; s/\./0/' <<< "$TERMUX_PKG_VERSION")00.zip
 TERMUX_PKG_SHA256=387e7f6cad4797b17848c07d453dc6606917bb356a6cfe5a3abafd38c240c71b

@@ -5,6 +5,9 @@ seem easy or straightforward to somehow fix it specifically for termux-proot-run
 Builds of SBCL produced by 'termux-proot-run sh make.sh' still pass this test when
 the build directory is copied to a real Termux App and the test suite is run there.
 
+exhaust.impure.lisp: control stack exhaustion handling under qemu in
+termux-proot-run fails with a memory fault and a fatal error.
+
 run-program-test.sh all envrionment variables comparison test:
 termux-proot-run for TERMUX_ON_DEVICE_BUILD=false mode currently does something
 that seems to make the environment variables scrambled into a different order
@@ -80,3 +83,13 @@ SBCL_PWD=/home/builder/.termux-build/sbcl/src/tests
    (let* ((sb-impl::*default-external-format* :latin-1)
           (sb-alien::*default-c-string-external-format* :latin-1)   
           (string (with-output-to-string (stream)
+--- a/tests/exhaust.impure.lisp
++++ b/tests/exhaust.impure.lisp
+@@ -35,6 +35,7 @@
+ ;; (It's not even "random" now - it's pretty reliable)
+ ;; Gotta do with fork() or something that I don't care to diagnose.
+ #+(and darwin x86-64 parallel-test-runner) (invoke-restart 'run-tests::skip-file)
++#+android (invoke-restart 'run-tests::skip-file)
+ 
+ (setf (extern-alien "lose_on_corruption_p" int) 0)
+ 

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://sourceforge.net/projects/libepubgen"
+TERMUX_PKG_HOMEPAGE="https://sourceforge.net/projects/libepubgen/"
 TERMUX_PKG_DESCRIPTION="an EPUB generator for librevenge"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

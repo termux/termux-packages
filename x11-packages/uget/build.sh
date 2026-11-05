@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://ugetdm.com/
+TERMUX_PKG_HOMEPAGE="https://github.com/ugetdm/uget"
 TERMUX_PKG_DESCRIPTION="GTK+ download manager featuring download classification and HTML import"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

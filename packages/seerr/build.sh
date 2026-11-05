@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jel
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.5.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=08be110365b520d8bfa227278b6d84c9d6104a2c838decf68669ab127f622b11
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
@@ -145,6 +146,9 @@ termux_step_make_install() {
 	# Remove native build intermediate objects to save space
 	find "${TERMUX_PREFIX}/lib/seerr/node_modules" -type d -name "obj.target" -exec rm -rf {} +
 
+	# Install TMDB retry helper
+	install -Dm644 "$TERMUX_PKG_BUILDER_DIR/tmdb-retry.js" "${TERMUX_PREFIX}/lib/seerr/tmdb-retry.js"
+
 	# Create launch script
 	cat >"${TERMUX_PREFIX}/bin/seerr" <<-HERE
 		#!${TERMUX_PREFIX}/bin/sh
@@ -152,7 +156,7 @@ termux_step_make_install() {
 		export PORT="\${PORT:-5055}"
 		export NODE_ENV=production
 		cd "${TERMUX_PREFIX}/lib/seerr"
-		exec node dist/index.js "\$@"
+		exec node --require "${TERMUX_PREFIX}/lib/seerr/tmdb-retry.js" dist/index.js "\$@"
 	HERE
 	chmod u+x "${TERMUX_PREFIX}/bin/seerr"
 }

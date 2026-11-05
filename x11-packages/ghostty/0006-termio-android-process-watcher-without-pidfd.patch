@@ -1,6 +1,6 @@
 --- a/src/termio/Exec.zig
 +++ b/src/termio/Exec.zig
-@@ -30,6 +30,169 @@
+@@ -32,6 +32,171 @@ const compat_fd = @import("../lib/compat/fd.zig");
  
  const log = std.log.scoped(.io_exec);
  
@@ -111,6 +111,7 @@
 +                        state.pid,
 +                        &info,
 +                        std.os.linux.W.EXITED | std.os.linux.W.NOHANG,
++                        null,
 +                    );
 +
 +                    break :code state.exit_code.load(.acquire);
@@ -134,9 +135,10 @@
 +                state.pid,
 +                &info,
 +                linux.W.EXITED | linux.W.NOWAIT,
++                null,
 +            );
 +            // The raw syscall returns -errno, decode it ourselves.
-+            switch (linux.E.init(rc)) {
++            switch (linux.errno(rc)) {
 +                .SUCCESS => {
 +                    code = @intCast(info.fields.common.second.sigchld.status);
 +                    break;
@@ -170,7 +172,7 @@
  /// The termios poll rate in milliseconds.
  const TERMIOS_POLL_MS = 200;
  
-@@ -102,8 +265,8 @@
+@@ -104,8 +269,8 @@ pub fn threadEnter(
      errdefer self.subprocess.stop();
  
      // Watcher to detect subprocess exit
@@ -181,7 +183,7 @@
              cmd.pid orelse return error.ProcessNoPid,
          ),
  
-@@ -296,7 +459,7 @@
+@@ -297,7 +462,7 @@ fn processExit(
      td_: ?*termio.Termio.ThreadData,
      _: *xev.Loop,
      _: *xev.Completion,
@@ -190,12 +192,12 @@
  ) xev.CallbackAction {
      const exit_code = r catch unreachable;
      processExitCommon(td_.?, exit_code);
-@@ -502,7 +665,7 @@
+@@ -515,7 +680,7 @@ pub const ThreadData = struct {
      write_stream: xev.Stream,
  
      /// The process watcher
 -    process: ?xev.Process,
 +    process: ?ProcessWatcher,
  
-     /// This is the pool of available (unused) write requests. If you grab
+     /// This is the pool of available (unused) write states. If you grab
      /// one from the pool, you must put it back when you're done!

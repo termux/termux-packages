@@ -38,7 +38,9 @@ fi
 
 # Installing CGCT
 echo "Installing CGCT..."
-curl "${REPO_URL}/cgct.json" -o "${TMPDIR_CGCT}/cgct.json"
+termux_download "${REPO_URL}/cgct.json" \
+	"${TMPDIR_CGCT}/cgct.json" \
+	"SKIP_CHECKSUM"
 for pkgname in ${!CGCT[@]}; do
 	SHA256SUM=$(jq -r '."'$pkgname'"."SHA256SUM"' "${TMPDIR_CGCT}/cgct.json")
 	if [ "$SHA256SUM" = "null" ]; then

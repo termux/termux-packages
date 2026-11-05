@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://ghostty.org
 TERMUX_PKG_DESCRIPTION="Fast, feature-rich, GPU-accelerated terminal emulator (GTK4 + X11)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.3.1"
+TERMUX_PKG_VERSION="1.4.0"
 # Release tarball ships prebuilt GTK resources
 TERMUX_PKG_SRCURL="https://release.files.ghostty.org/${TERMUX_PKG_VERSION}/ghostty-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=3349d25600ffbda281197a18314f7d18791969cffe9474f0ff16a45a9ebfccdb
+TERMUX_PKG_SHA256=cb188ac6c3a8278d5fd7bfef15d8c017104c87f638b5560eb38024a71ae0f005
 TERMUX_PKG_DEPENDS="fontconfig, freetype, glib, gtk4, harfbuzz, libadwaita, libbz2, libpng, libx11, oniguruma, zlib"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
@@ -15,9 +15,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 lib/systemd
 share/systemd
 "
-
-# Must match minimum_zig_version in build.zig.zon
-TERMUX_ZIG_VERSION="0.15.2"
 
 termux_step_pre_configure() {
 	termux_setup_zig
@@ -32,10 +29,17 @@ termux_step_pre_configure() {
 	local _resources="${TERMUX_PKG_SRCDIR}/src/build/GhosttyResources.zig"
 	grep -q 'std.heap.c_allocator' "${_build_data}" ||
 		termux_error_exit "Expected std.heap.c_allocator not found in ${_build_data}"
-	grep -q 'build_data_exe.linkLibC();' "${_resources}" ||
-		termux_error_exit "Expected build_data_exe.linkLibC() not found in ${_resources}"
+	grep -q '\.link_libc = true,' "${_resources}" ||
+		termux_error_exit "Expected .link_libc = true not found in ${_resources}"
 	sed -i 's/std\.heap\.c_allocator/std.heap.page_allocator/' "${_build_data}"
-	sed -i '/build_data_exe\.linkLibC();/d' "${_resources}"
+	sed -i '0,/\.link_libc = true,/s//.link_libc = false,/' "${_resources}"
+
+	(cd "${TERMUX_PKG_SRCDIR}" && zig build --fetch)
+	patch -p1 -d "${TERMUX_PKG_SRCDIR}"/zig-pkg/translate_c-* < "${TERMUX_PKG_BUILDER_DIR}/translate-c-android-libc.diff"
+}
+
+termux_step_configure() {
+	:
 }
 
 termux_step_make() {
@@ -50,8 +54,12 @@ termux_step_make() {
 		crt_dir=${_sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
 		msvc_lib_dir=
 		kernel32_lib_dir=
-		gcc_dir=
+		cc_dir=${_sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
+		darwin_sdk_dir=
 	EOF
+
+	export ZIG_LIBC="${_libc_file}"
+	export ZIG_ANDROID_API="${TERMUX_PKG_API_LEVEL}"
 
 	# Ghostty links -lbzip2, Termux ships libbz2. Alias kept outside $TERMUX_PREFIX
 	local _bz2_compat="${TERMUX_PKG_TMPDIR}/bz2-compat"
@@ -71,6 +79,7 @@ termux_step_make() {
 		-Dgtk-x11=true \
 		-Dgtk-wayland=false \
 		-Dpatch-rpath="${TERMUX_PREFIX}/lib" \
+		-Dversion-string="${TERMUX_PKG_VERSION}" \
 		-Di18n=false \
 		-Demit-docs=false \
 		-fsys=freetype \

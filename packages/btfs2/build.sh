@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.bittorrent.com/btfs/
+TERMUX_PKG_HOMEPAGE="https://github.com/bittorrent/go-btfs"
 TERMUX_PKG_DESCRIPTION="Decentralized file system integrating with TRON network and Bittorrent network"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"

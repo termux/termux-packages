@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://alembic.io
+TERMUX_PKG_HOMEPAGE="https://www.alembic.io"
 TERMUX_PKG_DESCRIPTION="A framework for sharing scene data that includes a C++ lib, a file format and client plugin"
 TERMUX_PKG_LICENSE="BSD 3-Clause, BSL-1.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt"

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://bombadillo.colorfield.space/
+TERMUX_PKG_HOMEPAGE="https://tildegit.org/sloum/bombadillo"
 TERMUX_PKG_DESCRIPTION="A non-web client for the terminal, supporting Gopher, Gemini and much more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

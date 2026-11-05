@@ -1,0 +1,11 @@
+--- a/modules/lwjgl/core/src/main/c/common_tools.c
++++ b/modules/lwjgl/core/src/main/c/common_tools.c
+@@ -178,7 +178,7 @@
+         return data;
+     }
+ 
+-    inline EnvData* tlsGetEnvData(void) {
++    static inline EnvData* tlsGetEnvData(void) {
+         EnvData* data = (EnvData*)pthread_getspecific(envTLS);
+         if (data == NULL) {
+             data = tlsCreateEnvData();

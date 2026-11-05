@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://bitbucket.org/tmedwards/tweego
+TERMUX_PKG_HOMEPAGE="https://www.motoslave.net/tweego/"
 TERMUX_PKG_DESCRIPTION="A free command line compiler for Twine/Twee story formats"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"

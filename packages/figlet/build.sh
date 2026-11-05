@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.figlet.org/
+TERMUX_PKG_HOMEPAGE="https://www.figlet.org/"
 TERMUX_PKG_DESCRIPTION="Program for making large letters out of ordinary text"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"

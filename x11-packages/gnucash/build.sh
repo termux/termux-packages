@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0-or-later" # with OpenSSL linking exceptions
 TERMUX_PKG_LICENSE_FILE="LICENSE"     # specified for additional nuance.
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="5.17"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Gnucash/gnucash/releases/download/${TERMUX_PKG_VERSION}/gnucash-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_SHA256=3d18a88f5b8230f01e04c2d2d73bf95e7dcd3bf8d8cee6ffa54bb24dee58b85f
 TERMUX_PKG_DEPENDS="boost, gettext, guile, glib, gtk3, libicu, libsecret, libxml2, libxslt, perl, python, swig, webkit2gtk-4.1, xsltproc, zlib"

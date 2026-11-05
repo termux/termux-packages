@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://voikko.sourceforge.net"
+TERMUX_PKG_HOMEPAGE="https://voikko.puimula.org/"
 TERMUX_PKG_DESCRIPTION="A spelling and grammar checker, hyphenator and collection of related linguistic data for Finnish language"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

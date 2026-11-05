@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://albertlauncher.github.io/
 TERMUX_PKG_DESCRIPTION="A fast and flexible plugin-based keyboard launcher"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="35.1.0"
+TERMUX_PKG_VERSION="35.2.0"
 # The release tarballs do not contain the git submodules (plugins, QHotkey,
 # QNotification, i18n), so a git checkout is required.
 TERMUX_PKG_SRCURL="git+https://github.com/albertlauncher/albert"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for parsing and evaluating OSM opening hours exp
 TERMUX_PKG_LICENSE="LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/kopeninghours-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=17f6710625f58a069b20ff6de36232abfb4c4ccdd90d93f739b5fb6a11726b14
 TERMUX_PKG_AUTO_UPDATE=true

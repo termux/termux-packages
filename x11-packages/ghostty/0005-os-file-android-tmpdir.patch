@@ -1,10 +1,12 @@
 --- a/src/os/file.zig
 +++ b/src/os/file.zig
-@@ -67,6 +67,7 @@
+@@ -82,7 +82,8 @@ pub fn allocTmpDir(allocator: std.mem.Allocator, environ: std.process.Environ) s
+         }
+         return allocator.dupe(u8, "C:\\Windows\\Temp");
      }
-     if (posix.getenv("TMPDIR")) |v| return v;
-     if (posix.getenv("TMP")) |v| return v;
-+    if (comptime builtin.target.abi.isAndroid()) return "@TERMUX_PREFIX@/tmp";
-     return "/tmp";
+-    const tmpdir = environ.getPosix("TMPDIR") orelse environ.getPosix("TMP") orelse return "/tmp";
++    const tmpdir = environ.getPosix("TMPDIR") orelse environ.getPosix("TMP") orelse
++        return if (comptime builtin.target.abi.isAndroid()) "@TERMUX_PREFIX@/tmp" else "/tmp";
+     return std.mem.trimEnd(u8, tmpdir, &.{std.fs.path.sep});
  }
  

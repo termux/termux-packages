@@ -1,0 +1,11 @@
+--- a/src/root.zig
++++ b/src/root.zig
+@@ -92,7 +92,7 @@ pub const Language = enum {
+         };
+     }
+ };
+-pub const max_size = 4 * 1024 * 1024 * 1024;
++pub const max_size: usize = if (@sizeOf(usize) > 4) 4 * 1024 * 1024 * 1024 else std.math.maxInt(usize);
+ 
+ pub const Range = struct {
+     start: Pos,

@@ -1,6 +1,6 @@
 --- a/electrum/electrum
 +++ b/electrum/electrum
-@@ -42,7 +42,7 @@
+@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING, Optional, Dict
  
  script_dir = os.path.dirname(os.path.realpath(__file__))
  is_pyinstaller = getattr(sys, 'frozen', False)
@@ -11,7 +11,7 @@
  # is_local: unpacked tar.gz but not pip installed, or git clone
 --- a/electrum/logging.py
 +++ b/electrum/logging.py
-@@ -345,7 +345,7 @@
+@@ -345,7 +345,7 @@ def get_logfile_path() -> Optional[pathlib.Path]:
  
  
  def describe_os_version() -> str:
@@ -22,7 +22,7 @@
          b = jnius.autoclass('android.os.Build')
 --- a/electrum/simple_config.py
 +++ b/electrum/simple_config.py
-@@ -468,7 +468,7 @@
+@@ -468,7 +468,7 @@ class SimpleConfig(Logger):
      def get_backup_dir(self) -> Optional[str]:
          # this is used to save wallet file backups (without active lightning channels)
          # on Android, the export backup button uses android_backup_dir()
@@ -33,7 +33,7 @@
              return self.WALLET_BACKUP_DIRECTORY
 --- a/electrum/util.py
 +++ b/electrum/util.py
-@@ -415,7 +415,7 @@
+@@ -423,7 +423,7 @@ class DaemonThread(threading.Thread, Logger):
              self.wake_up_event.clear()
  
      def on_stop(self):
@@ -42,7 +42,7 @@
              import jnius
              jnius.detach()
              self.logger.info("jnius detach")
-@@ -621,7 +621,7 @@
+@@ -644,7 +644,7 @@ def is_hidden_wallet_path(wallet_path: Any) -> bool:
  
  
  def is_android_debug_apk() -> bool:
@@ -51,7 +51,7 @@
      if not is_android:
          return False
      from jnius import autoclass
-@@ -631,7 +631,7 @@
+@@ -654,7 +654,7 @@ def is_android_debug_apk() -> bool:
  
  
  def get_android_package_name() -> str:
@@ -60,7 +60,7 @@
      assert is_android
      from jnius import autoclass
      from android.config import ACTIVITY_CLASS_NAME
-@@ -695,7 +695,7 @@
+@@ -718,7 +718,7 @@ def xor_bytes(a: bytes, b: bytes) -> bytes:
  def user_dir():
      if "ELECTRUMDIR" in os.environ:
          return os.environ["ELECTRUMDIR"]
@@ -71,7 +71,7 @@
          return os.path.join(os.environ["HOME"], ".electrum")
 --- a/run_electrum
 +++ b/run_electrum
-@@ -42,7 +42,7 @@
+@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING, Optional, Dict
  
  script_dir = os.path.dirname(os.path.realpath(__file__))
  is_pyinstaller = getattr(sys, 'frozen', False)

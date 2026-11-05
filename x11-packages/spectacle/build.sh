@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="KDE screenshot capture utility"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.8.0+really6.7.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/plasma/${TERMUX_PKG_VERSION#*really}/spectacle-${TERMUX_PKG_VERSION#*really}.tar.xz"
 TERMUX_PKG_SHA256=2a63a8da331f9249e0ff0091a38f2fa946c7b85c7b7133bd8b60dd524e8e01b8
 TERMUX_PKG_AUTO_UPDATE=false
@@ -12,7 +13,7 @@ TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules, plasma-wayland-protocols"
 TERMUX_PKG_RECOMMENDS="tesseract"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCMAKE_SYSTEM_NAME=Linux
--DCMAKE_CXX_FLAGS=-I$TERMUX_PREFIX/include/opencv4
+-DCMAKE_CXX_FLAGS=-I$TERMUX_PREFIX/include/opencv5
 -DKDE_INSTALL_QMLDIR=lib/qt6/qml
 -DKDE_INSTALL_QTPLUGINDIR=lib/qt6/plugins
 "

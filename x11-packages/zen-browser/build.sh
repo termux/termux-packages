@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://zen-browser.app
 TERMUX_PKG_DESCRIPTION="Zen is a firefox-based browser with the aim of pushing your productivity to a new level!"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@sabamdarif"
-TERMUX_PKG_VERSION="1.23.4b"
+TERMUX_PKG_VERSION="1.24b"
 TERMUX_PKG_SRCURL="https://github.com/zen-browser/desktop/releases/download/${TERMUX_PKG_VERSION}/zen.source.tar.zst"
-TERMUX_PKG_SHA256=a14da36b6aa101a59794c7f7e29e3a00c1be0c5e0e53d9f6c05a06e1cb631064
+TERMUX_PKG_SHA256=a3a3fa0adbccc15711878f9947046b4278460b950264d9f80374c4a959d5640e
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
-TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwayland, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxkbcommon, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -42,6 +42,10 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
+	fi
+
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		CXXFLAGS+=" -DLIBYUV_DISABLE_X86"
 	fi
 }
 

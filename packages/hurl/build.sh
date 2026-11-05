@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://hurl.dev
 TERMUX_PKG_DESCRIPTION="Command line tool that runs and tests HTTP requests defined in a plain text format"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="8.0.1"
+TERMUX_PKG_VERSION="8.1.0"
 TERMUX_PKG_SRCURL="https://github.com/Orange-OpenSource/hurl/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=d5ea72ed489b9de319d0306d7b23728c4d284ac505adeb06c297ff5da1cf0de8
+TERMUX_PKG_SHA256=2e45678806a8a1c7307d4b4298b11aab6d947799bdce986c67fd9c693dac98a5
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libcurl, libxml2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -18,8 +18,8 @@ termux_step_pre_configure() {
 	# the host's glibc instead of the Android/bionic sysroot.
 	export BINDGEN_EXTRA_CLANG_ARGS="--sysroot ${TERMUX_STANDALONE_TOOLCHAIN}/sysroot"
 	case "${TERMUX_ARCH}" in
-		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi" ;;
-		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android" ;;
+		arm) BINDGEN_EXTRA_CLANG_ARGS+=" --target=arm-linux-androideabi${TERMUX_PKG_API_LEVEL}" ;;
+		*) BINDGEN_EXTRA_CLANG_ARGS+=" --target=${TERMUX_ARCH}-linux-android${TERMUX_PKG_API_LEVEL}" ;;
 	esac
 
 	termux_setup_rust

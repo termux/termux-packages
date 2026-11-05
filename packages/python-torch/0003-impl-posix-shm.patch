@@ -1,10 +1,9 @@
 --- a/torch/lib/libshm/manager.cpp
 +++ b/torch/lib/libshm/manager.cpp
-@@ -25,6 +25,65 @@
- #else
+@@ -25,6 +25,65 @@ const int SHUTDOWN_TIMEOUT = 2000; // 2s
  #define DEBUG(...) (void)0
  #endif
-+
+ 
 +static int shm_unlink(const char *name) {
 +    size_t namelen;
 +    char *fname;
@@ -63,16 +62,16 @@
 +
 +    return fd;
 +}
- 
++
  struct ClientSession {
    ClientSession(ManagerSocket s) : socket(std::move(s)) {}
+ 
 --- a/aten/src/ATen/MapAllocator.cpp
 +++ b/aten/src/ATen/MapAllocator.cpp
-@@ -26,6 +26,69 @@
- #include <c10/util/win32-headers.h>
+@@ -27,6 +27,69 @@
  #endif
  #include <fmt/format.h>
-+
+ 
 +#define HAVE_SHM_OPEN 1
 +#define HAVE_SHM_UNLINK 1
 +
@@ -135,6 +134,7 @@
 +    return fd;
 +}
 +
- 
++
  namespace at {
  
+ static constexpr int64_t map_alloc_alignment = 64;

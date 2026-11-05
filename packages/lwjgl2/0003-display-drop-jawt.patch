@@ -1,0 +1,34 @@
+--- a/src/native/linux/opengl/org_lwjgl_opengl_Display.c
++++ b/src/native/linux/opengl/org_lwjgl_opengl_Display.c
+@@ -47,7 +47,6 @@
+ #include <stdlib.h>
+ #include <assert.h>
+ #include <jni.h>
+-#include <jawt_md.h>
+ #include "common_tools.h"
+ #include "extgl.h"
+ #include "extgl_glx.h"
+@@ -568,23 +567,9 @@
+ }
+ 
+ JNIEXPORT void JNICALL Java_org_lwjgl_opengl_LinuxDisplay_nLockAWT(JNIEnv *env, jclass clazz) {
+-	JAWT jawt;
+-	jawt.version = JAWT_VERSION_1_4;
+-	if (JAWT_GetAWT(env, &jawt) != JNI_TRUE) {
+-		throwException(env, "GetAWT failed");
+-		return;
+-	}
+-	jawt.Lock(env);
+ }
+ 
+ JNIEXPORT void JNICALL Java_org_lwjgl_opengl_LinuxDisplay_nUnlockAWT(JNIEnv *env, jclass clazz) {
+-	JAWT jawt;
+-	jawt.version = JAWT_VERSION_1_4;
+-	if (JAWT_GetAWT(env, &jawt) != JNI_TRUE) {
+-		throwException(env, "GetAWT failed");
+-		return;
+-	}
+-	jawt.Unlock(env);
+ }
+ 
+ JNIEXPORT void JNICALL Java_org_lwjgl_opengl_LinuxDisplay_nSetWindowIcon
