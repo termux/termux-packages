@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://rolldown.rs/
 TERMUX_PKG_DESCRIPTION="Fast JavaScript/TypeScript bundler in Rust with Rollup-compatible API"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.2.16"
+TERMUX_PKG_VERSION="1.3.0"
 TERMUX_PKG_SRCURL=https://github.com/rolldown/rolldown/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4caefdecedcba5a0c182fabe4d51f72dac72358b31ee0df6f1ab5be0d81ec5d0
+TERMUX_PKG_SHA256=ca08aa1fe5a2b1c0ccf9c31208643d1349f52167713cfc60b0cfc64797dc1c32
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="nodejs | nodejs-lts, yuku"
@@ -69,6 +69,7 @@ termux_step_make() {
 
 	# Replace deployed yuku dependencies with symlinks to the system prefix
 	rm -rf packages/rolldown-deploy/node_modules/yuku-codegen packages/rolldown-deploy/node_modules/yuku-parser
+	rm -rf packages/rolldown-deploy/node_modules/.pnpm/yuku-* packages/rolldown-deploy/node_modules/.pnpm/@yuku-toolchain+*
 	ln -sf "$TERMUX_PREFIX/lib/node_modules/yuku-codegen" packages/rolldown-deploy/node_modules/yuku-codegen
 	ln -sf "$TERMUX_PREFIX/lib/node_modules/yuku-parser" packages/rolldown-deploy/node_modules/yuku-parser
 }
