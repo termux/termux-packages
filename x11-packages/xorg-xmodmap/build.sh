@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X11 keymap utility"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION=1.0.12
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xmodmap-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=fc54b9b5bbf2ae58ba8f9d42bd051c41c7438377400c42c17d7496d19e1bb3ce
+TERMUX_PKG_DEPENDS="libx11"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
+TERMUX_PKG_AUTO_UPDATE=true

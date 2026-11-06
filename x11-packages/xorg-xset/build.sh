@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X11 user preference utility"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION=1.2.6
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/xset-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=623837349ea887bc003f01ee2e4b6b8ddd9c2774f632c6d70eead1b56306b695
+TERMUX_PKG_DEPENDS="libx11, libxext, libxmu"
+TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
+TERMUX_PKG_AUTO_UPDATE=true
