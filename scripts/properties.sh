@@ -2198,22 +2198,21 @@ TERMUX_REPO_URL=()
 TERMUX_REPO_DISTRIBUTION=()
 TERMUX_REPO_COMPONENT=()
 
-# FIXME: Move `repo.json` file to under `scripts/` directory and COPY it to `/tmp/termux-packages` in `Dockerfile`.
-if [[ ! -f "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json" ]]; then
+if [[ ! -f "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json" ]]; then
     if [[ "${TERMUX_PKGS__BUILD__IS_DOCKER_BUILD:-}" != "true" ]]; then
-        echo "The 'repo.json' file not found at the '$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json' path." 1>&2
+        echo "The 'repo.json' file not found at the '$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json' path." 1>&2
         exit 1
     fi
 else
-    readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json")
+    readarray -t TERMUX_PACKAGES_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json")
 
-    for url in $(jq -r 'del(.pkg_format) | .[] | .url' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json"); do
+    for url in $(jq -r 'del(.pkg_format) | .[] | .url' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json"); do
         TERMUX_REPO_URL+=("$url")
     done
-    for distribution in $(jq -r 'del(.pkg_format) | .[] | .distribution' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json"); do
+    for distribution in $(jq -r 'del(.pkg_format) | .[] | .distribution' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json"); do
         TERMUX_REPO_DISTRIBUTION+=("$distribution")
     done
-    for component in $(jq -r 'del(.pkg_format) | .[] | .component' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/repo.json"); do
+    for component in $(jq -r 'del(.pkg_format) | .[] | .component' "$TERMUX_PKGS__BUILD__REPO_ROOT_DIR/scripts/repo.json"); do
         TERMUX_REPO_COMPONENT+=("$component")
     done
 fi
