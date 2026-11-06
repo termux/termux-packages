@@ -1,28 +1,6 @@
---- a/gtk2_ardour/ardour_http.cc
-+++ b/gtk2_ardour/ardour_http.cc
-@@ -84,6 +84,7 @@
- 	 */
- 	assert (!ca_path && !ca_info); // call once
- 
-+#ifndef __ANDROID__
- 	if (Glib::file_test ("/etc/pki/tls/certs/ca-bundle.crt", Glib::FILE_TEST_IS_REGULAR)) {
- 		// Fedora / RHEL, Arch
- 		ca_info = "/etc/pki/tls/certs/ca-bundle.crt";
-@@ -96,6 +97,11 @@
- 		// GNU/TLS can keep extra stuff here
- 		ca_info = "/etc/pki/tls/cert.pem";
- 	}
-+#else // __ANDROID__
-+	if (Glib::file_test ("@TERMUX_PREFIX@/etc/tls/cert.pem", Glib::FILE_TEST_IS_REGULAR)) {
-+		ca_info = "@TERMUX_PREFIX@/etc/tls/cert.pem";
-+	}
-+#endif
- 	// else NULL: use default (currently) "/etc/ssl/certs/ca-certificates.crt" if it exists
- 
- 	/* If we don't set anything defaults are used. at the time of writing we compile bundled curl on debian
 --- a/gtk2_ardour/bundle_env_linux.cc
 +++ b/gtk2_ardour/bundle_env_linux.cc
-@@ -104,9 +104,9 @@
+@@ -105,9 +105,9 @@ fixup_bundle_environment (int /*argc*/, char* argv[], string & localedir)
  	   if it exists, otherwise use the stuff we included in the bundle
  	*/
  
@@ -37,7 +15,7 @@
  	}
 --- a/gtk2_ardour/luainstance.cc
 +++ b/gtk2_ardour/luainstance.cc
-@@ -451,11 +451,11 @@
+@@ -455,11 +455,11 @@ lua_exec (std::string cmd)
  {
  	// args are free()ed in ~SystemExec
  	char** args = (char**) malloc (4 * sizeof(char*));
@@ -53,7 +31,7 @@
  	}
 --- a/gtk2_ardour/video_server_dialog.cc
 +++ b/gtk2_ardour/video_server_dialog.cc
-@@ -83,7 +83,7 @@
+@@ -83,7 +83,7 @@ VideoServerDialog::VideoServerDialog (Session* s)
  	HBox* docroot_hbox = manage (new HBox);
  
  	path_entry.set_width_chars(38);
@@ -64,7 +42,7 @@
  
 --- a/libs/ardour/plugin_manager.cc
 +++ b/libs/ardour/plugin_manager.cc
-@@ -296,9 +296,9 @@
+@@ -305,9 +305,9 @@ PluginManager::PluginManager ()
  	}
  
  	if (lxvst_path.length() == 0) {
@@ -77,18 +55,18 @@
  	}
  
  	/* first time setup, use 'default' path */
-@@ -2023,7 +2023,7 @@
+@@ -2062,7 +2062,7 @@ PluginManager::vst3_refresh (bool cache_only)
  	std::string prog = PBD::get_win_special_folder_path (CSIDL_PROGRAM_FILES);
  	vst3_discover_from_path (Glib::build_filename (prog, "Common Files", "VST3"), cache_only);
  #else
--	vst3_discover_from_path ("~/.vst3:/usr/local/lib/vst3:/usr/lib/vst3", cache_only);
+-	vst3_discover_from_path ("~/.vst3:/usr/lib64/vst3:/usr/lib/vst3:/usr/local/lib64/vst3:/usr/local/lib/vst3", cache_only);
 +	vst3_discover_from_path ("~/.vst3:@TERMUX_PREFIX@/local/lib/vst3:@TERMUX_PREFIX@/lib/vst3", cache_only);
  #endif
  }
  
 --- a/libs/ardour/search_paths.cc
 +++ b/libs/ardour/search_paths.cc
-@@ -108,10 +108,8 @@
+@@ -108,10 +108,8 @@ ladspa_search_path ()
  	spath.add_subdirectory_to_paths (ladspa_dir_name);
  
  #ifndef PLATFORM_WINDOWS
@@ -101,7 +79,7 @@
  #endif
  
  #ifdef __APPLE__
-@@ -293,7 +291,7 @@
+@@ -316,7 +314,7 @@ vst_search_path ()
  const char *
  vst_search_path ()
  {
@@ -112,7 +90,7 @@
  #endif // PLATFORM_WINDOWS
 --- a/libs/ardour/vst3_plugin.cc
 +++ b/libs/ardour/vst3_plugin.cc
-@@ -1038,8 +1038,8 @@
+@@ -1162,8 +1162,8 @@ VST3PluginInfo::preset_search_path () const
  	}
  #else
  	preset_path += Glib::build_filename (Glib::get_home_dir (), ".vst3", "presets", vendor, pname);
@@ -125,7 +103,7 @@
  	return preset_path;
 --- a/libs/lua/lua-5.3.5/loslib.c
 +++ b/libs/lua/lua-5.3.5/loslib.c
-@@ -115,7 +115,7 @@
+@@ -115,7 +115,7 @@ static time_t l_checktime (lua_State *L, int arg) {
  #define LUA_TMPNAMBUFSIZE	32
  
  #if !defined(LUA_TMPNAMTEMPLATE)
@@ -147,7 +125,7 @@
  #define LUA_PATH_DEFAULT  \
 --- a/libs/pbd/mountpoint.cc
 +++ b/libs/pbd/mountpoint.cc
-@@ -52,7 +52,7 @@
+@@ -52,7 +52,7 @@ mountpoint (string path)
  	const char *cpath = path.c_str();
  	char best[PATH_MAX+1];
  
