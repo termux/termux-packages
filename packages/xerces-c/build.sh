@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Validating XML parser library for C++."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
 TERMUX_PKG_VERSION="3.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://downloads.apache.org/xerces/c/3/sources/xerces-c-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=9555f1d06f82987fbb4658862705515740414fd34b4db6ad2ed76a2dc08d3bde
 TERMUX_PKG_DEPENDS="libc++, libcurl, libicu"
