@@ -1,10 +1,8 @@
-diff --git a/js/ui/main.js b/js/ui/main.js
-index b487c16..c64dab0 100644
 --- a/js/ui/main.js
 +++ b/js/ui/main.js
-@@ -104,7 +104,10 @@ const Overview = imports.ui.overview;
- const Expo = imports.ui.expo;
+@@ -110,7 +110,10 @@ const Expo = imports.ui.expo;
  const Panel = imports.ui.panel;
+ const ChromeRaise = imports.ui.chromeRaise;
  const PlacesManager = imports.ui.placesManager;
 -const PolkitAuthenticationAgent = imports.ui.polkitAuthenticationAgent;
 +let PolkitAuthenticationAgent = null;
@@ -14,7 +12,7 @@ index b487c16..c64dab0 100644
  const KeyringPrompt = imports.ui.keyringPrompt;
  const RunDialog = imports.ui.runDialog;
  const Layout = imports.ui.layout;
-@@ -450,11 +450,15 @@ function start() {
+@@ -527,11 +530,15 @@ function start() {
      }
  
      // Polkit Agent
@@ -32,11 +30,9 @@ index b487c16..c64dab0 100644
      }
  
      // SSH Agent
-diff --git a/meson.build b/meson.build
-index 1bdeaec..111d639 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -31,7 +31,11 @@ cogl = dependency('muffin-cogl-0')
+@@ -38,7 +38,11 @@ cogl = dependency('muffin-cogl-0')
  cogl_path = dependency('muffin-cogl-path-0')
  gcr = dependency('gcr-base-3', version: '>= 3.7.5')
  gdkx11 = dependency('gdk-x11-3.0')
@@ -47,17 +43,17 @@ index 1bdeaec..111d639 100644
 +    polkit = dependency('', required : false)
 +endif
  atk = dependency('atk-bridge-2.0')
+ atspi = dependency('atspi-2')
  gio = dependency('gio-2.0', version: '>= 2.36.0')
- gio_unix = dependency('gio-unix-2.0')
-@@ -93,6 +97,7 @@ cinnamon_conf = configuration_data()
+@@ -130,6 +134,7 @@ cinnamon_conf = configuration_data()
  cinnamon_conf.set_quoted('VERSION', version)
  cinnamon_conf.set_quoted('GETTEXT_PACKAGE', meson.project_name().to_lower())
  cinnamon_conf.set('BUILT_NM_AGENT', internal_nm_agent)
 +cinnamon_conf.set10('HAVE_POLKIT', get_option('polkit'))
  cinnamon_conf.set10('USE_GIR20', use_gir20)
+ cinnamon_conf.set10('HAVE_WAYLAND', get_option('wayland'))
  
- have_mallinfo = cc.has_function('mallinfo', prefix: '#include <malloc.h>')
-@@ -105,10 +110,14 @@ config_h = declare_dependency(
+@@ -187,10 +192,14 @@ config_h = declare_dependency(
  # includes
  include_root = include_directories('.')
  
@@ -75,35 +71,31 @@ index 1bdeaec..111d639 100644
  endif
  
  # compiler flags
-diff --git a/meson_options.txt b/meson_options.txt
-index 321192d..0477b2a 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -28,4 +28,8 @@ option('wayland',
-     value : true,
-     description: 'Enable wayland support'
+@@ -49,4 +49,9 @@ option('use_debian_pam',
+     value : false,
+     description: 'Use the debian pam file'
  )
--
 +option('polkit',
 +  type: 'boolean',
 +  value: true,
 +  description: 'Enable polkit support'
 +)
-diff --git a/src/meson.build b/src/meson.build
-index 75a9447..4e0e445 100644
+ 
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -54,8 +54,6 @@ cinnamon_sources = [
-     'cinnamon-keyring-prompt.c',
+@@ -64,8 +64,6 @@ cinnamon_sources = [
      'cinnamon-keyring-prompt.h',
+     'cinnamon-mount-operation.c',
      'cinnamon-perf-log.c',
 -    'cinnamon-polkit-authentication-agent.c',
 -    'cinnamon-polkit-authentication-agent.h',
      'cinnamon-screen.c',
      'cinnamon-screenshot.c',
      'cinnamon-secure-text-buffer.c',
-@@ -72,6 +70,13 @@ cinnamon_sources = [
-     calendar_generated
+@@ -83,6 +81,13 @@ cinnamon_sources = [
+     background_generated
  ]
  
 +if get_option('polkit')
@@ -116,14 +108,14 @@ index 75a9447..4e0e445 100644
  cinnamon_enum_types = gnome.mkenums_simple(
      'cinnamon-enum-types',
      sources: cinnamon_headers,
-@@ -107,12 +112,15 @@ libcinnamon_deps = [
+@@ -119,12 +124,15 @@ libcinnamon_deps = [
      gtk,
      muffin,
      pango,
 -    polkit,
      st_dep,
      xapp,
-     xml,
+     xdo,
  ]
  
 +if get_option('polkit')
@@ -132,8 +124,8 @@ index 75a9447..4e0e445 100644
 +
  libcinnamon_deps += nm_deps
  
- if have_networkmanager
-@@ -214,10 +214,13 @@ cinnamon_gir_includes = [
+ if internal_nm_agent
+@@ -221,10 +229,13 @@ cinnamon_gir_includes = [
      'Meta-0',
      'CMenu-3.0',
      'Gcr-3',

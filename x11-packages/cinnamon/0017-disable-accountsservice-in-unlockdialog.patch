@@ -1,0 +1,19 @@
+--- a/js/ui/screensaver/unlockDialog.js
++++ b/js/ui/screensaver/unlockDialog.js
+@@ -1,6 +1,5 @@
+ // -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+ 
+-const AccountsService = imports.gi.AccountsService;
+ const Clutter = imports.gi.Clutter;
+ const GLib = imports.gi.GLib;
+ const GObject = imports.gi.GObject;
+@@ -54,8 +53,7 @@ class UnlockDialog extends St.BoxLayout {
+         this._dialogBox.add_child(this._contentLayout);
+ 
+         let username = GLib.get_user_name();
+-        this._userManager = AccountsService.UserManager.get_default();
+-        this._user = this._userManager.get_user(username);
++        this._user = null;
+ 
+         this._userWidget = new UserWidget.UserWidget(this._user, Clutter.Orientation.VERTICAL);
+         this._userWidget.x_align = Clutter.ActorAlign.CENTER;
