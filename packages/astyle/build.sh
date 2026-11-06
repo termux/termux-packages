@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://astyle.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Source code formatter for C-like programming languages"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.6.21"
+TERMUX_PKG_VERSION="3.6.22"
 TERMUX_PKG_SRCURL="https://gitlab.com/saalen/astyle/-/archive/${TERMUX_PKG_VERSION}/astyle-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=dbcd16b486e228d29d43be8334053842c76931fefe3507d1541aeec2c6f75be8
+TERMUX_PKG_SHA256=1116a77eab2f4466ee399ee2af046c5a501f1429089b1d5e0c97e0ca33de5336
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_post_get_source() {
