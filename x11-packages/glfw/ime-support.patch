@@ -1,0 +1,1147 @@
+diff -ruN xa/include/GLFW/glfw3.h xb/include/GLFW/glfw3.h
+--- xa/include/GLFW/glfw3.h	2026-10-30 03:20:12.033489416 +0000
++++ xb/include/GLFW/glfw3.h	2026-10-30 03:20:12.035684226 +0000
+@@ -941,6 +941,8 @@
+  */
+ #define GLFW_POSITION_Y             0x0002000F
+ 
++#define GLFW_SOFT_FULLSCREEN  0x00020010
++
+ /*! @brief Framebuffer bit depth hint.
+  *
+  *  Framebuffer bit depth [hint](@ref GLFW_RED_BITS).
+@@ -1155,6 +1157,7 @@
+ #define GLFW_LOCK_KEY_MODS           0x00033004
+ #define GLFW_RAW_MOUSE_MOTION        0x00033005
+ #define GLFW_UNLIMITED_MOUSE_BUTTONS 0x00033006
++#define GLFW_IME                     0x00033007
+ 
+ #define GLFW_CURSOR_NORMAL          0x00034001
+ #define GLFW_CURSOR_HIDDEN          0x00034002
+@@ -1308,6 +1311,7 @@
+  *  Platform selection [init hint](@ref GLFW_PLATFORM).
+  */
+ #define GLFW_PLATFORM               0x00050003
++#define GLFW_MANAGE_PREEDIT_CANDIDATE 0x00050004
+ /*! @brief macOS specific init hint.
+  *
+  *  macOS specific [init hint](@ref GLFW_COCOA_CHDIR_RESOURCES_hint).
+@@ -1323,6 +1327,7 @@
+  *  X11 specific [init hint](@ref GLFW_X11_XCB_VULKAN_SURFACE_hint).
+  */
+ #define GLFW_X11_XCB_VULKAN_SURFACE 0x00052001
++#define GLFW_X11_ONTHESPOT          0x00052002
+ /*! @brief Wayland specific init hint.
+  *
+  *  Wayland specific [init hint](@ref GLFW_WAYLAND_LIBDECOR_hint).
+@@ -1949,6 +1954,22 @@
+  */
+ typedef void (* GLFWcharmodsfun)(GLFWwindow* window, unsigned int codepoint, int mods);
+ 
++typedef void (* GLFWpreeditfun)(GLFWwindow* window,
++                                int preedit_count,
++                                unsigned int* preedit_string,
++                                int block_count,
++                                int* block_sizes,
++                                int focused_block,
++                                int caret);
++
++typedef void (* GLFWimestatusfun)(GLFWwindow* window);
++
++typedef void (* GLFWpreeditcandidatefun)(GLFWwindow* window,
++                                         int candidates_count,
++                                         int selected_index,
++                                         int page_start,
++                                         int page_size);
++
+ /*! @brief The function pointer type for path drop callbacks.
+  *
+  *  This is the function pointer type for path drop callbacks.  A path drop
+@@ -5168,6 +5189,14 @@
+  */
+ GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
+ 
++GLFWAPI void glfwGetPreeditCursorRectangle(GLFWwindow* window, int* x, int* y, int* w, int* h);
++
++GLFWAPI void glfwSetPreeditCursorRectangle(GLFWwindow* window, int x, int y, int w, int h);
++
++GLFWAPI void glfwResetPreeditText(GLFWwindow* window);
++
++GLFWAPI unsigned int* glfwGetPreeditCandidate(GLFWwindow* window, int index, int* textCount);
++
+ /*! @brief Sets the key callback.
+  *
+  *  This function sets the key callback of the specified window, which is called
+@@ -5303,6 +5332,12 @@
+  */
+ GLFWAPI GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmodsfun callback);
+ 
++GLFWAPI GLFWpreeditfun glfwSetPreeditCallback(GLFWwindow* window, GLFWpreeditfun cbfun);
++
++GLFWAPI GLFWimestatusfun glfwSetIMEStatusCallback(GLFWwindow* window, GLFWimestatusfun cbfun);
++
++GLFWAPI GLFWpreeditcandidatefun glfwSetPreeditCandidateCallback(GLFWwindow* window, GLFWpreeditcandidatefun cbfun);
++
+ /*! @brief Sets the mouse button callback.
+  *
+  *  This function sets the mouse button callback of the specified window, which
+diff -ruN xa/src/init.c xb/src/init.c
+--- xa/src/init.c	2026-10-30 03:20:12.041426866 +0000
++++ xb/src/init.c	2026-10-30 03:20:12.043023398 +0000
+@@ -52,6 +52,7 @@
+     .hatButtons = true,
+     .angleType = GLFW_ANGLE_PLATFORM_TYPE_NONE,
+     .platformID = GLFW_ANY_PLATFORM,
++    .managePreeditCandidate = GLFW_FALSE,
+     .vulkanLoader = NULL,
+     .ns =
+     {
+@@ -61,6 +62,7 @@
+     .x11 =
+     {
+         .xcbVulkanSurface = true,
++        .onTheSpotIMStyle = false
+     },
+     .wl =
+     {
+@@ -175,6 +177,26 @@
+     return count;
+ }
+ 
++uint32_t _glfwDecodeUTF8(const char** s)
++{
++    uint32_t codepoint = 0, count = 0;
++    static const uint32_t offsets[] =
++    {
++        0x00000000u, 0x00003080u, 0x000e2080u,
++        0x03c82080u, 0xfa082080u, 0x82082080u
++    };
++
++    do
++    {
++        codepoint = (codepoint << 6) + (unsigned char) **s;
++        (*s)++;
++        count++;
++    } while ((**s & 0xc0) == 0x80);
++
++    assert(count <= 6);
++    return codepoint - offsets[count - 1];
++}
++
+ // Splits and translates a text/uri-list into separate file paths
+ // NOTE: This function destroys the provided string
+ //
+@@ -450,6 +472,9 @@
+         case GLFW_PLATFORM:
+             _glfwInitHints.platformID = value;
+             return;
++        case GLFW_MANAGE_PREEDIT_CANDIDATE:
++            _glfwInitHints.managePreeditCandidate = value;
++            return;
+         case GLFW_COCOA_CHDIR_RESOURCES:
+             _glfwInitHints.ns.chdir = value;
+             return;
+@@ -459,6 +484,9 @@
+         case GLFW_X11_XCB_VULKAN_SURFACE:
+             _glfwInitHints.x11.xcbVulkanSurface = value;
+             return;
++        case GLFW_X11_ONTHESPOT:
++            _glfwInitHints.x11.onTheSpotIMStyle = value;
++            return;
+         case GLFW_WAYLAND_LIBDECOR:
+             _glfwInitHints.wl.libdecorMode = value;
+             return;
+diff -ruN xa/src/input.c xb/src/input.c
+--- xa/src/input.c	2026-10-30 03:20:12.047567658 +0000
++++ xb/src/input.c	2026-10-30 03:20:12.049221482 +0000
+@@ -328,6 +328,42 @@
+     }
+ }
+ 
++void _glfwInputPreedit(_GLFWwindow* window)
++{
++    if (window->callbacks.preedit)
++    {
++        _GLFWpreedit *preedit = &window->preedit;
++        window->callbacks.preedit((GLFWwindow*) window,
++                                  preedit->textCount,
++                                  preedit->text,
++                                  preedit->blockSizesCount,
++                                  preedit->blockSizes,
++                                  preedit->focusedBlockIndex,
++                                  preedit->caretIndex);
++    }
++}
++
++void _glfwInputIMEStatus(_GLFWwindow* window)
++{
++    if (window->callbacks.imestatus)
++    {
++        window->callbacks.imestatus((GLFWwindow*) window);
++    }
++}
++
++void _glfwInputPreeditCandidate(_GLFWwindow* window)
++{
++    if (window->callbacks.preeditCandidate)
++    {
++        _GLFWpreedit* preedit = &window->preedit;
++        window->callbacks.preeditCandidate((GLFWwindow*) window,
++                                           preedit->candidateCount,
++                                           preedit->candidateSelection,
++                                           preedit->candidatePageStart,
++                                           preedit->candidatePageSize);
++    }
++}
++
+ // Notifies shared code of a scroll event
+ //
+ void _glfwInputScroll(_GLFWwindow* window, double xoffset, double yoffset)
+@@ -577,6 +613,8 @@
+             return window->rawMouseMotion;
+         case GLFW_UNLIMITED_MOUSE_BUTTONS:
+             return window->disableMouseButtonLimit;
++        case GLFW_IME:
++            return _glfw.platform.getIMEStatus(window);
+     }
+ 
+     _glfwInputError(GLFW_INVALID_ENUM, "Invalid input mode 0x%08X", mode);
+@@ -690,6 +728,12 @@
+             window->disableMouseButtonLimit = value ? GLFW_TRUE : GLFW_FALSE;
+             return;
+         }
++
++        case GLFW_IME:
++        {
++            _glfw.platform.setIMEStatus(window, value ? GLFW_TRUE : GLFW_FALSE);
++            return;
++        }
+     }
+ 
+     _glfwInputError(GLFW_INVALID_ENUM, "Invalid input mode 0x%08X", mode);
+@@ -949,6 +993,62 @@
+     _glfw.platform.setCursor(window, cursor);
+ }
+ 
++GLFWAPI void glfwGetPreeditCursorRectangle(GLFWwindow* handle, int* x, int* y, int* w, int* h)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFWpreedit* preedit = &window->preedit;
++    if (x)
++        *x = preedit->cursorPosX;
++    if (y)
++        *y = preedit->cursorPosY;
++    if (w)
++        *w = preedit->cursorWidth;
++    if (h)
++        *h = preedit->cursorHeight;
++}
++
++GLFWAPI void glfwSetPreeditCursorRectangle(GLFWwindow* handle, int x, int y, int w, int h)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFWpreedit* preedit = &window->preedit;
++
++    if (x == preedit->cursorPosX &&
++        y == preedit->cursorPosY &&
++        w == preedit->cursorWidth &&
++        h == preedit->cursorHeight)
++    {
++        return;
++    }
++
++    preedit->cursorPosX = x;
++    preedit->cursorPosY = y;
++    preedit->cursorWidth = w;
++    preedit->cursorHeight = h;
++
++    _glfw.platform.updatePreeditCursorRectangle(window);
++}
++
++GLFWAPI void glfwResetPreeditText(GLFWwindow* handle)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _glfw.platform.resetPreeditText(window);
++}
++
++GLFWAPI unsigned int* glfwGetPreeditCandidate(GLFWwindow* handle, int index, int* textCount)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFWpreedit* preedit = &window->preedit;
++
++    if (preedit->candidateCount <= index)
++        return NULL;
++
++    if (textCount)
++        *textCount = preedit->candidates[index].textCount;
++
++
++    return preedit->candidates[index].text;
++}
++
+ GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)
+ {
+     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+@@ -982,6 +1082,31 @@
+     return cbfun;
+ }
+ 
++GLFWAPI GLFWpreeditfun glfwSetPreeditCallback(GLFWwindow* handle, GLFWpreeditfun cbfun)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
++    _GLFW_SWAP(GLFWpreeditfun, window->callbacks.preedit, cbfun);
++    return cbfun;
++}
++
++GLFWAPI GLFWimestatusfun glfwSetIMEStatusCallback(GLFWwindow* handle, GLFWimestatusfun cbfun)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
++    _GLFW_SWAP(GLFWimestatusfun, window->callbacks.imestatus, cbfun);
++    return cbfun;
++}
++
++GLFWAPI GLFWpreeditcandidatefun glfwSetPreeditCandidateCallback(GLFWwindow* handle,
++                                                                GLFWpreeditcandidatefun cbfun)
++{
++    _GLFWwindow* window = (_GLFWwindow*) handle;
++    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
++    _GLFW_SWAP(GLFWpreeditcandidatefun, window->callbacks.preeditCandidate, cbfun);
++    return cbfun;
++}
++
+ GLFWAPI GLFWmousebuttonfun glfwSetMouseButtonCallback(GLFWwindow* handle,
+                                                       GLFWmousebuttonfun cbfun)
+ {
+diff -ruN xa/src/internal.h xb/src/internal.h
+--- xa/src/internal.h	2026-10-30 03:20:12.054150877 +0000
++++ xb/src/internal.h	2026-10-30 03:20:12.055873552 +0000
+@@ -63,22 +63,24 @@
+ typedef int GLFWbool;
+ typedef void (*GLFWproc)(void);
+ 
+-typedef struct _GLFWerror       _GLFWerror;
+-typedef struct _GLFWinitconfig  _GLFWinitconfig;
+-typedef struct _GLFWwndconfig   _GLFWwndconfig;
+-typedef struct _GLFWctxconfig   _GLFWctxconfig;
+-typedef struct _GLFWfbconfig    _GLFWfbconfig;
+-typedef struct _GLFWcontext     _GLFWcontext;
+-typedef struct _GLFWwindow      _GLFWwindow;
+-typedef struct _GLFWplatform    _GLFWplatform;
+-typedef struct _GLFWlibrary     _GLFWlibrary;
+-typedef struct _GLFWmonitor     _GLFWmonitor;
+-typedef struct _GLFWcursor      _GLFWcursor;
+-typedef struct _GLFWmapelement  _GLFWmapelement;
+-typedef struct _GLFWmapping     _GLFWmapping;
+-typedef struct _GLFWjoystick    _GLFWjoystick;
+-typedef struct _GLFWtls         _GLFWtls;
+-typedef struct _GLFWmutex       _GLFWmutex;
++typedef struct _GLFWerror            _GLFWerror;
++typedef struct _GLFWinitconfig       _GLFWinitconfig;
++typedef struct _GLFWwndconfig        _GLFWwndconfig;
++typedef struct _GLFWctxconfig        _GLFWctxconfig;
++typedef struct _GLFWfbconfig         _GLFWfbconfig;
++typedef struct _GLFWcontext          _GLFWcontext;
++typedef struct _GLFWpreedit          _GLFWpreedit;
++typedef struct _GLFWpreeditcandidate _GLFWpreeditcandidate;
++typedef struct _GLFWwindow           _GLFWwindow;
++typedef struct _GLFWplatform         _GLFWplatform;
++typedef struct _GLFWlibrary          _GLFWlibrary;
++typedef struct _GLFWmonitor          _GLFWmonitor;
++typedef struct _GLFWcursor           _GLFWcursor;
++typedef struct _GLFWmapelement       _GLFWmapelement;
++typedef struct _GLFWmapping          _GLFWmapping;
++typedef struct _GLFWjoystick         _GLFWjoystick;
++typedef struct _GLFWtls              _GLFWtls;
++typedef struct _GLFWmutex            _GLFWmutex;
+ 
+ #define GL_VERSION 0x1f02
+ #define GL_NONE 0
+@@ -378,6 +380,7 @@
+     bool          hatButtons;
+     int           angleType;
+     int           platformID;
++    GLFWbool      managePreeditCandidate;
+     PFN_vkGetInstanceProcAddr vulkanLoader;
+     struct {
+         bool      menubar;
+@@ -385,6 +388,7 @@
+     } ns;
+     struct {
+         bool      xcbVulkanSurface;
++        bool      onTheSpotIMStyle;
+     } x11;
+     struct {
+         int       libdecorMode;
+@@ -415,6 +419,7 @@
+     bool          mousePassthrough;
+     bool          scaleToMonitor;
+     bool          scaleFramebuffer;
++    bool          softFullscreen;
+     struct {
+         char      frameName[256];
+     } ns;
+@@ -526,6 +531,33 @@
+     GLFW_PLATFORM_CONTEXT_STATE
+ };
+ 
++struct _GLFWpreedit
++{
++    unsigned int*          text;
++    int                    textCount;
++    int                    textBufferCount;
++    int*                   blockSizes;
++    int                    blockSizesCount;
++    int                    blockSizesBufferCount;
++    int                    focusedBlockIndex;
++    int                    caretIndex;
++    int                    cursorPosX, cursorPosY, cursorWidth, cursorHeight;
++
++    _GLFWpreeditcandidate* candidates;
++    int                    candidateCount;
++    int                    candidateBufferCount;
++    int                    candidateSelection;
++    int                    candidatePageStart;
++    int                    candidatePageSize;
++};
++
++struct _GLFWpreeditcandidate
++{
++    unsigned int*       text;
++    int                 textCount;
++    int                 textBufferCount;
++};
++
+ // Window and context structure
+ //
+ struct _GLFWwindow
+@@ -564,6 +596,8 @@
+ 
+     _GLFWcontext        context;
+ 
++    _GLFWpreedit        preedit;
++
+     struct {
+         GLFWwindowposfun          pos;
+         GLFWwindowsizefun         size;
+@@ -581,6 +615,9 @@
+         GLFWkeyfun                key;
+         GLFWcharfun               character;
+         GLFWcharmodsfun           charmods;
++        GLFWpreeditfun            preedit;
++        GLFWimestatusfun          imestatus;
++        GLFWpreeditcandidatefun   preeditCandidate;
+         GLFWdropfun               drop;
+     } callbacks;
+ 
+@@ -700,6 +737,10 @@
+     int (*getKeyScancode)(int);
+     void (*setClipboardString)(const char*);
+     const char* (*getClipboardString)(void);
++    void (*updatePreeditCursorRectangle)(_GLFWwindow*);
++    void (*resetPreeditText)(_GLFWwindow*);
++    void (*setIMEStatus)(_GLFWwindow*,int);
++    int  (*getIMEStatus)(_GLFWwindow*);
+     GLFWbool (*initJoysticks)(void);
+     void (*terminateJoysticks)(void);
+     GLFWbool (*pollJoystick)(_GLFWjoystick*,int);
+@@ -911,6 +952,7 @@
+ void _glfwPlatformUnlockMutex(_GLFWmutex* mutex);
+ 
+ void* _glfwPlatformLoadModule(const char* path);
++void* _glfwPlatformLoadModuleUTF8(const char* path);
+ void _glfwPlatformFreeModule(void* module);
+ GLFWproc _glfwPlatformGetModuleSymbol(void* module, const char* name);
+ 
+@@ -935,6 +977,9 @@
+                    int key, int scancode, int action, int mods);
+ void _glfwInputChar(_GLFWwindow* window,
+                     uint32_t codepoint, int mods, GLFWbool plain);
++void _glfwInputPreedit(_GLFWwindow* window);
++void _glfwInputIMEStatus(_GLFWwindow* window);
++void _glfwInputPreeditCandidate(_GLFWwindow* window);
+ void _glfwInputScroll(_GLFWwindow* window, double xoffset, double yoffset);
+ void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods);
+ void _glfwInputCursorPos(_GLFWwindow* window, double xpos, double ypos);
+@@ -1011,6 +1056,7 @@
+ const char* _glfwGetVulkanResultString(VkResult result);
+ 
+ size_t _glfwEncodeUTF8(char* s, uint32_t codepoint);
++uint32_t _glfwDecodeUTF8(const char** s);
+ char** _glfwParseUriList(char* text, int* count);
+ 
+ char* _glfw_strdup(const char* source);
+diff -ruN xa/src/null_init.c xb/src/null_init.c
+--- xa/src/null_init.c	2026-10-30 03:20:12.067679036 +0000
++++ xb/src/null_init.c	2026-10-30 03:20:12.068948648 +0000
+@@ -55,6 +55,10 @@
+         .getKeyScancode = _glfwGetKeyScancodeNull,
+         .setClipboardString = _glfwSetClipboardStringNull,
+         .getClipboardString = _glfwGetClipboardStringNull,
++        .updatePreeditCursorRectangle = _glfwUpdatePreeditCursorRectangleNull,
++        .resetPreeditText = _glfwResetPreeditTextNull,
++        .setIMEStatus = _glfwSetIMEStatusNull,
++        .getIMEStatus = _glfwGetIMEStatusNull,
+         .initJoysticks = _glfwInitJoysticksNull,
+         .terminateJoysticks = _glfwTerminateJoysticksNull,
+         .pollJoystick = _glfwPollJoystickNull,
+diff -ruN xa/src/null_platform.h xb/src/null_platform.h
+--- xa/src/null_platform.h	2026-10-30 03:20:12.073294530 +0000
++++ xb/src/null_platform.h	2026-10-30 03:20:12.074553989 +0000
+@@ -270,6 +270,11 @@
+ const char* _glfwGetScancodeNameNull(int scancode);
+ int _glfwGetKeyScancodeNull(int key);
+ 
++void _glfwUpdatePreeditCursorRectangleNull(_GLFWwindow* window);
++void _glfwResetPreeditTextNull(_GLFWwindow* window);
++void _glfwSetIMEStatusNull(_GLFWwindow* window, int active);
++int _glfwGetIMEStatusNull(_GLFWwindow* window);
++
+ EGLenum _glfwGetEGLPlatformNull(EGLint** attribs);
+ EGLNativeDisplayType _glfwGetEGLNativeDisplayNull(void);
+ EGLNativeWindowType _glfwGetEGLNativeWindowNull(_GLFWwindow* window);
+diff -ruN xa/src/null_window.c xb/src/null_window.c
+--- xa/src/null_window.c	2026-10-30 03:20:12.078811797 +0000
++++ xb/src/null_window.c	2026-10-30 03:20:12.080147141 +0000
+@@ -551,6 +551,23 @@
+     return _glfw.null.clipboardString;
+ }
+ 
++void _glfwUpdatePreeditCursorRectangleNull(_GLFWwindow* window)
++{
++}
++
++void _glfwResetPreeditTextNull(_GLFWwindow* window)
++{
++}
++
++void _glfwSetIMEStatusNull(_GLFWwindow* window, int active)
++{
++}
++
++int _glfwGetIMEStatusNull(_GLFWwindow* window)
++{
++    return GLFW_FALSE;
++}
++
+ EGLenum _glfwGetEGLPlatformNull(EGLint** attribs)
+ {
+     if (_glfw.egl.EXT_platform_base && _glfw.egl.MESA_platform_surfaceless)
+diff -ruN xa/src/window.c xb/src/window.c
+--- xa/src/window.c	2026-10-30 03:20:12.060779146 +0000
++++ xb/src/window.c	2026-10-30 03:20:12.062567225 +0000
+@@ -243,6 +243,11 @@
+     window->denom       = GLFW_DONT_CARE;
+     window->title       = _glfw_strdup(title);
+ 
++    window->preedit.cursorPosX = 0;
++    window->preedit.cursorPosY = height;
++    window->preedit.cursorWidth = 0;
++    window->preedit.cursorHeight = 0;
++
+     if (!_glfw.platform.createWindow(window, &wndconfig, &ctxconfig, &fbconfig))
+     {
+         glfwDestroyWindow((GLFWwindow*) window);
+@@ -275,6 +280,7 @@
+     _glfw.hints.window.xpos         = GLFW_ANY_POSITION;
+     _glfw.hints.window.ypos         = GLFW_ANY_POSITION;
+     _glfw.hints.window.scaleFramebuffer = true;
++    _glfw.hints.window.softFullscreen = false;
+ 
+     // The default is 24 bits of color, 24 bits of depth and 8 bits of stencil,
+     // double buffered
+@@ -397,6 +403,9 @@
+         case GLFW_MOUSE_PASSTHROUGH:
+             _glfw.hints.window.mousePassthrough = value;
+             return;
++        case GLFW_SOFT_FULLSCREEN:
++            _glfw.hints.window.softFullscreen = value;
++            return;
+         case GLFW_CLIENT_API:
+             _glfw.hints.context.client = value;
+             return;
+@@ -494,6 +503,10 @@
+         *prev = window->next;
+     }
+ 
++    if (window->preedit.text)
++        _glfw_free(window->preedit.text);
++    if (window->preedit.blockSizes)
++        _glfw_free(window->preedit.blockSizes);
+     _glfw_free(window->title);
+     _glfw_free(window);
+ }
+diff -ruN xa/src/x11_init.c xb/src/x11_init.c
+--- xa/src/x11_init.c	2026-10-30 03:20:12.084615427 +0000
++++ xb/src/x11_init.c	2026-10-30 03:20:12.086264849 +0000
+@@ -445,9 +445,14 @@
+     if (XGetIMValues(_glfw.x11.im, XNQueryInputStyle, &styles, NULL) != NULL)
+         return GLFW_FALSE;
+ 
++    if (_glfw.hints.init.x11.onTheSpotIMStyle)
++        _glfw.x11.imStyle = STYLE_ONTHESPOT;
++    else
++        _glfw.x11.imStyle = STYLE_OVERTHESPOT;
++
+     for (unsigned int i = 0;  i < styles->count_styles;  i++)
+     {
+-        if (styles->supported_styles[i] == (XIMPreeditNothing | XIMStatusNothing))
++        if (styles->supported_styles[i] == _glfw.x11.imStyle)
+         {
+             found = GLFW_TRUE;
+             break;
+@@ -1183,6 +1188,10 @@
+         .getKeyScancode = _glfwGetKeyScancodeX11,
+         .setClipboardString = _glfwSetClipboardStringX11,
+         .getClipboardString = _glfwGetClipboardStringX11,
++        .updatePreeditCursorRectangle = _glfwUpdatePreeditCursorRectangleX11,
++        .resetPreeditText = _glfwResetPreeditTextX11,
++        .setIMEStatus = _glfwSetIMEStatusX11,
++        .getIMEStatus = _glfwGetIMEStatusX11,
+ #if defined(GLFW_BUILD_LINUX_JOYSTICK)
+         .initJoysticks = _glfwInitJoysticksLinux,
+         .terminateJoysticks = _glfwTerminateJoysticksLinux,
+@@ -1452,6 +1461,8 @@
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XSetErrorHandler");
+     _glfw.x11.xlib.SetICFocus = (PFN_XSetICFocus)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XSetICFocus");
++    _glfw.x11.xlib.SetICValues = (PFN_XSetICValues)
++        _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XSetICValues");
+     _glfw.x11.xlib.SetIMValues = (PFN_XSetIMValues)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XSetIMValues");
+     _glfw.x11.xlib.SetInputFocus = (PFN_XSetInputFocus)
+@@ -1482,6 +1493,8 @@
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XUnmapWindow");
+     _glfw.x11.xlib.UnsetICFocus = (PFN_XUnsetICFocus)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XUnsetICFocus");
++    _glfw.x11.xlib.VaCreateNestedList = (PFN_XVaCreateNestedList)
++        _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XVaCreateNestedList");
+     _glfw.x11.xlib.VisualIDFromVisual = (PFN_XVisualIDFromVisual)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XVisualIDFromVisual");
+     _glfw.x11.xlib.WarpPointer = (PFN_XWarpPointer)
+@@ -1514,6 +1527,8 @@
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XrmUniqueQuark");
+     _glfw.x11.xlib.UnregisterIMInstantiateCallback = (PFN_XUnregisterIMInstantiateCallback)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XUnregisterIMInstantiateCallback");
++    _glfw.x11.xlib.mbResetIC = (PFN_XmbResetIC)
++        _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "XmbResetIC");
+     _glfw.x11.xlib.utf8LookupString = (PFN_Xutf8LookupString)
+         _glfwPlatformGetModuleSymbol(_glfw.x11.xlib.handle, "Xutf8LookupString");
+     _glfw.x11.xlib.utf8SetWMProperties = (PFN_Xutf8SetWMProperties)
+diff -ruN xa/src/x11_platform.h xb/src/x11_platform.h
+--- xa/src/x11_platform.h	2026-10-30 03:20:12.090638580 +0000
++++ xb/src/x11_platform.h	2026-10-30 03:20:12.092083214 +0000
+@@ -91,6 +91,9 @@
+ #define GLX_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB 0x2098
+ #define GLX_CONTEXT_OPENGL_NO_ERROR_ARB 0x31b3
+ 
++#define STYLE_OVERTHESPOT (XIMPreeditNothing | XIMStatusNothing)
++#define STYLE_ONTHESPOT (XIMPreeditCallbacks | XIMStatusCallbacks)
++
+ typedef XID GLXWindow;
+ typedef XID GLXDrawable;
+ typedef struct __GLXFBConfig* GLXFBConfig;
+@@ -165,6 +168,7 @@
+ typedef int (* PFN_XSetClassHint)(Display*,Window,XClassHint*);
+ typedef XErrorHandler (* PFN_XSetErrorHandler)(XErrorHandler);
+ typedef void (* PFN_XSetICFocus)(XIC);
++typedef char* (* PFN_XSetICValues)(XIC,...);
+ typedef char* (* PFN_XSetIMValues)(XIM,...);
+ typedef int (* PFN_XSetInputFocus)(Display*,Window,int,Time);
+ typedef char* (* PFN_XSetLocaleModifiers)(const char*);
+@@ -180,6 +184,7 @@
+ typedef int (* PFN_XUngrabPointer)(Display*,Time);
+ typedef int (* PFN_XUnmapWindow)(Display*,Window);
+ typedef void (* PFN_XUnsetICFocus)(XIC);
++typedef XVaNestedList (* PFN_XVaCreateNestedList)(int,...);
+ typedef VisualID (* PFN_XVisualIDFromVisual)(Visual*);
+ typedef int (* PFN_XWarpPointer)(Display*,Window,Window,int,int,unsigned int,unsigned int,int,int);
+ typedef void (* PFN_XkbFreeKeyboard)(XkbDescPtr,unsigned int,Bool);
+@@ -191,6 +196,7 @@
+ typedef Bool (* PFN_XkbQueryExtension)(Display*,int*,int*,int*,int*,int*);
+ typedef Bool (* PFN_XkbSelectEventDetails)(Display*,unsigned int,unsigned int,unsigned long,unsigned long);
+ typedef Bool (* PFN_XkbSetDetectableAutoRepeat)(Display*,Bool,Bool*);
++typedef char* (* PFN_XmbResetIC)(XIC);
+ typedef void (* PFN_XrmDestroyDatabase)(XrmDatabase);
+ typedef Bool (* PFN_XrmGetResource)(XrmDatabase,const char*,const char*,char**,XrmValue*);
+ typedef XrmDatabase (* PFN_XrmGetStringDatabase)(const char*);
+@@ -265,6 +271,7 @@
+ #define XSetClassHint _glfw.x11.xlib.SetClassHint
+ #define XSetErrorHandler _glfw.x11.xlib.SetErrorHandler
+ #define XSetICFocus _glfw.x11.xlib.SetICFocus
++#define XSetICValues _glfw.x11.xlib.SetICValues
+ #define XSetIMValues _glfw.x11.xlib.SetIMValues
+ #define XSetInputFocus _glfw.x11.xlib.SetInputFocus
+ #define XSetLocaleModifiers _glfw.x11.xlib.SetLocaleModifiers
+@@ -280,6 +287,7 @@
+ #define XUngrabPointer _glfw.x11.xlib.UngrabPointer
+ #define XUnmapWindow _glfw.x11.xlib.UnmapWindow
+ #define XUnsetICFocus _glfw.x11.xlib.UnsetICFocus
++#define XVaCreateNestedList _glfw.x11.xlib.VaCreateNestedList
+ #define XVisualIDFromVisual _glfw.x11.xlib.VisualIDFromVisual
+ #define XWarpPointer _glfw.x11.xlib.WarpPointer
+ #define XkbFreeKeyboard _glfw.x11.xkb.FreeKeyboard
+@@ -291,6 +299,7 @@
+ #define XkbQueryExtension _glfw.x11.xkb.QueryExtension
+ #define XkbSelectEventDetails _glfw.x11.xkb.SelectEventDetails
+ #define XkbSetDetectableAutoRepeat _glfw.x11.xkb.SetDetectableAutoRepeat
++#define XmbResetIC _glfw.x11.xlib.mbResetIC
+ #define XrmDestroyDatabase _glfw.x11.xrm.DestroyDatabase
+ #define XrmGetResource _glfw.x11.xrm.GetResource
+ #define XrmGetStringDatabase _glfw.x11.xrm.GetStringDatabase
+@@ -545,6 +554,16 @@
+     // The time of the last KeyPress event per keycode, for discarding
+     // duplicate key events generated for some keys by ibus
+     Time            keyPressTimes[256];
++
++    XIMCallback preeditStartCallback;
++    XIMCallback preeditDoneCallback;
++    XIMCallback preeditDrawCallback;
++    XIMCallback preeditCaretCallback;
++    XIMCallback statusStartCallback;
++    XIMCallback statusDoneCallback;
++    XIMCallback statusDrawCallback;
++
++    int imeFocus;
+ } _GLFWwindowX11;
+ 
+ // X11-specific global data
+@@ -565,6 +584,7 @@
+     XContext        context;
+     // XIM input method
+     XIM             im;
++    XIMStyle        imStyle;
+     // The previous X error handler, to be restored later
+     XErrorHandler   errorHandler;
+     // Most recent error code received by X error handler
+@@ -710,6 +730,7 @@
+         PFN_XSetClassHint SetClassHint;
+         PFN_XSetErrorHandler SetErrorHandler;
+         PFN_XSetICFocus SetICFocus;
++        PFN_XSetICValues SetICValues;
+         PFN_XSetIMValues SetIMValues;
+         PFN_XSetInputFocus SetInputFocus;
+         PFN_XSetLocaleModifiers SetLocaleModifiers;
+@@ -725,9 +746,11 @@
+         PFN_XUngrabPointer UngrabPointer;
+         PFN_XUnmapWindow UnmapWindow;
+         PFN_XUnsetICFocus UnsetICFocus;
++        PFN_XVaCreateNestedList VaCreateNestedList;
+         PFN_XVisualIDFromVisual VisualIDFromVisual;
+         PFN_XWarpPointer WarpPointer;
+         PFN_XUnregisterIMInstantiateCallback UnregisterIMInstantiateCallback;
++        PFN_XmbResetIC mbResetIC;
+         PFN_Xutf8LookupString utf8LookupString;
+         PFN_Xutf8SetWMProperties utf8SetWMProperties;
+     } xlib;
+@@ -954,6 +977,11 @@
+ void _glfwSetClipboardStringX11(const char* string);
+ const char* _glfwGetClipboardStringX11(void);
+ 
++void _glfwUpdatePreeditCursorRectangleX11(_GLFWwindow* window);
++void _glfwResetPreeditTextX11(_GLFWwindow* window);
++void _glfwSetIMEStatusX11(_GLFWwindow* window, int active);
++int _glfwGetIMEStatusX11(_GLFWwindow* window);
++
+ EGLenum _glfwGetEGLPlatformX11(EGLint** attribs);
+ EGLNativeDisplayType _glfwGetEGLNativeDisplayX11(void);
+ EGLNativeWindowType _glfwGetEGLNativeWindowX11(_GLFWwindow* window);
+diff -ruN xa/src/x11_window.c xb/src/x11_window.c
+--- xa/src/x11_window.c	2026-10-30 03:20:12.096116857 +0000
++++ xb/src/x11_window.c	2026-10-30 03:20:12.098010163 +0000
+@@ -365,7 +365,7 @@
+         // Enable compositor bypass
+         if (!window->x11.transparent)
+         {
+-            const unsigned long value = 1;
++            const unsigned long value = _glfw.hints.window.softFullscreen ? 2 : 1;
+ 
+             XChangeProperty(_glfw.x11.display,  window->x11.handle,
+                             _glfw.x11.NET_WM_BYPASS_COMPOSITOR, XA_CARDINAL, 32,
+@@ -410,29 +410,6 @@
+     }
+ }
+ 
+-// Decode a Unicode code point from a UTF-8 stream
+-// Based on cutef8 by Jeff Bezanson (Public Domain)
+-//
+-static uint32_t decodeUTF8(const char** s)
+-{
+-    uint32_t codepoint = 0, count = 0;
+-    static const uint32_t offsets[] =
+-    {
+-        0x00000000u, 0x00003080u, 0x000e2080u,
+-        0x03c82080u, 0xfa082080u, 0x82082080u
+-    };
+-
+-    do
+-    {
+-        codepoint = (codepoint << 6) + (unsigned char) **s;
+-        (*s)++;
+-        count++;
+-    } while ((**s & 0xc0) == 0x80);
+-
+-    assert(count <= 6);
+-    return codepoint - offsets[count - 1];
+-}
+-
+ // Convert the specified Latin-1 string to UTF-8
+ //
+ static char* convertLatin1toUTF8(const char* source)
+@@ -561,6 +538,198 @@
+     window->x11.ic = NULL;
+ }
+ 
++static void _ximPreeditStartCallback(XIC xic, XPointer clientData, XPointer callData)
++{
++}
++
++static void _ximPreeditDoneCallback(XIC xic, XPointer clientData, XPointer callData)
++{
++}
++
++static void _ximPreeditDrawCallback(XIC xic, XPointer clientData, XIMPreeditDrawCallbackStruct* callData)
++{
++    _GLFWwindow* window = (_GLFWwindow*) clientData;
++    _GLFWpreedit* preedit = &window->preedit;
++
++    if (!callData->text)
++    {
++        preedit->textCount = 0;
++        preedit->blockSizesCount = 0;
++        preedit->focusedBlockIndex = 0;
++        preedit->caretIndex = 0;
++        _glfwInputPreedit(window);
++        return;
++    }
++    else if (callData->text->encoding_is_wchar)
++    {
++        return;
++    }
++    else
++    {
++        XIMText* text = callData->text;
++        int textLen = preedit->textCount + text->length - callData->chg_length;
++        int textBufferCount = preedit->textBufferCount;
++        int i, j, rstart, rend;
++        const char* src;
++
++        while (textBufferCount < textLen + 1)
++            textBufferCount = (textBufferCount == 0) ? 1 : textBufferCount * 2;
++        if (textBufferCount != preedit->textBufferCount)
++        {
++            unsigned int* preeditText = _glfw_realloc(preedit->text,
++                                                      sizeof(unsigned int) * textBufferCount);
++            if (preeditText == NULL)
++                return;
++
++            preedit->text = preeditText;
++            preedit->textBufferCount = textBufferCount;
++        }
++        preedit->textCount = textLen;
++        preedit->text[textLen] = 0;
++
++        if (preedit->blockSizesBufferCount == 0)
++        {
++            preedit->blockSizes = _glfw_calloc(4, sizeof(int));
++            preedit->blockSizesBufferCount = 4;
++        }
++
++        src = text->string.multi_byte;
++        rend = 0;
++        rstart = textLen;
++        for (i = 0, j = callData->chg_first; i < text->length; i++)
++        {
++            XIMFeedback f;
++
++            if (i < callData->chg_first || callData->chg_first + textLen < i)
++                continue;
++
++            preedit->text[j++] = _glfwDecodeUTF8(&src);
++            f = text->feedback[i];
++            if ((f & XIMReverse) || (f & XIMHighlight))
++            {
++                rend = i;
++                if (i < rstart)
++                    rstart = i;
++            }
++        }
++
++        if (rstart == textLen)
++        {
++            preedit->blockSizesCount = 1;
++            preedit->blockSizes[0] = textLen;
++            preedit->blockSizes[1] = 0;
++            preedit->focusedBlockIndex = 0;
++            preedit->caretIndex = callData->caret;
++            _glfwInputPreedit(window);
++        }
++        else if (rstart == 0)
++        {
++            if (rend == textLen -1)
++            {
++                preedit->blockSizesCount = 1;
++                preedit->blockSizes[0] = textLen;
++                preedit->blockSizes[1] = 0;
++                preedit->focusedBlockIndex = 0;
++                preedit->caretIndex = callData->caret;
++                _glfwInputPreedit(window);
++            }
++            else
++            {
++                preedit->blockSizesCount = 2;
++                preedit->blockSizes[0] = rend + 1;
++                preedit->blockSizes[1] = textLen - rend - 1;
++                preedit->blockSizes[2] = 0;
++                preedit->focusedBlockIndex = 0;
++                preedit->caretIndex = callData->caret;
++                _glfwInputPreedit(window);
++            }
++        }
++        else if (rend == textLen - 1)
++        {
++            preedit->blockSizesCount = 2;
++            preedit->blockSizes[0] = rstart;
++            preedit->blockSizes[1] = textLen - rstart;
++            preedit->blockSizes[2] = 0;
++            preedit->focusedBlockIndex = 1;
++            preedit->caretIndex = callData->caret;
++            _glfwInputPreedit(window);
++        }
++        else
++        {
++            preedit->blockSizesCount = 3;
++            preedit->blockSizes[0] = rstart;
++            preedit->blockSizes[1] = rend - rstart + 1;
++            preedit->blockSizes[2] = textLen - rend - 1;
++            preedit->blockSizes[3] = 0;
++            preedit->focusedBlockIndex = 1;
++            preedit->caretIndex = callData->caret;
++            _glfwInputPreedit(window);
++        }
++    }
++}
++
++static void _ximPreeditCaretCallback(XIC xic, XPointer clientData, XPointer callData)
++{
++}
++
++static void _ximStatusStartCallback(XIC xic, XPointer clientData, XPointer callData)
++{
++    _GLFWwindow* window = (_GLFWwindow*) clientData;
++    window->x11.imeFocus = GLFW_TRUE;
++}
++
++static void _ximStatusDoneCallback(XIC xic, XPointer clientData, XPointer callData)
++{
++    _GLFWwindow* window = (_GLFWwindow*) clientData;
++    window->x11.imeFocus = GLFW_FALSE;
++}
++
++static void _ximStatusDrawCallback(XIC xic, XPointer clientData, XIMStatusDrawCallbackStruct* callData)
++{
++    _GLFWwindow* window = (_GLFWwindow*) clientData;
++    _glfwInputIMEStatus(window);
++}
++
++static XVaNestedList _createXIMPreeditCallbacks(_GLFWwindow* window)
++{
++    window->x11.preeditStartCallback.client_data = (XPointer) window;
++    window->x11.preeditStartCallback.callback = (XIMProc) _ximPreeditStartCallback;
++    window->x11.preeditDoneCallback.client_data = (XPointer) window;
++    window->x11.preeditDoneCallback.callback = (XIMProc) _ximPreeditDoneCallback;
++    window->x11.preeditDrawCallback.client_data = (XPointer) window;
++    window->x11.preeditDrawCallback.callback = (XIMProc) _ximPreeditDrawCallback;
++    window->x11.preeditCaretCallback.client_data = (XPointer) window;
++    window->x11.preeditCaretCallback.callback = (XIMProc) _ximPreeditCaretCallback;
++    return XVaCreateNestedList(0,
++                               XNPreeditStartCallback,
++                               &window->x11.preeditStartCallback.client_data,
++                               XNPreeditDoneCallback,
++                               &window->x11.preeditDoneCallback.client_data,
++                               XNPreeditDrawCallback,
++                               &window->x11.preeditDrawCallback.client_data,
++                               XNPreeditCaretCallback,
++                               &window->x11.preeditCaretCallback.client_data,
++                               NULL);
++}
++
++static XVaNestedList _createXIMStatusCallbacks(_GLFWwindow* window)
++{
++    window->x11.statusStartCallback.client_data = (XPointer) window;
++    window->x11.statusStartCallback.callback = (XIMProc) _ximStatusStartCallback;
++    window->x11.statusDoneCallback.client_data = (XPointer) window;
++    window->x11.statusDoneCallback.callback = (XIMProc) _ximStatusDoneCallback;
++    window->x11.statusDrawCallback.client_data = (XPointer) window;
++    window->x11.statusDrawCallback.callback = (XIMProc) _ximStatusDrawCallback;
++    return XVaCreateNestedList(0,
++                               XNStatusStartCallback,
++                               &window->x11.statusStartCallback.client_data,
++                               XNStatusDoneCallback,
++                               &window->x11.statusDoneCallback.client_data,
++                               XNStatusDrawCallback,
++                               &window->x11.statusDrawCallback.client_data,
++                               NULL);
++}
++
+ // Create the X11 window (and its colormap)
+ //
+ static GLFWbool createNativeWindow(_GLFWwindow* window,
+@@ -1294,7 +1463,7 @@
+                         const char* c = chars;
+                         chars[count] = '\0';
+                         while (c - chars < count)
+-                            _glfwInputChar(window, decodeUTF8(&c), mods, plain);
++                            _glfwInputChar(window, _glfwDecodeUTF8(&c), mods, plain);
+                     }
+ 
+                     if (chars != buffer)
+@@ -1929,16 +2098,50 @@
+     callback.callback = (XIMProc) inputContextDestroyCallback;
+     callback.client_data = (XPointer) window;
+ 
+-    window->x11.ic = XCreateIC(_glfw.x11.im,
+-                               XNInputStyle,
+-                               XIMPreeditNothing | XIMStatusNothing,
+-                               XNClientWindow,
+-                               window->x11.handle,
+-                               XNFocusWindow,
+-                               window->x11.handle,
+-                               XNDestroyCallback,
+-                               &callback,
+-                               NULL);
++    window->x11.imeFocus = GLFW_FALSE;
++
++    if (_glfw.x11.imStyle == STYLE_ONTHESPOT)
++    {
++        XVaNestedList preeditList = _createXIMPreeditCallbacks(window);
++        XVaNestedList statusList = _createXIMStatusCallbacks(window);
++
++        window->x11.ic = XCreateIC(_glfw.x11.im,
++                                   XNInputStyle,
++                                   _glfw.x11.imStyle,
++                                   XNClientWindow,
++                                   window->x11.handle,
++                                   XNFocusWindow,
++                                   window->x11.handle,
++                                   XNPreeditAttributes,
++                                   preeditList,
++                                   XNStatusAttributes,
++                                   statusList,
++                                   XNDestroyCallback,
++                                   &callback,
++                                   NULL);
++
++        XFree(preeditList);
++        XFree(statusList);
++    }
++    else if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
++    {
++        window->x11.ic = XCreateIC(_glfw.x11.im,
++                                   XNInputStyle,
++                                   _glfw.x11.imStyle,
++                                   XNClientWindow,
++                                   window->x11.handle,
++                                   XNFocusWindow,
++                                   window->x11.handle,
++                                   XNDestroyCallback,
++                                   &callback,
++                                   NULL);
++    }
++    else
++    {
++        _glfwInputError(GLFW_PLATFORM_ERROR,
++                        "X11: Failed to create input context.");
++        return;
++    }
+ 
+     if (window->x11.ic)
+     {
+@@ -3110,6 +3313,86 @@
+     return getSelectionString(_glfw.x11.CLIPBOARD);
+ }
+ 
++void _glfwUpdatePreeditCursorRectangleX11(_GLFWwindow* window)
++{
++    XVaNestedList preedit_attr;
++    XPoint spot;
++    _GLFWpreedit* preedit = &window->preedit;
++
++    if (!window->x11.ic)
++        return;
++
++    spot.x = preedit->cursorPosX + preedit->cursorWidth;
++    spot.y = preedit->cursorPosY + preedit->cursorHeight;
++    preedit_attr = XVaCreateNestedList(0, XNSpotLocation, &spot, NULL);
++    XSetICValues(window->x11.ic, XNPreeditAttributes, preedit_attr, NULL);
++    XFree(preedit_attr);
++}
++
++void _glfwResetPreeditTextX11(_GLFWwindow* window)
++{
++    XIC ic = window->x11.ic;
++    _GLFWpreedit* preedit = &window->preedit;
++
++    XIMPreeditState preedit_state = XIMPreeditUnKnown;
++    XVaNestedList preedit_attr;
++    char* result;
++
++    if (!ic)
++        return;
++
++    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
++        return;
++
++    if (preedit->textCount == 0)
++        return;
++
++    preedit_attr = XVaCreateNestedList(0, XNPreeditState, &preedit_state, NULL);
++    XGetICValues(ic, XNPreeditAttributes, preedit_attr, NULL);
++    XFree(preedit_attr);
++
++    result = XmbResetIC(ic);
++
++    preedit_attr = XVaCreateNestedList(0, XNPreeditState, preedit_state, NULL);
++    XSetICValues(ic, XNPreeditAttributes, preedit_attr, NULL);
++    XFree(preedit_attr);
++
++    preedit->textCount = 0;
++    preedit->blockSizesCount = 0;
++    preedit->focusedBlockIndex = 0;
++    preedit->caretIndex = 0;
++    _glfwInputPreedit(window);
++
++    XFree (result);
++}
++
++void _glfwSetIMEStatusX11(_GLFWwindow* window, int active)
++{
++    XIC ic = window->x11.ic;
++
++    if (!ic)
++        return;
++
++    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
++        return;
++
++    if (active)
++        XSetICFocus(ic);
++    else
++        XUnsetICFocus(ic);
++}
++
++int _glfwGetIMEStatusX11(_GLFWwindow* window)
++{
++    if (!window->x11.ic)
++        return GLFW_FALSE;
++
++    if (_glfw.x11.imStyle == STYLE_OVERTHESPOT)
++        return GLFW_FALSE;
++
++    return window->x11.imeFocus;
++}
++
+ EGLenum _glfwGetEGLPlatformX11(EGLint** attribs)
+ {
+     if (_glfw.egl.ANGLE_platform_angle)
