@@ -1,23 +1,8 @@
 diff --git a/src/NzbDrone.Mono/Disk/DiskProvider.cs b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-index a44966b..ee3a390 100644
+index 9d9026ec21..0aa69df99f 100644
 --- a/src/NzbDrone.Mono/Disk/DiskProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-@@ -21,13 +21,11 @@ namespace NzbDrone.Mono.Disk
-         private readonly Logger _logger;
-         private readonly IProcMountProvider _procMountProvider;
-         private readonly ISymbolicLinkResolver _symLinkResolver;
--        private readonly ICreateRefLink _createRefLink;
- 
--        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, ICreateRefLink createRefLink, Logger logger)
-+        public DiskProvider(IProcMountProvider procMountProvider, ISymbolicLinkResolver symLinkResolver, Logger logger)
-         {
-             _procMountProvider = procMountProvider;
-             _symLinkResolver = symLinkResolver;
--            _createRefLink = createRefLink;
-             _logger = logger;
-         }
- 
-@@ -179,6 +177,16 @@ namespace NzbDrone.Mono.Disk
+@@ -183,6 +183,16 @@ protected override List<IMount> GetAllMounts()
                  _logger.Warn(e, $"Unable to get mounts: {e.Message}");
              }
  
@@ -34,59 +19,26 @@ index a44966b..ee3a390 100644
              try
              {
                  mounts.AddRange(GetDriveInfoMounts()
-@@ -234,19 +242,6 @@ namespace NzbDrone.Mono.Disk
-             return mount?.TotalSize;
-         }
- 
--        protected override void CloneFileInternal(string source, string destination, bool overwrite)
--        {
--            if (!File.Exists(destination) && !UnixFileSystemInfo.GetFileSystemEntry(source).IsSymbolicLink)
--            {
--                if (_createRefLink.TryCreateRefLink(source, destination))
--                {
--                    return;
--                }
--            }
--
--            CopyFileInternal(source, destination, overwrite);
--        }
--
-         protected override void CopyFileInternal(string source, string destination, bool overwrite)
-         {
-             var sourceInfo = UnixFileSystemInfo.GetFileSystemEntry(source);
-@@ -464,11 +459,6 @@ namespace NzbDrone.Mono.Disk
-             }
-         }
- 
--        public override bool TryCreateRefLink(string source, string destination)
--        {
--            return _createRefLink.TryCreateRefLink(source, destination);
--        }
--
-         private uint GetUserId(string user)
-         {
-             if (user.IsNullOrWhiteSpace())
 diff --git a/src/NzbDrone.Mono/Disk/ProcMount.cs b/src/NzbDrone.Mono/Disk/ProcMount.cs
-index 2b0b9e5..f542ad6 100644
+index 5e5d1f3c05..993952f3ab 100644
 --- a/src/NzbDrone.Mono/Disk/ProcMount.cs
 +++ b/src/NzbDrone.Mono/Disk/ProcMount.cs
 @@ -1,4 +1,4 @@
--﻿using System.IO;
-+using System.IO;
+-﻿using System;
++using System;
+ using System.IO;
  using Mono.Unix;
- using NzbDrone.Common.Disk;
- using NzbDrone.Common.Extensions;
-@@ -7,7 +7,8 @@ namespace NzbDrone.Mono.Disk
- {
+ using NLog;
+@@ -11,7 +11,7 @@ namespace NzbDrone.Mono.Disk
      public class ProcMount : IMount
      {
+         private static readonly Logger Logger = NzbDroneLogger.GetLogger(typeof(ProcMount));
 -        private readonly UnixDriveInfo _unixDriveInfo;
-+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 +        private readonly System.IO.DriveInfo _driveInfo;
  
          public ProcMount(DriveType driveType, string name, string mount, string type, MountOptions mountOptions)
          {
-@@ -17,16 +18,51 @@ namespace NzbDrone.Mono.Disk
+@@ -21,16 +21,51 @@ public ProcMount(DriveType driveType, string name, string mount, string type, Mo
              DriveFormat = type;
              MountOptions = mountOptions;
  
@@ -141,53 +93,45 @@ index 2b0b9e5..f542ad6 100644
  
          public MountOptions MountOptions { get; private set; }
  
-@@ -34,11 +70,63 @@ namespace NzbDrone.Mono.Disk
- 
-         public string RootDirectory { get; private set; }
- 
--        public long TotalFreeSpace => _unixDriveInfo.TotalFreeSpace;
-+        public long TotalFreeSpace
-+        {
-+            get
-+            {
-+                try
-+                {
+@@ -44,13 +79,18 @@ public long TotalFreeSpace
+             {
+                 try
+                 {
+-                    return _unixDriveInfo.TotalFreeSpace;
 +                    return _driveInfo?.TotalFreeSpace ?? long.MaxValue;
-+                }
-+                catch (System.OverflowException ex)
-+                {
-+                    Logger.Warn(ex, "Failed to get total free space");
-+                    return long.MaxValue;
-+                }
+                 }
+                 catch (OverflowException ex)
+                 {
+                     Logger.Warn(ex, "Failed to get total free space");
+                     return long.MaxValue;
+                 }
 +                catch (System.Exception ex)
 +                {
 +                    Logger.Debug(ex, "Failed to get total free space");
 +                    return long.MaxValue;
 +                }
-+            }
-+        }
+             }
+         }
  
--        public long TotalSize => _unixDriveInfo.TotalSize;
-+        public long TotalSize
-+        {
-+            get
-+            {
-+                try
-+                {
+@@ -60,17 +100,36 @@ public long TotalSize
+             {
+                 try
+                 {
+-                    return _unixDriveInfo.TotalSize;
 +                    return _driveInfo?.TotalSize ?? long.MaxValue;
-+                }
-+                catch (System.OverflowException ex)
-+                {
-+                    Logger.Warn(ex, "Failed to get total size");
-+                    return long.MaxValue;
-+                }
+                 }
+                 catch (OverflowException ex)
+                 {
+                     Logger.Warn(ex, "Failed to get total size");
+                     return long.MaxValue;
+                 }
 +                catch (System.Exception ex)
 +                {
 +                    Logger.Debug(ex, "Failed to get total size");
 +                    return long.MaxValue;
 +                }
-+            }
-+        }
+             }
+         }
  
 -        public string VolumeLabel => _unixDriveInfo.VolumeLabel;
 +        public string VolumeLabel
@@ -209,10 +153,10 @@ index 2b0b9e5..f542ad6 100644
          public string VolumeName
          {
 diff --git a/src/NzbDrone.Mono/Disk/ProcMountProvider.cs b/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
-index 2cce7d8..9218036 100644
+index 2cce7d8b64..9218036c51 100644
 --- a/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/ProcMountProvider.cs
-@@ -130,7 +130,15 @@ namespace NzbDrone.Mono.Disk
+@@ -130,7 +130,15 @@ private IMount ParseLine(string line)
                  driveType = DriveType.Network;
              }
  
