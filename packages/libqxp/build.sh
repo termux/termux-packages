@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="a library that parses the file format of QuarkXPress doc
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.0.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://dev-www.libreoffice.org/src/libqxp/libqxp-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=4687a9cc96c32d7406e5072c4da150fca696c563e5cde62b024f82fa53d32332
 TERMUX_PKG_AUTO_UPDATE=true
