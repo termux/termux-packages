@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Microsoft Publisher file format parser library (latest s
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.1.5"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://dev-www.libreoffice.org/src/libmspub/libmspub-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=3671095f5a10bee8a755052a30576952c5b16d8b0f2ba9f2fb998338c18cb119
 TERMUX_PKG_DEPENDS="libwpd, libicu, libxml2, librevenge, zlib"
