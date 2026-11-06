@@ -1,21 +1,28 @@
-diff --git a/meson.build b/meson.build
-index 111d639..eaaf308 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -166,8 +166,14 @@ configure_file(
- )
+@@ -276,11 +276,22 @@ if get_option('exclude_users_settings')
+     excluded_files += ['usr/share/cinnamon/cinnamon-settings/modules/cs_user.py']
+ endif
  
- install_subdir(
--    'files',
--    install_dir: '/',
++excluded_usr_files = []
++foreach f : excluded_files
++    excluded_usr_files += f.substring(4)
++endforeach
++
++install_subdir(
 +    'files/usr',
 +    install_dir: prefix,
 +    strip_directory: true,
++    exclude_files : excluded_usr_files
 +)
 +
-+install_subdir(
+ install_subdir(
+-    'files',
+-    install_dir: '/',
 +    'files/etc',
 +    install_dir: join_paths(prefix, 'etc'),
      strip_directory: true,
+-    exclude_files : excluded_files
  )
  
+ session_files = ['cinnamon.session']

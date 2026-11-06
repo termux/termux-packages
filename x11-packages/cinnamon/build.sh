@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/linuxmint/cinnamon
 TERMUX_PKG_DESCRIPTION="Cinnamon shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.6.9"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="6.8.0"
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=62fe4a47f727fda66b4f38a83d21b23a7ccb9f2af169a5f8e7c0b4258131d6bf
+TERMUX_PKG_SHA256=848ed95275202eb0b992689e5fe18f9126dc188c2a5f674505335d81ebe38b40
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(?!-)"
-TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, ibus, libadapta, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-pip, python-xapp, sassc, xapp"
+TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, gtk4, ibus, libadapta, libcairo, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-pip, python-xapp, sassc, xapp, xdotool"
 TERMUX_PKG_BUILD_DEPENDS="g-ir-scanner, glib-cross, intltool, python-libsass"
 TERMUX_PKG_PYTHON_RUNTIME_DEPS="pytz, tinycss2, requests"
 TERMUX_PKG_SUGGESTS="gnome-terminal, gnome-screenshot"
@@ -27,6 +26,7 @@ termux_step_post_get_source() {
 	find "$TERMUX_PKG_SRCDIR" -type f | \
 		xargs -n 1 sed -i \
 		-e "s|/usr|$TERMUX_PREFIX|g" \
+		-e "s|files$TERMUX_PREFIX|files/usr|g" \
 		-e "s|#!$TERMUX_PREFIX|#!/usr|g"
 }
 
