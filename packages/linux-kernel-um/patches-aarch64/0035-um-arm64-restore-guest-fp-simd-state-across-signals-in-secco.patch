@@ -1,0 +1,93 @@
+From 4741dd4073e6d4471cb8004b95e18ddb78a9e85e Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 03:15:29 +0200
+Subject: [PATCH] um: arm64: restore guest FP/SIMD state across signals in
+ SECCOMP mode
+
+fpstate_to_sigctx() and sigctx_to_fpstate() both guard on
+
+	if (host_fp_size < sizeof(struct user_fpsimd_state))
+		return;
+
+which is the wrong bound. That struct is 528 bytes, because its uapi
+definition carries a __reserved[2] tail, while the payload these
+functions move is vregs + fpsr + fpcr = 520 bytes and nothing here ever
+touches the tail.
+
+In SECCOMP mode host_fp_size is derived from the mcontext, in
+get_stub_state(), as exactly that 520-byte payload. The guard is then
+520 < 528, so both directions return without copying: the guest's vector
+registers are never saved into a signal frame and never restored from
+one. Any guest signal handler that touches a V register silently
+corrupts the state of the code it interrupted. The ptrace path is
+unaffected, because there host_fp_size is the NT_PRFPREG regset size,
+which is sizeof(*st).
+
+Go finds this within seconds. It preempts goroutines with SIGURG at
+arbitrary instructions from 1.14 onwards, and its arm64 AES-GCM assembly
+holds cipher state across most of the register file, so every TLS
+transfer past a few megabytes fails with "local error: tls: bad record
+MAC". A Docker image pull reports that as "filesystem layer verification
+failed", which points at the disk, and the disk is intact.
+
+Guard on the payload actually copied. With this, a 29 MB image layer
+that failed a hundred times out of a hundred pulls cleanly with async
+preemption fully enabled.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/signal.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/um/signal.c b/arch/arm64/um/signal.c
+index ea5432f924c73..7163bebcd5fbc 100644
+--- a/arch/arm64/um/signal.c
++++ b/arch/arm64/um/signal.c
+@@ -66,11 +66,37 @@ struct frame_record {
+  * registers after taking a signal, and shows up much later as a guest whose
+  * rounding mode or denormal handling resets at random.
+  */
++/*
++ * The bytes these two functions actually move.
++ *
++ * Not sizeof(struct user_fpsimd_state): that is eight bytes larger, because
++ * the uapi struct carries a __reserved[2] tail which neither the host's
++ * NT_PRFPREG payload nor a signal frame's fpsimd_context contains, and which
++ * nothing here ever reads or writes.
++ *
++ * Guarding on the struct size instead of on this was a silent disaster in
++ * SECCOMP mode. There host_fp_size is derived from the mcontext and comes out
++ * as exactly vregs + fpsr + fpcr = 520, so "host_fp_size < sizeof(*st)" is
++ * 520 < 528 -- true -- and both directions returned without copying anything.
++ * The guest's vector registers were therefore never saved into a signal frame
++ * and never restored from one: any guest signal handler that touched a V
++ * register silently corrupted the state of the code it interrupted.
++ *
++ * That is not a corner case. Go preempts goroutines with SIGURG at arbitrary
++ * instructions from 1.14 onwards, and its arm64 AES-GCM assembly holds cipher
++ * state across most of the register file, so every TLS transfer past a few
++ * megabytes died with "tls: bad record MAC" -- which Docker reports as
++ * "filesystem layer verification failed", pointing at the disk. The ptrace
++ * path was unaffected, because there host_fp_size is the NT_PRFPREG regset
++ * size, which is sizeof(*st).
++ */
++#define UM_FP_PAYLOAD_SIZE offsetof(struct user_fpsimd_state, __reserved)
++
+ static void fpstate_to_sigctx(struct fpsimd_context *fp, struct pt_regs *regs)
+ {
+ 	struct user_fpsimd_state *st = (struct user_fpsimd_state *)regs->regs.fp;
+ 
+-	if (host_fp_size < sizeof(*st))
++	if (host_fp_size < UM_FP_PAYLOAD_SIZE)
+ 		return;
+ 
+ 	memcpy(&fp->vregs, &st->vregs, sizeof(fp->vregs));
+@@ -82,7 +108,7 @@ static void sigctx_to_fpstate(struct pt_regs *regs, const struct fpsimd_context
+ {
+ 	struct user_fpsimd_state *st = (struct user_fpsimd_state *)regs->regs.fp;
+ 
+-	if (host_fp_size < sizeof(*st))
++	if (host_fp_size < UM_FP_PAYLOAD_SIZE)
+ 		return;
+ 
+ 	memcpy(&st->vregs, &fp->vregs, sizeof(fp->vregs));

@@ -1,0 +1,238 @@
+From db7b19e8c6967eed43dbf7ffa176d21161e6fad0 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 19:57:41 +0200
+Subject: [PATCH] um: arm64: fix syscall arg1 aliasing, add boot harness fixes
+
+handle_syscall() seeds the return register with -ENOSYS before reading the
+syscall arguments. On x86 those are different registers (RAX vs RDI); on
+arm64 both are x0, so argument 1 was destroyed on every guest syscall. Read
+argument 1 from the saved ORIG_X0 slot instead.
+
+Guest userspace now runs: brk, mmap, faulting writes and munmap all work.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/os-Linux/registers.c   | 45 ++++++++++++++++++++++++++++
+ arch/arm64/um/shared/sysdep/ptrace.h | 19 ++++++++++--
+ arch/um/configs/arm64_defconfig      | 12 ++++++++
+ arch/um/include/shared/registers.h   | 17 +++++++++++
+ arch/um/kernel/skas/syscall.c        |  1 +
+ arch/um/os-Linux/start_up.c          | 12 ++++----
+ arch/x86/um/os-Linux/registers.c     | 20 +++++++++++++
+ 7 files changed, 117 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/um/os-Linux/registers.c b/arch/arm64/um/os-Linux/registers.c
+index 8a76a54bfbc73..b97b88f3866cd 100644
+--- a/arch/arm64/um/os-Linux/registers.c
++++ b/arch/arm64/um/os-Linux/registers.c
+@@ -147,6 +147,51 @@ int put_host_regs(int pid, unsigned long *regs)
+ }
+ 
+ 
++/*
++ * The syscall number is a regset of its own on arm64. x8 holds it at entry, but
++ * writing x8 does not change which syscall runs -- the kernel latched the number
++ * before the ptrace stop -- so NT_ARM_SYSTEM_CALL is the only lever, and writing
++ * -1 through it is how a syscall is cancelled.
++ */
++long ptrace_get_syscall_nr(int pid)
++{
++	int scno = -1;
++	int err;
++
++	err = getregset(pid, NT_ARM_SYSTEM_CALL, &scno, sizeof(scno), NULL);
++	if (err) {
++		errno = -err;
++		return -1;
++	}
++	errno = 0;
++	return scno;
++}
++
++int ptrace_set_syscall_nr(int pid, long nr)
++{
++	int scno = (int)nr;
++
++	return setregset(pid, NT_ARM_SYSTEM_CALL, &scno, sizeof(scno));
++}
++
++int ptrace_set_syscall_ret(int pid, long val)
++{
++	unsigned long regs[MAX_REG_NR];
++	int err;
++
++	/*
++	 * The return value is just x0, but arm64 has no PTRACE_POKEUSER, so the
++	 * whole GPR set has to be read back, modified and rewritten.
++	 */
++	err = getregset(pid, NT_PRSTATUS, regs, UM_FRAME_SIZE, NULL);
++	if (err)
++		return err;
++
++	regs[HOST_X0] = (unsigned long)val;
++
++	return setregset(pid, NT_PRSTATUS, regs, UM_FRAME_SIZE);
++}
++
+ const char *ptrace_reg_name(int idx)
+ {
+ 	static const char * const xname[] = {
+diff --git a/arch/arm64/um/shared/sysdep/ptrace.h b/arch/arm64/um/shared/sysdep/ptrace.h
+index 0e04de9733455..15c7737786c82 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace.h
++++ b/arch/arm64/um/shared/sysdep/ptrace.h
+@@ -28,8 +28,23 @@
+ #define UPT_ORIG_X0(r)	REGS_ORIG_X0((r)->gp)
+ #define UPT_TLS(r)	REGS_TLS((r)->gp)
+ 
+-/* AAPCS64 syscall ABI: arguments in x0..x5, number in x8, result in x0. */
+-#define UPT_SYSCALL_ARG1(r) UPT_X(r, HOST_X0)
++/*
++ * AAPCS64 syscall ABI: arguments in x0..x5, number in x8, result in x0.
++ *
++ * Argument 1 is read from the saved ORIG_X0 slot, not from the live x0.
++ *
++ * The syscall return value and the first syscall argument are the same register
++ * on arm64. handle_syscall() in arch/um/kernel/skas/syscall.c seeds the return
++ * value with -ENOSYS *before* it reads the arguments -- which is harmless on
++ * x86, where the return lands in RAX and argument 1 comes from RDI, but on arm64
++ * it would destroy argument 1 in every single syscall. (The symptom is that
++ * every guest syscall sees -38 as its first argument, so the very first
++ * open/write from init fails and userspace dies before printing anything.)
++ *
++ * get_host_regs() and get_regs_from_mc() both capture x0 into HOST_ORIG_X0 at
++ * the point the guest trapped, which is the value the ABI actually passed.
++ */
++#define UPT_SYSCALL_ARG1(r) UPT_ORIG_X0(r)
+ #define UPT_SYSCALL_ARG2(r) UPT_X(r, HOST_X1)
+ #define UPT_SYSCALL_ARG3(r) UPT_X(r, HOST_X2)
+ #define UPT_SYSCALL_ARG4(r) UPT_X(r, HOST_X3)
+diff --git a/arch/um/configs/arm64_defconfig b/arch/um/configs/arm64_defconfig
+index fdfffc25cd347..2adabee796802 100644
+--- a/arch/um/configs/arm64_defconfig
++++ b/arch/um/configs/arm64_defconfig
+@@ -1,3 +1,15 @@
++CONFIG_BLK_DEV_INITRD=y
++CONFIG_RD_GZIP=y
++CONFIG_RD_XZ=y
++CONFIG_RD_ZSTD=y
++CONFIG_EXT4_FS=y
++CONFIG_EXT4_USE_FOR_EXT2=y
++CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_DEVTMPFS=y
++CONFIG_DEVTMPFS_MOUNT=y
++CONFIG_BINFMT_ELF=y
++CONFIG_BINFMT_SCRIPT=y
+ # CONFIG_COMPACTION is not set
+ CONFIG_BINFMT_MISC=m
+ CONFIG_HOSTFS=y
+diff --git a/arch/um/include/shared/registers.h b/arch/um/include/shared/registers.h
+index cc88abb83ce6f..a2193492ac950 100644
+--- a/arch/um/include/shared/registers.h
++++ b/arch/um/include/shared/registers.h
+@@ -24,6 +24,23 @@ extern int put_host_regs(int pid, unsigned long *regs);
+ /* Human-readable name for gp[] index @idx, or "" -- used by the crash dump. */
+ extern const char *ptrace_reg_name(int idx);
+ 
++/*
++ * Inspect and rewrite the syscall a stopped tracee is about to make.
++ *
++ * These were open-coded as PTRACE_PEEKUSER/PTRACE_POKEUSER at
++ * PT_SYSCALL_NR_OFFSET. That works on x86, where the syscall number lives in
++ * orig_ax inside the ptrace user area. arm64 implements neither request, and
++ * its syscall number is not in the user area at all: it is reachable only
++ * through the NT_ARM_SYSTEM_CALL regset, which is also the only way to cancel a
++ * syscall (by writing -1).
++ *
++ * ptrace_get_syscall_nr() returns the number, or -1 with errno set.
++ * The setters return 0 or a negative errno.
++ */
++extern long ptrace_get_syscall_nr(int pid);
++extern int ptrace_set_syscall_nr(int pid, long nr);
++extern int ptrace_set_syscall_ret(int pid, long val);
++
+ extern int init_pid_registers(int pid);
+ extern void get_safe_registers(unsigned long *regs, unsigned long *fp_regs);
+ extern int get_fp_registers(int pid, unsigned long *regs);
+diff --git a/arch/um/kernel/skas/syscall.c b/arch/um/kernel/skas/syscall.c
+index ba7494f9bfe41..6611fba6a6e68 100644
+--- a/arch/um/kernel/skas/syscall.c
++++ b/arch/um/kernel/skas/syscall.c
+@@ -23,6 +23,7 @@ void handle_syscall(struct uml_pt_regs *r)
+ 	UPT_SYSCALL_NR(r) = PT_SYSCALL_NR(r->gp);
+ 	PT_REGS_SET_SYSCALL_RETURN(regs, -ENOSYS);
+ 
++
+ 	if (syscall_trace_enter(regs))
+ 		goto out;
+ 
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index f1b7c3280a0fc..2c90dfa387c2f 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -165,8 +165,7 @@ static void __init check_sysemu(void)
+ 					  "doesn't singlestep");
+ 				goto fail;
+ 			}
+-			n = ptrace(PTRACE_POKEUSER, pid, PT_SYSCALL_RET_OFFSET,
+-				   os_getpid());
++			n = ptrace_set_syscall_ret(pid, os_getpid());
+ 			if (n < 0)
+ 				fatal_perror("check_sysemu : failed to modify "
+ 					     "system call return");
+@@ -194,7 +193,8 @@ static void __init check_sysemu(void)
+ 
+ static void __init check_ptrace(void)
+ {
+-	int pid, syscall, n, status;
++	int pid, n, status;
++	long syscall;
+ 
+ 	os_info("Checking that ptrace can change system call numbers...");
+ 	pid = start_ptraced_child();
+@@ -216,11 +216,9 @@ static void __init check_ptrace(void)
+ 			fatal("check_ptrace : expected (SIGTRAP|0x80), "
+ 			       "got status = %d", status);
+ 
+-		syscall = ptrace(PTRACE_PEEKUSER, pid, PT_SYSCALL_NR_OFFSET,
+-				 0);
++		syscall = ptrace_get_syscall_nr(pid);
+ 		if (syscall == __NR_getpid) {
+-			n = ptrace(PTRACE_POKEUSER, pid, PT_SYSCALL_NR_OFFSET,
+-				   __NR_getppid);
++			n = ptrace_set_syscall_nr(pid, __NR_getppid);
+ 			if (n < 0)
+ 				fatal_perror("check_ptrace : failed to modify "
+ 					     "system call");
+diff --git a/arch/x86/um/os-Linux/registers.c b/arch/x86/um/os-Linux/registers.c
+index 6bc563c5e7842..2ecaae0e5899c 100644
+--- a/arch/x86/um/os-Linux/registers.c
++++ b/arch/x86/um/os-Linux/registers.c
+@@ -59,6 +59,26 @@ int put_host_regs(int pid, unsigned long *regs)
+ 	return 0;
+ }
+ 
++long ptrace_get_syscall_nr(int pid)
++{
++	errno = 0;
++	return ptrace(PTRACE_PEEKUSER, pid, PT_SYSCALL_NR_OFFSET, 0);
++}
++
++int ptrace_set_syscall_nr(int pid, long nr)
++{
++	if (ptrace(PTRACE_POKEUSER, pid, PT_SYSCALL_NR_OFFSET, nr) < 0)
++		return -errno;
++	return 0;
++}
++
++int ptrace_set_syscall_ret(int pid, long val)
++{
++	if (ptrace(PTRACE_POKEUSER, pid, PT_SYSCALL_RET_OFFSET, val) < 0)
++		return -errno;
++	return 0;
++}
++
+ const char *ptrace_reg_name(int idx)
+ {
+ #define R(n) case HOST_##n: return #n

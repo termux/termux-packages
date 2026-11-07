@@ -1,0 +1,77 @@
+From ce1a317551414ab541aa89d62e0b0b4343fb6a7e Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 20:12:25 +0200
+Subject: [PATCH] um: fix the uniprocessor build of the ptrace CPU clamp
+
+uml_ncpus is not a variable everywhere. On a uniprocessor build
+arch/um/include/shared/smp.h defines it as the constant 1, so the clamp
+added for ptrace userspace does not compile at all:
+
+	arch/um/os-Linux/start_up.c:1006:13: error: expression is not
+	assignable
+
+which breaks exactly the configuration it was meant to protect -- the one
+that cannot run more than one CPU in the first place.
+
+Give the constant a setter that is a no-op when there is nothing to set,
+rather than putting an #ifdef at the call site. The call site is where
+this went wrong: it read as an ordinary assignment, and nothing about it
+suggested that half the configurations define the target as a literal.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/shared/smp.h |  9 +++++++++
+ arch/um/os-Linux/start_up.c  | 10 ++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/arch/um/include/shared/smp.h b/arch/um/include/shared/smp.h
+index ed667ee832eb..dbd96fe68030 100644
+--- a/arch/um/include/shared/smp.h
++++ b/arch/um/include/shared/smp.h
+@@ -7,6 +7,14 @@
+ extern int uml_ncpus;
+ void um_ncpus_init(void);
+ 
++/*
++ * Drop back to one CPU. A setter rather than a plain assignment because
++ * uml_ncpus is a constant on a uniprocessor build, where this is a no-op --
++ * the alternative is an #ifdef at every caller, which is how the ptrace path
++ * came to break the !SMP build.
++ */
++static inline void um_ncpus_force_up(void) { uml_ncpus = 1; }
++
+ int uml_curr_cpu(void);
+ void uml_start_secondary(void *opaque);
+ void uml_ipi_handler(int vector);
+@@ -16,6 +24,7 @@ void uml_ipi_handler(int vector);
+ #define uml_ncpus 1
+ #define uml_curr_cpu() 0
+ static inline void um_ncpus_init(void) { }
++static inline void um_ncpus_force_up(void) { }
+ 
+ #endif /* CONFIG_SMP */
+ 
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index f8b3bd32beec..bc129f59cb7e 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -999,11 +999,17 @@ void __init os_early_checks(void)
+ 	 * One binary then scales to whatever each host allows, and a host that
+ 	 * only has ptrace gets a slower boot instead of no boot.
+ 	 */
+-	if (uml_ncpus > 1) {
++	/*
++	 * Guarded because uml_ncpus is not a variable on a uniprocessor build:
++	 * arch/um/include/shared/smp.h defines it as the constant 1 there, so
++	 * the assignment below does not compile at all. Nothing to clamp in
++	 * that configuration anyway.
++	 */
++	if (IS_ENABLED(CONFIG_SMP) && uml_ncpus > 1) {
+ 		os_info("SMP is not supported with ptrace userspace; "
+ 			"running on 1 CPU instead of the %d requested\n",
+ 			uml_ncpus);
+-		uml_ncpus = 1;
++		um_ncpus_force_up();
+ 	}
+ 
+ 	using_seccomp = 0;
