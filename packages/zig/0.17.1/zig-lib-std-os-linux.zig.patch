@@ -1,0 +1,279 @@
+--- a/zig/lib/std/os/linux.zig
++++ b/zig/lib/std/os/linux.zig
+@@ -11,6 +11,7 @@ const elf = std.elf;
+ const vdso = @import("linux/vdso.zig");
+ const dl = @import("../dynamic_library.zig");
+ const native_arch = builtin.cpu.arch;
++const legacy_syscalls = native_arch != .x86_64;
+ const native_abi = builtin.abi;
+ const native_endian = native_arch.endian();
+ const is_loongarch = native_arch.isLoongArch();
+@@ -1053,7 +1054,7 @@ pub fn dup(old: fd_t) usize {
+ }
+ 
+ pub fn dup2(old: fd_t, new: fd_t) usize {
+-    if (@hasField(SYS, "dup2")) {
++    if (@hasField(SYS, "dup2") and legacy_syscalls) {
+         return syscall2(.dup2, @as(u32, @bitCast(old)), @as(u32, @bitCast(new)));
+     } else {
+         if (old == new) {
+@@ -1105,8 +1106,6 @@ pub fn execveat(dirfd: fd_t, path: [*:0]const u8, argv: [*:null]const ?[*:0]cons
+ pub fn fork() usize {
+     if (comptime native_arch.isSPARC()) {
+         return syscall_fork();
+-    } else if (@hasField(SYS, "fork")) {
+-        return syscall0(.fork);
+     } else {
+         return syscall2(.clone, @backingInt(SIG.CHLD), 0);
+     }
+@@ -1396,7 +1395,7 @@ pub fn name_to_handle_at(
+ }
+ 
+ pub fn readlink(noalias path: [*:0]const u8, noalias buf_ptr: [*]u8, buf_len: usize) usize {
+-    if (@hasField(SYS, "readlink")) {
++    if (@hasField(SYS, "readlink") and legacy_syscalls) {
+         return syscall3(.readlink, @intFromPtr(path), @intFromPtr(buf_ptr), buf_len);
+     } else {
+         return syscall4(.readlinkat, @as(u32, @bitCast(@as(i32, AT.FDCWD))), @intFromPtr(path), @intFromPtr(buf_ptr), buf_len);
+@@ -1408,7 +1407,7 @@ pub fn readlinkat(dirfd: fd_t, noalias path: [*:0]const u8, noalias buf_ptr: [*]
+ }
+ 
+ pub fn mkdir(path: [*:0]const u8, mode: mode_t) usize {
+-    if (@hasField(SYS, "mkdir")) {
++    if (@hasField(SYS, "mkdir") and legacy_syscalls) {
+         return syscall2(.mkdir, @intFromPtr(path), mode);
+     } else {
+         return syscall3(.mkdirat, @as(u32, @bitCast(@as(i32, AT.FDCWD))), @intFromPtr(path), mode);
+@@ -1420,7 +1419,7 @@ pub fn mkdirat(dirfd: fd_t, path: [*:0]const u8, mode: mode_t) usize {
+ }
+ 
+ pub fn mknod(path: [*:0]const u8, mode: mode_t, dev: dev_t) usize {
+-    if (@hasField(SYS, "mknod")) {
++    if (@hasField(SYS, "mknod") and legacy_syscalls) {
+         return syscall3(.mknod, @intFromPtr(path), mode, dev);
+     } else {
+         return mknodat(AT.FDCWD, path, mode, dev);
+@@ -1683,7 +1682,7 @@ pub fn munlockall() usize {
+ }
+ 
+ pub fn poll(fds: [*]pollfd, n: nfds_t, timeout: i32) usize {
+-    if (@hasField(SYS, "poll")) {
++    if (@hasField(SYS, "poll") and legacy_syscalls) {
+         return syscall3(.poll, @intFromPtr(fds), n, @as(u32, @bitCast(timeout)));
+     } else {
+         var ts: timespec = if (timeout >= 0)
+@@ -1854,7 +1853,7 @@ pub fn pwritev2(fd: fd_t, iov: [*]const iovec_const, count: usize, offset: off_t
+ }
+ 
+ pub fn rmdir(path: [*:0]const u8) usize {
+-    if (@hasField(SYS, "rmdir")) {
++    if (@hasField(SYS, "rmdir") and legacy_syscalls) {
+         return syscall1(.rmdir, @intFromPtr(path));
+     } else {
+         return syscall3(.unlinkat, @as(u32, @bitCast(@as(i32, AT.FDCWD))), @intFromPtr(path), AT.REMOVEDIR);
+@@ -1862,7 +1861,7 @@ pub fn rmdir(path: [*:0]const u8) usize {
+ }
+ 
+ pub fn symlink(existing: [*:0]const u8, new: [*:0]const u8) usize {
+-    if (@hasField(SYS, "symlink")) {
++    if (@hasField(SYS, "symlink") and legacy_syscalls) {
+         return syscall2(.symlink, @intFromPtr(existing), @intFromPtr(new));
+     } else {
+         return syscall3(.symlinkat, @intFromPtr(existing), @as(u32, @bitCast(@as(i32, AT.FDCWD))), @intFromPtr(new));
+@@ -1874,7 +1873,7 @@ pub fn symlinkat(existing: [*:0]const u8, newfd: fd_t, newpath: [*:0]const u8) u
+ }
+ 
+ pub fn access(path: [*:0]const u8, mode: mode_t) usize {
+-    if (@hasField(SYS, "access")) {
++    if (@hasField(SYS, "access") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall2(.access, @intFromPtr(path), mode);
+     } else {
+         return faccessat(AT.FDCWD, path, mode, 0);
+@@ -1895,7 +1894,7 @@ pub fn acct(path: [*:0]const u8) usize {
+ pub fn pipe(fd: *[2]fd_t) usize {
+     if (native_arch.isMIPS() or native_arch.isSPARC()) {
+         return syscall_pipe(fd);
+-    } else if (@hasField(SYS, "pipe")) {
++    } else if (@hasField(SYS, "pipe") and (comptime builtin.cpu.arch != .x86_64)) {
+         return syscall1(.pipe, @intFromPtr(fd));
+     } else {
+         return syscall2(.pipe2, @intFromPtr(fd), 0);
+@@ -1935,7 +1934,7 @@ pub fn ftruncate(fd: fd_t, length: off_t) usize {
+ }
+ 
+ pub fn rename(old: [*:0]const u8, new: [*:0]const u8) usize {
+-    if (@hasField(SYS, "rename")) {
++    if (@hasField(SYS, "rename") and legacy_syscalls) {
+         return syscall2(.rename, @intFromPtr(old), @intFromPtr(new));
+     } else if (@hasField(SYS, "renameat")) {
+         return syscall4(
+@@ -1990,7 +1989,7 @@ pub fn renameat2(oldfd: fd_t, oldpath: [*:0]const u8, newfd: fd_t, newpath: [*:0
+ }
+ 
+ pub fn open(path: [*:0]const u8, flags: O, perm: mode_t) usize {
+-    if (@hasField(SYS, "open")) {
++    if (@hasField(SYS, "open") and legacy_syscalls) {
+         return syscall3(.open, @intFromPtr(path), @as(u32, @bitCast(flags)), perm);
+     } else {
+         return syscall4(
+@@ -2049,7 +2048,7 @@ pub fn fchmod(fd: fd_t, mode: mode_t) usize {
+ }
+ 
+ pub fn chmod(path: [*:0]const u8, mode: mode_t) usize {
+-    if (@hasField(SYS, "chmod")) {
++    if (@hasField(SYS, "chmod") and legacy_syscalls) {
+         return syscall2(.chmod, @intFromPtr(path), mode);
+     } else {
+         return fchmodat(AT.FDCWD, path, mode);
+@@ -2071,7 +2070,7 @@ pub fn fchownat(fd: fd_t, path: [*:0]const u8, owner: uid_t, group: gid_t, flags
+ pub fn chown(path: [*:0]const u8, owner: uid_t, group: gid_t) usize {
+     if (@hasField(SYS, "chown32")) {
+         return syscall3(.chown32, @intFromPtr(path), owner, group);
+-    } else if (@hasField(SYS, "chown")) {
++    } else if (@hasField(SYS, "chown") and legacy_syscalls) {
+         return syscall3(.chown, @intFromPtr(path), owner, group);
+     } else {
+         return fchownat(AT.FDCWD, path, owner, group, 0);
+@@ -2081,7 +2080,7 @@ pub fn chown(path: [*:0]const u8, owner: uid_t, group: gid_t) usize {
+ pub fn lchown(path: [*:0]const u8, owner: uid_t, group: gid_t) usize {
+     if (@hasField(SYS, "lchown32")) {
+         return syscall3(.lchown32, @intFromPtr(path), owner, group);
+-    } else if (@hasField(SYS, "lchown")) {
++    } else if (@hasField(SYS, "lchown") and legacy_syscalls) {
+         return syscall3(.lchown, @intFromPtr(path), owner, group);
+     } else {
+         return fchownat(AT.FDCWD, path, owner, group, AT.SYMLINK_NOFOLLOW);
+@@ -2208,7 +2207,7 @@ pub fn tgkill(tgid: pid_t, tid: pid_t, sig: SIG) usize {
+ }
+ 
+ pub fn link(oldpath: [*:0]const u8, newpath: [*:0]const u8) usize {
+-    if (@hasField(SYS, "link")) {
++    if (@hasField(SYS, "link") and legacy_syscalls) {
+         return syscall2(
+             .link,
+             @intFromPtr(oldpath),
+@@ -2238,7 +2237,7 @@ pub fn linkat(oldfd: fd_t, oldpath: [*:0]const u8, newfd: fd_t, newpath: [*:0]co
+ }
+ 
+ pub fn unlink(path: [*:0]const u8) usize {
+-    if (@hasField(SYS, "unlink")) {
++    if (@hasField(SYS, "unlink") and legacy_syscalls) {
+         return syscall1(.unlink, @intFromPtr(path));
+     } else {
+         return syscall3(.unlinkat, @as(u32, @bitCast(@as(i32, AT.FDCWD))), @intFromPtr(path), 0);
+@@ -2497,7 +2496,7 @@ pub fn nanosleep(req: *const timespec, rem: ?*timespec) usize {
+ }
+ 
+ pub fn pause() usize {
+-    if (@hasField(SYS, "pause")) {
++    if (@hasField(SYS, "pause") and legacy_syscalls) {
+         return syscall0(.pause);
+     } else {
+         return syscall4(.ppoll, 0, 0, 0, 0);
+@@ -2930,7 +2929,106 @@ pub fn accept4(fd: fd_t, noalias addr: ?*sockaddr, noalias len: ?*socklen_t, fla
+     return syscall4(.accept4, @as(u32, @bitCast(fd)), @intFromPtr(addr), @intFromPtr(len), flags);
+ }
+ 
++const KernelStat = switch (native_arch) {
++    .x86_64 => extern struct {
++        dev: u64,
++        ino: u64,
++        nlink: u64,
++        mode: u32,
++        uid: u32,
++        gid: u32,
++        __pad0: u32,
++        rdev: u64,
++        size: i64,
++        blksize: i64,
++        blocks: i64,
++        atime: i64,
++        atime_nsec: u64,
++        mtime: i64,
++        mtime_nsec: u64,
++        ctime: i64,
++        ctime_nsec: u64,
++        __unused: [3]i64,
++    },
++    .aarch64 => extern struct {
++        dev: u64,
++        ino: u64,
++        mode: u32,
++        nlink: u32,
++        uid: u32,
++        gid: u32,
++        rdev: u64,
++        __pad1: u64,
++        size: i64,
++        blksize: i32,
++        __pad2: i32,
++        blocks: i64,
++        atime: i64,
++        atime_nsec: u64,
++        mtime: i64,
++        mtime_nsec: u64,
++        ctime: i64,
++        ctime_nsec: u64,
++        __unused: [2]u32,
++    },
++    .arm, .x86 => extern struct {
++        dev: u64,
++        __pad0: u32,
++        __ino: u32,
++        mode: u32,
++        nlink: u32,
++        uid: u32,
++        gid: u32,
++        rdev: u64,
++        __pad3: u32,
++        size: i64,
++        blksize: u32,
++        blocks: u64,
++        atime: u32,
++        atime_nsec: u32,
++        mtime: u32,
++        mtime_nsec: u32,
++        ctime: u32,
++        ctime_nsec: u32,
++        ino: u64,
++    },
++    else => void,
++};
++
++fn statxTimestamp(sec: anytype, nsec: anytype) statx_timestamp {
++    return .{ .sec = @intCast(sec), .nsec = @intCast(nsec), .__pad1 = 0 };
++}
++
+ pub fn statx(dirfd: fd_t, path: [*:0]const u8, flags: u32, mask: STATX, statx_buf: *Statx) usize {
++    if (KernelStat != void) {
++        var st: KernelStat = undefined;
++        const rc = syscall4(
++            if (@hasField(SYS, "fstatat64")) .fstatat64 else .newfstatat,
++            @as(u32, @bitCast(dirfd)),
++            @intFromPtr(path),
++            @intFromPtr(&st),
++            flags & (AT.SYMLINK_NOFOLLOW | AT.NO_AUTOMOUNT | AT.EMPTY_PATH),
++        );
++        if (errno(rc) != .SUCCESS) return rc;
++        statx_buf.* = std.mem.zeroes(Statx);
++        statx_buf.mask = STATX.BASIC_STATS;
++        statx_buf.blksize = @intCast(st.blksize);
++        statx_buf.nlink = @intCast(st.nlink);
++        statx_buf.uid = st.uid;
++        statx_buf.gid = st.gid;
++        statx_buf.mode = @truncate(st.mode);
++        statx_buf.ino = if (@hasField(KernelStat, "ino")) st.ino else 0;
++        statx_buf.size = @intCast(st.size);
++        statx_buf.blocks = @intCast(st.blocks);
++        statx_buf.atime = statxTimestamp(st.atime, st.atime_nsec);
++        statx_buf.mtime = statxTimestamp(st.mtime, st.mtime_nsec);
++        statx_buf.ctime = statxTimestamp(st.ctime, st.ctime_nsec);
++        statx_buf.rdev_major = @truncate(((st.rdev >> 8) & 0xfff) | ((st.rdev >> 32) & ~@as(u64, 0xfff)));
++        statx_buf.rdev_minor = @truncate((st.rdev & 0xff) | ((st.rdev >> 12) & ~@as(u64, 0xff)));
++        statx_buf.dev_major = @truncate(((st.dev >> 8) & 0xfff) | ((st.dev >> 32) & ~@as(u64, 0xfff)));
++        statx_buf.dev_minor = @truncate((st.dev & 0xff) | ((st.dev >> 12) & ~@as(u64, 0xff)));
++        return rc;
++    }
+     return syscall5(
+         .statx,
+         @as(u32, @bitCast(dirfd)),
