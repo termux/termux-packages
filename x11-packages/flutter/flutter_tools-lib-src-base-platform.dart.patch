@@ -1,0 +1,17 @@
+dart:io reports Platform.operatingSystem as "android" under Termux, which
+makes flutter_tools reject the host (isLinux is false everywhere, the cache
+picks no host artifacts, doctor/validators misbehave). Termux is a Linux
+userland, so report "linux". Target platforms are separate (TargetPlatform)
+and are not affected.
+
+--- a/packages/flutter_tools/lib/src/base/platform.dart	2026-10-30 03:44:14.991882718 +0000
++++ b/packages/flutter_tools/lib/src/base/platform.dart	2026-10-30 03:44:18.668104806 +0000
+@@ -132,7 +132,7 @@
+   String get pathSeparator => io.Platform.pathSeparator;
+ 
+   @override
+-  String get operatingSystem => io.Platform.operatingSystem;
++  String get operatingSystem => io.Platform.isAndroid ? 'linux' : io.Platform.operatingSystem;
+ 
+   @override
+   String get operatingSystemVersion => io.Platform.operatingSystemVersion;

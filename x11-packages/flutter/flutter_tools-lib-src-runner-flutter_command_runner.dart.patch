@@ -1,0 +1,18 @@
+By default every command runs checkFlutterVersionFreshness, which does
+"git fetch --tags" against github.com/flutter/flutter on the first run and
+then every 3 days. The checkout shipped by the package has a single commit,
+so that fetch downloads the whole flutter history and blocks the command for
+minutes. Updates come from the package manager, so the check is off by
+default; passing --version-check explicitly still enables it.
+
+--- a/packages/flutter_tools/lib/src/runner/flutter_command_runner.dart	2026-10-30 03:54:13.107126381 +0000
++++ b/packages/flutter_tools/lib/src/runner/flutter_command_runner.dart	2026-10-30 09:57:18.304721817 +0000
+@@ -124,7 +124,7 @@
+     );
+     argParser.addFlag(
+       FlutterGlobalOptions.kVersionCheckFlag,
+-      defaultsTo: true,
++      defaultsTo: false,
+       hide: !verboseHelp,
+       help: 'Allow Flutter to check for updates when this command runs.',
+     );
