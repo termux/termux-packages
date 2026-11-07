@@ -15,6 +15,7 @@ TERMUX_PKG_VERSION=(
 	5.44.0
 	1.6.5
 )
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(
 	505cf43912e9480495c344c70260452e32aa2a73c546a026b3f100053b23ce91
 	24cccde966c79cec3064c661df519a8d9f710b0b1bb3e2f44c30c1c29e7afbc5
@@ -105,4 +106,10 @@ termux_step_post_make_install() {
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX}/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX%%/usr}",'g' Config_heavy.pl.new > Config_heavy.pl
 	rm Config_heavy.pl.new
+
+	# Make Termux headers discoverable to CPAN modules via Config.
+	sed -i \
+		-e "s|^usrinc=.*$|usrinc='$TERMUX_PREFIX/include'|" \
+		-e "/^usrinc=/a incpth='$TERMUX_PREFIX/include'" \
+		Config_heavy.pl
 }

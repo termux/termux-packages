@@ -10,9 +10,9 @@ and start menu failing to load
  const XApp = imports.gi.XApp;
 -const AccountsService = imports.gi.AccountsService;
  const GnomeSession = imports.misc.gnomeSession;
- const ScreenSaver = imports.misc.screenSaver;
  const FileUtils = imports.misc.fileUtils;
-@@ -2429,7 +2428,7 @@ class CinnamonMenuApplet extends Applet.TextIconApplet {
+ const Util = imports.misc.util;
+@@ -2604,7 +2603,7 @@ class CinnamonMenuApplet extends Applet.TextIconApplet {
              reactive: false
          });
  
@@ -20,12 +20,10 @@ and start menu failing to load
 +        let user = null;
          this.userIcon = new UserWidget.UserWidget(user, Clutter.Orientation.VERTICAL, false);
          this.userIcon.set_reactive(true);
-         this.userIcon.connect('button-press-event', () => {
-diff --git a/js/ui/userWidget.js b/js/ui/userWidget.js
-index 0c7e244..b57b93c 100644
+         this.userIcon.track_hover = true;
 --- a/js/ui/userWidget.js
 +++ b/js/ui/userWidget.js
-@@ -158,6 +158,9 @@ class UserWidget extends St.BoxLayout {
+@@ -161,6 +161,9 @@ class UserWidget extends St.BoxLayout {
          this._label.y_align = Clutter.ActorAlign.CENTER;
          this.add_child(this._label);
  

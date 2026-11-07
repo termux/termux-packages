@@ -1,6 +1,6 @@
 --- a/gtk2_ardour/editor_timefx.cc
 +++ b/gtk2_ardour/editor_timefx.cc
-@@ -411,7 +411,14 @@
+@@ -419,7 +419,14 @@ Editor::do_timefx (bool fixed_end)
  		delete fx;
  	}
  
@@ -15,7 +15,7 @@
  	if (current_timefx->request.cancel) {
  		current_timefx->status = -1;
  		for (ResultMap::const_iterator i = results.begin(); i != results.end(); ++i) {
-@@ -434,7 +441,11 @@
+@@ -446,7 +453,11 @@ Editor::do_timefx (bool fixed_end)
  			}
  		}
  	}
@@ -27,7 +27,7 @@
  
  	current_timefx->request.done = true;
  }
-@@ -447,7 +458,9 @@
+@@ -459,7 +470,9 @@ Editor::timefx_thread (void *arg)
  
  	TimeFXDialog* tsd = static_cast<TimeFXDialog*>(arg);
  
@@ -35,11 +35,11 @@
  	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 +#endif
  
- 	tsd->editor.do_timefx ();
+ 	tsd->editor.do_timefx (tsd->fixed_end);
  
 --- a/gtk2_ardour/main.cc
 +++ b/gtk2_ardour/main.cc
-@@ -307,7 +307,9 @@
+@@ -338,7 +338,9 @@ int main (int argc, char *argv[])
  	(void) bind_textdomain_codeset (PACKAGE,"UTF-8");
  #endif
  
@@ -51,7 +51,7 @@
  
 --- a/gtk2_ardour/video_image_frame.cc
 +++ b/gtk2_ardour/video_image_frame.cc
-@@ -199,8 +199,10 @@
+@@ -199,8 +199,10 @@ static void *
  http_get_thread (void *arg) {
  	VideoImageFrame *vif = static_cast<VideoImageFrame *>(arg);
  	char url[2048];
@@ -62,7 +62,7 @@
  	snprintf(url, sizeof(url), "%s?frame=%li&w=%d&h=%d&file=%s&format=bgra",
  	  vif->get_video_server_url().c_str(),
  	  (long int) vif->get_req_frame(), vif->get_width(), vif->get_height(),
-@@ -218,7 +220,14 @@
+@@ -218,7 +220,14 @@ http_get_thread (void *arg) {
  		printf("no-video frame: video-server returned http-status: %d\n", status);
  	}
  
@@ -79,7 +79,7 @@
  	return 0;
 --- a/libs/pbd/pthread_utils.cc
 +++ b/libs/pbd/pthread_utils.cc
-@@ -171,10 +171,24 @@
+@@ -179,10 +179,24 @@ struct ThreadStartWithName {
  		, name (s)
  	{}
  };
@@ -105,7 +105,7 @@
  	ThreadStartWithName* ts      = (ThreadStartWithName*)arg;
  	void* (*thread_work) (void*) = ts->thread_work;
  	void* thread_arg             = ts->arg;
-@@ -281,7 +295,11 @@
+@@ -289,7 +303,11 @@ pthread_cancel_all ()
  			continue;
  		}
  		DEBUG_TRACE (PBD::DEBUG::Threads, string_compose ("Cancel: '%1'\n", t.second));
@@ -117,7 +117,7 @@
  	}
  	all_threads.clear ();
  	pthread_mutex_unlock (&thread_map_lock);
-@@ -297,8 +315,11 @@
+@@ -305,8 +323,11 @@ pthread_cancel_one (pthread_t thread)
  			break;
  		}
  	}
@@ -130,29 +130,3 @@
  	pthread_mutex_unlock (&thread_map_lock);
  }
  
---- a/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
-+++ b/libs/surfaces/frontier/tranzport/tranzport_control_protocol.cc
-@@ -1029,8 +1029,10 @@
- 
- 
- 	PBD::notify_gui_about_thread_creation ("gui", pthread_self(), X_("Tranzport"));
-+#ifndef __ANDROID__
- 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
- 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-+#endif
- 	next_track ();
- 	rtpriority_set();
- 	inflight=0;
---- a/libs/surfaces/tranzport/init.cc
-+++ b/libs/surfaces/tranzport/init.cc
-@@ -155,8 +155,10 @@
- 	uint8_t offline = 0;
- 
- 	register_thread (X_("Tranzport"));
-+#ifndef __ANDROID__
- 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
- 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-+#endif
- 	rtpriority_set();
- 	inflight=0;
- 	//int intro = 20;

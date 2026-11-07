@@ -1,0 +1,27 @@
+--- a/libs/pbd/pbd/configuration_variable.h
++++ b/libs/pbd/pbd/configuration_variable.h
+@@ -18,7 +18,9 @@
+ 
+ #pragma once
+ 
++#include <cmath>
+ #include <string>
++#include <type_traits>
+ 
+ #include "pbd/xml++.h"
+ #include "pbd/string_convert.h"
+@@ -74,7 +76,13 @@ class /*LIBPBD_API*/ ConfigVariable : public ConfigVariableBase
+ 	}
+ 
+ 	virtual void set_from_string (std::string const & s) {
+-		value = string_to<T>(s);
++		T v = string_to<T>(s);
++		if constexpr (std::is_floating_point<T>::value) {
++			if (!std::isfinite (v)) {
++				return;
++			}
++		}
++		value = v;
+ 	}
+ 
+   protected:
