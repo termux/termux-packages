@@ -1,0 +1,11 @@
+--- a/vendor/github.com/docker/docker/client/client_unix.go
++++ b/vendor/github.com/docker/docker/client/client_unix.go
+@@ -10,7 +10,7 @@
+ 
+ // DefaultDockerHost defines OS-specific default host if the DOCKER_HOST
+ // (EnvOverrideHost) environment variable is unset or empty.
+-const DefaultDockerHost = "unix:///var/run/docker.sock"
++const DefaultDockerHost = "unix://@TERMUX_PREFIX@/var/run/docker.sock"
+ 
+ // dialPipeContext connects to a Windows named pipe. It is not supported on non-Windows.
+ func dialPipeContext(_ context.Context, _ string) (net.Conn, error) {
