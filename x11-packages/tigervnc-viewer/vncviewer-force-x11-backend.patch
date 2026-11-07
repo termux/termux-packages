@@ -1,0 +1,18 @@
+vncviewer only has X11 code (XKB, XInput, Surface_X11) and dereferences
+fl_display right after fl_open_display(). The Termux fltk is built with
+--enable-wayland, so when WAYLAND_DISPLAY is set FLTK picks its Wayland
+backend, fl_display stays NULL and vncviewer segfaults. Force the X11
+backend (Xwayland on Wayland sessions).
+
+--- a/vncviewer/vncviewer.cxx
++++ b/vncviewer/vncviewer.cxx
+@@ -723,6 +723,9 @@ int main(int argc, char** argv)
+   }
+ 
+ #if !defined(WIN32) && !defined(__APPLE__)
++  // FLTK 1.4 is a Wayland/X11 hybrid, but this viewer is X11 only.
++  setenv("FLTK_BACKEND", "x11", 1);
++
+   if (strcmp(display, "") != 0) {
+     Fl::display(display);
+   }
