@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fb51108c23d88269d37da5813d97b5b27395c824b751ba1141a5cf408bcdd658
 TERMUX_PKG_AUTO_UPDATE=true
@@ -29,7 +30,7 @@ termux_step_post_make_install() {
 	install -vDm 644 docs/build/man/*.1 -t "$TERMUX_PREFIX/share/man/man1/"
 	install -vDm 644 {NEWS,README}.rst -t "$TERMUX_PREFIX/share/doc/python-pip/"
 
-	local pip_cmd=(python -c "import sys; sys.path.insert(0, '$TERMUX_PYTHON_HOME/site-packages'); from pip._internal.cli.main import main; sys.exit(main(sys.argv[1:]))")
+	local pip_cmd=(python -c "import sys; sys.path.insert(0, '$TERMUX_PYTHON_HOME/site-packages'); sys.argv[0] = 'pip'; from pip._internal.cli.main import main; sys.exit(main(sys.argv[1:]))")
 	"${pip_cmd[@]}" completion --bash | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/bash-completion/completions/pip
 	"${pip_cmd[@]}" completion --fish | install -vDm 644 /dev/stdin "$TERMUX_PREFIX"/share/fish/vendor_completions.d/pip.fish
 
