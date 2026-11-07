@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://launchpad.net/python-distutils-extra
+TERMUX_PKG_DESCRIPTION="Enhancements to the Python build system"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="JesusChapman <developer@jesuschapman.me>"
+TERMUX_PKG_VERSION=2.39
+TERMUX_PKG_SRCURL=https://launchpad.net/python-distutils-extra/trunk/2.39/+download/python-distutils-extra-2.39.tar.gz
+TERMUX_PKG_SHA256=723f24f4d65fc8d99b33a002fbbb3771d4cc9d664c97085bf37f3997ae8063af
+TERMUX_PKG_DEPENDS="python"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_IN_SRC=true
