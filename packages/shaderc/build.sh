@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of tools, libraries, and tests for Vulkan sha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.4"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/shaderc/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f06ce5bcca94e5df7f34e115743597d0ad2e13c5fe9213c67dc8c76031241947
 TERMUX_PKG_DEPENDS="glslang, spirv-tools, libc++"
@@ -33,4 +34,11 @@ termux_step_pre_configure() {
 		"${_SPIRV_TOOLS_VERSION}\\n"
 		"${_GLSLANG_VERSION}\\n"
 	EOF
+}
+
+termux_step_post_make_install() {
+	# Making a symlink for the shared library
+	# so some apps like PrismLauncher can use it.
+	ln -sfrT "$TERMUX__PREFIX__LIB_DIR/libshaderc_shared.so" \
+		"$TERMUX__PREFIX__LIB_DIR/libshaderc.so"
 }
