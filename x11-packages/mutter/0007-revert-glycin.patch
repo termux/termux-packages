@@ -1,0 +1,515 @@
+Partially revert https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/4554
+glycin does not work on Android
+
+diff --git a/config.h.meson b/config.h.meson
+index 655227c..fc1e518 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -130,6 +130,9 @@
+ /* Supports timerfd_create/timerfd_settime */
+ #mesondefine HAVE_TIMERFD
+ 
++/* Supports malloc_trim */
++#mesondefine HAVE_MALLOC_TRIM
++
+ /* Supports eventfd */
+ #mesondefine HAVE_EVENTFD
+ 
+diff --git a/meson.build b/meson.build
+index c9f85b1..5feca07 100644
+--- a/meson.build
++++ b/meson.build
+@@ -21,7 +21,7 @@ gi_req = '>= 0.9.5'
+ graphene_req = '>= 1.10.2'
+ gtk3_req = '>= 3.19.8'
+ gtk4_req = '>= 4.14.0'
+-glycin_req = '>= 2.0.beta.2'
++gdk_pixbuf_req = '>= 2.0'
+ pango_req = '>= 1.46.0'
+ cairo_req = '>= 1.10.0'
+ pangocairo_req = '>= 1.20'
+@@ -117,7 +117,7 @@ subproject('gvdb')
+ 
+ m_dep = cc.find_library('m', required: true)
+ graphene_dep = dependency('graphene-gobject-1.0', version: graphene_req)
+-glycin_dep = dependency('glycin-2', version: glycin_req)
++gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: gdk_pixbuf_req)
+ cairo_dep = dependency('cairo', version: cairo_req)
+ pixman_dep = dependency('pixman-1', version: pixman_req)
+ gsettings_desktop_schemas_dep = dependency('gsettings-desktop-schemas',
+@@ -394,6 +394,8 @@ int main (int argc, char ** argv) {
+ }
+ ''', name : 'timerfd_create(2) system call')
+ 
++have_malloc_trim = cc.has_function('malloc_trim')
++
+ have_documentation = get_option('docs')
+ have_tests = get_option('tests').enable_auto_if(have_native_backend).enabled()
+ have_mutter_tests = false
+@@ -617,6 +619,7 @@ cdata.set('HAVE_STARTUP_NOTIFICATION', have_startup_notification)
+ cdata.set('HAVE_INTROSPECTION', have_introspection)
+ cdata.set('HAVE_PROFILER', have_profiler)
+ cdata.set('HAVE_TIMERFD', have_timerfd)
++cdata.set('HAVE_MALLOC_TRIM', have_malloc_trim)
+ cdata.set('HAVE_EVENTFD', have_eventfd)
+ cdata.set('HAVE_FONTS', have_fonts)
+ cdata.set('HAVE_DRM_PLANE_SIZE_HINT', have_drm_plane_size_hint)
+diff --git a/src/compositor/meta-background-actor.c b/src/compositor/meta-background-actor.c
+index cf3d6a0..71591a7 100644
+--- a/src/compositor/meta-background-actor.c
++++ b/src/compositor/meta-background-actor.c
+@@ -22,7 +22,6 @@
+ #include "config.h"
+ 
+ #include "compositor/meta-background-content-private.h"
+-#include "compositor/meta-background-private.h"
+ #include "compositor/meta-cullable.h"
+ #include "meta/meta-background-actor.h"
+ 
+@@ -47,26 +46,6 @@ static void cullable_iface_init (MetaCullableInterface *iface);
+ G_DEFINE_TYPE_WITH_CODE (MetaBackgroundActor, meta_background_actor, CLUTTER_TYPE_ACTOR,
+                          G_IMPLEMENT_INTERFACE (META_TYPE_CULLABLE, cullable_iface_init));
+ 
+-static void
+-on_background_changed (MetaBackgroundContent *content,
+-                       GParamSpec            *pspec,
+-                       gpointer               data)
+-{
+-  MetaBackgroundActor *self = META_BACKGROUND_ACTOR (data);
+-  MetaBackground *background;
+-  ClutterColorState *color_state;
+-
+-  background = meta_background_content_get_background (content);
+-  if (!background)
+-    return;
+-
+-  color_state = meta_background_get_color_state (background);
+-  if (!color_state)
+-    return;
+-
+-  clutter_actor_set_color_state (CLUTTER_ACTOR (self), color_state);
+-}
+-
+ static void
+ maybe_create_content (MetaBackgroundActor *self)
+ {
+@@ -78,10 +57,6 @@ maybe_create_content (MetaBackgroundActor *self)
+   content = meta_background_content_new (self->display, self->monitor);
+   self->content = META_BACKGROUND_CONTENT (content);
+   clutter_actor_set_content (CLUTTER_ACTOR (self), content);
+-  g_signal_connect_object (content, "notify::background",
+-                           G_CALLBACK (on_background_changed), self,
+-                           G_CONNECT_DEFAULT);
+-  on_background_changed (self->content, NULL, self);
+ }
+ 
+ static void
+diff --git a/src/compositor/meta-background-content-private.h b/src/compositor/meta-background-content-private.h
+index ac83784..36031a4 100644
+--- a/src/compositor/meta-background-content-private.h
++++ b/src/compositor/meta-background-content-private.h
+@@ -11,5 +11,3 @@ void meta_background_content_cull_unobscured (MetaBackgroundContent *self,
+ 
+ void meta_background_content_cull_redraw_clip (MetaBackgroundContent *self,
+                                                MtkRegion             *clip_region);
+-
+-MetaBackground * meta_background_content_get_background (MetaBackgroundContent *self);
+diff --git a/src/compositor/meta-background-content.c b/src/compositor/meta-background-content.c
+index 918d5f8..481765c 100644
+--- a/src/compositor/meta-background-content.c
++++ b/src/compositor/meta-background-content.c
+@@ -303,7 +303,6 @@ on_background_changed (MetaBackground        *background,
+ {
+   invalidate_pipeline (self, CHANGED_BACKGROUND);
+   clutter_content_invalidate (CLUTTER_CONTENT (self));
+-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BACKGROUND]);
+ }
+ 
+ static CoglPipeline *
+@@ -970,9 +969,7 @@ meta_background_content_class_init (MetaBackgroundContentClass *klass)
+   properties[PROP_BACKGROUND] =
+     g_param_spec_object ("background", NULL, NULL,
+                          META_TYPE_BACKGROUND,
+-                         G_PARAM_READWRITE |
+-                         G_PARAM_STATIC_STRINGS |
+-                         G_PARAM_EXPLICIT_NOTIFY);
++                         G_PARAM_READWRITE);
+ 
+   properties[PROP_GRADIENT] =
+     g_param_spec_boolean ("gradient", NULL, NULL,
+@@ -1075,7 +1072,6 @@ meta_background_content_set_background (MetaBackgroundContent *self,
+ 
+   invalidate_pipeline (self, CHANGED_BACKGROUND);
+   clutter_content_invalidate (CLUTTER_CONTENT (self));
+-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BACKGROUND]);
+ }
+ 
+ void
+@@ -1233,9 +1229,3 @@ meta_background_content_cull_redraw_clip (MetaBackgroundContent *self,
+ {
+   set_clip_region (self, clip_region);
+ }
+-
+-MetaBackground *
+-meta_background_content_get_background (MetaBackgroundContent *self)
+-{
+-  return self->background;
+-}
+diff --git a/src/compositor/meta-background-image-private.h b/src/compositor/meta-background-image-private.h
+deleted file mode 100644
+index d29260d..0000000
+--- a/src/compositor/meta-background-image-private.h
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+-/*
+- * Copyright 2025 Red Hat, Inc.
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 of the
+- * License, or (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+- * Author: Matthias Clasen <mclasen@redhat.com>
+- */
+-
+-#pragma once
+-
+-#include "clutter/clutter.h"
+-#include "meta/meta-background-image.h"
+-
+-ClutterColorState * meta_background_image_get_color_state (MetaBackgroundImage *self);
+diff --git a/src/compositor/meta-background-image.c b/src/compositor/meta-background-image.c
+index 6cf9187..59e43bd 100644
+--- a/src/compositor/meta-background-image.c
++++ b/src/compositor/meta-background-image.c
+@@ -18,13 +18,16 @@
+ 
+ #include "config.h"
+ 
+-#include "compositor/meta-background-image-private.h"
++#include "meta/meta-background-image.h"
+ 
+-#include <glycin.h>
++#include <gdk-pixbuf/gdk-pixbuf.h>
+ #include <gio/gio.h>
+ 
++#ifdef HAVE_MALLOC_TRIM
++#include <malloc.h>
++#endif
++
+ #include "clutter/clutter.h"
+-#include "clutter/clutter-backend-private.h"
+ #include "compositor/cogl-utils.h"
+ 
+ enum
+@@ -63,7 +66,6 @@ struct _MetaBackgroundImage
+   gboolean in_cache;
+   gboolean loaded;
+   CoglTexture *texture;
+-  ClutterColorState *color_state;
+ };
+ 
+ G_DEFINE_TYPE (MetaBackgroundImageCache, meta_background_image_cache, G_TYPE_OBJECT);
+@@ -117,111 +119,37 @@ meta_background_image_cache_get_default (void)
+   return cache;
+ }
+ 
+-static CoglPixelFormat
+-gly_memory_format_to_cogl (GlyMemoryFormat format)
+-{
+-  switch ((guint) format)
+-    {
+-    case GLY_MEMORY_B8G8R8A8_PREMULTIPLIED:
+-      return COGL_PIXEL_FORMAT_BGRA_8888_PRE;
+-    case GLY_MEMORY_A8R8G8B8_PREMULTIPLIED:
+-      return COGL_PIXEL_FORMAT_ARGB_8888_PRE;
+-    case GLY_MEMORY_R8G8B8A8_PREMULTIPLIED:
+-      return COGL_PIXEL_FORMAT_RGBA_8888_PRE;
+-    case GLY_MEMORY_B8G8R8A8:
+-      return COGL_PIXEL_FORMAT_BGRA_8888;
+-    case GLY_MEMORY_A8R8G8B8:
+-      return COGL_PIXEL_FORMAT_ARGB_8888;
+-    case GLY_MEMORY_R8G8B8A8:
+-      return COGL_PIXEL_FORMAT_RGBA_8888;
+-    case GLY_MEMORY_A8B8G8R8:
+-      return COGL_PIXEL_FORMAT_ABGR_8888;
+-    case GLY_MEMORY_R8G8B8:
+-      return COGL_PIXEL_FORMAT_RGB_888;
+-    case GLY_MEMORY_B8G8R8:
+-      return COGL_PIXEL_FORMAT_BGR_888;
+-    case GLY_MEMORY_R16G16B16A16_PREMULTIPLIED:
+-      return COGL_PIXEL_FORMAT_RGBA_16161616_PRE;
+-    case GLY_MEMORY_R16G16B16A16:
+-      return COGL_PIXEL_FORMAT_RGBA_16161616;
+-    case GLY_MEMORY_R16G16B16A16_FLOAT:
+-      return COGL_PIXEL_FORMAT_RGBA_FP_16161616;
+-    case GLY_MEMORY_R32G32B32A32_FLOAT_PREMULTIPLIED:
+-      return COGL_PIXEL_FORMAT_RGBA_FP_32323232_PRE;
+-    case GLY_MEMORY_R32G32B32A32_FLOAT:
+-      return COGL_PIXEL_FORMAT_RGBA_FP_32323232;
+-    default:
+-      g_assert_not_reached ();
+-    }
+-}
+-
+-static GlyMemoryFormatSelection
+-glycin_supported_memory_formats (void)
+-{
+-  return GLY_MEMORY_SELECTION_B8G8R8A8_PREMULTIPLIED |
+-         GLY_MEMORY_SELECTION_A8R8G8B8_PREMULTIPLIED |
+-         GLY_MEMORY_SELECTION_R8G8B8A8_PREMULTIPLIED |
+-         GLY_MEMORY_SELECTION_B8G8R8A8 |
+-         GLY_MEMORY_SELECTION_A8R8G8B8 |
+-         GLY_MEMORY_SELECTION_R8G8B8A8 |
+-         GLY_MEMORY_SELECTION_A8B8G8R8 |
+-         GLY_MEMORY_SELECTION_R8G8B8 |
+-         GLY_MEMORY_SELECTION_B8G8R8 |
+-         GLY_MEMORY_SELECTION_R16G16B16A16_PREMULTIPLIED |
+-         GLY_MEMORY_SELECTION_R16G16B16A16 |
+-         GLY_MEMORY_SELECTION_R16G16B16A16_FLOAT |
+-         GLY_MEMORY_SELECTION_R32G32B32A32_FLOAT_PREMULTIPLIED |
+-         GLY_MEMORY_SELECTION_R32G32B32A32_FLOAT;
+-}
+-
+-static void
+-gly_cicp_to_clutter (const GlyCicp *gly_cicp,
+-                     ClutterCicp   *clutter_cicp)
+-{
+-  clutter_cicp->primaries = (ClutterCicpPrimaries) gly_cicp->color_primaries;
+-  clutter_cicp->transfer = (ClutterCicpTransfer) gly_cicp->transfer_characteristics;
+-  clutter_cicp->matrix_coefficients = gly_cicp->matrix_coefficients;
+-  clutter_cicp->video_full_range_flag = gly_cicp->video_full_range_flag;
+-}
+-
+ static void
+ load_file (GTask               *task,
+-           MetaBackgroundImage *source,
++           MetaBackgroundImage *image,
+            gpointer             task_data,
+            GCancellable        *cancellable)
+ {
+-  g_autoptr (GFileInputStream) stream = NULL;
+-  g_autoptr (GlyLoader) loader = NULL;
+-  g_autoptr (GlyImage) image = NULL;
+-  GlyFrame *frame;
+   GError *error = NULL;
++  GdkPixbuf *pixbuf;
++  GFileInputStream *stream;
+ 
+-  stream = g_file_read (source->file, NULL, &error);
++  stream = g_file_read (image->file, NULL, &error);
+   if (stream == NULL)
+     {
+       g_task_return_error (task, error);
+       return;
+     }
+ 
+-  loader = gly_loader_new_for_stream (G_INPUT_STREAM (stream));
++  pixbuf = gdk_pixbuf_new_from_stream (G_INPUT_STREAM (stream), NULL, &error);
++  g_object_unref (stream);
+ 
+-  gly_loader_set_accepted_memory_formats (loader, glycin_supported_memory_formats ());
++#ifdef HAVE_MALLOC_TRIM
++  malloc_trim (0);
++#endif
+ 
+-  image = gly_loader_load (loader, &error);
+-  if (!image)
++  if (pixbuf == NULL)
+     {
+       g_task_return_error (task, error);
+       return;
+     }
+ 
+-  frame = gly_image_next_frame (image, &error);
+-  if (!frame)
+-    {
+-      g_task_return_error (task, error);
+-      return;
+-    }
+-
+-  g_task_return_pointer (task, frame, (GDestroyNotify) g_object_unref);
++  g_task_return_pointer (task, pixbuf, (GDestroyNotify) g_object_unref);
+ }
+ 
+ static void
+@@ -236,16 +164,15 @@ file_loaded (GObject      *source_object,
+   g_autoptr (GError) local_error = NULL;
+   GTask *task;
+   CoglTexture *texture;
+-  g_autoptr (GlyFrame) frame = NULL;
++  GdkPixbuf *pixbuf, *rotated;
+   int width, height, row_stride;
+-  GlyMemoryFormat format;
+-  g_autoptr (GlyCicp) cicp = NULL;
+-  GBytes *bytes;
++  guchar *pixels;
++  gboolean has_alpha;
+ 
+   task = G_TASK (result);
+-  frame = g_task_propagate_pointer (task, &error);
++  pixbuf = g_task_propagate_pointer (task, &error);
+ 
+-  if (frame == NULL)
++  if (pixbuf == NULL)
+     {
+       char *uri = g_file_get_uri (image->file);
+       g_warning ("Failed to load background '%s': %s",
+@@ -254,23 +181,27 @@ file_loaded (GObject      *source_object,
+       goto out;
+     }
+ 
+-  width = gly_frame_get_width (frame);
+-  height = gly_frame_get_height (frame);
+-  row_stride = gly_frame_get_stride (frame);
+-  bytes = gly_frame_get_buf_bytes (frame);
+-  format = gly_frame_get_memory_format (frame);
+-  cicp = gly_frame_get_color_cicp (frame);
++  rotated = gdk_pixbuf_apply_embedded_orientation (pixbuf);
++  if (rotated != NULL)
++    {
++      g_object_unref (pixbuf);
++      pixbuf = rotated;
++    }
++
++  width = gdk_pixbuf_get_width (pixbuf);
++  height = gdk_pixbuf_get_height (pixbuf);
++  row_stride = gdk_pixbuf_get_rowstride (pixbuf);
++  pixels = gdk_pixbuf_get_pixels (pixbuf);
++  has_alpha = gdk_pixbuf_get_has_alpha (pixbuf);
+ 
+   texture = meta_create_texture (width, height, ctx,
+-                                 gly_memory_format_has_alpha (format)
+-                                   ? COGL_TEXTURE_COMPONENTS_RGBA
+-                                   : COGL_TEXTURE_COMPONENTS_RGB,
++                                 has_alpha ? COGL_TEXTURE_COMPONENTS_RGBA : COGL_TEXTURE_COMPONENTS_RGB,
+                                  META_TEXTURE_ALLOW_SLICING);
+ 
+   if (!cogl_texture_set_data (texture,
+-                              gly_memory_format_to_cogl (format),
++                              has_alpha ? COGL_PIXEL_FORMAT_RGBA_8888 : COGL_PIXEL_FORMAT_RGB_888,
+                               row_stride,
+-                              g_bytes_get_data (bytes, NULL), 0,
++                              pixels, 0,
+                               &local_error))
+     {
+       g_warning ("Failed to create texture for background: %s",
+@@ -280,28 +211,10 @@ file_loaded (GObject      *source_object,
+ 
+   image->texture = texture;
+ 
+-  if (cicp)
+-    {
+-      ClutterCicp clutter_cicp;
+-      ClutterBackend *clutter_backend = clutter_get_default_backend ();
+-      ClutterContext *clutter_context = clutter_backend->context;
+-      g_autoptr (GError) local_error2 = NULL;
+-
+-      gly_cicp_to_clutter (cicp, &clutter_cicp);
+-
+-      image->color_state =
+-        clutter_color_state_params_new_from_cicp (clutter_context,
+-                                                  &clutter_cicp,
+-                                                  &local_error2);
+-      if (local_error2)
+-        g_warning ("%s", local_error2->message);
+-    }
+-  else
+-    {
+-      image->color_state = NULL;
+-    }
+-
+ out:
++  if (pixbuf != NULL)
++    g_object_unref (pixbuf);
++
+   image->loaded = TRUE;
+   g_signal_emit (image, signals[LOADED], 0);
+ }
+@@ -395,8 +308,6 @@ meta_background_image_finalize (GObject *object)
+   if (image->file)
+     g_object_unref (image->file);
+ 
+-  g_clear_object (&image->color_state);
+-
+   G_OBJECT_CLASS (meta_background_image_parent_class)->finalize (object);
+ }
+ 
+@@ -462,11 +373,3 @@ meta_background_image_get_texture (MetaBackgroundImage *image)
+ 
+   return image->texture;
+ }
+-
+-ClutterColorState *
+-meta_background_image_get_color_state (MetaBackgroundImage *image)
+-{
+-  g_return_val_if_fail (META_IS_BACKGROUND_IMAGE (image), NULL);
+-
+-  return image->color_state;
+-}
+diff --git a/src/compositor/meta-background-private.h b/src/compositor/meta-background-private.h
+index 056e274..dca3a5d 100644
+--- a/src/compositor/meta-background-private.h
++++ b/src/compositor/meta-background-private.h
+@@ -9,5 +9,3 @@ CoglTexture * meta_background_get_texture (MetaBackground         *self,
+                                            int                     monitor_index,
+                                            MtkRectangle           *texture_area,
+                                            CoglPipelineWrapMode   *wrap_mode);
+-
+-ClutterColorState * meta_background_get_color_state (MetaBackground *self);
+diff --git a/src/compositor/meta-background.c b/src/compositor/meta-background.c
+index 18833ff..7e33bc1 100644
+--- a/src/compositor/meta-background.c
++++ b/src/compositor/meta-background.c
+@@ -24,11 +24,9 @@
+ #include <string.h>
+ 
+ #include "backends/meta-backend-private.h"
+-#include "clutter/clutter-color-state.h"
+ #include "compositor/cogl-utils.h"
+-#include "compositor/meta-background-image-private.h"
+-#include "meta/compositor.h"
+ #include "meta/display.h"
++#include "meta/meta-background-image.h"
+ #include "meta/meta-background.h"
+ #include "meta/meta-monitor-manager.h"
+ #include "meta/util.h"
+@@ -1034,16 +1032,3 @@ meta_background_refresh_all (void)
+   for (l = all_backgrounds; l; l = l->next)
+     mark_changed (l->data);
+ }
+-
+-ClutterColorState *
+-meta_background_get_color_state (MetaBackground *self)
+-{
+-  g_return_val_if_fail (META_IS_BACKGROUND (self), NULL);
+-
+-  if (self->background_image1)
+-    return meta_background_image_get_color_state (self->background_image1);
+-  else if (self->background_image2)
+-    return meta_background_image_get_color_state (self->background_image2);
+-  else
+-    return NULL;
+-}
+diff --git a/src/meson.build b/src/meson.build
+index 508c341..c36efc3 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -25,7 +25,7 @@ mutter_pkg_private_deps = [
+   gmodule_no_export_dep,
+   gnome_settings_daemon_dep,
+   xkbcommon_dep,
+-  glycin_dep,
++  gdk_pixbuf_dep,
+   libeis_dep,
+   libdisplay_info_dep,
+ ]

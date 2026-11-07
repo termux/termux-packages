@@ -1,0 +1,238 @@
+diff --git a/js/js-resources.gresource.xml b/js/js-resources.gresource.xml
+index df23e5e..67eff29 100644
+--- a/js/js-resources.gresource.xml
++++ b/js/js-resources.gresource.xml
+@@ -1,16 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <gresources>
+   <gresource prefix="/org/gnome/shell">
+-    <file>gdm/authList.js</file>
+-    <file>gdm/authPrompt.js</file>
+-    <file>gdm/batch.js</file>
+-    <file>gdm/credentialManager.js</file>
+-    <file>gdm/loginDialog.js</file>
+-    <file>gdm/oVirt.js</file>
+-    <file>gdm/realmd.js</file>
+-    <file>gdm/util.js</file>
+-    <file>gdm/vmware.js</file>
+-
+     <file>extensions/extension.js</file>
+     <file>extensions/sharedInternals.js</file>
+ 
+diff --git a/js/misc/dependencies.js b/js/misc/dependencies.js
+index b820a39..11398a8 100644
+--- a/js/misc/dependencies.js
++++ b/js/misc/dependencies.js
+@@ -8,7 +8,6 @@ import 'gi://Atk?version=1.0';
+ import 'gi://Atspi?version=2.0';
+ import 'gi://Gcr?version=4';
+ import 'gi://Gdk?version=4.0';
+-import 'gi://Gdm?version=1.0';
+ import 'gi://Geoclue?version=2.0';
+ import 'gi://Gio?version=2.0';
+ import 'gi://GioUnix?version=2.0';
+diff --git a/js/misc/systemActions.js b/js/misc/systemActions.js
+index 13ee439..0193230 100644
+--- a/js/misc/systemActions.js
++++ b/js/misc/systemActions.js
+@@ -1,5 +1,4 @@
+ import Clutter from 'gi://Clutter';
+-import Gdm from 'gi://Gdm';
+ import Gio from 'gi://Gio';
+ import GLib from 'gi://GLib';
+ import GObject from 'gi://GObject';
+@@ -10,7 +10,6 @@ import * as Main from '../ui/main.js';
+ import * as Screenshot from '../ui/screenshot.js';
+ 
+ const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
+-const LOGIN_SCREEN_SCHEMA = 'org.gnome.login-screen';
+ const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
+ const DISABLE_USER_SWITCH_KEY = 'disable-user-switching';
+ const DISABLE_LOCK_SCREEN_KEY = 'disable-lock-screen';
+@@ -150,7 +148,6 @@ const SystemActions = GObject.registerClass({
+             available: true,
+         });
+ 
+-        this._loginScreenSettings = new Gio.Settings({schema_id: LOGIN_SCREEN_SCHEMA});
+         this._lockdownSettings = new Gio.Settings({schema_id: LOCKDOWN_SCHEMA});
+         this._orientationSettings = new Gio.Settings({schema_id: 'org.gnome.settings-daemon.peripherals.touchscreen'});
+ 
+@@ -340,10 +340,7 @@ const SystemActions = GObject.registerClass({
+     }
+ 
+     _updatePowerOff() {
+-        let disabled = (Main.sessionMode.isLocked &&
+-                        !this._screenSaverSettings.get_boolean(RESTART_ENABLED_KEY)) ||
+-                       (Main.sessionMode.isGreeter &&
+-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
++        let disabled = true;
+         this._actions.get(POWER_OFF_ACTION_ID).available = this._canHavePowerOff && !disabled;
+         this.notify('can-power-off');
+ 
+@@ -354,10 +349,7 @@ const SystemActions = GObject.registerClass({
+     }
+ 
+     _updateSuspend() {
+-        let disabled = (Main.sessionMode.isLocked &&
+-                        this._suspendNeedsAuth) ||
+-                       (Main.sessionMode.isGreeter &&
+-                        this._loginScreenSettings.get_boolean(DISABLE_RESTART_KEY));
++        let disabled = true;
+         this._actions.get(SUSPEND_ACTION_ID).available = this._canHaveSuspend && !disabled;
+         this.notify('can-suspend');
+     }
+@@ -385,7 +377,7 @@ const SystemActions = GObject.registerClass({
+         let systemAccount = true;
+         let localAccount = true;
+         let multiUser = false;
+-        let multiSession = Gdm.get_session_ids().length > 1;
++        let multiSession = false;
+         let shouldShowInMode = !Main.sessionMode.isLocked && !Main.sessionMode.isGreeter;
+ 
+         let visible = allowLogout && (alwaysShow || multiUser || multiSession || systemAccount || !localAccount) && shouldShowInMode;
+@@ -418,7 +410,6 @@ const SystemActions = GObject.registerClass({
+             Main.screenShield.lock(false);
+ 
+         Clutter.threads_add_repaint_func(Clutter.RepaintFlags.POST_PAINT, () => {
+-            Gdm.goto_login_session_sync(null);
+             return false;
+         });
+     }
+diff --git a/js/ui/screenShield.js b/js/ui/screenShield.js
+index 96a1cad..f1e6fdc 100644
+--- a/js/ui/screenShield.js
++++ b/js/ui/screenShield.js
+@@ -9,7 +9,6 @@ import St from 'gi://St';
+ import * as Signals from '../misc/signals.js';
+ 
+ import * as GnomeSession from '../misc/gnomeSession.js';
+-import * as OVirt from '../gdm/oVirt.js';
+ import * as LoginManager from '../misc/loginManager.js';
+ import * as Lightbox from './lightbox.js';
+ import * as Main from './main.js';
+@@ -96,7 +95,6 @@ export class ScreenShield extends Signals.EventEmitter {
+             });
+ 
+         this._credentialManagers = {};
+-        this.addCredentialManager(OVirt.SERVICE_NAME, OVirt.getOVirtCredentialsManager());
+ 
+         this._loginManager = LoginManager.getLoginManager();
+         this._loginManager.connect('prepare-for-sleep',
+diff --git a/js/ui/sessionMode.js b/js/ui/sessionMode.js
+index 6c2a15e..72e8195 100644
+--- a/js/ui/sessionMode.js
++++ b/js/ui/sessionMode.js
+@@ -3,7 +3,6 @@ import * as Signals from '../misc/signals.js';
+ 
+ import * as FileUtils from '../misc/fileUtils.js';
+ 
+-import {LoginDialog}  from '../gdm/loginDialog.js';
+ import {UnlockDialog} from '../ui/unlockDialog.js';
+ 
+ import * as Config from '../misc/config.js';
+@@ -52,7 +51,6 @@ const _modes = {
+         hasNotifications: true,
+         isGreeter: true,
+         isPrimary: true,
+-        unlockDialog: LoginDialog,
+         components: Config.HAVE_NETWORKMANAGER
+             ? ['networkAgent', 'polkitAgent']
+             : ['polkitAgent'],
+diff --git a/js/ui/unlockDialog.js b/js/ui/unlockDialog.js
+index a162fa9..9962ef1 100644
+--- a/js/ui/unlockDialog.js
++++ b/js/ui/unlockDialog.js
+@@ -1,6 +1,5 @@
+ import Atk from 'gi://Atk';
+ import Clutter from 'gi://Clutter';
+-import Gdm from 'gi://Gdm';
+ import Gio from 'gi://Gio';
+ import GnomeDesktop from 'gi://GnomeDesktop';
+ import GLib from 'gi://GLib';
+@@ -13,8 +13,6 @@ import * as Main from './main.js';
+ import * as MessageTray from './messageTray.js';
+ import * as SwipeTracker from './swipeTracker.js';
+ import {formatDateWithCFormatString} from '../misc/dateUtils.js';
+-import * as AuthPrompt from '../gdm/authPrompt.js';
+-import {AuthPromptStatus} from '../gdm/authPrompt.js';
+ import {MprisSource} from './mpris.js';
+ import {MediaMessage} from './messageList.js';
+ 
+@@ -493,15 +490,6 @@ export const UnlockDialog = GObject.registerClass({
+ 
+         parentActor.add_child(this);
+ 
+-        this._gdmClient = new Gdm.Client();
+-
+-        try {
+-            this._gdmClient.set_enabled_extensions([
+-                Gdm.UserVerifierChoiceList.interface_info().name,
+-            ]);
+-        } catch {
+-        }
+-
+         this._adjustment = new St.Adjustment({
+             actor: this,
+             lower: 0,
+@@ -699,6 +687,7 @@ export const UnlockDialog = GObject.registerClass({
+     }
+ 
+     _ensureAuthPrompt() {
++        return;
+         if (!this._authPrompt) {
+             this._authPrompt = new AuthPrompt.AuthPrompt(this._gdmClient,
+                 AuthPrompt.AuthPromptMode.UNLOCK_ONLY);
+@@ -746,8 +735,6 @@ export const UnlockDialog = GObject.registerClass({
+     }
+ 
+     _showPrompt() {
+-        this._ensureAuthPrompt();
+-
+         if (this._activePage === this._promptBox)
+             return;
+ 
+@@ -798,13 +785,12 @@ export const UnlockDialog = GObject.registerClass({
+ 
+     _onReset(authPrompt, beginRequest) {
+         let userName;
+-        if (beginRequest === AuthPrompt.BeginRequestType.PROVIDE_USERNAME) {
++        if (true) {
+             userName = this._userName;
+         } else {
+             userName = null;
+         }
+ 
+-        this._authPrompt.begin({userName});
+     }
+ 
+     _escape() {
+@@ -818,8 +804,6 @@ export const UnlockDialog = GObject.registerClass({
+ 
+         this._adjustment.remove_transition('value');
+ 
+-        this._ensureAuthPrompt();
+-
+         let progress = this._adjustment.value;
+         tracker.confirmSwipe(this._stack.height,
+             [0, 1],
+@@ -847,8 +831,6 @@ export const UnlockDialog = GObject.registerClass({
+     }
+ 
+     _otherUserClicked() {
+-        Gdm.goto_login_session_sync(null);
+-
+         this._authPrompt.cancel();
+     }
+ 
+@@ -859,11 +841,6 @@ export const UnlockDialog = GObject.registerClass({
+             this._idleMonitor.remove_watch(this._idleWatchId);
+             this._idleWatchId = 0;
+         }
+-
+-        if (this._gdmClient) {
+-            this._gdmClient = null;
+-            delete this._gdmClient;
+-        }
+     }
+ 
+     _updateUserSwitchVisibility() {

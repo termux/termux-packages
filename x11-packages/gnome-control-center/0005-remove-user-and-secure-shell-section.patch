@@ -1,0 +1,177 @@
+diff --git a/panels/system/cc-system-panel.c b/panels/system/cc-system-panel.c
+index a81e9a4..bf58e46 100644
+--- a/panels/system/cc-system-panel.c
++++ b/panels/system/cc-system-panel.c
+@@ -32,8 +32,10 @@
+ #include "datetime/cc-datetime-page.h"
+ #include "region/cc-region-page.h"
+ #include "remote-desktop/cc-remote-desktop-page.h"
++#ifndef __ANDROID__
+ #include "secure-shell/cc-secure-shell-page.h"
+ #include "users/cc-users-page.h"
++#endif
+ 
+ struct _CcSystemPanel
+ {
+@@ -43,9 +45,11 @@ struct _CcSystemPanel
+   AdwActionRow *datetime_row;
+   AdwActionRow *region_row;
+   AdwActionRow *remote_desktop_row;
++#ifndef __ANDROID__
+   AdwActionRow *users_row;
+ 
+   CcSecureShellPage *secure_shell_dialog;
++#endif
+   AdwNavigationPage *software_updates_group;
+ };
+ 
+@@ -118,6 +122,7 @@ cc_system_page_open_software_update (CcSystemPanel *self)
+     g_warning ("Failed to spawn %s: %s", argv[0], error->message);
+ }
+ 
++#ifndef __ANDROID__
+ static void
+ on_secure_shell_row_clicked (CcSystemPanel *self)
+ {
+@@ -130,7 +135,7 @@ on_secure_shell_row_clicked (CcSystemPanel *self)
+ 
+   adw_dialog_present (ADW_DIALOG (self->secure_shell_dialog), GTK_WIDGET (self));
+ }
+-
++#endif
+ static void
+ cc_system_panel_class_init (CcSystemPanelClass *klass)
+ {
+@@ -142,19 +147,25 @@ cc_system_panel_class_init (CcSystemPanelClass *klass)
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, datetime_row);
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, region_row);
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, remote_desktop_row);
++#ifndef __ANDROID__
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, users_row);
++#endif
+   gtk_widget_class_bind_template_child (widget_class, CcSystemPanel, software_updates_group);
+ 
+   gtk_widget_class_bind_template_callback (widget_class, cc_system_page_open_software_update);
++#ifndef __ANDROID__
+   gtk_widget_class_bind_template_callback (widget_class, on_secure_shell_row_clicked);
++#endif
+ 
+   g_type_ensure (CC_TYPE_ABOUT_PAGE);
+   g_type_ensure (CC_TYPE_DATE_TIME_PAGE);
+   g_type_ensure (CC_TYPE_LIST_ROW);
+   g_type_ensure (CC_TYPE_REGION_PAGE);
+   g_type_ensure (CC_TYPE_REMOTE_DESKTOP_PAGE);
++#ifndef __ANDROID__
+   g_type_ensure (CC_TYPE_SECURE_SHELL_PAGE);
+   g_type_ensure (CC_TYPE_USERS_PAGE);
++#endif
+ }
+ 
+ static void
+@@ -175,5 +186,7 @@ cc_system_panel_init (CcSystemPanel *self)
+   cc_panel_add_static_subpage (CC_PANEL (self), "datetime", CC_TYPE_DATE_TIME_PAGE);
+   cc_panel_add_static_subpage (CC_PANEL (self), "region", CC_TYPE_REGION_PAGE);
+   cc_panel_add_static_subpage (CC_PANEL (self), "remote-desktop", CC_TYPE_REMOTE_DESKTOP_PAGE);
++#ifndef __ANDROID__
+   cc_panel_add_static_subpage (CC_PANEL (self), "users", CC_TYPE_USERS_PAGE);
++#endif
+ }
+--- a/panels/system/cc-system-panel.blp
++++ b/panels/system/cc-system-panel.blp
+@@ -30,16 +30,6 @@ template $CcSystemPanel: $CcPanel {
+             action-target: "'datetime'";
+           }
+ 
+-          $CcListRow users_row {
+-            title: _("_Users");
+-            subtitle: _("Add and remove accounts, change password");
+-            icon-name: "org.gnome.Settings-users-symbolic";
+-            use-underline: true;
+-            show-arrow: true;
+-            action-name: "navigation.push";
+-            action-target: "'users'";
+-          }
+-
+           $CcListRow remote_desktop_row {
+             title: _("R_emote Desktop");
+             subtitle: _("Allow this device to be used remotely");
+@@ -49,14 +39,6 @@ template $CcSystemPanel: $CcPanel {
+             action-target: "'remote-desktop'";
+           }
+ 
+-          $CcListRow {
+-            title: _("Se_cure Shell");
+-            subtitle: _("SSH network access");
+-            icon-name: "utilities-terminal-symbolic";
+-            show-arrow: true;
+-            activated => $on_secure_shell_row_clicked(template);
+-          }
+-
+           $CcListRow about_row {
+             title: _("_About");
+             subtitle: _("Hardware details and software versions");
+diff --git a/panels/system/meson.build b/panels/system/meson.build
+index a9ac171..b8b06b9 100644
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -41,23 +41,7 @@ sources = files(
+   'remote-desktop/cc-remote-desktop-page.c',
+   'remote-desktop/cc-remote-login-page.c',
+   'remote-desktop/cc-tls-certificate.c',
+-  'secure-shell/cc-secure-shell.c',
+-  'secure-shell/cc-secure-shell-page.c',
+-  'users/cc-add-user-dialog.c',
+-  'users/cc-avatar-chooser.c',
+-  'users/cc-crop-area.c',
+-  'users/cc-entry-feedback.c',
+-  'users/cc-enterprise-login-dialog.c',
+-  'users/cc-fingerprint-dialog.c',
+-  'users/cc-fingerprint-manager.c',
+-  'users/cc-password-dialog.c',
+-  'users/cc-realm-manager.c',
+-  'users/cc-user-page.c',
+-  'users/cc-users-page.c',
+-  'users/pw-utils.c',
+-  'users/run-passwd.c',
+-  'users/user-utils.c',
+-)
++  )
+ 
+ sources += gnome.compile_resources(
+   'cc-' + cappletname + '-resources',
+@@ -132,8 +116,10 @@ subdir('datetime')
+ subdir('icons')
+ subdir('region')
+ subdir('remote-desktop')
++if host_is_linux
+ subdir('secure-shell')
+ subdir('users')
++endif
+ 
+ panels_libs += static_library(
+   cappletname,
+diff --git a/panels/system/system.gresource.xml b/panels/system/system.gresource.xml
+index 6df8843..bc90942 100644
+--- a/panels/system/system.gresource.xml
++++ b/panels/system/system.gresource.xml
+@@ -14,20 +14,6 @@
+     <file preprocess="xml-stripblanks">region/cc-format-chooser.ui</file>
+     <file preprocess="xml-stripblanks">region/cc-format-preview.ui</file>
+     <file>region/region.css</file>
+-    <file preprocess="xml-stripblanks">remote-desktop/cc-encryption-fingerprint-dialog.ui</file>
+-    <file preprocess="xml-stripblanks">remote-desktop/cc-remote-desktop-page.ui</file>
+-    <file preprocess="xml-stripblanks">remote-desktop/cc-remote-login-page.ui</file>
+-    <file preprocess="xml-stripblanks">remote-desktop/cc-desktop-sharing-page.ui</file>
+-    <file>remote-desktop/remote-desktop.css</file>
+-    <file preprocess="xml-stripblanks">secure-shell/cc-secure-shell-page.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-add-user-dialog.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-avatar-chooser.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-entry-feedback.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-enterprise-login-dialog.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-fingerprint-dialog.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-password-dialog.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-users-page.ui</file>
+-    <file preprocess="xml-stripblanks">users/cc-user-page.ui</file>
+     <file>users/users.css</file>
+     <file alias="wordlist.txt">eff_short_wordlist_2_0.txt</file>
+   </gresource>

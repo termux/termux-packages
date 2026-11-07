@@ -1,0 +1,63 @@
+diff --git a/meson.build b/meson.build
+index 22da3cf..ceb222c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -208,7 +208,6 @@ x11_dep = dependency('x11', version: '>= 1.8')
+ xi_dep = dependency('xi', version: '>= 1.2')
+ epoxy_dep = dependency('epoxy')
+ gcr_dep = dependency('gcr-4', version: '>= 4.1.0')
+-pwquality_dep = dependency('pwquality', version: '>= 1.2.2')
+ 
+ m_dep = cc.find_library('m')
+ 
+diff --git a/panels/system/meson.build b/panels/system/meson.build
+index b8b06b9..00a5105 100644
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -82,7 +82,6 @@ deps = common_deps + [
+   libsecret_dep,
+   krb_dep,
+   polkit_gobject_dep,
+-  pwquality_dep,
+   udisks2,
+ ]
+ 
+diff --git a/panels/system/remote-desktop/cc-desktop-sharing-page.c b/panels/system/remote-desktop/cc-desktop-sharing-page.c
+index 58178d8..9d53d9e 100644
+--- a/panels/system/remote-desktop/cc-desktop-sharing-page.c
++++ b/panels/system/remote-desktop/cc-desktop-sharing-page.c
+@@ -44,7 +44,6 @@
+ #endif
+ 
+ #include <pwd.h>
+-#include <pwquality.h>
+ #include <unistd.h>
+ 
+ #include "org.gnome.RemoteDesktop.h"
+@@ -418,10 +417,23 @@ setup_desktop_sharing_page (CcDesktopSharingPage *self)
+   if (username == NULL)
+     {
+       struct passwd *pw = getpwuid (getuid ());
+-      if (pw != NULL)
+-        username = g_strdup (pw->pw_name);
++      if (pw != NULL && pw->pw_name != NULL)
++        {
++          username = g_strdup (pw->pw_name);
++        }
+       else
+-        g_warning ("Failed to get username: %s", g_strerror (errno));
++        {
++          const char *env_user = g_getenv ("USER");
++          if (env_user != NULL)
++            {
++              username = g_strdup (env_user);
++            }
++          else
++            {
++              username = g_strdup ("termux");
++              g_warning ("Failed to get username, using fallback 'termux': %s", g_strerror (errno));
++            }
++        }
+     }
+   gtk_editable_set_text (GTK_EDITABLE (self->username_entry), username);
+ 

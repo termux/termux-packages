@@ -1,0 +1,70 @@
+diff --git a/build-aux/meson/find_xdg_file.py b/build-aux/meson/find_xdg_file.py
+index 8e12823..1704a72 100644
+--- a/build-aux/meson/find_xdg_file.py
++++ b/build-aux/meson/find_xdg_file.py
+@@ -21,7 +21,7 @@ if not data_home or data_home == '':
+ 
+ data_dirs_str = os.getenv('XDG_DATA_DIRS')
+ if not data_dirs_str or data_dirs_str == '':
+-    data_dirs_str = '/usr/local/share/:/usr/share/'
++    data_dirs_str = '@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/'
+ 
+ dirs = []
+ dirs += [ data_home ]
+diff --git a/panels/power/power-panel-scenario-tester.py b/panels/power/power-panel-scenario-tester.py
+index 75adc7d..ae34ae6 100755
+--- a/panels/power/power-panel-scenario-tester.py
++++ b/panels/power/power-panel-scenario-tester.py
+@@ -62,7 +62,7 @@ class GccDBusTestCase(DBusTestCase):
+ 
+         if not os.environ.get('UNDER_JHBUILD', False) or klass.upowerd_path == None:
+             klass.upowerd_path = None
+-            with open('/usr/share/dbus-1/system-services/org.freedesktop.UPower.service') as f:
++            with open('@TERMUX_PREFIX@/share/dbus-1/system-services/org.freedesktop.UPower.service') as f:
+                 for line in f:
+                     if line.startswith('Exec='):
+                         klass.upowerd_path = line.split('=', 1)[1].strip()
+diff --git a/panels/printers/pp-host.c b/panels/printers/pp-host.c
+index a31a606..424c935 100644
+--- a/panels/printers/pp-host.c
++++ b/panels/printers/pp-host.c
+@@ -256,7 +256,7 @@ _pp_host_get_snmp_devices_thread (GTask        *task,
+   devices = g_ptr_array_new_with_free_func (g_object_unref);
+ 
+   argv = g_new0 (gchar *, 3);
+-  argv[0] = g_strdup ("/usr/lib/cups/backend/snmp");
++  argv[0] = g_strdup ("@TERMUX_PREFIX@/lib/cups/backend/snmp");
+   argv[1] = g_strdup (priv->hostname);
+ 
+   /* Use SNMP to get printer's informations */
+diff --git a/panels/printers/pp-options-dialog.c b/panels/printers/pp-options-dialog.c
+index e7416f3..89dccf4 100644
+--- a/panels/printers/pp-options-dialog.c
++++ b/panels/printers/pp-options-dialog.c
+@@ -805,8 +805,8 @@ test_page_cb (PpOptionsDialog *self)
+ 
+   if (self->printer_name)
+     {
+-      const gchar      *const dirs[] = { "/usr/share/cups",
+-                                         "/usr/local/share/cups",
++      const gchar      *const dirs[] = { "@TERMUX_PREFIX@/share/cups",
++                                         "@TERMUX_PREFIX@/local/share/cups",
+                                          NULL };
+       const gchar      *datadir = NULL;
+       g_autofree gchar *filename = NULL;
+diff --git a/panels/system/datetime/tz.h b/panels/system/datetime/tz.h
+index feef165..c50fd4d 100644
+--- a/panels/system/datetime/tz.h
++++ b/panels/system/datetime/tz.h
+@@ -28,9 +28,9 @@
+ G_BEGIN_DECLS
+ 
+ #ifndef __sun
+-#  define TZ_DATA_FILE "/usr/share/zoneinfo/zone.tab"
++#  define TZ_DATA_FILE "@TERMUX_PREFIX@/share/zoneinfo/zone.tab"
+ #else
+-#  define TZ_DATA_FILE "/usr/share/lib/zoneinfo/tab/zone_sun.tab"
++#  define TZ_DATA_FILE "@TERMUX_PREFIX@/share/lib/zoneinfo/tab/zone_sun.tab"
+ #endif
+ 
+ typedef struct _TzDB TzDB;

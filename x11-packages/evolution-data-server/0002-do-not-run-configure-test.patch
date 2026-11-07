@@ -1,0 +1,21 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -639,6 +639,10 @@
+ # Check to see if strftime supports the use of %l and %k
+ # *******************************************************
+ 
++if(CMAKE_CROSSCOMPILING)
++	message(INFO "Cross compiling, assume HAVE_LKSTRFTIME is 0")
++	set(HAVE_LKSTRFTIME 0)
++else()
+ CHECK_C_SOURCE_RUNS("
+ 	#include <stdlib.h>
+ 	#include <string.h>
+@@ -657,6 +661,7 @@
+ 		return 1;
+ 	return 0;
+ 	}" HAVE_LKSTRFTIME)
++endif()
+ 
+ # ******************************
+ # system mail stuff
