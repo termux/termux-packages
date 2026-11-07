@@ -1,0 +1,30 @@
+diff --git a/build.rs b/build.rs
+index 27dfb57..d0b45c7 100644
+--- a/build.rs
++++ b/build.rs
+@@ -104,6 +104,8 @@ fn main() {
+             "aarch64-unknown-linux-gnu" => "aarch64-linux-gnu",
+             "x86_64-unknown-linux-musl" => "x86_64-linux-musl",
+             "aarch64-unknown-linux-musl" => "aarch64-linux-musl",
++            "aarch64-linux-android" => "aarch64-linux-android",
++            "x86_64-linux-android" => "x86_64-linux-android",
+             "x86_64-apple-darwin" => "x86_64-macos",
+             "aarch64-apple-darwin" => "aarch64-macos",
+             "x86_64-pc-windows-msvc" => "x86_64-windows-msvc",
+diff --git a/src/daemon.rs b/src/daemon.rs
+index 4062ed2..f197ab1 100644
+--- a/src/daemon.rs
++++ b/src/daemon.rs
+@@ -350,7 +350,11 @@ mod unix {
+ 
+     // Sockets stay in /tmp so their paths fit sun_path; temp cleaners skip sockets.
+     fn socket_root() -> PathBuf {
+-        PathBuf::from("/tmp").join(format!(
++        let base = std::env::var_os("TMPDIR")
++            .map(PathBuf::from)
++            .filter(|dir| dir.is_absolute())
++            .unwrap_or_else(|| PathBuf::from("/tmp"));
++        base.join(format!(
+             "opencode-pty-{}",
+             nix::unistd::Uid::effective().as_raw()
+         ))
