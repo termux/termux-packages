@@ -1,0 +1,77 @@
+diff --git a/src/runtime/src/coreclr/CMakeLists.txt b/src/runtime/src/coreclr/CMakeLists.txt
+index b1433e14d..a53b62d31 100644
+--- a/src/runtime/src/coreclr/CMakeLists.txt
++++ b/src/runtime/src/coreclr/CMakeLists.txt
+@@ -105,6 +105,20 @@ if(CLR_CMAKE_HOST_UNIX)
+         endif()
+     endif()
+ 
++    # Termux's <semaphore.h> maps sem_open/sem_close to libandroid-posix-semaphore.
++    # Optional: stock NDK builds don't have it and don't need it.
++    if(CLR_CMAKE_TARGET_ANDROID)
++        find_library(ANDROID_POSIX_SEMAPHORE NAMES android-posix-semaphore)
++        if(NOT ANDROID_POSIX_SEMAPHORE)
++            set(ANDROID_POSIX_SEMAPHORE "")
++        else()
++            # It lives outside the system library path (Termux: $PREFIX/lib), so the
++            # runtime libraries need a RUNPATH to load it and other libraries there.
++            get_filename_component(ANDROID_POSIX_SEMAPHORE_DIR "${ANDROID_POSIX_SEMAPHORE}" DIRECTORY)
++            add_link_options("LINKER:-rpath,${ANDROID_POSIX_SEMAPHORE_DIR}")
++        endif()
++    endif()
++
+     if(CLR_CMAKE_TARGET_LINUX AND (CLR_CMAKE_TARGET_ARCH_I386 OR CLR_CMAKE_TARGET_ARCH_RISCV64))
+       add_linker_flag(-Wl,-z,notext)
+     endif()
+diff --git a/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt b/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
+index 8b937537c..9439ac194 100644
+--- a/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
++++ b/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
+@@ -209,13 +209,17 @@ if (CLR_CMAKE_HOST_ANDROID)
+         PUBLIC
+         coreclrminipal_objects
+         coreclrpal_objects
+-        eventprovider_objects
+         gcinfo
+         libunwind
+         log
+         minipal_objects
+         nativeresourcestring_objects
++        ${ANDROID_POSIX_SEMAPHORE}
+     )
++    # eventprovider is only built with FEATURE_EVENT_TRACE (off on Android: no lttng)
++    if (FEATURE_EVENT_TRACE)
++        target_link_libraries(coreclr_static PUBLIC eventprovider_objects)
++    endif()
+ endif()
+ 
+ if(CLR_CMAKE_TARGET_WIN32)
+diff --git a/src/runtime/src/coreclr/pal/src/CMakeLists.txt b/src/runtime/src/coreclr/pal/src/CMakeLists.txt
+index a850607a2..ec8b881a6 100644
+--- a/src/runtime/src/coreclr/pal/src/CMakeLists.txt
++++ b/src/runtime/src/coreclr/pal/src/CMakeLists.txt
+@@ -313,7 +313,8 @@ if(CLR_CMAKE_TARGET_LINUX)
+   else(NOT CLR_CMAKE_TARGET_ANDROID)
+     target_link_libraries(coreclrpal
+       PUBLIC
+-      ${ANDROID_GLOB})
++      ${ANDROID_GLOB}
++      ${ANDROID_POSIX_SEMAPHORE})
+   endif(NOT CLR_CMAKE_TARGET_ANDROID)
+ 
+   target_link_libraries(coreclrpal
+diff --git a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+--- a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
++++ b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+@@ -192,6 +192,11 @@
+         nativeresourcestring
+     )
+ 
++    # Termux's <semaphore.h> maps sem_open/sem_close (used by the PAL) to libandroid-posix-semaphore
++    if(ANDROID_POSIX_SEMAPHORE)
++        LIST(APPEND NATIVE_LIBS ${ANDROID_POSIX_SEMAPHORE})
++    endif()
++
+     # additional requirements for System.IO.Compression.Native
+     include(${CLR_SRC_NATIVE_DIR}/libs/System.IO.Compression.Native/extra_libs.cmake)
+     append_extra_compression_libs(NATIVE_LIBS)
