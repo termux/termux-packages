@@ -1,0 +1,13 @@
+diff --git a/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp b/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp
+--- a/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp
++++ b/src/runtime/src/native/corehost/hostpolicy/hostpolicy_context.cpp
+@@ -392,7 +392,8 @@
+         }
+ 
+         host_contract.get_runtime_property = &get_runtime_property;
+-        pal::char_t buffer[STRING_LENGTH("0xffffffffffffffff")];
++        // +1 for the terminator: Android tagged heap pointers use all 16 hex digits
++        pal::char_t buffer[STRING_LENGTH("0xffffffffffffffff") + 1];
+         pal::snwprintf(buffer, ARRAY_SIZE(buffer), _X("0x%zx"), (size_t)(&host_contract));
+         if (!coreclr_properties.add(_STRINGIFY(HOST_PROPERTY_RUNTIME_CONTRACT), buffer))
+         {

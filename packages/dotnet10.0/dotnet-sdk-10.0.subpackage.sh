@@ -18,9 +18,9 @@ termux_step_create_subpkg_debscripts() {
 	Pass '-v n' or '-v d' or '-v diag' to increase
 	log verbosity.
 
-	Initial build only offers Mono runtime.
+	Runs on CoreCLR (Mono on i686). NativeAOT
+	publishing is not available on the device.
 	Check logcat for runtime errors.
-	CoreCLR is still WIP.
 
 	EOL
 	EOF
