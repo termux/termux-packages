@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Zen is a firefox-based browser with the aim of pushing y
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@sabamdarif"
 TERMUX_PKG_VERSION="1.24.1b"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/zen-browser/desktop/releases/download/${TERMUX_PKG_VERSION}/zen.source.tar.zst"
 TERMUX_PKG_SHA256=f719e7db90bab2f209e5ac2896a77bcebdf74765ae02574e863e675ab4bdb1ec
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
