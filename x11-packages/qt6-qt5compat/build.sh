@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt6 Module that contains unsupported Qt 5 APIs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="6.12.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qt5compat-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=78cf1c283795312a7fa31c73eb7f7f556b48374adc484f10ad5a3c0bcb59264e
 TERMUX_PKG_DEPENDS="libc++, libicu, qt6-qtbase (>= ${TERMUX_PKG_VERSION}), qt6-qtdeclarative (>= ${TERMUX_PKG_VERSION}), qt6-qtshadertools (>= ${TERMUX_PKG_VERSION})"
