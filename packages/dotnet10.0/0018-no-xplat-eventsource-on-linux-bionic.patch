@@ -1,0 +1,16 @@
+Backport of https://github.com/dotnet/runtime/pull/137158
+
+diff --git a/src/runtime/src/coreclr/clr.featuredefines.props b/src/runtime/src/coreclr/clr.featuredefines.props
+--- a/src/runtime/src/coreclr/clr.featuredefines.props
++++ b/src/runtime/src/coreclr/clr.featuredefines.props
+@@ -11,7 +11,9 @@
+     </PropertyGroup>
+ 
+     <PropertyGroup Condition="'$(TargetsUnix)' == 'true'">
+-        <FeatureXplatEventSource Condition="'$(FeatureXplatEventSource)' == '' AND '$(TargetOS)' == 'linux'">true</FeatureXplatEventSource>
++        <!-- Must match FEATURE_EVENTSOURCE_XPLAT in clrfeatures.cmake, which is off for Android. A VMR build for
++             linux-bionic has TargetOS=linux, so check the RID too: otherwise CoreLib calls QCalls the runtime lacks. -->
++        <FeatureXplatEventSource Condition="'$(FeatureXplatEventSource)' == '' AND '$(TargetOS)' == 'linux' AND !$(TargetRid.StartsWith('linux-bionic'))">true</FeatureXplatEventSource>
+         <FeatureComWrappers>true</FeatureComWrappers>
+     </PropertyGroup>
+ 

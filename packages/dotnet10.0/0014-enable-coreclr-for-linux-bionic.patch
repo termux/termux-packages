@@ -1,0 +1,49 @@
+Backport of https://github.com/dotnet/runtime/pull/131115 and https://github.com/dotnet/runtime/pull/137159
+
+diff --git a/src/runtime/eng/Subsets.props b/src/runtime/eng/Subsets.props
+--- a/src/runtime/eng/Subsets.props
++++ b/src/runtime/eng/Subsets.props
+@@ -35,6 +35,7 @@
+ 
+     <!-- Android 32-bit builds blocked by https://github.com/dotnet/runtime/issues/111665 -->
+     <_CoreCLRSupportedOS Condition="'$(TargetsAndroid)' == 'true' and '$(TargetArchitecture)' != 'arm' and '$(TargetArchitecture)' != 'x86'">true</_CoreCLRSupportedOS>
++    <_CoreCLRSupportedOS Condition="'$(TargetsLinuxBionic)' == 'true' and '$(TargetArchitecture)' != 'arm' and '$(TargetArchitecture)' != 'x86'">true</_CoreCLRSupportedOS>
+     <_CoreCLRSupportedOS Condition="'$(TargetsBrowser)' == 'true'">true</_CoreCLRSupportedOS>
+ 
+     <_CoreCLRSupportedArch Condition="'$(TargetArchitecture)' != 'ppc64le' and '$(TargetArchitecture)' != 's390x'">true</_CoreCLRSupportedArch>
+@@ -367,7 +368,7 @@
+     The cross tools are used as part of the build process with the downloaded build tools, so we need to build them for the host architecture and build them as unsanitized binaries.
+     -->
+   <PropertyGroup>
+-    <_BuildAnyCrossArch Condition="('$(CrossBuild)' == 'true' or '$(BuildArchitecture)' != '$(TargetArchitecture)' or '$(HostOS)' != '$(TargetOS)' or '$(EnableNativeSanitizers)' != '') and '$(TargetArchitecture)' != 'wasm'">true</_BuildAnyCrossArch>
++    <_BuildAnyCrossArch Condition="('$(CrossBuild)' == 'true' or '$(BuildArchitecture)' != '$(TargetArchitecture)' or '$(HostOS)' != '$(TargetOS)' or '$(TargetsLinuxBionic)' == 'true' or '$(EnableNativeSanitizers)' != '') and '$(TargetArchitecture)' != 'wasm'">true</_BuildAnyCrossArch>
+     <_BuildCrossComponents Condition="$(_subset.Contains('+clr.crossarchtools+'))">true</_BuildCrossComponents>
+     <_BuildCrossComponents Condition="'$(ClrRuntimeBuildSubsets)' != '' and ('$(PrimaryRuntimeFlavor)' == 'CoreCLR' or '$(TargetsMobile)' == 'true')">true</_BuildCrossComponents>
+     <_CrossBitwidthBuild Condition="'$(BuildArchitecture)' == 'x64' and ('$(TargetArchitecture)' == 'x86' or '$(TargetArchitecture)' == 'arm')">true</_CrossBitwidthBuild>
+diff --git a/src/runtime/src/coreclr/.nuget/coreclr-packages.proj b/src/runtime/src/coreclr/.nuget/coreclr-packages.proj
+--- a/src/runtime/src/coreclr/.nuget/coreclr-packages.proj
++++ b/src/runtime/src/coreclr/.nuget/coreclr-packages.proj
+@@ -13,7 +13,8 @@
+     <ProjectReference Include="Microsoft.NETCore.TestHost\Microsoft.NETCore.TestHost.proj" />
+   </ItemGroup>
+ 
+-  <ItemGroup Condition=" '$(TargetsMobile)' != 'true' ">
++  <!-- ilasm/ildasm are not built for Android targets (CLR_CMAKE_BUILD_TOOLS), linux-bionic included -->
++  <ItemGroup Condition=" '$(TargetsMobile)' != 'true' and '$(TargetsLinuxBionic)' != 'true' and !$(TargetRid.StartsWith('linux-bionic')) ">
+     <ProjectReference Include="Microsoft.NETCore.ILAsm\Microsoft.NETCore.ILAsm.proj" />
+     <ProjectReference Include="Microsoft.NETCore.ILDAsm\Microsoft.NETCore.ILDAsm.proj" />
+   </ItemGroup>
+diff --git a/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj b/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
+--- a/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
++++ b/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
+@@ -32,8 +32,8 @@
+   </ItemGroup>
+ 
+   <ItemGroup>
+-    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.CoreCLR.sfxproj" Condition="'$(RuntimeFlavor)' == 'CoreCLR' and '$(TargetsLinuxBionic)' != 'true'" />
+-    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.Mono.sfxproj" Condition="'$(RuntimeFlavor)' == 'Mono' or '$(TargetsLinuxBionic)' == 'true'" />
++    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.CoreCLR.sfxproj" Condition="'$(RuntimeFlavor)' == 'CoreCLR' and ('$(TargetsLinuxBionic)' != 'true' or '$(PrimaryRuntimeFlavor)' == 'CoreCLR')" />
++    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.Mono.sfxproj" Condition="'$(RuntimeFlavor)' == 'Mono' or ('$(TargetsLinuxBionic)' == 'true' and '$(PrimaryRuntimeFlavor)' != 'CoreCLR')" />
+     <BundleComponentReference Include="../installers/dotnet-hostfxr.proj" Condition="'$(TestReadyToRun)' != 'true'" />
+     <BundleComponentReference Include="../installers/dotnet-host.proj" Condition="'$(TestReadyToRun)' != 'true'" />
+   </ItemGroup>

@@ -1,0 +1,25 @@
+diff --git a/src/sdk/src/Layout/Directory.Build.props b/src/sdk/src/Layout/Directory.Build.props
+--- a/src/sdk/src/Layout/Directory.Build.props
++++ b/src/sdk/src/Layout/Directory.Build.props
+@@ -51,7 +51,7 @@
+   <PropertyGroup>
+     <GenerateSdkBundleOnly Condition="'$(DotNetBuildPass)' == '3' and '$(OS)' == 'Windows_NT'">true</GenerateSdkBundleOnly>
+     <BundleRuntimePacks Condition="'$(BundleRuntimePacks)' == '' and '$(DotNetBuildSourceOnly)' == 'true'">true</BundleRuntimePacks>
+-    <BundleNativeAotCompiler Condition="'$(BundleNativeAotCompiler)' == '' and '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true'">true</BundleNativeAotCompiler>
++    <BundleNativeAotCompiler Condition="'$(BundleNativeAotCompiler)' == '' and '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRid.StartsWith('linux-bionic'))">true</BundleNativeAotCompiler>
+ 
+     <!-- Crossgen2 is not bundled by default on platforms where Microsoft provides a package on nuget.org, 
+          because it is large (100MB+). -->
+diff --git a/src/sdk/src/Layout/redist/targets/Crossgen.targets b/src/sdk/src/Layout/redist/targets/Crossgen.targets
+--- a/src/sdk/src/Layout/redist/targets/Crossgen.targets
++++ b/src/sdk/src/Layout/redist/targets/Crossgen.targets
+@@ -5,7 +5,8 @@
+     <IsCrossgenSupported Condition="'$(SkipUsingCrossgen)' != 'true' and
+                                     '$(TargetArchitecture)' != 's390x' and
+                                     '$(TargetArchitecture)' != 'ppc64le' and
+-                                    '$(DotNetBuildUseMonoRuntime)' != 'true'">true</IsCrossgenSupported>
++                                    '$(DotNetBuildUseMonoRuntime)' != 'true' and
++                                    !$(TargetRid.StartsWith('linux-bionic'))">true</IsCrossgenSupported>
+ 
+     <RuntimeNETCrossgenPackageName>microsoft.netcore.app.crossgen2.$(NETCoreSdkRuntimeIdentifier)</RuntimeNETCrossgenPackageName>
+   </PropertyGroup>
