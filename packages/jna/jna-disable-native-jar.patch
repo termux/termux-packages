@@ -1,0 +1,73 @@
+--- a/build.xml
++++ b/build.xml
+@@ -1032,26 +1032,7 @@ cd ..
+     </exec>
+     <mkdir dir="${classes}/${native.path}"/>
+     <copy todir="${classes}/${native.path}">
+-      <fileset dir="${build.native}"
+-               includes="jnidispatch.dll,libjnidispatch.*"/>
+-    </copy>
+-    <mkdir dir="${eclipse.classes}/${native.path}"/>
+-    <copy todir="${eclipse.classes}/${native.path}"
+-          failonerror="false">
+-      <fileset dir="${build.native}"
+-               includes="jnidispatch.dll,libjnidispatch.*"/>
+-    </copy>
+-    <!-- For web start, native libraries may be provided in the root of -->
+-    <!-- an included jar file -->
+-    <jar jarfile="${build}/${native.jar}" createUnicodeExtraFields="never" encoding="UTF-8">
+-      <fileset dir="${build.native}" includes="jnidispatch.dll,libjnidispatch.*"/>
+-      <manifest>
+-        <attribute name="Implementation-Version" value="${jni.version} b${jni.build}"/>
+-        <attribute name="Specification-Version" value="${jni.version}"/>
+-      </manifest>
+-    </jar>
+-    <copy todir="${lib.native}">
+-      <fileset dir="${build}" includes="${native.jar}"/>
++      <fileset dir="${build.native}" includes="libjnidispatch.so"/>
+     </copy>
+   </target>
+ 
+@@ -1262,6 +1243,7 @@ cd ..
+       <sysproperty key="jna.nosys" value="true"/>
+       <sysproperty key="jna.builddir" file="${build}"/>
+       <sysproperty key="jna.nativedir" file="${build.native}"/>
++      <sysproperty key="jna.disableNativeJarTest" value="true" if:set="omit-jnilib"/>
+       <classpath><path refid="test.runpath"/></classpath>
+       <formatter type="brief" usefile="false"/>
+       <formatter type="xml"/>
+--- a/test/com/sun/jna/JNALoadTest.java
++++ b/test/com/sun/jna/JNALoadTest.java
+@@ -89,6 +89,10 @@ public class JNALoadTest extends TestCase implements Paths {
+     }
+ 
+     public void testAvoidJarUnpacking() throws Exception {
++        if (Boolean.getBoolean("jna.disableNativeJarTest")) {
++            System.out.println("Skip " + getName() + " - native library is intentionally excluded from jna.jar");
++            return;
++        }
+         System.setProperty("jna.nounpack", "true");
+         try {
+             Class<?> cls = Class.forName("com.sun.jna.Native", true, new TestLoader(true));
+@@ -119,6 +123,10 @@ public class JNALoadTest extends TestCase implements Paths {
+     }
+ 
+     public void testLoadAndUnloadFromJar() throws Exception {
++        if (Boolean.getBoolean("jna.disableNativeJarTest")) {
++            System.out.println("Skip " + getName() + " - native library is intentionally excluded from jna.jar");
++            return;
++        }
+         if (Platform.isIntel() && (! Platform.is64Bit())) {
+             System.out.println("Skip " + getName() + " - it is known to be flaky and produces false positives on x86-32bit");
+             return;
+@@ -232,6 +240,10 @@ public class JNALoadTest extends TestCase implements Paths {
+     }
+ 
+     public void testLoadFromUnicodePath() throws Exception {
++        if (Boolean.getBoolean("jna.disableNativeJarTest")) {
++            System.out.println("Skip " + getName() + " - native library is intentionally excluded from jna.jar");
++            return;
++        }
+         if (Platform.isWindows()) {
+             String vendor = System.getProperty("java.vendor");
+             if (vendor != null) {
