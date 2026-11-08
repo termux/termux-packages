@@ -1,0 +1,24 @@
+--- a/native/Makefile
++++ b/native/Makefile
+@@ -101,7 +101,7 @@ CDEFINES=-D_REENTRANT
+ PCFLAGS=-W -Wall -Wno-unused -Wno-parentheses
+ CFLAGS=$(PCFLAGS) $(CFLAGS_EXTRA) $(COPT) $(CDEBUG) $(CDEFINES) $(CINCLUDES) \
+        -DJNA_JNI_VERSION='"$(JNA_JNI_VERSION)"' -DCHECKSUM='"$(CHECKSUM)"'
+-LDFLAGS=-o $@ -shared
++LDFLAGS+=-o $@ -shared
+ ifeq ($(DYNAMIC_LIBFFI),true)
+ CFLAGS += $(shell pkg-config --cflags libffi 2>/dev/null || echo)
+ LIBS += $(shell pkg-config --libs libffi 2>/dev/null || echo -lffi)
+@@ -285,10 +285,10 @@ ARCH=$(shell uname -m | sed 's/i.86/i386/g')
+ PCFLAGS+=-fPIC
+ CDEFINES+=-DHAVE_PROTECTION
+ ifeq ($(DYNAMIC_LIBFFI),true)
+-LDFLAGS+=-Wl,-soname,$@
++LDFLAGS+=-Wl,-soname,$(@F)
+ else
+ # Ensure we bind to local libffi symbols
+-LDFLAGS+=-Wl,-soname,$@,-Bsymbolic
++LDFLAGS+=-Wl,-soname,$(@F),-Bsymbolic
+ endif
+ endif
+ 
