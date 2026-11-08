@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Standalone mail and news reader from mozilla.org"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="159.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
 TERMUX_PKG_SHA256=b4cbc4e010deaa66a51a5c647586c8dc41579c136155fe8baa8253f7c8b3927e
 TERMUX_PKG_DEPENDS="botan3, dbus, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwayland, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxkbcommon, libxrandr, libxtst, pango, pulseaudio, zlib"
