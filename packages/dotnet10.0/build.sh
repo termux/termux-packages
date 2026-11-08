@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION=".NET 10.0"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
 TERMUX_PKG_VERSION="10.0.13"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 _DOTNET_SDK_VERSION="10.0.113"
 TERMUX_PKG_SRCURL=git+https://github.com/dotnet/dotnet
 TERMUX_PKG_GIT_BRANCH="v${_DOTNET_SDK_VERSION}"
-TERMUX_PKG_BUILD_DEPENDS="krb5, libicu, openssl, zlib"
+TERMUX_PKG_BUILD_DEPENDS="krb5, libandroid-posix-semaphore, libicu, openssl, zlib"
 TERMUX_PKG_SUGGESTS="dotnet-sdk-10.0"
 TERMUX_PKG_CONFLICTS="dotnet8.0, dotnet9.0"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -88,6 +88,18 @@ termux_step_configure() {
 	*) termux_error_exit "Unknown arch: ${TERMUX_ARCH}"
 	esac
 
+	# CoreCLR on linux-bionic is arm64 and x64 only (dotnet/runtime#131115)
+	export _USE_MONO=false
+	[[ "${arch}" == "x86" ]] && _USE_MONO=true
+
+	if [[ "${_USE_MONO}" == "false" ]]; then
+		# no Mono LLVM libclang; the framework is crossgen'd with the build machine's crossgen2
+		sed -i \
+			-e '/Mono\.LLVM\.Libclang/d' \
+			-e "s|^  </Usages>|    <Usage Id=\"Microsoft.NETCore.App.Crossgen2.linux-x64\" Version=\"${TERMUX_PKG_VERSION}\" />\n&|" \
+			eng/tools/prebuilt-baseline.xml
+	fi
+
 	export CONFIG="Release"
 	if [[ "${TERMUX_DEBUG_BUILD}" == "true" ]]; then
 		CONFIG="Debug"
@@ -156,11 +168,15 @@ termux_step_configure() {
 	set(HAVE_COMPATIBLE_EXP_EXITCODE 0)
 
 	# https://github.com/dotnet/runtime/issues/57784
-	# Android has no liblttng-ust, Linux also has different issue
-	set(FEATURE_EVENT_TRACE 0)
-	# .NET 10 changed lttng check to use FEATURE_EVENTSOURCE_XPLAT
+	# Android has no liblttng-ust: keep the LTTng-based Xplat EventSource off (0018 does the same
+	# for CoreLib). FEATURE_EVENT_TRACE stays on as in upstream Android builds (dummy provider, no
+	# lttng): CoreLib always calls the EventPipe QCalls it enables.
 	set(FEATURE_EVENTSOURCE_XPLAT 0)
 	EOL
+
+	if [[ "${_USE_MONO}" == "true" ]]; then
+		echo "set(FEATURE_EVENT_TRACE 0)" >> "${TERMUX_PKG_TMPDIR}/build/cmake/android.toolchain.cmake"
+	fi
 
 	echo "INFO: ${TERMUX_PKG_TMPDIR}/build/cmake/android.toolchain.cmake"
 	cat "${TERMUX_PKG_TMPDIR}/build/cmake/android.toolchain.cmake"
@@ -180,7 +196,7 @@ termux_step_make() {
 	# --online needed to workaround restore issue
 	if ! time ./build.sh \
 		--clean-while-building \
-		--use-mono-runtime \
+		$([[ "${_USE_MONO}" == "true" ]] && echo --use-mono-runtime) \
 		--online \
 		--source-build \
 		-m:${TERMUX_PKG_MAKE_PROCESSES} \
