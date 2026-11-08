@@ -1,0 +1,184 @@
+Backport of https://github.com/v8/v8/commit/f607706154eabc4a949628a88b38dbe95cd2274c
+([regexp] Handle supplementary case equivalents of BMP characters).
+
+--- a/deps/v8/src/regexp/gen-regexp-special-case.cc
++++ b/deps/v8/src/regexp/gen-regexp-special-case.cc
+@@ -9,6 +9,7 @@
+ 
+ #include "src/base/strings.h"
+ #include "src/regexp/special-case.h"
++#include "unicode/uchar.h"
+ 
+ namespace v8 {
+ namespace internal {
+@@ -17,6 +18,19 @@ static const base::uc32 kSurrogateStart = 0xd800;
+ static const base::uc32 kSurrogateEnd = 0xdfff;
+ static const base::uc32 kNonBmpStart = 0x10000;
+ 
++// Removes supplementary code points from |set| and returns whether any were
++// present. Since Unicode 18, the case closure of a BMP character can contain
++// supplementary code points (U+1DF95 LATIN SMALL LIGATURE LONG S WITH
++// DESCENDER S case-folds to U+00DF LATIN SMALL LETTER SHARP S). Non-unicode
++// ignoreCase matching compares UTF-16 code units, so a supplementary code
++// point never matches a BMP character and does not take part in Canonicalize.
++bool RemoveSupplementary(icu::UnicodeSet& set) {
++  constexpr UChar32 kFirstSupplementary = static_cast<UChar32>(kNonBmpStart);
++  if (!set.containsSome(kFirstSupplementary, UCHAR_MAX_VALUE)) return false;
++  set.remove(kFirstSupplementary, UCHAR_MAX_VALUE);
++  return true;
++}
++
+ // The following code generates "src/regexp/special-case.cc".
+ void PrintSet(std::ofstream& out, const char* name,
+               const icu::UnicodeSet& set) {
+@@ -51,6 +65,7 @@ void PrintSpecial(std::ofstream& out) {
+   icu::UnicodeSet current;
+   icu::UnicodeSet special_add;
+   icu::UnicodeSet ignore;
++  icu::UnicodeSet supplementary_equivalents;
+   UErrorCode status = U_ZERO_ERROR;
+   icu::UnicodeSet upper("[\\p{Lu}]", status);
+   CHECK(U_SUCCESS(status));
+@@ -63,6 +78,7 @@ void PrintSpecial(std::ofstream& out) {
+     }
+     current.set(i, i);
+     current.closeOver(USET_CASE_INSENSITIVE);
++    if (RemoveSupplementary(current)) supplementary_equivalents.add(i);
+ 
+     // Check to see if all characters in the case-folding equivalence
+     // class as defined by UnicodeSet::closeOver all map to the same
+@@ -112,6 +128,7 @@ void PrintSpecial(std::ofstream& out) {
+       UChar32 canonical = RegExpCaseFolding::Canonicalize(c);
+       current.set(c, c);
+       current.closeOver(USET_CASE_INSENSITIVE);
++      RemoveSupplementary(current);
+       current.removeAll(ignore);
+       for (int32_t j = 0; j < current.getRangeCount(); j++) {
+         for (UChar32 c2 = current.getRangeStart(j);
+@@ -124,6 +141,7 @@ void PrintSpecial(std::ofstream& out) {
+ 
+   PrintSet(out, "IgnoreSet", ignore);
+   PrintSet(out, "SpecialAddSet", special_add);
++  PrintSet(out, "SupplementaryEquivalentsSet", supplementary_equivalents);
+ }
+ 
+ void WriteHeader(const char* header_filename) {
+--- a/deps/v8/src/regexp/regexp-parser.cc
++++ b/deps/v8/src/regexp/regexp-parser.cc
+@@ -10,6 +10,7 @@
+ #include "src/regexp/regexp-ast.h"
+ #include "src/regexp/regexp-macro-assembler.h"
+ #include "src/regexp/regexp.h"
++#include "src/regexp/special-case.h"
+ #include "src/strings/char-predicates-inl.h"
+ #include "src/utils/ostreams.h"
+ #include "src/utils/utils.h"
+@@ -156,6 +157,10 @@ void RegExpTextBuilder::FlushText() {
+ 
+ void RegExpTextBuilder::AddCharacter(base::uc16 c) {
+   FlushPendingSurrogate();
++  if (NeedsDesugaringForIgnoreCase(c)) {
++    AddClassRangesForDesugaring(c);
++    return;
++  }
+   if (characters_ == nullptr) {
+     characters_ = zone()->New<ZoneList<base::uc16>>(4, zone());
+   }
+@@ -238,15 +243,18 @@ bool RegExpTextBuilder::NeedsDesugaringForUnicode(RegExpClassRanges* cc) {
+   return false;
+ }
+ 
+-// We only use this for characters made of surrogate pairs.  All other
+-// characters outside of character classes are made case independent in the
+-// code generation.
++// Desugar supplementary characters with case equivalents and BMP characters
++// with supplementary equivalents. Other atoms are folded during code
++// generation.
+ bool RegExpTextBuilder::NeedsDesugaringForIgnoreCase(base::uc32 c) {
+ #ifdef V8_INTL_SUPPORT
+   if (IsUnicodeMode() && ignore_case()) {
++    if (c <= unibrow::Utf16::kMaxNonSurrogateCharCode) {
++      return RegExpCaseFolding::HasSupplementaryEquivalents(
++          static_cast<base::uc16>(c));
++    }
+     icu::UnicodeSet set(c, c);
+-    set.closeOver(USET_CASE_INSENSITIVE);
+-    set.removeAllStrings();
++    RegExpCaseFolding::CloseOver(set, RegExpCaseFolding::Mode::kUnicode);
+     return set.size() > 1;
+   }
+   // In the case where ICU is not included, we act as if the unicode flag is
+--- a/deps/v8/src/regexp/special-case.h
++++ b/deps/v8/src/regexp/special-case.h
+@@ -7,8 +7,8 @@
+ 
+ #ifdef V8_INTL_SUPPORT
+ #include "src/base/logging.h"
++#include "src/base/strings.h"
+ #include "src/common/globals.h"
+-
+ #include "unicode/uchar.h"
+ #include "unicode/uniset.h"
+ #include "unicode/unistr.h"
+@@ -71,9 +71,17 @@ namespace internal {
+ // another character. Characters that match no other characters in
+ // their equivalence class are added to IgnoreSet. Characters that
+ // match at least one other character are added to SpecialAddSet.
++// Supplementary code points are ignored throughout: non-unicode matching
++// compares UTF-16 code units, so they can never match a BMP character.
++//
++// The generator additionally emits SupplementaryEquivalentsSet, the BMP
++// characters whose Unicode case closure contains supplementary code points.
++// This set is used for unicode-mode matching, see HasSupplementaryEquivalents.
+ 
+ class RegExpCaseFolding final : public AllStatic {
+  public:
++  enum class Mode { kNonUnicode, kUnicode };
++
+   static const icu::UnicodeSet& IgnoreSet();
+   static const icu::UnicodeSet& SpecialAddSet();
+ 
+@@ -108,6 +116,43 @@ class RegExpCaseFolding final : public AllStatic {
+     // h. Return cu.
+     return cu;
+   }
++
++  // Close a set of characters under case equivalence, preserving its
++  // original members. Non-unicode inputs must be UTF-16 code units.
++  static void CloseOver(icu::UnicodeSet& set, Mode mode) {
++    if (mode == Mode::kUnicode) {
++      set.closeOver(USET_SIMPLE_CASE_INSENSITIVE);
++      return;
++    }
++    DCHECK(!set.containsSome(0x10000, 0x10ffff));
++    if (IgnoreSet().containsNone(set)) {
++      CloseOverNonUnicode(set);
++      return;
++    }
++    if (IgnoreSet().containsAll(set)) return;
++    // Ignored characters neither contribute nor acquire equivalents, but
++    // must remain in the result if they were explicitly present.
++    icu::UnicodeSet ignored(set);
++    ignored.retainAll(IgnoreSet());
++    set.removeAll(IgnoreSet());
++    CloseOverNonUnicode(set);
++    set.addAll(ignored);
++  }
++
++  // Whether c has supplementary Unicode case equivalents.
++  static bool HasSupplementaryEquivalents(base::uc16 c) {
++    return SupplementaryEquivalentsSet().contains(c);
++  }
++
++ private:
++  static const icu::UnicodeSet& SupplementaryEquivalentsSet();
++
++  // Requires a set containing no IgnoreSet characters.
++  static void CloseOverNonUnicode(icu::UnicodeSet& set) {
++    set.closeOver(USET_SIMPLE_CASE_INSENSITIVE);
++    set.removeAll(IgnoreSet());
++    set.remove(0x10000, 0x10ffff);
++  }
+ };
+ 
+ }  // namespace internal

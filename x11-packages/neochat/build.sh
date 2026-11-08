@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A client for matrix, the decentralized communication pro
 TERMUX_PKG_LICENSE="GPL-2.0-or-later, LGPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.08.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/release-service/${TERMUX_PKG_VERSION}/src/neochat-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=0858891f64116ec25883158b94233eb0fa3c7449640340868ecfbf4205555c81
 TERMUX_PKG_AUTO_UPDATE=true
