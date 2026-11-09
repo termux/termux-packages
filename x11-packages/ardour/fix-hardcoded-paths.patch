@@ -90,7 +90,7 @@
  #endif // PLATFORM_WINDOWS
 --- a/libs/ardour/vst3_plugin.cc
 +++ b/libs/ardour/vst3_plugin.cc
-@@ -1162,8 +1162,8 @@ VST3PluginInfo::preset_search_path () const
+@@ -1163,8 +1163,8 @@ VST3PluginInfo::preset_search_path () const
  	}
  #else
  	preset_path += Glib::build_filename (Glib::get_home_dir (), ".vst3", "presets", vendor, pname);
@@ -123,14 +123,3 @@
  #define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR "/"
  #define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR "/"
  #define LUA_PATH_DEFAULT  \
---- a/libs/pbd/mountpoint.cc
-+++ b/libs/pbd/mountpoint.cc
-@@ -52,7 +52,7 @@ mountpoint (string path)
- 	const char *cpath = path.c_str();
- 	char best[PATH_MAX+1];
- 
--	if ((mntf = setmntent ("/etc/mtab", "r")) == 0) {
-+	if ((mntf = setmntent ("@TERMUX_PREFIX@/etc/mtab", "r")) == 0) {
- 		return "";
- 	}
- 
