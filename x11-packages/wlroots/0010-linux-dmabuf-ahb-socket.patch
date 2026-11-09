@@ -1,0 +1,71 @@
+--- a/types/wlr_linux_dmabuf_v1.c
++++ b/types/wlr_linux_dmabuf_v1.c
+@@ -16,6 +16,10 @@
+ #include "linux-dmabuf-v1-protocol.h"
+ #include "render/drm_format_set.h"
+ #include "util/shm.h"
++#include <poll.h>
++#include <sys/socket.h>
++#include <sys/stat.h>
++#include "render/allocator/ahb.h"
+ 
+ #if WLR_HAS_DRM_BACKEND
+ #include <wlr/backend/drm.h>
+@@ -227,6 +231,42 @@ static bool check_import_dmabuf(struct wlr_dmabuf_attributes *attribs, void *dat
+ 	return true;
+ }
+ 
++#ifdef __TERMUX__
++static bool receive_ahb(struct wlr_dmabuf_attributes *attribs,
++		int32_t width, int32_t height, uint32_t client_format) {
++	AHardwareBuffer *handle = NULL;
++	struct pollfd pfd = { .fd = attribs->fd[0], .events = POLLIN };
++	if (!wlr_ahb_available() ||
++			send(attribs->fd[0], "", 1, MSG_NOSIGNAL) != 1 ||
++			poll(&pfd, 1, 1000) <= 0 ||
++			AHardwareBuffer_recvHandleFromUnixSocket(attribs->fd[0], &handle) != 0) {
++		return false;
++	}
++	close(attribs->fd[0]);
++	attribs->fd[0] = -1;
++
++	AHardwareBuffer_Desc desc;
++	AHardwareBuffer_describe(handle, &desc);
++
++	bool format_ok;
++	if (desc.format == 5) { // AHARDWAREBUFFER_FORMAT_B8G8R8A8_UNORM
++		format_ok = client_format == DRM_FORMAT_ARGB8888 ||
++			client_format == DRM_FORMAT_XRGB8888;
++	} else {
++		format_ok = (desc.format == AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM ||
++				desc.format == AHARDWAREBUFFER_FORMAT_R8G8B8X8_UNORM) &&
++			(client_format == DRM_FORMAT_ABGR8888 || client_format == DRM_FORMAT_XBGR8888 ||
++				client_format == DRM_FORMAT_ARGB8888 || client_format == DRM_FORMAT_XRGB8888);
++	}
++
++	bool ok = format_ok && (int32_t)desc.width >= width &&
++		(int32_t)desc.height >= height &&
++		wlr_ahb_get_dmabuf_attributes(handle, &desc, client_format, width, attribs);
++	AHardwareBuffer_release(handle);
++	return ok;
++}
++#endif
++
+ static void params_create_common(struct wl_resource *params_resource,
+ 		uint32_t buffer_id, int32_t width, int32_t height, uint32_t format,
+ 		uint32_t flags) {
+@@ -293,6 +333,14 @@ static void params_create_common(struct wl_resource *params_resource,
+ 		goto err_out;
+ 	}
+ 
++#ifdef __TERMUX__
++	struct stat fd_stat;
++	if (attribs.n_planes == 1 && fstat(attribs.fd[0], &fd_stat) == 0 &&
++			S_ISSOCK(fd_stat.st_mode) && !receive_ahb(&attribs, width, height, format)) {
++		goto err_failed;
++	}
++#endif
++
+ 	for (int i = 0; i < attribs.n_planes; i++) {
+ 		if ((uint64_t)attribs.offset[i]
+ 				+ attribs.stride[i] > UINT32_MAX) {

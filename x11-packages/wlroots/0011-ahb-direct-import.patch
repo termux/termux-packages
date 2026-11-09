@@ -1,0 +1,726 @@
+--- a/include/render/egl.h
++++ b/include/render/egl.h
+@@ -17,6 +17,7 @@ struct wlr_egl {
+ 		bool EXT_image_dma_buf_import_modifiers;
+ 		bool IMG_context_priority;
+ 		bool EXT_create_context_robustness;
++		bool ANDROID_image_native_buffer;
+ 
+ 		// Device extensions
+ 		bool EXT_device_drm;
+@@ -44,9 +45,11 @@ struct wlr_egl {
+ 		PFNEGLDESTROYSYNCKHRPROC eglDestroySyncKHR;
+ 		PFNEGLDUPNATIVEFENCEFDANDROIDPROC eglDupNativeFenceFDANDROID;
+ 		PFNEGLWAITSYNCKHRPROC eglWaitSyncKHR;
++		PFNEGLGETNATIVECLIENTBUFFERANDROIDPROC eglGetNativeClientBufferANDROID;
+ 	} procs;
+ 
+ 	bool has_modifiers;
++	bool ahb_only;
+ 	struct wlr_drm_format_set dmabuf_texture_formats;
+ 	struct wlr_drm_format_set dmabuf_render_formats;
+ };
+@@ -78,6 +81,12 @@ void wlr_egl_destroy(struct wlr_egl *egl);
+ EGLImageKHR wlr_egl_create_image_from_dmabuf(struct wlr_egl *egl,
+ 	struct wlr_dmabuf_attributes *attributes, bool *external_only);
+ 
++/**
++ * Creates an EGL image from the given AHardwareBuffer.
++ */
++EGLImageKHR wlr_egl_create_image_from_ahb(struct wlr_egl *egl,
++	struct AHardwareBuffer *ahb);
++
+ /**
+  * Get DMA-BUF formats suitable for sampling usage.
+  */
+--- a/include/render/vulkan.h
++++ b/include/render/vulkan.h
+@@ -56,6 +56,7 @@ struct wlr_vk_device {
+ 		PFN_vkGetSemaphoreFdKHR vkGetSemaphoreFdKHR;
+ 		PFN_vkImportSemaphoreFdKHR vkImportSemaphoreFdKHR;
+ 		PFN_vkQueueSubmit2KHR vkQueueSubmit2KHR;
++		PFN_vkGetAndroidHardwareBufferPropertiesANDROID vkGetAndroidHardwareBufferPropertiesANDROID;
+ 	} api;
+ 
+ 	uint32_t format_prop_count;
+--- a/include/wlr/types/wlr_linux_dmabuf_v1.h
++++ b/include/wlr/types/wlr_linux_dmabuf_v1.h
+@@ -26,6 +26,8 @@ struct wlr_dmabuf_v1_buffer {
+ 
+ 	struct {
+ 		struct wl_listener release;
++		struct AHardwareBuffer *ahb;
++		uint32_t ahb_format;
+ 	} WLR_PRIVATE;
+ };
+ 
+--- a/render/egl.c
++++ b/render/egl.c
+@@ -2,7 +2,9 @@
+ #include <drm_fourcc.h>
+ #include <fcntl.h>
+ #include <stdio.h>
++#include <signal.h>
+ #include <stdlib.h>
++#include <sys/wait.h>
+ #include <unistd.h>
+ #include <gbm.h>
+ #include <wlr/render/egl.h>
+@@ -13,6 +15,14 @@
+ #include "render/egl.h"
+ #include "util/env.h"
+ 
++enum probe_result {
++	PROBE_DMABUF,
++	PROBE_AHB_ONLY,
++	PROBE_NONE,
++};
++
++static enum probe_result probe_dmabuf_import(void);
++
+ static enum wlr_log_importance egl_log_importance_to_wlr(EGLint type) {
+ 	switch (type) {
+ 	case EGL_DEBUG_MSG_CRITICAL_KHR: return WLR_ERROR;
+@@ -149,8 +159,12 @@ static void init_dmabuf_formats(struct wlr_egl *egl) {
+ 
+ 		// EGL always supports implicit modifiers. If at least one modifier supports rendering,
+ 		// assume the implicit modifier supports rendering too.
+-		wlr_drm_format_set_add(&egl->dmabuf_texture_formats, fmt,
+-			DRM_FORMAT_MOD_INVALID);
++		bool texturable = !egl->ahb_only ||
++			(fmt != DRM_FORMAT_ARGB8888 && fmt != DRM_FORMAT_XRGB8888);
++		if (texturable) {
++			wlr_drm_format_set_add(&egl->dmabuf_texture_formats, fmt,
++				DRM_FORMAT_MOD_INVALID);
++		}
+ 		if (modifiers_len == 0 || !all_external_only) {
+ 			wlr_drm_format_set_add(&egl->dmabuf_render_formats, fmt,
+ 				DRM_FORMAT_MOD_INVALID);
+@@ -159,8 +173,10 @@ static void init_dmabuf_formats(struct wlr_egl *egl) {
+ 		if (modifiers_len == 0) {
+ 			// Assume the linear layout is supported if the driver doesn't
+ 			// explicitly say otherwise
+-			wlr_drm_format_set_add(&egl->dmabuf_texture_formats, fmt,
+-				DRM_FORMAT_MOD_LINEAR);
++			if (texturable) {
++				wlr_drm_format_set_add(&egl->dmabuf_texture_formats, fmt,
++					DRM_FORMAT_MOD_LINEAR);
++			}
+ 			wlr_drm_format_set_add(&egl->dmabuf_render_formats, fmt,
+ 				DRM_FORMAT_MOD_LINEAR);
+ 		}
+@@ -205,6 +221,12 @@ static struct wlr_egl *egl_create(void) {
+ 
+ 	wlr_log(WLR_INFO, "Supported EGL client extensions: %s", client_exts_str);
+ 
++#ifdef __TERMUX__
++	if (check_egl_ext(client_exts_str, "EGL_KHR_platform_android")) {
++		probe_dmabuf_import();
++	}
++#endif
++
+ 	if (!check_egl_ext(client_exts_str, "EGL_EXT_platform_base")) {
+ 		wlr_log(WLR_ERROR, "EGL_EXT_platform_base not supported");
+ 		return NULL;
+@@ -263,40 +285,96 @@ static struct wlr_egl *egl_create(void) {
+ 	return egl;
+ }
+ 
++static void probe_child_crashed(int sig) {
++	_exit(2);
++}
++
+ // Android EGL drivers sometimes advertise EGL_EXT_image_dma_buf_import without
+ // supporting it, and sometimes support it without advertising it. Import a real
+ // buffer instead of trusting the extension string.
+-static bool probe_dmabuf_import(struct wlr_egl *egl) {
++static void probe_child_run(bool ahb) {
++	signal(SIGSEGV, probe_child_crashed);
++	signal(SIGBUS, probe_child_crashed);
++	signal(SIGABRT, probe_child_crashed);
++	alarm(5);
++
++	struct wlr_egl egl = {0};
++	egl.display = eglGetPlatformDisplay(EGL_PLATFORM_ANDROID_KHR,
++		EGL_DEFAULT_DISPLAY, NULL);
++	if (egl.display == EGL_NO_DISPLAY || !eglInitialize(egl.display, NULL, NULL)) {
++		_exit(1);
++	}
++
++	const char *exts = eglQueryString(egl.display, EGL_EXTENSIONS);
++	if (exts == NULL || !check_egl_ext(exts, "EGL_KHR_image_base")) {
++		_exit(1);
++	}
++	egl.exts.KHR_image_base = true;
++	load_egl_proc(&egl.procs.eglCreateImageKHR, "eglCreateImageKHR");
++	load_egl_proc(&egl.procs.eglDestroyImageKHR, "eglDestroyImageKHR");
++	if (!ahb && check_egl_ext(exts, "EGL_EXT_image_dma_buf_import")) {
++		_exit(0);
++	}
++	if (ahb) {
++		egl.exts.ANDROID_image_native_buffer =
++			check_egl_ext(exts, "EGL_ANDROID_image_native_buffer");
++		load_egl_proc(&egl.procs.eglGetNativeClientBufferANDROID,
++			"eglGetNativeClientBufferANDROID");
++	}
++	egl.exts.EXT_image_dma_buf_import = true;
++
+ 	struct wlr_allocator *allocator = wlr_ahb_allocator_create();
+ 	if (allocator == NULL) {
+-		return false;
++		_exit(1);
+ 	}
+-
+ 	struct wlr_drm_format_set formats = {0};
+ 	wlr_drm_format_set_add(&formats, DRM_FORMAT_XRGB8888, DRM_FORMAT_MOD_LINEAR);
+ 	struct wlr_buffer *buffer = wlr_allocator_create_buffer(allocator, 64, 64,
+ 		wlr_drm_format_set_get(&formats, DRM_FORMAT_XRGB8888));
++	if (buffer == NULL) {
++		_exit(1);
++	}
+ 
+-	bool ok = false;
++	EGLImageKHR image = EGL_NO_IMAGE_KHR;
+ 	struct wlr_dmabuf_attributes dmabuf = {0};
+-	if (buffer != NULL && wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
+-		bool external_only;
+-		egl->exts.EXT_image_dma_buf_import = true;
+-		EGLImageKHR image =
+-			wlr_egl_create_image_from_dmabuf(egl, &dmabuf, &external_only);
+-		if (image != EGL_NO_IMAGE_KHR) {
+-			wlr_egl_destroy_image(egl, image);
+-			ok = true;
+-		}
+-		egl->exts.EXT_image_dma_buf_import = ok;
++	bool external_only;
++	if (ahb) {
++		image = wlr_egl_create_image_from_ahb(&egl,
++			wlr_ahb_buffer_from_buffer(buffer)->handle);
++	} else if (wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
++		image = wlr_egl_create_image_from_dmabuf(&egl, &dmabuf, &external_only);
++	}
++	_exit(image != EGL_NO_IMAGE_KHR ? 0 : 1);
++}
++
++static bool probe_child(bool ahb) {
++	pid_t pid = fork();
++	if (pid < 0) {
++		return false;
++	}
++	if (pid == 0) {
++		probe_child_run(ahb);
+ 	}
+ 
+-	if (buffer != NULL) {
+-		wlr_buffer_drop(buffer);
++	int status;
++	return waitpid(pid, &status, 0) == pid && WIFEXITED(status) &&
++		WEXITSTATUS(status) == 0;
++}
++
++// Runs before this process touches the EGL driver: using it in a forked child
++// afterwards corrupts the parent's driver state.
++static enum probe_result probe_dmabuf_import(void) {
++	static int result = -1;
++	if (result < 0) {
++		if (probe_child(false)) {
++			result = PROBE_DMABUF;
++		} else if (probe_child(true)) {
++			result = PROBE_AHB_ONLY;
++		} else {
++			result = PROBE_NONE;
++		}
+ 	}
+-	wlr_drm_format_set_finish(&formats);
+-	wlr_allocator_destroy(allocator);
+-	return ok;
++	return result;
+ }
+ 
+ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display,
+@@ -321,11 +399,23 @@ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display,
+ 		load_egl_proc(&egl->procs.eglDestroyImageKHR, "eglDestroyImageKHR");
+ 	}
+ 
++	if (check_egl_ext(display_exts_str, "EGL_ANDROID_image_native_buffer")) {
++		egl->exts.ANDROID_image_native_buffer = true;
++		load_egl_proc(&egl->procs.eglGetNativeClientBufferANDROID,
++			"eglGetNativeClientBufferANDROID");
++	}
++
+ 	egl->exts.EXT_image_dma_buf_import =
+ 		check_egl_ext(display_exts_str, "EGL_EXT_image_dma_buf_import");
+ #ifdef __TERMUX__
+ 	if (!egl->exts.EXT_image_dma_buf_import && egl->exts.KHR_image_base) {
+-		egl->exts.EXT_image_dma_buf_import = probe_dmabuf_import(egl);
++		enum probe_result probe = probe_dmabuf_import();
++		egl->exts.EXT_image_dma_buf_import = probe != PROBE_NONE;
++		egl->ahb_only = probe == PROBE_AHB_ONLY;
++		if (egl->ahb_only) {
++			wlr_log(WLR_DEBUG, "DMA-BUF import is not usable, "
++				"importing AHardwareBuffers only");
++		}
+ 	}
+ #endif
+ 	if (check_egl_ext(display_exts_str,
+@@ -817,6 +907,25 @@ bool wlr_egl_restore_context(struct wlr_egl_context *context) {
+ 			context->read_surface, context->context);
+ }
+ 
++EGLImageKHR wlr_egl_create_image_from_ahb(struct wlr_egl *egl,
++		struct AHardwareBuffer *ahb) {
++	if (!egl->exts.KHR_image_base || !egl->exts.ANDROID_image_native_buffer ||
++			!egl->procs.eglGetNativeClientBufferANDROID) {
++		wlr_log(WLR_ERROR, "AHardwareBuffer import extension not present");
++		return EGL_NO_IMAGE_KHR;
++	}
++
++	EGLClientBuffer client_buffer = egl->procs.eglGetNativeClientBufferANDROID(ahb);
++	if (client_buffer == NULL) {
++		wlr_log(WLR_ERROR, "eglGetNativeClientBufferANDROID failed");
++		return EGL_NO_IMAGE_KHR;
++	}
++
++	EGLint attribs[] = { EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE };
++	return egl->procs.eglCreateImageKHR(egl->display, EGL_NO_CONTEXT,
++		EGL_NATIVE_BUFFER_ANDROID, client_buffer, attribs);
++}
++
+ EGLImageKHR wlr_egl_create_image_from_dmabuf(struct wlr_egl *egl,
+ 		struct wlr_dmabuf_attributes *attributes, bool *external_only) {
+ 	if (!egl->exts.KHR_image_base || !egl->exts.EXT_image_dma_buf_import) {
+@@ -824,6 +933,11 @@ EGLImageKHR wlr_egl_create_image_from_dmabuf(struct wlr_egl *egl,
+ 		return NULL;
+ 	}
+ 
++	if (egl->ahb_only) {
++		wlr_log(WLR_ERROR, "dmabuf import is not supported");
++		return NULL;
++	}
++
+ 	if (attributes->modifier != DRM_FORMAT_MOD_INVALID &&
+ 			attributes->modifier != DRM_FORMAT_MOD_LINEAR &&
+ 			!egl->has_modifiers) {
+@@ -924,8 +1038,11 @@ static int get_egl_dmabuf_formats(struct wlr_egl *egl, EGLint **formats) {
+ 		static const EGLint fallback_formats[] = {
+ 			DRM_FORMAT_ARGB8888,
+ 			DRM_FORMAT_XRGB8888,
++			DRM_FORMAT_ABGR8888,
++			DRM_FORMAT_XBGR8888,
+ 		};
+ 		int num = sizeof(fallback_formats) / sizeof(fallback_formats[0]);
++		const EGLint *fallback = fallback_formats;
+ 
+ 		*formats = calloc(num, sizeof(**formats));
+ 		if (!*formats) {
+@@ -933,7 +1050,7 @@ static int get_egl_dmabuf_formats(struct wlr_egl *egl, EGLint **formats) {
+ 			return -1;
+ 		}
+ 
+-		memcpy(*formats, fallback_formats, num * sizeof(**formats));
++		memcpy(*formats, fallback, num * sizeof(**formats));
+ 		return num;
+ 	}
+ 
+--- a/render/gles2/renderer.c
++++ b/render/gles2/renderer.c
+@@ -139,20 +139,31 @@ struct wlr_gles2_buffer *gles2_buffer_get_or_create(struct wlr_gles2_renderer *r
+ 	buffer->buffer = wlr_buffer;
+ 	buffer->renderer = renderer;
+ 
+-	struct wlr_dmabuf_attributes dmabuf = {0};
+-	if (!wlr_buffer_get_dmabuf(wlr_buffer, &dmabuf)) {
+-		goto error_buffer;
+-	}
++	struct AHardwareBuffer *ahb = wlr_dmabuf_v1_buffer_get_ahb(wlr_buffer);
++	bool own_ahb = ahb == NULL && renderer->egl->ahb_only &&
++		wlr_buffer_is_ahb(wlr_buffer);
++	if (own_ahb) {
++		ahb = wlr_ahb_buffer_from_buffer(wlr_buffer)->handle;
++	}
++	if (ahb != NULL) {
++		buffer->image = wlr_egl_create_image_from_ahb(renderer->egl, ahb);
++		buffer->external_only = !own_ahb;
++	} else {
++		struct wlr_dmabuf_attributes dmabuf = {0};
++		if (!wlr_buffer_get_dmabuf(wlr_buffer, &dmabuf)) {
++			goto error_buffer;
++		}
+ 
+ #ifdef __TERMUX__
+-	if (wlr_buffer_is_ahb(wlr_buffer) && dmabuf.n_planes == 1 &&
+-			dmabuf.stride[0] / 4 > (uint32_t)dmabuf.width) {
+-		dmabuf.width = dmabuf.stride[0] / 4;
+-	}
++		if (wlr_buffer_is_ahb(wlr_buffer) && dmabuf.n_planes == 1 &&
++				dmabuf.stride[0] / 4 > (uint32_t)dmabuf.width) {
++			dmabuf.width = dmabuf.stride[0] / 4;
++		}
+ #endif
+ 
+-	buffer->image = wlr_egl_create_image_from_dmabuf(renderer->egl,
+-		&dmabuf, &buffer->external_only);
++		buffer->image = wlr_egl_create_image_from_dmabuf(renderer->egl,
++			&dmabuf, &buffer->external_only);
++	}
+ 	if (buffer->image == EGL_NO_IMAGE_KHR) {
+ 		goto error_buffer;
+ 	}
+--- a/render/gles2/texture.c
++++ b/render/gles2/texture.c
+@@ -10,6 +10,7 @@
+ #include <wlr/render/interface.h>
+ #include <wlr/render/wlr_texture.h>
+ #include <wlr/util/log.h>
++#include "render/allocator/ahb.h"
+ #include "render/egl.h"
+ #include "render/gles2.h"
+ #include "render/pixel_format.h"
+@@ -418,6 +419,13 @@ struct wlr_texture *gles2_texture_from_buffer(struct wlr_renderer *wlr_renderer,
+ 	struct wlr_dmabuf_attributes dmabuf;
+ 	if (wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
+ 		return gles2_texture_from_dmabuf(renderer, buffer, &dmabuf);
++	} else if (wlr_dmabuf_v1_buffer_get_ahb(buffer) != NULL) {
++		dmabuf = (struct wlr_dmabuf_attributes){
++			.width = buffer->width,
++			.height = buffer->height,
++			.format = wlr_dmabuf_v1_buffer_get_ahb_format(buffer),
++		};
++		return gles2_texture_from_dmabuf(renderer, buffer, &dmabuf);
+ 	} else if (wlr_buffer_begin_data_ptr_access(buffer,
+ 			WLR_BUFFER_DATA_PTR_ACCESS_READ, &data, &format, &stride)) {
+ 		struct wlr_texture *tex = gles2_texture_from_pixels(wlr_renderer,
+--- a/render/vulkan/renderer.c
++++ b/render/vulkan/renderer.c
+@@ -19,6 +19,7 @@
+ #include <wlr/types/wlr_linux_dmabuf_v1.h>
+ #include <xf86drm.h>
+ 
++#include "render/allocator/ahb.h"
+ #include "render/dmabuf.h"
+ #include "render/pixel_format.h"
+ #include "render/vulkan.h"
+@@ -971,7 +972,11 @@ static struct wlr_vk_render_buffer *get_render_buffer(
+ static bool buffer_export_sync_file(struct wlr_vk_renderer *renderer, struct wlr_buffer *buffer,
+ 		uint32_t flags, int sync_file_fds[static WLR_DMABUF_MAX_PLANES]) {
+ 	struct wlr_dmabuf_attributes dmabuf = {0};
+-	if (!wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
++	if (wlr_dmabuf_v1_buffer_get_ahb(buffer) != NULL) {
++		if (!wlr_dmabuf_v1_buffer_get_ahb_dmabuf(buffer, &dmabuf)) {
++			return true;
++		}
++	} else if (!wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
+ 		wlr_log(WLR_ERROR, "wlr_buffer_get_dmabuf() failed");
+ 		return false;
+ 	}
+--- a/render/vulkan/texture.c
++++ b/render/vulkan/texture.c
+@@ -10,6 +10,7 @@
+ #include <wlr/render/vulkan.h>
+ #include <wlr/util/log.h>
+ #include <xf86drm.h>
++#include "render/allocator/ahb.h"
+ #include "render/pixel_format.h"
+ #include "render/vulkan.h"
+ 
+@@ -767,6 +768,113 @@ error:
+ 	return NULL;
+ }
+ 
++static struct wlr_vk_texture *vulkan_texture_from_ahb(
++		struct wlr_vk_renderer *renderer, AHardwareBuffer *ahb,
++		uint32_t drm_format, uint32_t width, uint32_t height) {
++	VkDevice dev = renderer->dev->dev;
++	if (renderer->dev->api.vkGetAndroidHardwareBufferPropertiesANDROID == NULL) {
++		wlr_log(WLR_ERROR, "AHardwareBuffer import is not supported");
++		return NULL;
++	}
++
++	const struct wlr_vk_format_props *fmt = vulkan_format_props_from_drm(
++		renderer->dev, drm_format);
++	if (fmt == NULL) {
++		wlr_log(WLR_ERROR, "Unsupported pixel format 0x%"PRIX32, drm_format);
++		return NULL;
++	}
++
++	VkAndroidHardwareBufferFormatPropertiesANDROID fprops = {
++		.sType = VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_FORMAT_PROPERTIES_ANDROID,
++	};
++	VkAndroidHardwareBufferPropertiesANDROID props = {
++		.sType = VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_PROPERTIES_ANDROID,
++		.pNext = &fprops,
++	};
++	VkResult res = renderer->dev->api.vkGetAndroidHardwareBufferPropertiesANDROID(
++		dev, ahb, &props);
++	if (res != VK_SUCCESS) {
++		wlr_vk_error("vkGetAndroidHardwareBufferPropertiesANDROID failed", res);
++		return NULL;
++	}
++	if (fprops.format != fmt->format.vk) {
++		wlr_log(WLR_ERROR, "AHardwareBuffer format %d doesn't match %d",
++			fprops.format, fmt->format.vk);
++		return NULL;
++	}
++
++	struct wlr_vk_texture *texture = vulkan_texture_create(renderer, width, height);
++	if (texture == NULL) {
++		return NULL;
++	}
++
++	VkExternalMemoryImageCreateInfo extci = {
++		.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
++		.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID,
++	};
++	VkImageCreateInfo ici = {
++		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
++		.pNext = &extci,
++		.imageType = VK_IMAGE_TYPE_2D,
++		.format = fprops.format,
++		.extent = { width, height, 1 },
++		.mipLevels = 1,
++		.arrayLayers = 1,
++		.samples = VK_SAMPLE_COUNT_1_BIT,
++		.tiling = VK_IMAGE_TILING_OPTIMAL,
++		.usage = VK_IMAGE_USAGE_SAMPLED_BIT,
++		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
++		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
++	};
++	res = vkCreateImage(dev, &ici, NULL, &texture->image);
++	if (res != VK_SUCCESS) {
++		wlr_vk_error("vkCreateImage failed", res);
++		goto error;
++	}
++
++	int mem = vulkan_find_mem_type(renderer->dev, 0, props.memoryTypeBits);
++	if (mem < 0) {
++		wlr_log(WLR_ERROR, "no valid memory type index");
++		goto error;
++	}
++
++	VkMemoryDedicatedAllocateInfo dedi = {
++		.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO,
++		.image = texture->image,
++	};
++	VkImportAndroidHardwareBufferInfoANDROID impi = {
++		.sType = VK_STRUCTURE_TYPE_IMPORT_ANDROID_HARDWARE_BUFFER_INFO_ANDROID,
++		.pNext = &dedi,
++		.buffer = ahb,
++	};
++	VkMemoryAllocateInfo memi = {
++		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
++		.pNext = &impi,
++		.allocationSize = props.allocationSize,
++		.memoryTypeIndex = mem,
++	};
++	res = vkAllocateMemory(dev, &memi, NULL, &texture->memories[0]);
++	if (res != VK_SUCCESS) {
++		wlr_vk_error("vkAllocateMemory failed", res);
++		goto error;
++	}
++	texture->mem_count = 1;
++
++	res = vkBindImageMemory(dev, texture->image, texture->memories[0], 0);
++	if (res != VK_SUCCESS) {
++		wlr_vk_error("vkBindImageMemory failed", res);
++		goto error;
++	}
++
++	texture_set_format(texture, &fmt->format, false);
++	texture->dmabuf_imported = true;
++	return texture;
++
++error:
++	vulkan_texture_destroy(texture);
++	return NULL;
++}
++
+ static void texture_handle_buffer_destroy(struct wlr_addon *addon) {
+ 	struct wlr_vk_texture *texture =
+ 		wl_container_of(addon, texture, buffer_addon);
+@@ -812,7 +920,26 @@ struct wlr_texture *vulkan_texture_from_buffer(struct wlr_renderer *wlr_renderer
+ 	uint32_t format;
+ 	size_t stride;
+ 	struct wlr_dmabuf_attributes dmabuf;
+-	if (wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
++	struct AHardwareBuffer *ahb = wlr_dmabuf_v1_buffer_get_ahb(buffer);
++	if (ahb != NULL) {
++		struct wlr_addon *addon =
++			wlr_addon_find(&buffer->addons, renderer, &buffer_addon_impl);
++		if (addon != NULL) {
++			struct wlr_vk_texture *texture =
++				wl_container_of(addon, texture, buffer_addon);
++			wlr_buffer_lock(texture->buffer);
++			return &texture->wlr_texture;
++		}
++		struct wlr_vk_texture *texture = vulkan_texture_from_ahb(renderer, ahb,
++			wlr_dmabuf_v1_buffer_get_ahb_format(buffer), buffer->width, buffer->height);
++		if (texture == NULL) {
++			return NULL;
++		}
++		texture->buffer = wlr_buffer_lock(buffer);
++		wlr_addon_init(&texture->buffer_addon, &buffer->addons, renderer,
++			&buffer_addon_impl);
++		return &texture->wlr_texture;
++	} else if (wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
+ 		return vulkan_texture_from_dmabuf_buffer(renderer, buffer, &dmabuf);
+ 	} else if (wlr_buffer_begin_data_ptr_access(buffer,
+ 			WLR_BUFFER_DATA_PTR_ACCESS_READ, &data, &format, &stride)) {
+--- a/render/vulkan/vulkan.c
++++ b/render/vulkan/vulkan.c
+@@ -535,6 +535,12 @@ struct wlr_vk_device *vulkan_device_create(struct wlr_vk_instance *ini,
+ 			VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT;
+ 		extensions[extensions_len++] = VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME;
+ 	}
++	bool has_ahb_import = check_extension(avail_ext_props, avail_extc,
++		VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
++	if (has_ahb_import) {
++		extensions[extensions_len++] =
++			VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME;
++	}
+ 	if (!exportable_semaphore) {
+ 		wlr_log(WLR_DEBUG, "VkSemaphore is not exportable to a sync_file");
+ 	}
+@@ -645,6 +651,11 @@ struct wlr_vk_device *vulkan_device_create(struct wlr_vk_instance *ini,
+ 		&dev->api.vkGetSemaphoreCounterValueKHR);
+ 	load_device_proc(dev, "vkQueueSubmit2KHR", &dev->api.vkQueueSubmit2KHR);
+ 
++	if (has_ahb_import) {
++		load_device_proc(dev, "vkGetAndroidHardwareBufferPropertiesANDROID",
++			&dev->api.vkGetAndroidHardwareBufferPropertiesANDROID);
++	}
++
+ 	if (has_external_semaphore_fd) {
+ 		load_device_proc(dev, "vkGetSemaphoreFdKHR", &dev->api.vkGetSemaphoreFdKHR);
+ 		load_device_proc(dev, "vkImportSemaphoreFdKHR", &dev->api.vkImportSemaphoreFdKHR);
+--- a/types/wlr_linux_dmabuf_v1.c
++++ b/types/wlr_linux_dmabuf_v1.c
+@@ -112,6 +112,9 @@ static void buffer_destroy(struct wlr_buffer *wlr_buffer) {
+ 		wl_resource_set_user_data(buffer->resource, NULL);
+ 	}
+ 	wlr_dmabuf_attributes_finish(&buffer->attributes);
++	if (buffer->ahb != NULL) {
++		AHardwareBuffer_release(buffer->ahb);
++	}
+ 	free(buffer);
+ }
+ 
+@@ -119,6 +122,9 @@ static bool buffer_get_dmabuf(struct wlr_buffer *wlr_buffer,
+ 		struct wlr_dmabuf_attributes *attribs) {
+ 	struct wlr_dmabuf_v1_buffer *buffer =
+ 		dmabuf_v1_buffer_from_buffer(wlr_buffer);
++	if (buffer->ahb != NULL) {
++		return false;
++	}
+ 	*attribs = buffer->attributes;
+ 	return true;
+ }
+@@ -128,6 +134,30 @@ static const struct wlr_buffer_impl buffer_impl = {
+ 	.get_dmabuf = buffer_get_dmabuf,
+ };
+ 
++AHardwareBuffer *wlr_dmabuf_v1_buffer_get_ahb(struct wlr_buffer *wlr_buffer) {
++	if (wlr_buffer->impl != &buffer_impl) {
++		return NULL;
++	}
++	return dmabuf_v1_buffer_from_buffer(wlr_buffer)->ahb;
++}
++
++bool wlr_dmabuf_v1_buffer_get_ahb_dmabuf(struct wlr_buffer *wlr_buffer,
++		struct wlr_dmabuf_attributes *attribs) {
++	if (wlr_buffer->impl != &buffer_impl) {
++		return false;
++	}
++	struct wlr_dmabuf_v1_buffer *buffer = dmabuf_v1_buffer_from_buffer(wlr_buffer);
++	if (buffer->ahb == NULL || buffer->attributes.n_planes == 0) {
++		return false;
++	}
++	*attribs = buffer->attributes;
++	return true;
++}
++
++uint32_t wlr_dmabuf_v1_buffer_get_ahb_format(struct wlr_buffer *wlr_buffer) {
++	return dmabuf_v1_buffer_from_buffer(wlr_buffer)->ahb_format;
++}
++
+ static void buffer_handle_release(struct wl_listener *listener, void *data) {
+ 	struct wlr_dmabuf_v1_buffer *buffer =
+ 		wl_container_of(listener, buffer, release);
+@@ -233,7 +263,8 @@ static bool check_import_dmabuf(struct wlr_dmabuf_attributes *attribs, void *dat
+ 
+ #ifdef __TERMUX__
+ static bool receive_ahb(struct wlr_dmabuf_attributes *attribs,
+-		int32_t width, int32_t height, uint32_t client_format) {
++		int32_t width, int32_t height, uint32_t client_format,
++		AHardwareBuffer **direct) {
+ 	AHardwareBuffer *handle = NULL;
+ 	struct pollfd pfd = { .fd = attribs->fd[0], .events = POLLIN };
+ 	if (!wlr_ahb_available() ||
+@@ -260,8 +291,19 @@ static bool receive_ahb(struct wlr_dmabuf_attributes *attribs,
+ 	}
+ 
+ 	bool ok = format_ok && (int32_t)desc.width >= width &&
+-		(int32_t)desc.height >= height &&
+-		wlr_ahb_get_dmabuf_attributes(handle, &desc, client_format, width, attribs);
++		(int32_t)desc.height >= height;
++	bool native_order =desc.format == 5 ||
++		client_format == DRM_FORMAT_ABGR8888 || client_format == DRM_FORMAT_XBGR8888;
++	if (ok && native_order && !(desc.usage & (AHARDWAREBUFFER_USAGE_CPU_READ_MASK |
++			AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK))) {
++		wlr_log(WLR_DEBUG, "Importing AHardwareBuffer %dx%d directly", width, height);
++		if (!wlr_ahb_get_dmabuf_attributes(handle, &desc, client_format, width, attribs)) {
++			attribs->n_planes = 0;
++		}
++		*direct = handle;
++		return true;
++	}
++	ok = ok && wlr_ahb_get_dmabuf_attributes(handle, &desc, client_format, width, attribs);
+ 	AHardwareBuffer_release(handle);
+ 	return ok;
+ }
+@@ -281,6 +323,7 @@ static void params_create_common(struct wl_resource *params_resource,
+ 
+ 	struct wlr_dmabuf_attributes attribs = params->attributes;
+ 	struct wlr_linux_dmabuf_v1 *linux_dmabuf = params->linux_dmabuf;
++	AHardwareBuffer *direct_ahb = NULL;
+ 
+ 	// Make the params resource inert
+ 	wl_resource_set_user_data(params_resource, NULL);
+@@ -336,7 +379,8 @@ static void params_create_common(struct wl_resource *params_resource,
+ #ifdef __TERMUX__
+ 	struct stat fd_stat;
+ 	if (attribs.n_planes == 1 && fstat(attribs.fd[0], &fd_stat) == 0 &&
+-			S_ISSOCK(fd_stat.st_mode) && !receive_ahb(&attribs, width, height, format)) {
++			S_ISSOCK(fd_stat.st_mode) &&
++			!receive_ahb(&attribs, width, height, format, &direct_ahb)) {
+ 		goto err_failed;
+ 	}
+ #endif
+@@ -391,7 +435,7 @@ static void params_create_common(struct wl_resource *params_resource,
+ 	}
+ 
+ 	/* Check if dmabuf is usable */
+-	if (!linux_dmabuf->check_dmabuf_callback(&attribs,
++	if (direct_ahb == NULL && !linux_dmabuf->check_dmabuf_callback(&attribs,
+ 				linux_dmabuf->check_dmabuf_callback_data)) {
+ 		goto err_failed;
+ 	}
+@@ -415,6 +459,9 @@ static void params_create_common(struct wl_resource *params_resource,
+ 		&wl_buffer_impl, buffer, buffer_handle_resource_destroy);
+ 
+ 	buffer->attributes = attribs;
++	buffer->ahb = direct_ahb;
++	buffer->ahb_format = format;
++	direct_ahb = NULL;
+ 
+ 	buffer->release.notify = buffer_handle_release;
+ 	wl_signal_add(&buffer->base.events.release, &buffer->release);
+@@ -443,6 +490,9 @@ err_failed:
+ 			"importing the supplied dmabufs failed");
+ 	}
+ err_out:
++	if (direct_ahb != NULL) {
++		AHardwareBuffer_release(direct_ahb);
++	}
+ 	wlr_dmabuf_attributes_finish(&attribs);
+ }
+ 

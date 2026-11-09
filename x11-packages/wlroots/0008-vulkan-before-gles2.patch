@@ -1,0 +1,77 @@
+# Try the Vulkan renderer before GLES2, then pixman, and skip CPU Vulkan devices.
+# Vulkan is more likely than GLES2 to support importing dma-bufs, so it goes first.
+
+--- a/render/vulkan/vulkan.c
++++ b/render/vulkan/vulkan.c
+@@ -369,6 +369,9 @@ VkPhysicalDevice vulkan_find_drm_phdev(struct wlr_vk_instance *ini, int drm_fd)
+ 			return phdev;
+ 		}
+ #else
++		if (phdev_props.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU) {
++			continue;
++		}
+ 		if (check_extension(avail_ext_props, avail_extc, VK_EXT_EXTERNAL_MEMORY_DMA_BUF_EXTENSION_NAME) &&
+ 				check_extension(avail_ext_props, avail_extc, VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME)) {
+ 			return phdev;
+--- a/render/vulkan/renderer.c
++++ b/render/vulkan/renderer.c
+@@ -2605,7 +2605,7 @@ struct wlr_renderer *wlr_vk_renderer_create_with_drm_fd(int drm_fd) {
+ 	VkPhysicalDevice phdev = vulkan_find_drm_phdev(ini, drm_fd);
+ 	if (!phdev) {
+ 		// We rather fail here than doing some guesswork
+-		wlr_log(WLR_ERROR, "Could not match drm and vulkan device");
++		wlr_log(WLR_DEBUG, "Could not match drm and vulkan device");
+ 		goto error;
+ 	}
+
+--- a/render/wlr_renderer.c
++++ b/render/wlr_renderer.c
+@@ -241,36 +241,36 @@ static struct wlr_renderer *renderer_autocreate(struct wlr_backend *backend, int
+ 
+ 	bool own_drm_fd = false;
+ 
+-	if ((is_auto && WLR_HAS_GLES2_RENDERER) || strcmp(renderer_name, "gles2") == 0) {
++	if ((is_auto && WLR_HAS_VULKAN_RENDERER) || strcmp(renderer_name, "vulkan") == 0) {
+ 		if (!open_preferred_drm_fd(backend, &drm_fd, &own_drm_fd)) {
+-			log_creation_failure(is_auto, "Cannot create GLES2 renderer: no DRM FD available");
++			log_creation_failure(is_auto, "Cannot create Vulkan renderer: no DRM FD available");
+ 		} else {
+-#if WLR_HAS_GLES2_RENDERER
+-			renderer = wlr_gles2_renderer_create_with_drm_fd(drm_fd);
++#if WLR_HAS_VULKAN_RENDERER
++			renderer = wlr_vk_renderer_create_with_drm_fd(drm_fd);
+ #else
+-			wlr_log(WLR_ERROR, "Cannot create GLES renderer: disabled at compile-time");
++			wlr_log(WLR_ERROR, "Cannot create Vulkan renderer: disabled at compile-time");
+ #endif
+ 			if (renderer) {
+ 				goto out;
+ 			} else {
+-				log_creation_failure(is_auto, "Failed to create a GLES2 renderer");
++				log_creation_failure(is_auto, "Failed to create a Vulkan renderer");
+ 			}
+ 		}
+ 	}
+ 
+-	if ((is_auto && WLR_HAS_VULKAN_RENDERER) || strcmp(renderer_name, "vulkan") == 0) {
++	if ((is_auto && WLR_HAS_GLES2_RENDERER) || strcmp(renderer_name, "gles2") == 0) {
+ 		if (!open_preferred_drm_fd(backend, &drm_fd, &own_drm_fd)) {
+-			log_creation_failure(is_auto, "Cannot create Vulkan renderer: no DRM FD available");
++			log_creation_failure(is_auto, "Cannot create GLES2 renderer: no DRM FD available");
+ 		} else {
+-#if WLR_HAS_VULKAN_RENDERER
+-			renderer = wlr_vk_renderer_create_with_drm_fd(drm_fd);
++#if WLR_HAS_GLES2_RENDERER
++			renderer = wlr_gles2_renderer_create_with_drm_fd(drm_fd);
+ #else
+-			wlr_log(WLR_ERROR, "Cannot create Vulkan renderer: disabled at compile-time");
++			wlr_log(WLR_ERROR, "Cannot create GLES renderer: disabled at compile-time");
+ #endif
+ 			if (renderer) {
+ 				goto out;
+ 			} else {
+-				log_creation_failure(is_auto, "Failed to create a Vulkan renderer");
++				log_creation_failure(is_auto, "Failed to create a GLES2 renderer");
+ 			}
+ 		}
+ 	}
