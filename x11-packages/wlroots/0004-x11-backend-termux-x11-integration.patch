@@ -1,0 +1,1423 @@
+# Synchronize the X11 CLIPBOARD with the seat, deliver characters typed on termux-x11 scratch keys via text-input-v3 (binding to the seat and text-input manager automatically on creation), hide DISPLAY from clients, reset the X keymap to the compositor layout and fit the output to the root window when there is no window manager.
+
+--- a/backend/x11/backend.c
++++ b/backend/x11/backend.c
+@@ -28,6 +28,7 @@
+ #include <wlr/util/log.h>
+ 
+ #include "backend/x11.h"
++#include "backend/x11_attach.h"
+ #include "render/drm_format_set.h"
+ 
+ // See dri2_format_for_depth in mesa
+@@ -78,6 +79,10 @@ static void handle_x11_event(struct wlr_x11_backend *x11,
+ 	case XCB_CONFIGURE_NOTIFY: {
+ 		xcb_configure_notify_event_t *ev =
+ 			(xcb_configure_notify_event_t *)event;
++		if (ev->window == x11->screen->root) {
++			x11_fit_outputs_to_root(x11);
++			break;
++		}
+ 		struct wlr_x11_output *output =
+ 			get_x11_output_from_window_id(x11, ev->window);
+ 		if (output != NULL) {
+@@ -85,6 +90,13 @@ static void handle_x11_event(struct wlr_x11_backend *x11,
+ 		}
+ 		break;
+ 	}
++	case XCB_PROPERTY_NOTIFY: {
++		xcb_property_notify_event_t *ev = (xcb_property_notify_event_t *)event;
++		if (ev->window == x11->screen->root &&
++			ev->atom == x11->atoms.net_supporting_wm_check)
++			x11_fit_outputs_to_root(x11);
++		break;
++	}
+ 	case XCB_CLIENT_MESSAGE: {
+ 		xcb_client_message_event_t *ev = (xcb_client_message_event_t *)event;
+ 		if (ev->data.data32[0] == x11->atoms.wm_delete_window) {
+@@ -120,6 +132,9 @@ static void handle_x11_event(struct wlr_x11_backend *x11,
+ 	case XCB_MAP_NOTIFY:
+ 		break;
+ 	default:
++		if (x11_xkb_handle_event(x11, event) ||
++			x11_selection_handle_event(x11, event))
++			break;
+ 		handle_x11_unknown_event(x11, event);
+ 		break;
+ 	}
+@@ -186,6 +201,9 @@ static void backend_destroy(struct wlr_backend *backend) {
+ 	}
+ 
+ 	wlr_keyboard_finish(&x11->keyboard);
++	x11_selection_finish(x11);
++	x11_text_input_finish(x11);
++	wl_list_remove(&x11->link);
+ 
+ 	wlr_backend_finish(backend);
+ 
+@@ -389,6 +407,33 @@ static void x11_get_argb32(struct wlr_x11_backend *x11) {
+ 	free(reply);
+ }
+ 
++static struct wl_list x11_backends;
++
++void x11_backends_attach_seat(struct wl_display *display, struct wlr_seat *seat) {
++	if (!x11_backends.next)
++		return;
++	struct wl_event_loop *loop = wl_display_get_event_loop(display);
++	struct wlr_x11_backend *x11;
++	wl_list_for_each(x11, &x11_backends, link) {
++		if (x11->event_loop == loop) {
++			x11_selection_attach_seat(x11, seat);
++			x11_text_input_attach_seat(x11, seat);
++		}
++	}
++}
++
++void x11_backends_attach_text_input_manager(struct wl_display *display,
++	struct wlr_text_input_manager_v3 *manager) {
++	if (!x11_backends.next)
++		return;
++	struct wl_event_loop *loop = wl_display_get_event_loop(display);
++	struct wlr_x11_backend *x11;
++	wl_list_for_each(x11, &x11_backends, link) {
++		if (x11->event_loop == loop)
++			x11_text_input_attach_manager(x11, manager);
++	}
++}
++
+ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 		const char *x11_display) {
+ 	wlr_log(WLR_INFO, "Creating X11 backend");
+@@ -408,6 +453,12 @@ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 		goto error_x11;
+ 	}
+ 
++	const char *env_display = getenv("DISPLAY");
++	if (env_display != NULL && (x11_display == NULL || strcmp(x11_display, env_display) == 0))
++		unsetenv("DISPLAY");
++
++	x11_selection_init(x11);
++
+ 	struct {
+ 		const char *name;
+ 		xcb_intern_atom_cookie_t cookie;
+@@ -418,11 +469,12 @@ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 		{ .name = "_NET_WM_NAME", .atom = &x11->atoms.net_wm_name },
+ 		{ .name = "UTF8_STRING", .atom = &x11->atoms.utf8_string },
+ 		{ .name = "_VARIABLE_REFRESH", .atom = &x11->atoms.variable_refresh },
++		{ .name = "_NET_SUPPORTING_WM_CHECK", .atom = &x11->atoms.net_supporting_wm_check },
+ 	};
+ 
+ 	for (size_t i = 0; i < sizeof(atom) / sizeof(atom[0]); ++i) {
+ 		atom[i].cookie = xcb_intern_atom(x11->xcb,
+-			true, strlen(atom[i].name), atom[i].name);
++			false, strlen(atom[i].name), atom[i].name);
+ 	}
+ 
+ 	for (size_t i = 0; i < sizeof(atom) / sizeof(atom[0]); ++i) {
+@@ -657,6 +709,7 @@ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 
+ 	wlr_keyboard_init(&x11->keyboard, &x11_keyboard_impl,
+ 		x11_keyboard_impl.name);
++	x11_xkb_init(x11);
+ 
+ 	x11->event_loop_destroy.notify = handle_event_loop_destroy;
+ 	wl_event_loop_add_destroy_listener(loop, &x11->event_loop_destroy);
+@@ -680,6 +733,10 @@ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 
+ 	x11_get_argb32(x11);
+ 
++	if (!x11_backends.next)
++		wl_list_init(&x11_backends);
++	wl_list_insert(&x11_backends, &x11->link);
++
+ 	return &x11->backend;
+ 
+ error_event:
+--- a/backend/x11/input_device.c
++++ b/backend/x11/input_device.c
+@@ -128,20 +128,26 @@ void handle_x11_xinput_event(struct wlr_x11_backend *x11,
+ 			return;
+ 		}
+ 
++		x11->time = ev->time;
++		if (x11_xkb_filter_key(x11, ev->detail, true, ev->mods.effective))
++			break;
++
+ 		wlr_keyboard_notify_modifiers(&x11->keyboard, ev->mods.base,
+ 			ev->mods.latched, ev->mods.locked, ev->group.effective);
+ 		send_key_event(x11, ev->detail - 8, WL_KEYBOARD_KEY_STATE_PRESSED, ev->time);
+-		x11->time = ev->time;
+ 		break;
+ 	}
+ 	case XCB_INPUT_KEY_RELEASE: {
+ 		xcb_input_key_release_event_t *ev =
+ 			(xcb_input_key_release_event_t *)event;
+ 
++		x11->time = ev->time;
++		if (x11_xkb_filter_key(x11, ev->detail, false, ev->mods.effective))
++			break;
++
+ 		wlr_keyboard_notify_modifiers(&x11->keyboard, ev->mods.base,
+ 			ev->mods.latched, ev->mods.locked, ev->group.effective);
+ 		send_key_event(x11, ev->detail - 8, WL_KEYBOARD_KEY_STATE_RELEASED, ev->time);
+-		x11->time = ev->time;
+ 		break;
+ 	}
+ 	case XCB_INPUT_BUTTON_PRESS: {
+--- a/backend/x11/meson.build
++++ b/backend/x11/meson.build
+@@ -8,6 +8,8 @@ x11_required = [
+ 	'xcb-shm',
+ 	'xcb-xfixes',
+ 	'xcb-xinput',
++	'xcb-xkb',
++	'xkbcommon-x11',
+ ]
+ 
+ msg = ['Required for X11 backend support.']
+@@ -31,6 +33,8 @@ wlr_files += files(
+ 	'backend.c',
+ 	'input_device.c',
+ 	'output.c',
++	'selection.c',
++	'xkb_text.c',
+ )
+ wlr_deps += x11_libs
+ features += { 'x11-backend': true }
+--- a/backend/x11/output.c
++++ b/backend/x11/output.c
+@@ -585,6 +585,56 @@ static const struct wlr_output_impl output_impl = {
+ 	.get_primary_formats = output_get_primary_formats,
+ };
+ 
++bool x11_has_window_manager(struct wlr_x11_backend *x11) {
++	xcb_get_property_reply_t *reply = xcb_get_property_reply(x11->xcb,
++		xcb_get_property(x11->xcb, false, x11->screen->root,
++			x11->atoms.net_supporting_wm_check, XCB_ATOM_WINDOW, 0, 1),
++		NULL);
++	if (!reply)
++		return false;
++
++	bool found = false;
++	if (reply->type == XCB_ATOM_WINDOW && reply->format == 32 &&
++			xcb_get_property_value_length(reply) >= (int)sizeof(xcb_window_t)) {
++		xcb_window_t check = *(xcb_window_t *)xcb_get_property_value(reply);
++		xcb_get_window_attributes_reply_t *attrs = xcb_get_window_attributes_reply(
++			x11->xcb, xcb_get_window_attributes(x11->xcb, check), NULL);
++		found = attrs != NULL;
++		free(attrs);
++	}
++	free(reply);
++	return found;
++}
++
++bool x11_get_root_size(struct wlr_x11_backend *x11, int32_t *width,
++		int32_t *height) {
++	xcb_get_geometry_reply_t *reply = xcb_get_geometry_reply(x11->xcb,
++		xcb_get_geometry(x11->xcb, x11->screen->root), NULL);
++	if (!reply)
++		return false;
++	*width = reply->width;
++	*height = reply->height;
++	free(reply);
++	return *width > 0 && *height > 0;
++}
++
++void x11_fit_outputs_to_root(struct wlr_x11_backend *x11) {
++	int32_t width, height;
++	if (x11_has_window_manager(x11) || !x11_get_root_size(x11, &width, &height))
++		return;
++
++	struct wlr_x11_output *output;
++	wl_list_for_each(output, &x11->outputs, link) {
++		if (output->win_width == width && output->win_height == height)
++			continue;
++		const uint32_t values[] = {0, 0, width, height};
++		xcb_configure_window(x11->xcb, output->win,
++			XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
++			XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
++	}
++	xcb_flush(x11->xcb);
++}
++
+ struct wlr_output *wlr_x11_output_create(struct wlr_backend *backend) {
+ 	struct wlr_x11_backend *x11 = get_x11_backend_from_backend(backend);
+ 
+@@ -605,7 +655,11 @@ struct wlr_output *wlr_x11_output_create(struct wlr_backend *backend) {
+ 
+ 	struct wlr_output_state state;
+ 	wlr_output_state_init(&state);
+-	wlr_output_state_set_custom_mode(&state, 1024, 768, 0);
++	int32_t init_width = 1024, init_height = 768;
++	bool no_wm = !x11_has_window_manager(x11);
++	if (no_wm)
++		x11_get_root_size(x11, &init_width, &init_height);
++	wlr_output_state_set_custom_mode(&state, init_width, init_height, 0);
+ 
+ 	wlr_output_init(wlr_output, &x11->backend, &output_impl, x11->event_loop, &state);
+ 	wlr_output_state_finish(&state);
+@@ -640,6 +694,12 @@ struct wlr_output *wlr_x11_output_create(struct wlr_backend *backend) {
+ 	output->win_width = wlr_output->width;
+ 	output->win_height = wlr_output->height;
+ 
++	const uint32_t root_mask[] = {
++		XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_PROPERTY_CHANGE,
++	};
++	xcb_change_window_attributes(x11->xcb, x11->screen->root,
++		XCB_CW_EVENT_MASK, root_mask);
++
+ 	struct {
+ 		xcb_input_event_mask_t head;
+ 		xcb_input_xi_event_mask_t mask;
+--- /dev/null
++++ b/backend/x11/selection.c
+@@ -0,0 +1,629 @@
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <xcb/xcb.h>
++#include <xcb/xfixes.h>
++#include <wlr/types/wlr_data_device.h>
++#include <wlr/types/wlr_seat.h>
++#include <wlr/util/log.h>
++#include "backend/x11.h"
++
++#define TRANSFER_TIMEOUT_MS 5000
++
++struct x11_mime {
++	char *name;
++	xcb_atom_t atom;
++};
++
++struct x11_data_source {
++	struct wlr_data_source base;
++	struct wlr_x11_backend *x11;
++	struct x11_mime *mimes;
++	size_t n_mimes;
++};
++
++struct x11_transfer {
++	struct wl_list link;
++	struct wlr_x11_backend *x11;
++	bool to_wayland;
++
++	int fd;
++	struct wl_event_source *fd_source;
++	struct wl_event_source *timer;
++
++	char *buf;
++	size_t len, cap, off;
++
++	xcb_atom_t property;
++	xcb_window_t requestor;
++	xcb_atom_t selection, target, reply_type;
++	xcb_timestamp_t time;
++};
++
++static const struct wlr_data_source_impl x_source_impl;
++
++static xcb_atom_t intern_atom(struct wlr_x11_backend *x11, const char *name) {
++	xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(x11->xcb,
++		xcb_intern_atom(x11->xcb, false, strlen(name), name), NULL);
++	if (!reply)
++		return XCB_ATOM_NONE;
++	xcb_atom_t atom = reply->atom;
++	free(reply);
++	return atom;
++}
++
++static char *atom_name(struct wlr_x11_backend *x11, xcb_atom_t atom) {
++	xcb_get_atom_name_reply_t *reply = xcb_get_atom_name_reply(x11->xcb,
++		xcb_get_atom_name(x11->xcb, atom), NULL);
++	if (!reply)
++		return NULL;
++	char *name = strndup(xcb_get_atom_name_name(reply),
++		xcb_get_atom_name_name_length(reply));
++	free(reply);
++	return name;
++}
++
++static void send_notify(struct wlr_x11_backend *x11, xcb_window_t requestor,
++		xcb_atom_t selection, xcb_atom_t target, xcb_atom_t property,
++		xcb_timestamp_t time) {
++	xcb_selection_notify_event_t ev = {
++		.response_type = XCB_SELECTION_NOTIFY,
++		.time = time,
++		.requestor = requestor,
++		.selection = selection,
++		.target = target,
++		.property = property,
++	};
++	xcb_send_event(x11->xcb, false, requestor, XCB_EVENT_MASK_NO_EVENT,
++		(const char *)&ev);
++	xcb_flush(x11->xcb);
++}
++
++static void transfer_destroy(struct x11_transfer *t) {
++	wl_list_remove(&t->link);
++	if (t->fd_source)
++		wl_event_source_remove(t->fd_source);
++	if (t->timer)
++		wl_event_source_remove(t->timer);
++	if (t->fd >= 0)
++		close(t->fd);
++	free(t->buf);
++	free(t);
++}
++
++static struct x11_transfer *transfer_create(struct wlr_x11_backend *x11,
++		bool to_wayland) {
++	struct x11_transfer *t = calloc(1, sizeof(*t));
++	if (!t)
++		return NULL;
++	t->x11 = x11;
++	t->to_wayland = to_wayland;
++	t->fd = -1;
++	wl_list_insert(&x11->sel.transfers, &t->link);
++	return t;
++}
++
++static int transfer_timeout(void *data) {
++	struct x11_transfer *t = data;
++	wlr_log(WLR_DEBUG, "Selection transfer timed out");
++	if (!t->to_wayland)
++		send_notify(t->x11, t->requestor, t->selection, t->target,
++			XCB_ATOM_NONE, t->time);
++	transfer_destroy(t);
++	return 0;
++}
++
++static void transfer_arm_timer(struct x11_transfer *t) {
++	t->timer = wl_event_loop_add_timer(t->x11->event_loop, transfer_timeout, t);
++	if (t->timer)
++		wl_event_source_timer_update(t->timer, TRANSFER_TIMEOUT_MS);
++}
++
++/* X11 -> Wayland: write the converted data into the client's pipe. */
++
++static int write_to_client(int fd, uint32_t mask, void *data) {
++	struct x11_transfer *t = data;
++	while (t->off < t->len) {
++		ssize_t n = write(t->fd, t->buf + t->off, t->len - t->off);
++		if (n < 0) {
++			if (errno == EAGAIN || errno == EINTR)
++				return 0;
++			break;
++		}
++		t->off += n;
++	}
++	transfer_destroy(t);
++	return 0;
++}
++
++static void start_write_to_client(struct x11_transfer *t) {
++	fcntl(t->fd, F_SETFL, fcntl(t->fd, F_GETFL) | O_NONBLOCK);
++	t->fd_source = wl_event_loop_add_fd(t->x11->event_loop, t->fd,
++		WL_EVENT_WRITABLE, write_to_client, t);
++	if (!t->fd_source) {
++		transfer_destroy(t);
++		return;
++	}
++	write_to_client(t->fd, WL_EVENT_WRITABLE, t);
++}
++
++static struct x11_transfer *find_transfer_by_property(
++		struct wlr_x11_backend *x11, xcb_atom_t property) {
++	struct x11_transfer *t;
++	wl_list_for_each(t, &x11->sel.transfers, link) {
++		if (t->to_wayland && t->property == property)
++			return t;
++	}
++	return NULL;
++}
++
++static void x_source_send(struct wlr_data_source *wlr_source,
++		const char *mime_type, int32_t fd) {
++	struct x11_data_source *source = wl_container_of(wlr_source, source, base);
++	struct wlr_x11_backend *x11 = source->x11;
++
++	xcb_atom_t target = XCB_ATOM_NONE;
++	for (size_t i = 0; i < source->n_mimes; i++) {
++		if (strcmp(source->mimes[i].name, mime_type) == 0) {
++			target = source->mimes[i].atom;
++			break;
++		}
++	}
++
++	struct x11_transfer *t = target != XCB_ATOM_NONE ?
++		transfer_create(x11, true) : NULL;
++	if (!t) {
++		close(fd);
++		return;
++	}
++
++	char name[48];
++	snprintf(name, sizeof(name), "WLR_X11_TRANSFER_%u", x11->sel.next_property++);
++	t->fd = fd;
++	t->property = intern_atom(x11, name);
++	transfer_arm_timer(t);
++	xcb_convert_selection(x11->xcb, x11->sel.win, x11->sel.clipboard, target,
++		t->property, XCB_CURRENT_TIME);
++	xcb_flush(x11->xcb);
++}
++
++static void x_source_destroy(struct wlr_data_source *wlr_source) {
++	struct x11_data_source *source = wl_container_of(wlr_source, source, base);
++	if (source->x11->sel.x_source == source)
++		source->x11->sel.x_source = NULL;
++	for (size_t i = 0; i < source->n_mimes; i++)
++		free(source->mimes[i].name);
++	free(source->mimes);
++	free(source);
++}
++
++static const struct wlr_data_source_impl x_source_impl = {
++	.send = x_source_send,
++	.destroy = x_source_destroy,
++};
++
++static void x_source_add_mime(struct x11_data_source *source, const char *name,
++	xcb_atom_t atom) {
++	for (size_t i = 0; i < source->n_mimes; i++)
++		if (strcmp(source->mimes[i].name, name) == 0)
++			return;
++
++	struct x11_mime *mimes = realloc(source->mimes,
++		(source->n_mimes + 1) * sizeof(*mimes));
++	char **slot = wl_array_add(&source->base.mime_types, sizeof(*slot));
++	if (!mimes || !slot)
++		return;
++	source->mimes = mimes;
++	source->mimes[source->n_mimes].name = strdup(name);
++	source->mimes[source->n_mimes].atom = atom;
++	*slot = strdup(name);
++	source->n_mimes++;
++}
++
++static void handle_targets(struct wlr_x11_backend *x11, xcb_atom_t property) {
++	struct x11_selection *sel = &x11->sel;
++
++	xcb_get_property_reply_t *reply = xcb_get_property_reply(x11->xcb,
++		xcb_get_property(x11->xcb, true, sel->win, property,
++			XCB_ATOM_ATOM, 0, 4096), NULL);
++	if (!reply || reply->type != XCB_ATOM_ATOM || reply->format != 32) {
++		free(reply);
++		return;
++	}
++
++	struct x11_data_source *source = calloc(1, sizeof(*source));
++	if (!source) {
++		free(reply);
++		return;
++	}
++	wlr_data_source_init(&source->base, &x_source_impl);
++	source->x11 = x11;
++
++	xcb_atom_t *atoms = xcb_get_property_value(reply);
++	int n = xcb_get_property_value_length(reply) / sizeof(*atoms);
++	bool has_utf8 = false, has_string = false;
++	for (int i = 0; i < n; i++) {
++		has_utf8 |= atoms[i] == sel->utf8_string;
++		has_string |= atoms[i] == sel->string;
++	}
++
++	if (has_utf8)
++		x_source_add_mime(source, "text/plain;charset=utf-8", sel->utf8_string);
++	if (has_string || has_utf8)
++		x_source_add_mime(source, "text/plain",
++			has_string ? sel->string : sel->utf8_string);
++	for (int i = 0; i < n; i++) {
++		char *name = atom_name(x11, atoms[i]);
++		if (name && strchr(name, '/'))
++			x_source_add_mime(source, name, atoms[i]);
++		free(name);
++	}
++	free(reply);
++
++	if (source->n_mimes == 0) {
++		wlr_data_source_destroy(&source->base);
++		return;
++	}
++
++	sel->x_source = source;
++	wlr_seat_set_selection(sel->seat, &source->base,
++		wl_display_next_serial(sel->seat->display));
++}
++
++static void handle_selection_notify(struct wlr_x11_backend *x11,
++		xcb_selection_notify_event_t *ev) {
++	struct x11_selection *sel = &x11->sel;
++	if (ev->requestor != sel->win)
++		return;
++
++	if (ev->property == sel->targets_property) {
++		if (ev->property != XCB_ATOM_NONE)
++			handle_targets(x11, ev->property);
++		return;
++	}
++
++	struct x11_transfer *t = find_transfer_by_property(x11, ev->property);
++	if (!t)
++		return;
++
++	xcb_get_property_reply_t *reply = xcb_get_property_reply(x11->xcb,
++		xcb_get_property(x11->xcb, true, sel->win, ev->property,
++			XCB_GET_PROPERTY_TYPE_ANY, 0, sel->max_property_bytes / 4), NULL);
++	if (!reply || reply->type == sel->incr) {
++		free(reply);
++		transfer_destroy(t);
++		return;
++	}
++
++	int len = xcb_get_property_value_length(reply);
++	t->buf = malloc(len > 0 ? len : 1);
++	if (!t->buf) {
++		free(reply);
++		transfer_destroy(t);
++		return;
++	}
++	memcpy(t->buf, xcb_get_property_value(reply), len);
++	t->len = len;
++	free(reply);
++
++	if (t->timer) {
++		wl_event_source_remove(t->timer);
++		t->timer = NULL;
++	}
++	start_write_to_client(t);
++}
++
++/* Wayland -> X11: serve SelectionRequest from the seat selection. */
++
++static const char *source_mime(struct wlr_data_source *source,
++		const char *a, const char *b) {
++	char **mime;
++	wl_array_for_each(mime, &source->mime_types) {
++		if (strcmp(*mime, a) == 0 || (b && strcmp(*mime, b) == 0))
++			return *mime;
++	}
++	return NULL;
++}
++
++static const char *mime_for_target(struct wlr_x11_backend *x11,
++		xcb_atom_t target, char **owned_name) {
++	struct x11_selection *sel = &x11->sel;
++	struct wlr_data_source *source = sel->wl_source;
++	*owned_name = NULL;
++
++	if (target == sel->utf8_string)
++		return source_mime(source, "text/plain;charset=utf-8", "text/plain");
++	if (target == sel->string || target == sel->text)
++		return source_mime(source, "text/plain", "text/plain;charset=utf-8");
++
++	*owned_name = atom_name(x11, target);
++	if (*owned_name && strchr(*owned_name, '/'))
++		return source_mime(source, *owned_name, NULL);
++	return NULL;
++}
++
++static int read_from_client(int fd, uint32_t mask, void *data) {
++	struct x11_transfer *t = data;
++	struct wlr_x11_backend *x11 = t->x11;
++
++	for (;;) {
++		if (t->len == t->cap) {
++			size_t cap = t->cap ? t->cap * 2 : 4096;
++			if (cap > x11->sel.max_property_bytes)
++				goto fail;
++			char *buf = realloc(t->buf, cap);
++			if (!buf)
++				goto fail;
++			t->buf = buf;
++			t->cap = cap;
++		}
++
++		ssize_t n = read(t->fd, t->buf + t->len, t->cap - t->len);
++		if (n < 0) {
++			if (errno == EAGAIN || errno == EINTR)
++				return 0;
++			goto fail;
++		}
++		if (n == 0)
++			break;
++		t->len += n;
++	}
++
++	xcb_change_property(x11->xcb, XCB_PROP_MODE_REPLACE, t->requestor,
++		t->property, t->reply_type, 8, t->len, t->buf);
++	send_notify(x11, t->requestor, t->selection, t->target, t->property, t->time);
++	transfer_destroy(t);
++	return 0;
++
++fail:
++	send_notify(x11, t->requestor, t->selection, t->target, XCB_ATOM_NONE, t->time);
++	transfer_destroy(t);
++	return 0;
++}
++
++static void handle_selection_request(struct wlr_x11_backend *x11,
++		xcb_selection_request_event_t *req) {
++	struct x11_selection *sel = &x11->sel;
++	xcb_atom_t property = req->property != XCB_ATOM_NONE ? req->property : req->target;
++
++	if (req->selection != sel->clipboard || !sel->owner || !sel->wl_source) {
++		send_notify(x11, req->requestor, req->selection, req->target,
++			XCB_ATOM_NONE, req->time);
++		return;
++	}
++
++	if (req->target == sel->targets) {
++		xcb_atom_t atoms[64];
++		size_t n = 0;
++		atoms[n++] = sel->targets;
++		atoms[n++] = sel->timestamp;
++		if (source_mime(sel->wl_source, "text/plain;charset=utf-8", "text/plain")) {
++			atoms[n++] = sel->utf8_string;
++			atoms[n++] = sel->string;
++			atoms[n++] = sel->text;
++		}
++		char **mime;
++		wl_array_for_each(mime, &sel->wl_source->mime_types) {
++			if (n < 64 && strchr(*mime, '/') && strncmp(*mime, "text/plain", 10) != 0) {
++				xcb_atom_t atom = intern_atom(x11, *mime);
++				if (atom != XCB_ATOM_NONE)
++					atoms[n++] = atom;
++			}
++		}
++		xcb_change_property(x11->xcb, XCB_PROP_MODE_REPLACE, req->requestor,
++			property, XCB_ATOM_ATOM, 32, n, atoms);
++		send_notify(x11, req->requestor, req->selection, req->target, property,
++			req->time);
++		return;
++	}
++
++	if (req->target == sel->timestamp) {
++		uint32_t time = req->time;
++		xcb_change_property(x11->xcb, XCB_PROP_MODE_REPLACE, req->requestor,
++			property, XCB_ATOM_INTEGER, 32, 1, &time);
++		send_notify(x11, req->requestor, req->selection, req->target, property,
++			req->time);
++		return;
++	}
++
++	char *name;
++	const char *mime = mime_for_target(x11, req->target, &name);
++	free(name);
++	struct x11_transfer *t = mime ? transfer_create(x11, false) : NULL;
++	int fds[2];
++	if (!t || pipe2(fds, O_CLOEXEC) != 0) {
++		if (t)
++			transfer_destroy(t);
++		send_notify(x11, req->requestor, req->selection, req->target,
++			XCB_ATOM_NONE, req->time);
++		return;
++	}
++
++	fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL) | O_NONBLOCK);
++	t->fd = fds[0];
++	t->requestor = req->requestor;
++	t->selection = req->selection;
++	t->target = req->target;
++	t->property = property;
++	t->time = req->time;
++	t->reply_type = req->target == sel->utf8_string || req->target == sel->string ?
++		req->target : req->target == sel->text ? sel->utf8_string : req->target;
++	t->fd_source = wl_event_loop_add_fd(x11->event_loop, t->fd, WL_EVENT_READABLE,
++		read_from_client, t);
++	transfer_arm_timer(t);
++	wlr_data_source_send(sel->wl_source, mime, fds[1]);
++}
++
++/* Seat selection tracking. */
++
++static void release_x_selection(struct wlr_x11_backend *x11) {
++	struct x11_selection *sel = &x11->sel;
++	if (sel->owner) {
++		xcb_set_selection_owner(x11->xcb, XCB_NONE, sel->clipboard, XCB_CURRENT_TIME);
++		xcb_flush(x11->xcb);
++		sel->owner = false;
++	}
++}
++
++static void handle_wl_source_destroy(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, sel.wl_source_destroy);
++	wl_list_remove(&x11->sel.wl_source_destroy.link);
++	x11->sel.wl_source = NULL;
++}
++
++static void handle_seat_set_selection(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, sel.seat_set_selection);
++	struct x11_selection *sel = &x11->sel;
++	struct wlr_data_source *source = sel->seat->selection_source;
++
++	if (sel->wl_source) {
++		wl_list_remove(&sel->wl_source_destroy.link);
++		sel->wl_source = NULL;
++	}
++
++	if (source == NULL) {
++		release_x_selection(x11);
++		return;
++	}
++
++	if (source->impl == &x_source_impl)
++		return;
++
++	sel->wl_source = source;
++	sel->wl_source_destroy.notify = handle_wl_source_destroy;
++	wl_signal_add(&source->events.destroy, &sel->wl_source_destroy);
++
++	xcb_set_selection_owner(x11->xcb, sel->win, sel->clipboard, XCB_CURRENT_TIME);
++	xcb_flush(x11->xcb);
++	sel->owner = true;
++}
++
++static void handle_seat_destroy(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, sel.seat_destroy);
++	struct x11_selection *sel = &x11->sel;
++	wl_list_remove(&sel->seat_set_selection.link);
++	wl_list_remove(&sel->seat_destroy.link);
++	if (sel->wl_source) {
++		wl_list_remove(&sel->wl_source_destroy.link);
++		sel->wl_source = NULL;
++	}
++	sel->seat = NULL;
++}
++
++static void handle_owner_change(struct wlr_x11_backend *x11, xcb_window_t owner) {
++	struct x11_selection *sel = &x11->sel;
++	if (owner == sel->win)
++		return;
++
++	sel->owner = false;
++
++	if (owner == XCB_NONE) {
++		if (sel->x_source && sel->seat->selection_source == &sel->x_source->base)
++			wlr_seat_set_selection(sel->seat, NULL,
++				wl_display_next_serial(sel->seat->display));
++		return;
++	}
++
++	xcb_convert_selection(x11->xcb, sel->win, sel->clipboard, sel->targets,
++		sel->targets_property, XCB_CURRENT_TIME);
++	xcb_flush(x11->xcb);
++}
++
++bool x11_selection_handle_event(struct wlr_x11_backend *x11,
++		xcb_generic_event_t *event) {
++	struct x11_selection *sel = &x11->sel;
++	if (!sel->seat)
++		return false;
++
++	uint8_t type = event->response_type & XCB_EVENT_RESPONSE_TYPE_MASK;
++	if (type == sel->xfixes_first_event + XCB_XFIXES_SELECTION_NOTIFY) {
++		xcb_xfixes_selection_notify_event_t *ev =
++			(xcb_xfixes_selection_notify_event_t *)event;
++		if (ev->selection == sel->clipboard)
++			handle_owner_change(x11, ev->owner);
++		return true;
++	}
++
++	switch (type) {
++	case XCB_SELECTION_NOTIFY:
++		handle_selection_notify(x11, (xcb_selection_notify_event_t *)event);
++		return true;
++	case XCB_SELECTION_REQUEST:
++		handle_selection_request(x11, (xcb_selection_request_event_t *)event);
++		return true;
++	case XCB_SELECTION_CLEAR:
++		sel->owner = false;
++		return true;
++	}
++	return false;
++}
++
++void x11_selection_init(struct wlr_x11_backend *x11) {
++	struct x11_selection *sel = &x11->sel;
++	wl_list_init(&sel->transfers);
++}
++
++void x11_selection_finish(struct wlr_x11_backend *x11) {
++	struct x11_selection *sel = &x11->sel;
++	struct x11_transfer *t, *tmp;
++	wl_list_for_each_safe(t, tmp, &sel->transfers, link) {
++		transfer_destroy(t);
++	}
++	if (sel->seat) {
++		wl_list_remove(&sel->seat_set_selection.link);
++		wl_list_remove(&sel->seat_destroy.link);
++		if (sel->wl_source)
++			wl_list_remove(&sel->wl_source_destroy.link);
++		sel->seat = NULL;
++	}
++}
++
++void x11_selection_attach_seat(struct wlr_x11_backend *x11,
++		struct wlr_seat *seat) {
++	struct x11_selection *sel = &x11->sel;
++	if (sel->seat)
++		return;
++
++	const xcb_query_extension_reply_t *ext =
++		xcb_get_extension_data(x11->xcb, &xcb_xfixes_id);
++	if (!ext || !ext->present)
++		return;
++	sel->xfixes_first_event = ext->first_event;
++
++	sel->clipboard = intern_atom(x11, "CLIPBOARD");
++	sel->targets = intern_atom(x11, "TARGETS");
++	sel->timestamp = intern_atom(x11, "TIMESTAMP");
++	sel->utf8_string = x11->atoms.utf8_string;
++	sel->string = XCB_ATOM_STRING;
++	sel->text = intern_atom(x11, "TEXT");
++	sel->incr = intern_atom(x11, "INCR");
++	sel->targets_property = intern_atom(x11, "WLR_X11_TARGETS");
++	sel->max_property_bytes = (size_t)xcb_get_maximum_request_length(x11->xcb) * 4 - 1024;
++
++	sel->win = xcb_generate_id(x11->xcb);
++	xcb_create_window(x11->xcb, XCB_COPY_FROM_PARENT, sel->win, x11->screen->root,
++		0, 0, 1, 1, 0, XCB_WINDOW_CLASS_INPUT_ONLY, XCB_COPY_FROM_PARENT, 0, NULL);
++
++	sel->seat = seat;
++	sel->seat_set_selection.notify = handle_seat_set_selection;
++	wl_signal_add(&seat->events.set_selection, &sel->seat_set_selection);
++	sel->seat_destroy.notify = handle_seat_destroy;
++	wl_signal_add(&seat->events.destroy, &sel->seat_destroy);
++
++	xcb_xfixes_select_selection_input(x11->xcb, sel->win, sel->clipboard,
++		XCB_XFIXES_SELECTION_EVENT_MASK_SET_SELECTION_OWNER |
++		XCB_XFIXES_SELECTION_EVENT_MASK_SELECTION_WINDOW_DESTROY |
++		XCB_XFIXES_SELECTION_EVENT_MASK_SELECTION_CLIENT_CLOSE);
++
++	xcb_get_selection_owner_reply_t *owner = xcb_get_selection_owner_reply(x11->xcb,
++		xcb_get_selection_owner(x11->xcb, sel->clipboard), NULL);
++	if (owner) {
++		if (owner->owner != XCB_NONE)
++			handle_owner_change(x11, owner->owner);
++		free(owner);
++	}
++	xcb_flush(x11->xcb);
++}
+--- /dev/null
++++ b/backend/x11/xkb_text.c
+@@ -0,0 +1,336 @@
++#include <ctype.h>
++#include <stdio.h>
++#include <sys/uio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <xcb/xcb.h>
++#include <xcb/xcbext.h>
++#include <xcb/xkb.h>
++#include <xkbcommon/xkbcommon-x11.h>
++#include <wlr/types/wlr_compositor.h>
++#include <wlr/types/wlr_seat.h>
++#include <wlr/types/wlr_text_input_v3.h>
++#include <wlr/util/log.h>
++#include "backend/x11.h"
++
++#define MAX_INCREMENTAL_KEYS 16
++
++static void load_mapping(struct wlr_x11_backend *x11, xcb_keycode_t first,
++		uint8_t count, bool base) {
++	xcb_get_keyboard_mapping_reply_t *reply = xcb_get_keyboard_mapping_reply(
++		x11->xcb, xcb_get_keyboard_mapping(x11->xcb, first, count), NULL);
++	if (!reply)
++		return;
++
++	int per_key = reply->keysyms_per_keycode;
++	xcb_keysym_t *keysyms = xcb_get_keyboard_mapping_keysyms(reply);
++	for (int i = 0; i < count; i++) {
++		xcb_keysym_t *syms = &keysyms[i * per_key];
++		size_t keycode = first + i;
++		if (keycode > 255)
++			break;
++
++		if (base) {
++			x11->xkb.base_defined[keycode] = false;
++			for (int j = 0; j < per_key; j++) {
++				if (syms[j] != XCB_NO_SYMBOL) {
++					x11->xkb.base_defined[keycode] = true;
++					break;
++				}
++			}
++			x11->xkb.scratch[keycode][0] = syms[0];
++			x11->xkb.scratch[keycode][1] = per_key > 1 ? syms[1] : XCB_NO_SYMBOL;
++		} else if (!x11->xkb.base_defined[keycode]) {
++			x11->xkb.sticky_scratch[keycode] = true;
++			x11->xkb.scratch[keycode][0] = syms[0];
++			x11->xkb.scratch[keycode][1] = per_key > 1 ? syms[1] : XCB_NO_SYMBOL;
++		}
++	}
++	free(reply);
++}
++
++static bool is_scratch_name(const char *name, uint32_t keycode) {
++	return name && name[0] == 'T' && isdigit((unsigned char)name[1]) &&
++		isdigit((unsigned char)name[2]) && isdigit((unsigned char)name[3]) &&
++		name[4] == '\0' && (uint32_t)atoi(name + 1) == keycode;
++}
++
++static void load_base_mapping(struct wlr_x11_backend *x11) {
++	const xcb_setup_t *setup = xcb_get_setup(x11->xcb);
++	memset(&x11->xkb.base_defined, 0, sizeof(x11->xkb.base_defined));
++	memset(&x11->xkb.scratch, 0, sizeof(x11->xkb.scratch));
++	load_mapping(x11, setup->min_keycode,
++		setup->max_keycode - setup->min_keycode + 1, true);
++
++	struct xkb_context *context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
++	int32_t device = xkb_x11_get_core_keyboard_device_id(x11->xcb);
++	struct xkb_keymap *keymap = context && device >= 0 ?
++		xkb_x11_keymap_new_from_device(context, x11->xcb, device,
++			XKB_KEYMAP_COMPILE_NO_FLAGS) : NULL;
++	for (size_t keycode = setup->min_keycode; keycode <= setup->max_keycode &&
++			keycode <= 255; keycode++) {
++		bool named = x11->xkb.sticky_scratch[keycode] || (keymap &&
++			is_scratch_name(xkb_keymap_key_get_name(keymap, keycode), keycode));
++		if (named) {
++			x11->xkb.sticky_scratch[keycode] = true;
++			x11->xkb.base_defined[keycode] = false;
++		} else {
++			memset(x11->xkb.scratch[keycode], 0, sizeof(x11->xkb.scratch[keycode]));
++		}
++	}
++	xkb_keymap_unref(keymap);
++	xkb_context_unref(context);
++}
++
++static bool append_name(uint8_t *buf, size_t cap, size_t *len, const char *name) {
++	size_t n = strlen(name);
++	if (n > 255 || *len + 1 + n > cap)
++		return false;
++	buf[(*len)++] = n;
++	memcpy(buf + *len, name, n);
++	*len += n;
++	return true;
++}
++
++static void reset_server_keymap(struct wlr_x11_backend *x11) {
++	const char *layout = getenv("XKB_DEFAULT_LAYOUT");
++	const char *variant = getenv("XKB_DEFAULT_VARIANT");
++	if (layout == NULL || layout[0] == '\0') {
++		layout = "us";
++		variant = NULL;
++	}
++
++	char symbols[256];
++	snprintf(symbols, sizeof(symbols), "pc+%s%s%s%s+inet(evdev)", layout,
++		variant && variant[0] ? "(" : "", variant && variant[0] ? variant : "",
++		variant && variant[0] ? ")" : "");
++
++	uint8_t names[512];
++	size_t names_len = 0;
++	const char *components[] = {
++		"", "evdev+aliases(qwerty)", "complete", "complete", symbols, "",
++	};
++	for (size_t i = 0; i < sizeof(components) / sizeof(components[0]); i++)
++		if (!append_name(names, sizeof(names), &names_len, components[i]))
++			return;
++
++	struct {
++		uint8_t major_opcode, minor_opcode;
++		uint16_t length;
++		uint16_t device_spec, need, want;
++		uint8_t load, pad;
++	} request = {
++		.minor_opcode = XCB_XKB_GET_KBD_BY_NAME,
++		.device_spec = XCB_XKB_ID_USE_CORE_KBD,
++		.need = 0x3f, .want = 0xff, .load = 1,
++	};
++
++	uint8_t padding[3] = {0};
++	size_t padded = (names_len + 3) & ~(size_t)3;
++	struct iovec parts[5] = {
++		{ NULL, 0 }, { NULL, 0 },
++		{ &request, sizeof(request) },
++		{ names, names_len },
++		{ padding, padded - names_len },
++	};
++	xcb_protocol_request_t proto = {
++		.count = 3,
++		.ext = &xcb_xkb_id,
++		.opcode = XCB_XKB_GET_KBD_BY_NAME,
++		.isvoid = 0,
++	};
++
++	unsigned int sequence = xcb_send_request(x11->xcb, 0, &parts[2], &proto);
++	xcb_generic_error_t *error = NULL;
++	void *reply = xcb_wait_for_reply(x11->xcb, sequence, &error);
++	if (error) {
++		wlr_log(WLR_ERROR, "Failed to reset X11 keymap (error %d)", error->error_code);
++		free(error);
++	}
++	free(reply);
++}
++
++void x11_xkb_init(struct wlr_x11_backend *x11) {
++	const xcb_query_extension_reply_t *ext =
++		xcb_get_extension_data(x11->xcb, &xcb_xkb_id);
++	if (!ext || !ext->present)
++		return;
++
++	xcb_xkb_use_extension_reply_t *reply = xcb_xkb_use_extension_reply(
++		x11->xcb, xcb_xkb_use_extension(x11->xcb, 1, 0), NULL);
++	if (!reply || !reply->supported) {
++		free(reply);
++		return;
++	}
++	free(reply);
++
++	x11->xkb.first_event = ext->first_event;
++	if (!x11_has_window_manager(x11) && !getenv("WLR_X11_KEEP_KEYMAP"))
++		reset_server_keymap(x11);
++	memset(&x11->xkb.sticky_scratch, 0, sizeof(x11->xkb.sticky_scratch));
++	load_base_mapping(x11);
++
++	xcb_xkb_select_events(x11->xcb, XCB_XKB_ID_USE_CORE_KBD,
++		XCB_XKB_EVENT_TYPE_MAP_NOTIFY | XCB_XKB_EVENT_TYPE_NEW_KEYBOARD_NOTIFY,
++		0, XCB_XKB_EVENT_TYPE_NEW_KEYBOARD_NOTIFY,
++		XCB_XKB_MAP_PART_KEY_SYMS, XCB_XKB_MAP_PART_KEY_SYMS, NULL);
++	x11->xkb.enabled = true;
++}
++
++bool x11_xkb_handle_event(struct wlr_x11_backend *x11,
++		xcb_generic_event_t *event) {
++	if (!x11->xkb.enabled ||
++		(event->response_type & XCB_EVENT_RESPONSE_TYPE_MASK) != x11->xkb.first_event)
++		return false;
++
++	uint8_t type = ((uint8_t *)event)[1];
++	if (type == XCB_XKB_MAP_NOTIFY) {
++		xcb_xkb_map_notify_event_t *ev = (xcb_xkb_map_notify_event_t *)event;
++		if (!(ev->changed & XCB_XKB_MAP_PART_KEY_SYMS))
++			return true;
++		if (ev->nKeySyms > MAX_INCREMENTAL_KEYS)
++			load_base_mapping(x11);
++		else
++			load_mapping(x11, ev->firstKeySym, ev->nKeySyms, false);
++	} else if (type == XCB_XKB_NEW_KEYBOARD_NOTIFY) {
++		load_base_mapping(x11);
++	}
++	return true;
++}
++
++static void text_input_sync_focus(struct wlr_x11_backend *x11) {
++	struct x11_text_input *ti = &x11->text_input;
++	struct wlr_surface *focused = ti->seat->keyboard_state.focused_surface;
++
++	struct wlr_text_input_v3 *input;
++	wl_list_for_each(input, &ti->manager->text_inputs, link) {
++		if (input->seat != ti->seat)
++			continue;
++
++		struct wlr_surface *wanted = NULL;
++		if (focused && wl_resource_get_client(input->resource) == wl_resource_get_client(focused->resource))
++			wanted = focused;
++
++		if (input->focused_surface == wanted)
++			continue;
++		if (input->focused_surface)
++			wlr_text_input_v3_send_leave(input);
++		if (wanted)
++			wlr_text_input_v3_send_enter(input, wanted);
++	}
++}
++
++static void handle_text_input_event(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, text_input.new_text_input);
++	text_input_sync_focus(x11);
++}
++
++static void handle_focus_change(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, text_input.focus_change);
++	text_input_sync_focus(x11);
++}
++
++static void text_input_stop(struct wlr_x11_backend *x11) {
++	struct x11_text_input *ti = &x11->text_input;
++	if (!ti->active)
++		return;
++	wl_list_remove(&ti->new_text_input.link);
++	wl_list_remove(&ti->manager_destroy.link);
++	wl_list_remove(&ti->focus_change.link);
++	wl_list_remove(&ti->seat_destroy.link);
++	ti->active = false;
++}
++
++static void handle_manager_destroy(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, text_input.manager_destroy);
++	text_input_stop(x11);
++	x11->text_input.manager = NULL;
++}
++
++static void handle_text_input_seat_destroy(struct wl_listener *listener, void *data) {
++	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, text_input.seat_destroy);
++	text_input_stop(x11);
++	x11->text_input.seat = NULL;
++}
++
++static void text_input_start(struct wlr_x11_backend *x11) {
++	struct x11_text_input *ti = &x11->text_input;
++	if (ti->active || ti->manager == NULL || ti->seat == NULL)
++		return;
++
++	ti->new_text_input.notify = handle_text_input_event;
++	wl_signal_add(&ti->manager->events.new_text_input, &ti->new_text_input);
++	ti->manager_destroy.notify = handle_manager_destroy;
++	wl_signal_add(&ti->manager->events.destroy, &ti->manager_destroy);
++	ti->focus_change.notify = handle_focus_change;
++	wl_signal_add(&ti->seat->keyboard_state.events.focus_change, &ti->focus_change);
++	ti->seat_destroy.notify = handle_text_input_seat_destroy;
++	wl_signal_add(&ti->seat->events.destroy, &ti->seat_destroy);
++	ti->active = true;
++
++	text_input_sync_focus(x11);
++}
++
++void x11_text_input_attach_seat(struct wlr_x11_backend *x11,
++		struct wlr_seat *seat) {
++	if (x11->text_input.seat == NULL) {
++		x11->text_input.seat = seat;
++		text_input_start(x11);
++	}
++}
++
++void x11_text_input_attach_manager(struct wlr_x11_backend *x11,
++		struct wlr_text_input_manager_v3 *manager) {
++	if (x11->text_input.manager == NULL) {
++		x11->text_input.manager = manager;
++		text_input_start(x11);
++	}
++}
++
++void x11_text_input_finish(struct wlr_x11_backend *x11) {
++	text_input_stop(x11);
++}
++
++static bool commit_text(struct wlr_x11_backend *x11, const char *text) {
++	struct wlr_text_input_manager_v3 *manager = x11->text_input.manager;
++	if (manager == NULL)
++		return false;
++
++	struct wlr_text_input_v3 *input;
++	wl_list_for_each(input, &manager->text_inputs, link) {
++		if (input->focused_surface == NULL || !input->current_enabled)
++			continue;
++		wlr_text_input_v3_send_commit_string(input, text);
++		wlr_text_input_v3_send_done(input);
++		return true;
++	}
++	return false;
++}
++
++bool x11_xkb_filter_key(struct wlr_x11_backend *x11, uint32_t keycode,
++	bool pressed, uint32_t effective_mods) {
++	if (!x11->xkb.enabled || keycode > 255)
++		return false;
++
++	if (!pressed) {
++		bool was_down = x11->xkb.scratch_down[keycode];
++		x11->xkb.scratch_down[keycode] = false;
++		return was_down;
++	}
++
++	xkb_keysym_t *syms = x11->xkb.scratch[keycode];
++	if (syms[0] == XCB_NO_SYMBOL)
++		return false;
++
++	x11->xkb.scratch_down[keycode] = true;
++
++	bool shifted = effective_mods & (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);
++	xkb_keysym_t sym = shifted && syms[1] != XCB_NO_SYMBOL ? syms[1] : syms[0];
++
++	char text[8];
++	if (xkb_keysym_to_utf8(sym, text, sizeof(text)) <= 1)
++		return true;
++	if (!commit_text(x11, text))
++		wlr_log(WLR_DEBUG, "No enabled text-input for keysym 0x%x", sym);
++	return true;
++}
+--- a/include/backend/x11.h
++++ b/include/backend/x11.h
+@@ -10,6 +10,7 @@
+ #include <xcb/present.h>
+ 
+ #include <pixman.h>
++#include <xkbcommon/xkbcommon.h>
+ #include <wlr/backend/x11.h>
+ #include <wlr/interfaces/wlr_keyboard.h>
+ #include <wlr/interfaces/wlr_output.h>
+@@ -26,6 +27,50 @@
+ #define XCB_EVENT_RESPONSE_TYPE_MASK 0x7f
+ 
+ struct wlr_x11_backend;
++struct wlr_seat;
++struct wlr_data_source;
++struct wlr_text_input_manager_v3;
++struct x11_data_source;
++
++struct x11_xkb {
++	bool enabled;
++	uint8_t first_event;
++	bool base_defined[256];
++	bool sticky_scratch[256];
++	xkb_keysym_t scratch[256][2];
++	bool scratch_down[256];
++};
++
++struct x11_text_input {
++	struct wlr_text_input_manager_v3 *manager;
++	struct wlr_seat *seat;
++	bool active;
++	struct wl_listener new_text_input;
++	struct wl_listener manager_destroy;
++	struct wl_listener focus_change;
++	struct wl_listener seat_destroy;
++};
++
++struct x11_selection {
++	xcb_window_t win;
++	xcb_atom_t clipboard, targets, timestamp, utf8_string, string, text, incr;
++	uint8_t xfixes_first_event;
++	size_t max_property_bytes;
++
++	struct wlr_seat *seat;
++	struct wl_listener seat_set_selection;
++	struct wl_listener seat_destroy;
++
++	struct x11_data_source *x_source;
++	xcb_atom_t targets_property;
++
++	struct wlr_data_source *wl_source;
++	struct wl_listener wl_source_destroy;
++	bool owner;
++
++	struct wl_list transfers; // x11_transfer.link
++	uint32_t next_property;
++};
+ 
+ struct wlr_x11_output {
+ 	struct wlr_output wlr_output;
+@@ -63,6 +108,7 @@ struct wlr_x11_touchpoint {
+ struct wlr_x11_backend {
+ 	struct wlr_backend backend;
+ 	struct wl_event_loop *event_loop;
++	struct wl_list link; // x11_backends
+ 	bool started;
+ 
+ 	xcb_connection_t *xcb;
+@@ -82,6 +128,10 @@ struct wlr_x11_backend {
+ 
+ 	struct wlr_keyboard keyboard;
+ 
++	struct x11_xkb xkb;
++	struct x11_selection sel;
++	struct x11_text_input text_input;
++
+ 	int drm_fd;
+ 	struct wlr_drm_format_set dri3_formats;
+ 	struct wlr_drm_format_set shm_formats;
+@@ -96,6 +146,7 @@ struct wlr_x11_backend {
+ 		xcb_atom_t net_wm_name;
+ 		xcb_atom_t utf8_string;
+ 		xcb_atom_t variable_refresh;
++		xcb_atom_t net_supporting_wm_check;
+ 	} atoms;
+ 
+ 	// The time we last received an event
+@@ -141,7 +192,30 @@ void update_x11_pointer_position(struct wlr_x11_output *output,
+ 
+ void handle_x11_configure_notify(struct wlr_x11_output *output,
+ 	xcb_configure_notify_event_t *event);
++bool x11_has_window_manager(struct wlr_x11_backend *x11);
++bool x11_get_root_size(struct wlr_x11_backend *x11, int32_t *width,
++	int32_t *height);
++void x11_fit_outputs_to_root(struct wlr_x11_backend *x11);
+ void handle_x11_present_event(struct wlr_x11_backend *x11,
+ 	xcb_ge_generic_event_t *event);
+ 
++void x11_xkb_init(struct wlr_x11_backend *x11);
++bool x11_xkb_handle_event(struct wlr_x11_backend *x11,
++	xcb_generic_event_t *event);
++bool x11_xkb_filter_key(struct wlr_x11_backend *x11, uint32_t keycode,
++	bool pressed, uint32_t effective_mods);
++
++void x11_text_input_attach_seat(struct wlr_x11_backend *x11,
++	struct wlr_seat *seat);
++void x11_text_input_attach_manager(struct wlr_x11_backend *x11,
++	struct wlr_text_input_manager_v3 *manager);
++void x11_text_input_finish(struct wlr_x11_backend *x11);
++
++void x11_selection_attach_seat(struct wlr_x11_backend *x11,
++	struct wlr_seat *seat);
++void x11_selection_init(struct wlr_x11_backend *x11);
++void x11_selection_finish(struct wlr_x11_backend *x11);
++bool x11_selection_handle_event(struct wlr_x11_backend *x11,
++	xcb_generic_event_t *event);
++
+ #endif
+--- /dev/null
++++ b/include/backend/x11_attach.h
+@@ -0,0 +1,12 @@
++#ifndef BACKEND_X11_ATTACH_H
++#define BACKEND_X11_ATTACH_H
++
++struct wl_display;
++struct wlr_seat;
++struct wlr_text_input_manager_v3;
++
++void x11_backends_attach_seat(struct wl_display *display, struct wlr_seat *seat);
++void x11_backends_attach_text_input_manager(struct wl_display *display,
++	struct wlr_text_input_manager_v3 *manager);
++
++#endif
+--- a/types/seat/wlr_seat.c
++++ b/types/seat/wlr_seat.c
+@@ -7,7 +7,9 @@
+ #include <wlr/types/wlr_primary_selection.h>
+ #include <wlr/types/wlr_seat.h>
+ #include <wlr/types/wlr_compositor.h>
++#include <wlr/config.h>
+ #include <wlr/util/log.h>
++#include "backend/x11_attach.h"
+ #include "types/wlr_seat.h"
+ #include "util/global.h"
+ 
+@@ -373,6 +375,10 @@ struct wlr_seat *wlr_seat_create(struct wl_display *display, const char *name) {
+ 	seat->display_destroy.notify = handle_display_destroy;
+ 	wl_display_add_destroy_listener(display, &seat->display_destroy);
+ 
++#if WLR_HAS_X11_BACKEND
++	x11_backends_attach_seat(display, seat);
++#endif
++
+ 	return seat;
+ }
+ 
+--- a/types/wlr_text_input_v3.c
++++ b/types/wlr_text_input_v3.c
+@@ -1,7 +1,9 @@
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <stddef.h>
++#include <wlr/config.h>
+ #include <wlr/types/wlr_compositor.h>
++#include "backend/x11_attach.h"
+ #include <wlr/types/wlr_text_input_v3.h>
+ #include <wlr/util/log.h>
+ #include "text-input-unstable-v3-protocol.h"
+@@ -346,5 +348,9 @@ struct wlr_text_input_manager_v3 *wlr_text_input_manager_v3_create(
+ 	manager->display_destroy.notify = handle_display_destroy;
+ 	wl_display_add_destroy_listener(display, &manager->display_destroy);
+ 
++#if WLR_HAS_X11_BACKEND
++	x11_backends_attach_text_input_manager(display, manager);
++#endif
++
+ 	return manager;
+ }
