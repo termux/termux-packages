@@ -1,0 +1,26 @@
+diff --git a/src/runtime/src/native/libs/configure.cmake b/src/runtime/src/native/libs/configure.cmake
+--- a/src/runtime/src/native/libs/configure.cmake
++++ b/src/runtime/src/native/libs/configure.cmake
+@@ -8,6 +8,7 @@
+ include(CheckTypeSize)
+ include(CheckLibraryExists)
+ include(CheckFunctionExists)
++include(CMakePushCheckState)
+ 
+ if (CLR_CMAKE_TARGET_APPLE)
+     # Xcode's clang does not include /usr/local/include by default, but brew's does.
+@@ -233,10 +234,14 @@
+     sys/uio.h
+     HAVE_PWRITEV)
+ 
++cmake_push_check_state()
++# Bionic also declares an overloaded ioctl, whose address can't be taken.
++list(APPEND CMAKE_REQUIRED_DEFINITIONS -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
+ check_symbol_exists(
+     ioctl
+     sys/ioctl.h
+     HAVE_IOCTL)
++cmake_pop_check_state()
+ 
+ check_symbol_exists(
+     sched_getaffinity
