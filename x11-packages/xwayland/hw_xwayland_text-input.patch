@@ -1,0 +1,420 @@
+# Port the Unicode input method of termux-x11 (scratch keys added to the keymap on demand) to Xwayland, receiving the characters through text-input-v3.
+
+--- a/hw/xwayland/meson.build
++++ b/hw/xwayland/meson.build
+@@ -15,6 +15,8 @@ srcs = [
+     'xwayland-screen.h',
+     'xwayland-shm.c',
+     'xwayland-shm.h',
++    'xwayland-text-input.c',
++    'xwayland-text-input.h',
+     'xwayland-types.h',
+     'xwayland-output.c',
+     'xwayland-output.h',
+@@ -51,6 +53,7 @@ xwayland_shell_xml = join_paths(protodir, 'staging', 'xwayland-shell', 'xwayland
+ tearing_xml = join_paths(protodir, 'staging', 'tearing-control', 'tearing-control-v1.xml')
+ fractional_scale_xml = join_paths(protodir, 'staging', 'fractional-scale', 'fractional-scale-v1.xml')
+ syncobj_xml = join_paths(protodir, 'staging', 'linux-drm-syncobj', 'linux-drm-syncobj-v1.xml')
++text_input_xml = join_paths(protodir, 'unstable', 'text-input', 'text-input-unstable-v3.xml')
+ 
+ client_header = generator(scanner,
+     output : '@BASENAME@-client-protocol.h',
+@@ -82,6 +85,7 @@ srcs += client_header.process(xwayland_shell_xml)
+ srcs += client_header.process(tearing_xml)
+ srcs += client_header.process(fractional_scale_xml)
+ srcs += client_header.process(syncobj_xml)
++srcs += client_header.process(text_input_xml)
+ srcs += code.process(relative_xml)
+ srcs += code.process(pointer_xml)
+ srcs += code.process(gestures_xml)
+@@ -97,6 +101,7 @@ srcs += code.process(xwayland_shell_xml)
+ srcs += code.process(tearing_xml)
+ srcs += code.process(fractional_scale_xml)
+ srcs += code.process(syncobj_xml)
++srcs += code.process(text_input_xml)
+ 
+ if build_ei
+     xwayland_dep += libei_dep
+--- a/hw/xwayland/xwayland-input.c
++++ b/hw/xwayland/xwayland-input.c
+@@ -44,6 +44,7 @@
+ #include "xwayland-input.h"
+ #include "xwayland-window.h"
+ #include "xwayland-screen.h"
++#include "xwayland-text-input.h"
+ 
+ #ifdef XWL_HAS_EI
+ #include "xwayland-xtest.h"
+@@ -55,6 +56,7 @@
+ #include "pointer-gestures-unstable-v1-client-protocol.h"
+ #include "xwayland-keyboard-grab-unstable-v1-client-protocol.h"
+ #include "keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h"
++#include "text-input-unstable-v3-client-protocol.h"
+ 
+ #define SCROLL_AXIS_HORIZ 2
+ #define SCROLL_AXIS_VERT 3
+@@ -1990,6 +1992,8 @@ create_input_device(struct xwl_screen *xwl_screen, uint32_t id, uint32_t version
+ 
+     xorg_list_init(&xwl_seat->touches);
+     xorg_list_init(&xwl_seat->sync_pending);
++
++    xwl_text_input_seat_init(xwl_seat);
+ }
+ 
+ void
+@@ -2010,6 +2014,7 @@ xwl_seat_destroy(struct xwl_seat *xwl_seat)
+     }
+ 
+     release_tablet_manager_seat(xwl_seat);
++    xwl_text_input_seat_release(xwl_seat);
+ 
+     release_grab(xwl_seat);
+     wl_seat_destroy(xwl_seat->seat);
+@@ -3166,6 +3171,8 @@ input_handler(void *data, struct wl_registry *registry, uint32_t id,
+         init_keyboard_grab(xwl_screen, id, version);
+     } else if (strcmp(interface, zwp_keyboard_shortcuts_inhibit_manager_v1_interface.name) == 0) {
+         init_keyboard_shortcuts_inhibit(xwl_screen, id, version);
++    } else if (strcmp(interface, zwp_text_input_manager_v3_interface.name) == 0) {
++        xwl_text_input_manager_init(xwl_screen, id, version);
+     }
+ }
+ 
+--- a/hw/xwayland/xwayland-input.h
++++ b/hw/xwayland/xwayland-input.h
+@@ -72,6 +72,8 @@ struct xwl_seat {
+     struct wl_touch *wl_touch;
+     struct zwp_tablet_seat_v2 *tablet_seat;
+     struct wl_array keys;
++    struct zwp_text_input_v3 *text_input;
++    char *text_input_commit;
+     struct xwl_window *focus_window;
+     struct xwl_window *tablet_focus_window;
+     uint32_t id;
+--- a/hw/xwayland/xwayland-screen.h
++++ b/hw/xwayland/xwayland-screen.h
+@@ -109,6 +109,7 @@ struct xwl_screen {
+     struct zwp_xwayland_keyboard_grab_manager_v1 *wp_grab;
+     struct zwp_keyboard_shortcuts_inhibit_manager_v1 *shortcuts_inhibit_manager;
+     struct zwp_keyboard_shortcuts_inhibitor_v1 *shortcuts_inhibit;
++    struct zwp_text_input_manager_v3 *text_input_manager;
+     struct zwp_linux_dmabuf_v1 *dmabuf;
+     int dmabuf_protocol_version;
+     struct xwl_dmabuf_feedback default_feedback;
+--- /dev/null
++++ b/hw/xwayland/xwayland-text-input.c
+@@ -0,0 +1,297 @@
++#include <xwayland-config.h>
++
++#include <inputstr.h>
++#include <xkbsrv.h>
++#include <eventstr.h>
++#include <mi.h>
++#include <list.h>
++
++#include "xwayland-input.h"
++#include "xwayland-screen.h"
++#include "xwayland-text-input.h"
++
++#include "text-input-unstable-v3-client-protocol.h"
++
++#define XWL_SCRATCH_FIRST_CHAR 0x20
++
++struct xwl_scratch_key {
++    KeySym keysym;
++    KeyCode keycode;
++    struct xorg_list entry;
++};
++
++static struct xorg_list scratch_keys;
++static Bool scratch_keys_initialized;
++
++static struct xwl_scratch_key *
++xwl_scratch_key_lookup(XkbDescPtr xkb, KeySym keysym)
++{
++    struct xwl_scratch_key *key;
++
++    xorg_list_for_each_entry(key, &scratch_keys, entry) {
++        if (key->keysym == keysym &&
++            XkbKeyNumGroups(xkb, key->keycode) > 0 &&
++            XkbKeySymsPtr(xkb, key->keycode)[0] == keysym &&
++            xkb->names && xkb->names->keys[key->keycode].name[0] == 'T')
++            return key;
++    }
++    return NULL;
++}
++
++static struct xwl_scratch_key *
++xwl_scratch_key_find_free(XkbDescPtr xkb)
++{
++    struct xwl_scratch_key *key;
++    unsigned int code;
++
++    for (code = xkb->max_key_code; code >= xkb->min_key_code; code--) {
++        if (XkbKeyNumGroups(xkb, code) != 0)
++            continue;
++
++        key = calloc(1, sizeof(*key));
++        if (!key)
++            return NULL;
++        key->keycode = code;
++        xorg_list_add(&key->entry, &scratch_keys);
++        return key;
++    }
++
++    if (xorg_list_is_empty(&scratch_keys))
++        return NULL;
++
++    key = xorg_list_last_entry(&scratch_keys, struct xwl_scratch_key, entry);
++    if (XkbKeyNumGroups(xkb, key->keycode) > 0 && xkb->names &&
++        xkb->names->keys[key->keycode].name[0] == 'T')
++        return key;
++    return NULL;
++}
++
++static KeyCode
++xwl_scratch_key_assign(DeviceIntPtr master, KeySym keysym)
++{
++    XkbDescPtr xkb = master->key->xkbInfo->desc;
++    struct xwl_scratch_key *key;
++    XkbEventCauseRec cause;
++    XkbChangesRec changes;
++    int types[1] = { XkbOneLevelIndex };
++
++    key = xwl_scratch_key_lookup(xkb, keysym);
++    if (!key)
++        key = xwl_scratch_key_find_free(xkb);
++    if (!key)
++        return 0;
++
++    xorg_list_del(&key->entry);
++    xorg_list_add(&key->entry, &scratch_keys);
++
++    if (key->keysym == keysym && XkbKeyNumGroups(xkb, key->keycode) > 0 &&
++        XkbKeySymsPtr(xkb, key->keycode)[0] == keysym)
++        return key->keycode;
++
++    memset(&changes, 0, sizeof(changes));
++    memset(&cause, 0, sizeof(cause));
++    XkbSetCauseUnknown(&cause);
++
++    if (xkb->names && xkb->names->keys) {
++        xkb->names->keys[key->keycode].name[0] = 'T';
++        xkb->names->keys[key->keycode].name[1] = '0' + (key->keycode / 100) % 10;
++        xkb->names->keys[key->keycode].name[2] = '0' + (key->keycode / 10) % 10;
++        xkb->names->keys[key->keycode].name[3] = '0' + key->keycode % 10;
++
++        changes.names.changed |= XkbKeyNamesMask;
++        changes.names.first_key = key->keycode;
++        changes.names.num_keys = 1;
++    }
++
++    XkbChangeTypesOfKey(xkb, key->keycode, 1, XkbGroup1Mask, types, &changes.map);
++    XkbKeySymsPtr(xkb, key->keycode)[0] = keysym;
++    key->keysym = keysym;
++
++    changes.map.changed |= XkbKeySymsMask;
++    changes.map.first_key_sym = key->keycode;
++    changes.map.num_key_syms = 1;
++
++    XkbSendNotification(master, &changes, &cause);
++    return key->keycode;
++}
++
++static void
++xwl_seat_type_keysym(struct xwl_seat *xwl_seat, KeySym keysym)
++{
++    DeviceIntPtr master;
++    InternalEvent event;
++    int count = 0;
++    KeyCode keycode;
++
++    if (!xwl_seat->keyboard)
++        return;
++
++    master = GetMaster(xwl_seat->keyboard, MASTER_KEYBOARD);
++    if (!master || !master->key)
++        return;
++
++    mieqProcessInputEvents();
++
++    input_lock();
++    UpdateFromMaster(&event, xwl_seat->keyboard, DEVCHANGE_KEYBOARD_EVENT, &count);
++    if (count)
++        mieqEnqueue(xwl_seat->keyboard, &event);
++    input_unlock();
++    if (count)
++        mieqProcessInputEvents();
++
++    keycode = xwl_scratch_key_assign(master, keysym);
++    if (!keycode)
++        return;
++
++    QueueKeyboardEvents(xwl_seat->keyboard, KeyPress, keycode);
++    QueueKeyboardEvents(xwl_seat->keyboard, KeyRelease, keycode);
++    mieqProcessInputEvents();
++}
++
++static uint32_t
++utf8_next(const char **s)
++{
++    const unsigned char *p = (const unsigned char *) *s;
++    uint32_t cp;
++    int len, i;
++
++    if (p[0] < 0x80) {
++        cp = p[0];
++        len = 1;
++    } else if ((p[0] & 0xe0) == 0xc0) {
++        cp = p[0] & 0x1f;
++        len = 2;
++    } else if ((p[0] & 0xf0) == 0xe0) {
++        cp = p[0] & 0x0f;
++        len = 3;
++    } else if ((p[0] & 0xf8) == 0xf0) {
++        cp = p[0] & 0x07;
++        len = 4;
++    } else {
++        *s += 1;
++        return 0;
++    }
++
++    for (i = 1; i < len; i++) {
++        if ((p[i] & 0xc0) != 0x80) {
++            *s += i;
++            return 0;
++        }
++        cp = (cp << 6) | (p[i] & 0x3f);
++    }
++    *s += len;
++    return cp;
++}
++
++static void
++text_input_enter(void *data, struct zwp_text_input_v3 *text_input,
++                 struct wl_surface *surface)
++{
++    zwp_text_input_v3_enable(text_input);
++    zwp_text_input_v3_commit(text_input);
++}
++
++static void
++text_input_leave(void *data, struct zwp_text_input_v3 *text_input,
++                 struct wl_surface *surface)
++{
++}
++
++static void
++text_input_preedit_string(void *data, struct zwp_text_input_v3 *text_input,
++                          const char *text, int32_t cursor_begin,
++                          int32_t cursor_end)
++{
++}
++
++static void
++text_input_commit_string(void *data, struct zwp_text_input_v3 *text_input,
++                         const char *text)
++{
++    struct xwl_seat *xwl_seat = data;
++
++    free(xwl_seat->text_input_commit);
++    xwl_seat->text_input_commit = text ? strdup(text) : NULL;
++}
++
++static void
++text_input_delete_surrounding_text(void *data,
++                                   struct zwp_text_input_v3 *text_input,
++                                   uint32_t before_length,
++                                   uint32_t after_length)
++{
++}
++
++static void
++text_input_done(void *data, struct zwp_text_input_v3 *text_input,
++                uint32_t serial)
++{
++    struct xwl_seat *xwl_seat = data;
++    const char *s = xwl_seat->text_input_commit;
++
++    if (!s)
++        return;
++
++    while (*s) {
++        uint32_t cp = utf8_next(&s);
++
++        if (cp < XWL_SCRATCH_FIRST_CHAR || cp > 0x10ffff)
++            continue;
++        xwl_seat_type_keysym(xwl_seat, cp < 0x100 ? cp : 0x01000000 | cp);
++    }
++
++    free(xwl_seat->text_input_commit);
++    xwl_seat->text_input_commit = NULL;
++}
++
++static const struct zwp_text_input_v3_listener text_input_listener = {
++    text_input_enter,
++    text_input_leave,
++    text_input_preedit_string,
++    text_input_commit_string,
++    text_input_delete_surrounding_text,
++    text_input_done,
++};
++
++void
++xwl_text_input_seat_init(struct xwl_seat *xwl_seat)
++{
++    struct xwl_screen *xwl_screen = xwl_seat->xwl_screen;
++
++    if (!xwl_screen->text_input_manager || xwl_seat->text_input)
++        return;
++
++    if (!scratch_keys_initialized) {
++        xorg_list_init(&scratch_keys);
++        scratch_keys_initialized = TRUE;
++    }
++
++    xwl_seat->text_input =
++        zwp_text_input_manager_v3_get_text_input(xwl_screen->text_input_manager,
++                                                 xwl_seat->seat);
++    zwp_text_input_v3_add_listener(xwl_seat->text_input, &text_input_listener,
++                                   xwl_seat);
++}
++
++void
++xwl_text_input_seat_release(struct xwl_seat *xwl_seat)
++{
++    if (xwl_seat->text_input)
++        zwp_text_input_v3_destroy(xwl_seat->text_input);
++    free(xwl_seat->text_input_commit);
++}
++
++void
++xwl_text_input_manager_init(struct xwl_screen *xwl_screen, uint32_t id,
++                            uint32_t version)
++{
++    struct xwl_seat *xwl_seat;
++
++    xwl_screen->text_input_manager =
++        wl_registry_bind(xwl_screen->registry, id,
++                         &zwp_text_input_manager_v3_interface, 1);
++
++    xorg_list_for_each_entry(xwl_seat, &xwl_screen->seat_list, link)
++        xwl_text_input_seat_init(xwl_seat);
++}
+--- /dev/null
++++ b/hw/xwayland/xwayland-text-input.h
+@@ -0,0 +1,15 @@
++#ifndef XWAYLAND_TEXT_INPUT_H
++#define XWAYLAND_TEXT_INPUT_H
++
++#include <xwayland-config.h>
++
++#include "xwayland-types.h"
++
++struct xwl_seat;
++
++void xwl_text_input_manager_init(struct xwl_screen *xwl_screen, uint32_t id,
++                                 uint32_t version);
++void xwl_text_input_seat_init(struct xwl_seat *xwl_seat);
++void xwl_text_input_seat_release(struct xwl_seat *xwl_seat);
++
++#endif
