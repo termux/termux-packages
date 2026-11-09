@@ -1,6 +1,6 @@
 --- a/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
 +++ b/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
-@@ -285,7 +285,7 @@
+@@ -285,7 +285,7 @@ private:
    uintptr_t SlabSize = 0;
    uintptr_t CurrentSlabOffset = 0;
    SectionIDMap *SecIDMap = nullptr;
@@ -9,7 +9,7 @@
    unsigned UsedTLSStorage = 0;
  #endif
  };
-@@ -349,7 +349,7 @@
+@@ -349,7 +349,7 @@ uint8_t *TrivialMemoryManager::allocateDataSection(uintptr_t Size,
  
  // In case the execution needs TLS storage, we define a very small TLS memory
  // area here that will be used in allocateTLSSection().
@@ -18,7 +18,7 @@
  extern "C" {
  alignas(16) __attribute__((visibility("hidden"), tls_model("initial-exec"),
                             used)) thread_local char LLVMRTDyldTLSSpace[16];
-@@ -360,7 +360,7 @@
+@@ -360,7 +360,7 @@ TrivialMemoryManager::TLSSection
  TrivialMemoryManager::allocateTLSSection(uintptr_t Size, unsigned Alignment,
                                           unsigned SectionID,
                                           StringRef SectionName) {
