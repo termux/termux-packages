@@ -1,6 +1,6 @@
 --- a/compiler-rt/CMakeLists.txt
 +++ b/compiler-rt/CMakeLists.txt
-@@ -203,6 +203,9 @@
+@@ -247,6 +247,9 @@ macro(handle_default_cxx_lib var)
      elseif (FUCHSIA)
        set(${var}_LIBNAME "libc++")
        set(${var}_INTREE 1)
@@ -10,7 +10,7 @@
      else()
        set(${var}_LIBNAME "libstdc++")
        set(${var}_SYSTEM 1)
-@@ -218,7 +221,7 @@
+@@ -262,7 +265,7 @@ endmacro()
  # TODO: Mark this as internal flag, most users should use COMPILER_RT_CXX_LIBRARY.
  set(SANITIZER_CXX_ABI "default" CACHE STRING
      "Specify C++ ABI library to use.")
@@ -19,7 +19,7 @@
  set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
  handle_default_cxx_lib(SANITIZER_CXX_ABI)
  
-@@ -639,6 +642,8 @@
+@@ -754,6 +757,8 @@ elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libcxxabi")
    list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
  elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")
    append_list_if(COMPILER_RT_HAS_LIBSTDCXX stdc++ SANITIZER_CXX_ABI_LIBRARIES)
