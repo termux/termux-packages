@@ -10,7 +10,7 @@
 +        // the 107-char AF_UNIX sun_path limit, and a browser-launched proxy inherits
 +        // none of our env overrides. Hardcode a short, deterministic socket directory
 +        // that GUI and keepassxc-proxy derive identically WITHOUT any environment setup.
-+        const QString termuxSocketDir = QStringLiteral("/data/data/com.termux/files/usr/tmp/kx/app");
++        const QString termuxSocketDir = QStringLiteral("@TERMUX_PREFIX@/tmp/kx/app");
 +        QDir().mkpath(termuxSocketDir);
 +        return termuxSocketDir + serverName;
 +#elif defined(KEEPASSXC_DIST_SNAP)
