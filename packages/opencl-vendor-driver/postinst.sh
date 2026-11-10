@@ -17,6 +17,7 @@ check_cmd() {
 
 install_deps() { (
 	LIB=$(basename "$1")
+	touch "${VISITED_DIR}/${LIB}"
 	NEEDED_LIBS=$(readelf -d "$1" | sed -ne "s|.*NEEDED.* \[\(.*\)\]|\1|p" | sort)
 	SET_RPATH="0"
 	NOT_SYSTEM_LIBS=""
@@ -36,8 +37,10 @@ install_deps() { (
 		vendor_needed_lib="${VENDOR_LIBDIR}/${needed_lib}"
 		if [ -e "${vendor_needed_lib}" ]; then
 			echo "INFO: ${LIB} ... found ${vendor_needed_lib}"
-			install -Dm644 "${vendor_needed_lib}" "${target_needed_lib}"
-			install_deps "${target_needed_lib}"
+			if [ ! -e "${VISITED_DIR}/${needed_lib}" ]; then
+				install -Dm644 "${vendor_needed_lib}" "${target_needed_lib}"
+				install_deps "${target_needed_lib}"
+			fi
 			SET_RPATH="1"
 			continue
 		fi
@@ -141,8 +144,10 @@ fi
 echo "INFO: VENDOR_LIBOPENCL = ${VENDOR_LIBOPENCL}"
 echo "INFO: VENDOR_LIBDIR    = ${VENDOR_LIBDIR}"
 echo "INFO: Installing as ${TARGET_LIBOPENCL} ..."
+VISITED_DIR=$(mktemp -d)
 install -Dm644 "${VENDOR_LIBOPENCL}" "${TARGET_LIBOPENCL}"
 install_deps "${TARGET_LIBOPENCL}"
+rm -rf "${VISITED_DIR}"
 
 echo "
 ===== Post install notice =====
