@@ -1,0 +1,14 @@
+diff --git a/src/runtime/eng/native/build-commons.sh b/src/runtime/eng/native/build-commons.sh
+--- a/src/runtime/eng/native/build-commons.sh
++++ b/src/runtime/eng/native/build-commons.sh
+@@ -566,6 +566,10 @@
+         ROOTFS_DIR="$__RepoRootDir/.tools/rootfs/$__TargetArch"
+         export ROOTFS_DIR
+     fi
++elif [[ -n "$CROSSCOMPILE" ]]; then
++    # Not a cross build (e.g. the cross components that run on the build machine), but the
++    # caller exported a cross environment (Termux does): don't let it leak into this build.
++    unset CROSSCOMPILE ROOTFS_DIR EXTRA_CFLAGS EXTRA_CXXFLAGS EXTRA_LDFLAGS
+ fi
+ 
+ # init the target distro name (__DistroRid) and target portable os (__PortableTargetOS).
