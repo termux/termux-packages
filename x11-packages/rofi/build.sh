@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://davatorium.github.io/rofi/
 TERMUX_PKG_DESCRIPTION="A window switcher, application launcher and dmenu replacement"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.1.0"
+TERMUX_PKG_VERSION="2.1.1"
 TERMUX_PKG_SRCURL="https://github.com/davatorium/rofi/releases/download/$TERMUX_PKG_VERSION/rofi-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=e2444a5e9ff14221e00a2d561437c671d5ded615ce089838478f34eed035cca8
+TERMUX_PKG_SHA256=4f5777cfcb7a92a189352314d628c826404cf6a53b346bfeb9289436f6aa1cf2
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, libandroid-glob, libcairo, libwayland, libxcb, libxkbcommon, pango, startup-notification, xcb-util, xcb-util-cursor, xcb-util-keysyms, xcb-util-wm"
 
