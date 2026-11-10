@@ -1,0 +1,52 @@
+--- a/makepanda/makepandacore.py
++++ b/makepanda/makepandacore.py
+@@ -2230,6 +2230,37 @@
+         if ver != running_ver:
+             Warn("running makepanda with Python %s, but building Panda3D with Python %s." % (running_ver, ver))
+ 
++    elif GetTarget() == 'android' and CrossCompiling() and os.environ.get("TERMUX_PREFIX"):
++        # Termux cross-compiles against its own prefix rather than an Android
++        # NDK thirdparty directory, so locate the target Python installed there.
++        prefix = os.environ.get("TERMUX_PREFIX") or \
++                 os.environ.get("TERMUX__PREFIX") or \
++                 os.environ.get("PREFIX")
++        if not prefix:
++            exit("TERMUX_PREFIX is not defined, cannot locate the target Python.")
++        incdir = os.path.join(prefix, "include")
++        libdir = os.path.join(prefix, "lib")
++        py_headers = sorted(glob.glob(os.path.join(incdir, "python*", "Python.h")))
++        if not py_headers:
++            exit("Could not find Python.h under %s." % (incdir))
++        py_verdir = os.path.basename(os.path.dirname(py_headers[-1]))
++        version = py_verdir[len("python"):] if py_verdir.startswith("python") else py_verdir
++        py_libs = [os.path.join(libdir, "libpython" + version + ".so"),
++                   os.path.join(libdir, "libpython" + version + ".a")]
++        py_libs = [x for x in py_libs if os.path.isfile(x)] or \
++                  (glob.glob(os.path.join(libdir, "libpython" + version + "*.so*")) +
++                   glob.glob(os.path.join(libdir, "libpython" + version + "*.a")))
++        if not py_libs:
++            exit("Could not find the Python library in %s." % (libdir))
++        SDK["PYTHONVERSION"] = "python" + version + abiflags
++        SDK["PYTHONEXEC"] = os.path.realpath(sys.executable)
++        SDK["PYTHON"] = os.path.join(incdir, py_verdir)
++        # Make SmartPkgEnable() search the Termux prefix instead of the
++        # (nonexistent) thirdparty directory or the host include directories.
++        PkgSetCustomLocation("PYTHON")
++        IncDirectory("PYTHON", incdir)
++        LibDirectory("PYTHON", libdir)
++
+     elif CrossCompiling() or (prefer_thirdparty_python and os.path.isdir(os.path.join(GetThirdpartyDir(), "python"))):
+         tp_python = os.path.join(GetThirdpartyDir(), "python")
+ 
+@@ -2621,9 +2652,9 @@
+     SDK["ANDROID_ABI"] = abi
+     SDK["ANDROID_TRIPLE"] = ANDROID_TRIPLE
+ 
+-    if GetHost() == 'android':
++    if GetHost() == 'android' or os.environ.get("TERMUX_PREFIX"):
+         # Assume we're compiling from termux.
+-        prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
++        prefix = os.environ.get("TERMUX_PREFIX") or os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
+         SDK["ANDROID_JAR"] = prefix + "/share/aapt/android.jar"
+         return
+ 
