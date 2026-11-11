@@ -1,0 +1,121 @@
+Bundle the aspnetcore SDK tools (dev-certs, user-jwts, user-secrets) without
+Native AOT on linux-bionic, as for Mono. The Native AOT aggregate has no SONAME,
+so Android's linker can't resolve the shims' versioned symbols, and on x86_64
+it needs __tls_get_addr, which bionic only exports from API 29.
+
+diff --git a/src/aspnetcore/eng/Build.props b/src/aspnetcore/eng/Build.props
+index e3e3a5569..aa69a35c3 100644
+--- a/src/aspnetcore/eng/Build.props
++++ b/src/aspnetcore/eng/Build.props
+@@ -188,7 +188,7 @@
+                         Condition=" '$(BuildMainlyReferenceProviders)' != 'true' " />
+         <DotNetProjects Include="$(RepoRoot)src\Tools\NativeAot\aspnetcoretools\aspnetcoretools.csproj"
+                         Exclude="@(ProjectToBuild);@(ProjectToExclude);$(RepoRoot)**\bin\**\*;$(RepoRoot)**\obj\**\*"
+-                        Condition=" '$(BuildMainlyReferenceProviders)' != 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' " />
++                        Condition=" '$(BuildMainlyReferenceProviders)' != 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRuntimeIdentifier.StartsWith('linux-bionic')) " />
+         <!-- Only build the composite R2R runtime pack when we will actually ship it -->
+         <DotNetProjects Include="$(RepoRoot)src\Framework\App.Runtime\src\aspnetcore-runtime-composite.proj"
+                         Condition=" '$(BuildMainlyReferenceProviders)' != 'true' and '$(TargetOsName)' != 'win' " />
+diff --git a/src/aspnetcore/src/Tools/NativeAot/aspnetcoretools/aspnetcoretools.csproj b/src/aspnetcore/src/Tools/NativeAot/aspnetcoretools/aspnetcoretools.csproj
+index dab280f69..1276dcb47 100644
+--- a/src/aspnetcore/src/Tools/NativeAot/aspnetcoretools/aspnetcoretools.csproj
++++ b/src/aspnetcore/src/Tools/NativeAot/aspnetcoretools/aspnetcoretools.csproj
+@@ -8,7 +8,7 @@
+     <IsShippingPackage>false</IsShippingPackage>
+     <ExcludeFromSourceOnlyBuild>false</ExcludeFromSourceOnlyBuild>
+     <!-- Native AOT requires the CoreCLR runtime; the aggregate executable cannot be produced when building with the Mono runtime. -->
+-    <ExcludeFromSourceOnlyBuild Condition="'$(DotNetBuildUseMonoRuntime)' == 'true'">true</ExcludeFromSourceOnlyBuild>
++    <ExcludeFromSourceOnlyBuild Condition="('$(DotNetBuildUseMonoRuntime)' == 'true' or $(TargetRuntimeIdentifier.StartsWith('linux-bionic')))">true</ExcludeFromSourceOnlyBuild>
+     <PublishAot Condition="'$(NativeAotSupported)' == 'true'">true</PublishAot>
+     <NativeLib>Shared</NativeLib>
+     <EnablePreviewFeatures>true</EnablePreviewFeatures>
+diff --git a/src/aspnetcore/src/Tools/dotnet-dev-certs/src/dotnet-dev-certs.csproj b/src/aspnetcore/src/Tools/dotnet-dev-certs/src/dotnet-dev-certs.csproj
+index e856f779b..011b55055 100644
+--- a/src/aspnetcore/src/Tools/dotnet-dev-certs/src/dotnet-dev-certs.csproj
++++ b/src/aspnetcore/src/Tools/dotnet-dev-certs/src/dotnet-dev-certs.csproj
+@@ -12,7 +12,7 @@
+     <ExcludeFromSourceOnlyBuild>false</ExcludeFromSourceOnlyBuild>
+   </PropertyGroup>
+ 
+-  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and '$(NativeAotSupported)' == 'true'">
++  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRuntimeIdentifier.StartsWith('linux-bionic')) and '$(NativeAotSupported)' == 'true'">
+     <PublishAot>true</PublishAot>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' != 'true'">$(BundledToolTargetRuntimeIdentifiers)</RuntimeIdentifiers>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' == 'true'">$(TargetRuntimeIdentifier)</RuntimeIdentifiers>
+diff --git a/src/aspnetcore/src/Tools/dotnet-user-jwts/src/dotnet-user-jwts.csproj b/src/aspnetcore/src/Tools/dotnet-user-jwts/src/dotnet-user-jwts.csproj
+index debfca691..2a88ec58b 100644
+--- a/src/aspnetcore/src/Tools/dotnet-user-jwts/src/dotnet-user-jwts.csproj
++++ b/src/aspnetcore/src/Tools/dotnet-user-jwts/src/dotnet-user-jwts.csproj
+@@ -13,7 +13,7 @@
+     <ExcludeFromSourceOnlyBuild>false</ExcludeFromSourceOnlyBuild>
+   </PropertyGroup>
+ 
+-  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and '$(NativeAotSupported)' == 'true'">
++  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRuntimeIdentifier.StartsWith('linux-bionic')) and '$(NativeAotSupported)' == 'true'">
+     <PublishAot>true</PublishAot>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' != 'true'">$(BundledToolTargetRuntimeIdentifiers)</RuntimeIdentifiers>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' == 'true'">$(TargetRuntimeIdentifier)</RuntimeIdentifiers>
+diff --git a/src/aspnetcore/src/Tools/dotnet-user-secrets/src/dotnet-user-secrets.csproj b/src/aspnetcore/src/Tools/dotnet-user-secrets/src/dotnet-user-secrets.csproj
+index be73f302d..08039a703 100644
+--- a/src/aspnetcore/src/Tools/dotnet-user-secrets/src/dotnet-user-secrets.csproj
++++ b/src/aspnetcore/src/Tools/dotnet-user-secrets/src/dotnet-user-secrets.csproj
+@@ -13,7 +13,7 @@
+     <ExcludeFromSourceOnlyBuild>false</ExcludeFromSourceOnlyBuild>
+   </PropertyGroup>
+ 
+-  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and '$(NativeAotSupported)' == 'true'">
++  <PropertyGroup Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRuntimeIdentifier.StartsWith('linux-bionic')) and '$(NativeAotSupported)' == 'true'">
+     <PublishAot>true</PublishAot>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' != 'true'">$(BundledToolTargetRuntimeIdentifiers)</RuntimeIdentifiers>
+     <RuntimeIdentifiers Condition="'$(DotNetBuild)' == 'true'">$(TargetRuntimeIdentifier)</RuntimeIdentifiers>
+diff --git a/src/sdk/src/Layout/redist/targets/BundledDotnetTools.targets b/src/sdk/src/Layout/redist/targets/BundledDotnetTools.targets
+index bd9241221..fa32732d5 100644
+--- a/src/sdk/src/Layout/redist/targets/BundledDotnetTools.targets
++++ b/src/sdk/src/Layout/redist/targets/BundledDotnetTools.targets
+@@ -3,13 +3,15 @@
+   <UsingTask TaskName="Microsoft.NET.Build.Tasks.SelectRuntimeIdentifierSpecificItems" AssemblyFile="$(MicrosoftNETBuildTasksAssembly)" />
+ 
+   <PropertyGroup>
++    <!-- linux-bionic has no Native AOT aspnetcore tools, so bundle them as for Mono. -->
++    <_BundleAspNetCoreToolsWithoutAot Condition="'$(DotNetBuildUseMonoRuntime)' == 'true' or $(TargetRid.StartsWith('linux-bionic'))">true</_BundleAspNetCoreToolsWithoutAot>
+     <AspNetCoreRidSpecificToolPackageRids>;linux-x64;linux-arm;linux-arm64;linux-musl-x64;linux-musl-arm;linux-musl-arm64;win-x64;win-x86;win-arm64;osx-x64;osx-arm64;</AspNetCoreRidSpecificToolPackageRids>
+     <AspNetCoreRidSpecificToolPackageRids Condition="'$(ProductMonikerRid)' != '' and !$(AspNetCoreRidSpecificToolPackageRids.Contains(';$(ProductMonikerRid);'))">$(AspNetCoreRidSpecificToolPackageRids)$(ProductMonikerRid);</AspNetCoreRidSpecificToolPackageRids>
+   </PropertyGroup>
+ 
+   <ItemGroup Condition="'$(IncludeAspNetCoreRuntime)' != 'false'">
+     <BundledDotnetTool Include="aspnetcoretools"
+-                       Condition="'$(DotNetBuildUseMonoRuntime)' != 'true'"
++                       Condition="'$(_BundleAspNetCoreToolsWithoutAot)' != 'true'"
+                        Version="$(MicrosoftAspNetCoreAppRefInternalPackageVersion)"
+                        ObsoletesCliTool="Microsoft.Extensions.SecretManager.Tools"
+                        RidSpecificPackageRids="$(AspNetCoreRidSpecificToolPackageRids)"
+@@ -17,17 +19,17 @@
+     <!-- Native AOT requires the CoreCLR runtime; the Mono runtime build cannot publish the Native AOT aggregate executable, so bundle the individual tools instead. -->
+     <!-- RID-specific tool packages are produced by aspnetcore and use its internal package version. -->
+     <BundledDotnetTool Include="dotnet-dev-certs"
+-                       Condition="'$(DotNetBuildUseMonoRuntime)' == 'true'"
++                       Condition="'$(_BundleAspNetCoreToolsWithoutAot)' == 'true'"
+                        Version="$(DotnetDevCertsPackageVersion)"
+                        RidSpecificPackageRids="$(AspNetCoreRidSpecificToolPackageRids)"
+                        RidSpecificPackageVersion="$(MicrosoftAspNetCoreAppRefInternalPackageVersion)" />
+     <BundledDotnetTool Include="dotnet-user-jwts"
+-                       Condition="'$(DotNetBuildUseMonoRuntime)' == 'true'"
++                       Condition="'$(_BundleAspNetCoreToolsWithoutAot)' == 'true'"
+                        Version="$(DotnetUserJwtsPackageVersion)"
+                        RidSpecificPackageRids="$(AspNetCoreRidSpecificToolPackageRids)"
+                        RidSpecificPackageVersion="$(MicrosoftAspNetCoreAppRefInternalPackageVersion)" />
+     <BundledDotnetTool Include="dotnet-user-secrets"
+-                       Condition="'$(DotNetBuildUseMonoRuntime)' == 'true'"
++                       Condition="'$(_BundleAspNetCoreToolsWithoutAot)' == 'true'"
+                        Version="$(DotnetUserSecretsPackageVersion)"
+                        ObsoletesCliTool="Microsoft.Extensions.SecretManager.Tools"
+                        RidSpecificPackageRids="$(AspNetCoreRidSpecificToolPackageRids)"
+@@ -52,7 +54,7 @@
+           Condition="'@(BundledDotnetTool)' != ''">
+     <ItemGroup>
+       <_RidSpecificBundledDotnetTool Include="@(BundledDotnetTool)"
+-                                      Condition="'$(DotNetBuildUseMonoRuntime)' != 'true' and '%(BundledDotnetTool.RidSpecificPackageRids)' != ''">
++                                      Condition="'$(_BundleAspNetCoreToolsWithoutAot)' != 'true' and '%(BundledDotnetTool.RidSpecificPackageRids)' != ''">
+         <ToolId>%(BundledDotnetTool.Identity)</ToolId>
+         <ToolVersion>%(BundledDotnetTool.RidSpecificPackageVersion)</ToolVersion>
+         <ToolVersion Condition="'%(BundledDotnetTool.RidSpecificPackageVersion)' == ''">%(BundledDotnetTool.Version)</ToolVersion>
