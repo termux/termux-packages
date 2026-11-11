@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://goreleaser.com
 TERMUX_PKG_DESCRIPTION="Deliver Go binaries as fast and easily as possible"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="2.20.0"
+TERMUX_PKG_VERSION="2.20.1"
 TERMUX_PKG_SRCURL="https://github.com/goreleaser/goreleaser/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=4365a8112344b9c9c227873d3a2071f596db6056ad8a86b47467728856f7afea
+TERMUX_PKG_SHA256=ae67dc2c731946a45cffa650899552c326ef5239375a6896f90812a4e51cf5be
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
