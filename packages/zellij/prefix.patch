@@ -1,9 +1,9 @@
 --- a/zellij-server/src/pty.rs
 +++ b/zellij-server/src/pty.rs
-@@ -2244,8 +2244,8 @@
+@@ -2681,8 +2681,8 @@
  #[cfg(not(windows))]
- pub fn get_default_shell() -> PathBuf {
-     PathBuf::from(std::env::var("SHELL").unwrap_or_else(|_| {
+ pub fn default_shell_from(pane_env: &PaneEnv) -> PathBuf {
+     PathBuf::from(env_value(pane_env, "SHELL").unwrap_or_else(|| {
 -        log::warn!("Cannot read SHELL env, falling back to use /bin/sh");
 -        "/bin/sh".to_string()
 +        log::warn!("Cannot read SHELL env, falling back to use @TERMUX_PREFIX@/bin/sh");
@@ -13,12 +13,12 @@
  
 --- a/zellij-utils/src/consts.rs
 +++ b/zellij-utils/src/consts.rs
-@@ -16,7 +16,7 @@
- pub static DEBUG_MODE: OnceLock<bool> = OnceLock::new();
- 
+@@ -19,7 +19,7 @@
+ /// (`/etc/zellij`, `C:\ProgramData\Zellij`)
  #[cfg(not(windows))]
--pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "/etc/zellij";
-+pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "@TERMUX_PREFIX@/etc/zellij";
+ pub fn system_default_config_dir() -> PathBuf {
+-    PathBuf::from("/etc").join(crate::distribution::name())
++    PathBuf::from("@TERMUX_PREFIX@/etc").join(crate::distribution::name())
+ }
+ 
  #[cfg(windows)]
- pub const SYSTEM_DEFAULT_CONFIG_DIR: &str = "C:\\ProgramData\\Zellij";
- pub const SYSTEM_DEFAULT_DATA_DIR_PREFIX: &str = system_default_data_dir();
