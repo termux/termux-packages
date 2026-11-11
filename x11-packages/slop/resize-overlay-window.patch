@@ -1,0 +1,44 @@
+--- a/src/xshaperectangle.cpp
++++ b/src/xshaperectangle.cpp
+@@ -1,5 +1,25 @@
+ #include "xshaperectangle.hpp"
+ 
++namespace slop {
++// Termux:X11 resizes the X screen at runtime (for example when the Android
++// keyboard is shown or hidden). Keep the overlay window as big as the real
++// root window instead of the screen size cached when slop started.
++static void syncWindowSize( Window win ) {
++    Window junk;
++    int x, y;
++    unsigned int rootw, rooth, winw, winh, border, depth;
++    if ( !XGetGeometry( x11->display, x11->root, &junk, &x, &y, &rootw, &rooth, &border, &depth ) ) {
++        return;
++    }
++    if ( !XGetGeometry( x11->display, win, &junk, &x, &y, &winw, &winh, &border, &depth ) ) {
++        return;
++    }
++    if ( winw != rootw || winh != rooth ) {
++        XResizeWindow( x11->display, win, rootw, rooth );
++    }
++}
++}
++
+ slop::XShapeRectangle::XShapeRectangle( glm::vec2 p1, glm::vec2 p2, float border, float padding, glm::vec4 color, bool highlight ) {
+     this->color = convertColor( color );
+     this->border = border;
+@@ -94,6 +114,7 @@
+ }
+ 
+ void slop::XShapeRectangle::setPoints( glm::vec2 p1, glm::vec2 p2 ) {
++    syncWindowSize( window );
+     // Find each corner of the rectangle
+     ul = glm::vec2( glm::min( p1.x, p2.x ), glm::max( p1.y, p2.y ) ) ;
+     bl = glm::vec2( glm::min( p1.x, p2.x ), glm::min( p1.y, p2.y ) ) ;
+@@ -120,6 +141,7 @@
+ void slop::XShapeRectangle::draw( glm::mat4& matrix ) {
+     // We don't want to be visible until we're asked to draw.
+     createWindow();
++    syncWindowSize( window );
+ }
+ 
+ glm::vec4 slop::XShapeRectangle::getRect() {
