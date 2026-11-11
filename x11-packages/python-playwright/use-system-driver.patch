@@ -1,44 +1,52 @@
 diff --git a/playwright/_impl/_driver.py b/playwright/_impl/_driver.py
-index 22b53b8..7cb77cd 100644
+index f26f88c..3411aa7 100644
 --- a/playwright/_impl/_driver.py
 +++ b/playwright/_impl/_driver.py
-@@ -23,14 +23,8 @@ from playwright._repo_version import version
+@@ -24,19 +24,8 @@ from playwright._repo_version import version
  
  
  def compute_driver_executable() -> Tuple[str, str]:
 -    driver_path = Path(inspect.getfile(playwright)).parent / "driver"
 -    cli_path = str(driver_path / "package" / "cli.js")
--    if sys.platform == "win32":
--        return (
--            os.getenv("PLAYWRIGHT_NODEJS_PATH", str(driver_path / "node.exe")),
--            cli_path,
+-    node_path = os.getenv("PLAYWRIGHT_NODEJS_PATH")
+-    if node_path:
+-        return (node_path, cli_path)
+-    bundled_node = driver_path / ("node.exe" if sys.platform == "win32" else "node")
+-    if not bundled_node.is_file():
+-        # The source distribution ships the driver without Node.js.
+-        raise Error(
+-            "This installation of Playwright does not include Node.js. "
+-            "Set PLAYWRIGHT_NODEJS_PATH pointing to Node.js executable."
 -        )
--    return (os.getenv("PLAYWRIGHT_NODEJS_PATH", str(driver_path / "node")), cli_path)
+-    return (str(bundled_node), cli_path)
 +    cli_path = "@TERMUX_PREFIX@/lib/node_modules/playwright-core/cli.js"
 +    return (os.getenv("PLAYWRIGHT_NODEJS_PATH", "@TERMUX_PREFIX@/bin/node"), cli_path)
  
  
- def get_driver_env() -> dict:
+ def node_launch_error(executable: str, error: OSError) -> Error:
 diff --git a/pyproject.toml b/pyproject.toml
-index 0e5e5db..32ce8ca 100644
+index e638b30..461f79e 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -1,5 +1,5 @@
  [build-system]
--requires = ["setuptools==82.0.1", "setuptools-scm==10.3.4", "wheel==0.48.0", "auditwheel==6.7.0"]
+-requires = ["setuptools==84.2.1", "setuptools-scm==10.3.4", "wheel==0.48.0", "auditwheel==6.7.0"]
 +requires = ["setuptools", "setuptools-scm", "wheel"]
  build-backend = "setuptools.build_meta"
  
  [project]
 diff --git a/setup.py b/setup.py
-index 2ceb4d1..e1ecb12 100644
+index c1d589b..6791fb1 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -212,6 +212,4 @@ class PlaywrightBDistWheelCommand(BDistWheelCommand):
+@@ -254,9 +254,4 @@ class PlaywrightBDistWheelCommand(BDistWheelCommand):
              extractall(zip, "playwright/driver")
  
  
 -setup(
--    cmdclass={"bdist_wheel": PlaywrightBDistWheelCommand},
+-    cmdclass={
+-        "sdist": PlaywrightSDistCommand,
+-        "bdist_wheel": PlaywrightBDistWheelCommand,
+-    },
 -)
 +setup()
