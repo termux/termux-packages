@@ -51,7 +51,7 @@ termux_step_pre_configure() {
 	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
 	export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
 	export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
-	# export CXX_STD_LIB_LIBS="c++" # the `m4/fp_find_cxx_std_lib.m4` is broken for us.
+	export CXX_STD_LIB_LIBS="c++" # see `m4/fp_find_cxx_std_lib.m4`
 
 	export target="$TERMUX_HOST_PLATFORM"
 	export no_profiled_libs=""
@@ -65,12 +65,6 @@ termux_step_pre_configure() {
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
 	./boot.source
-}
-
-termux_step_post_configure() {
-	grep -Hn "CXX_STD_LIB_LIBS" ./configure
-	"$CXX" --print-file-name "libc++.so"
-	exit 0
 }
 
 termux_step_make() {
