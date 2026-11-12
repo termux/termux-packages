@@ -1,0 +1,47 @@
+--- a/src/wl_init.c
++++ b/src/wl_init.c
+@@ -508,7 +508,7 @@ GLFWbool _glfwConnectWayland(int platformID, _GLFWplatform* platform)
+         .createWindowSurface = _glfwCreateWindowSurfaceWayland
+     };
+ 
+-    void* module = _glfwPlatformLoadModule("libwayland-client.so.0");
++    void* module = _glfwPlatformLoadModule("libwayland-client.so");
+     if (!module)
+     {
+         if (platformID == GLFW_PLATFORM_WAYLAND)
+@@ -642,7 +642,7 @@ int _glfwInitWayland(void)
+         return GLFW_FALSE;
+     }
+ 
+-    _glfw.wl.cursor.handle = _glfwPlatformLoadModule("libwayland-cursor.so.0");
++    _glfw.wl.cursor.handle = _glfwPlatformLoadModule("libwayland-cursor.so");
+     if (!_glfw.wl.cursor.handle)
+     {
+         _glfwInputError(GLFW_PLATFORM_ERROR,
+@@ -659,7 +659,7 @@ int _glfwInitWayland(void)
+     _glfw.wl.cursor.image_get_buffer = (PFN_wl_cursor_image_get_buffer)
+         _glfwPlatformGetModuleSymbol(_glfw.wl.cursor.handle, "wl_cursor_image_get_buffer");
+ 
+-    _glfw.wl.egl.handle = _glfwPlatformLoadModule("libwayland-egl.so.1");
++    _glfw.wl.egl.handle = _glfwPlatformLoadModule("libwayland-egl.so");
+     if (!_glfw.wl.egl.handle)
+     {
+         _glfwInputError(GLFW_PLATFORM_ERROR,
+@@ -674,7 +674,7 @@ int _glfwInitWayland(void)
+     _glfw.wl.egl.window_resize = (PFN_wl_egl_window_resize)
+         _glfwPlatformGetModuleSymbol(_glfw.wl.egl.handle, "wl_egl_window_resize");
+ 
+-    _glfw.wl.xkb.handle = _glfwPlatformLoadModule("libxkbcommon.so.0");
++    _glfw.wl.xkb.handle = _glfwPlatformLoadModule("libxkbcommon.so");
+     if (!_glfw.wl.xkb.handle)
+     {
+         _glfwInputError(GLFW_PLATFORM_ERROR,
+@@ -754,7 +754,7 @@ int _glfwInitWayland(void)
+     }
+ 
+     if (_glfw.hints.init.wl.libdecorMode == GLFW_WAYLAND_PREFER_LIBDECOR)
+-        _glfw.wl.libdecor.handle = _glfwPlatformLoadModule("libdecor-0.so.0");
++        _glfw.wl.libdecor.handle = _glfwPlatformLoadModule("libdecor-0.so");
+ 
+     if (_glfw.wl.libdecor.handle)
+     {
