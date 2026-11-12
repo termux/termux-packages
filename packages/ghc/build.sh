@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
 TERMUX_PKG_VERSION=9.12.4
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
 TERMUX_PKG_SHA256=02d1ee5080acf00e135b93b238f09015b06ff27254cde59669cf57c42c2bee43
-TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes, ncurses"
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, libandroid-utimes, ncurses, libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
@@ -51,6 +51,7 @@ termux_step_pre_configure() {
 	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS"
 	export CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
 	export CONF_CXX_OPTS_STAGE2="$CXXFLAGS"
+	# export CXX_STD_LIB_LIBS="c++" # the `m4/fp_find_cxx_std_lib.m4` is broken for us.
 
 	export target="$TERMUX_HOST_PLATFORM"
 	export no_profiled_libs=""
@@ -64,6 +65,11 @@ termux_step_pre_configure() {
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="$TERMUX_PKG_EXTRA_CONFIGURE_ARGS --target=$target"
 	./boot.source
+}
+
+termux_step_post_configure() {
+	grep -Hn "CXX_STD_LIB_LIBS" ./configure
+	exit 0
 }
 
 termux_step_make() {
