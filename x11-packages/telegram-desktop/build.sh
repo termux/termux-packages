@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="7.4.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz"
 TERMUX_PKG_SHA256=941defe5565eebfdf810de27b2b212621959e32dc82a11eb2c70df7dd4b3f305
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtshadertools, qt6-qtsvg, qt6-qtwayland, xxhash, zlib"
