@@ -452,7 +452,7 @@ lint_package() {
 		if (( ${#TERMUX_PKG_REVISION} )); then
 		echo -n "TERMUX_PKG_REVISION: "
 
-			if (( TERMUX_PKG_REVISION > 1 || TERMUX_PKG_REVISION < 999999999 )); then
+			if (( TERMUX_PKG_REVISION >= 1 && TERMUX_PKG_REVISION <= 999999999 )); then
 				echo "PASS"
 			else
 				echo "INVALID (allowed: number in range 1 - 999999999)"
