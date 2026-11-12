@@ -69,6 +69,7 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	grep -Hn "CXX_STD_LIB_LIBS" ./configure
+	"$CXX" --print-file-name "libc++.so"
 	exit 0
 }
 
@@ -104,6 +105,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	mkdir "$TERMUX_PREFIX"/opt/ghc-build-tree
+	cp -r . "$TERMUX_PREFIX"/opt/ghc-build-tree
+
 	cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
 
 	# Remove unnecessary flags. They would get written to settings file otherwise:
@@ -116,6 +120,7 @@ termux_step_make_install() {
 		--host="$target"
 
 	HOST_GHC_PKG="$(realpath ../../stage0/bin/ghc-pkg)" make install
+
 }
 
 termux_step_post_massage() {
