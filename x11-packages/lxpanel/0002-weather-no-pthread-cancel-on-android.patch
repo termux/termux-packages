@@ -1,0 +1,63 @@
+--- a/plugins/weather/weatherwidget.c
++++ b/plugins/weather/weatherwidget.c
+@@ -182,6 +182,13 @@
+ static gboolean gtk_weather_update_location_progress_bar (gpointer data);
+ 
+ static void * gtk_weather_get_location_threadfunc  (void * arg);
++#ifdef __ANDROID__
++/* bionic has neither pthread_cancel nor PTHREAD_CANCELED */
++#ifndef PTHREAD_CANCELED
++#define PTHREAD_CANCELED ((void *)-1)
++#endif
++static void * gtk_weather_cancelled_threadfunc (void * arg);
++#endif
+ static gboolean gtk_weather_get_forecast_timerfunc (gpointer data);
+ 
+ 
+@@ -2022,12 +2029,27 @@
+     case GTK_RESPONSE_CANCEL:
+       if (pthread_kill(*(priv->location_data.tid), 0) != ESRCH)
+         {
++#ifdef __ANDROID__
++          /* bionic has no pthread_cancel: wait for the lookup,
++             discard its result, then report cancellation. */
++          void * lookup_result = NULL;
++          if (pthread_join(*(priv->location_data.tid), &lookup_result) == 0
++              && lookup_result)
++            g_list_free_full((GList *)lookup_result, (GDestroyNotify)freeLocation);
++          pthread_t cancelled_tid;
++          if (pthread_create(&cancelled_tid, NULL,
++                             gtk_weather_cancelled_threadfunc, NULL) == 0)
++            *(priv->location_data.tid) = cancelled_tid;
++          else
++            pthread_detach(*(priv->location_data.tid));
++#else
+           int ret = pthread_cancel(*(priv->location_data.tid));
+ 
+           if (ret != 0)
+             {
+               LOG_ERRNO(ret, "pthread_cancel");
+             }
++#endif
+         }
+ 
+       break;
+@@ -2390,7 +2412,18 @@
+     {
+       gtk_weather_get_forecast_timerfunc((gpointer)weather);
+     }
++}
++
++#ifdef __ANDROID__
++/* bionic has no pthread_cancel: this stand-in lets a cancelled lookup
++   still join with PTHREAD_CANCELED (see GTK_RESPONSE_CANCEL below). */
++static void *
++gtk_weather_cancelled_threadfunc(void * arg)
++{
++  (void)arg;
++  return PTHREAD_CANCELED;
+ }
++#endif
+ 
+ /**
+  * The location retrieval thread function.
