@@ -1,0 +1,37 @@
+--- ghc-9.12.2/hadrian/src/Settings/Default.hs	2025-03-13 00:55:18.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Settings/Default.hs	2026-07-26 15:51:17.411113352 +0530
+@@ -176,10 +176,10 @@
+       , when (not cross)
+         [ haddock
+         , hpcBin
+-        , iserv
+         , runGhc
+         , ghcToolchainBin
+-        ]
++        ],
++        [ iserv ]
+       , when (winTarget && not cross)
+         [ -- See Note [Hadrian's ghci-wrapper package]
+           ghciWrapper
+--- ghc-9.12.2/hadrian/src/Rules/Program.hs	2025-03-13 00:55:18.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Rules/Program.hs	2026-07-26 14:23:26.754864544 +0530
+@@ -102,7 +102,7 @@
+   cross <- flag CrossCompiling
+   -- For cross compiler, copy @stage0/bin/<pgm>@ to @stage1/bin/@.
+   case (cross, stage) of
+-    (True, s) | s > stage0InTree -> do
++    (True, s) | s > stage0InTree && package /= iserv -> do
+         srcDir <- buildRoot <&> (-/- (stageString stage0InTree -/- "bin"))
+         copyFile (srcDir -/- takeFileName bin) bin
+     _ -> buildBinary rs bin ctx
+--- ghc-9.12.2/hadrian/src/Rules/BinaryDist.hs	2025-03-13 00:55:18.000000000 +0530
++++ ghc-9.12.2.mod/hadrian/src/Rules/BinaryDist.hs	2026-07-26 14:31:19.718285737 +0530
+@@ -155,7 +155,7 @@
+         all_pkgs <- stagePackages Stage1
+         (lib_targets, bin_targets) <- partitionEithers <$> mapM pkgTarget all_pkgs
+         cross <- flag CrossCompiling
+-        iserv_targets <- if cross then pure [] else iservBins
++        iserv_targets <- iservBins
+ 
+         let lib_exe_targets = (lib_targets ++ (map (\(_, p) -> p) (bin_targets ++ iserv_targets)))
+ 
