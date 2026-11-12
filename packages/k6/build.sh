@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://k6.io
 TERMUX_PKG_DESCRIPTION="Modern load-testing tool for developers and testers"
 TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION=2.3.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.4.0"
 TERMUX_PKG_SRCURL="https://github.com/grafana/k6/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=35d0e4ce17ac3b7557f220a63bd9486f24dd63e032fbe1aed8a79326191a2097
+TERMUX_PKG_SHA256=0eb3c64b3debee94d46a19ae895c10de6385b5f4b2a2c24956d49aabc1808bd1
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

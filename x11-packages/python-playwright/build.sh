@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://playwright.dev/python
 TERMUX_PKG_DESCRIPTION="Python bindings for Playwright browser automation"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.64.1"
+TERMUX_PKG_VERSION="1.65.1"
 TERMUX_PKG_SRCURL="https://github.com/microsoft/playwright-python/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=7fb347825975afdeabbf7284a273d2335fd05e64b6a3ed1ec005afaa7b8696a9
+TERMUX_PKG_SHA256=3385a900d46c5d10f9a1815a24504effcbf5e04aaeda5f0551a9b2be2a16ba2e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_DEPENDS="playwright, python, python-pip, python-greenlet"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="setuptools, setuptools-scm, wheel"
-TERMUX_PKG_PYTHON_TARGET_DEPS="pyee"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SETUP_PYTHON=true
 

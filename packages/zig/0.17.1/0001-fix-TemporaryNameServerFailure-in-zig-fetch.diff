@@ -1,0 +1,49 @@
+diff -ru a/zig/lib/libc/include/generic-musl/resolv.h b/zig/lib/libc/include/generic-musl/resolv.h
+--- a/zig/lib/libc/include/generic-musl/resolv.h
++++ b/zig/lib/libc/include/generic-musl/resolv.h
+@@ -64,7 +64,7 @@
+ #define	__RES	19960801
+ 
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ struct res_sym {
+diff -ru a/zig/lib/libc/musl/include/resolv.h b/zig/lib/libc/musl/include/resolv.h
+--- a/zig/lib/libc/musl/include/resolv.h
++++ b/zig/lib/libc/musl/include/resolv.h
+@@ -64,7 +64,7 @@
+ #define	__RES	19960801
+ 
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ struct res_sym {
+diff -ru a/zig/lib/libc/musl/src/network/resolvconf.c b/zig/lib/libc/musl/src/network/resolvconf.c
+--- a/zig/lib/libc/musl/src/network/resolvconf.c
++++ b/zig/lib/libc/musl/src/network/resolvconf.c
+@@ -18,7 +18,7 @@
+ 	conf->attempts = 2;
+ 	if (search) *search = 0;
+ 
+-	f = __fopen_rb_ca("/etc/resolv.conf", &_f, _buf, sizeof _buf);
++	f = __fopen_rb_ca("@TERMUX_PREFIX@/etc/resolv.conf", &_f, _buf, sizeof _buf);
+ 	if (!f) switch (errno) {
+ 	case ENOENT:
+ 	case ENOTDIR:
+diff -ru a/zig/lib/std/Io/net/HostName.zig b/zig/lib/std/Io/net/HostName.zig
+--- a/zig/lib/std/Io/net/HostName.zig
++++ b/zig/lib/std/Io/net/HostName.zig
+@@ -429,7 +429,8 @@
+             .attempts = 2,
+         };
+ 
+-        const file = Io.Dir.openFileAbsolute(io, "/etc/resolv.conf", .{}) catch |err| switch (err) {
++        const resolvconf = Io.Dir.openFileAbsolute(io, "/etc/resolv.conf", .{}) catch Io.Dir.openFileAbsolute(io, "@TERMUX_PREFIX@/etc/resolv.conf", .{});
++        const file = resolvconf catch |err| switch (err) {
+             error.FileNotFound,
+             error.NotDir,
+             error.AccessDenied,
