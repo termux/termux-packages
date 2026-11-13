@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Opensource API Client for Exploring and Testing APIs"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="4.3.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/usebruno/bruno/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=0fa45df272c49e9c82e7192c5066162e02c26c89c017ceb8d7c07156b1e54e24
-TERMUX_PKG_DEPENDS="electron42, libx11"
-TERMUX_PKG_BUILD_DEPENDS="electron42-headers, pkg-config"
+TERMUX_PKG_DEPENDS="electron43, libx11"
+TERMUX_PKG_BUILD_DEPENDS="electron43-headers, pkg-config"
 TERMUX_PKG_BUILD_IN_SRC=true
 # Chromium/Electron don't support i686 on Linux.
 TERMUX_PKG_EXCLUDED_ARCHES="i686"
