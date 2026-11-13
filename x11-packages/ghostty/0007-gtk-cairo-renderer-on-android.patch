@@ -1,0 +1,15 @@
+--- a/src/apprt/gtk/class/application.zig
++++ b/src/apprt/gtk/class/application.zig
+@@ -3306,6 +3306,12 @@ fn setGtkEnv(config: *const CoreConfig) std.Io.Writer.Error!void {
+         _ = setenv("GDK_DISABLE", @ptrCast(value[0 .. value.len - 1 :0]), 1);
+     }
+ 
++    {
++        if (comptime builtin.target.abi == .android) {
++            _ = setenv("GSK_RENDERER", "cairo", 0);
++        }
++    }
++
+     // Sync environ after altering system env
+     global.syncEnviron();
+ }
