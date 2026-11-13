@@ -1,0 +1,96 @@
+diff --git a/packages/native/build.zig b/packages/native/build.zig
+index b226da7..43d8d6d 100644
+--- a/packages/native/build.zig
++++ b/packages/native/build.zig
+@@ -367,8 +367,10 @@ fn addNativeAudioDependencies(
+         .macos => addMacOSSystemLibraries(b, module, macos_sdk_path.?),
+         .linux => {
+             module.linkSystemLibrary("dl", .{});
+-            module.linkSystemLibrary("pthread", .{});
+-            module.linkSystemLibrary("m", .{});
++            if (!target.result.abi.isAndroid()) {
++                module.linkSystemLibrary("pthread", .{});
++                module.linkSystemLibrary("m", .{});
++            }
+         },
+         else => {},
+     }
+@@ -399,26 +401,53 @@ fn ghosttyVtAvailable(target: std.Build.ResolvedTarget) bool {
+     };
+ }
+ 
++fn bionicSysrootInclude(b: *std.Build) ?[]const u8 {
++    const path = b.graph.environ_map.get("BIONIC_SYSROOT_INC") orelse return null;
++    return path;
++}
++
++fn bionicSysrootLib(b: *std.Build, target: std.Build.ResolvedTarget) ?[]const u8 {
++    if (!target.result.abi.isAndroid()) return null;
++    const home = b.graph.environ_map.get("ANDROID_NDK_HOME") orelse return null;
++    const triple: []const u8 = switch (target.result.cpu.arch) {
++        .aarch64 => "aarch64-linux-android",
++        .x86_64 => "x86_64-linux-android",
++        else => return null,
++    };
++    return b.fmt("{s}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/{s}", .{ home, triple });
++}
++
+ fn addTranslatedCImports(
+     b: *std.Build,
+     module: *std.Build.Module,
+     optimize: std.builtin.OptimizeMode,
+     target: std.Build.ResolvedTarget,
+ ) void {
++    const bionic_inc = bionicSysrootInclude(b);
+     const miniaudio_translate = b.addTranslateC(.{
+-        .root_source_file = b.path("src/vendor/miniaudio/miniaudio.h"),
++        .root_source_file = if (bionic_inc != null)
++            .{ .cwd_relative = b.fmt("{s}/__opentui/miniaudio_shimmed.h", .{bionic_inc.?}) }
++        else
++            b.path("src/vendor/miniaudio/miniaudio.h"),
+         .target = target,
+         .optimize = optimize,
+     });
++    if (bionic_inc) |inc| {
++        miniaudio_translate.addIncludePath(.{ .cwd_relative = inc });
++    }
+     miniaudio_translate.addIncludePath(b.path("src"));
+     module.addImport("miniaudio", miniaudio_translate.createModule());
+ 
+     const yoga_dep = b.dependency("yoga", .{});
+     const yoga_translate = b.addTranslateC(.{
+-        .root_source_file = yoga_dep.path("yoga/Yoga.h"),
++        .root_source_file = if (bionic_inc != null)
++            .{ .cwd_relative = b.fmt("{s}/__opentui/Yoga_shimmed.h", .{bionic_inc.?}) }
++        else
++            yoga_dep.path("yoga/Yoga.h"),
+         .target = target,
+         .optimize = optimize,
+     });
++    if (bionic_inc) |inc| yoga_translate.addIncludePath(.{ .cwd_relative = inc });
+     yoga_translate.addIncludePath(yoga_dep.path(""));
+     module.addImport("yoga", yoga_translate.createModule());
+ }
+@@ -432,6 +461,8 @@ fn applyDependencies(
+     build_options: *std.Build.Step.Options,
+ ) void {
+     module.addOptions("build_options", build_options);
++    if (bionicSysrootInclude(b)) |inc| module.addSystemIncludePath(.{ .cwd_relative = inc });
++    if (bionicSysrootLib(b, target)) |lib| module.addLibraryPath(.{ .cwd_relative = lib });
+     addTranslatedCImports(b, module, optimize, target);
+ 
+     const ghostty_vt_available = ghosttyVtAvailable(target);
+diff --git a/packages/native/src/clipboard/host.zig b/packages/native/src/clipboard/host.zig
+index 6305136..f9eb79c 100644
+--- a/packages/native/src/clipboard/host.zig
++++ b/packages/native/src/clipboard/host.zig
+@@ -103,6 +103,9 @@ extern "c" fn pthread_tryjoin_np(thread: std.Thread.Handle, result: ?*?*anyopaqu
+ extern "c" fn pthread_peekjoin_np(thread: std.Thread.Handle, result: ?*?*anyopaque) c_int;
+ 
+ fn tryJoinThread(thread: std.Thread) bool {
++    if (builtin.os.tag == .linux and builtin.abi.isAndroid()) {
++        return false;
++    }
+     return switch (builtin.os.tag) {
+         .linux => switch (pthread_tryjoin_np(thread.getHandle(), null)) {
+             0 => true,

@@ -1,0 +1,22 @@
+diff --git a/packages/tui/src/routes/session/message-parts.tsx b/packages/tui/src/routes/session/message-parts.tsx
+index f63ba65..fdda910 100644
+--- a/packages/tui/src/routes/session/message-parts.tsx
++++ b/packages/tui/src/routes/session/message-parts.tsx
+@@ -64,7 +64,7 @@ export function ReasoningPart(props: {
+   })
+   const summary = createMemo(() => reasoningSummary(content()))
+   const toggle = () => {
+-    if (!inMinimal()) return
++    if (!inMinimal() || !isDone()) return
+     setExpanded((prev) => !prev)
+   }
+ 
+@@ -77,7 +77,7 @@ export function ReasoningPart(props: {
+           borderColor={theme.decrease(theme.background.base)}
+           paddingLeft={!inMinimal() || expanded() ? 1 : 0}
+         >
+-          <box onMouseUp={toggle}>
++          <box onMouseUp={isDone() ? toggle : undefined}>
+             <ReasoningHeader
+               toggleable={inMinimal()}
+               open={!inMinimal() || expanded()}
