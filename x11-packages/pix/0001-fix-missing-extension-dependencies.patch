@@ -1,0 +1,34 @@
+--- a/extensions/cairo_io/meson.build
++++ b/extensions/cairo_io/meson.build
+@@ -37,6 +37,7 @@
+   dependencies : [
+     extension_common_deps,
+     jpeg_deps,
++    use_lcms2 ? lcms2_dep : [],
+     use_libtiff ? tiff_deps : [],
+     use_librsvg ? librsvg_dep : [],
+     use_libwebp ? libwebp_dep : [],
+--- a/extensions/image_viewer/meson.build
++++ b/extensions/image_viewer/meson.build
+@@ -14,7 +14,11 @@
+ 
+ image_viewer_mod = shared_library('image_viewer',
+   sources : [ source_files, gresource_files ],
+-  dependencies : extension_common_deps,
++  dependencies : [
++    extension_common_deps,
++    use_libwebp ? libwebp_dep : [],
++    use_libjxl ? libjxl_deps : []
++  ],
+   include_directories : [ config_inc, pix_inc ],
+   c_args : c_args,
+   link_with : jpeg_utils_mod,
+--- a/pix/meson.build
++++ b/pix/meson.build
+@@ -335,6 +335,7 @@
+   include_directories : [ config_inc, pix_inc ],
+   c_args : c_args,
+   implib : true,
++  export_dynamic : true,
+   install : true
+ )
