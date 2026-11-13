@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://github.com/seerr-team/seerr"
 TERMUX_PKG_DESCRIPTION="A fork of Overseerr with focus on adding support for Jellyfin/Emby"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.5.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="3.5.2"
 TERMUX_PKG_SRCURL="https://github.com/seerr-team/seerr/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=08be110365b520d8bfa227278b6d84c9d6104a2c838decf68669ab127f622b11
+TERMUX_PKG_SHA256=d4340a2eb2c11e30dc7fbb600eb576e5694226580a3405e2879b768a3b53bb12
 TERMUX_PKG_BUILD_DEPENDS="nodejs, libvips, pkg-config"
 TERMUX_PKG_DEPENDS="nodejs | nodejs-lts, libvips, termux-services"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -66,29 +65,13 @@ termux_step_pre_configure() {
 		sed -i 's/const isWebContainer = .*;/const isWebContainer = true;/g' "$INDEX_JS"
 	fi
 
-	# Disable swcMinify in config file to prevent build issues
-	local CONFIG_FILE=""
-	if [ -f "next.config.ts" ]; then
-		CONFIG_FILE="next.config.ts"
-	elif [ -f "next.config.js" ]; then
-		CONFIG_FILE="next.config.js"
-	fi
-
-	if [ -n "$CONFIG_FILE" ]; then
-		if ! grep -q "swcMinify: false" "$CONFIG_FILE"; then
-			if grep -q "const nextConfig: NextConfig = {" "$CONFIG_FILE"; then
-				sed -i 's/const nextConfig: NextConfig = {/const nextConfig: NextConfig = {\n  swcMinify: false,/' "$CONFIG_FILE"
-			elif grep -q "module.exports = {" "$CONFIG_FILE"; then
-				sed -i 's/module.exports = {/module.exports = {\n  swcMinify: false,/' "$CONFIG_FILE"
-			fi
-		fi
-	fi
-
 	# Force Next.js to use Webpack instead of Turbopack (the default in Next.js 16).
 	# Turbopack's runtime dynamically generates relative symlinks in .next/node_modules/
 	# pointing back to the temporary build directory, which go dead once relocated to
 	# $TERMUX_PREFIX for packaging (upstream bug: vercel/next.js#89851).
 	sed -i 's/"build:next": "next build"/"build:next": "next build --webpack"/g' package.json
+	grep -q '"build:next": "next build --webpack"' package.json || \
+		termux_error_exit "Failed to force webpack in package.json"
 }
 
 termux_step_make() {
