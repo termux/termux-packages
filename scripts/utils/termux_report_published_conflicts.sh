@@ -11,7 +11,7 @@ while read -r number title; do
 	cached_issues["$number"]="'${title}'" # extra quotes avoid false positive substring matches
 done < <(
 	gh issue list \
-		--limit 10000 \
+		--limit 100000 \
 		--label "file conflict" --label "bot" \
 		--state open \
 		--search "File conflict: in:title type:issue" \
