@@ -1,0 +1,40 @@
+--- a/src/ptyxis-tab.c
++++ b/src/ptyxis-tab.c
+@@ -25,7 +25,7 @@
+ 
+ #include <cairo.h>
+ 
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ # include <libportal/portal.h>
+ # include <libportal-gtk4/portal-gtk4.h>
+ #endif
+@@ -115,7 +115,7 @@ static void ptyxis_tab_respawn (PtyxisTab *self);
+ 
+ G_DEFINE_FINAL_TYPE (PtyxisTab, ptyxis_tab, GTK_TYPE_WIDGET)
+ 
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ static XdpPortal *portal;
+ #endif
+ 
+@@ -2005,7 +2005,7 @@ ptyxis_tab_get_command_line (PtyxisTab *self)
+   return self->command_line;
+ }
+ 
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ static void
+ ptyxis_tab_toast (PtyxisTab  *self,
+                   int         timeout,
+--- a/agent/meson.build
++++ b/agent/meson.build
+@@ -43,7 +43,7 @@ ptyxis_agent_c_args = [
+ ]
+ 
+ libc_compat = true
+-if target_machine.cpu_family() == 'x86_64'
++if false
+   ptyxis_agent_c_args += ['-include', 'x86_64/force_link_glibc_2.17.h']
+ else
+   libc_compat = false

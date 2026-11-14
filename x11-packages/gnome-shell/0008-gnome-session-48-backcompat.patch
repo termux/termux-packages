@@ -1,0 +1,132 @@
+We don't ship gnome-session 49 yet.
+---
+From 078fbcde4147147d47b9facafba5de4a9db4abd7 Mon Sep 17 00:00:00 2001
+From: Achill Gilgenast <achill@achill.org>
+Date: Tue, 16 Sep 2025 09:36:10 +0200
+Subject: [PATCH 1/2] Reapply "main: Notify gnome-session when we're ready"
+
+This reverts commit d697bdceaefeae49ad0e03df7352884899c3e14a.
+
+Signed-off-by: Achill Gilgenast <achill@achill.org>
+---
+ js/ui/main.js | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/js/ui/main.js b/js/ui/main.js
+index 40898e15c23d..ae7a80527361 100644
+--- a/js/ui/main.js
++++ b/js/ui/main.js
+@@ -326,6 +326,7 @@ async function _initializeUI() {
+     GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+         Shell.util_sd_notify();
+         global.context.notify_ready();
++        _notifyGnomeSessionReady();
+         return GLib.SOURCE_REMOVE;
+     });
+ 
+@@ -390,6 +391,20 @@ async function _initializeUI() {
+     });
+ }
+ 
++async function _notifyGnomeSessionReady() {
++    try {
++        let params = GLib.Variant.new('(ss)', ['org.gnome.Shell.desktop', '']);
++        await Gio.DBus.session.call(
++            'org.gnome.SessionManager',
++            '/org/gnome/SessionManager',
++            'org.gnome.SessionManager',
++            'RegisterClient', params, null,
++            Gio.DBusCallFlags.NONE, -1, null);
++    } catch (e) {
++        log(`Error notifying gnome-session that we're ready: ${e.message}`);
++    }
++}
++
+ function _handleShowWelcomeScreen() {
+     const lastShownVersion = global.settings.get_string(WELCOME_DIALOG_LAST_SHOWN_VERSION);
+     if (Util.GNOMEversionCompare(WELCOME_DIALOG_LAST_TOUR_CHANGE, lastShownVersion) > 0) {
+-- 
+2.51.0
+
+From ca32ea422d2b075406a78058a14b0898ddb87698 Mon Sep 17 00:00:00 2001
+From: Achill Gilgenast <achill@achill.org>
+Date: Tue, 16 Sep 2025 09:36:18 +0200
+Subject: [PATCH 2/2] Revert "data: Drop org.gnome.Shell.desktop"
+
+This reverts commit f3911151da7b0e3c630011cb26bd85f719e531d2.
+
+Signed-off-by: Achill Gilgenast <achill@achill.org>
+---
+ data/meson.build                                    | 13 ++++++++++++-
+ ....in => org.gnome.Shell.Extensions.desktop.in.in} |  0
+ ...n => org.gnome.Shell.PortalHelper.desktop.in.in} |  0
+ data/org.gnome.Shell.desktop.in.in                  | 13 +++++++++++++
+ 4 files changed, 25 insertions(+), 1 deletion(-)
+ rename data/{org.gnome.Shell.Extensions.desktop.in => org.gnome.Shell.Extensions.desktop.in.in} (100%)
+ rename data/{org.gnome.Shell.PortalHelper.desktop.in => org.gnome.Shell.PortalHelper.desktop.in.in} (100%)
+ create mode 100644 data/org.gnome.Shell.desktop.in.in
+
+diff --git a/data/meson.build b/data/meson.build
+index cc7b5e2a1fe6..76a32ca59f1b 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -1,6 +1,7 @@
+ data_builddir = meson.current_build_dir()
+ 
+ desktop_files = [
++  'org.gnome.Shell.desktop',
+   'org.gnome.Shell.Extensions.desktop',
+ ]
+ service_files = []
+@@ -10,9 +11,19 @@ if have_portal_helper
+   service_files += 'org.gnome.Shell.PortalHelper.service'
+ endif
+ 
++desktopconf = configuration_data()
++# We substitute in bindir so it works as an autostart
++# file when built in a non-system prefix
++desktopconf.set('bindir', bindir)
++desktopconf.set('systemd_hidden', have_systemd ? 'true' : 'false')
++
+ foreach desktop_file : desktop_files
+   i18n.merge_file(
+-    input: desktop_file + '.in',
++    input: configure_file(
++      input: desktop_file + '.in.in',
++      output: desktop_file + '.in',
++      configuration: desktopconf
++    ),
+     output: desktop_file,
+     po_dir: po_dir,
+     install: true,
+diff --git a/data/org.gnome.Shell.Extensions.desktop.in b/data/org.gnome.Shell.Extensions.desktop.in.in
+similarity index 100%
+rename from data/org.gnome.Shell.Extensions.desktop.in
+rename to data/org.gnome.Shell.Extensions.desktop.in.in
+diff --git a/data/org.gnome.Shell.PortalHelper.desktop.in b/data/org.gnome.Shell.PortalHelper.desktop.in.in
+similarity index 100%
+rename from data/org.gnome.Shell.PortalHelper.desktop.in
+rename to data/org.gnome.Shell.PortalHelper.desktop.in.in
+diff --git a/data/org.gnome.Shell.desktop.in.in b/data/org.gnome.Shell.desktop.in.in
+new file mode 100644
+index 000000000000..59d1cd2fe924
+--- /dev/null
++++ b/data/org.gnome.Shell.desktop.in.in
+@@ -0,0 +1,13 @@
++[Desktop Entry]
++Type=Application
++Name=GNOME Shell
++Comment=Window management and application launching
++Exec=@bindir@/gnome-shell
++Categories=GNOME;GTK;Core;
++OnlyShowIn=GNOME;
++NoDisplay=true
++X-GNOME-Autostart-Phase=DisplayServer
++X-GNOME-Provides=panel;windowmanager;
++X-GNOME-Autostart-Notify=true
++X-GNOME-AutoRestart=false
++X-GNOME-HiddenUnderSystemd=@systemd_hidden@
+-- 
+2.51.0
+
+

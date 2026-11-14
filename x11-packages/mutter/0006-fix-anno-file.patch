@@ -1,0 +1,17 @@
+Fallback to `@TERMUX_PREFIX@/tmp` if env `XDG_RUNTIME_DIR` is not set.
+
+--- a/mtk/mtk/mtk-anonymous-file.c
++++ b/mtk/mtk/mtk-anonymous-file.c
+@@ -121,6 +121,12 @@ create_anonymous_file (const char *name,
+       g_autofree char *filename = NULL;
+ 
+       path = g_get_user_runtime_dir ();
++#ifdef __TERMUX__
++      if (!path)
++        {
++          path = "@TERMUX_PREFIX@/tmp";
++        }
++#endif
+       if (!path)
+         {
+           errno = ENOENT;

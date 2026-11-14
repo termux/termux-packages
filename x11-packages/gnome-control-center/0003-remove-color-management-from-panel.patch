@@ -1,0 +1,58 @@
+diff --git a/meson.build b/meson.build
+index 684fccd..6e4a052 100644
+--- a/meson.build
++++ b/meson.build
+@@ -182,7 +182,7 @@ subproject('libgxdp',
+ )
+ 
+ accounts_dep = dependency('accountsservice', version: '>= 23.11.69')
+-colord_dep = dependency('colord', version: '>= 0.1.34')
++colord_dep = dependency('colord', version: '>= 0.1.34', required: false)
+ gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: '>= 2.23.0')
+ gio_dep = dependency('gio-2.0')
+ glib_dep = dependency('glib-2.0', version: '>= 2.76.6')
+@@ -334,6 +334,8 @@ config_h.set('HAVE_WACOM', host_is_linux_not_s390,
+              description: 'Define to 1 if Wacom is supportted')
+ config_h.set('BUILD_THUNDERBOLT', host_is_linux_not_s390,
+              description: 'Define to 1 to build the Thunderbolt panel')
++config_h.set('HAVE__COLORD', colord_dep.found(),
++             description: 'Build with color management in panel')
+ 
+ gnome = import('gnome')
+ i18n = import('i18n')
+diff --git a/panels/meson.build b/panels/meson.build
+index fc37f02..0877009 100644
+--- a/panels/meson.build
++++ b/panels/meson.build
+@@ -7,7 +7,6 @@ dependent_panels = [
+ panels = [
+   'applications',
+   'background',
+-  'color',
+   'display',
+   'mouse',
+   'multitasking',
+diff --git a/shell/cc-panel-loader.c b/shell/cc-panel-loader.c
+index 85482e5..ffeda92 100644
+--- a/shell/cc-panel-loader.c
++++ b/shell/cc-panel-loader.c
+@@ -36,7 +36,9 @@ extern GType cc_background_panel_get_type (void);
+ #ifdef BUILD_BLUETOOTH
+ extern GType cc_bluetooth_panel_get_type (void);
+ #endif /* BUILD_BLUETOOTH */
++#ifdef HAVE__COLORD
+ extern GType cc_color_panel_get_type (void);
++#endif
+ extern GType cc_date_time_panel_get_type (void);
+ extern GType cc_display_panel_get_type (void);
+ extern GType cc_keyboard_panel_get_type (void);
+@@ -97,7 +99,9 @@ static CcPanelLoaderVtable default_panels[] =
+ #ifdef BUILD_BLUETOOTH
+   PANEL_TYPE("bluetooth",        cc_bluetooth_panel_get_type,            NULL),
+ #endif
++#ifdef HAVE__COLORD
+   PANEL_TYPE("color",            cc_color_panel_get_type,                NULL),
++#endif
+   PANEL_TYPE("display",          cc_display_panel_get_type,              NULL),
+   PANEL_TYPE("keyboard",         cc_keyboard_panel_get_type,             NULL),
+   PANEL_TYPE("mouse",            cc_mouse_panel_get_type,                NULL),

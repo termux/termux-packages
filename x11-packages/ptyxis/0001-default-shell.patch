@@ -1,0 +1,40 @@
+--- a/agent/ptyxis-agent-impl.c
++++ b/agent/ptyxis-agent-impl.c
+@@ -349,7 +349,7 @@ ptyxis_agent_impl_get_preferred_shell_cb (GObject      *object,
+   g_autoptr(GError) error = NULL;
+   g_autofree char *stdout_buf = NULL;
+   PtyxisIpcAgent *agent;
+-  const char *default_shell = "/bin/sh";
++  const char *default_shell = "@TERMUX_PREFIX@/bin/bash";
+ 
+   g_assert (G_IS_SUBPROCESS (subprocess));
+   g_assert (G_IS_ASYNC_RESULT (result));
+@@ -381,7 +381,7 @@ static gboolean
+ ptyxis_agent_impl_handle_get_preferred_shell (PtyxisIpcAgent        *agent,
+                                               GDBusMethodInvocation *invocation)
+ {
+-  const char *default_shell = "/bin/sh";
++  const char *default_shell = "@TERMUX_PREFIX@/bin/bash";
+   struct passwd *pw;
+ 
+   g_assert (PTYXIS_IS_AGENT_IMPL (agent));
+--- a/src/org.gnome.Ptyxis.gschema.xml.in
++++ b/src/org.gnome.Ptyxis.gschema.xml.in
+@@ -287,7 +287,7 @@
+     </key>
+ 
+     <key name="use-custom-command" type="b">
+-      <default>false</default>
++      <default>true</default>
+       <summary>Use Custom Command</summary>
+       <description>If a custom command should be used</description>
+     </key>
+@@ -299,7 +299,7 @@
+     </key>
+ 
+     <key name="custom-command" type="s">
+-      <default>''</default>
++      <default>'@TERMUX_PREFIX@/bin/bash'</default>
+       <summary>Custom Command</summary>
+       <description>A custom command for the shell</description>
+     </key>

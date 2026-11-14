@@ -1,0 +1,20 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -569,12 +569,17 @@
+ 	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
+ endif(NOT HAVE_ICONV)
+ 
++if(CMAKE_CROSSCOMPILING)
++	file(COPY "$ENV{ICONV_DETECT_H}" DESTINATION "${CMAKE_BINARY_DIR}/")
++	set(_correct_iconv 1)
++else()
+ set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBS})
+ file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/" _binary_dir_with_separator)
+ CHECK_C_SOURCE_RUNS("#define ICONV_DETECT_BUILD_DIR \"${_binary_dir_with_separator}\"
+ 		     #include \"${CMAKE_SOURCE_DIR}/iconv-detect.c\"" _correct_iconv)
+ unset(_binary_dir_with_separator)
+ unset(CMAKE_REQUIRED_LIBRARIES)
++endif()
+ 
+ if(NOT _correct_iconv)
+ 	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
