@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A Git-compatible VCS that is both simple and powerful"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="0.47.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jj-vcs/jj/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=838fb5ddbf474ccee6639ce68835cedf88c8285b5c812599c56688286fb0b7a6
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -12,6 +13,19 @@ TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
+
+	cargo vendor
+	find ./vendor \
+		-mindepth 1 -maxdepth 1 -type d \
+		! -wholename ./vendor/cc \
+		-exec rm -rf '{}' \;
+
+	local cc_patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
+	patch -p1 -d vendor/cc < "$cc_patch"
+
+	echo "" >> Cargo.toml
+	echo '[patch.crates-io]' >> Cargo.toml
+	echo "cc = { path = \"./vendor/cc\" }" >> Cargo.toml
 }
 
 termux_step_make() {
