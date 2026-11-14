@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE='https://invent.kde.org/frameworks/kpackage'
 TERMUX_PKG_DESCRIPTION='Framework that lets applications manage user installable packages of non-binary assets'
 TERMUX_PKG_LICENSE="LGPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.31.0"
+TERMUX_PKG_VERSION="6.32.0"
 TERMUX_PKG_SRCURL="https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/kpackage-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=cdfdc95ccc31f753f30d62918c8098d8544b08c10b70835628839198671c13a3
+TERMUX_PKG_SHA256=f3959f4a5956a29ce9bd083410d7df63d4f93a1a4e451cb87c2ccf834995e3ca
 TERMUX_PKG_DEPENDS="kf6-karchive (>= ${TERMUX_PKG_VERSION%.*}), kf6-kcoreaddons (>= ${TERMUX_PKG_VERSION%.*}), kf6-ki18n (>= ${TERMUX_PKG_VERSION%.*}), libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION%.*}), qt6-qttools, kf6-kdoctools-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
