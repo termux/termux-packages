@@ -16,7 +16,7 @@ termux_step_post_get_source() {
 	# after SOVERSION is changed.
 	local _SOVERSION=2.15
 
-	if [[ ! "${TERMUX_PKG_VERSION}" =~ ^${_SOVERSION//./\.}\. ]]; then
+	if [[ "${TERMUX_PKG_VERSION}" != "${_SOVERSION}."* ]]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 }
