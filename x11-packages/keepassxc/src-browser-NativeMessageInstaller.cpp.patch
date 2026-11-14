@@ -1,0 +1,18 @@
+--- a/src/browser/NativeMessageInstaller.cpp
++++ b/src/browser/NativeMessageInstaller.cpp
+@@ -365,6 +365,15 @@
+  */
+ bool NativeMessageInstaller::createNativeMessageFile(SupportedBrowsers browser)
+ {
++#ifdef __ANDROID__
++    // Termux/Android fork patch: the native-messaging manifest is hand-placed (its
++    // "path" entry is managed outside the GUI). Rewriting it here would clobber it
++    // back to the raw proxy path on every enable/shutdown cycle. Skip the write and
++    // report success so no error dialog fires up the call chain
++    // (BrowserService::setEnabled -> updateBinaryPaths -> setBrowserEnabled -> here).
++    Q_UNUSED(browser);
++    return true;
++#endif
+     auto path = getNativeMessagePath(browser);
+ 
+     // Make the parent directory path if necessary

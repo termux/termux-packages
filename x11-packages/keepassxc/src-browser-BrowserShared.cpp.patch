@@ -1,0 +1,19 @@
+--- a/src/browser/BrowserShared.cpp
++++ b/src/browser/BrowserShared.cpp
+@@ -53,7 +53,15 @@
+     QString localServerPath()
+     {
+         const auto serverName = QStringLiteral("/org.keepassxc.KeePassXC.BrowserServer");
+-#if defined(KEEPASSXC_DIST_SNAP)
++#if defined(__ANDROID__)
++        // Termux: the XDG_RUNTIME_DIR-derived default path exceeds
++        // the 107-char AF_UNIX sun_path limit, and a browser-launched proxy inherits
++        // none of our env overrides. Hardcode a short, deterministic socket directory
++        // that GUI and keepassxc-proxy derive identically WITHOUT any environment setup.
++        const QString termuxSocketDir = QStringLiteral("@TERMUX_PREFIX@/tmp/kx/app");
++        QDir().mkpath(termuxSocketDir);
++        return termuxSocketDir + serverName;
++#elif defined(KEEPASSXC_DIST_SNAP)
+         return QProcessEnvironment::systemEnvironment().value("SNAP_USER_COMMON") + serverName;
+ #elif defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
+         // This returns XDG_RUNTIME_DIR or else a temporary subdirectory.
