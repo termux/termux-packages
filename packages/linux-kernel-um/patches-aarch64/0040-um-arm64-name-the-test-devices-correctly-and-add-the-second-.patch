@@ -1,0 +1,57 @@
+From 8d984326036a8d1c9ae9d5debcebf6d0895344cd Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 11:30:11 +0200
+Subject: [PATCH] um: arm64: name the test devices correctly and add the second
+ one
+
+The tested-on list said Xiaomi Mi 11 / Snapdragon 888. The device is a
+Poco F3: M2012K11AG, codename alioth, Snapdragon 870 / SM8250. Same
+mistake in the benchmark section.
+
+Add the Galaxy S26 Ultra, which is not a second data point but the other
+half of the coverage: Armv9 with SVE and pointer authentication against
+Armv8.2 with neither, and a 6.12 host that has PTRACE_SYSEMU against a
+4.19 one that does not. Two of the three bugs on this branch are NOPs on
+the older phone and fatal on the newer, so testing on one of them alone
+proves very little.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ README.md | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/README.md b/README.md
+index b0343e8b031e..c3ac68c7b607 100644
+--- a/README.md
++++ b/README.md
+@@ -57,10 +57,17 @@ reading it, and all fixed on this branch:
+ 
+ Tested on:
+ 
+-- **Xiaomi Mi 11** (Snapdragon 888), Android 15, host kernel `4.19.246`, 4 KB pages.
+-  That host has no `PTRACE_SYSEMU` — arm64 gained it in 5.3 — which is why the
+-  cancellation and substitution paths exist and are exercised daily rather than
+-  theoretically.
++- **Poco F3** (`M2012K11AG`/`alioth`, Snapdragon 870 / SM8250), Android 15, host
++  kernel `4.19.246`, 4 KB pages, Armv8.2. That host has no `PTRACE_SYSEMU` —
++  arm64 gained it in 5.3 — which is why the cancellation and substitution paths
++  exist and are exercised daily rather than theoretically. It also has neither
++  pointer authentication nor SVE, so it says nothing about either.
++- **Galaxy S26 Ultra** (`SM-S948B`/`m3q`), Android 16, host kernel `6.12.30`,
++  4 KB pages, Armv9 with SVE and pointer authentication. The opposite end: a
++  current host where `PTRACE_SYSEMU` is present and the CPU implements the
++  features the older phone lacks. Two of the three bugs above were invisible on
++  the Poco and immediate here — the PAC one is fatal on this CPU and a NOP on
++  that one — so the pair is the point rather than either device.
+ - An **arm64 Debian run domain** for the gates.
+ 
+ Both interception fallbacks can be forced anywhere with `nosysemu` and
+@@ -173,7 +180,7 @@ fails identically whether or not `CONFIG_VETH` is set — useless as a test.
+ 
+ ## Benchmarks
+ 
+-Measured on the Mi 11, `adb shell`, guest running `perfbench`. All three kernels
++Measured on the Poco F3, `adb shell`, guest running `perfbench`. All three kernels
+ are conditions **inside one interleaved run**, so a difference between them
+ cannot be thermal drift or governor state.
+ 

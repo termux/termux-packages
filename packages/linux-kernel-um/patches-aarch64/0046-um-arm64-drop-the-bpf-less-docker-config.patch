@@ -1,0 +1,105 @@
+From 413418f94d9d136b2db89ed603ae48a9b0b0c171 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 15:15:04 +0200
+Subject: [PATCH] um/arm64: drop the BPF-less docker config
+
+docker-bionic.config existed because BPF did not compile against bionic:
+the libc symbol renaming used -D, and the preprocessor rewrote the bare
+"snprintf" token inside __BPF_FUNC_MAPPER as well, so kernel/bpf/disasm.c
+asked for a BPF_FUNC_kernel_snprintf that does not exist. Renaming moved
+to objcopy, which cannot make that mistake, and BPF has built against
+bionic since; the workaround outlived its reason.
+
+It was also wrong on its own terms. It said dropping CGROUP_BPF costs
+only the device controller, and that docker "starts and runs". Docker
+starts; containers do not. runc calls bpf_prog_query(BPF_CGROUP_DEVICE)
+while setting up every container, and fails the create:
+
+	OCI runtime create failed: ... error setting cgroup config for
+	procHooks process: bpf_prog_query(BPF_CGROUP_DEVICE) failed:
+	function not implemented
+
+Verified on a Poco F3 with the fragment gone and CONFIG_BPF_SYSCALL=y:
+builds clean against NDK r27c, docker ready 9s after start, hello-world
+runs to completion, and nginx:alpine answers HTTP 200 through a
+forwarded port from the phone's own loopback.
+
+page16k.config comes along; it was only ever in the standalone tree.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ tools/um-arm64/config/docker-bionic.config | 16 ----------------
+ tools/um-arm64/config/docker.config        | 19 +++++++++++++++++++
+ tools/um-arm64/config/page16k.config       | 10 ++++++++++
+ 3 files changed, 29 insertions(+), 16 deletions(-)
+ delete mode 100644 tools/um-arm64/config/docker-bionic.config
+ create mode 100644 tools/um-arm64/config/page16k.config
+
+diff --git a/tools/um-arm64/config/docker-bionic.config b/tools/um-arm64/config/docker-bionic.config
+deleted file mode 100644
+index 3a727588456d7..0000000000000
+--- a/tools/um-arm64/config/docker-bionic.config
++++ /dev/null
+@@ -1,16 +0,0 @@
+-# Docker on the bionic build, minus BPF.
+-#
+-# CONFIG_BPF_SYSCALL does not compile against bionic here, and the reason is
+-# this port's own doing rather than anything in BPF: arch/arm64/Makefile.um
+-# renames a handful of libc names with -D so that bionic's own calls do not
+-# bind to the kernel's definitions, and "snprintf" is not only a function name
+-# but a bare token in __BPF_FUNC_MAPPER. The rename rewrites it there too, so
+-# kernel/bpf/disasm.c asks for BPF_FUNC_kernel_snprintf, which does not exist.
+-#
+-# The real fix is to rename at the object level (objcopy --redefine-sym) rather
+-# than in the preprocessor, where it cannot touch identifiers being assembled by
+-# token pasting. Until then this file is docker.config without CGROUP_BPF, which
+-# costs the device controller on cgroup v2 -- docker starts and runs; per
+-# container device rules are not enforced.
+-CONFIG_BPF_SYSCALL=n
+-CONFIG_CGROUP_BPF=n
+diff --git a/tools/um-arm64/config/docker.config b/tools/um-arm64/config/docker.config
+index 0ff651856e363..d15029fc89f53 100644
+--- a/tools/um-arm64/config/docker.config
++++ b/tools/um-arm64/config/docker.config
+@@ -8,6 +8,25 @@
+ # union filesystem and netfilter, all of which are generic kernel features. The
+ # one UML-specific prerequisite lives in config/usb-wifi.config's neighbours --
+ # see arch/um/Kconfig -- and is not needed for containers.
++#
++# This file used to have a docker-bionic.config beside it that turned
++# BPF_SYSCALL and CGROUP_BPF off, because BPF did not compile against bionic:
++# the libc symbol renaming was done with -D, and the preprocessor rewrote the
++# bare "snprintf" token inside __BPF_FUNC_MAPPER too, so kernel/bpf/disasm.c
++# asked for a BPF_FUNC_kernel_snprintf that does not exist. Renaming moved to
++# objcopy, which cannot touch a token being pasted into an identifier, and BPF
++# has built against bionic since.
++#
++# That variant was not merely redundant, it was broken: it claimed dropping
++# CGROUP_BPF only costs the device controller and that "docker starts and runs".
++# Docker starts; containers do not. runc calls bpf_prog_query(BPF_CGROUP_DEVICE)
++# while setting up every container and fails the create outright:
++#
++#	OCI runtime create failed: ... error setting cgroup config for procHooks
++#	process: bpf_prog_query(BPF_CGROUP_DEVICE) failed: function not implemented
++#
++# So there is one docker config again, and CGROUP_BPF below is required rather
++# than nice to have.
+ 
+ # --- namespaces: what actually isolates a container ---
+ CONFIG_NAMESPACES=y
+diff --git a/tools/um-arm64/config/page16k.config b/tools/um-arm64/config/page16k.config
+new file mode 100644
+index 0000000000000..d0ad2e6e5d570
+--- /dev/null
++++ b/tools/um-arm64/config/page16k.config
+@@ -0,0 +1,10 @@
++# 16 KB guest pages.
++#
++# A guest page is a host mmap(), so it can never be smaller than the host's
++# page size, and every Android 15+ device ships a 16 KB host kernel. A 4 KB
++# build refuses to run there -- correctly, in os_early_checks() -- so a binary
++# meant to run on modern phones has to be built this way.
++#
++# It costs nothing on a 4 KB host: one guest page is simply four host pages.
++# That is what makes a single 16 KB binary enough for both.
++CONFIG_PAGE_SIZE_16KB=y

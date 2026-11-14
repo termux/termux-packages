@@ -1,0 +1,144 @@
+From eb18fac1d000b24c7ee82bffc74db2837ed8e213 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 11:23:21 +0200
+Subject: [PATCH] um: arm64: disable pointer authentication in the stub
+
+A guest fork() creates a new mm, init_new_context() starts a new stub
+process for it, and starting a stub means execve(). On arm64 execve
+generates fresh pointer authentication keys and enables them, so the
+child of a guest fork() returns into a stub whose APIAKey is unrelated to
+the one that signed the return addresses already on its stack.
+
+glibc's _Fork has exactly that shape:
+
+	paciasp			// signs x30, in the parent's stub
+	svc #0			// clone; the child appears in a new stub
+	autiasp			// authenticates with a different key
+
+Since FEAT_FPAC, mandatory from Armv8.6, a failed authentication traps
+rather than corrupting a pointer, so the child dies inside _Fork before
+returning to its caller and before anything it might have printed. On a
+CPU without FEAT_PAuth the same instructions are NOPs, which is why this
+is invisible on older hardware and fatal on newer: the same static binary
+and the same disk image ran correctly on a Snapdragon 870 and, on a
+Galaxy S26, produced a daemon that accepted a connection and never
+answered, with nothing in any log.
+
+Turn the keys off in the stub. This is the consistent choice rather than
+a workaround: the port already refuses to advertise HWCAP_PACA and
+HWCAP_PACG to the guest, so a guest that has been told it has no pointer
+authentication should not be running with keys enabled underneath it. The
+instructions then execute as NOPs everywhere, as they already did on
+hardware without the feature.
+
+It has to be done in the stub after the exec, because the exec is what
+re-randomises and re-enables the keys, and before the seccomp filter is
+installed. Synchronising keys across stubs instead is not workable: they
+are reachable only through PTRACE_SETREGSET(NT_ARM_PACA_KEYS), and in
+SECCOMP mode the stub is never ptraced.
+
+The prctl's return value is ignored: a host without FEAT_PAuth answers
+-EINVAL, which is the case where there is nothing to disable.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/stub.h | 51 ++++++++++++++++++++++++++++++
+ arch/um/kernel/skas/stub_exe.c     |  6 ++++
+ arch/x86/um/shared/sysdep/stub.h   |  5 +++
+ 3 files changed, 62 insertions(+)
+
+diff --git a/arch/arm64/um/shared/sysdep/stub.h b/arch/arm64/um/shared/sysdep/stub.h
+index de7f7f020150d..9981ae6e1c51f 100644
+--- a/arch/arm64/um/shared/sysdep/stub.h
++++ b/arch/arm64/um/shared/sysdep/stub.h
+@@ -318,6 +318,57 @@ stub_seccomp_restore_state(struct stub_data_arch *arch)
+ 	arch->sync = 0;
+ }
+ 
++/*
++ * stub_arch_init() - what this architecture must do inside a fresh stub
++ *
++ * Turn pointer authentication off for the stub process.
++ *
++ * There is one stub per guest mm, so a guest fork() makes a new one, and a new
++ * stub is a new execve() -- which on arm64 makes the host generate fresh PAC
++ * keys and enable them. The child of a guest fork() therefore comes back in a
++ * process whose APIAKey has nothing to do with the one that signed the return
++ * addresses already sitting on its stack.
++ *
++ * glibc's _Fork is exactly that shape: paciasp on entry, the clone syscall in
++ * the middle, autiasp on the way out. The parent signs, the child
++ * authenticates with a different key, and since FEAT_FPAC (mandatory from
++ * Armv8.6) a failed authentication traps immediately rather than corrupting a
++ * pointer. The child dies inside _Fork, before returning to its caller and
++ * before anything it might have printed. On a CPU without FEAT_PAuth the same
++ * instructions are NOPs and nothing happens, which is why this is invisible on
++ * older hardware and fatal on newer.
++ *
++ * Making the instructions inert is the consistent answer rather than a
++ * workaround: the port already refuses to advertise HWCAP_PACA and HWCAP_PACG
++ * to the guest (see arch/arm64/um/cpuinfo.c), so a guest told it has no
++ * pointer authentication should not be running with keys enabled underneath.
++ * Synchronising keys across stubs is the alternative and is not workable --
++ * they are only reachable through PTRACE_SETREGSET(NT_ARM_PACA_KEYS), and in
++ * SECCOMP mode the stub is not ptraced at all.
++ *
++ * Must run after PR_SET_NO_NEW_PRIVS and before the seccomp filter is
++ * installed, and it cannot be done before the execve: the exec is precisely
++ * what re-randomises and re-enables the keys.
++ *
++ * The return value is ignored on purpose: a host without FEAT_PAuth answers
++ * -EINVAL, which is the case where there is nothing to disable.
++ */
++#ifndef PR_PAC_SET_ENABLED_KEYS
++#define PR_PAC_SET_ENABLED_KEYS	60
++#define PR_PAC_APIAKEY		(1UL << 0)
++#define PR_PAC_APIBKEY		(1UL << 1)
++#define PR_PAC_APDAKEY		(1UL << 2)
++#define PR_PAC_APDBKEY		(1UL << 3)
++#endif
++
++static __always_inline void stub_arch_init(void)
++{
++	stub_syscall5(__NR_prctl, PR_PAC_SET_ENABLED_KEYS,
++		      PR_PAC_APIAKEY | PR_PAC_APIBKEY |
++		      PR_PAC_APDAKEY | PR_PAC_APDBKEY,
++		      0 /* none enabled */, 0, 0);
++}
++
+ extern void stub_segv_handler(int, siginfo_t *, void *);
+ extern void stub_syscall_handler(void);
+ extern void stub_signal_interrupt(int, siginfo_t *, void *);
+diff --git a/arch/um/kernel/skas/stub_exe.c b/arch/um/kernel/skas/stub_exe.c
+index ad60d3215b904..002e62adee57f 100644
+--- a/arch/um/kernel/skas/stub_exe.c
++++ b/arch/um/kernel/skas/stub_exe.c
+@@ -40,6 +40,12 @@ noinline static void real_init(void)
+ 	/* Needed in SECCOMP mode (and safe to do anyway) */
+ 	stub_syscall5(__NR_prctl, PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+ 
++	/*
++	 * Whatever this architecture has to settle in a fresh stub, before the
++	 * seccomp filter is installed and so still able to make any syscall.
++	 */
++	stub_arch_init();
++
+ 	/* read information from STDIN and close it */
+ 	res = stub_syscall3(__NR_read, 0,
+ 			    (unsigned long)&init_data, sizeof(init_data));
+diff --git a/arch/x86/um/shared/sysdep/stub.h b/arch/x86/um/shared/sysdep/stub.h
+index a88af2a4e5cf8..58f6010ade116 100644
+--- a/arch/x86/um/shared/sysdep/stub.h
++++ b/arch/x86/um/shared/sysdep/stub.h
+@@ -91,6 +91,11 @@ static __always_inline unsigned long stub_cycles_per_us(void)
+ 	return 0;
+ }
+ 
++/* Nothing this architecture needs to do in a fresh stub. */
++static __always_inline void stub_arch_init(void)
++{
++}
++
+ extern void stub_segv_handler(int, siginfo_t *, void *);
+ extern void stub_syscall_handler(void);
+ extern void stub_signal_interrupt(int, siginfo_t *, void *);

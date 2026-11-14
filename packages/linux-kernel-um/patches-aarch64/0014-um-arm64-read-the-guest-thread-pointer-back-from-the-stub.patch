@@ -1,0 +1,129 @@
+From c0e3390d240488ae935adedd20600a184a69b9d2 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 02:00:27 +0200
+Subject: [PATCH] um: arm64: read the guest thread pointer back from the stub
+
+set_stub_state() pushes UML's cached TPIDR_EL0 into the stub, but
+get_stub_state() never read one back, so UML's copy could only ever be what
+it last wrote.
+
+That is fine on x86, where FS_BASE and GS_BASE can only change through
+arch_prctl() -- a syscall UML already sees. arm64 is different in kind:
+TPIDR_EL0 is writable at EL0, so a guest changes its thread pointer with a
+bare "msr" and the kernel is never told. Something real does exactly
+that: glibc's TLS_INIT_TP writes tpidr_el0 directly when it sets up the
+initial thread, as does musl.
+
+Without a readback, the first thread switch in a multi-threaded process
+reinstates UML's stale value and quietly destroys the main thread's TLS
+pointer. Capture it in the stub on the way into the handler, symmetric with
+the restore on the way out, and consume it in get_stub_state().
+
+x86 gets an empty save, matching its empty need.
+
+The ptrace path never had this problem because it reads NT_ARM_TLS on every
+stop.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/os-Linux/mcontext.c   | 14 ++++++++++++++
+ arch/arm64/um/shared/sysdep/stub.h  | 23 +++++++++++++++++++++++
+ arch/um/kernel/skas/stub.c          |  3 +++
+ arch/x86/um/shared/sysdep/stub_64.h | 11 +++++++++++
+ 4 files changed, 51 insertions(+)
+
+diff --git a/arch/arm64/um/os-Linux/mcontext.c b/arch/arm64/um/os-Linux/mcontext.c
+index 7b325c9e17936..adc1a9cd8640c 100644
+--- a/arch/arm64/um/os-Linux/mcontext.c
++++ b/arch/arm64/um/os-Linux/mcontext.c
+@@ -128,6 +128,20 @@ int get_stub_state(struct uml_pt_regs *regs, struct stub_data *data,
+ 
+ 	get_regs_from_mc(regs, mcontext);
+ 
++	/*
++	 * TPIDR_EL0 is not in the mcontext -- the host does not save it in a
++	 * signal frame, because on a real kernel it is per-thread state the
++	 * scheduler restores rather than something a handler can change. Under
++	 * UML the guest's threads all live in one stub process, so UML has to
++	 * track it, and the stub captured it for us on the way in.
++	 *
++	 * Reading it back rather than assuming it matters because the guest can
++	 * write TPIDR_EL0 itself with a single unprivileged "msr"; glibc and musl
++	 * both do exactly that when they set up the initial thread. See
++	 * stub_seccomp_save_state().
++	 */
++	regs->gp[HOST_TLS] = data->arch_data.tls;
++
+ 	fp = find_ctx(mcontext, UM_FPSIMD_MAGIC, &size);
+ 	if (!fp || size < sizeof(*fp))
+ 		return -EINVAL;
+diff --git a/arch/arm64/um/shared/sysdep/stub.h b/arch/arm64/um/shared/sysdep/stub.h
+index e75221c729ca4..67529942db912 100644
+--- a/arch/arm64/um/shared/sysdep/stub.h
++++ b/arch/arm64/um/shared/sysdep/stub.h
+@@ -185,6 +185,29 @@ static __always_inline void *get_stub_data(void)
+ 		   "r" (&fn)						\
+ 		: "x30", "memory")
+ 
++/*
++ * Report the guest's current TLS back to the kernel.
++ *
++ * x86 has nothing to do here: FS_BASE can only be changed with arch_prctl(),
++ * which is a syscall and therefore something UML already sees. arm64 is
++ * different in kind -- TPIDR_EL0 is writable at EL0, so a guest changes its
++ * thread pointer with a bare "msr" and the kernel is never told.
++ *
++ * Something real does exactly that: glibc's TLS_INIT_TP writes tpidr_el0
++ * directly when it sets up the initial thread, as does musl. Without this
++ * readback UML's idea of the thread pointer stays whatever it was when the
++ * process started, and stub_seccomp_restore_state() below then *reinstates*
++ * that stale value the next time this stub runs a different guest thread --
++ * quietly destroying the main thread's TLS pointer in any multi-threaded
++ * process. The ptrace path does not have the problem because it reads
++ * NT_ARM_TLS on every stop; this is the seccomp path's equivalent.
++ */
++static __always_inline void
++stub_seccomp_save_state(struct stub_data_arch *arch)
++{
++	__asm__ volatile ("mrs %0, tpidr_el0" : "=r" (arch->tls));
++}
++
+ /*
+  * Reinstate guest TLS after the stub is resumed for a different guest thread.
+  * On x86 this costs an arch_prctl(ARCH_SET_FS) syscall; on arm64 TPIDR_EL0 is
+diff --git a/arch/um/kernel/skas/stub.c b/arch/um/kernel/skas/stub.c
+index e09216a20cb57..cd8d62e34e995 100644
+--- a/arch/um/kernel/skas/stub.c
++++ b/arch/um/kernel/skas/stub.c
+@@ -118,6 +118,9 @@ stub_signal_interrupt(int sig, siginfo_t *info, void *p)
+ 	d->si_offset = (unsigned long)info - (unsigned long)&d->sigstack[0];
+ 	d->mctx_offset = (unsigned long)&uc->uc_mcontext - (unsigned long)&d->sigstack[0];
+ 
++	/* Capture arch state that is not part of the mcontext */
++	stub_seccomp_save_state(&d->arch_data);
++
+ restart_wait:
+ 	d->futex = FUTEX_IN_KERN;
+ 	do {
+diff --git a/arch/x86/um/shared/sysdep/stub_64.h b/arch/x86/um/shared/sysdep/stub_64.h
+index 2ad7a87ab52c1..81fef1c9ad032 100644
+--- a/arch/x86/um/shared/sysdep/stub_64.h
++++ b/arch/x86/um/shared/sysdep/stub_64.h
+@@ -138,6 +138,17 @@ static __always_inline void *get_stub_data(void)
+ 		:: "i" (STUB_SIZE),					\
+ 		   "i" (&fn))
+ 
++/*
++ * Nothing to capture: FS_BASE and GS_BASE can only be changed through
++ * arch_prctl(), which is a syscall the kernel already intercepts, so its idea
++ * of them is never stale. See the arm64 version, where the guest can change its
++ * thread pointer without any syscall at all.
++ */
++static __always_inline void
++stub_seccomp_save_state(struct stub_data_arch *arch)
++{
++}
++
+ static __always_inline void
+ stub_seccomp_restore_state(struct stub_data_arch *arch)
+ {

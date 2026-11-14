@@ -1,0 +1,22 @@
+diff --git a/virtio.c b/virtio.c
+index d7016cc..d03ede3 100644
+--- a/virtio.c
++++ b/virtio.c
+@@ -299,6 +299,17 @@ static bool vu_queue_empty(struct vu_virtq *vq)
+ 	return vring_avail_idx(vq) == vq->last_avail_idx;
+ }
+ 
++#include <stdint.h>
++#ifdef __ANDROID__
++/* Absent from the NDK linux/virtio_ring.h; stock implementation. */
++static inline int vring_need_event(uint16_t event_idx, uint16_t new_idx,
++				   uint16_t old_idx)
++{
++	return (uint16_t)(new_idx - event_idx - 1) <
++	       (uint16_t)(new_idx - old_idx);
++}
++#endif
++
+ /**
+  * vring_can_notify() - Check if a notification can be sent
+  * @dev:	Vhost-user device

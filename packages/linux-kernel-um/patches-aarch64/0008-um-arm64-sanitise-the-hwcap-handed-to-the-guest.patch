@@ -1,0 +1,275 @@
+From db12996e882d0c04f835f3420823aeb8c98870c7 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 21:51:35 +0200
+Subject: [PATCH] um: arm64: sanitise the HWCAP handed to the guest
+
+Forwarding the host's raw AT_HWCAP is unsafe. glibc's ifunc resolvers
+select memcpy/strlen implementations from these bits, so advertising a
+feature commits UML to preserving that feature's architectural state across
+syscalls, task switches and signals.
+
+In particular, advertising SVE on an SVE host would make glibc use SVE and
+the host put variable-length sve_context records in
+sigcontext.__reserved[], which arch/arm64/um/signal.c does not round-trip
+-- and os-Linux/registers.c already deliberately uses NT_PRFPREG rather
+than NT_ARM_SVE. Advertising a feature we decline to save is the
+inconsistency this fixes.
+
+Use an allowlist so unaudited bits default to off, and derive
+/proc/cpuinfo's Features line from the same mask so a library parsing it
+cannot reach a different conclusion than auxv.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/asm/elf.h |  14 ++--
+ arch/arm64/um/cpuinfo.c | 182 ++++++++++++++++++++++++++++++++--------
+ 2 files changed, 156 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm64/um/asm/elf.h b/arch/arm64/um/asm/elf.h
+index 4c1cec8d44141..46845702716e3 100644
+--- a/arch/arm64/um/asm/elf.h
++++ b/arch/arm64/um/asm/elf.h
+@@ -87,11 +87,15 @@ struct task_struct;
+ 
+ #define ELF_ET_DYN_BASE (2 * TASK_SIZE / 3)
+ 
+-extern long elf_aux_hwcap;
+-#define ELF_HWCAP (elf_aux_hwcap)
+-
+-extern long elf_aux_hwcap2;
+-#define ELF_HWCAP2 (elf_aux_hwcap2)
++/*
++ * Sanitised in arch/arm64/um/cpuinfo.c: the guest is told only about features
++ * whose architectural state UML actually preserves. Deliberately not the host's
++ * raw AT_HWCAP -- see the allowlist there.
++ */
++extern unsigned long um_arm64_elf_hwcap;
++extern unsigned long um_arm64_elf_hwcap2;
++#define ELF_HWCAP (um_arm64_elf_hwcap)
++#define ELF_HWCAP2 (um_arm64_elf_hwcap2)
+ 
+ extern char *elf_aux_platform;
+ #define ELF_PLATFORM (elf_aux_platform ?: ELF_PLATFORM_FALLBACK)
+diff --git a/arch/arm64/um/cpuinfo.c b/arch/arm64/um/cpuinfo.c
+index 6013b940d33ee..e4b5b22076c30 100644
+--- a/arch/arm64/um/cpuinfo.c
++++ b/arch/arm64/um/cpuinfo.c
+@@ -15,6 +15,7 @@
+  * during an arm64 kernel build, which does not run for ARCH=um, and hardcoding
+  * a copy of it would go stale against whatever host the binary is run on.
+  */
++#include <linux/array_size.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/seq_file.h>
+@@ -22,36 +23,163 @@
+ 
+ #include <asm/processor.h>
+ #include <arch.h>
++#include <linux/init.h>
++#include <uapi/asm/hwcap.h>
+ 
+ extern long elf_aux_hwcap;
+ extern long elf_aux_hwcap2;
+ 
+ /*
+- * The host's "Features" list, captured verbatim (minus the field name and the
+- * trailing newline). arm64 hosts list on the order of 40 short names; 512 bytes
+- * is comfortably above that and the string is truncated rather than overflowed
+- * if a future host exceeds it.
++ * What the guest is told it can do.
++ *
++ * UML must not simply forward the host's AT_HWCAP. glibc's ifunc resolvers pick
++ * memcpy/strlen/strcmp implementations from these bits, so advertising a
++ * feature obliges UML to preserve whatever architectural state that feature
++ * uses -- across syscalls, task switches and, above all, signal delivery.
++ *
++ * This is an allowlist rather than a denylist on purpose: a bit nobody has
++ * audited must default to "not advertised", because the failure mode of the
++ * other direction is a guest silently using state UML drops on the floor.
++ *
++ * Included: the FPSIMD baseline plus extensions that are purely new
++ * instructions over the X, V and PSTATE state UML already saves and restores.
++ * DIT and SSBS are PSTATE bits, and both are in UM_PSTATE_WRITABLE.
++ *
++ * Excluded, and why:
++ *
++ *   SVE, SVE2, SME   Z, P and ZA registers, and variable-length sve_context /
++ *                    za_context records inside sigcontext.__reserved[].
++ *                    arch/arm64/um/signal.c writes an fpsimd_context and
++ *                    nothing else, and os-Linux/registers.c deliberately uses
++ *                    NT_PRFPREG rather than NT_ARM_SVE. Advertising SVE while
++ *                    saving only FPSIMD is precisely how "apt fails somewhere
++ *                    different every time" happens.
++ *   PACA, PACG       Pointer-authentication keys are per-task kernel state
++ *                    (NT_ARM_PACA_KEYS) that UML does not manage; guest threads
++ *                    sharing one stub process would silently share keys.
++ *   BTI              Needs PROT_BTI, which arch/arm64/um/asm/mman.h explicitly
++ *                    does not implement.
++ *   MTE              Tag storage and tag-fault delivery, neither of which
++ *                    exists here.
++ *   GCS              Guarded control stack; needs kernel support.
++ *   CPUID            Lets EL0 read the host's ID registers directly, which
++ *                    would contradict everything masked out above: a library
++ *                    probing CPUID would "discover" SVE after being told it has
++ *                    none.
++ *
++ * Being wrong in the conservative direction costs a less-optimised memcpy.
++ * Being wrong in the other direction costs silent corruption.
+  */
+-static char host_features[512];
+-static bool host_features_valid;
++#define UM_ARM64_HWCAP_ALLOWED						\
++	(HWCAP_FP | HWCAP_ASIMD | HWCAP_EVTSTRM |			\
++	 HWCAP_AES | HWCAP_PMULL | HWCAP_SHA1 | HWCAP_SHA2 |		\
++	 HWCAP_CRC32 | HWCAP_ATOMICS | HWCAP_FPHP | HWCAP_ASIMDHP |	\
++	 HWCAP_ASIMDRDM | HWCAP_JSCVT | HWCAP_FCMA | HWCAP_LRCPC |	\
++	 HWCAP_DCPOP | HWCAP_SHA3 | HWCAP_SM3 | HWCAP_SM4 |		\
++	 HWCAP_ASIMDDP | HWCAP_SHA512 | HWCAP_ASIMDFHM | HWCAP_DIT |	\
++	 HWCAP_USCAT | HWCAP_ILRCPC | HWCAP_FLAGM | HWCAP_SSBS |	\
++	 HWCAP_SB)
++
++/*
++ * Nothing from AT_HWCAP2 is advertised. Its bits are overwhelmingly SVE2, SME,
++ * MTE and BTI -- all state-bearing or needing kernel support UML lacks. The few
++ * instruction-only bits there are not worth the audit surface until something
++ * actually needs them.
++ */
++#define UM_ARM64_HWCAP2_ALLOWED	0UL
++
++unsigned long um_arm64_elf_hwcap;
++unsigned long um_arm64_elf_hwcap2;
++
++static int __init um_arm64_init_hwcap(void)
++{
++	unsigned long host = (unsigned long)elf_aux_hwcap;
++	unsigned long host2 = (unsigned long)elf_aux_hwcap2;
++
++	um_arm64_elf_hwcap = host & UM_ARM64_HWCAP_ALLOWED;
++	um_arm64_elf_hwcap2 = host2 & UM_ARM64_HWCAP2_ALLOWED;
++
++	pr_info("arm64: hwcap host 0x%lx/0x%lx -> guest 0x%lx/0x%lx (masked out 0x%lx/0x%lx)\n",
++		host, host2, um_arm64_elf_hwcap, um_arm64_elf_hwcap2,
++		host & ~UM_ARM64_HWCAP_ALLOWED, host2 & ~UM_ARM64_HWCAP2_ALLOWED);
++
++	if (host & HWCAP_SVE)
++		pr_info("arm64: host has SVE; not advertised, UML saves only FPSIMD state\n");
++
++	return 0;
++}
++/*
++ * early_initcall: ELF_HWCAP is read while building the auxv of the first user
++ * process, so this has to have run before init is exec'd.
++ */
++early_initcall(um_arm64_init_hwcap);
++
++/*
++ * Names for the bits we advertise, in the spelling arm64's own /proc/cpuinfo
++ * uses. The list is generated from the mask rather than echoed from the host's
++ * Features line on purpose: some libraries parse /proc/cpuinfo instead of
++ * reading auxv, and a guest told "no SVE" through AT_HWCAP but "sve" through
++ * /proc/cpuinfo would be free to pick an SVE code path anyway -- reintroducing
++ * exactly the corruption the mask exists to prevent. The two must agree, so
++ * they come from the same place.
++ */
++static const struct {
++	unsigned long bit;
++	const char *name;
++} um_arm64_hwcap_names[] = {
++	{ HWCAP_FP,		"fp" },
++	{ HWCAP_ASIMD,		"asimd" },
++	{ HWCAP_EVTSTRM,	"evtstrm" },
++	{ HWCAP_AES,		"aes" },
++	{ HWCAP_PMULL,		"pmull" },
++	{ HWCAP_SHA1,		"sha1" },
++	{ HWCAP_SHA2,		"sha2" },
++	{ HWCAP_CRC32,		"crc32" },
++	{ HWCAP_ATOMICS,	"atomics" },
++	{ HWCAP_FPHP,		"fphp" },
++	{ HWCAP_ASIMDHP,	"asimdhp" },
++	{ HWCAP_ASIMDRDM,	"asimdrdm" },
++	{ HWCAP_JSCVT,		"jscvt" },
++	{ HWCAP_FCMA,		"fcma" },
++	{ HWCAP_LRCPC,		"lrcpc" },
++	{ HWCAP_DCPOP,		"dcpop" },
++	{ HWCAP_SHA3,		"sha3" },
++	{ HWCAP_SM3,		"sm3" },
++	{ HWCAP_SM4,		"sm4" },
++	{ HWCAP_ASIMDDP,	"asimddp" },
++	{ HWCAP_SHA512,		"sha512" },
++	{ HWCAP_ASIMDFHM,	"asimdfhm" },
++	{ HWCAP_DIT,		"dit" },
++	{ HWCAP_USCAT,		"uscat" },
++	{ HWCAP_ILRCPC,		"ilrcpc" },
++	{ HWCAP_FLAGM,		"flagm" },
++	{ HWCAP_SSBS,		"ssbs" },
++	{ HWCAP_SB,		"sb" },
++};
+ 
+ void arch_show_cpuinfo(struct seq_file *m)
+ {
++	unsigned int i;
++
+ 	/*
+-	 * "Features" is the arm64 spelling; guest userspace and lscpu both look
+-	 * for that key, not for x86's "flags".
++	 * "Features" is the arm64 spelling; guest userspace and lscpu look for
++	 * that key, not for x86's "flags".
+ 	 */
+-	seq_printf(m, "Features\t: %s\n",
+-		   host_features_valid ? host_features : "");
+-	seq_printf(m, "hwcap\t\t: 0x%lx\n", (unsigned long)boot_cpu_data.arch.hwcap);
+-	seq_printf(m, "hwcap2\t\t: 0x%lx\n", (unsigned long)boot_cpu_data.arch.hwcap2);
++	seq_puts(m, "Features\t:");
++	for (i = 0; i < ARRAY_SIZE(um_arm64_hwcap_names); i++)
++		if (um_arm64_elf_hwcap & um_arm64_hwcap_names[i].bit)
++			seq_printf(m, " %s", um_arm64_hwcap_names[i].name);
++	seq_puts(m, "\n");
++
++	seq_printf(m, "hwcap\t\t: 0x%lx\n", um_arm64_elf_hwcap);
++	seq_printf(m, "hwcap2\t\t: 0x%lx\n", um_arm64_elf_hwcap2);
++	seq_printf(m, "host hwcap\t: 0x%lx/0x%lx\n",
++		   (unsigned long)boot_cpu_data.arch.hwcap,
++		   (unsigned long)boot_cpu_data.arch.hwcap2);
+ }
+ 
+ int arch_parse_host_cpu_flags(char *line)
+ {
+-	char *value;
+-	size_t len;
+-
+ 	/*
+ 	 * Record the auxv values on the first call; they come from the host
+ 	 * kernel directly and are the authoritative answer, independent of how
+@@ -60,27 +188,11 @@ int arch_parse_host_cpu_flags(char *line)
+ 	boot_cpu_data.arch.hwcap = elf_aux_hwcap;
+ 	boot_cpu_data.arch.hwcap2 = elf_aux_hwcap2;
+ 
+-	if (strncmp(line, "Features", 8))
+-		return 0;
+-
+-	value = strchr(line, ':');
+-	if (!value)
+-		return 0;
+-	value++;
+-	while (*value == ' ' || *value == '\t')
+-		value++;
+-
+-	strscpy(host_features, value, sizeof(host_features));
+-	len = strlen(host_features);
+-	while (len && (host_features[len - 1] == '\n' ||
+-		       host_features[len - 1] == ' '))
+-		host_features[--len] = '\0';
+-	host_features_valid = true;
+-
+ 	/*
+-	 * arm64's /proc/cpuinfo has no cache_alignment field and repeats the
+-	 * same Features line for every core, so once it is seen there is
+-	 * nothing further to read.
++	 * The host's Features line is deliberately not parsed. What the guest is
++	 * told comes from the sanitised mask above, not from the host's own list;
++	 * see arch_show_cpuinfo(). auxv is the authoritative source and it has
++	 * already been captured, so there is nothing left to read.
+ 	 */
+ 	return 1;
+ }

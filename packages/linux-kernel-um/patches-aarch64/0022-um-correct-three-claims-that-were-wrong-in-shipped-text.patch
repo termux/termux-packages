@@ -1,0 +1,177 @@
+From 46f29eef01a682a71432e288a4f251c597f35a7c Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 08:10:06 +0200
+Subject: [PATCH] um: correct three claims that were wrong in shipped text
+
+Found by an audit of the series rather than by any failure. None changes
+behaviour except the third; all three would have misled a reader.
+
+The AT_MINSIGSTKSZ comment said the value is zero on "everything that is
+not arm64". x86 has published it since v5.16 -- arch/x86/include/asm/elf.h
+has three NEW_AUX_ENT sites, sized by get_sigframe_size(), which grows with
+XSAVE state much as arm64's grows with the vector length. So the mechanism
+is not arm64-specific and the comment said it was.
+
+arch/arm64/um/Kconfig selected MODULES_USE_ELF_RELA. aarch64 modules are
+RELA, but nothing here implements apply_relocate_add(), so the select
+asserted a capability that does not exist and let allmodconfig and
+randconfig get as far as failing to link. Drop it and say plainly that
+modules are not supported yet.
+
+The seccomp probe's new per-step diagnostic labelled its two most important
+cases the wrong way round: exit 2 is sigaction() failing, which says
+nothing about seccomp and everything about the probe, and was reported as
+"missing"; exit 3 is SECCOMP_SET_MODE_FILTER refusing, which really does
+mean this host has no seccomp, and was reported as "filter rejected". That
+points the reader at the host when the bug is here -- exactly the failure
+this diagnostic was added to prevent.
+
+Also drop references to files outside the kernel tree from a header
+comment, keeping the measurements they describe.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/Kconfig                     |  8 ++++-
+ arch/arm64/um/shared/sysdep/ptrace_user.h | 10 +++---
+ arch/um/os-Linux/elf_aux.c                |  6 ++--
+ arch/um/os-Linux/start_up.c               | 44 +++++++++++++++++++++--
+ 4 files changed, 58 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/um/Kconfig b/arch/arm64/um/Kconfig
+index 4cfd2b6303802..0641f180e5c04 100644
+--- a/arch/arm64/um/Kconfig
++++ b/arch/arm64/um/Kconfig
+@@ -6,7 +6,13 @@ config UML_ARM64
+ 	select ARCH_USE_QUEUED_RWLOCKS
+ 	select ARCH_USE_QUEUED_SPINLOCKS
+ 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+-	select MODULES_USE_ELF_RELA
++	#
++	# MODULES_USE_ELF_RELA is deliberately NOT selected yet. aarch64 modules
++	# are indeed RELA, but nothing here implements apply_relocate_add(), so
++	# selecting it would assert a capability that does not exist. CONFIG_MODULES
++	# is off in the defconfig; allmodconfig and randconfig will not link until
++	# module support lands, and that is honest rather than hidden.
++	#
+ 	#
+ 	# The guest's syscall ABI must match what aarch64 userspace was built
+ 	# against, and that is decided here rather than by arch/arm64/Kconfig,
+diff --git a/arch/arm64/um/shared/sysdep/ptrace_user.h b/arch/arm64/um/shared/sysdep/ptrace_user.h
+index f3a0bd8b54328..d7091288191ed 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace_user.h
++++ b/arch/arm64/um/shared/sysdep/ptrace_user.h
+@@ -30,9 +30,9 @@
+  * ends. ptrace_save_reg() in arch/arm64/kernel/ptrace.c spells out the
+  * consequences: writes by the tracer to that register during the stop are
+  * discarded, and the real value is not available while stopped. Confirmed
+- * against a live 6.12 host by harness/probe/hostx7.c: x7 reads back as 0
+- * (PTRACE_SYSCALL_ENTER) rather than the value the tracee put there, and a write
+- * of 0xdeadbeef is gone by the next stop.
++ * against a live 6.12 host: x7 reads back as 0 (PTRACE_SYSCALL_ENTER) rather
++ * than the value the tracee put there, and a write of 0xdeadbeef is gone by the
++ * next stop.
+  *
+  * x86 has no equivalent, so nothing in UML expected it, and the result was a
+  * guest-visible data corruption rather than a missing feature. Every thread of a
+@@ -43,8 +43,8 @@
+  * base, in the case that found this, so dpkg-deb faulted at what was really a
+  * dictionary offset.
+  *
+- * The escape, measured by harness/probe/hostx7b.c: resuming a PTRACE_SYSEMU
+- * entry stop with PTRACE_SINGLESTEP lands on a pseudo-step SIGTRAP where the
++ * The escape, measured the same way: resuming a PTRACE_SYSEMU entry stop with
++ * PTRACE_SINGLESTEP lands on a pseudo-step SIGTRAP where the
+  * register is both readable and writable, without executing a single guest
+  * instruction -- the syscall stays emulated away and the program counter does
+  * not move. See userspace() in arch/um/os-Linux/skas/process.c.
+diff --git a/arch/um/os-Linux/elf_aux.c b/arch/um/os-Linux/elf_aux.c
+index 0d0a61c0a5c6e..4446c3cba3493 100644
+--- a/arch/um/os-Linux/elf_aux.c
++++ b/arch/um/os-Linux/elf_aux.c
+@@ -53,8 +53,10 @@ long elf_aux_hwcap2;
+  * from this number rather than from a measurement taken on one machine; see
+  * check_stub_sigstack().
+  *
+- * Zero if the host does not publish it, which is the pre-5.5 case and also
+- * everything that is not arm64.
++ * Zero if the host does not publish it. arm64 has since v5.5, and x86 since
++ * v5.16 (get_sigframe_size(), which grows with XSAVE state much as arm64's
++ * grows with the vector length), so on the hosts UML actually runs on this is
++ * usually populated.
+  */
+ long elf_aux_min_sigstack;
+ 
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 5f953f5dc013a..6e03368ca56e5 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -427,16 +427,24 @@ static bool __init init_seccomp(void)
+ 	 * and "UML's own probe is broken" -- which is how a fixable bug in the
+ 	 * probe turned into SECCOMP mode simply never being available.
+ 	 */
++	/*
++	 * Exit 3 is the one that means "this host does not do seccomp", because
++	 * it is SECCOMP_SET_MODE_FILTER that refused. Exit 2 is sigaction()
++	 * failing, which says nothing about seccomp and everything about the
++	 * probe. Labelling them the other way round -- as this did, following
++	 * the single "missing" the code had before -- points the reader at the
++	 * host when the bug is here.
++	 */
+ 	if (WIFEXITED(status)) {
+ 		switch (WEXITSTATUS(status)) {
+ 		case 1:
+ 			os_info("no close_range\n");
+ 			break;
+ 		case 2:
+-			os_info("missing\n");
++			os_info("cannot catch SIGSYS\n");
+ 			break;
+ 		case 3:
+-			os_info("filter rejected\n");
++			os_info("missing\n");
+ 			break;
+ 		case 4:
+ 			os_info("filter did not trap\n");
+@@ -590,10 +598,42 @@ static void __init check_stub_sigstack(void)
+ 			" -- SMALLER than this host's worst case" : "");
+ }
+ 
++/*
++ * A guest page is a host mmap(), so the guest's page size cannot be smaller
++ * than the host's: mmap() rejects a length or offset that is not a multiple of
++ * the host's granularity, and UML has nothing to fall back on.
++ *
++ * Getting this wrong is not a subtle failure, but it is a silent one. A UML
++ * built with 4 KB pages on a 16 KB host stops dead just after the ptrace
++ * capability checks, with no message, because the first thing it does
++ * afterwards is map the stub. That is a live configuration and not a corner
++ * case: Android 15 and later ship 16 KB kernels, arm64 servers ship 4 KB, and
++ * the default here is 4 KB -- so the first person to run this on a modern phone
++ * gets a hang and no clue.
++ *
++ * The other direction is fine and needs no check: a 16 KB guest on a 4 KB host
++ * simply uses four host pages per guest page.
++ */
++static void __init check_page_size(void)
++{
++	unsigned long host = getpagesize();
++
++	if (host <= UM_KERN_PAGE_SIZE)
++		return;
++
++	fatal("Host page size is %lu bytes but this kernel was built for %lu.\n"
++	      "A guest page is a host mmap(), so it cannot be smaller than the\n"
++	      "host's page size. Rebuild with CONFIG_PAGE_SIZE_%luKB.\n",
++	      host, (unsigned long)UM_KERN_PAGE_SIZE, host / 1024);
++}
++
+ void __init os_early_checks(void)
+ {
+ 	int pid;
+ 
++	/* Nothing below can work if this is wrong, so check it before anything */
++	check_page_size();
++
+ 	/* Print out the core dump limits early */
+ 	check_coredump_limit();
+ 

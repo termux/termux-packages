@@ -1,0 +1,67 @@
+From e324024434bdeb81f4c530e25a03ec3259ab4757 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 15:58:30 +0200
+Subject: [PATCH] um: do not test the seccomp filter through a libc wrapper
+
+The probe issued sleep(0) to trip its own filter. What libc does with that
+is libc's business: bionic answers a zero timeout in userspace and never
+enters the kernel, so nothing ever reached the filter and check_seccomp()
+reported a working seccomp implementation as "filter did not trap". UML
+then fell back to ptrace, which costs about four times as much per guest
+syscall -- measured on the phone at 13.6 us/call under SECCOMP against 22
+us under ptrace.
+
+glibc happens to make the call, which is the only reason this ever worked.
+A probe for whether a filter traps has no business going through a libc
+wrapper; close_range above is already issued raw for the same reason.
+
+Verified on an Android phone (4.19 host): the bionic build now reports
+"Userspace mode: SECCOMP" where it previously reported ptrace, and the
+glibc build is unchanged.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/os-Linux/start_up.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 0f8eb3ba0cae6..ee6d13d9964ab 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -17,6 +17,7 @@
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <sys/time.h>
++#include <time.h>
+ #include <sys/resource.h>
+ #include <asm/unistd.h>
+ #include <init.h>
+@@ -547,7 +548,27 @@ static int __init seccomp_helper(void *data)
+ 			SECCOMP_FILTER_FLAG_TSYNC, &prog) != 0)
+ 		exit(3);
+ 
+-	sleep(0);
++	/*
++	 * Issue the filtered call directly rather than through libc.
++	 *
++	 * This was sleep(0), and what libc does with that is libc's business:
++	 * bionic answers a zero timeout from userspace and never enters the
++	 * kernel, so nothing reached the filter and the probe concluded the host
++	 * could not trap -- reporting a working seccomp implementation as
++	 * missing and dropping UML onto the ptrace path, which costs about four
++	 * times as much per guest syscall. glibc happens to make the call, which
++	 * is the only reason this ever worked.
++	 *
++	 * A probe for "does this filter trap" has no business going through a
++	 * libc wrapper at all; close_range above is already issued raw for the
++	 * same reason.
++	 */
++	{
++		struct timespec ts = { 0, 0 };
++
++		stub_syscall4(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
++			      (long) &ts, 0);
++	}
+ 
+ 	/* Never reached. */
+ 	_exit(4);

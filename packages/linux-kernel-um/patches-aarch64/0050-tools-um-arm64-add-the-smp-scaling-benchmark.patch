@@ -1,0 +1,316 @@
+From 1532f4aee863d3a580d13cc99685599c46caf3e1 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 17:09:03 +0200
+Subject: [PATCH] tools/um-arm64: add the SMP scaling benchmark
+
+smpbench.sh answers "what does giving the guest more CPUs buy" with one
+kernel binary under different ncpus= values, so a difference between
+conditions cannot be a different compiler, config or binary.
+
+It runs on a Raspberry Pi 5 rather than a phone, and each reason changes
+the answer rather than the convenience: the Pi's host pages are 16K like
+the guest's, so per-page figures are one unit instead of hiding a factor
+of four; Docker runs natively there, so a guest build has a same-hardware
+reference; and it is quiet enough to measure.
+
+Every condition also runs the same work forced serial. That control is
+what separates parallelism from a machine that drifted, and it earned its
+place: an earlier version measured 194ms for a compile that cannot take
+194ms, because the container image it used has no compiler and make was
+failing instantly. The numbers looked entirely plausible.
+
+run-smpbench.sh builds, stages, and refuses to measure unless the guest
+really came up on more than one CPU. ncpus= is a request that gets
+clamped, so a run can quietly produce identical columns because every
+condition booted uniprocessor -- and that failure looks exactly like the
+answer being sought.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ tools/um-arm64/harness/run-smpbench.sh |  83 +++++++++++
+ tools/um-arm64/harness/smpbench.sh     | 186 +++++++++++++++++++++++++
+ 2 files changed, 269 insertions(+)
+ create mode 100644 tools/um-arm64/harness/run-smpbench.sh
+ create mode 100644 tools/um-arm64/harness/smpbench.sh
+
+diff --git a/tools/um-arm64/harness/run-smpbench.sh b/tools/um-arm64/harness/run-smpbench.sh
+new file mode 100644
+index 000000000000..7e7d7c66217a
+--- /dev/null
++++ b/tools/um-arm64/harness/run-smpbench.sh
+@@ -0,0 +1,83 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Wait for the SMP kernel to finish building, put it on the Pi, prove SMP
++# actually comes up there, and only then spend time on the real measurement.
++#
++# The smoke test is not ceremony. ncpus= is a request that the kernel clamps --
++# to NR_CPUS, and to 1 when the host can only do ptrace -- so a run can quietly
++# produce four identical columns because every condition booted on one CPU. That
++# failure looks exactly like "SMP does not help", which is the answer we are
++# trying to measure, so it has to be excluded before the run rather than
++# explained after it.
++set -uo pipefail
++
++HOST=${HOST:-magicjr}
++TREE=${TREE:-/tmp/smp-tree}
++O=${O:-/tmp/umarm-smp-glibc}
++SRC=$O/linux
++ROUNDS=${ROUNDS:-3}
++JOBS=${JOBS:-$(nproc)}
++
++# Build here rather than waiting for a build someone else started. Waiting on
++# another process by name is how the first attempt at this deadlocked: the
++# pattern "O=/tmp/umarm-smp" appears in the waiting shell's OWN command line, so
++# pgrep matched the waiter and the loop could never end. Owning the build has no
++# such failure mode, and it also means the kernel under test is the one this
++# script configured.
++#
++# STATIC_LINK because the binary is built here and run on the Pi: a dynamic link
++# would bind to this machine's glibc and depend on the Pi having the same one.
++if [ ! -f "$SRC" ]; then
++	echo "building $SRC"
++	M=(-C "$TREE" O="$O" ARCH=um SUBARCH=arm64 LLVM=1 -j"$JOBS")
++	make "${M[@]}" defconfig >/dev/null 2>&1 || { echo "FAIL: defconfig"; exit 1; }
++	"$TREE"/scripts/config --file "$O/.config" -e STATIC_LINK -e UML_NET_VECTOR
++	for f in /root/mlu-arm64/config/page16k.config \
++		 /root/mlu-arm64/config/docker.config \
++		 "$TREE"/smp16.config; do
++		"$TREE"/scripts/kconfig/merge_config.sh -m -O "$O" "$O/.config" "$f" \
++			>/dev/null 2>&1 || { echo "FAIL: merging $f"; exit 1; }
++	done
++	make "${M[@]}" olddefconfig >/dev/null 2>&1
++	if ! make "${M[@]}" > /tmp/smpbuild.log 2>&1; then
++		echo "FAIL: build; tail:"; tail -15 /tmp/smpbuild.log; exit 1
++	fi
++fi
++[ -f "$SRC" ] || { echo "FAIL: no kernel at $SRC"; exit 1; }
++grep -E "^CONFIG_(SMP|NR_CPUS|STATIC_LINK)=" "$O/.config"
++echo "built: $(file -b "$SRC" | cut -c1-80)"
++
++# Strip: the debug build is ~90MB and the link goes over a tunnel.
++llvm-strip -s -o /tmp/linux-smp "$SRC" 2>/dev/null ||
++	aarch64-linux-gnu-strip -s -o /tmp/linux-smp "$SRC" 2>/dev/null ||
++	cp -f "$SRC" /tmp/linux-smp
++scp -q -o ConnectTimeout=15 /tmp/linux-smp "$HOST:umarm/linux-smp" || {
++	echo "FAIL: could not copy the kernel to $HOST"; exit 1; }
++ssh "$HOST" 'chmod +x ~/umarm/linux-smp; ls -l ~/umarm/linux-smp'
++
++# --- smoke test: does it boot, and does it really bring up 4 CPUs? ---
++ssh "$HOST" 'mkdir -p ~/umarm/share; cat > ~/umarm/share/cmd' <<'EOF'
++echo "SMOKE_NPROC=$(nproc)"
++echo "SMOKE_CPUS=$(ls -d /sys/devices/system/cpu/cpu[0-9]* 2>/dev/null | wc -l)"
++EOF
++
++smoke=$(timeout 180 ssh "$HOST" 'cd ~/umarm && HOME=$PWD timeout 150 ./linux-smp \
++	mem=2048M ubd0=$PWD/debian-docker.ext4 root=/dev/ubda rw init=/umarm-init \
++	umarm.share=$PWD/share ncpus=4 seccomp=auto \
++	panic=-1 con=null con0=null,fd:1 2>&1 | cat' 2>&1)
++
++printf '%s\n' "$smoke" | grep -aE "Brought up|SMOKE_|Userspace mode|panic" | head -8
++
++np=$(printf '%s\n' "$smoke" | sed -n 's/.*SMOKE_NPROC=\([0-9]*\).*/\1/p' | head -1)
++if [ "${np:-0}" -lt 2 ]; then
++	echo "FAIL: guest came up on ${np:-0} CPU with ncpus=4 - not measuring."
++	printf '%s\n' "$smoke" | tail -25
++	exit 1
++fi
++echo "smoke OK: guest reports $np CPUs"
++
++# --- the real thing ---
++ROUNDS=$ROUNDS HOST=$HOST KERNEL='$HOME/umarm/linux-smp' \
++	IMAGE='$HOME/umarm/debian-docker.ext4' REMOTE='$HOME/umarm' \
++	bash /root/mlu-arm64/harness/smpbench.sh
+diff --git a/tools/um-arm64/harness/smpbench.sh b/tools/um-arm64/harness/smpbench.sh
+new file mode 100644
+index 000000000000..47d4d410fd44
+--- /dev/null
++++ b/tools/um-arm64/harness/smpbench.sh
+@@ -0,0 +1,186 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# smpbench.sh -- what does giving the guest more CPUs actually buy?
++#
++# Run on a Raspberry Pi 5, not a phone, and each reason changes the answer
++# rather than the convenience:
++#
++#   * The Pi's host pages are 16K, the same as the guest's, so every per-page
++#     figure is one unit. On a 4K phone a 16K guest page hides a factor of four
++#     inside the number, which is exactly the error that made the fault path
++#     look far worse than it was.
++#   * Docker runs natively on the Pi, so "docker build inside UML" has a
++#     same-hardware reference. On a phone there is nothing to compare against.
++#   * It is quiet: no app, no zygote, no handset thermal policy.
++#
++# The conditions are ONE kernel binary under different ncpus= values. NR_CPUS is
++# only a compile-time ceiling; the count actually brought up is the ncpus= boot
++# argument, clamped to it. So nothing is rebuilt between conditions and a
++# difference cannot be a different compiler, config or binary.
++#
++# Two numbers are collected, and the gap between them is the point:
++#
++#   compile   a parallel build inside an already-built container. This is the
++#             case SMP is supposed to help; if it does not scale here it will
++#             not scale anywhere.
++#   build     a full `docker build` of the same work. Deliberately not the same
++#             number: a build also writes layers, and guest block I/O goes
++#             through ubd, whose completions arrive as SIGIO. SIGIO is
++#             process-directed, so the host delivers it to the thread group
++#             leader -- CPU0 -- and extra CPUs cannot parallelise it. The gap
++#             between compile and build is that effect, measured.
++#
++# Usage: HOST=magicjr KERNEL='~/umarm/linux-smp' ROUNDS=3 harness/smpbench.sh
++set -uo pipefail
++
++HOST=${HOST:-magicjr}
++REMOTE=${REMOTE:-'$HOME/umarm'}
++KERNEL=${KERNEL:-"$REMOTE/linux-smp"}
++IMAGE=${IMAGE:-"$REMOTE/debian-docker.ext4"}
++MEM=${MEM:-4096M}
++ROUNDS=${ROUNDS:-3}
++CPUSETS=${CPUSETS:-"1 2 4"}
++UNITS=${UNITS:-24}        # translation units to compile; parallelism ceiling
++OUT=${OUT:-/root/mlu-arm64/artifacts/smpbench-$(date -u +%Y%m%dT%H%M%SZ)}
++
++mkdir -p "$OUT"
++log() { printf '[smpbench] %s\n' "$*"; }
++rsh() { timeout "${SSH_TIMEOUT:-1800}" ssh -o ConnectTimeout=10 "$HOST" "$@"; }
++
++# ---- the guest-side script --------------------------------------------------
++#
++# Every wait here is bounded and prints the log it was waiting on when it gives
++# up: a run that hangs must fail with the reason attached, not with silence.
++# dockerd is killed at the end because init only powers off once the command
++# returns, and a surviving background daemon holds the guest open forever.
++cat > "$OUT/work.sh" <<WORKEOF
++#!/bin/bash
++export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++NCPU=\$(nproc)
++echo "SMPBENCH_NCPU=\$NCPU"
++
++mount -t cgroup2 none /sys/fs/cgroup 2>/dev/null
++mount -t tmpfs tmpfs /run 2>/dev/null
++dockerd >/var/log/dockerd.log 2>&1 &
++n=0
++while [ \$n -lt 60 ]; do
++	docker version >/dev/null 2>&1 && break
++	n=\$((n+1)); sleep 1
++done
++if [ \$n -ge 60 ]; then
++	echo "SMPBENCH_FAIL dockerd did not start"
++	tail -20 /var/log/dockerd.log
++	pkill -9 dockerd; exit 1
++fi
++echo "SMPBENCH_DOCKERD_UP=\${n}s"
++
++mkdir -p /tmp/w && cd /tmp/w
++# Independent translation units: the only limit on parallelism is CPUs, and
++# nothing is fetched -- the base image is already in the image store.
++i=0
++while [ \$i -lt $UNITS ]; do
++	{
++		echo '#include <math.h>'
++		j=0
++		while [ \$j -lt 40 ]; do
++			printf 'double f%s_%s(double x){double s=0;' "\$i" "\$j"
++			printf 'for(int k=0;k<64;k++)s+=sin(x*k)*cos(x/(k+1));'
++			printf 'return s;}\\n'
++			j=\$((j+1))
++		done
++	} > u\$i.c
++	i=\$((i+1))
++done
++printf 'all: \$(patsubst %%.c,%%.o,\$(wildcard *.c))\n' > Makefile
++
++cat > Dockerfile <<'DEOF'
++FROM debian:bookworm-slim
++WORKDIR /src
++COPY . /src/
++RUN make -j\$(nproc) 2>&1 | tail -1
++DEOF
++
++# compile: parallel work only, inside a container that already exists.
++# Nanoseconds and bash integer arithmetic: the image has no bc, and the first
++# run of this discovered that by printing an empty timing for every condition.
++t0=\$(date +%s%N)
++docker run --rm -v /tmp/w:/src -w /src debian:bookworm-slim \\
++	sh -c 'make -j\$(nproc) >/dev/null 2>&1' >/dev/null 2>&1
++t1=\$(date +%s%N)
++echo "SMPBENCH_COMPILE_MS=\$(( (t1 - t0) / 1000000 ))"
++rm -f /tmp/w/*.o
++
++# build: the same work plus layer writes, which is what was asked about.
++t0=\$(date +%s%N)
++docker build -q -t smpbench:t . >/dev/null 2>&1
++t1=\$(date +%s%N)
++echo "SMPBENCH_BUILD_MS=\$(( (t1 - t0) / 1000000 ))"
++docker rmi -f smpbench:t >/dev/null 2>&1
++
++# Where the interrupts landed. If they are all on CPU0 the I/O half of the
++# build cannot have scaled, whatever the wall clock says.
++echo "SMPBENCH_IRQ_BEGIN"
++cat /proc/interrupts 2>/dev/null | head -12
++echo "SMPBENCH_IRQ_END"
++
++pkill -9 dockerd 2>/dev/null; pkill -9 containerd 2>/dev/null
++echo "SMPBENCH_DONE"
++WORKEOF
++
++# ---- provenance -------------------------------------------------------------
++{
++	echo "### run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
++	echo "### git HEAD: $(git -C /root/mlu-arm64/linux rev-parse --short HEAD 2>/dev/null)"
++	echo "### rounds: $ROUNDS  cpusets: $CPUSETS  units: $UNITS  mem: $MEM"
++	echo
++	rsh 'uname -a; echo "pagesize: $(getconf PAGESIZE)"; echo "host cpus: $(nproc)"; \
++	     lscpu | grep -E "Model name"; \
++	     echo "governor: $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)"; \
++	     vcgencmd measure_temp 2>/dev/null; docker --version'
++	echo "### kernel"
++	rsh "md5sum $KERNEL; file -b $KERNEL | cut -c1-90"
++} > "$OUT/manifest.txt" 2>&1
++
++rsh "mkdir -p $REMOTE/share" >/dev/null 2>&1
++dest=$(rsh "echo $REMOTE")/share/cmd
++scp -q "$OUT/work.sh" "$HOST:$dest" ||
++	{ echo "staging failed" >&2; exit 2; }
++log "staged; manifest in $OUT/manifest.txt"
++
++# ---- run --------------------------------------------------------------------
++for r in $(seq 1 "$ROUNDS"); do
++	for n in $CPUSETS; do
++		log "round $r/$ROUNDS  ncpus=$n"
++		rsh "cd $REMOTE && HOME=\$PWD timeout 1500 $KERNEL \
++			mem=$MEM ubd0=$IMAGE root=/dev/ubda rw init=/umarm-init \
++			umarm.share=$REMOTE/share ncpus=$n seccomp=auto \
++			panic=-1 con=null con0=null,fd:1 2>&1 | cat" \
++			> "$OUT/ncpus$n.$r" 2>&1
++	done
++done
++
++# ---- report -----------------------------------------------------------------
++{
++	echo "=== medians over $ROUNDS rounds (seconds) ==="
++	printf '%-8s %10s %10s %8s\n' ncpus compile_ms build_ms guest_nproc
++	for n in $CPUSETS; do
++		for m in COMPILE_MS BUILD_MS; do
++			vals=$(grep -ah "SMPBENCH_$m=" "$OUT"/ncpus$n.* 2>/dev/null | cut -d= -f2)
++			med=$(printf '%s\n' $vals | sort -n |
++				awk '{a[NR]=$1}
++				     END{if(NR)print (NR%2)?a[(NR+1)/2]:(a[NR/2]+a[NR/2+1])/2}')
++			eval "med_$m=\$med"
++		done
++		np=$(grep -ah "SMPBENCH_NCPU=" "$OUT"/ncpus$n.1 2>/dev/null | cut -d= -f2 | head -1)
++		printf '%-8s %10s %10s %8s\n' "$n" \
++			"${med_COMPILE_MS:-?}" "${med_BUILD_MS:-?}" "${np:-?}"
++	done
++	echo
++	echo "=== where interrupts landed (ncpus=4, round 1) ==="
++	sed -n '/SMPBENCH_IRQ_BEGIN/,/SMPBENCH_IRQ_END/p' \
++		"$OUT"/ncpus4.1 2>/dev/null
++} | tee "$OUT/report.txt"
++
++echo
++echo "artifacts: $OUT"

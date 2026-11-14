@@ -1,0 +1,17 @@
+--- a/isolation.c
++++ b/isolation.c
+@@ -486,7 +486,11 @@ int isolate_prefork(const struct ctx *c)
+ 		flags |= CLONE_NEWPID;
+ 
+ 	if (unshare(flags)) {
+-		err_perror("Failed to detach isolating namespaces");
+-		return -errno;
++		/* Sandboxes such as the Android app one deny this with EPERM:
++		 * skip the whole prefork isolation (private tmpfs,
++		 * pivot_root) rather than failing step by step. The seccomp
++		 * filter from isolate_postfork still applies. */
++		warn_perror("Cannot detach isolating namespaces, continuing without filesystem isolation");
++		return 0;
+ 	}
+ 
+ 	if (mount("", "/", "", MS_UNBINDABLE | MS_REC, NULL)) {

@@ -1,0 +1,56 @@
+From 911ad7918f505acb2e159d0ecf3f1835c31ba17b Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 21:33:00 +0200
+Subject: [PATCH] um: arm64: select CLONE_BACKWARDS
+
+arch/arm64/Kconfig selects it, but that file is not sourced for ARCH=um, so
+the UML/arm64 guest was using the asm-generic sys_clone argument order
+while every aarch64 libc passes the CLONE_BACKWARDS one -- tls and
+child_tidptr swapped.
+
+A guest pthread_create() therefore received its child-tid pointer as the
+new thread's TPIDR_EL0, and CLONE_CHILD_SETTID/CLEARTID operated on a NULL
+pointer, so glibc's per-thread tid was never set and the exit futex never
+woken.
+
+Gates 1-5 cannot see this: fork() passes neither a tls value nor a
+child_tidptr, and Alpine's busybox does not thread. Covered now by
+harness/probe/threadtorture.c, which checks TPIDR_EL0, per-thread FP state
+and CLONE_CHILD_CLEARTID across 8 threads sharing one stub process.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/Kconfig | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/um/Kconfig b/arch/arm64/um/Kconfig
+index 9988bb4202bbe..d740353955ef0 100644
+--- a/arch/arm64/um/Kconfig
++++ b/arch/arm64/um/Kconfig
+@@ -7,6 +7,26 @@ config UML_ARM64
+ 	select ARCH_USE_QUEUED_SPINLOCKS
+ 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	select MODULES_USE_ELF_RELA
++	#
++	# The guest's syscall ABI must match what aarch64 userspace was built
++	# against, and that is decided here rather than by arch/arm64/Kconfig,
++	# which is not sourced for ARCH=um.
++	#
++	# CLONE_BACKWARDS makes sys_clone take
++	#	(flags, newsp, parent_tidptr, tls, child_tidptr)
++	# instead of the generic
++	#	(flags, newsp, parent_tidptr, child_tidptr, tls)
++	# i.e. it swaps the last two arguments. Every aarch64 libc passes them in
++	# the CLONE_BACKWARDS order, so without this a guest pthread_create()
++	# hands the kernel its child-tid pointer as the new thread's TPIDR_EL0 and
++	# its TLS pointer as the address to clear on exit: the thread starts with
++	# a garbage thread pointer and, on exit, writes a zero and a futex wake to
++	# whatever the TLS pointer happened to be.
++	#
++	# Nothing in gates 1-5 catches this, because fork() passes neither a tls
++	# value nor a child_tidptr -- it is threads, and therefore glibc, that
++	# make it visible.
++	select CLONE_BACKWARDS
+ 
+ config 64BIT
+ 	def_bool y

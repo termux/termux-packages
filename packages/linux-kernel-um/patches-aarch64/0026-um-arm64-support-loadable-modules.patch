@@ -1,0 +1,614 @@
+From beac9bd4235fae4faf8efbc90188923cdf2ab735 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 21:42:26 +0200
+Subject: [PATCH] um: arm64: support loadable modules
+
+aarch64 modules are RELA and need apply_relocate_add(), PLT veneers for
+branches out of range, and the immediate-field encoders that write the
+relocated instructions. None of that is a property of how the kernel is
+hosted -- it is the aarch64 ELF ABI and the instruction set -- so this
+reuses arch/arm64/kernel/module.c and module-plts.c rather than growing a
+second copy that would have to be kept in step forever. x86 UML has taken
+exactly that approach to its own module.c for years.
+
+What has to be supplied locally is small: the relocation constants,
+arm64's struct mod_arch_specific and module linker script (which a
+generic-y wrapper in arch/um would otherwise shadow, since generated
+headers win the include path), and aarch64_insn_copy(). arch/arm64's
+version of the last one manufactures a writable alias of read-only kernel
+text; a UML guest has no such mapping, so this one is a memcpy plus the
+I-cache maintenance a real CPU still requires.
+
+The headers that arch/arm64/kernel/module.c reaches for on the way --
+alternative.h, cpufeature.h, debug-monitors.h, kprobes.h, simd.h -- are
+stubs here, because the features behind them are properties of a CPU this
+kernel does not drive.
+
+MODULES_USE_ELF_RELA is now selected, having been deliberately left out
+while nothing implemented apply_relocate_add().
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/kernel/module-plts.c    |   9 +++
+ arch/arm64/lib/insn.c              |   1 +
+ arch/arm64/um/Kconfig              |  13 ++--
+ arch/arm64/um/Makefile             |  19 ++++-
+ arch/arm64/um/asm/alternative.h    |  32 ++++++++
+ arch/arm64/um/asm/cpufeature.h     |  33 +++++++++
+ arch/arm64/um/asm/debug-monitors.h |  15 ++++
+ arch/arm64/um/asm/elf.h            |  42 ++++++++++-
+ arch/arm64/um/asm/kprobes.h        |  18 +++++
+ arch/arm64/um/asm/module.h         | 114 +++++++++++++++++++++++++++++
+ arch/arm64/um/asm/module.lds.h     |  27 +++++++
+ arch/arm64/um/asm/simd.h           |  28 +++++++
+ arch/arm64/um/patching.c           |  45 ++++++++++++
+ arch/um/include/asm/Kbuild         |   7 ++
+ arch/um/os-Linux/user_syms.c       |  19 ++++-
+ 15 files changed, 414 insertions(+), 8 deletions(-)
+ create mode 100644 arch/arm64/um/asm/alternative.h
+ create mode 100644 arch/arm64/um/asm/cpufeature.h
+ create mode 100644 arch/arm64/um/asm/debug-monitors.h
+ create mode 100644 arch/arm64/um/asm/kprobes.h
+ create mode 100644 arch/arm64/um/asm/module.h
+ create mode 100644 arch/arm64/um/asm/module.lds.h
+ create mode 100644 arch/arm64/um/asm/simd.h
+ create mode 100644 arch/arm64/um/patching.c
+
+diff --git a/arch/arm64/kernel/module-plts.c b/arch/arm64/kernel/module-plts.c
+index 7afd370da9f48..20970ae92d78a 100644
+--- a/arch/arm64/kernel/module-plts.c
++++ b/arch/arm64/kernel/module-plts.c
+@@ -10,6 +10,15 @@
+ #include <linux/moduleloader.h>
+ #include <linux/sort.h>
+ 
++/*
++ * get_plt_entry() and friends build veneers with aarch64_insn_gen_*(). Those
++ * are declared in <asm/insn.h>, which reaches this file only by way of
++ * <linux/ftrace.h> -> <asm/ftrace.h> on arm64. ARCH=um supplies its own
++ * asm/ftrace.h, so the declarations do not arrive and every encoder call
++ * becomes an implicit declaration. Include what is used.
++ */
++#include <asm/insn.h>
++
+ static struct plt_entry __get_adrp_add_pair(u64 dst, u64 pc,
+ 					    enum aarch64_insn_register reg)
+ {
+diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
+index 37ce75f7f1f08..ee6e276828f2f 100644
+--- a/arch/arm64/lib/insn.c
++++ b/arch/arm64/lib/insn.c
+@@ -5,6 +5,7 @@
+  *
+  * Copyright (C) 2014-2016 Zi Shen Lim <zlim.lnx@gmail.com>
+  */
++#include <linux/align.h>
+ #include <linux/bitfield.h>
+ #include <linux/bitops.h>
+ #include <linux/bug.h>
+diff --git a/arch/arm64/um/Kconfig b/arch/arm64/um/Kconfig
+index 0641f180e5c04..366ac9c022773 100644
+--- a/arch/arm64/um/Kconfig
++++ b/arch/arm64/um/Kconfig
+@@ -7,12 +7,15 @@ config UML_ARM64
+ 	select ARCH_USE_QUEUED_SPINLOCKS
+ 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	#
+-	# MODULES_USE_ELF_RELA is deliberately NOT selected yet. aarch64 modules
+-	# are indeed RELA, but nothing here implements apply_relocate_add(), so
+-	# selecting it would assert a capability that does not exist. CONFIG_MODULES
+-	# is off in the defconfig; allmodconfig and randconfig will not link until
+-	# module support lands, and that is honest rather than hidden.
++	# Loadable modules. aarch64 modules are RELA, and the relocation
++	# processing is arch/arm64/kernel/module.c reused verbatim -- the same
++	# arrangement x86 UML has used for its own module.c for years
++	# (subarch-$(CONFIG_MODULES) in the Makefile). HAVE_MOD_ARCH_SPECIFIC
++	# goes with it because arm64's struct mod_arch_specific carries the PLT
++	# bookkeeping that module-plts.c fills in.
+ 	#
++	select MODULES_USE_ELF_RELA
++	select HAVE_MOD_ARCH_SPECIFIC
+ 	#
+ 	# The guest's syscall ABI must match what aarch64 userspace was built
+ 	# against, and that is decided here rather than by arch/arm64/Kconfig,
+diff --git a/arch/arm64/um/Makefile b/arch/arm64/um/Makefile
+index ebfe15e34f3a1..751ffdb72997c 100644
+--- a/arch/arm64/um/Makefile
++++ b/arch/arm64/um/Makefile
+@@ -6,7 +6,24 @@
+ obj-y = bugs.o cpuinfo.o delay.o fault.o mem.o ptrace.o \
+ 	setjmp_aarch64.o signal.o stub_segv.o syscalls.o \
+ 	sys_call_table.o sysrq.o tls.o \
+-	os-Linux/ vdso/
++	subarch.o os-Linux/ vdso/
++
++# Module loading is the parent architecture's, reused rather than reimplemented.
++# The relocation types, the PLT veneers and the immediate-field encoders are
++# properties of the aarch64 ELF ABI and of the instruction set, not of how the
++# kernel is hosted, so a UML copy of them would be 900 lines that have to be
++# kept in step with arch/arm64 forever. x86 UML has taken exactly this approach
++# to its own module.c for years -- see arch/x86/um/Makefile.
++#
++# insn.o comes along because module.c encodes branch and move-wide immediates
++# through aarch64_insn_encode_immediate().
++subarch-$(CONFIG_MODULES) += ../kernel/module.o ../kernel/module-plts.o ../lib/insn.o
++
++# patching.c supplies aarch64_insn_copy(), which module.c uses to write
++# relocated instructions. arch/arm64's version manufactures a writable alias of
++# read-only kernel text; a UML guest has no such mapping, so this one is a
++# memcpy plus the I-cache maintenance that a real CPU still requires.
++obj-$(CONFIG_MODULES) += patching.o
+ 
+ # Built with USER_CFLAGS against host headers rather than kernel headers:
+ # these speak to the host kernel, not to the guest.
+diff --git a/arch/arm64/um/asm/alternative.h b/arch/arm64/um/asm/alternative.h
+new file mode 100644
+index 0000000000000..d37a975c3d7dd
+--- /dev/null
++++ b/arch/arm64/um/asm/alternative.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Alternatives for ARCH=um SUBARCH=arm64: there are none.
++ *
++ * arch/arm64/kernel/module.c is reused here for module loading, and it calls
++ * apply_alternatives_module() on any `.altinstructions` section a module
++ * carries. On hardware that patches instruction sequences according to CPU
++ * capabilities discovered at boot.
++ *
++ * A UML guest has no such capabilities to discover: it is an ordinary
++ * userspace process, arch/arm64/Kconfig -- which is where every erratum and
++ * feature symbol lives -- is not sourced for ARCH=um, and no code built for
++ * this configuration emits ALTERNATIVE sequences. So a UML module has no
++ * `.altinstructions` section, module_finalize() never finds one, and this
++ * function is never called.
++ *
++ * It exists so the shared module.c compiles. The alternative would be to pull
++ * in arch/arm64/include/asm/alternative.h, which reaches asm/cpucaps.h and the
++ * generated asm/cpucap-defs.h, i.e. the whole cpufeature apparatus, to reach a
++ * call that cannot happen.
++ */
++#ifndef __UM_ARM64_ALTERNATIVE_H
++#define __UM_ARM64_ALTERNATIVE_H
++
++#include <linux/types.h>
++
++static inline int apply_alternatives_module(void *start, size_t length)
++{
++	return 0;
++}
++
++#endif /* __UM_ARM64_ALTERNATIVE_H */
+diff --git a/arch/arm64/um/asm/cpufeature.h b/arch/arm64/um/asm/cpufeature.h
+new file mode 100644
+index 0000000000000..5443383d0d64c
+--- /dev/null
++++ b/arch/arm64/um/asm/cpufeature.h
+@@ -0,0 +1,33 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * CPU capabilities for ARCH=um SUBARCH=arm64: there are none to discover.
++ *
++ * On hardware, cpus_have_final_cap() reports a capability bit established at
++ * boot by reading ID registers at EL1. A UML guest runs at EL0 as an ordinary
++ * process and cannot read them; arch/arm64/Kconfig, where every erratum symbol
++ * is defined, is not sourced for ARCH=um, so none of those CONFIG symbols
++ * exist here either.
++ *
++ * The reused arch/arm64/kernel/module-plts.c consults exactly one capability,
++ * ARM64_WORKAROUND_843419 (a Cortex-A53 erratum affecting ADRP placement), and
++ * consults it unconditionally rather than under an #ifdef. Answering "no" is
++ * what the same code does on any part without the erratum, and is the only
++ * answer this configuration can give honestly.
++ *
++ * Recorded as a limitation: a UML guest on an affected Cortex-A53 would not get
++ * the PLT slack that hardware would. The guest executes at EL0 either way, so
++ * this is the same exposure any userspace program on such a part has.
++ */
++#ifndef __UM_ARM64_CPUFEATURE_H
++#define __UM_ARM64_CPUFEATURE_H
++
++#include <linux/types.h>
++
++#define ARM64_WORKAROUND_843419		0
++
++static inline bool cpus_have_final_cap(int num)
++{
++	return false;
++}
++
++#endif /* __UM_ARM64_CPUFEATURE_H */
+diff --git a/arch/arm64/um/asm/debug-monitors.h b/arch/arm64/um/asm/debug-monitors.h
+new file mode 100644
+index 0000000000000..c9a4aa9df8574
+--- /dev/null
++++ b/arch/arm64/um/asm/debug-monitors.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * ARCH=um SUBARCH=arm64 has no hardware debug monitors: a UML guest is a
++ * userspace process and never programs MDSCR_EL1, breakpoints or watchpoints.
++ *
++ * This exists only so the reused arch/arm64/lib/insn.c can include
++ * <asm/debug-monitors.h>. It needs nothing from it -- the one constant it uses,
++ * AARCH64_BREAK_FAULT, comes from <asm/insn-def.h> -- but arch/arm64's copy
++ * reaches asm/sysreg.h and the generated asm/sysreg-defs.h, which are not built
++ * for ARCH=um.
++ */
++#ifndef __UM_ARM64_DEBUG_MONITORS_H
++#define __UM_ARM64_DEBUG_MONITORS_H
++
++#endif /* __UM_ARM64_DEBUG_MONITORS_H */
+diff --git a/arch/arm64/um/asm/elf.h b/arch/arm64/um/asm/elf.h
+index 46845702716e3..19b7603d4d579 100644
+--- a/arch/arm64/um/asm/elf.h
++++ b/arch/arm64/um/asm/elf.h
+@@ -11,8 +11,15 @@
+ 
+ #define CORE_DUMP_USE_REGSET
+ 
++/*
++ * The AArch32 "no-op" relocation. apply_relocate_add() accepts it alongside
++ * R_AARCH64_NONE because a module can carry compat relocations; both mean
++ * "nothing to do".
++ */
++#define R_ARM_NONE			0
++
+ /* aarch64 relocation types actually used by the module loader. */
+-#define R_AARCH64_NONE			0
++#define R_AARCH64_NONE			256
+ #define R_AARCH64_ABS64			257
+ #define R_AARCH64_ABS32			258
+ #define R_AARCH64_ABS16			259
+@@ -29,6 +36,39 @@
+ #define R_AARCH64_JUMP_SLOT		1026
+ #define R_AARCH64_RELATIVE		1027
+ 
++/*
++ * The rest of the aarch64 static relocation set. apply_relocate_add() in
++ * arch/arm64/kernel/module.c switches over all of these, so every one has to be
++ * defined for it to compile even though a given module will use only a few --
++ * which relocations appear is decided by the module's own code and data, not by
++ * the loader.
++ */
++#define R_AARCH64_MOVW_UABS_G0          263
++#define R_AARCH64_MOVW_UABS_G0_NC       264
++#define R_AARCH64_MOVW_UABS_G1          265
++#define R_AARCH64_MOVW_UABS_G1_NC       266
++#define R_AARCH64_MOVW_UABS_G2          267
++#define R_AARCH64_MOVW_UABS_G2_NC       268
++#define R_AARCH64_MOVW_UABS_G3          269
++#define R_AARCH64_MOVW_SABS_G0          270
++#define R_AARCH64_MOVW_SABS_G1          271
++#define R_AARCH64_MOVW_SABS_G2          272
++#define R_AARCH64_ADR_PREL_PG_HI21_NC   276
++#define R_AARCH64_LDST8_ABS_LO12_NC     278
++#define R_AARCH64_TSTBR14               279
++#define R_AARCH64_CONDBR19              280
++#define R_AARCH64_LDST16_ABS_LO12_NC    284
++#define R_AARCH64_LDST32_ABS_LO12_NC    285
++#define R_AARCH64_LDST64_ABS_LO12_NC    286
++#define R_AARCH64_LDST128_ABS_LO12_NC   299
++#define R_AARCH64_MOVW_PREL_G0          287
++#define R_AARCH64_MOVW_PREL_G0_NC       288
++#define R_AARCH64_MOVW_PREL_G1          289
++#define R_AARCH64_MOVW_PREL_G1_NC       290
++#define R_AARCH64_MOVW_PREL_G2          291
++#define R_AARCH64_MOVW_PREL_G2_NC       292
++#define R_AARCH64_MOVW_PREL_G3          293
++
+ #define elf_check_arch(x) ((x)->e_machine == EM_AARCH64)
+ 
+ #define ELF_CLASS	ELFCLASS64
+diff --git a/arch/arm64/um/asm/kprobes.h b/arch/arm64/um/asm/kprobes.h
+new file mode 100644
+index 0000000000000..511755ff86fbf
+--- /dev/null
++++ b/arch/arm64/um/asm/kprobes.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * ARCH=um SUBARCH=arm64 has no kprobes.
++ *
++ * arch/arm64/lib/insn.c is reused here for instruction encoding and tags some
++ * of its functions __kprobes, which is a section annotation rather than a
++ * dependency on the kprobes machinery. The generic header supplies it.
++ *
++ * Without this, <asm/kprobes.h> resolves to arch/arm64's, which reaches
++ * asm/cpucaps.h and the generated asm/cpucap-defs.h -- the whole cpufeature
++ * apparatus -- to obtain a macro that expands to nothing here.
++ */
++#ifndef __UM_ARM64_KPROBES_H
++#define __UM_ARM64_KPROBES_H
++
++#include <asm-generic/kprobes.h>
++
++#endif /* __UM_ARM64_KPROBES_H */
+diff --git a/arch/arm64/um/asm/module.h b/arch/arm64/um/asm/module.h
+new file mode 100644
+index 0000000000000..c99439b8c8f3e
+--- /dev/null
++++ b/arch/arm64/um/asm/module.h
+@@ -0,0 +1,114 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Module loading for ARCH=um SUBARCH=arm64.
++ *
++ * The loader itself is the parent architecture's: arch/arm64/kernel/module.c
++ * and module-plts.c are built into UML unchanged (see arch/arm64/um/Makefile),
++ * because relocation types, PLT veneers and instruction encodings are
++ * properties of the aarch64 ELF ABI and of the instruction set rather than of
++ * how the kernel is hosted.
++ *
++ * This header exists because <asm/module.h> does not reach the parent
++ * architecture's copy under ARCH=um -- UML's own asm/ generic wrapper wins the
++ * include path -- and because two of the declarations there mean something
++ * different here.
++ */
++#ifndef __UM_ARM64_MODULE_H
++#define __UM_ARM64_MODULE_H
++
++#include <asm-generic/module.h>
++#include <asm/cpufeature.h>
++
++/*
++ * Number of PLT slots the ftrace trampoline sections are sized for.
++ * arch/arm64 defines this in <asm/ftrace.h>, which ARCH=um supplies its own
++ * copy of; module-plts.c uses it unconditionally when sizing those sections,
++ * so it has to be defined even though UML has no arm64 ftrace and the
++ * sections stay empty.
++ */
++#ifndef NR_FTRACE_PLTS
++#define NR_FTRACE_PLTS 1
++#endif
++
++struct mod_plt_sec {
++	int			plt_shndx;
++	int			plt_num_entries;
++	int			plt_max_entries;
++};
++
++struct mod_arch_specific {
++	struct mod_plt_sec	core;
++	struct mod_plt_sec	init;
++
++#ifdef CONFIG_DYNAMIC_FTRACE
++	/*
++	 * Declared for symmetry with arch/arm64. UML has no arm64 ftrace
++	 * support, so CONFIG_DYNAMIC_FTRACE cannot currently be set here; the
++	 * fields are kept so the shared module.c continues to compile if it
++	 * ever can be.
++	 */
++	struct plt_entry	*ftrace_trampolines;
++	struct plt_entry	*init_ftrace_trampolines;
++#endif
++};
++
++u64 module_emit_plt_entry(struct module *mod, Elf64_Shdr *sechdrs,
++			  void *loc, const Elf64_Rela *rela,
++			  Elf64_Sym *sym);
++
++u64 module_emit_veneer_for_adrp(struct module *mod, Elf64_Shdr *sechdrs,
++				void *loc, u64 val);
++
++struct plt_entry {
++	/*
++	 * A program that conforms to the AArch64 Procedure Call Standard
++	 * (AAPCS64) must assume that a veneer that alters IP0 (x16) and/or
++	 * IP1 (x17) may be inserted at any branch instruction that is
++	 * exposed to a relocation that supports long branches. Since that
++	 * is exactly what we are dealing with here, we are free to use x16
++	 * as a scratch register in the PLT veneers.
++	 */
++	__le32	adrp;	/* adrp	x16, ....			*/
++	__le32	add;	/* add	x16, x16, #0x....		*/
++	__le32	br;	/* br	x16				*/
++};
++
++/*
++ * On real hardware this reports the Cortex-A53 erratum 843419 workaround, which
++ * forbids placing an ADRP in the last 8 bytes of a 4 KiB page, and it is driven
++ * by a CPU capability bit discovered at boot.
++ *
++ * UML has no cpucaps: it is an ordinary userspace process and does not probe
++ * CPU errata, and CONFIG_ARM64_ERRATUM_843419 is not offered here because
++ * arch/arm64/Kconfig is not sourced for ARCH=um. Reporting "not forbidden" is
++ * therefore the honest answer to a question this configuration cannot ask, and
++ * it is what the same code does on hardware whenever the capability is absent.
++ *
++ * Recorded as a limitation rather than a fix: a UML guest running on an
++ * affected Cortex-A53 would not get the veneer that hardware would. That is the
++ * same exposure as any other userspace program on such a part, since the guest
++ * executes at EL0 either way.
++ */
++static inline bool is_forbidden_offset_for_adrp(void *place)
++{
++	return false;
++}
++
++struct plt_entry get_plt_entry(u64 dst, void *pc);
++
++static inline const Elf_Shdr *find_section(const Elf_Ehdr *hdr,
++				    const Elf_Shdr *sechdrs,
++				    const char *name)
++{
++	const Elf_Shdr *s, *se;
++	const char *secstrs = (void *)hdr + sechdrs[hdr->e_shstrndx].sh_offset;
++
++	for (s = sechdrs, se = sechdrs + hdr->e_shnum; s < se; s++) {
++		if (strcmp(name, secstrs + s->sh_name) == 0)
++			return s;
++	}
++
++	return NULL;
++}
++
++#endif /* __UM_ARM64_MODULE_H */
+diff --git a/arch/arm64/um/asm/module.lds.h b/arch/arm64/um/asm/module.lds.h
+new file mode 100644
+index 0000000000000..24ec5bb48e3a5
+--- /dev/null
++++ b/arch/arm64/um/asm/module.lds.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Module linker script additions for ARCH=um SUBARCH=arm64.
++ *
++ * module_frob_arch_sections() in arch/arm64/kernel/module-plts.c counts the
++ * relocations that may need a veneer and sizes .plt and .init.plt accordingly.
++ * It finds those sections by name, so they have to exist in every module --
++ * which is what this script guarantees. Without it the sections are absent
++ * rather than empty, module_frob_arch_sections() has nowhere to put the PLT,
++ * and any module whose branches exceed the +/-128 MiB range of a direct BL
++ * fails to load.
++ *
++ * The ftrace trampoline sections are declared for the same reason arm64
++ * declares them: the shared module.c looks for them under
++ * CONFIG_DYNAMIC_FTRACE. UML has no arm64 ftrace support today, so they stay
++ * empty, and an empty section costs nothing.
++ *
++ * Deliberately shorter than arch/arm64/include/asm/module.lds.h: the KASAN_SW_TAGS
++ * and UNWIND_TABLES clauses there depend on options that arch/arm64/Kconfig
++ * offers and ARCH=um does not, since that Kconfig is not sourced here.
++ */
++SECTIONS {
++	.plt 0 : { BYTE(0) }
++	.init.plt 0 : { BYTE(0) }
++	.text.ftrace_trampoline 0 : { BYTE(0) }
++	.init.text.ftrace_trampoline 0 : { BYTE(0) }
++}
+diff --git a/arch/arm64/um/asm/simd.h b/arch/arm64/um/asm/simd.h
+new file mode 100644
+index 0000000000000..a671519b91922
+--- /dev/null
++++ b/arch/arm64/um/asm/simd.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Kernel-mode SIMD for ARCH=um SUBARCH=arm64: not available.
++ *
++ * On hardware, may_use_simd() reports whether the kernel may currently use the
++ * FPSIMD/NEON registers, which is safe at EL1 only because arch/arm64 saves and
++ * restores the interrupted context's FP state around it (kernel_neon_begin/end).
++ *
++ * A UML guest kernel has no such mechanism: it runs inside a userspace process
++ * and shares one FPSIMD register file with the guest userspace it is servicing.
++ * Using NEON in guest kernel code would silently corrupt the registers of
++ * whatever guest thread happened to be running -- which is precisely the class
++ * of bug the FP/SIMD torture gate exists to catch.
++ *
++ * Reporting "no" makes every crypto driver and library that offers a SIMD
++ * implementation fall back to its generic C one, which is the correct and only
++ * safe answer here.
++ *
++ * This also keeps <asm/simd.h> from resolving to arch/arm64's, which reaches
++ * asm/neon.h, asm/fpsimd.h and finally the generated asm/sysreg-defs.h that is
++ * not built for ARCH=um.
++ */
++#ifndef __UM_ARM64_SIMD_H
++#define __UM_ARM64_SIMD_H
++
++#include <asm-generic/simd.h>
++
++#endif /* __UM_ARM64_SIMD_H */
+diff --git a/arch/arm64/um/patching.c b/arch/arm64/um/patching.c
+new file mode 100644
+index 0000000000000..bf9c7449fb6c2
+--- /dev/null
++++ b/arch/arm64/um/patching.c
+@@ -0,0 +1,45 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Instruction patching for ARCH=um SUBARCH=arm64.
++ *
++ * arch/arm64/kernel/module.c is reused here to relocate modules, and it writes
++ * the relocated instructions through aarch64_insn_copy(). On hardware that
++ * function exists because kernel text is mapped read-only: it creates a
++ * writable alias of the target page, copies through it, and then performs the
++ * cache maintenance that makes the new instructions visible to the instruction
++ * fetch path.
++ *
++ * A UML guest has no read-only kernel text to work around -- module memory is
++ * ordinary writable memory in an ordinary process -- so the writable-alias half
++ * of the problem does not exist and a plain memcpy is correct.
++ *
++ * The cache maintenance half very much does still exist, and is the reason this
++ * is not simply a memcpy. These are real instructions being written to a real
++ * arm64 CPU, which has separate instruction and data caches that are not
++ * coherent with each other. Without cleaning the new bytes out of the D-cache
++ * to the point of unification and invalidating the I-cache for that range, the
++ * CPU is entitled to execute whatever was in the I-cache before -- which, for
++ * freshly vmalloc'd module memory, is stale data or another module's code. The
++ * failure would be intermittent, would depend on cache pressure, and would look
++ * like a random crash inside a newly loaded module.
++ *
++ * __builtin___clear_cache() is the right primitive here rather than arm64's
++ * caches_clean_inval_pou(): that one lives in arch/arm64/mm/cache.S, which is
++ * not built for ARCH=um, and it is written for EL1. The compiler builtin emits
++ * the EL0-legal sequence (DC CVAU / DSB ISH / IC IVAU / DSB ISH / ISB), which is
++ * exactly what a userspace JIT does and exactly what this is.
++ */
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/types.h>
++
++#include <asm/text-patching.h>
++
++void *aarch64_insn_copy(void *dst, void *src, size_t len)
++{
++	memcpy(dst, src, len);
++
++	__builtin___clear_cache((char *)dst, (char *)dst + len);
++
++	return dst;
++}
+diff --git a/arch/um/include/asm/Kbuild b/arch/um/include/asm/Kbuild
+index 8fdc0bd9ab6fb..30fa8a745e1b8 100644
+--- a/arch/um/include/asm/Kbuild
++++ b/arch/um/include/asm/Kbuild
+@@ -12,8 +12,15 @@ generic-y += irq_work.h
+ generic-y += kdebug.h
+ generic-y += mcs_spinlock.h
+ generic-y += mmiowb.h
++# The arm64 subarch reuses arch/arm64/kernel/module.c and module-plts.c, which
++# need arm64's own struct mod_arch_specific (PLT bookkeeping) and the PLT
++# sections in the module linker script. Those live in arch/arm64/um/asm/, and a
++# generic-y wrapper here would shadow them -- generated headers win the include
++# path -- leaving "field has incomplete type 'struct mod_arch_specific'".
++ifneq ($(HEADER_ARCH),arm64)
+ generic-y += module.h
+ generic-y += module.lds.h
++endif
+ generic-y += parport.h
+ generic-y += percpu.h
+ generic-y += percpu_types.h
+diff --git a/arch/um/os-Linux/user_syms.c b/arch/um/os-Linux/user_syms.c
+index 67f6112318b64..2104ac8c42a5c 100644
+--- a/arch/um/os-Linux/user_syms.c
++++ b/arch/um/os-Linux/user_syms.c
+@@ -20,7 +20,24 @@
+ EXPORT_SYMBOL(strstr);
+ #endif
+ 
+-#ifndef __x86_64__
++/*
++ * Who exports memcpy/memmove/memset differs per subarch, and exactly one of
++ * them must:
++ *
++ *   i386   -- <asm/string_32.h> defines __HAVE_ARCH_MEMCPY, so lib/string.c
++ *             does not build them, and nothing else exports the libc versions
++ *             the compiler emits calls to. This file has to.
++ *   x86_64 -- same __HAVE_ARCH_MEMCPY, but arch/x86/lib/memcpy_64.S and friends
++ *             are linked in via subarch-y and carry their own EXPORT_SYMBOL.
++ *   arm64  -- arch/arm64/um/asm/string.h deliberately defines no __HAVE_ARCH_*,
++ *             because arch/arm64/lib is not built for ARCH=um, so lib/string.c
++ *             supplies and exports the generic C versions.
++ *
++ * Exporting here as well makes modpost fail the build with "'memcpy' exported
++ * twice", which is only visible once CONFIG_MODULES is on -- so it appeared the
++ * moment arm64 gained module support, not when the subarch was written.
++ */
++#if !defined(__x86_64__) && !defined(__aarch64__)
+ #undef memcpy
+ extern void *memcpy(void *, const void *, size_t);
+ EXPORT_SYMBOL(memcpy);

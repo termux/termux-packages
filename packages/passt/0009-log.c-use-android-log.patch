@@ -1,0 +1,64 @@
+diff --git a/log.c b/log.c
+index cbac2ef..9e6b725 100644
+--- a/log.c
++++ b/log.c
+@@ -23,6 +24,9 @@
+ #include <string.h>
+ #include <time.h>
+ #include <syslog.h>
++#if defined(__ANDROID__) && !defined(__TERMUX__)
++#include <android/log.h>
++#endif
+ #include <stdarg.h>
+ #include <sys/socket.h>
+ 
+@@ -270,8 +274,32 @@ static void passt_vsyslog(bool newline, int pri, const char *format, va_list ap)
+ 	if (newline && format[strlen(format)] != '\n')
+ 		n += snprintf(buf + n, BUFSIZ - n, "\n");
+ 
++#if defined(__ANDROID__) && !defined(__TERMUX__)
++	{
++		int android_pri = ANDROID_LOG_DEFAULT;
++		/* convert only used levels in this code */
++		switch (pri) {
++		case LOG_ERR:
++			android_pri = ANDROID_LOG_ERROR;
++			break;
++		case LOG_WARNING:
++			android_pri = ANDROID_LOG_WARN;
++			break;
++		case LOG_INFO:
++			android_pri = ANDROID_LOG_INFO;
++			break;
++		case LOG_DEBUG:
++			android_pri = ANDROID_LOG_DEBUG;
++			break;
++		default:
++			break;
++		}
++		__android_log_print(android_pri, log_ident, "%s", buf);
++	}
++#else /* __ANDROID__ && !__TERMUX__ */
+ 	if (log_sock >= 0 && send(log_sock, buf, n, 0) != n && log_stderr)
+ 		FPRINTF(stderr, "Failed to send %i bytes to syslog\n", n);
++#endif /* __ANDROID__ && !__TERMUX__ */
+ }
+ 
+ /**
+@@ -370,6 +398,8 @@ void __openlog(const char *ident, int option, int facility)
+ {
+ 	(void)option;
+ 
++#ifdef __ANDROID__
++#else /* __ANDROID__ */
+ 	if (log_sock < 0) {
+ 		struct sockaddr_un a = { .sun_family = AF_UNIX, };
+ 
+@@ -384,6 +414,7 @@ void __openlog(const char *ident, int option, int facility)
+ 			return;
+ 		}
+ 	}
++#endif /* __ANDROID__ */
+ 
+ 	log_mask |= facility;
+ 	strncpy(log_ident, ident, sizeof(log_ident) - 1);

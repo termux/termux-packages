@@ -1,0 +1,224 @@
+From 3da6f8ed6d093603a484add38c777fb4c3d15e61 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 15:15:03 +0200
+Subject: [PATCH] um/arm64: report the benchmarks in units that mean something
+
+The fault row of the README table compared a 16K guest page against a 4K
+host page and called the ratio overhead. perfbench steps by
+sysconf(_SC_PAGESIZE), so the guest number covers four times the memory
+the native one does: the guest looked ~7x slower on fresh anonymous
+memory where per byte it is 1.77x. That reading sent a long stretch of
+work after an overhead that was mostly the unit. Say so under the table,
+and have faultbench report per megabyte as well as per page so the
+mistake is not available next time.
+
+Retake the table, since the old one mixed columns from separate runs --
+the one thing this harness exists to prevent. Every column of each table
+is now a condition inside one interleaved run, the older columns are
+described in prose rather than pasted beside newer numbers, and the
+window sweep gets its own table instead of being grafted onto the first.
+
+verifybench grows MODES so a run can name the interception modes the
+question needs. Not convenience: three kernels x two modes is eight
+conditions, which took long enough that the phone moved under it and the
+compute validator voided two runs in a row at ~27% jitter. MODES=sec
+halved the run and it passed at 1.1%. A measurement that cannot finish
+before the machine changes is not a more rigorous measurement.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ README.md                             | 61 +++++++++++++++++++++------
+ tools/um-arm64/harness/verifybench.sh | 61 +++++++++++++++++++++++----
+ 2 files changed, 99 insertions(+), 23 deletions(-)
+
+diff --git a/README.md b/README.md
+index c3ac68c7b6077..d2f87f6a0c21d 100644
+--- a/README.md
++++ b/README.md
+@@ -180,22 +180,49 @@ fails identically whether or not `CONFIG_VETH` is set — useless as a test.
+ 
+ ## Benchmarks
+ 
+-Measured on the Poco F3, `adb shell`, guest running `perfbench`. All three kernels
+-are conditions **inside one interleaved run**, so a difference between them
+-cannot be thermal drift or governor state.
+-
+-Medians of 7 interleaved rounds, µs/op:
+-
+-| | native | proot | before | +waiter-bit | +fault-around |
++Measured on the Poco F3, `adb shell`, guest running `perfbench`. Every column of
++a table below is a condition **inside one interleaved run**, so a difference
++along a row cannot be thermal drift or governor state. Columns from different
++tables are from different runs and must not be compared with each other — that
++restriction is the whole point of the harness, not a formality.
++
++Medians of 7 interleaved rounds, µs/op, seccomp mode:
++
++| | native | proot | 128K window | 512K window |
++|---|---|---|---|---|
++| syscall | 0.079 | 0.166 | 2.049 | **1.999** |
++| openat | 2.503 | 28.005 | 4.494 | **4.466** |
++| fault | 1.652 | 1.496 | 11.812 | **10.884** |
++| forkexec | 3196 | 516 | 1187 | **1177** |
++
++**The `fault` row is not one measurement.** `perfbench` steps by
++`sysconf(_SC_PAGESIZE)`, and this guest runs 16K pages against the host's 4K, so
++the native figure is per 4K page and the guest's is per 16K page — four times
++the memory for one number. Per byte the guest is **1.77×** the host on fresh
++anonymous memory, not the ~7× the column implies. The per-page reading of this
++row was believed here for a long time and sent a good deal of work chasing an
++overhead that was mostly a unit error; `harness/faultbench.c` reports per
++megabyte as well as per page so that it cannot happen again.
++
++The two guest columns are the same binary under two command lines, differing
++only in the fault-around window: 128K is what the default used to be (8 pages
++at 16K), 512K is what it is now (32, the top of the ramp). A separate run,
++seccomp only, takes the window apart — again all conditions inside that one run:
++
++| | native | proot | `prefault=0` | 8 pages | 32 pages |
+ |---|---|---|---|---|---|
+-| syscall | 0.080 | 0.168 | 9.841 | 1.995 | **1.987** |
+-| openat | 2.527 | 27.393 | 20.223 | 4.473 | **4.501** |
+-| fault | 1.456 | 1.418 | 24.592 | 18.897 | **11.076** |
+-| forkexec | 3255 | 516 | 1197 | 1138 | **1137** |
++| fault | 1.540 | 1.504 | 19.076 | 11.791 | **10.913** |
++
++So having a window at all is worth 1.62×, and widening it from 8 pages to 32
++adds a further 8%. `syscall` (2.001 / 1.953 / 2.043) and `forkexec` (1144 / 1152
++/ 1144) do not move across those three, which is the check that the change
++reaches the fault path and nothing else.
+ 
+-(`before`/`+waiter-bit`/`+fault-around` are seccomp mode. The ptrace column moved
+-by ≤1% for the waiter-bit change, which is the check that the measurement follows
+-the code and not the machine: that change touches only the seccomp path.)
++Earlier tables in this file's history carried `before` and `+waiter-bit`
++columns, from a run that no longer shares a machine state with anything above.
++They are not reproduced here rather than being pasted alongside newer numbers:
++the waiter-bit change took `syscall` from 9.841 to 1.995 µs and fault-around
++took `fault` from 18.897 to 11.076, both inside their own run.
+ 
+ **Methodology**, because the numbers are worthless without it:
+ 
+@@ -209,6 +236,12 @@ the code and not the machine: that change touches only the seccomp path.)
+   If it disagrees across conditions by more than 5%, or jitters more than 8%
+   within one, the whole table is thrown away and nothing is printed. Identical
+   instruction streams cannot differ; if they do, the machine moved.
++- That validator earns its keep. The window sweep above was run twice before it
++  produced a table: three kernels × two interception modes is eight conditions,
++  long enough for the phone to move under it, and both attempts came back at
++  ~27% jitter and printed nothing. Naming only the mode the question needs
++  (`MODES=sec`) halved the run and it passed at 1.1%. A table that takes longer
++  to collect than the machine stays still is not a more thorough table.
+ - `native` and `proot` are controls. proot is there because it is the real
+   alternative on an unrooted phone, not because bare metal is.
+ 
+diff --git a/tools/um-arm64/harness/verifybench.sh b/tools/um-arm64/harness/verifybench.sh
+index 3d93179584247..c8b0e89dd7e86 100644
+--- a/tools/um-arm64/harness/verifybench.sh
++++ b/tools/um-arm64/harness/verifybench.sh
+@@ -35,8 +35,45 @@ KEEPMASK=${KEEPMASK:-40}
+ ROUNDS=${ROUNDS:-7}
+ OUT=${OUT:-$ROOT/artifacts/verifybench-$(date -u +%Y%m%dT%H%M%SZ)}
+ 
+-# "label=path" per kernel, in the order they should appear.
+-KERNELS=${KERNELS:?set KERNELS="label=/path/to/linux ..."}
++# Which interception modes to measure: "sec ptr" (default), or one of them.
++#
++# This is a correctness knob, not a convenience one. Every condition doubles the
++# wall time of a round, ptrace conditions are the slow ones (20us a syscall
++# against 2), and the run has to finish before the phone's thermal state moves
++# or the validator throws the whole table away -- which is exactly what happened
++# to two runs of three kernels x two modes: median compute 0.90ns with a 1.14ns
++# outlier, 27% jitter, INVALID. The same comparison with MODES=sec passes.
++#
++# So: name the modes the question actually needs. A prefault window sweep is a
++# seccomp question, and measuring ptrace alongside it does not make it more
++# rigorous -- it makes it unmeasurable.
++MODES=${MODES:-"sec ptr"}
++for m in $MODES; do
++	case "$m" in
++	sec|ptr) ;;
++	*) echo "verifybench: unknown mode '$m' (want sec and/or ptr)" >&2
++	   exit 2 ;;
++	esac
++done
++
++# "label=path" per kernel, in the order they should appear, and optionally
++# "label=path%extra boot args".
++#
++# The second form is what lets the *same binary* be a condition twice under
++# different command lines -- prefault=0 against the default, say, or a
++# seccomp_spin sweep. Those are the cheapest experiments available, because
++# they need no rebuild, and without this the harness could only compare
++# binaries: the command line was hardcoded in run_uml.
++#
++#   KERNELS="base=/path/linux pf0=/path/linux%prefault=0"
++#
++# % rather than : as the separator, because a path may contain a colon and a
++# boot argument certainly does (ubd0=...).
++KERNELS=${KERNELS:?set KERNELS="label=/path/to/linux[%extra args] ..."}
++
++# kernel_path/kernel_args - split one KERNELS entry
++kernel_path() { local v=${1#*=}; printf '%s' "${v%%\%*}"; }
++kernel_args() { local v=${1#*=}; case "$v" in *%*) printf '%s' "${v#*%}" ;; *) : ;; esac; }
+ 
+ mkdir -p "$OUT"
+ log() { printf '[verify] %s\n' "$*"; }
+@@ -51,9 +88,10 @@ log() { printf '[verify] %s\n' "$*"; }
+ 	echo
+ 	echo "### kernels under test"
+ 	for k in $KERNELS; do
+-		lbl=${k%%=*}; path=${k#*=}
++		lbl=${k%%=*}; path=$(kernel_path "$k")
+ 		echo "  $lbl"
+ 		echo "    path : $path"
++		echo "    args : $(kernel_args "$k")"
+ 		echo "    md5  : $(md5sum "$path" | cut -d' ' -f1)"
+ 		echo "    size : $(stat -c%s "$path")"
+ 		echo "    file : $(file -b "$path" | cut -c1-100)"
+@@ -79,7 +117,7 @@ env_snapshot > "$OUT/env-before.txt"
+ 
+ # ---- stage the kernels ------------------------------------------------------
+ for k in $KERNELS; do
+-	lbl=${k%%=*}; path=${k#*=}
++	lbl=${k%%=*}; path=$(kernel_path "$k")
+ 	adb push "$path" "$DEV/k-$lbl" >/dev/null 2>&1 || { echo "push failed: $path" >&2; exit 2; }
+ done
+ 
+@@ -94,16 +132,19 @@ run_proot() {
+ 	adb shell "cd $DEV && TMPDIR=$DEV PROOT_LOADER=$DEV/prt/libexec/loader \
+ 		LD_LIBRARY_PATH=$DEV/prt/lib taskset $MASK ./prt/proot -r alp /perfbench --quick 2>&1"
+ }
++# run_uml <label> <seccomp on|off> [extra boot args]
+ run_uml() {
+ 	adb shell "cd $DEV && HOME=$DEV TMPDIR=/tmp taskset $MASK timeout 300 ./k-$1 \
+ 		mem=512M panic=-1 con=null con0=null,fd:1 \
+-		initrd=initramfs-perf.cpio.gz init=/init seccomp=$2 2>&1 | cat"
++		initrd=initramfs-perf.cpio.gz init=/init seccomp=$2 $3 2>&1 | cat"
+ }
+ 
+ CONDS="native proot"
+ for k in $KERNELS; do
+ 	lbl=${k%%=*}
+-	CONDS="$CONDS ${lbl}-sec ${lbl}-ptr"
++	for m in $MODES; do
++		CONDS="$CONDS ${lbl}-${m}"
++	done
+ done
+ echo "$CONDS" > "$OUT/conditions.txt"
+ 
+@@ -112,9 +153,11 @@ for r in $(seq 1 "$ROUNDS"); do
+ 	run_native > "$OUT/native.$r" 2>&1
+ 	run_proot  > "$OUT/proot.$r"  2>&1
+ 	for k in $KERNELS; do
+-		lbl=${k%%=*}
+-		run_uml "$lbl" on  > "$OUT/${lbl}-sec.$r" 2>&1
+-		run_uml "$lbl" off > "$OUT/${lbl}-ptr.$r" 2>&1
++		lbl=${k%%=*}; xargs=$(kernel_args "$k")
++		for m in $MODES; do
++			[ "$m" = sec ] && sc=on || sc=off
++			run_uml "$lbl" "$sc" "$xargs" > "$OUT/${lbl}-${m}.$r" 2>&1
++		done
+ 	done
+ 	sleep 3
+ done
