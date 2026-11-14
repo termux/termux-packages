@@ -1082,14 +1082,14 @@ index a08ebce1d2..5a2906643d 100644
          frame_tree_node_->current_replication_state().insecure_request_policy) {
        bad_message::ReceivedBadMessage(
 @@ -16326,7 +16326,7 @@
-     if (is_synchronous_about_blank_commit &&
-         params->origin.scheme() != url::kFileScheme &&
+         last_committed_origin_.scheme() == url::kFileScheme;
+     if (is_synchronous_about_blank_commit && !is_file_origin_commit &&
          (!frame_tree_->is_guest() ||
 -         !base::FeatureList::IsEnabled(features::kGuestViewMPArch))) {
 +         !base::FeatureList::IsEnabled(::features::kGuestViewMPArch))) {
-       bool origin_matches = false;
-       if (last_committed_origin_.opaque()) {
-         // When the browser-derived origin is opaque, the renderer-reported
+       // The renderer-reported origin should match the browser-derived one
+       // exactly, including the nonce: it's either inherited from the creator,
+       // or derived from a sandbox origin token that the browser also sends to
 @@ -17856,7 +17856,7 @@
            ->SupportsAvoidUnnecessaryBeforeUnloadCheckSync();
    if (is_eligible_for_avoid_unnecessary_beforeunload &&
