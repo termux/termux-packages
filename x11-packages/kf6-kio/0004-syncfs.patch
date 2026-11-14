@@ -1,0 +1,25 @@
+syncfs() is unavailable in Android until API level 28.
+Call the syscall directly instead.
+
+Prevents:
+file_unix_copy.cpp:1113:11: error: no member named 'syncfs' in the global namespace
+
+--- a/src/kioworkers/file/file_unix_copy.cpp
++++ b/src/kioworkers/file/file_unix_copy.cpp
+@@ -49,6 +49,7 @@
+ #include <poll.h>
+ #include <stdint.h>
+ #include <sys/stat.h>
++#include <sys/syscall.h>
+ #include <sys/time.h>
+ #include <thread>
+ #include <unistd.h>
+@@ -1110,7 +1111,7 @@ WorkerResult FileProtocol::flushRemovableFolder(const QString &folder)
+     }
+ #ifdef Q_OS_LINUX
+     infoMessage(i18n("Writing the copied data to the device..."));
+-    if (::syncfs(fd) != 0) {
++    if (::syscall(SYS_syncfs, fd) != 0) {
+         const int err = errno;
+         return WorkerResult::fail((err == ENOSPC || err == EDQUOT) ? KIO::ERR_DISK_FULL : KIO::ERR_CANNOT_WRITE, folder);
+     }
