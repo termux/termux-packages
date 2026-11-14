@@ -1,7 +1,6 @@
-diff -uNr a/llvm-project/openmp/runtime/cmake/config-ix.cmake b/llvm-project/openmp/runtime/cmake/config-ix.cmake
 --- a/llvm-project/openmp/runtime/cmake/config-ix.cmake
 +++ b/llvm-project/openmp/runtime/cmake/config-ix.cmake
-@@ -60,7 +60,6 @@
+@@ -71,7 +71,6 @@ check_cxx_compiler_flag(-Wint-to-void-pointer-cast LIBOMP_HAVE_WINT_TO_VOID_POIN
  check_cxx_compiler_flag(-msse2 LIBOMP_HAVE_MSSE2_FLAG)
  check_cxx_compiler_flag(-ftls-model=initial-exec LIBOMP_HAVE_FTLS_MODEL_FLAG)
  libomp_check_architecture_flag(-mmic LIBOMP_HAVE_MMIC_FLAG)
@@ -9,22 +8,21 @@ diff -uNr a/llvm-project/openmp/runtime/cmake/config-ix.cmake b/llvm-project/ope
  if(WIN32)
    if(MSVC)
      # Check Windows MSVC style flags.
-diff -uNr a/llvm-project/openmp/runtime/src/CMakeLists.txt b/llvm-project/openmp/runtime/src/CMakeLists.txt
 --- a/llvm-project/openmp/runtime/src/CMakeLists.txt
 +++ b/llvm-project/openmp/runtime/src/CMakeLists.txt
-@@ -49,6 +49,9 @@
- if(${LIBOMP_USE_HWLOC})
-   include_directories(${LIBOMP_HWLOC_INSTALL_DIR}/include)
+@@ -32,6 +32,9 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+   set(LIBOMP_MESSAGE_CONVERTER_EXTRA_ARGS ${LIBOMP_MESSAGE_CONVERTER_EXTRA_ARGS} --target-system-override=${CMAKE_SYSTEM_NAME})
  endif()
-+
+ 
 +include_directories(${LIBOMP_SRC_DIR}/android)
 +
- 
- # Getting correct source files to build library
- set(LIBOMP_CXXFILES)
-@@ -92,6 +95,9 @@
-     libomp_append(LIBOMP_CXXFILES kmp_gsupport.cpp)
-     libomp_append(LIBOMP_ASMFILES z_Linux_asm.S) # Unix assembly file
++
+ add_custom_command(
+   OUTPUT  kmp_i18n_id.inc
+   COMMAND ${Python3_EXECUTABLE} ${LIBOMP_TOOLS_DIR}/message-converter.py
+@@ -127,6 +130,9 @@ else()
+       libomp_append(LIBOMP_GNUASMFILES z_Linux_asm.S) # Unix assembly file
+     endif()
    endif()
 +
 +  libomp_append(LIBOMP_CXXFILES android/nltypes_stubs.cpp)
@@ -32,7 +30,6 @@ diff -uNr a/llvm-project/openmp/runtime/src/CMakeLists.txt b/llvm-project/openmp
    libomp_append(LIBOMP_CXXFILES thirdparty/ittnotify/ittnotify_static.cpp LIBOMP_USE_ITT_NOTIFY)
    libomp_append(LIBOMP_CXXFILES kmp_debugger.cpp LIBOMP_USE_DEBUGGER)
    libomp_append(LIBOMP_CXXFILES kmp_stats.cpp LIBOMP_STATS)
-diff -uNr a/llvm-project/openmp/runtime/src/android/nl_types.h b/llvm-project/openmp/runtime/src/android/nl_types.h
 --- a/llvm-project/openmp/runtime/src/android/nl_types.h
 +++ b/llvm-project/openmp/runtime/src/android/nl_types.h
 @@ -0,0 +1,45 @@
@@ -81,7 +78,6 @@ diff -uNr a/llvm-project/openmp/runtime/src/android/nl_types.h b/llvm-project/op
 +#endif
 +
 +#endif  /* ANDROID_NLTYPES_H */
-diff -uNr a/llvm-project/openmp/runtime/src/android/nltypes_stubs.cpp b/llvm-project/openmp/runtime/src/android/nltypes_stubs.cpp
 --- a/llvm-project/openmp/runtime/src/android/nltypes_stubs.cpp
 +++ b/llvm-project/openmp/runtime/src/android/nltypes_stubs.cpp
 @@ -0,0 +1,48 @@

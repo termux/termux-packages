@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="https://libproxy.github.io/"
+TERMUX_PKG_HOMEPAGE="https://github.com/libproxy/libproxy"
 TERMUX_PKG_DESCRIPTION="Automatic proxy configuration management library"
 TERMUX_PKG_LICENSE="LGPL-2.1-or-later"
 TERMUX_PKG_MAINTAINER="@termux"

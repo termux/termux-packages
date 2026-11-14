@@ -1,0 +1,24 @@
+--- a/libdecor/build/Makefile
++++ b/libdecor/build/Makefile
+@@ -41,7 +41,7 @@ fl_libdecor-plugins.o : fl_libdecor-plugins.c ../src/plugins/cairo/libdecor-cair
+ 	$(CC) $(CFLAGS) $(CFLAGS_DECOR) -c  fl_libdecor-plugins.c  -DLIBDECOR_PLUGIN_API_VERSION=1
+ 
+ libdecor-cairo-blur.o : ../src/plugins/common/libdecor-cairo-blur.c
+-	$(CC) $(CFLAGS_DECOR) -c  ../src/plugins/common/libdecor-cairo-blur.c
++	$(CC) $(CFLAGS) $(CFLAGS_DECOR) -c  ../src/plugins/common/libdecor-cairo-blur.c
+ 
+ os-compatibility.o : ../src/os-compatibility.c
+ 	$(CC) $(CFLAGS_DECOR) -c  ../src/os-compatibility.c
+--- a/libdecor/src/os-compatibility.c
++++ b/libdecor/src/os-compatibility.c
+@@ -35,6 +35,10 @@
+ 
+ #ifdef HAVE_MEMFD_CREATE
+ #include <sys/mman.h>
++#if defined(__ANDROID__) && __ANDROID_API__ < 26
++#include <sys/syscall.h>
++#define memfd_create(name, flags) syscall(SYS_memfd_create, name, flags)
++#endif
+ #endif
+ 
+ #include "os-compatibility.h"

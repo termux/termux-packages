@@ -10,9 +10,9 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
 +    set(fido2_target tdesktop::lib_fido2)
 +endif()
  include(cmake/lib_zxcvbn.cmake)
- include(cmake/td_export.cmake)
- include(cmake/td_gram.cmake)
-@@ -39,7 +42,10 @@ include(cmake/td_mtproto.cmake)
+ include(cmake/lib_litehtml.cmake)
+ include(cmake/lib_quickjs.cmake)
+@@ -43,7 +46,10 @@ include(cmake/td_mtproto.cmake)
  include(cmake/td_scheme.cmake)
  include(cmake/td_tde2e.cmake)
  include(cmake/td_ui.cmake)
@@ -23,16 +23,16 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
  include(cmake/telegram_apple_swift_runtime.cmake)
  include(cmake/generate_appstream_changelog.cmake)
  
-@@ -72,7 +78,7 @@ set_target_properties(Telegram PROPERTIES AUTOMOC ON)
+@@ -78,7 +84,7 @@ set_target_properties(Telegram PROPERTIES AUTOMOC ON)
  
  target_link_libraries(Telegram
  PRIVATE
 -    tdesktop::lib_fido2
 +    ${fido2_target}
-     tdesktop::lib_tgcalls
-     tdesktop::td_export
-     tdesktop::td_gram
-@@ -82,7 +88,7 @@ PRIVATE
+     tdesktop::lib_litehtml
+     tdesktop::lib_quickjs
+     tdesktop::lib_widget_renderer
+@@ -92,7 +98,7 @@ PRIVATE
      tdesktop::td_scheme
      tdesktop::td_tde2e
      tdesktop::td_ui
@@ -41,7 +41,7 @@ diff --git a/Telegram/CMakeLists.txt b/Telegram/CMakeLists.txt
      desktop-app::lib_webrtc
      desktop-app::lib_base
      desktop-app::lib_crl
-@@ -2352,6 +2358,18 @@ PRIVATE
+@@ -2610,6 +2616,18 @@ PRIVATE
      tray.h
  )
  
@@ -129,8 +129,8 @@ new file mode 100644
 diff --git a/Telegram/cmake/telegram_options.cmake b/Telegram/cmake/telegram_options.cmake
 --- a/Telegram/cmake/telegram_options.cmake
 +++ b/Telegram/cmake/telegram_options.cmake
-@@ -53,6 +53,8 @@ if (DESKTOP_APP_SPECIAL_TARGET)
-     target_compile_definitions(Telegram PRIVATE TDESKTOP_ALLOW_CLOSED_ALPHA)
+@@ -61,6 +61,8 @@ if (TDESKTOP_RELEASE_TEST_HARNESS)
+     target_compile_definitions(Telegram PRIVATE $<$<CONFIG:Release>:TDESKTOP_RELEASE_TEST_HARNESS>)
  endif()
  
 +option(DESKTOP_APP_DISABLE_FIDO2 "Disable FIDO2 security key support." OFF)

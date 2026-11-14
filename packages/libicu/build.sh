@@ -7,9 +7,9 @@ TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_MAINTAINER="@termux"
 # Never forget to always bump revision of reverse dependencies and rebuild them
 # when bumping "major" version.
-TERMUX_PKG_VERSION="78.3"
+TERMUX_PKG_VERSION="79.1"
 TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION}/icu4c-${TERMUX_PKG_VERSION}-sources.tgz
-TERMUX_PKG_SHA256=3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0
+TERMUX_PKG_SHA256=06fa63ecb521048f8082f12ad988f6b678d90cbd88aafce24cbc94902b191d99
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_METHOD=repology
 TERMUX_PKG_DEPENDS="libc++"
@@ -27,7 +27,7 @@ termux_step_post_get_source() {
 }
 
 termux_step_post_massage() {
-	local _GUARD_FILE="lib/libicuuc.so.78"
+	local _GUARD_FILE="lib/libicuuc.so.79"
 	if [[ ! -e "${_GUARD_FILE}" ]]; then
 		termux_error_exit "file ${_GUARD_FILE} not found."
 	fi

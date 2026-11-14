@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rizsotto/Bear
 TERMUX_PKG_DESCRIPTION="Bear is a tool that generates a compilation database for clang tooling."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Nguyen Khanh @nguynkhn"
-TERMUX_PKG_VERSION="4.2.2"
+TERMUX_PKG_VERSION="4.2.4"
 TERMUX_PKG_SRCURL="https://github.com/rizsotto/Bear/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=9f9d0236bf0751cb4f5d747c077697f396546ba1ad8653c2e9b7192ea47df14a
+TERMUX_PKG_SHA256=1a771dba88f9687e58b6c35537336bab7a26dc196b2d37f868c7a83a310ab959
+TERMUX_PKG_DEPENDS="libandroid-spawn"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

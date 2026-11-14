@@ -1,11 +1,11 @@
 --- a/GNUmakefile
 +++ b/GNUmakefile
-@@ -369,7 +369,10 @@
-	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
+@@ -390,7 +390,10 @@
+ 	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
  
  snowball$(EXEEXT): $(COMPILER_OBJECTS)
--	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-+	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ $^
+-	$(CC) $(CFLAGS) $(LDFLAGS) $(o_for_exe) $@ $^
++	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $(o_for_exe) $@ $^
 +
 +compiler/%.o: compiler/%.c
 +	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) -c $< -o $@

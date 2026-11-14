@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple and flexible tool for managing secrets"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.13.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/getsops/sops/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=49811c5ed80f6b4d4e98cef98e3f7378406aa692fd773dfb72ad1b4dfb940448
 TERMUX_PKG_AUTO_UPDATE=true

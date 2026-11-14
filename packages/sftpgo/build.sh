@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-featured and highly configurable SFTP, HTTP/S, FTP/
 TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.7.6"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/drakkan/sftpgo/releases/download/v$TERMUX_PKG_VERSION/sftpgo_v${TERMUX_PKG_VERSION}_src_with_deps.tar.xz"
 TERMUX_PKG_SHA256=f6da983e8d35bb698e4d8e99120a61cf0234f90eed396950bbee1a58d705cbad
 TERMUX_PKG_BUILD_IN_SRC=true

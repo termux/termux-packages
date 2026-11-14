@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.washington.edu/imap/ # Gone.
+TERMUX_PKG_HOMEPAGE="https://github.com/uw-imap/imap"
 TERMUX_PKG_DESCRIPTION="UW IMAP c-client library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

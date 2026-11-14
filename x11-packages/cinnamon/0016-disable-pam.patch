@@ -1,0 +1,28 @@
+--- a/meson.build
++++ b/meson.build
+@@ -122,10 +122,7 @@ pam_compile = '''#include <stdio.h>
+                      return 0;
+                  }'''
+ 
+-pam = cc.find_library('pam')
+-if not cc.has_function('sigtimedwait')
+-  pam = [pam, cc.find_library('rt')]
+-endif
++pam = dependency('', required : false)
+ 
+ python = find_program('python3')
+ 
+--- a/src/screensaver/meson.build
++++ b/src/screensaver/meson.build
+@@ -1,3 +1,4 @@
++if pam.found()
+ # Screensaver authentication library
+ screensaver_sources = [
+     'cs-auth-pam.c',
+@@ -22,5 +23,6 @@ executable(
+     install: true,
+     install_dir: libexecdir,
+ )
++endif
+ 
+ subdir('backup-locker')

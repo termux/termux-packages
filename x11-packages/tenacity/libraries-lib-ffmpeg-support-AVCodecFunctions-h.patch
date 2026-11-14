@@ -1,0 +1,12 @@
+--- a/libraries/lib-ffmpeg-support/AVCodecFunctions.h
++++ b/libraries/lib-ffmpeg-support/AVCodecFunctions.h
+@@ -46,6 +46,9 @@ struct FFMPEG_SUPPORT_API AVCodecFunctions
+ 
+    // New API for decoding and encoding. Audacity will preffer it when available.
+    int                (*avcodec_send_packet)(AVCodecContext* avctx, const AVPacket* avpkt) = nullptr;
++    int (*avcodec_get_supported_config)(const AVCodecContext* avctx, const AVCodec* codec,
++                                        AVCodecConfigFwd config, unsigned flags, const void** out_configs,
++                                        int* out_num_configs) = nullptr;
+    int                (*avcodec_receive_frame)(AVCodecContext* avctx, AVFrame* frame) = nullptr;
+    int                (*avcodec_send_frame)(AVCodecContext* avctx, const AVFrame* frame) = nullptr;
+    int                (*avcodec_receive_packet)(AVCodecContext* avctx, AVPacket* avpkt) = nullptr;

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-exec-package
 TERMUX_PKG_DESCRIPTION="Utils and libraries for Termux exec including a LD_PRELOAD shared library for proper functioning of the Termux execution environment"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=1:2.5.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-exec-package/archive/refs/tags/v${TERMUX_PKG_VERSION:2}.tar.gz

@@ -1,0 +1,16 @@
+Keep LD_PRELOAD in forked process environments.
+
+On Termux, LD_PRELOAD carries libtermux-exec, which rewrites shebangs such as
+`#!/usr/bin/env bash`. Without it, programs spawned from the extension host
+(e.g. git running hooks) fail with "No such file or directory".
+
+--- a/src/vs/base/common/processes.ts
++++ b/src/vs/base/common/processes.ts
+@@ -140,7 +140,6 @@ export function removeDangerousEnvVariables(env: IProcessEnvironment | undefined
+ 		'DEBUG',
+ 		'NODE_OPTIONS',
+ 		'VSCODE_NODE_OPTIONS',
+-		'LD_PRELOAD',
+ 		'DYLD_INSERT_LIBRARIES'
+ 	]);
+ 	for (const key of Object.keys(env)) {

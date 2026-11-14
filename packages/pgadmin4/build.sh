@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Feature-rich web-based administration and development pl
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="9.18"
+TERMUX_PKG_VERSION="9.19"
 TERMUX_PKG_SRCURL="git+https://github.com/pgadmin-org/pgadmin4"
 TERMUX_PKG_GIT_BRANCH="REL-${TERMUX_PKG_VERSION/./_}"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -15,7 +15,7 @@ TERMUX_PKG_RECOMMENDS="postgresql"
 # bdist_wheel imports web/config.py, which pulls in pgadmin/__init__.py
 # and its module tree, so all of that tree's imports must be importable
 # by the host build python.
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, flask, flask-socketio, flask-babel, flask-login, flask-mail, flask-paranoid, flask-security-too==5.8.*, flask-migrate, python-dateutil, cryptography, jsonformatter"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, flask, flask-socketio, flask-babel, flask-login, flask-mail, flask-paranoid, flask-security-too==5.8.*, flask-migrate, python-dateutil, cryptography, jsonformatter, psycopg, psycopg-binary"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_pre_configure() {
@@ -40,6 +40,7 @@ termux_step_make() {
 	cp "$TERMUX_PKG_SRCDIR/LICENSE" "$_stage/"
 
 	cd "$TERMUX_PKG_SRCDIR/pip-build"
+	echo "recursive-include pgadmin4 *" > MANIFEST.in
 	python "$TERMUX_PKG_SRCDIR/pkg/pip/setup_pip.py" bdist_wheel
 }
 

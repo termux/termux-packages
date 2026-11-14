@@ -1,6 +1,8 @@
+Use the Termux prefix for the shell fallback of mwm and the default UIL include directory.
+
 --- a/clients/mwm/WmFunction.c
 +++ b/clients/mwm/WmFunction.c
-@@ -1124,7 +1124,7 @@
+@@ -1112,7 +1112,7 @@ Boolean F_Exec (String args, ClientData *pCD, XEvent *event)
  #ifdef SVR4
          execl ("/usr/bin/sh", "sh", "-c", args, NULL);
  #else
@@ -11,23 +13,12 @@
  
 --- a/clients/uil/UilSrcSrc.c
 +++ b/clients/uil/UilSrcSrc.c
-@@ -642,7 +642,7 @@
+@@ -637,7 +637,7 @@ open_source_file( const char           *c_file_name,
  	az_fcb->az_file_ptr = fopen(c_file_name, "r");
  
      } else {
--	static char XmConst	c_include_dir[]= "/usr/include/";
-+	static char XmConst	c_include_dir[]= "@TERMUX_PREFIX@/include/";
+-	static const char	c_include_dir[]= "/usr/include/";
++	static const char	c_include_dir[]= "@TERMUX_PREFIX@/include/";
  	Boolean			search_user_include=True;
  	Boolean			specific_directory=False;
  
---- a/lib/Xm/ColorS.c
-+++ b/lib/Xm/ColorS.c
-@@ -146,7 +146,7 @@
-   {
-     XmNrgbFile, XmCString, XmRString,
-     sizeof(String), XtOffsetOf(XmColorSelectorRec, cs.rgb_file),
--    XmRString, (XtPointer) "/usr/lib/X11/rgb.txt"
-+    XmRString, (XtPointer) "@TERMUX_PREFIX@/lib/X11/rgb.txt"
-   },
- #endif
-   {

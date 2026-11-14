@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Abseil C++ Common Libraries"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Do not forget to rebuild revdeps along with EVERY "major" version bump.
-TERMUX_PKG_VERSION="20260526.0"
+TERMUX_PKG_VERSION="20260817.0"
 TERMUX_PKG_SRCURL=https://github.com/abseil/abseil-cpp/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6e1aee535473414164bf83e4ebc40240dec71a4701f8a642d906e95bea1aea0c
+TERMUX_PKG_SHA256=f7e05179df39c45434cad433f5783840bb3788ef322976f9138bc6b72b3a107d
 # updating this will break libprotobuf
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++"

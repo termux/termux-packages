@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="CorelDraw file format importer library for LibreOffice"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.1.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://dev-www.libreoffice.org/src/libcdr/libcdr-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=f7bb6abdd7f226820f288a93dd8d07759833c0250d9e202af90f9b312c4665a3
 TERMUX_PKG_DEPENDS="libicu, librevenge, libxml2, littlecms, zlib"

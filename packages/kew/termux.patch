@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -19,7 +19,7 @@ ARCH := $(shell uname -m)
+@@ -23,7 +23,7 @@ ARCH := $(shell uname -m)
  KEW_VERSION ?= $(shell git describe --tags --dirty --always)
  
    # Check if we're in Termux environment
@@ -9,7 +9,7 @@
    # Termux environment
    IS_ANDROID := 1
  endif
-@@ -78,17 +78,17 @@ ifeq ($(origin USE_FAAD), undefined)
+@@ -92,17 +92,17 @@ ifeq ($(origin USE_FAAD), undefined)
  
    ifeq ($(USE_FAAD),0)
          # Check if we're in Termux environment
@@ -35,7 +35,7 @@
                  USE_FAAD = $(shell [ -f /usr/lib/libfaad.so ] || [ -f /usr/lib64/libfaad.so ] || [ -f /usr/lib64/libfaad2.so ] || \
 --- a/src/ui/termbox2_input.h
 +++ b/src/ui/termbox2_input.h
-@@ -2634,15 +2634,15 @@ static int load_terminfo(void)
+@@ -3096,15 +3096,15 @@ static int load_terminfo(void)
  #ifdef TB_TERMINFO_DIR
          if_ok_return(rv, load_terminfo_from_path(TB_TERMINFO_DIR, term));
  #endif
@@ -61,7 +61,7 @@
  }
 --- a/src/utils/file.c
 +++ b/src/utils/file.c
-@@ -44,7 +44,7 @@ const char *get_temp_dir()
+@@ -50,7 +50,7 @@ const char *get_temp_dir()
          }
  
          // Fallback to /tmp on Unix-like systems
@@ -70,7 +70,7 @@
  }
  
  void get_directory_from_path(const char *path, char *directory)
-@@ -363,7 +363,7 @@ int is_in_temp_dir(const char *path)
+@@ -383,7 +383,7 @@ int is_in_temp_dir(const char *path)
          static char tmpdir_buf[KEW_PATH_MAX + 2];
  
          if (tmp_dir == NULL || strnlen(tmp_dir, KEW_PATH_MAX) >= KEW_PATH_MAX)
@@ -79,12 +79,12 @@
  
          size_t len = strlen(tmp_dir);
          c_strcpy(tmpdir_buf, tmp_dir, KEW_PATH_MAX);
-@@ -394,7 +394,7 @@ static const char *get_tmp_dir(void)
-     return "C:\\Temp";
+@@ -416,7 +416,7 @@ static const char *get_tmp_dir(void)
+         return "C:\\Temp";
  #else
-     const char *tmp = getenv("TMPDIR");
--    return (tmp && *tmp) ? tmp : "/tmp";
-+    return (tmp && *tmp) ? tmp : "@TERMUX_PREFIX@/tmp";
+         const char *tmp = getenv("TMPDIR");
+-        return (tmp && *tmp) ? tmp : "/tmp";
++        return (tmp && *tmp) ? tmp : "@TERMUX_PREFIX@/tmp";
  #endif
  }
  

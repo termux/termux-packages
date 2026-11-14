@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="10.1.18"
+TERMUX_PKG_VERSION="10.1.20"
 TERMUX_PKG_SRCURL=https://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=afeb631a3263ecd3c888ec6bd717cfeaa70a587168b013c8f483d224064c262c
+TERMUX_PKG_SHA256=5240b18c7edd31833a6107034c3e839cd18bb5e6bc8c305dd45dc83f3ffa8c69
 TERMUX_PKG_DEPENDS="libandroid-execinfo, libarchive, libcrypt, libdb, libedit, libgmp, libyaml, ncurses, openssl, ossp-uuid, pcre2, python, unixodbc, zlib"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
@@ -45,7 +45,10 @@ _SHARED_EXTRA_CONFIGURE_ARGS="
 termux_pkg_auto_update() {
 	# upstream website recommendes this to get the latest devel version
 	local latest_devel='https://www.swi-prolog.org/download/devel/src/swipl-latest.tar.gz'
-	local version="$(curl -s "$latest_devel" | grep location | sed -n 's/.*swipl-\([0-9\.]*\).tar.gz.*/\1/p')"
+	local version="$(curl -s --retry 5 --retry-delay 10 "$latest_devel" | grep location | sed -n 's/.*swipl-\([0-9\.]*\).tar.gz.*/\1/p')"
+	if [[ -z "$version" ]]; then
+		termux_error_exit "Unable to get the latest version from $latest_devel"
+	fi
 	termux_pkg_upgrade_version "$version"
 }
 

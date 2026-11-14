@@ -25,5 +25,5 @@ termux_step_cleanup_packages() {
 
 	echo "INFO: cleaning up some disk space for building \"${TERMUX_PKG_NAME}\"."
 
-	(cd "$TERMUX_TOPDIR" && find . -mindepth 1 -maxdepth 1 -type d -regextype posix-extended -regex "^\./$PKG_REGEX$" -exec rm -rf "{}" +)
+	(cd "$TERMUX_TOPDIR" && find . -mindepth 1 -maxdepth 1 -type d -regextype posix-extended -regex "^\./$PKG_REGEX$" -exec chmod +w -R "{}" + -exec rm -rf "{}" +)
 }

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/x11-packages
 TERMUX_PKG_DESCRIPTION="Package repository containing X11 programs and libraries"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=8.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=false

@@ -1,0 +1,40 @@
+--- a/scripts/build/bun.ts
++++ b/scripts/build/bun.ts
+@@ -194,7 +194,7 @@
+     // Linux local WebKit: link system ICU (prebuilt bundles its own).
+     // Assumes system ICU is in default lib paths — true on most distros.
+     // Android: no system ICU; the local WebKit build must bundle it.
+-    if (cfg.webkit === "local" && cfg.abi !== "android") {
++    if (cfg.webkit === "local") {
+       libs.push("-licudata", "-licui18n", "-licuuc");
+     }
+   }
+--- a/scripts/build/deps/webkit.ts
++++ b/scripts/build/deps/webkit.ts
+@@ -290,14 +290,6 @@
+     // Posix uses system ICU (linked via -licu* in bun.ts). Android has no
+     // system ICU — link the static cross-built libs from BUN_ANDROID_ICU_ROOT.
+     const libs = [...coreLibs(cfg), bmallocLib(cfg)];
+-    if (cfg.abi === "android") {
+-      const icuRoot = process.env.BUN_ANDROID_ICU_ROOT ?? "/tmp/icu-android";
+-      libs.push(
+-        resolve(icuRoot, "lib", "libicui18n.a"),
+-        resolve(icuRoot, "lib", "libicuuc.a"),
+-        resolve(icuRoot, "lib", "libicudata.a"),
+-      );
+-    }
+ 
+     const includes = [
+       // ABSOLUTE — resolved here because they're in the build dir, not src.
+--- a/scripts/build/flags.ts
++++ b/scripts/build/flags.ts
+@@ -1327,6 +1327,9 @@
+       "-static-libstdc++",
+       // -l:libunwind.a (driver-emitted) searches -L paths; point at the NDK's
+       // own per-arch runtime dir so it resolves regardless of resource-dir layout.
++      "-L@TERMUX_PREFIX@/lib",
++      "-Wl,-rpath=@TERMUX_PREFIX@/lib",
++      "-Wl,--enable-new-dtags",
+       `-L${join(c.androidNdkRuntimeDir!, c.arm64 ? "aarch64" : "x86_64")}`,
+     ],
+     when: c => c.linux && c.abi === "android",

@@ -4,12 +4,12 @@ Fixes https://github.com/termux/termux-packages/issues/29198
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -452,7 +452,7 @@
+@@ -570,7 +570,7 @@ cmake_dependent_option(USE_LLVM_BOLT "Optimize libraries with LLVM BOLT."
  # Enable third party mimalloc library to improve memory allocation performance
  # on Windows and AArch64.
- option(USE_MIMALLOC_ON_MKL "Use mimalloc on MKL" OFF)
+ set(USE_MIMALLOC_DEFAULT OFF)
 -if(WIN32 OR (CPU_AARCH64 AND NOT APPLE))
 +if(FALSE)
-   set(USE_MIMALLOC ON)
-   # Disable OPT flags for mimalloc on aarch64 as it breaks ARMv8.0
-   # See https://github.com/pytorch/pytorch/issues/174344
+   set(USE_MIMALLOC_DEFAULT ON)
+ endif()
+ option(USE_MIMALLOC "Use mimalloc" "${USE_MIMALLOC_DEFAULT}")

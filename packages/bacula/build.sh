@@ -13,6 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/bacula/bacula-fd.conf"
 TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${TERMUX_PREFIX}/bin/bacula-fd")
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_UPDATE_VERSION_REGEXP="^Release-\K\d+\.\d+\.\d+$"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setpgrp_void=yes
 --enable-client-only

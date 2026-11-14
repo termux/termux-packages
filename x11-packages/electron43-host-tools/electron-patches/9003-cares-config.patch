@@ -1,0 +1,176 @@
+--- a/third_party/electron_node/deps/cares/config/linux/ares_config.h
++++ b/third_party/electron_node/deps/cares/config/linux/ares_config.h
+@@ -50,10 +50,10 @@
+ #define HAVE_ARPA_INET_H 1
+ 
+ /* Define to 1 if you have the <arpa/nameser_compat.h> header file. */
+-#define HAVE_ARPA_NAMESER_COMPAT_H 1
++// #define HAVE_ARPA_NAMESER_COMPAT_H 1
+ 
+ /* Define to 1 if you have the <arpa/nameser.h> header file. */
+-#define HAVE_ARPA_NAMESER_H 1
++// #define HAVE_ARPA_NAMESER_H 1
+ 
+ /* Define to 1 if you have the <assert.h> header file. */
+ #define HAVE_ASSERT_H 1
+@@ -116,10 +116,10 @@
+ #define HAVE_GETNAMEINFO 1
+
+ /* Define to 1 if you have `getrandom` */
+-#define HAVE_GETRANDOM 1
++// #define HAVE_GETRANDOM 1
+
+ /* Define to 1 if you have `getservbyport_r` */
+-#define HAVE_GETSERVBYPORT_R 1
++// #define HAVE_GETSERVBYPORT_R 1
+
+ /* Define to 1 if you have `gettimeofday` */
+ #define HAVE_GETTIMEOFDAY 1
+@@ -146,7 +146,7 @@
+ #define HAVE_INTTYPES_H 1
+ 
+ /* Define to 1 if you have `ioctl` */
+-#define HAVE_IOCTL 1
++// #define HAVE_IOCTL 1
+ 
+ /* Define to 1 if you have `ioctlsocket` */
+ /* #undef HAVE_IOCTLSOCKET */
+@@ -158,7 +158,7 @@
+ /* #undef HAVE_IOCTLSOCKET_FIONBIO */
+ 
+ /* ioctl() with FIONBIO support */
+-#define HAVE_IOCTL_FIONBIO 1 
++// #define HAVE_IOCTL_FIONBIO 1 
+ 
+ /* Define to 1 if you have the <iphlpapi.h> header file. */
+ /* #undef HAVE_IPHLPAPI_H */
+@@ -212,7 +212,7 @@
+ #define HAVE_PIPE 1
+ 
+ /* Define to 1 if you have `pipe2` */
+-#define HAVE_PIPE2 1
++// #define HAVE_PIPE2 1
+ 
+ /* Define to 1 if you have `poll` */
+ #define HAVE_POLL 1
+--- a/third_party/electron_node/deps/cares/include/ares.h
++++ b/third_party/electron_node/deps/cares/include/ares.h
+@@ -85,7 +85,7 @@
+ #  include <netinet/in.h>
+ #endif
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include <jni.h>
+ #endif
+ 
+@@ -348,7 +348,7 @@
+                                        void *(*arealloc)(void  *ptr,
+                                                          size_t size));
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ CARES_EXTERN void ares_library_init_jvm(JavaVM *jvm);
+ CARES_EXTERN int  ares_library_init_android(jobject connectivity_manager);
+ CARES_EXTERN int  ares_library_android_initialized(void);
+--- a/third_party/electron_node/deps/cares/src/lib/ares_android.c
++++ b/third_party/electron_node/deps/cares/src/lib/ares_android.c
+@@ -23,7 +23,7 @@
+  *
+  * SPDX-License-Identifier: MIT
+  */
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include "ares_private.h"
+ #  include <jni.h>
+ 
+--- a/third_party/electron_node/deps/cares/src/lib/ares_library_init.c
++++ b/third_party/electron_node/deps/cares/src/lib/ares_library_init.c
+@@ -32,7 +32,7 @@
+ 
+ /* library-private global and unique instance vars */
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ #  include "ares_android.h"
+ #endif
+ 
+@@ -141,7 +141,7 @@
+ 
+   /* NOTE: ARES_LIB_INIT_WIN32 flag no longer used */
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+   ares_library_cleanup_android();
+ #endif
+ 
+--- a/third_party/electron_node/deps/cares/src/lib/ares_init.c
++++ b/third_party/electron_node/deps/cares/src/lib/ares_init.c
+@@ -47,7 +47,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+--- a/third_party/electron_node/deps/cares/src/lib/ares_sysconfig_files.c
++++ b/third_party/electron_node/deps/cares/src/lib/ares_sysconfig_files.c
+@@ -47,7 +47,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+--- a/third_party/electron_node/deps/cares/src/lib/ares_sysconfig.c
++++ b/third_party/electron_node/deps/cares/src/lib/ares_sysconfig.c
+@@ -45,7 +45,9 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #  include <sys/system_properties.h>
++#if 0
+ #  include "ares_android.h"
++#endif
+ /* From the Bionic sources */
+ #  define DNS_PROP_NAME_PREFIX "net.dns"
+ #  define MAX_DNS_PROPERTIES   8
+@@ -196,7 +198,7 @@
+ }
+ #endif
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if 0
+ static ares_status_t ares_init_sysconfig_android(const ares_channel_t *channel,
+                                                  ares_sysconfig_t *sysconfig)
+ {
+@@ -510,7 +512,7 @@
+   status = ares_init_sysconfig_riscos(channel, &sysconfig);
+ #elif defined(WATT32)
+   status = ares_init_sysconfig_watt32(channel, &sysconfig);
+-#elif defined(ANDROID) || defined(__ANDROID__)
++#elif 0
+   status = ares_init_sysconfig_android(channel, &sysconfig);
+ #elif defined(__APPLE__)
+   status = ares_init_sysconfig_macos(channel, &sysconfig);
+--- a/third_party/electron_node/deps/cares/src/lib/ares_private.h
++++ b/third_party/electron_node/deps/cares/src/lib/ares_private.h
+@@ -101,11 +101,11 @@
+ 
+ #else
+ 
+-#  define PATH_RESOLV_CONF "/etc/resolv.conf"
++#  define PATH_RESOLV_CONF "/data/data/com.termux/files/usr/etc/resolv.conf"
+ #  ifdef ETC_INET
+ #    define PATH_HOSTS "/etc/inet/hosts"
+ #  else
+-#    define PATH_HOSTS "/etc/hosts"
++#    define PATH_HOSTS "/data/data/com.termux/files/usr/etc/hosts"
+ #  endif
+ 
+ #endif

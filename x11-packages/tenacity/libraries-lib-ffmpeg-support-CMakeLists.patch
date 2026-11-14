@@ -1,6 +1,6 @@
---- a/libraries/lib-ffmpeg-support/CMakeLists.txt	2026-02-11 00:08:39.000000000 -0500
-+++ b/libraries/lib-ffmpeg-support/CMakeLists.txt	2026-02-22 22:42:06.619469852 -0500
-@@ -79,6 +79,13 @@
+--- a/libraries/lib-ffmpeg-support/CMakeLists.txt
++++ b/libraries/lib-ffmpeg-support/CMakeLists.txt
+@@ -79,6 +79,20 @@ if (USE_FFMPEG)
        impl/avformat/61/AVFormatImpl.cpp
        impl/avutil/59/AVUtilImpl.cpp
  
@@ -11,7 +11,22 @@
 +      impl/avformat/62/AVFormatImpl.cpp
 +      impl/avutil/60/AVUtilImpl.cpp
 +
++      impl/ffmpeg-9.0.0-single-header.h
++      impl/avutil/61/avconfig.h
++      impl/avcodec/63/AVCodecIDLookup.cpp
++      impl/avcodec/63/AVCodecImpl.cpp
++      impl/avformat/63/AVFormatImpl.cpp
++      impl/avutil/61/AVUtilImpl.cpp
++
        # Loaders
        impl/avcodec/AVCodecFunctionsLoader.cpp
        impl/avcodec/AVCodecFunctionsLoader.h
-
+@@ -89,6 +103,8 @@ if (USE_FFMPEG)
+ 
+       # not necessary here for the build, but they help browsing in an IDE:
+       impl/AVCodecIDLookup.inl
++      impl/avcodec/AVCodecCapabilitiesLegacy.inl
++      impl/avcodec/AVCodecCapabilitiesQuery.inl
+       impl/avcodec/AVCodecContextWrapperImpl.inl
+       impl/avcodec/AVCodecWrapperImpl.inl
+       impl/avcodec/AVPacketWrapperImpl.inl

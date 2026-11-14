@@ -163,11 +163,6 @@
     <member name="CLUTTER_OFFSCREEN_REDIRECT_ALWAYS" nick="always" value="2"/>
     <member name="CLUTTER_OFFSCREEN_REDIRECT_ON_IDLE" nick="on-idle" value="4"/>
   </flags>
-  <flags name="ClutterAllocationFlags" get-type="clutter_allocation_flags_get_type">
-    <member name="CLUTTER_ALLOCATION_NONE" nick="allocation-none" value="0"/>
-    <member name="CLUTTER_ABSOLUTE_ORIGIN_CHANGED" nick="absolute-origin-changed" value="2"/>
-    <member name="CLUTTER_DELEGATE_LAYOUT" nick="delegate-layout" value="4"/>
-  </flags>
   <enum name="ClutterAlignAxis" get-type="clutter_align_axis_get_type">
     <member name="CLUTTER_ALIGN_X_AXIS" nick="x-axis" value="0"/>
     <member name="CLUTTER_ALIGN_Y_AXIS" nick="y-axis" value="1"/>
@@ -252,10 +247,10 @@
     <member name="CLUTTER_DRAG_X_AXIS" nick="x-axis" value="1"/>
     <member name="CLUTTER_DRAG_Y_AXIS" nick="y-axis" value="2"/>
   </enum>  <flags name="ClutterEventFlags" get-type="clutter_event_flags_get_type">
-    <member name="CLUTTER_EVENT_NONE" nick="none" value="0"/>
-    <member name="CLUTTER_EVENT_FLAG_SYNTHETIC" nick="flag-synthetic" value="1"/>
-    <member name="CLUTTER_EVENT_FLAG_INPUT_METHOD" nick="flag-input-method" value="2"/>
-    <member name="CLUTTER_EVENT_FLAG_REPEATED" nick="flag-repeated" value="4"/>
+    <member name="CLUTTER_EVENT_FLAG_NONE" nick="none" value="0"/>
+    <member name="CLUTTER_EVENT_FLAG_SYNTHETIC" nick="synthetic" value="1"/>
+    <member name="CLUTTER_EVENT_FLAG_INPUT_METHOD" nick="input-method" value="2"/>
+    <member name="CLUTTER_EVENT_FLAG_REPEATED" nick="repeated" value="4"/>
   </flags>
   <enum name="ClutterEventType" get-type="clutter_event_type_get_type">
     <member name="CLUTTER_NOTHING" nick="nothing" value="0"/>
@@ -277,18 +272,19 @@
     <member name="CLUTTER_TOUCH_CANCEL" nick="touch-cancel" value="16"/>
     <member name="CLUTTER_TOUCHPAD_PINCH" nick="touchpad-pinch" value="17"/>
     <member name="CLUTTER_TOUCHPAD_SWIPE" nick="touchpad-swipe" value="18"/>
-    <member name="CLUTTER_PROXIMITY_IN" nick="proximity-in" value="19"/>
-    <member name="CLUTTER_PROXIMITY_OUT" nick="proximity-out" value="20"/>
-    <member name="CLUTTER_PAD_BUTTON_PRESS" nick="pad-button-press" value="21"/>
-    <member name="CLUTTER_PAD_BUTTON_RELEASE" nick="pad-button-release" value="22"/>
-    <member name="CLUTTER_PAD_STRIP" nick="pad-strip" value="23"/>
-    <member name="CLUTTER_PAD_RING" nick="pad-ring" value="24"/>
-    <member name="CLUTTER_IM_COMMIT" nick="im-commit" value="25"/>
-    <member name="CLUTTER_IM_DELETE" nick="im-delete" value="26"/>
-    <member name="CLUTTER_IM_PREEDIT" nick="im-preedit" value="27"/>
-    <member name="CLUTTER_DEVICE_ADDED" nick="device-added" value="28"/>
-    <member name="CLUTTER_DEVICE_REMOVED" nick="device-removed" value="29"/>
-    <member name="CLUTTER_EVENT_LAST" nick="event-last" value="30"/>
+    <member name="CLUTTER_TOUCHPAD_HOLD" nick="touchpad-hold" value="19"/>
+    <member name="CLUTTER_PROXIMITY_IN" nick="proximity-in" value="20"/>
+    <member name="CLUTTER_PROXIMITY_OUT" nick="proximity-out" value="21"/>
+    <member name="CLUTTER_PAD_BUTTON_PRESS" nick="pad-button-press" value="22"/>
+    <member name="CLUTTER_PAD_BUTTON_RELEASE" nick="pad-button-release" value="23"/>
+    <member name="CLUTTER_PAD_STRIP" nick="pad-strip" value="24"/>
+    <member name="CLUTTER_PAD_RING" nick="pad-ring" value="25"/>
+    <member name="CLUTTER_IM_COMMIT" nick="im-commit" value="26"/>
+    <member name="CLUTTER_IM_DELETE" nick="im-delete" value="27"/>
+    <member name="CLUTTER_IM_PREEDIT" nick="im-preedit" value="28"/>
+    <member name="CLUTTER_DEVICE_ADDED" nick="device-added" value="29"/>
+    <member name="CLUTTER_DEVICE_REMOVED" nick="device-removed" value="30"/>
+    <member name="CLUTTER_EVENT_LAST" nick="event-last" value="31"/>
   </enum>  <enum name="ClutterScrollDirection" get-type="clutter_scroll_direction_get_type">
     <member name="CLUTTER_SCROLL_UP" nick="up" value="0"/>
     <member name="CLUTTER_SCROLL_DOWN" nick="down" value="1"/>
@@ -641,10 +637,11 @@
   <boxed name="ClutterEvent" get-type="clutter_event_get_type"/>
   <boxed name="ClutterEventSequence" get-type="clutter_event_sequence_get_type"/>
   <class name="ClutterStageView" get-type="clutter_stage_view_get_type" parents="GObject">
+    <property name="name" type="gchararray" flags="235" default-value="NULL"/>
     <property name="layout" type="CairoRectangleInt" flags="231"/>
     <property name="framebuffer" type="CoglHandle" flags="231"/>
     <property name="offscreen" type="CoglHandle" flags="235"/>
-    <property name="shadowfb" type="CoglHandle" flags="235"/>
+    <property name="use-shadowfb" type="gboolean" flags="235" default-value="FALSE"/>
     <property name="scale" type="gfloat" flags="231" default-value="1.000000"/>
   </class>
   <boxed name="ClutterPaintContext" get-type="clutter_paint_context_get_type"/>
@@ -693,7 +690,6 @@
     <property name="scale-center-x" type="gfloat" flags="-2147483421" default-value="0.000000"/>
     <property name="scale-center-y" type="gfloat" flags="-2147483421" default-value="0.000000"/>
     <property name="scale-gravity" type="ClutterGravity" flags="-2147483421" default-value="CLUTTER_GRAVITY_NONE"/>
-    <property name="resource-scale" type="gfloat" flags="225" default-value="1.000000"/>
     <property name="rotation-angle-x" type="gdouble" flags="483" default-value="0.000000"/>
     <property name="rotation-angle-y" type="gdouble" flags="483" default-value="0.000000"/>
     <property name="rotation-angle-z" type="gdouble" flags="483" default-value="0.000000"/>
@@ -795,10 +791,6 @@
     <signal name="pick" return="void" when="last">
       <param type="ClutterPickContext"/>
     </signal>
-    <signal name="allocation-changed" return="void" when="last">
-      <param type="ClutterActorBox"/>
-      <param type="ClutterAllocationFlags"/>
-    </signal>
     <signal name="transitions-completed" return="void" when="last">
     </signal>
     <signal name="transition-stopped" return="void" when="last" no-recurse="1" detailed="1" no-hooks="1">
@@ -807,6 +799,10 @@
     </signal>
     <signal name="touch-event" return="gboolean" when="last">
       <param type="ClutterEvent"/>
+    </signal>
+    <signal name="stage-views-changed" return="void" when="last">
+    </signal>
+    <signal name="resource-scale-changed" return="void" when="last">
     </signal>
   </class>
   <class name="ClutterConstraint" get-type="clutter_constraint_get_type" parents="ClutterActorMeta,GInitiallyUnowned,GObject" abstract="1">

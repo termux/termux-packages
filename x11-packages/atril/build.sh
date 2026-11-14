@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="MATE document viewer"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.28.7"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 # https://pub.mate-desktop.org/releases/${TERMUX_PKG_VERSION%.*}/atril-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL="https://github.com/mate-desktop/atril/releases/download/v${TERMUX_PKG_VERSION}/atril-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=91942545e858cb0036b52e2f5d4372cdea813d9fde9702daefdf84854e6bb667

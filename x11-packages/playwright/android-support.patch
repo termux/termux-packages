@@ -1,0 +1,155 @@
+diff --git a/packages/playwright-core/src/server/chromium/crPage.ts b/packages/playwright-core/src/server/chromium/crPage.ts
+index 1510bd0..9b1157d 100644
+--- a/packages/playwright-core/src/server/chromium/crPage.ts
++++ b/packages/playwright-core/src/server/chromium/crPage.ts
+@@ -1021,7 +1021,7 @@ class FrameSession {
+         insets = { width: 24, height: 88 };
+         if (process.platform === 'win32')
+           insets = { width: 16, height: 88 };
+-        else if (process.platform === 'linux')
++        else if (process.platform === 'linux' || process.platform === 'android')
+           insets = { width: 8, height: 85 };
+         else if (process.platform === 'darwin')
+           insets = { width: 2, height: 80 };
+diff --git a/packages/playwright-core/src/server/registry/index.ts b/packages/playwright-core/src/server/registry/index.ts
+index 36fad71..cc4ad62 100644
+--- a/packages/playwright-core/src/server/registry/index.ts
++++ b/packages/playwright-core/src/server/registry/index.ts
+@@ -375,7 +375,7 @@ const DOWNLOAD_PATHS: Record<string, DownloadPaths> = {
+ };
+ 
+ function computeDefaultCacheDirectory(): string {
+-  if (process.platform === 'linux')
++  if (process.platform === 'linux' || process.platform === 'android')
+     return process.env.XDG_CACHE_HOME || path.join(os.homedir(), '.cache');
+   if (process.platform === 'darwin')
+     return path.join(os.homedir(), 'Library', 'Caches');
+@@ -504,12 +504,20 @@ interface ExecutableImpl extends Executable {
+   _isHermeticInstallation?: boolean;
+ }
+ 
++const TERMUX_EXECUTABLES: Partial<Record<string, string>> = {
++  'chromium': '@TERMUX_PREFIX@/bin/chromium-browser',
++  'chromium-headless-shell': '@TERMUX_PREFIX@/bin/headless_shell',
++  'ffmpeg': '@TERMUX_PREFIX@/bin/ffmpeg',
++};
++
+ export class Registry {
+   private _executables: ExecutableImpl[];
+ 
+   constructor(browsersJSON: BrowsersJSON) {
+     const descriptors = readDescriptors(browsersJSON);
+     const findExecutablePath = (dir: string, name: keyof typeof EXECUTABLE_PATHS) => {
++      if (process.platform === 'android' && TERMUX_EXECUTABLES[name])
++        return TERMUX_EXECUTABLES[name];
+       const tokens = EXECUTABLE_PATHS[name][shortPlatform];
+       return tokens ? path.join(dir, ...tokens) : undefined;
+     };
+@@ -518,6 +526,8 @@ export class Registry {
+         throw new Error(`${name} is not supported on ${hostPlatform}`);
+       const installCommand = buildPlaywrightCLICommand(sdkLanguage, `install${installByDefault ? '' : ' ' + name}`);
+       if (!canAccessFile(e)) {
++        if (process.platform === 'android')
++          throw new Error(`Executable doesn't exist at ${e}\nInstall it with: pkg install ${name === 'ffmpeg' ? 'ffmpeg' : 'chromium'}`);
+         const currentDockerVersion = readDockerVersionSync();
+         const preferredDockerVersion = currentDockerVersion ? dockerVersion(currentDockerVersion.dockerImageNameTemplate) : null;
+         const isOutdatedDockerImage = currentDockerVersion && preferredDockerVersion && currentDockerVersion.dockerImageName !== preferredDockerVersion.dockerImageName;
+@@ -932,6 +942,11 @@ export class Registry {
+   }
+ 
+   async install(executablesToInstall: Executable[], options?: { force?: boolean, gc?: boolean }) {
++    if (process.platform === 'android') {
++      // eslint-disable-next-line no-restricted-properties
++      process.stderr.write('Browsers are provided by Termux packages (chromium, ffmpeg); nothing to download.\n');
++      return;
++    }
+     const executables = this._dedupe(executablesToInstall);
+     await fs.promises.mkdir(registryDirectory, { recursive: true });
+     const lockfilePath = path.join(registryDirectory, '__dirlock');
+diff --git a/packages/playwright-core/src/server/userAgent.ts b/packages/playwright-core/src/server/userAgent.ts
+index bc8069d..d9696c4 100644
+--- a/packages/playwright-core/src/server/userAgent.ts
++++ b/packages/playwright-core/src/server/userAgent.ts
+@@ -44,7 +44,7 @@ function determineUserAgent(): string {
+     const version = execSync('sw_vers -productVersion', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().split('.');
+     osIdentifier = 'macOS';
+     osVersion = `${version[0]}.${version[1]}`;
+-  } else if (process.platform === 'linux') {
++  } else if (process.platform === 'linux' || process.platform === 'android') {
+     const distroInfo = getLinuxDistributionInfoSync();
+     if (distroInfo) {
+       osIdentifier = distroInfo.id || 'linux';
+diff --git a/packages/playwright-core/src/serverRegistry.ts b/packages/playwright-core/src/serverRegistry.ts
+index f5ee5ec..15090e1 100644
+--- a/packages/playwright-core/src/serverRegistry.ts
++++ b/packages/playwright-core/src/serverRegistry.ts
+@@ -244,7 +244,7 @@ async function canConnectTo(descriptor: BrowserDescriptor): Promise<boolean> {
+ }
+ 
+ function computeDefaultCacheDirectory(): string {
+-  if (process.platform === 'linux')
++  if (process.platform === 'linux' || process.platform === 'android')
+     return process.env.XDG_CACHE_HOME || path.join(os.homedir(), '.cache');
+   if (process.platform === 'darwin')
+     return path.join(os.homedir(), 'Library', 'Caches');
+diff --git a/packages/playwright-core/src/tools/cli-client/registry.ts b/packages/playwright-core/src/tools/cli-client/registry.ts
+index a9edb03..d2ae545 100644
+--- a/packages/playwright-core/src/tools/cli-client/registry.ts
++++ b/packages/playwright-core/src/tools/cli-client/registry.ts
+@@ -147,7 +147,7 @@ function computeBaseDaemonDir(): string {
+     return process.env.PWTEST_DAEMON_SESSION_DIR;
+ 
+   let localCacheDir: string | undefined;
+-  if (process.platform === 'linux')
++  if (process.platform === 'linux' || process.platform === 'android')
+     localCacheDir = process.env.XDG_CACHE_HOME || path.join(os.homedir(), '.cache');
+   if (process.platform === 'darwin')
+     localCacheDir = path.join(os.homedir(), 'Library', 'Caches');
+diff --git a/packages/playwright-core/src/tools/mcp/cdpRelay.ts b/packages/playwright-core/src/tools/mcp/cdpRelay.ts
+index 4396234..356a474 100644
+--- a/packages/playwright-core/src/tools/mcp/cdpRelay.ts
++++ b/packages/playwright-core/src/tools/mcp/cdpRelay.ts
+@@ -177,7 +177,7 @@ export class CDPRelayServer {
+       args.push(`--user-data-dir=${this._customUserDataDir}`);
+     if (this._profileDirectory)
+       args.push(`--profile-directory=${this._profileDirectory}`);
+-    if (os.platform() === 'linux' && channel === 'chromium')
++    if ((os.platform() === 'linux' || os.platform() === 'android') && channel === 'chromium')
+       args.push('--no-sandbox');
+     args.push(href);
+     spawn(executablePath, args, {
+diff --git a/packages/playwright-core/src/tools/mcp/config.ts b/packages/playwright-core/src/tools/mcp/config.ts
+index 07dc1d3..d481ac0 100644
+--- a/packages/playwright-core/src/tools/mcp/config.ts
++++ b/packages/playwright-core/src/tools/mcp/config.ts
+@@ -142,7 +142,7 @@ export async function resolveCLIConfigForMCP(cliOptions: CLIOptions, env?: NodeJ
+ 
+   const browser = await validateBrowserConfig(result.browser);
+   if (browser.launchOptions.headless === undefined)
+-    browser.launchOptions.headless = os.platform() === 'linux' && !process.env.DISPLAY;
++    browser.launchOptions.headless = (os.platform() === 'linux' || os.platform() === 'android') && !process.env.DISPLAY;
+ 
+   validateOutputDir(result.outputDir);
+ 
+@@ -232,7 +232,7 @@ async function validateBrowserConfig(browser: MergedConfig['browser']): Promise<
+   }
+ 
+   if (browserName === 'chromium' && browser.launchOptions.chromiumSandbox === undefined) {
+-    if (process.platform === 'linux') {
++    if (process.platform === 'linux' || process.platform === 'android') {
+       // Downloaded chromium builds (undefined channel, 'chromium', 'chrome-for-testing') lack the setuid sandbox helper on linux.
+       const { channel } = browser.launchOptions;
+       browser.launchOptions.chromiumSandbox = channel !== undefined && channel !== 'chromium' && channel !== 'chrome-for-testing';
+diff --git a/packages/utils/hostPlatform.ts b/packages/utils/hostPlatform.ts
+index d633ca3..80afbfa 100644
+--- a/packages/utils/hostPlatform.ts
++++ b/packages/utils/hostPlatform.ts
+@@ -45,7 +45,7 @@ function calculatePlatform(): { hostPlatform: HostPlatform, isOfficiallySupporte
+       isOfficiallySupportedPlatform: false
+     };
+   }
+-  const platform = os.platform();
++  const platform = os.platform() === 'android' ? 'linux' : os.platform();
+   if (platform === 'darwin') {
+     const ver = os.release().split('.').map((a: string) => parseInt(a, 10));
+     let macVersion = 0;

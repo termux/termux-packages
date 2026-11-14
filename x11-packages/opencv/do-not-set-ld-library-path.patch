@@ -7,12 +7,12 @@ ffmpeg
 
 --- a/modules/python/package/cv2/__init__.py
 +++ b/modules/python/package/cv2/__init__.py
-@@ -143,8 +143,7 @@ def bootstrap():
-         os.environ['PATH'] = ';'.join(l_vars['BINARIES_PATHS']) + ';' + os.environ.get('PATH', '')
-         if DEBUG: print('OpenCV loader: PATH={}'.format(str(os.environ['PATH'])))
+@@ -151,8 +151,7 @@ def bootstrap():
+         _prepend_env_paths('PATH', l_vars['BINARIES_PATHS'], ';')
+         if DEBUG: print('OpenCV loader: PATH={}'.format(str(os.environ.get('PATH'))))
      else:
 -        # amending of LD_LIBRARY_PATH works for sub-processes only
--        os.environ['LD_LIBRARY_PATH'] = ':'.join(l_vars['BINARIES_PATHS']) + ':' + os.environ.get('LD_LIBRARY_PATH', '')
+-        _prepend_env_paths('LD_LIBRARY_PATH', l_vars['BINARIES_PATHS'], ':')
 +        pass
  
      if DEBUG: print("Relink everything from native cv2 module to cv2 package")

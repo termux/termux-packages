@@ -2,11 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://librewolf.net/
 TERMUX_PKG_DESCRIPTION="A custom version of Firefox, focused on privacy, security and freedom."
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@3ls-it"
-TERMUX_PKG_VERSION="157.0.1-1"
+TERMUX_PKG_VERSION="159.0.1-1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://librewolf.dev/api/packages/librewolf/generic/librewolf-source/${TERMUX_PKG_VERSION}/librewolf-${TERMUX_PKG_VERSION}.source.tar.gz"
-TERMUX_PKG_SHA256=4b363d2c85eda694c671bda98fc1f0a0ad9cfa030c975ae4fd0e1092a3f59eb2
+TERMUX_PKG_SHA256=955a51063d15612260d993fb70794dc28a8c6e33d0380193e91ce44570ee3ff3
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
-TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
+TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libpixman, libsm, libvpx, libwayland, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxkbcommon, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -48,6 +49,10 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
+	fi
+
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		CXXFLAGS+=" -DLIBYUV_DISABLE_X86"
 	fi
 }
 

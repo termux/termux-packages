@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://marco.mate-desktop.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/mate-desktop/marco"
 TERMUX_PKG_DESCRIPTION="MATE default window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

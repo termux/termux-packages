@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Newsraft is a feed reader with text-based user interface
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.38"
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://codeberg.org/newsraft/newsraft/archive/newsraft-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=60da202448e104687c429a6d7b227ec7d038f7b906001dda594c78847efcc378
 TERMUX_PKG_AUTO_UPDATE=true

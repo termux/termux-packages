@@ -1,7 +1,6 @@
-diff -uNr hollywood-1.20/lib/hollywood/sshart hollywood-1.20.mod/lib/hollywood/sshart
---- hollywood-1.20/lib/hollywood/sshart	2019-06-12 07:18:12.000000000 +0300
-+++ hollywood-1.20.mod/lib/hollywood/sshart	2020-01-02 15:07:40.390659364 +0200
-@@ -15,10 +15,14 @@
+--- a/lib/hollywood/sshart
++++ b/lib/hollywood/sshart
+@@ -15,7 +15,11 @@
  # limitations under the License.
  
  command -v ssh-keygen >/dev/null 2>&1 || exit 1
@@ -12,14 +11,10 @@ diff -uNr hollywood-1.20/lib/hollywood/sshart hollywood-1.20.mod/lib/hollywood/s
 +	_HAS_CCZE=true
 +fi
  
- PKG=hollywood
--tmpdir="/tmp/$PKG"
-+tmpdir="@TERMUX_PREFIX@/tmp/$PKG"
- trap "rm -rf $tmpdir 2>/dev/null && pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
- while true; do
- 	mkdir -p "$tmpdir"
-@@ -28,6 +32,10 @@
- 	rm -f $tmpfile $tmpfile.pub
+ tmpdir=$(mktemp -d)
+ trap "rm -rf $tmpdir 2>/dev/null; pkill -9 -f lib/hollywood/ >/dev/null 2>&1; exit" INT
+@@ -26,6 +30,10 @@
+ 	rm -f "$tmpfile" "$tmpfile.pub"
  	wait
  	clear
 -	echo "$art" | ccze -A -c default=red

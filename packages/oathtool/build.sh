@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://www.nongnu.org/oath-toolkit/
+TERMUX_PKG_HOMEPAGE="https://oath-toolkit.codeberg.page/"
 TERMUX_PKG_DESCRIPTION="One-time password components"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.6.14"
-TERMUX_PKG_SRCURL=http://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8b1da365759f1249be57a82aec6e107f7b57dc77d813f96dc0aaf81624f28971
+TERMUX_PKG_VERSION="2.6.15"
+TERMUX_PKG_SRCURL=https://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=8ad24aa9ff13c0edf3efc2573d90e85cf8b5ce7e82c08042574c1591f9d91eaa
 TERMUX_PKG_DEPENDS="libxml2, xmlsec"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="oathtool-dev"

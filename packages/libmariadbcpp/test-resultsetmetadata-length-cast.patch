@@ -1,0 +1,11 @@
+--- a/test/unit/classes/resultsetmetadata.cpp
++++ b/test/unit/classes/resultsetmetadata.cpp
+@@ -1434,7 +1434,7 @@ void resultsetmetadata::concpp160()
+   ASSERT(rs->next());
+   auto val= rs->getString(1);
+   ASSERT_EQUALS("test1234561234567890", val);
+-  ASSERT_EQUALS(20ULL, val.length());
++  ASSERT_EQUALS(20ULL, static_cast<uint64_t>(val.length()));
+ }
+ 
+ void resultsetmetadata::doGetColumnCollation(bool is_ps)

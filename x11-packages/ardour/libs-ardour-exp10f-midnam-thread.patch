@@ -1,0 +1,45 @@
+# Fix exp10f missing on Android and the FORTIFY abort "pthread_mutex_lock called on a destroyed mutex" at exit caused by the still running MIDNAMLoader thread.
+
+--- a/libs/ardour/globals.cc
++++ b/libs/ardour/globals.cc
+@@ -841,6 +841,8 @@ ARDOUR::cleanup ()
+ 
+ 	delete TriggerBox::worker;
+ 
++	delete &MIDI::Name::MidiPatchManager::instance ();
++
+ 	Analyser::terminate ();
+ 	SourceFactory::terminate ();
+ 
+--- a/libs/ardour/lufs_meter.cc
++++ b/libs/ardour/lufs_meter.cc
+@@ -503,7 +503,7 @@ void
+ LUFSMeter::calc_true_peak (float const** data, const uint32_t n_samples)
+ {
+ 	float const cfg_db_s = Config->get_meter_falloff ();
+-#ifdef _GNU_SOURCE
++#if defined _GNU_SOURCE && !defined __ANDROID__
+ 	float const falloff = exp10f (-0.05f * cfg_db_s * n_samples / _samplerate);
+ #else
+ 	float const falloff = powf (10.f, -0.05f * cfg_db_s * n_samples / _samplerate);
+--- a/libs/ardour/midi_patch_manager.cc
++++ b/libs/ardour/midi_patch_manager.cc
+@@ -46,6 +46,7 @@ MidiPatchManager* MidiPatchManager::_manager = 0;
+ MidiPatchManager::MidiPatchManager ()
+ 	: no_patch_changed_messages (false)
+ 	, stop_thread (false)
++	, _midnam_load_thread (0)
+ {
+ 	add_search_path (midi_patch_search_path ());
+ }
+@@ -55,7 +56,9 @@ MidiPatchManager::~MidiPatchManager ()
+ 	_manager = 0;
+ 
+ 	stop_thread = true;
+-	_midnam_load_thread->join ();
++	if (_midnam_load_thread) {
++		_midnam_load_thread->join ();
++	}
+ }
+ 
+ void

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.cryptopp.com/
+TERMUX_PKG_HOMEPAGE="https://github.com/weidai11/cryptopp"
 TERMUX_PKG_DESCRIPTION="A free C++ class library of cryptographic schemes"
 TERMUX_PKG_LICENSE="BSL-1.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="License.txt"

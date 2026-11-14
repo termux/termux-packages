@@ -1,7 +1,6 @@
-diff -uNr libarchive-3.3.3/libarchive/archive_util.c libarchive-3.3.3.mod/libarchive/archive_util.c
---- libarchive-3.3.3/libarchive/archive_util.c	2018-09-02 09:05:18.000000000 +0300
-+++ libarchive-3.3.3.mod/libarchive/archive_util.c	2019-03-02 02:14:39.252942170 +0200
-@@ -374,7 +374,7 @@
+--- a/libarchive/archive_util.c
++++ b/libarchive/archive_util.c
+@@ -444,7 +444,7 @@ __archive_get_tempdir(struct archive_string *temppath)
  #ifdef _PATH_TMP
  		tmp = _PATH_TMP;
  #else
@@ -9,4 +8,4 @@ diff -uNr libarchive-3.3.3/libarchive/archive_util.c libarchive-3.3.3.mod/libarc
 +                tmp = "@TERMUX_PREFIX@/tmp";
  #endif
  	archive_strcpy(temppath, tmp);
- 	if (temppath->s[temppath->length-1] != '/')
+ 	if (temppath->length == 0 || temppath->s[temppath->length-1] != '/')

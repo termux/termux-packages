@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Lightweight coding agent that runs in your terminal"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="../LICENSE, ../NOTICE"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="0.162.1"
+TERMUX_PKG_VERSION="0.169.0"
 TERMUX_PKG_SRCURL="https://github.com/openai/codex/archive/refs/tags/rust-v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=e709bda93494c000a69d4c07a85a1975ce433f5541e737d1a5feddd399c97c60
+TERMUX_PKG_SHA256=d9b6335151f66d1d4ae9123f55553164ff339f30b14f64a358ea78139c4c093e
 TERMUX_PKG_DEPENDS="git, libc++, openssl"
 TERMUX_PKG_RECOMMENDS="ripgrep"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -47,7 +47,7 @@ termux_step_pre_configure() {
 		< "$TERMUX_PKG_BUILDER_DIR"/rusty-v8-search-files-with-target-suffix.diff
 
 	sed -i '/\[patch.crates-io\]/a cc = { path = "./vendor/cc" }' Cargo.toml
-	sed -i '/\[patch.crates-io\]/a v8 = { path = "./vendor/v8" }' Cargo.toml
+	sed -i 's|^v8 = { git = .*|v8 = { path = "./vendor/v8" }|' Cargo.toml
 }
 
 __fetch_rusty_v8() {

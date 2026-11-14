@@ -1,6 +1,6 @@
 --- a/clang/lib/Driver/ToolChains/Linux.cpp
 +++ b/clang/lib/Driver/ToolChains/Linux.cpp
-@@ -197,8 +197,8 @@
+@@ -196,8 +196,8 @@ static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
    // FIXME: This is a bit of a hack. We should really unify this code for
    // reasoning about oslibdir spellings with the lib dir spellings in the
    // GCCInstallationDetector, but that is a more significant refactoring.
@@ -11,7 +11,7 @@
      return "lib32";
  
    if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
-@@ -343,7 +343,8 @@
+@@ -358,7 +358,8 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
    }
  
    addPathIfExists(D, concat(SysRoot, "/usr/lib", MultiarchTriple), Paths);
@@ -21,7 +21,7 @@
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
      addPathIfExists(D, concat(SysRoot, "/", OSLibDir, ABIName), Paths);
-@@ -353,7 +354,15 @@
+@@ -368,7 +369,15 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
    Generic_GCC::AddMultiarchPaths(D, SysRoot, OSLibDir, Paths);
  
    addPathIfExists(D, concat(SysRoot, "/lib"), Paths);

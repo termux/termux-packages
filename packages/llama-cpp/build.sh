@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ggml-org/llama.cpp
 TERMUX_PKG_DESCRIPTION="LLM inference in C/C++"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.6.0"
+TERMUX_PKG_VERSION="1.0.0"
 TERMUX_PKG_SRCURL="https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=09b36dba235fcac180efff18514da7038e65d8e5b9e4aefa59238468abfdec12
+TERMUX_PKG_SHA256=3f5f750e36326aea4d65c7623e7d597a33e395d65f4d76e5e0532171f252532b
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-spawn, libc++, libcurl"
 TERMUX_PKG_BUILD_DEPENDS="ocl-icd, opencl-headers, spirv-headers, vulkan-headers"
@@ -12,6 +12,7 @@ TERMUX_PKG_SUGGESTS="llama-cpp-backend-vulkan, llama-cpp-backend-opencl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_SHARED_LIBS=ON
 -DLLAMA_BUILD_TESTS=OFF
+-DLLAMA_SUBPROCESS=ON
 -DLLAMA_BUILD_IS_DEV=OFF
 -DGGML_BACKEND_DL=ON
 -DGGML_BACKEND_DIR=$TERMUX_PREFIX/lib
@@ -26,6 +27,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
+	# Enable subprocess support on Android without requiring API 34.
+	# Use fork + exec for subprocess working-directory handling.
+	CFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
+	CXXFLAGS+=" -D_GNU_SOURCE -DSUBPROCESS_SPAWN_VIA_FORK=1"
+
 	export PATH="$NDK/shader-tools/linux-x86_64:$PATH"
 	LDFLAGS+=" -landroid-spawn"
 

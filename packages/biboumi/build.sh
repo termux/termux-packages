@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://biboumi.louiz.org/
+TERMUX_PKG_HOMEPAGE="https://codeberg.org/poezio/biboumi"
 TERMUX_PKG_DESCRIPTION="An XMPP gateway that connects to IRC servers and translates between the two protocols"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"

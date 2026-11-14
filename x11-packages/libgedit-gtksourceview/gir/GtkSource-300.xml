@@ -92,10 +92,9 @@
   <class name="GtkSourceCompletionItem" get-type="gtk_source_completion_item_get_type" parents="GObject">
     <implements name="GtkSourceCompletionProposal"/>
   </class>
-  <boxed name="GtkSourceEncoding" get-type="gtk_source_encoding_get_type"/>
   <class name="GtkSourceFile" get-type="gtk_source_file_get_type" parents="GObject">
     <property name="location" type="GFile" flags="231"/>
-    <property name="encoding" type="GtkSourceEncoding" flags="225"/>
+    <property name="encoding" type="GflsEncoding" flags="225"/>
     <property name="newline-type" type="GtkSourceNewlineType" flags="225" default-value="GTK_SOURCE_NEWLINE_TYPE_LF"/>
     <property name="compression-type" type="GtkSourceCompressionType" flags="225" default-value="GTK_SOURCE_COMPRESSION_TYPE_NONE"/>
     <property name="read-only" type="gboolean" flags="225" default-value="FALSE"/>
@@ -105,13 +104,13 @@
     <property name="file" type="GtkSourceFile" flags="235"/>
     <property name="location" type="GFile" flags="235"/>
     <property name="input-stream" type="GInputStream" flags="235"/>
-    <property name="max-size" type="guint64" flags="231" default-value="200000000"/>
+    <property name="max-size" type="guint64" flags="231" default-value="80000000"/>
   </class>
   <class name="GtkSourceFileSaver" get-type="gtk_source_file_saver_get_type" parents="GObject">
     <property name="buffer" type="GtkSourceBuffer" flags="235"/>
     <property name="file" type="GtkSourceFile" flags="235"/>
     <property name="location" type="GFile" flags="235"/>
-    <property name="encoding" type="GtkSourceEncoding" flags="231"/>
+    <property name="encoding" type="GflsEncoding" flags="231"/>
     <property name="newline-type" type="GtkSourceNewlineType" flags="231" default-value="GTK_SOURCE_NEWLINE_TYPE_LF"/>
     <property name="compression-type" type="GtkSourceCompressionType" flags="231" default-value="GTK_SOURCE_COMPRESSION_TYPE_NONE"/>
     <property name="flags" type="GtkSourceFileSaverFlags" flags="231" default-value="GTK_SOURCE_FILE_SAVER_FLAGS_NONE"/>
@@ -300,10 +299,7 @@
     <member name="GTK_SOURCE_COMPLETION_ACTIVATION_INTERACTIVE" nick="interactive" value="1"/>
     <member name="GTK_SOURCE_COMPLETION_ACTIVATION_USER_REQUESTED" nick="user-requested" value="2"/>
   </flags>
-  <enum name="GtkSourceEncodingDuplicates" get-type="gtk_source_encoding_duplicates_get_type">
-    <member name="GTK_SOURCE_ENCODING_DUPLICATES_KEEP_FIRST" nick="first" value="0"/>
-    <member name="GTK_SOURCE_ENCODING_DUPLICATES_KEEP_LAST" nick="last" value="1"/>
-  </enum>  <enum name="GtkSourceNewlineType" get-type="gtk_source_newline_type_get_type">
+  <enum name="GtkSourceNewlineType" get-type="gtk_source_newline_type_get_type">
     <member name="GTK_SOURCE_NEWLINE_TYPE_LF" nick="lf" value="0"/>
     <member name="GTK_SOURCE_NEWLINE_TYPE_CR" nick="cr" value="1"/>
     <member name="GTK_SOURCE_NEWLINE_TYPE_CR_LF" nick="cr-lf" value="2"/>

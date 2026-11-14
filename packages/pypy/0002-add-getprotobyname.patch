@@ -2,10 +2,10 @@
 
 --- a/rpython/rlib/rsocket.py
 +++ b/rpython/rlib/rsocket.py
-@@ -1627,11 +1627,48 @@
+@@ -1727,11 +1727,48 @@ def getservbyport(port, proto=None):
          raise RSocketError("port/proto not found")
      return rffi.charp2str(servent.c_s_name)
-
+ 
 +PROTOCOL_NAME_AND_NUMBER = {
 +    "ip": 0,
 +    "icmp": 1,
@@ -52,5 +52,5 @@
          raise RSocketError("protocol not found")
 -    proto = protoent.c_p_proto
      return rffi.cast(lltype.Signed, proto)
-
+ 
  def getnameinfo(address, flags):

@@ -1,17 +1,19 @@
 --- a/cmake/deps.cmake
 +++ b/cmake/deps.cmake
-@@ -156,13 +156,13 @@
+@@ -157,7 +157,6 @@ CPMAddPackage(
      EXCLUDE_FROM_ALL YES)
  
- if(NOT APPLE)
+ if(NOT APPLE AND NOT SYSTEM_BLAS)
 -    enable_language(Fortran)
-     CPMAddPackage(
-         NAME openblas
-         GITHUB_REPOSITORY "OpenMathLib/OpenBLAS"
+     set(OPENBLAS_TARGET_OPTIONS "")
+     if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+         set(OPENBLAS_TARGET_OPTIONS "TARGET PRESCOTT")
+@@ -170,7 +169,8 @@ if(NOT APPLE AND NOT SYSTEM_BLAS)
          GIT_TAG v0.3.33
          EXCLUDE_FROM_ALL YES
--        OPTIONS "DYNAMIC_ARCH ON"
-+        OPTIONS "C_LAPACK ON"
+         OPTIONS ${OPENBLAS_TARGET_OPTIONS}
+-                "DYNAMIC_ARCH ON"
++                "C_LAPACK ON"
 +                "$ENV{OPENBLAS_CROSS_TARGET}"
                  "BUILD_TESTING OFF"
                  "BUILD_BENCHMARKS OFF"

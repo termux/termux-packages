@@ -1,0 +1,11 @@
+--- a/src/quickunlock/QuickUnlockInterface.cpp
++++ b/src/quickunlock/QuickUnlockInterface.cpp
+@@ -24,7 +24,7 @@
+ #elif defined(Q_CC_MSVC)
+ #include "WindowsHello.h"
+ #define QUICKUNLOCK_IMPLEMENTATION WindowsHello
+-#elif defined(Q_OS_LINUX)
++#elif defined(Q_OS_LINUX) && !defined(__ANDROID__)
+ #include "Polkit.h"
+ #define QUICKUNLOCK_IMPLEMENTATION Polkit
+ #else

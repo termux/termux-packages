@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Level editor for Quake-engine based games"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/TrenchBroom/TrenchBroom/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=3989d4adc45bda543b42c0f3eacea5e75de90b1fd22704ab4f37466b728f3ab7
 TERMUX_PKG_AUTO_UPDATE=true

@@ -1,0 +1,22 @@
+From 3ef057378f71bc4a02db5caba5774d79d6284409 Mon Sep 17 00:00:00 2001
+From: Ali Riza KESKIN <aliriza.keskin@pardus.org.tr>
+Date: Mon, 2 Nov 2026 11:48:27 +0300
+Subject: [PATCH] fix missing shapemenu icon update
+
+---
+ src/tools/update.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/tools/update.cpp b/src/tools/update.cpp
+index 9b62be7c..97ffb6c9 100644
+--- a/src/tools/update.cpp
++++ b/src/tools/update.cpp
+@@ -35,6 +35,8 @@ void updateGui(){
+         set_icon(get_icon_by_id(PEN), toolButtons[PENMENU]);
+     }
+ 
++    set_icon(get_icon_by_id(penStyle), toolButtons[SHAPEMENU]);
++
+     // clear only previously-active buttons instead of all penButtons
+     for (int i = 0; i < 5; i++) {
+         if (prev_active[i] >= 0 && penButtons.contains(prev_active[i]) && penButtons[prev_active[i]] != nullptr) {

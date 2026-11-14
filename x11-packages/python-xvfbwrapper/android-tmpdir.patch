@@ -1,9 +1,9 @@
 --- a/xvfbwrapper.py
 +++ b/xvfbwrapper.py
-@@ -196,7 +196,7 @@
-                 return rand
-
+@@ -222,7 +222,7 @@
+ 
      def _local_display_exists(self, display: int) -> bool:
+         """Check whether the local X11 socket exists for a display."""
 -        tempdir = "/tmp"
 +        tempdir = os.environ.get("TMPDIR", os.environ.get("PREFIX", "@TERMUX_PREFIX@") + "/tmp")
          # We need read access to the real system temp directory

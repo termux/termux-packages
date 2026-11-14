@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://maturin.rs/
 TERMUX_PKG_DESCRIPTION="Build and publish Rust crates (pyo3, cffi, uniffi bindings) as Python packages"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.15.0"
+TERMUX_PKG_VERSION="1.16.0"
 TERMUX_PKG_SRCURL="https://github.com/PyO3/maturin/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=623111bddb2d7f6f4ba2e64038f91f8b673bd6f95dd6fcbaf334b7af7789b48d
-TERMUX_PKG_DEPENDS="python, rust"
+TERMUX_PKG_SHA256=b22d15b7dc4f27af50b831af0866bcd901bcce2433182c5b2f252dd420531c0d
+TERMUX_PKG_DEPENDS="openssl, python, rust"
 TERMUX_PKG_RECOMMENDS="python-pip"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -13,7 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	termux_setup_rust
 
-	export _CARGO_FEATURES="cli-completion,scaffolding,upload,sbom,rustls"
+	export _CARGO_FEATURES="cli-completion,scaffolding,upload,sbom,native-tls"
 }
 
 termux_step_make() {
@@ -37,6 +37,7 @@ termux_step_post_make_install() {
 	mkdir -p "${TERMUX_PREFIX}/share/fish/vendor_completions.d"
 	mkdir -p "${TERMUX_PREFIX}/share/zsh/site-functions"
 	(
+		export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 		unset CC CXX CFLAGS CXXFLAGS CPPFLAGS LDFLAGS AR AS CPP LD RANLIB READELF STRIP
 		cargo run --no-default-features --features "${_CARGO_FEATURES}" -- completions bash > "${TERMUX_PREFIX}/share/bash-completion/completions/${TERMUX_PKG_NAME}"
 		cargo run --no-default-features --features "${_CARGO_FEATURES}" -- completions elvish > "${TERMUX_PREFIX}/share/elvish/lib/${TERMUX_PKG_NAME}.elv"

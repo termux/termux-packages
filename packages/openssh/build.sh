@@ -2,16 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
-TERMUX_PKG_VERSION="10.6p1"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL="https://github.com/openssh/openssh-portable/archive/refs/tags/V_$(sed 's/\./_/g; s/p/_P/g' <<< $TERMUX_PKG_VERSION).tar.gz"
-TERMUX_PKG_SHA256=462a71d064c3bb313f68933f1cf5037528f314fab1be6e2c5fe29a741f2338ee
+TERMUX_PKG_VERSION="10.6p2"
+TERMUX_PKG_SRCURL="https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_SHA256=9ae44872090cf2f06b3cf9ff147e7f16f309671340763ed2f99248398ae29d5b
 TERMUX_PKG_DEPENDS="krb5, ldns, libandroid-support, libedit, openssh-sftp-server, openssl, termux-auth, zlib"
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_CONFLICTS="dropbear"
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_TAG_TYPE=newest-tag
-TERMUX_PKG_UPDATE_VERSION_SED_REGEXP="s/([0-9]+)_([0-9]+)_P([0-9]+)/\1.\2p\3/"
 # Certain packages are not safe to build on device because their
 # build.sh script deletes specific files in $TERMUX_PREFIX.
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true

@@ -1,0 +1,63 @@
+--- a/src/core/util-private.h
++++ b/src/core/util-private.h
+@@ -42,4 +42,50 @@ void     meta_set_is_wayland_compositor (gboolean setting);
+ char *   meta_generate_random_id (GRand *rand,
+                                   int    length);
+ 
++#ifdef __ANDROID__
++static inline int
++strverscmp (const char *a,
++            const char *b)
++{
++  while (*a && *b)
++    {
++      if (g_ascii_isdigit (*a) && g_ascii_isdigit (*b))
++        {
++          const char *end_a, *end_b;
++          size_t len_a, len_b;
++
++          while (*a == '0' && g_ascii_isdigit (a[1]))
++            a++;
++          while (*b == '0' && g_ascii_isdigit (b[1]))
++            b++;
++
++          for (end_a = a; g_ascii_isdigit (*end_a); end_a++);
++          for (end_b = b; g_ascii_isdigit (*end_b); end_b++);
++
++          len_a = end_a - a;
++          len_b = end_b - b;
++          if (len_a != len_b)
++            return len_a < len_b ? -1 : 1;
++
++          while (a < end_a)
++            {
++              if (*a != *b)
++                return (unsigned char) *a - (unsigned char) *b;
++              a++;
++              b++;
++            }
++        }
++      else
++        {
++          if (*a != *b)
++            return (unsigned char) *a - (unsigned char) *b;
++          a++;
++          b++;
++        }
++    }
++
++  return (unsigned char) *a - (unsigned char) *b;
++}
++#endif
++
+ #endif
+--- a/src/backends/x11/meta-gpu-xrandr.c
++++ b/src/backends/x11/meta-gpu-xrandr.c
+@@ -37,6 +37,7 @@
+ #include "backends/x11/meta-crtc-xrandr.h"
+ #include "backends/x11/meta-monitor-manager-xrandr.h"
+ #include "backends/x11/meta-output-xrandr.h"
++#include "core/util-private.h"
+ 
+ struct _MetaGpuXrandr
+ {

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://source.android.com/devices/graphics/arch-vulkan
 TERMUX_PKG_DESCRIPTION="Vulkan Loader for Android"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 # Version should be equal to TERMUX_NDK_{VERSION_NUM,REVISION} in
 # scripts/properties.sh
 TERMUX_PKG_VERSION=30

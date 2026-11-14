@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/projects/orc.html
+TERMUX_PKG_HOMEPAGE="https://gitlab.freedesktop.org/gstreamer/orc"
 TERMUX_PKG_DESCRIPTION="Library of Optimized Inner Loops Runtime Compiler"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING"

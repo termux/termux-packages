@@ -1,9 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://www.bittorrent.com/btfs/
+TERMUX_PKG_HOMEPAGE="https://github.com/bittorrent/go-btfs"
 TERMUX_PKG_DESCRIPTION="Decentralized file system integrating with TRON network and Bittorrent network"
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-APACHE, LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="4.1.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/bittorrent/go-btfs/archive/refs/tags/btfs-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=64ccbe66ffe6e0a7b789eda54a9ba0be233848c6af1989c71d0b89e92253d5d7
 TERMUX_PKG_AUTO_UPDATE=true

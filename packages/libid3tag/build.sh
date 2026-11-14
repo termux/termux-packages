@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.underbit.com/products/mad/
+TERMUX_PKG_HOMEPAGE="https://www.underbit.com/products/mad/"
 TERMUX_PKG_DESCRIPTION="MAD ID3 tag manipulation library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

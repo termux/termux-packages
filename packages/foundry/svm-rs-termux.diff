@@ -1,6 +1,6 @@
 --- a/src/paths.rs
 +++ b/src/paths.rs
-@@ -37,7 +37,8 @@
+@@ -37,7 +37,8 @@ pub fn setup_data_dir() -> Result<(), SvmError> {
  
  /// Returns the path to the default data directory.
  ///
@@ -10,7 +10,7 @@
  pub fn data_dir() -> &'static Path {
      static ONCE: OnceLock<PathBuf> = OnceLock::new();
      ONCE.get_or_init(|| {
-@@ -53,8 +54,32 @@
+@@ -53,8 +54,32 @@ pub fn data_dir() -> &'static Path {
      })
  }
  
@@ -53,7 +53,7 @@
  use crate::{
      SvmError, all_releases, data_dir, platform, releases::artifact_url, setup_data_dir,
      setup_version, version_binary, version_path,
-@@ -26,9 +30,35 @@
+@@ -29,9 +33,35 @@ const NIXOS_MIN_PATCH_VERSION: Version = Version::new(0, 7, 6);
  /// See <https://github.com/ethereum/solidity/releases/tag/v0.8.29>
  const NIXOS_MAX_PATCH_VERSION: Version = Version::new(0, 8, 28);
  
@@ -89,7 +89,7 @@
      setup_data_dir()?;
  
      let artifacts = crate::blocking_all_releases(platform::platform())?;
-@@ -83,6 +113,15 @@
+@@ -86,6 +116,15 @@ pub fn blocking_install(version: &Version) -> Result<PathBuf, SvmError> {
  ///
  /// Returns the path to the solc file.
  pub async fn install(version: &Version) -> Result<PathBuf, SvmError> {

@@ -5,7 +5,7 @@ This is a folder (~/.minetest) so it's necessary to use the implementation that 
 folders. It's also inside the /data/data/com.termux/files folder.
 --- a/src/porting.cpp
 +++ b/src/porting.cpp
-@@ -882,8 +882,8 @@ static bool open_uri(const std::string &uri)
+@@ -947,8 +947,8 @@ static bool open_uri(const std::string &uri)
  	return posix_spawnp(NULL, "open", NULL, NULL, (char**)argv,
  		(*_NSGetEnviron())) == 0;
  #else
@@ -15,5 +15,5 @@ folders. It's also inside the /data/data/com.termux/files folder.
 +	return posix_spawnp(NULL, "xdg-utils-xdg-open", NULL, NULL, (char**)argv, environ) == 0;
  #endif
  }
-
+ 
 

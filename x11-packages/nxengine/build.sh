@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://nxengine.sourceforge.net
+TERMUX_PKG_HOMEPAGE="https://nxengine.sourceforge.io/"
 TERMUX_PKG_DESCRIPTION="Open-source rewrite engine of the Cave Story for Dingux and MotoMAGX"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

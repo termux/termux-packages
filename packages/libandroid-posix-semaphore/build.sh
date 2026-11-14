@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://man7.org/linux/man-pages/man7/sem_overview.7.html
 TERMUX_PKG_DESCRIPTION="Shared library for the posix semaphore system function"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=0.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SKIP_SRC_EXTRACT=true

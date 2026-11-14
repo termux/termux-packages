@@ -1,6 +1,6 @@
 --- a/sway/commands.c
 +++ b/sway/commands.c
-@@ -75,7 +75,9 @@
+@@ -73,7 +73,9 @@ static const struct cmd_handler handlers[] = {
  	{ "fullscreen", cmd_fullscreen },
  	{ "gaps", cmd_gaps },
  	{ "hide_edge_borders", cmd_hide_edge_borders },
@@ -12,7 +12,7 @@
  	{ "new_float", cmd_new_float },
 --- a/sway/meson.build
 +++ b/sway/meson.build
-@@ -76,7 +76,6 @@
+@@ -76,7 +76,6 @@ sway_sources = files(
  	'commands/max_render_time.c',
  	'commands/opacity.c',
  	'commands/include.c',
@@ -20,7 +20,7 @@
  	'commands/layout.c',
  	'commands/mode.c',
  	'commands/mouse_warping.c',
-@@ -153,6 +152,37 @@
+@@ -153,6 +152,38 @@ sway_sources = files(
  	'commands/bar/workspace_min_width.c',
  	'commands/bar/wrap_scroll.c',
  
@@ -30,6 +30,7 @@
 +	'commands/output/disable.c',
 +	'commands/output/dpms.c',
 +	'commands/output/enable.c',
++	'commands/output/hdr.c',
 +	'commands/output/max_render_time.c',
 +	'commands/output/mode.c',
 +	'commands/output/position.c',
@@ -58,7 +59,7 @@
  	'commands/input/accel_profile.c',
  	'commands/input/calibration_matrix.c',
  	'commands/input/click_method.c',
-@@ -188,33 +218,6 @@
+@@ -188,34 +219,6 @@ sway_sources = files(
  	'commands/input/xkb_rules.c',
  	'commands/input/xkb_switch_layout.c',
  	'commands/input/xkb_variant.c',
@@ -69,6 +70,7 @@
 -	'commands/output/disable.c',
 -	'commands/output/dpms.c',
 -	'commands/output/enable.c',
+-	'commands/output/hdr.c',
 -	'commands/output/max_render_time.c',
 -	'commands/output/mode.c',
 -	'commands/output/position.c',
@@ -92,7 +94,7 @@
  )
  
  sway_deps = [
-@@ -242,6 +245,7 @@
+@@ -243,6 +246,7 @@ endif
  
  if wlroots_features['libinput_backend']
  	sway_sources += 'input/libinput.c'

@@ -12,6 +12,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 #     $TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_protobuf.sh
 # - ALWAYS bump revision of reverse dependencies and rebuild them.
 TERMUX_PKG_VERSION="2:36.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/protocolbuffers/protobuf/archive/refs/tags/v${TERMUX_PKG_VERSION#*:}.tar.gz
 TERMUX_PKG_SHA256=7e7eaf580ec77f1a392ff1ab1013c13d3b04a6716f002f697f67f3c1113f0530
 TERMUX_PKG_AUTO_UPDATE=false

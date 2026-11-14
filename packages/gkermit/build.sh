@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.columbia.edu/kermit/gkermit.html
+TERMUX_PKG_HOMEPAGE="https://www.kermitproject.org/gkermit.html"
 TERMUX_PKG_DESCRIPTION="Simple, Portable, Free File Transfer Software for UNIX"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

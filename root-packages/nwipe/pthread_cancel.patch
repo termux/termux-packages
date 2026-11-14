@@ -1,24 +1,24 @@
 --- a/src/context.h
 +++ b/src/context.h
-@@ -127,6 +127,7 @@
-     nwipe_speedring_t speedring;  // Ring buffer for computing the rolling throughput average.
+@@ -204,6 +204,7 @@ typedef struct nwipe_context_t_
      short sync_status;  // A flag to indicate when the method is syncing.
+     short retry_status;  // A flag to indicate when the method is retrying.
      pthread_t thread;  // The ID of the thread.
 +    atomic_flag thread_cancel;  // The cancelation flag of the thread.
      u64 throughput;  // Average throughput in bytes per second.
+     char throughput_txt[13];  // Human readable throughput.
      u64 verify_errors;  // The number of verification errors across all passes.
-     char temp1_path[MAX_HWMON_PATH_LENGTH];  // path to temperature variables /sys/class/hwmon/hwmonX/ etc.
 --- a/src/nwipe.c
 +++ b/src/nwipe.c
-@@ -516,6 +516,7 @@
-             }
+@@ -1061,6 +1061,7 @@ int main( int argc, char** argv )
+             nwipe_log( NWIPE_LOG_NOTICE, "  Total device bytes   = %llu", c2[i]->device_size );
  
              /* Fork a child process. */
 +            atomic_flag_test_and_set( &c2[i]->thread_cancel );
              errno = pthread_create( &c2[i]->thread, NULL, nwipe_options.method, (void*) c2[i] );
              if( errno )
              {
-@@ -597,7 +598,7 @@
+@@ -1146,7 +1147,7 @@ int main( int argc, char** argv )
              {
                  nwipe_log( NWIPE_LOG_INFO, "Requesting wipe thread cancellation for %s", c2[i]->device_name );
              }
@@ -29,7 +29,7 @@
  
 --- a/src/nwipe.h
 +++ b/src/nwipe.h
-@@ -111,4 +111,7 @@
+@@ -112,4 +112,7 @@ typedef unsigned char u8;
  /* This is required for ioctl FDFLUSH. */
  #include <linux/fd.h>
  
@@ -39,7 +39,7 @@
  #endif /* NWIPE_H_ */
 --- a/src/pass_internal.c
 +++ b/src/pass_internal.c
-@@ -98,7 +98,10 @@
+@@ -98,7 +98,10 @@ ssize_t nwipe_write_with_retry( nwipe_context_t* c, int fd, const void* buf, siz
              for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
              {
                  sleep( 1 );
@@ -51,7 +51,7 @@
              }
  
              if( r > 0 )
-@@ -178,7 +181,10 @@
+@@ -178,7 +181,10 @@ ssize_t nwipe_pwrite_with_retry( nwipe_context_t* c, int fd, const void* buf, si
              for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
              {
                  sleep( 1 );
@@ -63,7 +63,7 @@
              }
          }
      }
-@@ -247,7 +253,10 @@
+@@ -247,7 +253,10 @@ ssize_t nwipe_read_with_retry( nwipe_context_t* c, int fd, void* buf, size_t cou
              for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
              {
                  sleep( 1 );
@@ -75,7 +75,7 @@
              }
  
              if( r > 0 )
-@@ -327,7 +336,10 @@
+@@ -327,7 +336,10 @@ ssize_t nwipe_pread_with_retry( nwipe_context_t* c, int fd, void* buf, size_t co
              for( slept_s = 0; slept_s < NWIPE_IO_RETRY_DELAY_S; slept_s++ )
              {
                  sleep( 1 );
@@ -89,7 +89,7 @@
      }
 --- a/src/pass_random.c
 +++ b/src/pass_random.c
-@@ -192,7 +192,10 @@
+@@ -192,7 +192,10 @@ int nwipe_random_forward_pass( NWIPE_METHOD_SIGNATURE )
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -101,7 +101,7 @@
  
                  continue;
              }
-@@ -285,7 +288,10 @@
+@@ -285,7 +288,10 @@ int nwipe_random_forward_pass( NWIPE_METHOD_SIGNATURE )
                  rev_offset -= (off64_t) rev_blocksize;
                  rev_blocksize = io_blocksize; /* must be a full I/O block now */
  
@@ -113,7 +113,7 @@
              }
  
              nwipe_log( NWIPE_LOG_NOTICE,
-@@ -369,7 +375,10 @@
+@@ -369,7 +375,10 @@ int nwipe_random_forward_pass( NWIPE_METHOD_SIGNATURE )
              }
          }
  
@@ -125,7 +125,7 @@
  
      } /* /remaining bytes */
  
-@@ -520,7 +529,10 @@
+@@ -520,7 +529,10 @@ int nwipe_random_reverse_pass( NWIPE_METHOD_SIGNATURE )
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -137,7 +137,7 @@
  
                  continue;
              }
-@@ -609,7 +621,10 @@
+@@ -609,7 +621,10 @@ int nwipe_random_reverse_pass( NWIPE_METHOD_SIGNATURE )
  
                  fwd_offset += (off64_t) fwd_blocksize;
  
@@ -149,7 +149,7 @@
              }
  
              nwipe_log( NWIPE_LOG_NOTICE,
-@@ -682,7 +697,10 @@
+@@ -682,7 +697,10 @@ int nwipe_random_reverse_pass( NWIPE_METHOD_SIGNATURE )
              }
          }
  
@@ -161,7 +161,7 @@
  
      } /* /remaining bytes */
  
-@@ -855,7 +873,10 @@
+@@ -855,7 +873,10 @@ int nwipe_random_forward_verify( NWIPE_METHOD_SIGNATURE )
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -173,7 +173,7 @@
  
                  continue;
              }
-@@ -929,7 +950,10 @@
+@@ -929,7 +950,10 @@ int nwipe_random_forward_verify( NWIPE_METHOD_SIGNATURE )
          c->pass_done += (u64) r;
          c->round_done += (u64) r;
  
@@ -185,7 +185,7 @@
  
      } /* while bytes remaining */
  
-@@ -1058,7 +1082,10 @@
+@@ -1058,7 +1082,10 @@ int nwipe_random_reverse_verify( NWIPE_METHOD_SIGNATURE )
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -197,7 +197,7 @@
  
                  continue;
              }
-@@ -1120,7 +1147,10 @@
+@@ -1120,7 +1147,10 @@ int nwipe_random_reverse_verify( NWIPE_METHOD_SIGNATURE )
          c->pass_done += (u64) r;
          c->round_done += (u64) r;
  
@@ -211,7 +211,7 @@
  
 --- a/src/pass_scatter.c
 +++ b/src/pass_scatter.c
-@@ -404,7 +404,10 @@
+@@ -404,7 +404,10 @@ static int scatter_write( nwipe_context_t* c,
                      c->round_done += (u64) blocksize;
                      segment_bytes_done += blocksize;
  
@@ -223,7 +223,7 @@
                      continue;
                  }
  
-@@ -470,10 +473,16 @@
+@@ -470,10 +473,16 @@ static int scatter_write( nwipe_context_t* c,
                  }
              }
  
@@ -242,7 +242,7 @@
      } /* for (each segment) */
  
      free( b );
-@@ -588,7 +597,10 @@
+@@ -588,7 +597,10 @@ static int scatter_verify( nwipe_context_t* c,
                      c->round_done += (u64) blocksize;
                      segment_bytes_done += blocksize;
  
@@ -254,7 +254,7 @@
                      continue;
                  }
  
-@@ -643,10 +655,16 @@
+@@ -643,10 +655,16 @@ static int scatter_verify( nwipe_context_t* c,
              c->round_done += (u64) r;
              segment_bytes_done += (size_t) r;
  
@@ -275,7 +275,7 @@
      free( b );
 --- a/src/pass_static.c
 +++ b/src/pass_static.c
-@@ -218,7 +218,10 @@
+@@ -218,7 +218,10 @@ int nwipe_static_forward_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -287,7 +287,7 @@
  
                  continue;
              }
-@@ -327,7 +330,10 @@
+@@ -327,7 +330,10 @@ int nwipe_static_forward_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
                  rev_offset -= (off64_t) rev_blocksize;
                  rev_blocksize = io_blocksize; /* must be a full I/O block now */
  
@@ -299,7 +299,7 @@
              }
  
              nwipe_log( NWIPE_LOG_NOTICE,
-@@ -414,7 +420,10 @@
+@@ -414,7 +420,10 @@ int nwipe_static_forward_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
              }
          }
  
@@ -311,7 +311,7 @@
  
      } /* /remaining bytes */
  
-@@ -589,7 +598,10 @@
+@@ -589,7 +598,10 @@ int nwipe_static_reverse_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -323,7 +323,7 @@
  
                  continue;
              }
-@@ -694,7 +706,10 @@
+@@ -694,7 +706,10 @@ int nwipe_static_reverse_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
  
                  fwd_offset += (off64_t) fwd_blocksize;
  
@@ -335,7 +335,7 @@
              }
  
              nwipe_log( NWIPE_LOG_NOTICE,
-@@ -769,7 +784,10 @@
+@@ -769,7 +784,10 @@ int nwipe_static_reverse_pass( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* pattern
              }
          }
  
@@ -347,7 +347,7 @@
  
      } /* /remaining bytes */
  
-@@ -946,7 +964,10 @@
+@@ -946,7 +964,10 @@ int nwipe_static_forward_verify( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* patter
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -359,7 +359,7 @@
  
                  continue;
              }
-@@ -1020,7 +1041,10 @@
+@@ -1020,7 +1041,10 @@ int nwipe_static_forward_verify( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* patter
          c->pass_done += (u64) r;
          c->round_done += (u64) r;
  
@@ -371,7 +371,7 @@
  
      } /* while bytes remaining */
  
-@@ -1152,7 +1176,10 @@
+@@ -1152,7 +1176,10 @@ int nwipe_static_reverse_verify( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* patter
                  c->round_done += s;
  
                  /* Allow thread cancellation points and proceed with the next loop iteration. */
@@ -383,7 +383,7 @@
  
                  continue;
              }
-@@ -1214,7 +1241,10 @@
+@@ -1214,7 +1241,10 @@ int nwipe_static_reverse_verify( NWIPE_METHOD_SIGNATURE, nwipe_pattern_t* patter
          c->pass_done += (u64) r;
          c->round_done += (u64) r;
  

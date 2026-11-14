@@ -14,7 +14,7 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
  }
 --- a/Jellyfin.Server/StartupOptions.cs
 +++ b/Jellyfin.Server/StartupOptions.cs
-@@ -68,10 +68,10 @@ namespace Jellyfin.Server
+@@ -69,10 +69,10 @@ namespace Jellyfin.Server
          public string? PublishedServerUrl { get; set; }
  
          /// <summary>
@@ -28,7 +28,7 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
  
          /// <summary>
          /// Gets or sets the path to an jellyfin backup archive to restore the application to.
-@@ -102,9 +102,9 @@ namespace Jellyfin.Server
+@@ -110,9 +110,9 @@ namespace Jellyfin.Server
                  config.Add(FfmpegPathKey, FFmpegPath);
              }
  
@@ -42,7 +42,7 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
              return config;
 --- a/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
 +++ b/MediaBrowser.MediaEncoding/Encoder/EncoderValidator.cs
-@@ -217,7 +217,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
+@@ -216,7 +216,7 @@ namespace MediaBrowser.MediaEncoding.Encoder
          [GeneratedRegex(@"((?<name>lib\w+)\s+(?<major>[0-9]+)\.\s*(?<minor>[0-9]+))", RegexOptions.Multiline)]
          private static partial Regex LibraryRegex();
  
@@ -51,7 +51,7 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
          {
              string output;
              try
-@@ -226,13 +226,17 @@ namespace MediaBrowser.MediaEncoding.Encoder
+@@ -225,13 +225,17 @@ namespace MediaBrowser.MediaEncoding.Encoder
              }
              catch (Exception ex)
              {
@@ -73,7 +73,7 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
  
 --- a/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
 +++ b/MediaBrowser.MediaEncoding/Encoder/MediaEncoder.cs
-@@ -199,7 +199,10 @@ namespace MediaBrowser.MediaEncoding.Encoder
+@@ -202,7 +202,10 @@ namespace MediaBrowser.MediaEncoding.Encoder
                  }
              }
  
@@ -85,7 +85,8 @@ We also make Jellyfin try to use jellyfin-ffmpeg by default, if available
              {
                  _ffmpegPath = null;
                  _logger.LogError("FFmpeg: Path set by {FfmpegPathSetMethodText} is invalid", ffmpegPathSetMethodText);
-@@ -287,17 +290,20 @@ namespace MediaBrowser.MediaEncoding.Encoder
+@@ -289,18 +292,21 @@ namespace MediaBrowser.MediaEncoding.Encoder
+         /// If checks pass, global variable FFmpegPath is updated.
          /// </summary>
          /// <param name="path">FQPN to test.</param>
 +        /// <param name="noerr">If set to true, logger is not used</param>

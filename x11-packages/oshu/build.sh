@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Oshu Is a Musical Game"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.0.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/fmang/oshu/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=1d6e2700583426e71380bea7367358813794118608778fcf3172ea5e80693d6d
 TERMUX_PKG_DEPENDS="libc++, ffmpeg, zstd, xorgproto, libcairo, pango, sdl2 | sdl2-compat, sdl2-image"

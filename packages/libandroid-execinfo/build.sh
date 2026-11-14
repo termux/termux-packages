@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://man7.org/linux/man-pages/man3/backtrace.3.html
 TERMUX_PKG_DESCRIPTION="Shared library for the backtrace system function"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_GENERATE_REPOLOGY_METADATA=false
 TERMUX_PKG_VERSION=0.1
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_AUTO_UPDATE=false

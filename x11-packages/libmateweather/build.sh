@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://libmateweather.mate-desktop.dev/
+TERMUX_PKG_HOMEPAGE="https://github.com/mate-desktop/libmateweather"
 TERMUX_PKG_DESCRIPTION="libmateweather is a libgnomeweather fork."
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

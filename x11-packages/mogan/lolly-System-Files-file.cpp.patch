@@ -1,0 +1,11 @@
+--- a/lolly/System/Files/file.cpp
++++ b/lolly/System/Files/file.cpp
+@@ -292,7 +292,7 @@ url_temp_dir_sub () {
+ #if defined(OS_WIN) || defined(OS_MINGW)
+   base= url_system ("$TMP");
+ #else
+-  base= url_system ("/tmp");
++  base= url_system ("@TERMUX_PREFIX@/tmp");
+ #endif
+   static url tmp_dir=
+       base * url (user) * url (".lolly") * url (as_string (get_process_id ()));

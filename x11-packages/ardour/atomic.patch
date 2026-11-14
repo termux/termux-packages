@@ -12,7 +12,7 @@
  /* UUID */
  #include <string>
  #include <boost/uuid/uuid.hpp>
-@@ -87,7 +89,7 @@
+@@ -87,7 +89,7 @@ static uint32 makeLong (uint8 b1, uint8 b2, uint8 b3, uint8 b4);
  //------------------------------------------------------------------------
  namespace FUnknownPrivate {
  //------------------------------------------------------------------------
@@ -21,7 +21,7 @@
  {
  #if SMTG_USE_ATOMIC
  	return atomic_fetch_add (reinterpret_cast<std::atomic_int_least32_t*> (&var), d) +d;
-@@ -96,7 +98,11 @@
+@@ -96,7 +98,11 @@ int32 PLUGIN_API atomicAdd (int32& var, int32 d)
  #elif SMTG_OS_MACOS
  	return OSAtomicAdd32Barrier (d, (int32_t*)&var);
  #elif SMTG_OS_LINUX
@@ -46,7 +46,7 @@
  //------------------------------------------------------------------------
  /*! \defgroup pluginBase Basic Interfaces
  */
-@@ -83,13 +87,18 @@
+@@ -83,13 +87,18 @@ const ::Steinberg::FUID ClassName::iid (ClassName##_iid);
  //  FUnknown implementation macros
  //------------------------------------------------------------------------
  
@@ -66,7 +66,7 @@
  public:
  
  //------------------------------------------------------------------------
-@@ -116,7 +125,11 @@
+@@ -116,7 +125,11 @@ public:																			        \
  }
  
  //------------------------------------------------------------------------

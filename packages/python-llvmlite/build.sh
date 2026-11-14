@@ -5,16 +5,15 @@ TERMUX_PKG_LICENSE="BSD 2-Clause, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.thirdparty"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	"0.49.0"
+	"0.50.0"
 	"22.1.8"
 )
-TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=(
 	"https://github.com/numba/llvmlite/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/llvm-project-${TERMUX_PKG_VERSION[1]}.src.tar.xz"
 )
 TERMUX_PKG_SHA256=(
-	e73ad74110d60ec3eef076431b8853a5e8f940a83bd544cbff4c02d4c544ada0
+	30fca6c79b243ceda5cdc62c318292179f0703dd70e58adc6f2b5493e526d2fb
 	922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888
 )
 TERMUX_PKG_DEPENDS="libc++, libffi, python, python-pip"

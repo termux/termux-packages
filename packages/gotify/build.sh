@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple server for sending and receiving messages in re
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Izumi Sena Sora <info@unordinary.eu.org>"
 TERMUX_PKG_VERSION="3.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/gotify/server/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=61e2b5d97ccbf1bba62420f8800b45295cd24b5cf9e149c24963554a0fbae1a5
 TERMUX_PKG_BUILD_DEPENDS="yarn"

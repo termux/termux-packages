@@ -172,7 +172,7 @@ index d0260eb23d..2ad7fc2c0b 100644
    deps = []
    if (skia_support_gpu) {
      deps += [ "//gpu/config:workaround_list" ]
-@@ -941,6 +977,11 @@ if (skia_support_gpu) {
+@@ -1286,6 +1286,11 @@
    skia_source_set("skia_graphite_private") {
      sources = skia_graphite_sources + skia_graphite_precompile_sources +
                skia_sksl_graphite_modules_sources
@@ -181,9 +181,9 @@ index d0260eb23d..2ad7fc2c0b 100644
 +      "//third_party/skia/src/gpu/graphite/render/TessellateCurvesRenderStep.cpp",
 +      "//third_party/skia/src/gpu/graphite/render/TessellateWedgesRenderStep.cpp",
 +    ]
+     deps = [ "//gpu/config:workaround_list" ]
      if (skia_use_dawn) {
        sources += skia_graphite_dawn_sources
-     }
 diff --git a/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp b/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp
 index 86c7da9508..63581ed2f5 100644
 --- a/third_party/skia/modules/skottie/src/animator/KeyframeAnimator.cpp
@@ -1247,3 +1247,28 @@ index c7cf9f56f1..f91bae3051 100644
 +
 +#undef chopMonoQuadAt
 +#undef chopMonoQuadAtY
+--- a/third_party/skia/src/gpu/graphite/render/PerEdgeAAQuadRenderStep.cpp
++++ b/third_party/skia/src/gpu/graphite/render/PerEdgeAAQuadRenderStep.cpp
+@@ -31,6 +31,12 @@
+ #include <array>
+ #include <cstdint>
+ 
++#define kVertexCount kVertexCount_PerEdgeAAQuadRenderStep
++#define kIndexCount kIndexCount_PerEdgeAAQuadRenderStep
++#define Vertex Vertex_PerEdgeAAQuadRenderStep
++#define write_index_buffer write_index_buffer_PerEdgeAAQuadRenderStep
++#define write_vertex_buffer write_vertex_buffer_PerEdgeAAQuadRenderStep
++
+ // This RenderStep is specialized to draw filled rectangles with per-edge AA.
+ //
+ // Each of these "primitives" is represented by a single instance. The instance attributes are
+@@ -305,3 +311,9 @@
+ }
+ 
+ }  // namespace skgpu::graphite
++
++#undef kVertexCount
++#undef kIndexCount
++#undef Vertex
++#undef write_index_buffer
++#undef write_vertex_buffer

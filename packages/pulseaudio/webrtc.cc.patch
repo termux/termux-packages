@@ -1,0 +1,113 @@
+--- src/src/modules/echo-cancel/webrtc.cc	2026-10-21 16:37:40.277074354 +0000
++++ src/src/modules/echo-cancel/webrtc.cc.patch	2026-10-21 16:48:24.669836428 +0000
+@@ -48,7 +48,6 @@
+ #define DEFAULT_MOBILE false
+ #define DEFAULT_COMFORT_NOISE true
+ #define DEFAULT_DRIFT_COMPENSATION false
+-#define DEFAULT_VAD false
+ #define DEFAULT_AGC_START_VOLUME 85
+ #define DEFAULT_POSTAMP_ENABLE false
+ #define DEFAULT_POSTAMP_GAIN_DB 0
+@@ -71,7 +70,6 @@
+     "pre_amplifier",
+     "pre_amplifier_gain",
+     "transient_noise_suppression",
+-    "voice_detection",
+     NULL
+ };
+ 
+@@ -114,10 +112,10 @@
+                        pa_sample_spec *play_ss, pa_channel_map *play_map,
+                        pa_sample_spec *out_ss, pa_channel_map *out_map,
+                        uint32_t *nframes, const char *args) {
+-    webrtc::AudioProcessing *apm = webrtc::AudioProcessingBuilder().Create();
++    rtc::scoped_refptr<webrtc::AudioProcessing> apm = webrtc::AudioProcessingBuilder().Create();
+     webrtc::ProcessingConfig pconfig;
+     webrtc::AudioProcessing::Config config;
+-    bool hpf, ns, tns, agc, dgc, mobile, pre_amp, vad, post_amp;
++    bool hpf, ns, tns, agc, dgc, mobile, pre_amp, post_amp;
+     int i;
+     uint32_t agc_start_volume, pre_amp_gain, post_amp_gain;
+     pa_modargs *ma;
+@@ -200,12 +198,6 @@
+ 
+     ec->params.drift_compensation = DEFAULT_DRIFT_COMPENSATION;
+ 
+-    vad = DEFAULT_VAD;
+-    if (pa_modargs_get_value_boolean(ma, "voice_detection", &vad) < 0) {
+-        pa_log("Failed to parse voice_detection value");
+-        goto fail;
+-    }
+-
+     agc_start_volume = DEFAULT_AGC_START_VOLUME;
+     if (pa_modargs_get_value_u32(ma, "agc_start_volume", &agc_start_volume) < 0) {
+         pa_log("Failed to parse agc_start_volume value");
+@@ -220,10 +212,10 @@
+     webrtc_ec_fixate_spec(rec_ss, rec_map, play_ss, play_map, out_ss, out_map);
+ 
+     pconfig = {
+-        webrtc::StreamConfig(rec_ss->rate, rec_ss->channels, false), /* input stream */
+-        webrtc::StreamConfig(out_ss->rate, out_ss->channels, false), /* output stream */
+-        webrtc::StreamConfig(play_ss->rate, play_ss->channels, false), /* reverse input stream */
+-        webrtc::StreamConfig(play_ss->rate, play_ss->channels, false), /* reverse output stream */
++        webrtc::StreamConfig(rec_ss->rate, rec_ss->channels), /* input stream */
++        webrtc::StreamConfig(out_ss->rate, out_ss->channels), /* output stream */
++        webrtc::StreamConfig(play_ss->rate, play_ss->channels), /* reverse input stream */
++        webrtc::StreamConfig(play_ss->rate, play_ss->channels), /* reverse output stream */
+     };
+     if (apm->Initialize(pconfig) != webrtc::AudioProcessing::kNoError) {
+         pa_log("Error initialising audio processing module");
+@@ -269,15 +261,8 @@
+         ec->params.webrtc.agc = true;
+         config.gain_controller1.enabled = true;
+         config.gain_controller1.mode = webrtc::AudioProcessing::Config::GainController1::kAdaptiveAnalog;
+-        config.gain_controller1.analog_level_minimum = 0;
+-        config.gain_controller1.analog_level_maximum = WEBRTC_AGC_MAX_VOLUME;
+     }
+ 
+-    if (vad)
+-        config.voice_detection.enabled = true;
+-    else
+-        config.voice_detection.enabled = false;
+-
+     if (post_amp) {
+         config.gain_controller2.enabled = true;
+         config.gain_controller2.fixed_digital.gain_db = (float)post_amp_gain;
+@@ -285,7 +270,7 @@
+     } else
+         config.gain_controller2.enabled = false;
+ 
+-    ec->params.webrtc.apm = apm;
++    ec->params.webrtc.apm = &apm;
+     ec->params.webrtc.rec_ss = *rec_ss;
+     ec->params.webrtc.play_ss = *play_ss;
+     ec->params.webrtc.out_ss = *out_ss;
+@@ -306,8 +291,6 @@
+ fail:
+     if (ma)
+         pa_modargs_free(ma);
+-    if (apm)
+-        delete apm;
+ 
+     return false;
+ }
+@@ -317,7 +300,7 @@
+     const pa_sample_spec *ss = &ec->params.webrtc.play_ss;
+     int n = ec->params.webrtc.blocksize;
+     float **buf = ec->params.webrtc.play_buffer;
+-    webrtc::StreamConfig config(ss->rate, ss->channels, false);
++    webrtc::StreamConfig config(ss->rate, ss->channels);
+ 
+     pa_deinterleave(play, (void **) buf, ss->channels, pa_sample_size(ss), n);
+ 
+@@ -331,8 +314,8 @@
+     float **buf = ec->params.webrtc.rec_buffer;
+     int n = ec->params.webrtc.blocksize;
+     int old_volume, new_volume;
+-    webrtc::StreamConfig rec_config(rec_ss->rate, rec_ss->channels, false);
+-    webrtc::StreamConfig out_config(out_ss->rate, out_ss->channels, false);
++    webrtc::StreamConfig rec_config(rec_ss->rate, rec_ss->channels);
++    webrtc::StreamConfig out_config(out_ss->rate, out_ss->channels);
+ 
+     pa_deinterleave(rec, (void **) buf, rec_ss->channels, pa_sample_size(rec_ss), n);
+ 

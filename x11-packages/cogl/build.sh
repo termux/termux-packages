@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://developer-old.gnome.org/cogl/
+TERMUX_PKG_HOMEPAGE="https://gitlab.gnome.org/Archive/cogl"
 TERMUX_PKG_DESCRIPTION="A small open source library for using 3D graphics hardware for rendering"
 TERMUX_PKG_LICENSE="MIT, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYING"

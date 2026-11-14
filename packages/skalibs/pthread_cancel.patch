@@ -1,0 +1,45 @@
+--- a/src/libplaynice/pthread_create_flat.c
++++ b/src/libplaynice/pthread_create_flat.c
+@@ -9,6 +9,15 @@
+ 
+ #include <skalibs/functypes.h>
+ 
++#ifdef __ANDROID__
++#include <signal.h>
++
++static void thread_signal_handler (int signum)
++{
++  pthread_exit(0) ;
++}
++#endif
++
+ struct spawndata_s
+ {
+   pthread_cond_t cond ;
+@@ -21,6 +30,14 @@ struct spawndata_s
+ static void *bootstrap (void *arg)
+ {
+   struct spawndata_s *data = arg ;
++#ifdef __ANDROID__
++  struct sigaction actions ;
++  memset(&actions, 0, sizeof(actions)) ;
++  sigemptyset(&actions.sa_mask) ;
++  actions.sa_flags = 0 ;
++  actions.sa_handler = thread_signal_handler ;
++  sigaction(SIGUSR2, &actions, NULL) ;
++#endif
+   char newarg[data->argsize ? data->argsize : 1] ;
+   memcpy(newarg, data->arg, data->argsize) ;
+   int e = pthread_mutex_lock(&data->mutex) ;
+@@ -46,7 +63,11 @@ int pthread_create_flat (pthread_t *restrict th, pthread_attr_t const *restrict
+   e = pthread_create(&tth, attr, &bootstrap, &data) ;
+   if (e) return e ;
+   e = pthread_cond_wait(&data.cond, &data.mutex) ;
++#ifdef __ANDROID__
++  if (e) pthread_kill(tth, SIGUSR2) ; else *th = tth ;
++#else
+   if (e) pthread_cancel(tth) ; else *th = tth ;
++#endif
+   pthread_mutex_unlock(&data.mutex) ;
+   pthread_cond_destroy(&data.cond) ;
+   pthread_mutex_destroy(&data.mutex) ;

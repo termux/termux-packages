@@ -1,0 +1,11 @@
+--- a/src/config.rs
++++ b/src/config.rs
+@@ -233,6 +233,8 @@
+ 
+         if !is_termux() {
+             cfg.set("Dir", &self.sysroot.to_string_lossy());
++        } else {
++            cfg.set("Dir", "@TERMUX_PREFIX@");
+         }
+ 
+         for kv in &self.apt_options {

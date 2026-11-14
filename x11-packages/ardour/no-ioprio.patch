@@ -1,0 +1,22 @@
+--- a/libs/ardour/butler.cc
++++ b/libs/ardour/butler.cc
+@@ -190,7 +190,7 @@ Butler::thread_work ()
+ 	bool                disk_work_outstanding = false;
+ 	RouteList::iterator i;
+ 
+-#ifdef HAVE_IOPRIO
++#if defined(HAVE_IOPRIO) && !defined(__ANDROID__)
+ 	// ioprio_set (IOPRIO_WHO_PROCESS, 0 /*calling thread*/, IOPRIO_PRIO_VALUE (IOPRIO_CLASS_RT, 4))
+ 	if (0 != syscall (SYS_ioprio_set, 1, 0, (1 << 13) | 4)) {
+ 		info << _("Cannot set I/O Priority for disk read/write thread") << endmsg;
+--- a/libs/ardour/io_tasklist.cc
++++ b/libs/ardour/io_tasklist.cc
+@@ -145,7 +145,7 @@ IOTaskList::_worker_thread (void* me)
+ 	ARDOUR::ProcessThread* pt = new ProcessThread ();
+ 	pt->get_buffers ();
+ 
+-#ifdef HAVE_IOPRIO
++#if defined(HAVE_IOPRIO) && !defined(__ANDROID__)
+ 	/* compare to Butler::_thread_work */
+ 	// ioprio_set (IOPRIO_WHO_PROCESS, 0 /*calling thread*/, IOPRIO_PRIO_VALUE (IOPRIO_CLASS_RT, 4))
+ 	syscall (SYS_ioprio_set, 1, 0, (1 << 13) | 4);

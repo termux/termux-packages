@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.17+git20231016"
 TERMUX_PKG_SRCURL="git+https://gitlab.com/accounts-sso/signon-ui"
+TERMUX_PKG_REPOLOGY_METADATA_VERSION="${TERMUX_PKG_VERSION%%+*}"
 TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="glib, libaccounts-qt, libc++, libnotify, libproxy, qt6-qtbase, qt6-qtdeclarative, qt6-qtpositioning, qt6-qtwebengine, signond"

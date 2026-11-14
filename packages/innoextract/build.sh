@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tool to unpack installers created by Inno Setup"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.13.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/crazy-max/innoextract/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=f41b8afcd51d81b2be8cef58004ce88d64337e1092617cfa3f3de350834e0961
 TERMUX_PKG_AUTO_UPDATE=true

@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="VeraCrypt disk encryption manager for Termux"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="License.txt"
 TERMUX_PKG_MAINTAINER="Infiniti151 <43163551+Infiniti151@users.noreply.github.com>"
-TERMUX_PKG_VERSION="1.26.29"
+TERMUX_PKG_VERSION="1.26.30"
 TERMUX_PKG_SRCURL="https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_${TERMUX_PKG_VERSION}/VeraCrypt_${TERMUX_PKG_VERSION}_Source.tar.bz2"
-TERMUX_PKG_SHA256="60826731e2982b4bd231e3930e85a44391169638671a1b200c518f8c8b46cb2a"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256="3af1b5d69da637bf51866e500973e5421e9f4e4282c8aca254bce2b3ffc9ca30"
 TERMUX_PKG_DEPENDS="libfuse3, libpcsclite, libdevmapper, wxwidgets"
 TERMUX_PKG_BUILD_IN_SRC=true
 

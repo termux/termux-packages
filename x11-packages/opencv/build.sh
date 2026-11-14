@@ -2,18 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://opencv.org/
 TERMUX_PKG_DESCRIPTION="Open Source Computer Vision Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.14.0"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="5.1.0"
 TERMUX_PKG_SRCURL=(
 	"https://github.com/opencv/opencv/archive/refs/tags/${TERMUX_PKG_VERSION}/opencv-${TERMUX_PKG_VERSION}.tar.gz"
 	"https://github.com/opencv/opencv_contrib/archive/refs/tags/${TERMUX_PKG_VERSION}/opencv_contrib-${TERMUX_PKG_VERSION}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	ee8fb9b30eb60850431b4656447080e3737b56e45719c92b67f245950609f86e
-	4f17abd1bc7f88e19c3380c8de7cbf2d863aced5b5ee8d8934cc7902b67d42c9
+	638c1dae7e37e45afea21aa217dc667ad7cf57acc66cdf652c074f1e0e5ad6d2
+	6aee68285f0e7b7bf77d3656bc6568820c6f15704860fc0922def357d40ebeff
 )
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libc++, libjpeg-turbo, libopenblas, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, qt6-qtbase, qt6-qt5compat, zlib"
+TERMUX_PKG_DEPENDS="abseil-cpp, ffmpeg, libavif, libc++, libjpeg-turbo, libopenblas, libpng, libprotobuf, libtiff, libwebp, openjpeg, openjpeg-tools, qt6-qtbase, qt6-qt5compat, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python-numpy-static"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="Cython, wheel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -23,6 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_GSTREAMER=OFF
 -DWITH_OPENEXR=OFF
 -DWITH_QT=6
+-DBUILD_HARFBUZZ=ON
 -DBUILD_PERF_TESTS=OFF
 -DBUILD_PROTOBUF=OFF
 -DBUILD_TESTS=OFF

@@ -495,3 +495,60 @@ index db16e21024..dbf02f0dee 100644
  }  // namespace quiche
 +
 +#undef kFinalChunkIndicator
+--- a/third_party/wayland/src/src/wayland-client.c
++++ b/third_party/wayland/src/src/wayland-client.c
+@@ -24,6 +24,9 @@
+  * SOFTWARE.
+  */
+ 
++#pragma push_macro("_GNU_SOURCE")
++#undef _GNU_SOURCE
++
+ #define _GNU_SOURCE
+ 
+ #include <stdlib.h>
+@@ -2849,3 +2852,6 @@
+ {
+ 	wl_log_handler = handler;
+ }
++
++#undef _GNU_SOURCE
++#pragma pop_macro("_GNU_SOURCE")
+--- a/third_party/wayland/src/src/connection.c
++++ b/third_party/wayland/src/src/connection.c
+@@ -24,6 +24,9 @@
+  * SOFTWARE.
+  */
+ 
++#pragma push_macro("_GNU_SOURCE")
++#undef _GNU_SOURCE
++
+ #define _GNU_SOURCE
+ 
+ #include "../config.h"
+@@ -1692,3 +1695,6 @@
+ 	wl_closure_close_fds(closure);
+ 	free(closure);
+ }
++
++#undef _GNU_SOURCE
++#pragma pop_macro("_GNU_SOURCE")
+--- a/third_party/wayland/src/src/wayland-os.c
++++ b/third_party/wayland/src/src/wayland-os.c
+@@ -23,6 +23,9 @@
+  * SOFTWARE.
+  */
+ 
++#pragma push_macro("_GNU_SOURCE")
++#undef _GNU_SOURCE
++
+ #define _GNU_SOURCE
+ 
+ #include "../config.h"
+@@ -260,3 +263,6 @@
+ 
+ 	return result;
+ }
++
++#undef _GNU_SOURCE
++#pragma pop_macro("_GNU_SOURCE")

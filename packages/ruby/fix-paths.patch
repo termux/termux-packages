@@ -1,6 +1,6 @@
 --- a/addr2line.c
 +++ b/addr2line.c
-@@ -604,7 +604,7 @@
+@@ -604,7 +604,7 @@ static void
  follow_debuglink(const char *debuglink, int num_traces, void **traces,
                   obj_info_t **objp, line_info_t *lines, int offset, FILE *errout)
  {
@@ -9,7 +9,7 @@
      const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
      char *p;
      obj_info_t *o1 = *objp, *o2;
-@@ -636,7 +636,7 @@
+@@ -636,7 +636,7 @@ static void
  follow_debuglink_build_id(const char *build_id, size_t build_id_size, int num_traces, void **traces,
                            obj_info_t **objp, line_info_t *lines, int offset, FILE *errout)
  {
@@ -20,7 +20,7 @@
      char *p;
 --- a/dln_find.c
 +++ b/dln_find.c
-@@ -66,10 +66,7 @@
+@@ -66,10 +66,7 @@ dln_find_exe_r(const char *fname, const char *path, char *buf, size_t size
  
      if (!path) {
          path =
@@ -34,7 +34,7 @@
      buf = dln_find_1(fname, path, buf, size, 1 DLN_FIND_EXTRA_ARG);
 --- a/ext/etc/etc.c
 +++ b/ext/etc/etc.c
-@@ -744,7 +744,7 @@
+@@ -744,7 +744,7 @@ etc_systmpdir(VALUE _)
      if (!len) return Qnil;
      tmpdir = rb_w32_conv_from_wchar(path, rb_filesystem_encoding());
  #else
@@ -45,7 +45,7 @@
  # if defined _CS_DARWIN_USER_TEMP_DIR
 --- a/ext/pty/pty.c
 +++ b/ext/pty/pty.c
-@@ -207,7 +207,7 @@
+@@ -207,7 +207,7 @@ establishShell(int argc, VALUE *argv, struct pty_info *info,
      char		errbuf[32];
  
      if (argc == 0) {
@@ -56,7 +56,7 @@
              shellname = p;
 --- a/hash.c
 +++ b/hash.c
-@@ -641,11 +641,11 @@
+@@ -641,11 +641,11 @@ ar_find_entry_hint(VALUE hash, ar_hint_t hint, st_data_t key)
              else {
  #if 0
                  static int pid;
@@ -72,7 +72,7 @@
  
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
-@@ -1708,7 +1708,7 @@
+@@ -1708,7 +1708,7 @@ SRC
      if path ||= ENV['PATH']
        path = path.split(File::PATH_SEPARATOR)
      else
@@ -83,7 +83,7 @@
      path.each do |dir|
 --- a/lib/resolv.rb
 +++ b/lib/resolv.rb
-@@ -187,7 +187,7 @@
+@@ -187,7 +187,7 @@ class Resolv
        end
      end
      # The default file name for host names
@@ -92,7 +92,7 @@
  
      ##
      # Creates a new Resolv::Hosts, using +filename+ for its data source.
-@@ -1020,7 +1020,7 @@
+@@ -1029,7 +1029,7 @@ class Resolv
          return { :nameserver => nameserver.freeze, :search => search.freeze, :ndots => ndots.freeze }.freeze
        end
  
@@ -103,7 +103,7 @@
          elsif defined?(Win32::Resolv)
 --- a/process.c
 +++ b/process.c
-@@ -1617,9 +1617,9 @@
+@@ -1631,9 +1631,9 @@ exec_with_sh(const char *prog, char **argv, char **envp)
      *argv = (char *)prog;
      *--argv = (char *)"sh";
      if (envp)
@@ -115,7 +115,7 @@
  }
  
  #else
-@@ -1687,9 +1687,9 @@
+@@ -1701,9 +1701,9 @@ proc_exec_sh(const char *str, VALUE envp_str)
      }
  #else
      if (envp_str)
@@ -129,7 +129,7 @@
  }
 --- a/ruby.c
 +++ b/ruby.c
-@@ -699,7 +699,7 @@
+@@ -699,7 +699,7 @@ ruby_init_loadpath(void)
              RUBY_ARCH_PATH;
          const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
              - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
@@ -140,7 +140,7 @@
          const char *p2 = NULL;
 --- a/spec/ruby/core/dir/shared/pwd.rb
 +++ b/spec/ruby/core/dir/shared/pwd.rb
-@@ -14,7 +14,7 @@
+@@ -14,7 +14,7 @@ describe :dir_pwd, shared: true do
      # The following uses inode rather than file names to account for
      # case insensitive file systems like default OS/X file systems
      platform_is_not :windows do
@@ -151,7 +151,7 @@
        File.stat(pwd).ino.should == File.stat(File.expand_path(`cd`.chomp)).ino
 --- a/spec/ruby/core/process/spawn_spec.rb
 +++ b/spec/ruby/core/process/spawn_spec.rb
-@@ -133,7 +133,7 @@
+@@ -133,7 +133,7 @@ describe "Process.spawn" do
    describe "with a command array" do
      it "uses the first element as the command name and the second as the argv[0] value" do
        platform_is_not :windows do
@@ -160,7 +160,7 @@
        end
        platform_is :windows do
          -> { Process.wait Process.spawn(["cmd.exe", "/C"], "/C", "echo", "argv_zero") }.should output_to_fd("argv_zero\n")
-@@ -156,7 +156,7 @@
+@@ -156,7 +156,7 @@ describe "Process.spawn" do
      it "calls #to_ary to convert the argument to an Array" do
        o = mock("to_ary")
        platform_is_not :windows do
@@ -171,7 +171,7 @@
        platform_is :windows do
 --- a/st.c
 +++ b/st.c
-@@ -504,10 +504,10 @@
+@@ -504,10 +504,10 @@ static int init_st = 0;
  static void
  stat_col(void)
  {

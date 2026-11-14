@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://justine.lol/blinkenlights/
+TERMUX_PKG_HOMEPAGE="https://github.com/jart/blink"
 TERMUX_PKG_DESCRIPTION="Tiny x86-64 Linux emulator"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"

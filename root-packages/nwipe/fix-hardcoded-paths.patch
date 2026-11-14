@@ -1,6 +1,6 @@
 --- a/src/device.c
 +++ b/src/device.c
-@@ -520,12 +520,12 @@
+@@ -1151,12 +1151,12 @@ int nwipe_get_device_bus_type_and_serialno( char* device,
      int idx2;
  
      char readlink_command[] = "readlink /sys/block/%s";
@@ -18,7 +18,7 @@
      char device_shortform[50];
      char result[512];
      char final_cmd_readlink[sizeof( readlink_command ) + sizeof( device_shortform )];
-@@ -499,11 +499,11 @@
+@@ -1211,11 +1211,11 @@ int nwipe_get_device_bus_type_and_serialno( char* device,
  
      /* Determine whether we can access readlink, required if the PATH environment is not setup ! (Debian sid 'su' as
       * opposed to 'su -' */
@@ -33,7 +33,7 @@
              {
                  nwipe_log( NWIPE_LOG_WARNING, "Command not found. Install readlink !" );
                  set_return_value = 2;
-@@ -620,11 +620,11 @@
+@@ -1347,11 +1347,11 @@ int nwipe_get_device_bus_type_and_serialno( char* device,
  
      /* Determine whether we can access smartctl, required if the PATH environment is not setup ! (Debian sid 'su' as
       * opposed to 'su -' */
@@ -46,11 +46,11 @@
 -            if( system( "which /usr/bin/smartctl > /dev/null 2>&1" ) )
 +            if( system( "command -v @TERMUX_PREFIX@/bin/smartctl > /dev/null 2>&1" ) )
              {
-                 nwipe_log( NWIPE_LOG_WARNING, "Command not found. Install smartmontools !" );
-             }
+                 if( system( "which /usr/sbin/smartctl > /dev/null 2>&1" ) )
+                 {
 --- a/src/logging.c
 +++ b/src/logging.c
-@@ -541,8 +541,8 @@
+@@ -605,8 +605,8 @@ int nwipe_log_sysinfo( nwipe_misc_thread_data_t* ptrx )
      };
  
      char dmidecode_command[] = "dmidecode -s %s";
@@ -61,7 +61,7 @@
      char* p_dmidecode_command;
  
      char cmd[sizeof( dmidecode_keywords ) + sizeof( dmidecode_command2 )];
-@@ -553,11 +553,11 @@
+@@ -625,11 +625,11 @@ int nwipe_log_sysinfo( nwipe_misc_thread_data_t* ptrx )
  
      p_dmidecode_command = 0;
  
@@ -78,7 +78,7 @@
              }
 --- a/src/nwipe.c
 +++ b/src/nwipe.c
-@@ -67,8 +67,8 @@
+@@ -294,8 +294,8 @@ int main( int argc, char** argv )
      pthread_t nwipe_sigint_thread;  // The thread ID of the sigint handler.
  
      char modprobe_command[] = "modprobe %s";
@@ -89,7 +89,7 @@
      char module_shortform[50];
      char final_cmd_modprobe[sizeof( modprobe_command ) + sizeof( module_shortform )];
  
-@@ -227,11 +227,11 @@
+@@ -632,11 +632,11 @@ int main( int argc, char** argv )
      /* Determine whether we can access modprobe, required if the PATH environment is not setup ! (Debian sid 'su' as
       * opposed to 'su -' */
  

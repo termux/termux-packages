@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.yoctoproject.org/tools-resources/projects/matchbox
+TERMUX_PKG_HOMEPAGE="https://git.yoctoproject.org/libfakekey/"
 TERMUX_PKG_DESCRIPTION="X virtual keyboard library."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

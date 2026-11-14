@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Set of products that use OS-level virtualization to deli
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=24.0.6
+TERMUX_PKG_REVISION=1
 DOCKER_GITCOMMIT=ed223bc
 TERMUX_PKG_SRCURL=https://github.com/docker/cli/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c1a4a580ced3633e489c5c9869a20198415da44df7023fdc200d425cdf5fa652

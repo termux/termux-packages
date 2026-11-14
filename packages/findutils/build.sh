@@ -15,7 +15,7 @@ SORT_SUPPORTS_Z=yes
 SORT=$TERMUX_PREFIX/bin/sort
 "
 
-# Remove locale and updatedb which in Termux is provided by mlocate:
+# Remove locale and updatedb which in Termux is provided by plocate:
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/locate
 bin/updatedb

@@ -3,14 +3,13 @@ TERMUX_PKG_DESCRIPTION="The fundamental package for scientific computing with Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # Revbump revdeps after updating
-TERMUX_PKG_VERSION="2.4.4"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="2.5.4"
 TERMUX_PKG_SRCURL="https://github.com/numpy/numpy/releases/download/v$TERMUX_PKG_VERSION/numpy-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=2d390634c5182175533585cc89f3608a4682ccb173cc9bb940b2881c8d6f8fa0
+TERMUX_PKG_SHA256=9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a
 TERMUX_PKG_DEPENDS="libc++, libopenblas, python"
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
-TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, 'Cython>=3.0.6', 'meson-python>=0.18.0', build"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel, 'Cython>=3.1.0', 'meson-python>=0.18.0', build"
 
 TERMUX_MESON_WHEEL_CROSSFILE="$TERMUX_PKG_TMPDIR/wheel-cross-file.txt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -67,8 +66,17 @@ termux_step_configure() {
 }
 
 termux_step_make() {
+	local native_file="$TERMUX_PKG_TMPDIR/native-file.txt"
+	printf '[properties]\nneeds_exe_wrapper = false\n' > "$native_file"
+
+	rm -rf "$TERMUX_PKG_BUILDDIR"
+
 	pushd "$TERMUX_PKG_SRCDIR"
-	python -m build -w -n -x --config-setting builddir="$TERMUX_PKG_BUILDDIR" .
+	python -m build -w -n -x --config-setting builddir="$TERMUX_PKG_BUILDDIR" --config-setting=setup-args="--native-file=$native_file" \
+		--config-setting=setup-args="--cross-file=$TERMUX_MESON_CROSSFILE" \
+		--config-setting=setup-args="--cross-file=$TERMUX_MESON_WHEEL_CROSSFILE" \
+		--config-setting=setup-args="--prefix=$TERMUX_PREFIX" \
+		--config-setting=setup-args="--libdir=lib" .
 	popd
 }
 

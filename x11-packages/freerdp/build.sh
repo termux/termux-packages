@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.freerdp.com/
 TERMUX_PKG_DESCRIPTION="A free remote desktop protocol library and clients"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.32.2"
+TERMUX_PKG_VERSION="3.33.1"
 TERMUX_PKG_SRCURL=https://github.com/FreeRDP/FreeRDP/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=9ccb8357bf0188044a460de775c7ea289ca7d2a2a917eca0f0a7c4dc9c8b08ea
+TERMUX_PKG_SHA256=6b6da1e7217f924b033da6896e70eb4c4a447c3900d03c0d10179062f0a7d495
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-shmem, libcairo, libicu, libjpeg-turbo, libusb, libwayland, libx11, libxcursor, libxdamage, libxext, libxfixes, libxi, libxinerama, libxkbcommon, libxkbfile, libxrandr, libxrender, libxv, openssl, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-cross-scanner, libwayland-protocols"
@@ -24,6 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_OPUS=OFF
 -DWITH_SWSCALE=OFF
 -DWITH_FUSE=OFF
+-DWITH_JSON_DISABLED=ON
 -DWITH_KRB5=OFF
 "
 

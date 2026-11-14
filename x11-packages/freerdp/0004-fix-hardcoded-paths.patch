@@ -70,8 +70,17 @@ diff -uNr FreeRDP-3.32.0/winpr/libwinpr/sspi/Schannel/schannel_openssl.c FreeRDP
 diff -uNr FreeRDP-3.32.0/winpr/libwinpr/timezone/timezone.c FreeRDP-3.32.0.mod/winpr/libwinpr/timezone/timezone.c
 --- FreeRDP-3.32.0/winpr/libwinpr/timezone/timezone.c	2026-09-23 13:00:40.000000000 +0530
 +++ FreeRDP-3.32.0.mod/winpr/libwinpr/timezone/timezone.c	2026-09-23 20:53:06.436855296 +0530
-@@ -98,7 +98,7 @@
+@@ -103,7 +103,7 @@
+ 	// NOLINTNEXTLINE(concurrency-mt-unsafe)
+ 	const char* dir = getenv("TZDIR");
+ 	if (!dir || (dir[0] == '\0'))
+-		return "/usr/share/zoneinfo";
++		return "@TERMUX_PREFIX@/share/zoneinfo";
+ 	return dir;
+ }
  
+@@ -142,7 +142,7 @@
+ WINPR_ATTR_MALLOC(free, 1)
  static char* winpr_get_timezone_from_link(const char* links[], size_t count)
  {
 -	const char* _links[] = { "/etc/localtime", "/etc/TZ" };
@@ -79,15 +88,6 @@ diff -uNr FreeRDP-3.32.0/winpr/libwinpr/timezone/timezone.c FreeRDP-3.32.0.mod/w
  
  	if (links == nullptr)
  	{
-@@ -291,7 +291,7 @@
- 
- static char* winpr_translate_time_zone(const char* tzid)
- {
--	const char* zipath = "/usr/share/zoneinfo/";
-+	const char* zipath = "@TERMUX_PREFIX@/share/zoneinfo/";
- 	char* buf = nullptr;
- 	const char* links[] = { buf };
- 
 diff -uNr FreeRDP-3.32.0/winpr/libwinpr/wtsapi/wtsapi.c FreeRDP-3.32.0.mod/winpr/libwinpr/wtsapi/wtsapi.c
 --- FreeRDP-3.32.0/winpr/libwinpr/wtsapi/wtsapi.c	2026-09-23 13:00:40.000000000 +0530
 +++ FreeRDP-3.32.0.mod/winpr/libwinpr/wtsapi/wtsapi.c	2026-09-23 20:54:14.096143779 +0530

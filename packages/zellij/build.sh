@@ -3,9 +3,11 @@ TERMUX_PKG_DESCRIPTION="A terminal workspace with batteries included"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Jonathan Lei <me@xjonathan.dev>"
 TERMUX_PKG_VERSION="0.45.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/zellij-org/zellij/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=5cbe711437d2a61afd9287165f6aca0bcccb9ab1473633665a5b11ed55467852
-TERMUX_PKG_BUILD_DEPENDS="openssl, zlib"
+TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_BUILD_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 

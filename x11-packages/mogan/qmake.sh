@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
+# Presents the cross Qt as an SDK for xmake, see build.sh
 
 qmake_output=$(@TERMUX_PREFIX@/opt/qt6/cross/bin/qmake6 $@)
 
 echo "${qmake_output}" | \
 sed \
-	-e "s|^QT_INSTALL_PREFIX:.*|QT_INSTALL_PREFIX:@TERMUX_PREFIX@|" \
+	-e "s|^QT_INSTALL_PREFIX:.*|QT_INSTALL_PREFIX:@QT_SDK_DIR@|" \
 	-e "s|^QT_INSTALL_ARCHDATA:.*|QT_INSTALL_ARCHDATA:@TERMUX_PREFIX@/lib/qt6|" \
 	-e "s|^QT_INSTALL_DATA:.*|QT_INSTALL_DATA:@TERMUX_PREFIX@/share/qt6|" \
 	-e "s|^QT_INSTALL_DOCS:.*|QT_INSTALL_DOCS:@TERMUX_PREFIX@/share/doc/qt6|" \

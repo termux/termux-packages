@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://gedit-technology.github.io/apps/gedit/
 TERMUX_PKG_DESCRIPTION="GNOME Text Editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="50.0"
+TERMUX_PKG_VERSION="51.0"
 # for submodules https://gitlab.gnome.org/World/gedit/gedit/-/issues/611
 TERMUX_PKG_SRCURL="git+https://gitlab.gnome.org/World/gedit/gedit"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"

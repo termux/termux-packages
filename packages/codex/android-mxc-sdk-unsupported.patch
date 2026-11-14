@@ -1,0 +1,20 @@
+diff --git a/codex-rs/mxc-sandbox/Cargo.toml b/codex-rs/mxc-sandbox/Cargo.toml
+--- a/codex-rs/mxc-sandbox/Cargo.toml
++++ b/codex-rs/mxc-sandbox/Cargo.toml
+@@ -21,11 +21,15 @@
+ codex-utils-absolute-path = { workspace = true }
+ codex-utils-path-uri = { workspace = true }
+ codex-windows-sandbox = { workspace = true }
+-mxc-sdk = { workspace = true }
+ serde = { workspace = true, features = ["derive"] }
+ serde_json = { workspace = true }
+ thiserror = { workspace = true }
+ 
++# mxc-sdk does not support Android (its engine module is gated to
++# windows/linux/macos), and it is only used on Windows and in tests.
++[target.'cfg(not(target_os = "android"))'.dependencies]
++mxc-sdk = { workspace = true }
++
+ [target.'cfg(windows)'.dependencies]
+ flatbuffers = { workspace = true }
+ # 1.2.4 imports OneCore_apiset, which the GNU Windows toolchain does not ship.

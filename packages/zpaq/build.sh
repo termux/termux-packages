@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mattmahoney.net/dc/zpaq.html
+TERMUX_PKG_HOMEPAGE="https://mattmahoney.net/dc/zpaq.html"
 TERMUX_PKG_DESCRIPTION="Programmable file compressor, library and utilities. Based on the PAQ compression algorithm"
 TERMUX_PKG_LICENSE="MIT, Unlicense"
 TERMUX_PKG_MAINTAINER="@termux"

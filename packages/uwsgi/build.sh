@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://projects.unbit.it/uwsgi
+TERMUX_PKG_HOMEPAGE="https://github.com/unbit/uwsgi"
 TERMUX_PKG_DESCRIPTION="uWSGI application server container"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

@@ -1,0 +1,45 @@
+--- a/third_party/gemmlowp/src/profiling/instrumentation.h
++++ b/third_party/gemmlowp/src/profiling/instrumentation.h
+@@ -53,6 +53,11 @@
+ 
+ #include "./pthread_everywhere.h"
+ 
++#ifdef __clang__
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wexit-time-destructors"
++#endif
++
+ namespace gemmlowp {
+ 
+ inline void ReleaseBuildAssertion(bool condition, const char* msg) {
+@@ -240,4 +245,8 @@
+ 
+ }  // end namespace gemmlowp
+ 
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif
++
+ #endif  // GEMMLOWP_PROFILING_INSTRUMENTATION_H_
+--- a/third_party/vulkan-utility-libraries/src/src/layer/layer_settings_util.cpp
++++ b/third_party/vulkan-utility-libraries/src/src/layer/layer_settings_util.cpp
+@@ -14,6 +14,11 @@
+ #include <cassert>
+ #include <cstdint>
+ 
++#ifdef __clang__
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wexit-time-destructors"
++#endif
++
+ namespace vl {
+ 
+ std::vector<std::string> Split(const std::string &pValues, char delimiter) {
+@@ -275,3 +280,7 @@
+ }
+ 
+ }  // namespace vl
++
++#ifdef __clang__
++#pragma clang diagnostic pop
++#endif

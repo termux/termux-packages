@@ -1,0 +1,15 @@
+Pass a duplicated fd to TIFFFdOpen: TIFFClose closes it while the caller's FILE* still owns it, which aborts under Android fdsan.
+
+--- a/gdk-pixbuf/io-tiff.c
++++ b/gdk-pixbuf/io-tiff.c
+@@ -347,7 +347,10 @@ gdk_pixbuf__tiff_image_load (FILE *f, GError **error)
+          */
+         lseek (fd, 0, SEEK_SET);
+ #ifndef G_OS_WIN32
++        fd = dup (fd);
+         tiff = TIFFFdOpen (fd, "libpixbuf-tiff", "r");
++        if (!tiff && fd >= 0)
++                close (fd);
+ #else
+         /* W32 version of this function takes HANDLE.
+          * What's worse, the caller will close the file,

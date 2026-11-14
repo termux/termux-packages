@@ -1,6 +1,6 @@
 --- a/Makefile
 +++ b/Makefile
-@@ -9,7 +9,7 @@
+@@ -9,7 +9,7 @@ DEBUG:=#XXX -g -D_DEBUG ###-pg -Wpedantic ## -pg #-fprofile-arcs
  
  UTF8_SUPPORT:=yes
  DESTDIR=
@@ -9,7 +9,7 @@
  BINDIR=$(PREFIX)/bin
  SHAREDIR=$(PREFIX)/share
  MANDIR=$(SHAREDIR)/man
-@@ -37,7 +37,7 @@
+@@ -41,7 +41,7 @@ ifeq ($(PLATFORM),Darwin)
      LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
  else
  ifeq ($(UTF8_SUPPORT),yes)
@@ -18,7 +18,7 @@
      CPPFLAGS+=-DUTF8_SUPPORT
  else
      LDFLAGS+=-lpanel -lncurses -lutil -lm
-@@ -70,7 +70,7 @@
+@@ -74,7 +74,7 @@ install: multitail
  	### YOURSELF WITH THE NEW FILE
  	#
  	$(INSTALL_DIR) $(DESTDIR)$(CONFIG_DIR)

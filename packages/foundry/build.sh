@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A blazing fast, portable and modular toolkit for Ethereu
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.8.5"
+TERMUX_PKG_VERSION="1.9.0"
 # The Solidity compilers bundled with the package.
 TERMUX_PKG_SOLC_VERSIONS=(
 	0.8.28
@@ -17,7 +17,11 @@ TERMUX_PKG_SOLC_VERSIONS=(
 	0.8.36
 	0.8.37
 )
-TERMUX_PKG_SOLC_SHA256=(
+TERMUX_PKG_SRCURL=(
+	"https://github.com/foundry-rs/foundry/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	06e1a9f00435384126c20638dd50c7df6b50eccbc09ff2cf0deb502ad10d1228
 	ec756e30f26a5a38d028fd6f401ef0a7f5cfbf4a1ce71f76c2e3e1ffb8730672
 	fe76237f513b7d6727a93cd5b83f92747650c8dc5f8f89457a41e8f54119ed38
 	5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d
@@ -29,18 +33,12 @@ TERMUX_PKG_SOLC_SHA256=(
 	458c525af3a7bc1b5599e1a125cce960631ab8b3e7110c7ed4c9bbf34157fb86
 	705306af6d6e0f4da04b4de7be22a5d7b87a90af0901170e726d8d97b342fcf8
 )
-TERMUX_PKG_SRCURL=(
-	"https://github.com/foundry-rs/foundry/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-)
-TERMUX_PKG_SHA256=(
-	d46e735386a93ee793d377f0e857353781fa945b3a7c449916853bf40d95f702
-)
 for _solc_version in "${TERMUX_PKG_SOLC_VERSIONS[@]}"; do
 	TERMUX_PKG_SRCURL+=("https://github.com/argotorg/solidity/releases/download/v${_solc_version}/solidity_${_solc_version}.tar.gz")
 done
-TERMUX_PKG_SHA256+=("${TERMUX_PKG_SOLC_SHA256[@]}")
 unset _solc_version
 TERMUX_PKG_DEPENDS="libiconv, ca-certificates, zlib, openssl, libssh2, pcre2, libgit2, boost, libc++"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_DEPENDS="boost-headers, fmt, nlohmann-json, range-v3"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -277,6 +275,9 @@ termux_step_make() {
 		printf '}}'
 	} > "$release_list"
 	export SVM_RELEASES_LIST_JSON="$release_list"
+
+	# jitterentropy needs -O0, which -Oz in CFLAGS overrides
+	export AWS_LC_SYS_NO_JITTER_ENTROPY=1
 
 	cargo build \
 		--bin forge \

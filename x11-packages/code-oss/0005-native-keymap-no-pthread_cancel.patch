@@ -1,7 +1,6 @@
-diff -uNr a/node-native-keymap-src/src/keyboard_x.cc b/node-native-keymap-src/src/keyboard_x.cc
 --- a/node-native-keymap-src/src/keyboard_x.cc
 +++ b/node-native-keymap-src/src/keyboard_x.cc
-@@ -351,7 +353,11 @@
+@@ -351,7 +351,11 @@ void* ListenToXEvents(void *arg) {
    struct timeval tv;
    int x11_fd = ConnectionNumber(display);
  
@@ -13,7 +12,7 @@ diff -uNr a/node-native-keymap-src/src/keyboard_x.cc b/node-native-keymap-src/sr
      // See https://stackoverflow.com/a/8592969 which explains
      // the technique of waiting for an XEvent with a timeout
  
-@@ -395,7 +405,11 @@
+@@ -395,7 +399,11 @@ void RegisterKeyboardLayoutChangeListenerImpl(NotificationCallbackData *data) {
  }
  
  void DisposeKeyboardLayoutChangeListenerImpl(NotificationCallbackData *data) {
@@ -25,7 +24,6 @@ diff -uNr a/node-native-keymap-src/src/keyboard_x.cc b/node-native-keymap-src/sr
    void *res;
    pthread_join(data->tid, &res);
  }
-diff -uNr a/node-native-keymap-src/src/keymapping.h b/node-native-keymap-src/src/keymapping.h
 --- a/node-native-keymap-src/src/keymapping.h
 +++ b/node-native-keymap-src/src/keymapping.h
 @@ -12,6 +12,9 @@
@@ -38,7 +36,7 @@ diff -uNr a/node-native-keymap-src/src/keymapping.h b/node-native-keymap-src/src
  #if defined(__unix__)
  #include <pthread.h>
  #endif
-@@ -41,6 +44,9 @@
+@@ -41,6 +44,9 @@ typedef struct {
  #if defined(_WIN32)
    void* listener;
  #endif

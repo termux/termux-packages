@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://libplacebo.org/
 TERMUX_PKG_DESCRIPTION="Reusable library for GPU-accelerated video/image rendering"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.360.1"
+TERMUX_PKG_VERSION="7.387.0"
 TERMUX_PKG_SRCURL="https://code.videolan.org/videolan/libplacebo/-/archive/v${TERMUX_PKG_VERSION}/libplacebo-v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=14c0a99f4b01557ec9826ce6b1d52f6de21be274ba03fd5aab7307f18766dc39
+TERMUX_PKG_SHA256=3bf5d72786682c194387c33d563872f6bfe202a9816f9dde6535a31a9b2e0d74
 TERMUX_PKG_DEPENDS="littlecms, glslang, python, vulkan-icd"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='(?<=^v)\d+\.\d+\.\d+$'
@@ -37,7 +37,7 @@ termux_step_pre_configure() {
 termux_step_post_massage() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after SOVERSION is changed.
-	if [ ! -e "lib/libplacebo.so.360" ]; then
+	if [ ! -e "lib/libplacebo.so.387" ]; then
 		termux_error_exit "SOVERSION guard check failed."
 	fi
 

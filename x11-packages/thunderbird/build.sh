@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.thunderbird.net
 TERMUX_PKG_DESCRIPTION="Standalone mail and news reader from mozilla.org"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="157.0.1"
+TERMUX_PKG_VERSION="159.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/thunderbird/releases/${TERMUX_PKG_VERSION#*really}/source/thunderbird-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
-TERMUX_PKG_SHA256=f4f46de621d44ab7718a5878e0fcaff136e13f0f326db657c38953dc0151a1e8
-TERMUX_PKG_DEPENDS="botan3, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxrandr, libxtst, pango, pulseaudio, zlib"
+TERMUX_PKG_SHA256=b4cbc4e010deaa66a51a5c647586c8dc41579c136155fe8baa8253f7c8b3927e
+TERMUX_PKG_DEPENDS="botan3, dbus, ffmpeg, fontconfig, freetype, gdk-pixbuf, glib, gtk3, libandroid-shmem, libandroid-spawn, libc++, libcairo, libevent, libffi, libice, libicu, libjpeg-turbo, libnspr, libnss, libotr, libpixman, libsm, libvpx, libwayland, libwebp, libx11, libxcb, libxcomposite, libxdamage, libxext, libxfixes, libxkbcommon, libxrandr, libxtst, pango, pulseaudio, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libcpufeatures, libice, libsm"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -77,13 +78,25 @@ termux_step_pre_configure() {
 
 	# https://reviews.llvm.org/D141184
 	CXXFLAGS+=" -U__ANDROID__ -D_LIBCPP_HAS_NO_C11_ALIGNED_ALLOC"
-	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog"
+	LDFLAGS+=" -landroid-shmem -landroid-spawn -llog -ldbus-1"
 
 	if [[ "$TERMUX_ARCH" == "arm" ]]; then
 		export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_RUSTFLAGS+=" -C link-arg=-Wl,--threads=1"
 		# For symbol android_getCpuFeatures
 		LDFLAGS+=" -l:libndk_compat.a"
 	fi
+
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		CXXFLAGS+=" -DLIBYUV_DISABLE_X86"
+	fi
+
+	mkdir -p "$TERMUX_PKG_TMPDIR/host-pkgconfig"
+	cat > "$TERMUX_PKG_TMPDIR/host-pkgconfig/dbus-1.pc" <<-EOF
+	Name: dbus-1
+	Description: dbus
+	Version: 1.16.0
+	EOF
+	export HOST_PKG_CONFIG_PATH="$TERMUX_PKG_TMPDIR/host-pkgconfig"
 
 	# vendor crates that otherwise cause 'error: failed to calculate checksum of... .gitmodules'
 	# when '--frozen' is removed because the thunderbird archive doesn't contain any .gitmodules files

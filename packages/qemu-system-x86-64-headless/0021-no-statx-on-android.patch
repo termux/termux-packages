@@ -1,0 +1,13 @@
+statx() was added to bionic in API level 30, but Termux builds with API level 24.
+
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -427,7 +427,7 @@ static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
+     bs->bl.request_alignment = 0;
+     s->buf_align = 0;
+ 
+-#if defined(__linux__) && defined(STATX_DIOALIGN)
++#if defined(__linux__) && defined(STATX_DIOALIGN) && !defined(__ANDROID__)
+     struct statx stx;
+ 
+     /*

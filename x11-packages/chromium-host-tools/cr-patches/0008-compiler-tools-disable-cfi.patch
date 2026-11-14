@@ -1,0 +1,11 @@
+--- a/tools/generate_library_loader/generate_library_loader.py
++++ b/tools/generate_library_loader/generate_library_loader.py
+@@ -232,7 +232,7 @@
+     'class_name': options.name,
+     'member_decls': ''.join(member_decls),
+     'cfi_unchecked_callee_define': (
+-      '#if defined(__clang__)\n'
++      '#if defined(__clang__) && !defined(__ANDROID__)\n'
+       '#if !__has_attribute(cfi_unchecked_callee)\n'
+       '#error cfi_unchecked_callee requires a newer Clang\n'
+       '#endif\n'

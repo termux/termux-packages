@@ -1,0 +1,53 @@
+--- a/src/if_perl.xs
++++ b/src/if_perl.xs
+@@ -234,18 +234,15 @@ typedef int perl_key;
+ # else
+ #  define Perl_sv_2bool dll_Perl_sv_2bool
+ # endif
+-# define Perl_sv_2iv dll_Perl_sv_2iv
+ # define Perl_sv_2mortal dll_Perl_sv_2mortal
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 8)
+ #  define Perl_sv_2pv_flags dll_Perl_sv_2pv_flags
+-#  define Perl_sv_2pv_nolen dll_Perl_sv_2pv_nolen
+ # else
+ #  define Perl_sv_2pv dll_Perl_sv_2pv
+ # endif
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 32)
+ #  define Perl_sv_2pvbyte_flags dll_Perl_sv_2pvbyte_flags
+ # endif
+-# define Perl_sv_2pvbyte dll_Perl_sv_2pvbyte
+ # define Perl_sv_bless dll_Perl_sv_bless
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 8)
+ #  define Perl_sv_catpvn_flags dll_Perl_sv_catpvn_flags
+@@ -397,15 +394,12 @@ static void (*Perl_xs_apiversion_bootcheck)(pTHX_ SV *module, const char *api_p,
+ # else
+ static bool (*Perl_sv_2bool)(pTHX_ SV*);
+ # endif
+-static IV (*Perl_sv_2iv)(pTHX_ SV*);
+ static SV* (*Perl_sv_2mortal)(pTHX_ SV*);
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 8)
+ static char* (*Perl_sv_2pv_flags)(pTHX_ SV*, STRLEN* const, const U32);
+-static char* (*Perl_sv_2pv_nolen)(pTHX_ SV*);
+ # else
+ static char* (*Perl_sv_2pv)(pTHX_ SV*, STRLEN*);
+ # endif
+-static char* (*Perl_sv_2pvbyte)(pTHX_ SV*, STRLEN*);
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 32)
+ static char* (*Perl_sv_2pvbyte_flags)(pTHX_ SV*, STRLEN* const, const U32);
+ # endif
+@@ -561,15 +555,12 @@ static struct {
+ # else
+     {"Perl_sv_2bool", (PERL_PROC*)&Perl_sv_2bool},
+ # endif
+-    {"Perl_sv_2iv", (PERL_PROC*)&Perl_sv_2iv},
+     {"Perl_sv_2mortal", (PERL_PROC*)&Perl_sv_2mortal},
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 8)
+     {"Perl_sv_2pv_flags", (PERL_PROC*)&Perl_sv_2pv_flags},
+-    {"Perl_sv_2pv_nolen", (PERL_PROC*)&Perl_sv_2pv_nolen},
+ # else
+     {"Perl_sv_2pv", (PERL_PROC*)&Perl_sv_2pv},
+ # endif
+-    {"Perl_sv_2pvbyte", (PERL_PROC*)&Perl_sv_2pvbyte},
+ # if (PERL_REVISION == 5) && (PERL_VERSION >= 32)
+     {"Perl_sv_2pvbyte_flags", (PERL_PROC*)&Perl_sv_2pvbyte_flags},
+ # endif

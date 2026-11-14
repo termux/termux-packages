@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://bitbucket.org/mpyne/game-music-emu/wiki/Home
+TERMUX_PKG_HOMEPAGE="https://github.com/libgme/game-music-emu"
 TERMUX_PKG_DESCRIPTION="A collection of video game music file emulators"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"

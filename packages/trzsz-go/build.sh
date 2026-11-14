@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A simple file transfer tools, similar to lrzsz ( rz / sz
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/trzsz/trzsz-go/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6577fbab008264ff4678f60f56a0dea1e68763064a638eaf54e560198a5e6fd3
 TERMUX_PKG_RECOMMENDS='trzsz-ssh'

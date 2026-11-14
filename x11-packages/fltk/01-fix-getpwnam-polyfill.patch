@@ -1,0 +1,13 @@
+--- a/src/drivers/Posix/Fl_Posix_System_Driver.cxx
++++ b/src/drivers/Posix/Fl_Posix_System_Driver.cxx
+@@ -84,7 +84,10 @@ int Fl_Posix_System_Driver::file_type(const char *filename)
+   return filetype;
+ }
+ 
++#pragma push_macro("getpwnam")
++#undef getpwnam
+ const char *Fl_Posix_System_Driver::getpwnam(const char *login) {
++#pragma pop_macro("getpwnam")
+   struct passwd *pwd;
+   pwd = ::getpwnam(login);
+   return pwd ? pwd->pw_dir : NULL;

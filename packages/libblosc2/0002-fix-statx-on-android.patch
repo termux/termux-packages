@@ -1,0 +1,11 @@
+--- a/blosc/frame.c
++++ b/blosc/frame.c
+@@ -150,7 +150,7 @@ static void reader_cache_return(void) {
+    file's dirty pages to the server -- a synchronous round trip on every header
+    read while the frame is being written through its cached writer. */
+ static int file_identity(int fd, const char* path, uint64_t* dev, uint64_t* ino) {
+-#if defined(__linux__) && defined(STATX_INO)
++#if defined(__linux__) && defined(STATX_INO) && !defined(__ANDROID__)
+   struct statx stx;
+   int rc = path == NULL ? statx(fd, "", AT_EMPTY_PATH, STATX_INO, &stx)
+                         : statx(AT_FDCWD, path, 0, STATX_INO, &stx);

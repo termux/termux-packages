@@ -19,12 +19,12 @@ Lua portion adapted from https://github.com/termux/termux-packages/blob/master/p
  	e = (e == -1); }
 --- a/src/filesys.cpp
 +++ b/src/filesys.cpp
-@@ -439,7 +439,7 @@ std::string TempPath()
- #ifdef DISABLING_THIS_BECAUSE_IT_IS_FOR_BUILDING_AN_APK
- 	return porting::path_cache;
+@@ -352,7 +352,7 @@ std::string TempPath()
+ #ifdef P_tmpdir
+ 	return P_tmpdir;
  #else
 -	return DIR_DELIM "tmp";
 +	return "@TERMUX_PREFIX@" DIR_DELIM "tmp";
  #endif
+ #endif
  }
- 

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="LinCity NG is a city building game based on the classic 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@IntinteDAO"
 TERMUX_PKG_VERSION="2.15.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lincity-ng/lincity-ng/archive/refs/tags/lincity-ng-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=67ef6ef13d3b971db69653742a112bf3d343380834c7d777fd082d5f42fa2bb4
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"

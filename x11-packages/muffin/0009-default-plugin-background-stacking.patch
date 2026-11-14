@@ -1,0 +1,18 @@
+Fixes the default plugin painting an empty screen with muffin 6.8.0.
+
+meta_compositor_sync_stack() lowers every window actor to the bottom of
+window_group, below the plugin's background group that start() inserted
+there, so the background ends up above all windows. Parent the group to
+the bottom window group, which is kept below the windows.
+
+--- a/src/compositor/plugins/default.c
++++ b/src/compositor/plugins/default.c
+@@ -411,7 +411,7 @@ start (MetaPlugin *plugin)
+   MetaMonitorManager *monitor_manager = meta_monitor_manager_get ();
+ 
+   self->priv->background_group = clutter_actor_new ();
+-  clutter_actor_insert_child_below (meta_get_window_group_for_display (display),
++  clutter_actor_insert_child_below (meta_get_bottom_window_group_for_display (display),
+                                     self->priv->background_group, NULL);
+ 
+   g_signal_connect (monitor_manager, "monitors-changed",

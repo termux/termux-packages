@@ -1,0 +1,14 @@
+Disables use of pthread_getname_np() on Android, which does not have
+that function until API level 26 (Android 8.0)
+
+--- a/src/runtime/interr.c
++++ b/src/runtime/interr.c
+@@ -97,7 +97,7 @@ void set_lossage_handler(void (*handler)(void))
+ }
+ 
+ void print_pthread_self_name() {
+-#if (defined LISP_FEATURE_LINUX || defined LISP_FEATURE_DARWIN) && defined LISP_FEATURE_SB_THREAD
++#if (defined LISP_FEATURE_LINUX || defined LISP_FEATURE_DARWIN) && defined LISP_FEATURE_SB_THREAD && !defined LISP_FEATURE_ANDROID
+     char name[64];
+     int r = pthread_getname_np(pthread_self(), name, sizeof name);
+     if (r == 0 && strlen(name)) {

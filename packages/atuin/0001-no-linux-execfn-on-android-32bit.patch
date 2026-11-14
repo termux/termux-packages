@@ -1,0 +1,13 @@
+rustix::param::linux_execfn() is not available on 32-bit Android.
+
+--- a/crates/atuin-common/src/os/process.rs
++++ b/crates/atuin-common/src/os/process.rs
+@@ -31,7 +31,7 @@ pub fn current_exe() -> PathBuf {
+     let exe = std::env::current_exe();
+     // Without `/proc`, std can't read `/proc/self/exe`. `AT_EXECFN` is the path the executable was
+     // run from, relative if that was.
+-    #[cfg(any(target_os = "linux", target_os = "android"))]
++    #[cfg(any(target_os = "linux", all(target_os = "android", target_pointer_width = "64")))]
+     let exe = exe.or_else(|_| {
+         use std::os::unix::ffi::OsStrExt as _;
+ 

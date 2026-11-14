@@ -215,19 +215,19 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 		}
 
 		fragment workflowRun on Commit {
-			checkSuites(first: 32) { nodes { workflowRun { event file { path } databaseId } conclusion status } }
+			checkSuites(first: 32) { nodes { workflowRun { event file { path } databaseId } conclusion status checkRuns(first: 16) { nodes { name conclusion } } } }
 		}"
 
 		RESPONSE="$(graphql_request "$WORKFLOW_PR_QUERY" || infoexit "Failed to perform GraphQL request, not performing CI fast path")"
 
-		# Obtain the most recent, related, successful `packages.yml` workflow run.
+		# Obtain the most recent, related `packages.yml` workflow run whose build jobs all succeeded.
 		WORKFLOW_ID="$(
 			jq -r '[.data.repository.object?.checkSuites?.nodes[]?
 				| select(
 				.workflowRun.event == "pull_request"
 				and .workflowRun.file.path == ".github/workflows/packages.yml"
-				and .conclusion == "SUCCESS"
-				and .status == "COMPLETED")
+				and .status == "COMPLETED"
+				and ([.checkRuns.nodes[]? | select(.name | startswith("build ("))] | length > 0 and all(.conclusion == "SUCCESS")))
 				| .workflowRun.databaseId][0] // empty' <<< "$RESPONSE" || :
 		)"
 		if [[ -n "${WORKFLOW_ID}" ]]; then
@@ -267,21 +267,21 @@ readarray -t COMMITS < <(git rev-list --no-merges "$OLD_COMMIT..$HEAD_COMMIT" ||
 	}
 
 	fragment workflowRun on Commit {
-		checkSuites(first: 32) { nodes { workflowRun { event file { path } databaseId } conclusion status } }
+		checkSuites(first: 32) { nodes { workflowRun { event file { path } databaseId } conclusion status checkRuns(first: 16) { nodes { name conclusion } } } }
 	}"
 
 	RESPONSE="$(graphql_request "$WORKFLOW_COMMITS_QUERY" || infoexit "Failed to perform GraphQL request, not performing CI fast path")"
 
 	# git rev-list prints commits in chronologically descending order, so we can check them as is.
 	for commit in "${COMMITS[@]}"; do
-		# Get the most recent successful `packages.yml` workflow run for this commit if any
+		# Get the most recent `packages.yml` workflow run for this commit whose build jobs all succeeded, if any
 		WORKFLOW_ID="$(
 			jq -r '[.data.repository["_'"${commit::7}"'"].checkSuites?.nodes[]?
 				| select(
 					.workflowRun.event == "pull_request" and
 					.workflowRun.file.path == ".github/workflows/packages.yml" and
-					.conclusion == "SUCCESS" and
-					.status == "COMPLETED"
+					.status == "COMPLETED" and
+					([.checkRuns.nodes[]? | select(.name | startswith("build ("))] | length > 0 and all(.conclusion == "SUCCESS"))
 				) | .workflowRun.databaseId][0] // empty' <<< "$RESPONSE"
 		)"
 		# No need to go on if we found a match.

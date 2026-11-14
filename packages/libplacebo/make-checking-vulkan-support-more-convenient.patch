@@ -3,7 +3,7 @@ making troubleshooting Vulkan problems in libplacebo on Termux more accessible.
 
 --- a/src/vulkan/context.c
 +++ b/src/vulkan/context.c
-@@ -937,7 +937,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+@@ -1008,7 +1008,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
  {
      // Hack for the VK macro's logging to work
      struct { pl_log log; } *vk = (void *) &log;
@@ -12,7 +12,7 @@ making troubleshooting Vulkan problems in libplacebo on Termux more accessible.
  
      pl_assert(params->instance);
      VkInstance inst = params->instance;
-@@ -984,13 +984,13 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+@@ -1055,13 +1055,13 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
          GetPhysicalDeviceProperties2(devices[i], &prop);
          VkPhysicalDeviceType t = prop.properties.deviceType;
          const char *dtype = t < PL_ARRAY_SIZE(types) ? types[t].name : "unknown?";
@@ -29,7 +29,7 @@ making troubleshooting Vulkan problems in libplacebo on Termux more accessible.
                  continue;
              }
          }
-@@ -1000,7 +1000,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+@@ -1071,7 +1071,7 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
                  dev = devices[i];
                  continue;
              } else {
@@ -38,7 +38,7 @@ making troubleshooting Vulkan problems in libplacebo on Termux more accessible.
                  continue;
              }
          } else if (params->device_name && params->device_name[0] != '\0') {
-@@ -1008,18 +1008,18 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
+@@ -1079,18 +1079,18 @@ VkPhysicalDevice pl_vulkan_choose_device(pl_log log,
                  dev = devices[i];
                  continue;
              } else {

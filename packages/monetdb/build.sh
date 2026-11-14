@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance database kernel for query-intensive a
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="11.55.9"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://www.monetdb.org/downloads/sources/archive/MonetDB-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c2edb5a930fc0c5aaf7fe1cac34be2bb125a1e52ee5fbdf1df9a993cc526cffe
 TERMUX_PKG_AUTO_UPDATE=true
@@ -27,5 +28,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
+	termux_setup_python_pip
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPython3_EXECUTABLE=$(command -v cross-python)"
+
 	LDFLAGS+=" -landroid-sysv-semaphore -lm"
 }

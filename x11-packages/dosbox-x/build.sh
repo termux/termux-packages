@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform DOS emulator based on the DOSBox projec
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2026.10.01"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/joncampbell123/dosbox-x/archive/refs/tags/dosbox-x-v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=df023a6c0e4a139dcbd60befff5947e0db2cc68e4e79db463670f581a4044ed4
 TERMUX_PKG_DEPENDS="dosbox-x-data, fluidsynth, freetype, libandroid-posix-semaphore, libc++, libiconv, libpcap, libpng, libslirp, libx11, libxkbfile, libxrandr, opengl, sdl2 | sdl2-compat, sdl2-net, zlib"
@@ -14,7 +15,6 @@ ac_cv_path_SDL2_CONFIG=$TERMUX_PREFIX/bin/sdl2-config
 --enable-sdl2
 --disable-alsa-midi
 --disable-dynamic-x86
---disable-fpu-x86
 --disable-unaligned-memory
 --disable-avcodec
 "

@@ -182,7 +182,7 @@ termux_create_pacman_subpackages() {
 				COMPRESS=(bzip2 -c -f)
 				PKG_FORMAT="bz2";;
 			"zstd")
-				COMPRESS=(zstd -c -z -q -)
+				COMPRESS=(zstd -c -z -q -T"$TERMUX_PKG_MAKE_PROCESSES" -)
 				PKG_FORMAT="zst";;
 			"lrzip")
 				COMPRESS=(lrzip -q)

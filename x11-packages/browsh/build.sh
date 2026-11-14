@@ -1,8 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://www.brow.sh/
+TERMUX_PKG_HOMEPAGE="https://www.brow.sh/"
 TERMUX_PKG_DESCRIPTION="A fully-modern text-based browser, rendering to TTY and browsers"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/browsh-org/browsh/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 	"https://github.com/browsh-org/browsh/releases/download/v$TERMUX_PKG_VERSION/browsh-$TERMUX_PKG_VERSION.xpi"

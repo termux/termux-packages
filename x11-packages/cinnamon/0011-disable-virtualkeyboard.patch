@@ -1,8 +1,6 @@
-diff --git a/js/ui/ibusCandidatePopup.js b/js/ui/ibusCandidatePopup.js
-index c4048e3..7f0dedb 100644
 --- a/js/ui/ibusCandidatePopup.js
 +++ b/js/ui/ibusCandidatePopup.js
-@@ -260,12 +260,12 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
+@@ -359,12 +359,12 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
              for (let i = 0; (indexLabel = lookupTable.get_label(i)); ++i)
                  indexes.push(indexLabel.get_text());
  
@@ -17,16 +15,16 @@ index c4048e3..7f0dedb 100644
                      let index = i;
                      this._panelService.candidate_clicked(index, 1, 0);
                  });
-@@ -288,7 +288,7 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
-         });
+@@ -388,7 +388,7 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
          panelService.connect('focus-out', () => {
+             this._loseTextFocus();
              this.close(BoxPointer.PopupAnimation.NONE);
 -            Main.virtualKeyboardManager.resetSuggestions();
 +            if (Main.virtualKeyboardManager) Main.virtualKeyboardManager.resetSuggestions();
          });
      }
  
-@@ -301,7 +301,7 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
+@@ -434,7 +434,7 @@ class IbusCandidatePopup extends BoxPointer.BoxPointer {
      }
  
      _updateVisibility() {
@@ -35,11 +33,9 @@ index c4048e3..7f0dedb 100644
                           (this._preeditText.visible ||
                            this._auxText.visible ||
                            this._candidateArea.visible);
-diff --git a/js/ui/main.js b/js/ui/main.js
-index e5f8daa..1b9077e 100644
 --- a/js/ui/main.js
 +++ b/js/ui/main.js
-@@ -100,7 +100,7 @@ var AppletManager = imports.ui.appletManager;
+@@ -102,7 +102,7 @@ var AppletManager = imports.ui.appletManager;
  const SearchProviderManager = imports.ui.searchProviderManager;
  const DeskletManager = imports.ui.deskletManager;
  const ExtensionSystem = imports.ui.extensionSystem;
@@ -48,19 +44,10 @@ index e5f8daa..1b9077e 100644
  const MessageTray = imports.ui.messageTray;
  const OsdWindow = imports.ui.osdWindow;
  const Overview = imports.ui.overview;
-@@ -175,7 +175,7 @@ var magnifier = null;
- var locatePointer = null;
- var xdndHandler = null;
- var statusIconDispatcher = null;
--var virtualKeyboardManager = null;
-+// var virtualKeyboardManager = null;
- var inputMethod = null;
- var layoutManager = null;
- var networkAgent = null;
-@@ -520,13 +520,13 @@ function start() {
-     keyboardManager = new KeyboardManager();
-     inputMethod = new InputMethod.InputMethod();
-     Clutter.get_default_backend().set_input_method(inputMethod);
+@@ -609,13 +609,13 @@ function start() {
+             inputMethod = new InputMethod.InputMethod();
+         Clutter.get_default_backend().set_input_method(inputMethod);
+     }
 -    virtualKeyboardManager = new VirtualKeyboard.VirtualKeyboardManager();
 -    virtualKeyboardManager.connect("enabled-changed", () => {
 -        if (runDialog !== null) {
@@ -76,13 +63,27 @@ index e5f8daa..1b9077e 100644
 +    //     }
 +    // });
  
-     Promise.all([
-         AppletManager.init(),
-diff --git a/js/ui/popupMenu.js b/js/ui/popupMenu.js
-index 495a01f..3b48b76 100644
+     screensaverController = new ScreensaverController.ScreensaverController();
+ 
+@@ -2044,7 +2044,7 @@ function restartCinnamon(showOsd = false) {
+         return false;
+     });
+ 
+-    virtualKeyboardManager.destroyKeyboard();
++    virtualKeyboardManager?.destroyKeyboard();
+ 
+     global.reexec_self();
+ }
+@@ -2074,5 +2074,5 @@ function closeEndSessionDialog() {
+ 
+ function toggleKeyboard() {
+     if (!screensaverController?.toggleScreensaverKeyboard())
+-        virtualKeyboardManager.manualToggle();
++        virtualKeyboardManager?.manualToggle();
+ }
 --- a/js/ui/popupMenu.js
 +++ b/js/ui/popupMenu.js
-@@ -3667,7 +3667,7 @@ var PopupMenuManager = class PopupMenuManager {
+@@ -2945,7 +2945,7 @@ var PopupMenuManager = class PopupMenuManager {
          if (!this.grabbed)
              return false;
  

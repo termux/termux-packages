@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://librdf.org/
+TERMUX_PKG_HOMEPAGE="https://librdf.org/"
 TERMUX_PKG_DESCRIPTION="Library that provides a high-level interface to RDF data"
 TERMUX_PKG_LICENSE="LGPL-2.1, Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"

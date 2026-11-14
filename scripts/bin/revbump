@@ -30,15 +30,15 @@ def is_dep(DEP: str, line: str) -> bool:
     """
     Checks if the dep is in line
     """
-    tmp_deps = line.split("=")[1]
+    tmp_deps = line.split("=", 1)[1]
     if tmp_deps.startswith('"'):
-        deps = [dep.strip() for dep in tmp_deps.split('"')[1].split(",")]
+        deps = tmp_deps.split('"')[1].split(",")
     elif tmp_deps.startswith("'"):
-        deps = [dep.strip() for dep in tmp_deps.split("'")[1].split(",")]
+        deps = tmp_deps.split("'")[1].split(",")
     else:
         deps = [tmp_deps]
 
-    return DEP in deps
+    return DEP in [dep.split("(")[0].strip() for dep in deps]
 
 
 def get_build_dependent_files(folders: list, DEP: str) -> list:
