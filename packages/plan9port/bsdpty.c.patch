@@ -1,0 +1,14 @@
+--- a/src/cmd/9term/bsdpty.c
++++ b/src/cmd/9term/bsdpty.c
+@@ -5,9 +5,11 @@
+ #include <errno.h>
+ #include <grp.h>
+ #include <termios.h>
++#ifndef __ANDROID__
+ #ifdef HAS_SYS_TERMIOS
+ #include <sys/termios.h>
+ #endif
++#endif
+ #ifdef __linux__
+ #include <pty.h>
+ #endif

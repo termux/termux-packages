@@ -1,0 +1,30 @@
+--- a/include/libc.h
++++ b/include/libc.h
+@@ -406,17 +406,19 @@ extern	void	perror(const char*);
+ extern	int	postnote(int, int, char *);
+ extern	double	p9pow10(int);
+ /* extern	int	putenv(char*, char*); <stdlib.h. */
+-/* extern	void	qsort(void*, long, long, int (*)(void*, void*)); <stdlib.h> */
++#ifdef _STDLIB_H_P9P
++extern	void	qsort(void*, long, long, int (*)(const void*, const void*));
++#endif
+ extern	char*	searchpath(char*);
+ /* extern	int	p9setjmp(p9jmp_buf); */
+ #define p9setjmp(b)	sigsetjmp((void*)(b), 1)
+-/*
+- * <stdlib.h>
+-extern	long	strtol(char*, char**, int);
+-extern	ulong	strtoul(char*, char**, int);
+-extern	vlong	strtoll(char*, char**, int);
+-extern	uvlong	strtoull(char*, char**, int);
+- */
++#ifdef _STDLIB_H_P9P
++/* <stdlib.h> */
++extern	long	strtol(const char*, char**, int);
++extern	ulong	strtoul(const char*, char**, int);
++extern	vlong	strtoll(const char*, char**, int);
++extern	uvlong	strtoull(const char*, char**, int);
++#endif
+ extern	void	sysfatal(char*, ...);
+ extern	void	p9syslog(int, char*, char*, ...);
+ extern	long	p9time(long*);
