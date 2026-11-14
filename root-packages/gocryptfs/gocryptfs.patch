@@ -1,5 +1,5 @@
 diff --git a/main.go b/main.go
-index cd643b5..23921ab 100644
+index 62a7985..cf4640f 100644
 --- a/main.go
 +++ b/main.go
 @@ -133,7 +133,7 @@ func main() {
@@ -12,10 +12,19 @@ index cd643b5..23921ab 100644
  	// Show microseconds in go-fuse debug output (-fusedebug)
  	log.SetFlags(log.Lmicroseconds)
 diff --git a/mount.go b/mount.go
-index 5c0f064..b4a443f 100644
+index 489ae31..e19ea0c 100644
 --- a/mount.go
 +++ b/mount.go
-@@ -518,7 +518,7 @@ func initGoFuse(rootNode fs.InodeEmbedder, args *argContainer) *fuse.Server {
+@@ -524,7 +524,7 @@ func initGoFuse(rootNode fs.InodeEmbedder, args *argContainer) *fuse.Server {
+ 	// All FUSE file and directory create calls carry explicit permission
+ 	// information. We need an unrestricted umask to create the files and
+ 	// directories with the requested permissions.
+-	syscall.Umask(0000)
++	syscall.Umask(0o000)
+ 
+ 	return srv
+ }
+@@ -533,7 +533,7 @@ func initGoFuse(rootNode fs.InodeEmbedder, args *argContainer) *fuse.Server {
  func haveFusermount2() bool {
  	path, err := exec.LookPath("fusermount")
  	if err != nil {
