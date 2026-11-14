@@ -5,9 +5,9 @@ TERMUX_PKG_MAINTAINER="Jules Amonith <examosa@fastmail.com>"
 TERMUX_PKG_VERSION=0.8.0.2
 TERMUX_PKG_SRCURL="https://skarnet.org/software/s6-rc/s6-rc-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=2fc0fcfe1e74b404b132a978eb316668c8bcdbc1104b3b0fe702a3d2d76caef5
-TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="execline, s6, skalibs"
 TERMUX_PKG_BUILD_DEPENDS="execline-static, s6-static, skalibs-static"
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS='AR:=$(AR) RANLIB:=$(RANLIB) STRIP:=$(STRIP)'
 
