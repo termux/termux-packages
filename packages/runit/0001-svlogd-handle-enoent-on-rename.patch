@@ -1,0 +1,58 @@
+Avoid infinite pause loop in svlogd when current is missing.
+
+If 'current' was unlinked or deleted (e.g. during package management or
+cleanup), rename("current", ...) fails with ENOENT. Previously, svlogd
+would retry the rename indefinitely, pausing 3 seconds each time and
+never reading from its input pipe, eventually deadlocking the supervised
+service when the pipe buffer filled up.
+
+With this patch, if rename fails with ENOENT, svlogd assumes 'current' is
+already gone, breaks out of the rename loop, creates a new 'current' file,
+and continues reading from the pipe.
+
+--- a/src/svlogd.c
++++ b/src/svlogd.c
+@@ -295,6 +295,7 @@
+   }
+ 
+   if (ld->size > 0) {
++    int has_saved = 1;
+     buffer_flush(&ld->b);
+     while (fsync(ld->fdcur) == -1)
+       pause2("unable to fsync current logfile", ld->name);
+@@ -306,8 +307,13 @@
+       strerr_warn6(INFO, "rename: ", ld->name, "/current ",
+                    ld->fnsave, tmp, 0);
+     }
+-    while (rename("current", ld->fnsave) == -1)
++    while (rename("current", ld->fnsave) == -1) {
++      if (errno == error_noent) {
++        has_saved = 0;
++        break;
++      }
+       pause2("unable to rename current", ld->name);
++    }
+     while ((ld->fdcur =open_append("current")) == -1)
+       pause2("unable to create new current", ld->name);
+     coe(ld->fdcur);
+@@ -315,7 +321,7 @@
+     while (fchmod(ld->fdcur, 0644) == -1)
+       pause2("unable to set mode of current", ld->name);
+     rmoldest(ld);
+-    processorstart(ld);
++    if (has_saved) processorstart(ld);
+   }
+ 
+   while (fchdir(fdwdir) == -1)
+@@ -556,8 +562,10 @@
+         fmt_taia(ld->fnsave, &now);
+         errno =0;
+       } while ((stat(ld->fnsave, &st) != -1) || (errno != error_noent));
+-      while (rename("current", ld->fnsave) == -1)
++      while (rename("current", ld->fnsave) == -1) {
++        if (errno == error_noent) break;
+         pause2("unable to rename current", ld->name);
++      }
+       rmoldest(ld);
+       i =-1;
+     }
