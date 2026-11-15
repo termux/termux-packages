@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.4.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=b28bf4da1fce46dba9d16685c981b3d5e98de8db1b60d66f279b0bd2af2d8211
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob, openssl, libandroid-spawn"
@@ -62,14 +63,12 @@ termux_step_make() {
 			sed -i 's/arm64/amd64/g' makefile
 			;;
 	esac
-	export NIM_ARCH
 	CFLAGS+=" $CPPFLAGS -w -fno-strict-aliasing"
 	LDFLAGS+=" -landroid-glob -landroid-spawn"
 
 	for cmd in "${_NIM_TOOLS[@]}"; do
 		case "$cmd" in
 			"koch") nim_flags="--opt:size";;
-			"dist/nimble/src/nimble") nim_flags="-d:nimNimbleBootstrap";; # See: https://github.com/nim-lang/nimble/issues/1248
 			*) nim_flags="";;
 		esac
 		(
@@ -84,28 +83,19 @@ termux_step_make() {
 				-d:"tempDir:$TERMUX_PREFIX/tmp" \
 				-d:release \
 				-d:sslVersion=3 \
-				-l:"$LDFLAGS -landroid-glob" \
-				-t:"$CPPFLAGS $CFLAGS" \
+				-l:"$LDFLAGS" \
+				-t:"$CFLAGS" \
 				$nim_flags \
 				c \
 				"$(basename "$cmd").nim"
 		)
 	done
 
-	sed -i \
-		-e "s|@CC@|${CC}|g" \
-		-e "s|@CFLAGS@|${CFLAGS}|g" \
-		-e "s|@LDFLAGS@|${LDFLAGS}|g" \
-		-e "s|@CPPFLAGS@|${CPPFLAGS}|g" \
-		config/nim.cfg
-
 	make \
 		-j "$TERMUX_PKG_MAKE_PROCESSES" \
-		LD="$CC" \
 		mycpu="$NIM_ARCH" \
 		myos=android \
-		uos=linux \
-		useShPath="$TERMUX_PREFIX/bin/sh"
+		uos=linux
 }
 
 termux_step_make_install() {
