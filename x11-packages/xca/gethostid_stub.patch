@@ -1,0 +1,14 @@
+diff --git a/lib/func.cpp b/lib/func.cpp
+index 5f244368..49e748e0 100644
+--- a/lib/func.cpp
++++ b/lib/func.cpp
+@@ -364,6 +364,9 @@ QString hostId()
+ 			break;
+ 		}
+ 	}
++	#ifdef __ANDROID__
++	# define gethostid() (0L)
++	#endif
+ 	if (mach_id.isEmpty())
+ 		sprintf((char*)guid, "%ld", gethostid());
+ #endif
