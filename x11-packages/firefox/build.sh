@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Mozilla Firefox web browser"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="159.0.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://archive.mozilla.org/pub/firefox/releases/${TERMUX_PKG_VERSION#*really}/source/firefox-${TERMUX_PKG_VERSION#*really}.source.tar.xz"
 TERMUX_PKG_SHA256=b5fe407199685f8bddf3b2c81feb8b805429e6f3d307c9430f53456f85b6e063
 # ffmpeg and pulseaudio are dependencies through dlopen(3):
@@ -124,6 +124,7 @@ termux_step_make_install() {
 	./mach install
 
 	install -Dm644 -t "${TERMUX_PREFIX}/share/applications" "${TERMUX_PKG_BUILDER_DIR}/firefox.desktop"
+	sed -i "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" "${TERMUX_PREFIX}/share/applications/firefox.desktop"
 
 	# Install icons as Arch Linux does
 	local i theme=official
