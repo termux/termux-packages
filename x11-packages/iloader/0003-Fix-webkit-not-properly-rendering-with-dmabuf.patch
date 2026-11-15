@@ -1,0 +1,28 @@
+From 611ec1a99d263a3e87f40ff88dbd5d9b50b09e97 Mon Sep 17 00:00:00 2001
+From: alexytomi <60690056+alexytomi@users.noreply.github.com>
+Date: Sun, 29 Mar 2026 19:59:00 +0800
+Subject: [PATCH 3/3] Fix webkit not properly rendering with dmabuf
+
+Not setting this causes rendering to be very slow or just not happen
+---
+ src-tauri/src/main.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src-tauri/src/main.rs b/src-tauri/src/main.rs
+index 2417d18c..048160a1 100644
+--- a/src-tauri/src/main.rs
++++ b/src-tauri/src/main.rs
+@@ -11,6 +11,10 @@ fn main() {
+             }
+         }
+     }
++    #[cfg(target_os = "android")]
++    unsafe {
++        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
++    }
+ 
+     // To be quite honest, I have no idea how ring has made its way into the dependence tree in some cases.
+     rustls::crypto::aws_lc_rs::default_provider()
+-- 
+2.53.0
+
