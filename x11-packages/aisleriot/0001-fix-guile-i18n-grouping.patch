@@ -1,0 +1,56 @@
+--- a/src/sol.c
++++ b/src/sol.c
+@@ -104,6 +104,20 @@
+ 
+   g_set_application_name (data.freecell ? _("FreeCell Solitaire") : _("AisleRiot"));
+ 
++  /* Ensure Guile i18n number formatting does not fail on Bionic (missing GROUPING) */
++  scm_c_eval_string (
++    "(catch #t\n"
++    "  (lambda ()\n"
++    "    (use-modules (ice-9 i18n))\n"
++    "    (number->locale-string 0))\n"
++    "  (lambda _\n"
++    "    (false-if-exception\n"
++    "      (module-define! (resolve-module (quote (ice-9 i18n)))\n"
++    "                      (quote number->locale-string)\n"
++    "                      (lambda* (number #:optional (fraction-digits #t) (locale %global-locale))\n"
++    "                        (number->string number))))))\n"
++  );
++
+   aisleriot_conf_init ();
+ 
+   /* If we are asked for a specific game, check that it is valid. */
+--- a/games/api.scm
++++ b/games/api.scm
+@@ -18,6 +18,21 @@
+ 
+ (use-modules (aisleriot interface) (ice-9 format) (ice-9 i18n))
+ 
++;; Workaround for Guile on platforms without GROUPING in langinfo (e.g. Android Bionic)
++(catch #t
++  (lambda () (number->locale-string 0))
++  (lambda _
++    (false-if-exception
++      (module-define! (resolve-module (quote (ice-9 i18n)))
++                      (quote number->locale-string)
++                      (lambda* (number #:optional (fraction-digits #t) (locale %global-locale))
++                        (number->string number))))))
++
++(define (safe-number->locale-string n)
++  (catch #t
++    (lambda () (number->locale-string n))
++    (lambda _ (number->string n))))
++
+ ;; This is the encoding of strings returned from e.g. 'format',
+ ;; so we need to set this to "UTF-8" since that's what the C side
+ ;; of aisleriot expects.  Otherwise as per docs, guile sets this
+@@ -725,7 +740,7 @@
+ (define-public (set-score! value)
+   (begin
+     (set! SCORE value)
+-    (update-score (number->locale-string SCORE))
++    (update-score (safe-number->locale-string SCORE))
+     SCORE))
+ 
+ (define-public (get-score)
