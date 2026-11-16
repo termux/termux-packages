@@ -1,6 +1,6 @@
 --- a/blosc/frame.c
 +++ b/blosc/frame.c
-@@ -150,7 +150,7 @@ static void reader_cache_return(void) {
+@@ -176,7 +176,7 @@ static void reader_cache_return(void) {
     file's dirty pages to the server -- a synchronous round trip on every header
     read while the frame is being written through its cached writer. */
  static int file_identity(int fd, const char* path, uint64_t* dev, uint64_t* ino) {
@@ -9,3 +9,14 @@
    struct statx stx;
    int rc = path == NULL ? statx(fd, "", AT_EMPTY_PATH, STATX_INO, &stx)
                          : statx(AT_FDCWD, path, 0, STATX_INO, &stx);
+--- a/blosc/prefetch.c
++++ b/blosc/prefetch.c
+@@ -388,7 +388,7 @@ static bool backend_fd(const blosc2_io *io, void *fp, int *fd, const uint8_t **m
+    asked for (prefetch_set_populate()). */
+ #define FS_SEEN 4
+ static bool on_gpfs(int fd) {
+-#if defined(AT_STATX_DONT_SYNC) && defined(STATX_TYPE)
++#if defined(AT_STATX_DONT_SYNC) && defined(STATX_TYPE) && !defined(__ANDROID__)
+   static __thread struct {uint64_t dev; bool gpfs;} seen[FS_SEEN];
+   static __thread int nseen = 0;
+   static __thread int next = 0;
