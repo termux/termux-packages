@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://electrum.org
 TERMUX_PKG_DESCRIPTION="Electrum is a lightweight Bitcoin wallet"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="4.8.3"
+TERMUX_PKG_VERSION="4.8.4"
 TERMUX_PKG_SRCURL="https://download.electrum.org/$TERMUX_PKG_VERSION/Electrum-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=df41fa82e579f720a3859bff9de09dd98bb93079b01fa2973b73fdbdbfde7288
+TERMUX_PKG_SHA256=b3cbeefe37e84f62f6cec096eec28085d7a99097841eb96c9ee3e9bec20b0367
 # The python dependency list should be compared to
 # contrib/requirements/requirements.txt in upstream project on every
 # update (or at least every major update).
