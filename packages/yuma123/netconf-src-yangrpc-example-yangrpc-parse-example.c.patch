@@ -1,11 +1,13 @@
 --- a/netconf/src/yangrpc/example/yangrpc-parse-example.c
 +++ b/netconf/src/yangrpc/example/yangrpc-parse-example.c
-@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
+@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
+     char public_key[1024];
+     boolean autoload = TRUE;
  
-     res = yangrpc_init(NULL);
-     assert(res==NO_ERR);
--    res = yangrpc_connect("localhost"/*server*/, 830/*port*/, "vladimir"/*user*/,"mysecretpass"/*password*/,"/home/vladimir/.ssh/id_rsa.pub"/*public_key*/, "/home/vladimir/.ssh/id_rsa"/*private_key*/, NULL, &yangrpc_cb_ptr);
-+    res = yangrpc_connect("localhost"/*server*/, 830/*port*/, "vladimir"/*user*/,"mysecretpass"/*password*/,"@TERMUX_HOME@/.ssh/id_rsa.pub"/*public_key*/, "@TERMUX_HOME@/.ssh/id_rsa"/*private_key*/, NULL, &yangrpc_cb_ptr);
-     assert(res==NO_ERR);
+-    sprintf(private_key,"/home/%s/.ssh/id_rsa",user);
+-    sprintf(public_key,"/home/%s/.ssh/id_rsa.pub",user);
++    sprintf(private_key,"@TERMUX_HOME@/.ssh/id_rsa",user);
++    sprintf(public_key,"@TERMUX_HOME@/.ssh/id_rsa.pub",user);
  
-     res = yangrpc_parse_cli(yangrpc_cb_ptr, "xget /interfaces-state", &request_val);
+     while ((optc = getopt_long (argc, argv, "a:s:p:u:P:k:K", long_options, NULL)) != -1) {
+         switch (optc) {
