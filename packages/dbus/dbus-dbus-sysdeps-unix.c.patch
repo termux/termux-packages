@@ -1,6 +1,6 @@
 --- a/dbus/dbus-sysdeps-unix.c
 +++ b/dbus/dbus-sysdeps-unix.c
-@@ -144,7 +144,8 @@
+@@ -146,7 +146,8 @@
  
  #endif /* Solaris */
  
@@ -10,7 +10,7 @@
  /* The kernel headers are new enough to have the close_range syscall,
   * but glibc isn't new enough to have the syscall wrapper, so call the
   * syscall directly. */
-@@ -1958,9 +1958,11 @@
+@@ -1996,9 +1997,11 @@ add_groups_to_credentials (int              client_fd,
  #if defined(__linux__) && defined(SO_PEERGROUPS)
    _DBUS_STATIC_ASSERT (sizeof (gid_t) <= sizeof (dbus_gid_t));
    /* This function assumes socklen_t is unsigned, which is true on Linux */
@@ -24,7 +24,7 @@
    dbus_bool_t oom = FALSE;
    /* libdbus has a different representation of group IDs just to annoy you */
    dbus_gid_t *converted_gids = NULL;
-@@ -1974,8 +1976,9 @@
+@@ -2012,8 +2015,9 @@ add_groups_to_credentials (int              client_fd,
    if (buf == NULL)
      return FALSE;
  
