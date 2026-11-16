@@ -22,6 +22,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_configure() {
+	# Skarnet packages do *not* use GNU Autotools
+	# https://github.com/skarnet/s6-rc/blob/refs/tags/v0.8.0.2/configure
 	./configure \
 		--prefix="${TERMUX__PREFIX}" \
 		--host="${TERMUX_HOST_PLATFORM}" \
