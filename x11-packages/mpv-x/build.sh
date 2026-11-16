@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="Joshua Kahn <tom@termux.dev>"
 # Update both mpv and mpv-x to the same version in one PR.
-TERMUX_PKG_VERSION="0.41.0"
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_VERSION="0.42.0"
 TERMUX_PKG_SRCURL="https://github.com/mpv-player/mpv/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ee21092a5ee427353392360929dc64645c54479aefdb5babc5cfbb5fad626209
-TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, jack, libandroid-glob, libandroid-shmem, libarchive, libass, libbluray, libcaca, libdrm, libdvdnav, libiconv, libjpeg-turbo, libplacebo, libsixel, libuchardet, libwayland, libwayland-protocols, libx11, libxext, libxfixes, libxinerama, libxkbcommon, libxpresent, libxrandr, libxss, libzimg, littlecms, luajit, openal-soft, opengl, pipewire, pulseaudio, rubberband, vulkan-icd, zlib"
+TERMUX_PKG_SHA256=bcfebbfa2b65a6d88dc97ea18117831072373e38b5785a2afb874ed4df5070dd
+TERMUX_PKG_DEPENDS="alsa-lib, ffmpeg, jack, libandroid-glob, libandroid-shmem, libarchive, libass, libbluray, libcaca, libcurl, libdrm, libdvdnav, libiconv, libjpeg-turbo, libplacebo, libsixel, libuchardet, libwayland, libwayland-protocols, libx11, libxext, libxfixes, libxinerama, libxkbcommon, libxpresent, libxrandr, libxss, libzimg, littlecms, luajit, openal-soft, opengl, pipewire, pulseaudio, rubberband, vulkan-icd, zlib"
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-generic"
 TERMUX_PKG_CONFLICTS="mpv"
 TERMUX_PKG_REPLACES="mpv"
