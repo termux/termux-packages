@@ -3,7 +3,12 @@ TERMUX_PKG_DESCRIPTION="Terminal-based tool for monitoring the progress of data 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.12.7"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ivarch.com/programs/sources/pv-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5326ed7ee95ef18039390c0b17891ac28985ac7c7a4235070fab767c1fe37bd8
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-ipc -enable-copy-file-range"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-ipc
+--disable-static
+ac_cv_func_copy_file_range=yes
+"
