@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/westes/flex
 TERMUX_PKG_DESCRIPTION="Fast lexical analyser generator"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.6.4"
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="2.6.5"
 TERMUX_PKG_SRCURL="https://github.com/westes/flex/releases/download/v${TERMUX_PKG_VERSION}/flex-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995
+TERMUX_PKG_SHA256=4dfb3d6095c0cd58f050dd66fa132ad52c118c5ae26a4bddd916557720920769
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="m4"
 TERMUX_PKG_HOSTBUILD=true
@@ -34,4 +33,8 @@ termux_step_pre_configure() {
 	mkdir -p $TERMUX_PKG_BUILDDIR/src/
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/stage1flex $TERMUX_PKG_BUILDDIR/src/stage1flex
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/stage1flex
+
+	if [[ "$TERMUX_ON_DEVICE_BUILD" == "false" ]]; then
+		TERMUX_PKG_EXTRA_MAKE_ARGS+=" m4=$(command -v m4)"
+	fi
 }
