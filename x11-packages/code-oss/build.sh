@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.145.3"
+TERMUX_PKG_VERSION="1.146.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron43, libx11, libxkbfile, libsecret, ripgrep"
@@ -19,7 +19,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="latest-release-tag"
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 
-_setup_nodejs_24() {
+__setup_nodejs_24() {
 	local NODEJS_VERSION=24.22.2
 	local NODEJS_FOLDER=${TERMUX_PKG_CACHEDIR}/build-tools/nodejs-${NODEJS_VERSION}
 
@@ -32,6 +32,16 @@ _setup_nodejs_24() {
 		tar -xf "$NODEJS_TAR_FILE" -C "$NODEJS_FOLDER" --strip-components=1
 	fi
 	export PATH="$NODEJS_FOLDER/bin:$PATH"
+
+}
+
+__resolve_npm_arch() {
+	case "$TERMUX_ARCH" in
+		aarch64) echo arm64 ;;
+		arm	) echo arm ;;
+		x86_64 ) echo x64 ;;
+		*) termux_error_exit "Unsupported arch: $TERMUX_ARCH" ;;
+	esac
 }
 
 termux_step_post_get_source() {
@@ -71,36 +81,62 @@ termux_step_post_get_source() {
 	# https://gitlab.archlinux.org/archlinux/packaging/packages/code/-/commit/e050d3e8120e052cd7af19d2f67bcd36dc52e436
 	sed -r "s/\bsourcemap:\s*[\"'](inline|linked)[\"']/sourcemap: 'external'/" -i \
 		build/next/index.ts
+
+	# Append extraEnv for pnpm
+	python3 - <<PY
+import yaml
+
+files = [
+	"pnpm-workspace.yaml",
+	"extensions/pnpm-workspace.yaml",
+	"extensions/copilot/pnpm-workspace.yaml",
+]
+extra_env = {
+	"npm_config_arch": "$(__resolve_npm_arch)",
+	"npm_config_nodedir": "${TERMUX_PREFIX}/opt/electron43-host-tools/node_headers",
+}
+for path in files:
+	with open(path) as f:
+		data = yaml.safe_load(f)
+	data["extraEnv"] = extra_env
+	if path == "pnpm-workspace.yaml":
+		allow = data.setdefault("allowBuilds", {})
+		allow["@vscode/vsce-sign"] = True
+		allow["keytar"] = True
+		allow["native-keymap@file:node-native-keymap-src"] = True
+	with open(path, "w") as f:
+		yaml.safe_dump(data, f, sort_keys=False)
+PY
 }
 
 termux_step_host_build() {
-	_setup_nodejs_24
+	__setup_nodejs_24
 	export DISABLE_V8_COMPILE_CACHE=1
 	(unset PREFIX prefix
-	npm install node-gyp)
+	npm install pnpm@12.16.0)
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
 }
 
 termux_step_configure() {
-	_setup_nodejs_24
+	__setup_nodejs_24
 	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/node_modules/.bin:$PATH"
+}
+
+__resolve_code_arch() {
+	case "$TERMUX_ARCH" in
+		aarch64) echo arm64 ;;
+		arm	) echo armhf ;;
+		x86_64 ) echo x64 ;;
+		*) termux_error_exit "Unsupported arch: $TERMUX_ARCH" ;;
+	esac
 }
 
 termux_step_make() {
 	unset PREFIX prefix
 
-	if [ $TERMUX_ARCH = "arm" ]; then
-		export NPM_CONFIG_ARCH=arm
-		CODE_ARCH=armhf
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		export NPM_CONFIG_ARCH=x64
-		CODE_ARCH=x64
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		export NPM_CONFIG_ARCH=arm64
-		CODE_ARCH=arm64
-	else
-		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
+	NPM_CONFIG_ARCH=$(__resolve_npm_arch)
+	CODE_ARCH=$(__resolve_code_arch)
+	export NPM_CONFIG_ARCH
 	export npm_config_arch=$NPM_CONFIG_ARCH
 	export npm_config_nodedir=$TERMUX_PREFIX/opt/electron43-host-tools/node_headers
 
@@ -108,8 +144,8 @@ termux_step_make() {
 	export CXXFLAGS="$CXXFLAGS -DSPDLOG_USE_STD_FORMAT=1"
 
 	export DISABLE_V8_COMPILE_CACHE=1
-	npm install
-	npm run gulp vscode-linux-$CODE_ARCH-min
+	pnpm install --no-frozen-lockfile
+	pnpm run gulp -- vscode-linux-$CODE_ARCH-min
 }
 
 termux_step_make_install() {
