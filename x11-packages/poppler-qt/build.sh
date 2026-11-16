@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Poppler Qt wrapper"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Please align the version with `poppler` package.
-TERMUX_PKG_VERSION="26.10.0"
+TERMUX_PKG_VERSION="26.11.0"
 TERMUX_PKG_SRCURL="https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=6792cb7c69205007ad87d2e936cecc5b3a31fac29ab54ffc3175fdb6b2a6ce35
+TERMUX_PKG_SHA256=41c32680160addf5a8dd7a830e4869c01e9f6bee1abb91e44fabd1ba9d7828fb
 # The package must be updated at the same time as poppler, auto updater script does not support that.
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="freetype, libc++, littlecms, poppler (>= ${TERMUX_PKG_VERSION}), qt6-qtbase"
@@ -29,7 +29,7 @@ termux_step_pre_configure() {
 
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# when SOVERSION is changed.
-	local _POPPLER_SOVERSION=165
+	local _POPPLER_SOVERSION=166
 	if ! test "${_POPPLER_SOVERSION}"; then
 		termux_error_exit "Please set _POPPLER_SOVERSION variable."
 	fi
