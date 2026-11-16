@@ -1,0 +1,24 @@
+syncfs() is unavailable in Android until API level 28.
+Call the syscall directly instead.
+
+Fixes: nemo-writeback-pacer.c:176:18: error: call to undeclared function 'syncfs'
+
+--- a/libnemo-private/nemo-writeback-pacer.c
++++ b/libnemo-private/nemo-writeback-pacer.c
+@@ -31,6 +31,7 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <gio/gunixmounts.h>
++#include <sys/syscall.h>
+ 
+ #include "nemo-writeback-pacer.h"
+ 
+@@ -173,7 +174,7 @@ sync_thread_func (gpointer data)
+         g_mutex_unlock (&pacer->mutex);
+ 
+         start = g_get_monotonic_time ();
+-        result = syncfs (pacer->fd) == 0 ? 0 : errno;
++        result = syscall (SYS_syncfs, pacer->fd) == 0 ? 0 : errno;
+ 
+         g_mutex_lock (&pacer->mutex);
+         if (generation > PRIMING_GENERATION) {
