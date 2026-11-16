@@ -1,26 +1,26 @@
---- a/abc/src/base/abci/abc.c
-+++ b/abc/src/base/abci/abc.c
-@@ -282,7 +282,9 @@ static int Abc_CommandSimSec                 ( Abc_Frame_t * pAbc, int argc, cha
- static int Abc_CommandMatch                  ( Abc_Frame_t * pAbc, int argc, char ** argv );
- //static int Abc_CommandHaig                   ( Abc_Frame_t * pAbc, int argc, char ** argv );
- static int Abc_CommandQbf                    ( Abc_Frame_t * pAbc, int argc, char ** argv );
+--- a/abc/src/base/abcc/abcSim.c
++++ b/abc/src/base/abcc/abcSim.c
+@@ -32,7 +32,9 @@ ABC_NAMESPACE_IMPL_START
+ ////////////////////////////////////////////////////////////////////////
+ 
+ static int Abc_CommandFaultClasses           ( Abc_Frame_t * pAbc, int argc, char ** argv );
 +#ifdef __LP64__
  static int Abc_CommandAigSim                 ( Abc_Frame_t * pAbc, int argc, char ** argv );
 +#endif
- 
- static int Abc_CommandFraig                  ( Abc_Frame_t * pAbc, int argc, char ** argv );
- static int Abc_CommandFraigTrust             ( Abc_Frame_t * pAbc, int argc, char ** argv );
-@@ -1146,7 +1148,9 @@ void Abc_Init( Abc_Frame_t * pAbc )
-     Cmd_CommandAdd( pAbc, "New AIG",      "csweep",        Abc_CommandCSweep,           1 );
- //    Cmd_CommandAdd( pAbc, "New AIG",      "haig",          Abc_CommandHaig,             1 );
-     Cmd_CommandAdd( pAbc, "New AIG",      "qbf",           Abc_CommandQbf,              0 );
+ static int Abc_CommandXsim                   ( Abc_Frame_t * pAbc, int argc, char ** argv );
+ static int Abc_CommandSim                    ( Abc_Frame_t * pAbc, int argc, char ** argv );
+ static int Abc_CommandSim3                   ( Abc_Frame_t * pAbc, int argc, char ** argv );
+@@ -86,7 +88,9 @@ extern void Extra_BitMatrixTransposeP( Vec_Wrd_t * vSimsIn, int nWordsIn, Vec_Wr
+ void Abc_InitSim( Abc_Frame_t * pAbc )
+ {
+     Cmd_CommandAdd( pAbc, "Synthesis",    "faultclasses",  Abc_CommandFaultClasses,     0 );
 +#ifdef __LP64__
      Cmd_CommandAdd( pAbc, "New AIG",      "aigsim",        Abc_CommandAigSim,           0 );
 +#endif
- 
-     Cmd_CommandAdd( pAbc, "Fraiging",     "fraig",         Abc_CommandFraig,            1 );
-     Cmd_CommandAdd( pAbc, "Fraiging",     "fraig_trust",   Abc_CommandFraigTrust,       1 );
-@@ -19843,6 +19847,7 @@ usage:
+     Cmd_CommandAdd( pAbc, "Sequential",   "xsim",          Abc_CommandXsim,             0 );
+     Cmd_CommandAdd( pAbc, "Sequential",   "sim",           Abc_CommandSim,              0 );
+     Cmd_CommandAdd( pAbc, "Sequential",   "sim3",          Abc_CommandSim3,             0 );
+@@ -215,6 +219,7 @@ usage:
    SeeAlso     []
  
  ***********************************************************************/
@@ -28,7 +28,7 @@
  int Abc_CommandAigSim( Abc_Frame_t * pAbc, int argc, char ** argv )
  {
      extern int SimulateAigTop( char *fname1, char *fname2, char * mask, int verbose );
-@@ -19892,6 +19897,7 @@ usage:
+@@ -264,6 +269,7 @@ usage:
      Abc_Print( -2, "\t<file2>  : the second file to simulate\n");
      return 1;
  }
