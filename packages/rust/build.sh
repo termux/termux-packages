@@ -3,9 +3,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.99.1"
+TERMUX_PKG_VERSION="1.100.0"
 TERMUX_PKG_SRCURL="https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz"
-TERMUX_PKG_SHA256=6451598a99e77f07571960f6b21d577399d3a30f33e80cbd2e3a4aae6535d265
+TERMUX_PKG_SHA256=90dab90b8084eb57c35ae2b1d0b70c8e5138ace6023b22c60a5a400f586f63b2
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libc++, libllvm (<< $TERMUX_LLVM_NEXT_MAJOR_VERSION), lld, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
 TERMUX_PKG_SUGGESTS="rust-analyzer"
@@ -178,7 +178,21 @@ termux_step_configure() {
 		done
 	fi
 
+	local host_llvm_config="${TERMUX_PKG_TMPDIR}/host-llvm-config"
+	cat >"${host_llvm_config}" <<-EOF
+		#!/bin/bash
+		out=\$(${TERMUX_HOST_LLVM_BASE_DIR}/bin/llvm-config "\$@") || exit
+		if [[ " \$* " == *" --components "* ]]; then
+			tr ' ' '\n' <<<"\$out" | grep -v '^xtensa' | tr '\n' ' '
+			echo
+		else
+			echo "\$out"
+		fi
+	EOF
+	chmod +x "${host_llvm_config}"
+
 	sed \
+		-e "s|@HOST_LLVM_CONFIG@|${host_llvm_config}|g" \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		-e "s|@TERMUX_STANDALONE_TOOLCHAIN@|${TERMUX_STANDALONE_TOOLCHAIN}|g" \
 		-e "s|@TERMUX_HOST_LLVM_BASE_DIR@|${TERMUX_HOST_LLVM_BASE_DIR}|g" \
