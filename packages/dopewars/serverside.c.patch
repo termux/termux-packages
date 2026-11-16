@@ -1,7 +1,6 @@
-diff -uNr dopewars-1.5.12/src/serverside.c dopewars-1.5.12.mod/src/serverside.c
---- dopewars-1.5.12/src/serverside.c	2005-12-30 23:26:13.000000000 +0200
-+++ dopewars-1.5.12.mod/src/serverside.c	2020-04-28 03:01:36.285480545 +0300
-@@ -800,7 +800,7 @@
+--- a/src/serverside.c
++++ b/src/serverside.c
+@@ -784,7 +784,7 @@ void CreatePidFile(void)
      dopelog(1, LF_SERVER, _("Maintaining pid file %s"), PidFile);
      fprintf(fp, "%ld\n", (long)getpid());
      fclose(fp);
@@ -10,7 +9,7 @@ diff -uNr dopewars-1.5.12/src/serverside.c dopewars-1.5.12.mod/src/serverside.c
    } else {
      gchar *OpenError = ErrStrFromErrno(errno);
      g_warning(_("Cannot create pid file %s: %s"), PidFile, OpenError);
-@@ -1089,7 +1089,7 @@
+@@ -1111,7 +1111,7 @@ void RemovePlayerFromServer(Player *Play)
  }
  
  #ifndef CYGWIN
@@ -19,7 +18,7 @@ diff -uNr dopewars-1.5.12/src/serverside.c dopewars-1.5.12.mod/src/serverside.c
  
  static gchar *GetLocalSockDir(void)
  {
-@@ -1192,7 +1192,7 @@
+@@ -1296,7 +1296,7 @@ void ServerLoop(struct CMDLINE *cmdline)
    if (localsock == -1) {
      dopelog(0, LF_SERVER,
              _("Could not set up Unix domain socket for admin "
