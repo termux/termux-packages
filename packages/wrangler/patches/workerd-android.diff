@@ -1,0 +1,457 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 6acb6a7..1c8f15e 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -83,6 +83,24 @@ platform(
+     ],
+ )
+ 
++# Native Android/Termux 64-bit targets. These deliberately use the Android OS
++# constraint instead of pretending Bionic is glibc Linux.
++platform(
++    name = "android_arm64",
++    constraint_values = [
++        "@platforms//os:android",
++        "@platforms//cpu:aarch64",
++    ],
++)
++
++platform(
++    name = "android_x86_64",
++    constraint_values = [
++        "@platforms//os:android",
++        "@platforms//cpu:x86_64",
++    ],
++)
++
+ # Detect whether we use Linux/macOS/either, used to configure whether tcmalloc/perfetto should be
+ # used.
+ config_setting(
+@@ -97,11 +115,18 @@ config_setting(
+     visibility = ["//visibility:public"],
+ )
+ 
++config_setting(
++    name = "is_android",
++    constraint_values = ["@platforms//os:android"],
++    visibility = ["//visibility:public"],
++)
++
+ selects.config_setting_group(
+     name = "is_unix",
+     match_any = [
+         ":is_linux",
+         ":is_macos",
++        ":is_android",
+     ],
+     visibility = ["//visibility:public"],
+ )
+diff --git a/MODULE.bazel b/MODULE.bazel
+index f686065..b898bed 100644
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -2,6 +2,17 @@
+ 
+ module(name = "workerd")
+ 
++# Native Android targets for the Termux package build. The NDK is
++# supplied by the Termux build environment through ANDROID_NDK_HOME.
++bazel_dep(name = "rules_android_ndk", version = "0.1.5")
++android_ndk_repository_extension = use_extension(
++    "@rules_android_ndk//:extension.bzl",
++    "android_ndk_repository_extension",
++)
++android_ndk_repository_extension.configure(api_level = @TERMUX_PKG_API_LEVEL@)
++use_repo(android_ndk_repository_extension, "androidndk")
++register_toolchains("@androidndk//:all")
++
+ # sqlite3 is downloaded from sqlite.org (not GitHub), so it remains manual.
+ # We have some patches that aren't included in BCR:
+ # https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/sqlite3/3.47.0/patches
+diff --git a/build/BUILD.zlib b/build/BUILD.zlib
+index 65b292e..dfe463f 100644
+--- a/build/BUILD.zlib
++++ b/build/BUILD.zlib
+@@ -20,6 +20,14 @@ selects.config_setting_group(
+     ],
+ )
+ 
++selects.config_setting_group(
++    name = "x86_android",
++    match_all = [
++        "@platforms//cpu:x86_64",
++        "@platforms//os:android",
++    ],
++)
++
+ selects.config_setting_group(
+     name = "x86_macos",
+     match_all = [
+@@ -44,6 +52,14 @@ selects.config_setting_group(
+     ],
+ )
+ 
++selects.config_setting_group(
++    name = "arm64_android",
++    match_all = [
++        "@platforms//cpu:aarch64",
++        "@platforms//os:android",
++    ],
++)
++
+ selects.config_setting_group(
+     name = "arm64_macos",
+     match_all = [
+@@ -94,6 +110,7 @@ cc_library(
+         "@platforms//cpu:aarch64": ["ADLER32_SIMD_NEON"],
+     }) + select({
+         ":x86_linux": ["X86_NOT_WINDOWS"],
++        ":x86_android": ["X86_NOT_WINDOWS"],
+         ":x86_macos": ["X86_NOT_WINDOWS"],
+         ":x86_windows": ["X86_WINDOWS"],
+         "//conditions:default": [],
+@@ -119,6 +136,7 @@ cc_library(
+         "ZLIB_IMPLEMENTATION",
+     ] + select({
+         "@platforms//os:linux": ["ARMV8_OS_LINUX"],
++        "@platforms//os:android": ["ARMV8_OS_LINUX"],
+         "@platforms//os:macos": ["ARMV8_OS_MACOS"],
+         "@platforms//os:windows": ["ARMV8_OS_WINDOWS"],
+     }),
+@@ -244,9 +262,11 @@ cc_library(
+         ],
+     }) + select({
+         ":x86_linux": ["X86_NOT_WINDOWS"],
++        ":x86_android": ["X86_NOT_WINDOWS"],
+         ":x86_macos": ["X86_NOT_WINDOWS"],
+         ":x86_windows": ["X86_WINDOWS"],
+         ":arm64_linux": ["ARMV8_OS_LINUX"],
++        ":arm64_android": ["ARMV8_OS_LINUX"],
+         "arm64_macos": ["ARMV8_OS_MACOS"],
+         "arm64_windows": ["ARMV8_OS_WINDOWS"],
+         "//conditions:default": [],
+diff --git a/build/deps/gen/deps.MODULE.bazel b/build/deps/gen/deps.MODULE.bazel
+index 0825f59..3380fbf 100644
+--- a/build/deps/gen/deps.MODULE.bazel
++++ b/build/deps/gen/deps.MODULE.bazel
+@@ -27,6 +27,8 @@ bazel_dep(name = "brotli", version = "1.2.0.bcr.1")
+ # capnp-cpp
+ http.archive(
+     name = "capnp-cpp",
++    patch_args = ["-p1"],
++    patches = ["//:patches/capnp/0001-android-bionic-port.patch"],
+     sha256 = "a080720b26dd2e47ebab47a3be4b681184f7136a923b2225a39b5b2603aad446",
+     strip_prefix = "capnproto-capnproto-86bb703/c++",
+     type = "tgz",
+diff --git a/build/deps/rust.MODULE.bazel b/build/deps/rust.MODULE.bazel
+index fcd261e..a8bbba0 100644
+--- a/build/deps/rust.MODULE.bazel
++++ b/build/deps/rust.MODULE.bazel
+@@ -5,8 +5,10 @@ RUST_NIGHTLY_VERSION = "nightly/2026-05-28"
+ RUST_TARGET_TRIPLES = [
+     "x86_64-apple-darwin",
+     "aarch64-unknown-linux-gnu",
++    "aarch64-linux-android",
+     "aarch64-apple-darwin",
+     "x86_64-unknown-linux-gnu",
++    "x86_64-linux-android",
+     "x86_64-pc-windows-msvc",
+ ]
+ 
+@@ -18,9 +20,11 @@ rust.toolchain(
+         # Enable ISA extensions matching the ones used for C++. The clmul feature is not included as
+         # it is still "unstable" as of 1.86.0.
+         "x86_64-unknown-linux-gnu": ["-Ctarget-feature=+sse4.2"],
++        "x86_64-linux-android": ["-Ctarget-feature=+sse4.2"],
+         "x86_64-apple-darwin": ["-Ctarget-feature=+sse4.2"],
+         "x86_64-pc-windows-msvc": ["-Ctarget-feature=+sse4.2"],
+         "aarch64-unknown-linux-gnu": ["-Ctarget-feature=+crc"],
++        "aarch64-linux-android": ["-Ctarget-feature=+crc"],
+         # No options needed for aarch64-apple-darwin: CRC feature is enabled by default.
+     },
+     extra_target_triples = RUST_TARGET_TRIPLES,
+diff --git a/build/deps/v8.MODULE.bazel b/build/deps/v8.MODULE.bazel
+index 18db5f3..4c57a22 100644
+--- a/build/deps/v8.MODULE.bazel
++++ b/build/deps/v8.MODULE.bazel
+@@ -61,6 +61,13 @@ PATCHES = [
+     "0036-Fix-ExtendedMap-layout-on-Windows.patch",
+     "0037-Fix-CFunction-MemorySpan-declarations-on-Windows.patch",
+     "0038-Properly-depend-on-llvm-libc.patch",
++    "0040-Fix-Android-stack-trace-project-include.patch",
++    "0041-Provide-atomic-ref-on-Android.patch",
++    "0042-Build-V8-generators-in-exec-configuration.patch",
++    "0043-Use-CXX23-for-Clang-Bazel-builds.patch",
++    "0044-Set-Android-mksnapshot-target-OS.patch",
++    "0045-Explicit-SIMD-shuffle-array-size.patch",
++    "0046-Remove-unused-object-literal-native-context.patch",
+ ]
+ 
+ http_archive(
+diff --git a/patches/capnp/0001-android-bionic-port.patch b/patches/capnp/0001-android-bionic-port.patch
+new file mode 100644
+index 0000000..0964041
+--- /dev/null
++++ b/patches/capnp/0001-android-bionic-port.patch
+@@ -0,0 +1,20 @@
++diff --git a/src/kj/filesystem.c++ b/src/kj/filesystem.c++
++--- a/src/kj/filesystem.c++
+++++ b/src/kj/filesystem.c++
++@@ -31 +31 @@
++-#if __linux__
+++#if __linux__ && !defined(__ANDROID__)
++@@ -1839 +1839 @@
++-#if __linux__
+++#if __linux__ && !defined(__ANDROID__)
++diff --git a/src/kj/filesystem.h b/src/kj/filesystem.h
++--- a/src/kj/filesystem.h
+++++ b/src/kj/filesystem.h
++@@ -939 +939 @@
++-#if __linux__
+++#if __linux__ && !defined(__ANDROID__)
++diff --git a/src/kj/BUILD.bazel b/src/kj/BUILD.bazel
++--- a/src/kj/BUILD.bazel
+++++ b/src/kj/BUILD.bazel
++@@ -84,0 +85 @@
+++        "@platforms//os:android": [],
+diff --git a/patches/v8/0040-Fix-Android-stack-trace-project-include.patch b/patches/v8/0040-Fix-Android-stack-trace-project-include.patch
+new file mode 100644
+index 0000000..dd0ed17
+--- /dev/null
++++ b/patches/v8/0040-Fix-Android-stack-trace-project-include.patch
+@@ -0,0 +1,6 @@
++diff --git a/src/base/debug/stack_trace_android.cc b/src/base/debug/stack_trace_android.cc
++--- a/src/base/debug/stack_trace_android.cc
+++++ b/src/base/debug/stack_trace_android.cc
++@@ -15 +15 @@
++-#include <src/base/platform/platform.h>
+++#include "src/base/platform/platform.h"
+diff --git a/patches/v8/0041-Provide-atomic-ref-on-Android.patch b/patches/v8/0041-Provide-atomic-ref-on-Android.patch
+new file mode 100644
+index 0000000..3879022
+--- /dev/null
++++ b/patches/v8/0041-Provide-atomic-ref-on-Android.patch
+@@ -0,0 +1,108 @@
++diff --git a/include/v8config.h b/include/v8config.h
++--- a/include/v8config.h
+++++ b/include/v8config.h
++@@ -21,7 +21,104 @@
++ #include "v8-gn.h"  // NOLINT(build/include_directory)
++ #endif
++
+++#include <atomic>
++ #include <memory>
+++
+++// Android NDK libc++ does not currently provide C++20 std::atomic_ref. V8
+++// relies on atomic_ref for atomically accessing existing storage, so provide
+++// the subset of the interface V8 uses via Clang's __atomic builtins.
+++#if defined(__ANDROID__) && !defined(__cpp_lib_atomic_ref)
+++namespace std {
+++namespace __v8_android_atomic_ref_compat {
+++constexpr int ToBuiltinOrder(memory_order order) noexcept {
+++  switch (order) {
+++    case memory_order_relaxed: return __ATOMIC_RELAXED;
+++    case memory_order_consume: return __ATOMIC_CONSUME;
+++    case memory_order_acquire: return __ATOMIC_ACQUIRE;
+++    case memory_order_release: return __ATOMIC_RELEASE;
+++    case memory_order_acq_rel: return __ATOMIC_ACQ_REL;
+++    case memory_order_seq_cst: return __ATOMIC_SEQ_CST;
+++  }
+++  __builtin_unreachable();
+++}
+++constexpr memory_order FailureOrder(memory_order order) noexcept {
+++  if (order == memory_order_release) return memory_order_relaxed;
+++  if (order == memory_order_acq_rel) return memory_order_acquire;
+++  return order;
+++}
+++}  // namespace __v8_android_atomic_ref_compat
+++
+++template <typename T>
+++class atomic_ref {
+++ public:
+++  using value_type = T;
+++  static constexpr size_t required_alignment = alignof(T);
+++  static constexpr bool is_always_lock_free =
+++      __atomic_always_lock_free(sizeof(T), nullptr);
+++
+++  explicit atomic_ref(T& object) noexcept : ptr_(&object) {}
+++  atomic_ref(const atomic_ref&) noexcept = default;
+++
+++  T load(memory_order order = memory_order_seq_cst) const noexcept {
+++    T value;
+++    __atomic_load(ptr_, &value,
+++                  __v8_android_atomic_ref_compat::ToBuiltinOrder(order));
+++    return value;
+++  }
+++
+++  void store(T desired,
+++             memory_order order = memory_order_seq_cst) const noexcept {
+++    __atomic_store(ptr_, &desired,
+++                   __v8_android_atomic_ref_compat::ToBuiltinOrder(order));
+++  }
+++
+++  T exchange(T desired,
+++             memory_order order = memory_order_seq_cst) const noexcept {
+++    T old;
+++    __atomic_exchange(ptr_, &desired, &old,
+++                      __v8_android_atomic_ref_compat::ToBuiltinOrder(order));
+++    return old;
+++  }
+++
+++  bool compare_exchange_strong(T& expected, T desired, memory_order success,
+++                               memory_order failure) const noexcept {
+++    return __atomic_compare_exchange(
+++        ptr_, &expected, &desired, false,
+++        __v8_android_atomic_ref_compat::ToBuiltinOrder(success),
+++        __v8_android_atomic_ref_compat::ToBuiltinOrder(failure));
+++  }
+++
+++  bool compare_exchange_strong(
+++      T& expected, T desired,
+++      memory_order order = memory_order_seq_cst) const noexcept {
+++    return compare_exchange_strong(
+++        expected, desired, order,
+++        __v8_android_atomic_ref_compat::FailureOrder(order));
+++  }
+++
+++  template <typename U = T>
+++  enable_if_t<is_integral_v<U>, U> fetch_or(
+++      U arg, memory_order order = memory_order_seq_cst) const noexcept {
+++    return __atomic_fetch_or(
+++        ptr_, arg, __v8_android_atomic_ref_compat::ToBuiltinOrder(order));
+++  }
+++
+++  template <typename U = T>
+++  enable_if_t<is_integral_v<U>, U> fetch_add(
+++      U arg, memory_order order = memory_order_seq_cst) const noexcept {
+++    return __atomic_fetch_add(
+++        ptr_, arg, __v8_android_atomic_ref_compat::ToBuiltinOrder(order));
+++  }
+++
+++  bool is_lock_free() const noexcept {
+++    return __atomic_is_lock_free(sizeof(T), ptr_);
+++  }
+++
+++ private:
+++  T* ptr_;
+++};
+++}  // namespace std
+++#endif  // defined(__ANDROID__) && !defined(__cpp_lib_atomic_ref)
++ // clang-format off
++
++ // Platform headers for feature detection below.
+diff --git a/patches/v8/0042-Build-V8-generators-in-exec-configuration.patch b/patches/v8/0042-Build-V8-generators-in-exec-configuration.patch
+new file mode 100644
+index 0000000..cc39a0a
+--- /dev/null
++++ b/patches/v8/0042-Build-V8-generators-in-exec-configuration.patch
+@@ -0,0 +1,6 @@
++diff --git a/bazel/defs.bzl b/bazel/defs.bzl
++--- a/bazel/defs.bzl
+++++ b/bazel/defs.bzl
++@@ -353 +353 @@ def get_cfg():
++-    return "target"
+++    return "exec"
+diff --git a/patches/v8/0043-Use-CXX23-for-Clang-Bazel-builds.patch b/patches/v8/0043-Use-CXX23-for-Clang-Bazel-builds.patch
+new file mode 100644
+index 0000000..ad1df5b
+--- /dev/null
++++ b/patches/v8/0043-Use-CXX23-for-Clang-Bazel-builds.patch
+@@ -0,0 +1,6 @@
++diff --git a/bazel/defs.bzl b/bazel/defs.bzl
++--- a/bazel/defs.bzl
+++++ b/bazel/defs.bzl
++@@ -152 +152 @@
++-                "-std=c++20",
+++                "-std=c++23",
+diff --git a/patches/v8/0044-Set-Android-mksnapshot-target-OS.patch b/patches/v8/0044-Set-Android-mksnapshot-target-OS.patch
+new file mode 100644
+index 0000000..c0c059b
+--- /dev/null
++++ b/patches/v8/0044-Set-Android-mksnapshot-target-OS.patch
+@@ -0,0 +1,17 @@
++diff --git a/bazel/defs.bzl b/bazel/defs.bzl
++--- a/bazel/defs.bzl
+++++ b/bazel/defs.bzl
++@@ -548,5 +548 @@ def v8_mksnapshot(name, args, suffix = ""):
++-        target_os = select({
++-            "@v8//bazel/config:is_macos": "mac",
++-            "@v8//bazel/config:is_windows": "win",
++-            "//conditions:default": "",
++-        }),
+++        target_os = "android",
++@@ -557,5 +553 @@ def v8_mksnapshot(name, args, suffix = ""):
++-        target_os = select({
++-            "@v8//bazel/config:is_macos": "mac",
++-            "@v8//bazel/config:is_windows": "win",
++-            "//conditions:default": "",
++-        }),
+++        target_os = "android",
+diff --git a/patches/v8/0045-Explicit-SIMD-shuffle-array-size.patch b/patches/v8/0045-Explicit-SIMD-shuffle-array-size.patch
+new file mode 100644
+index 0000000..442fc3d
+--- /dev/null
++++ b/patches/v8/0045-Explicit-SIMD-shuffle-array-size.patch
+@@ -0,0 +1,6 @@
++diff --git a/src/compiler/turboshaft/wasm-shuffle-reducer.cc b/src/compiler/turboshaft/wasm-shuffle-reducer.cc
++--- a/src/compiler/turboshaft/wasm-shuffle-reducer.cc
+++++ b/src/compiler/turboshaft/wasm-shuffle-reducer.cc
++@@ -522 +522 @@
++-    SimdShuffle::ShuffleArray shuffle_bytes;
+++    SimdShuffle::ShuffleArray<kSimd128Size> shuffle_bytes;
+diff --git a/patches/v8/0046-Remove-unused-object-literal-native-context.patch b/patches/v8/0046-Remove-unused-object-literal-native-context.patch
+new file mode 100644
+index 0000000..6459dc0
+--- /dev/null
++++ b/patches/v8/0046-Remove-unused-object-literal-native-context.patch
+@@ -0,0 +1,5 @@
++diff --git a/src/runtime/runtime-literals.cc b/src/runtime/runtime-literals.cc
++--- a/src/runtime/runtime-literals.cc
+++++ b/src/runtime/runtime-literals.cc
++@@ -519 +518,0 @@ Handle<JSObject> CreateObjectLiteral(
++-  DirectHandle<NativeContext> native_context = isolate->native_context();
+diff --git a/src/workerd/api/crypto/endianness.c++ b/src/workerd/api/crypto/endianness.c++
+index 8bef872..c36ed5b 100644
+--- a/src/workerd/api/crypto/endianness.c++
++++ b/src/workerd/api/crypto/endianness.c++
+@@ -10,7 +10,26 @@
+ 
+ #endif
+ 
+-#if defined(__linux__) || defined(__CYGWIN__)
++#if defined(__ANDROID__)
++
++#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
++#error Termux Android targets are expected to be little-endian
++#endif
++
++uint16_t htobe16(uint16_t x) { return __builtin_bswap16(x); }
++uint16_t htole16(uint16_t x) { return x; }
++uint16_t be16toh(uint16_t x) { return __builtin_bswap16(x); }
++uint16_t le16toh(uint16_t x) { return x; }
++uint32_t htobe32(uint32_t x) { return __builtin_bswap32(x); }
++uint32_t htole32(uint32_t x) { return x; }
++uint32_t be32toh(uint32_t x) { return __builtin_bswap32(x); }
++uint32_t le32toh(uint32_t x) { return x; }
++uint64_t htobe64(uint64_t x) { return __builtin_bswap64(x); }
++uint64_t htole64(uint64_t x) { return x; }
++uint64_t be64toh(uint64_t x) { return __builtin_bswap64(x); }
++uint64_t le64toh(uint64_t x) { return x; }
++
++#elif defined(__linux__) || defined(__CYGWIN__)
+ 
+ #include <endian.h>
+ 
+diff --git a/src/workerd/jsg/modules-new.c++ b/src/workerd/jsg/modules-new.c++
+index f810391..5fa0277 100644
+--- a/src/workerd/jsg/modules-new.c++
++++ b/src/workerd/jsg/modules-new.c++
+@@ -8,7 +8,7 @@
+ #include <workerd/jsg/jsg.h>
+ #include <workerd/jsg/util.h>
+ 
+-#include <simdutf.h>
++#include "simdutf.h"
+ 
+ #include <kj/encoding.h>
+ #include <kj/mutex.h>
