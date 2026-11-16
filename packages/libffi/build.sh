@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://sourceware.org/libffi/
 TERMUX_PKG_DESCRIPTION="Library providing a portable, high level programming interface to various calling conventions"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.8.0"
+TERMUX_PKG_VERSION="3.8.1"
 TERMUX_PKG_SRCURL=https://github.com/libffi/libffi/releases/download/v${TERMUX_PKG_VERSION}/libffi-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4
+TERMUX_PKG_SHA256=81e879c094cc5ec3186c48510c6385ac6b3e866192e8bc71a35245703757ee40
 TERMUX_PKG_BREAKS="libffi-dev"
 TERMUX_PKG_REPLACES="libffi-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-multi-os-directory ac_cv_func_memfd_create=no"
