@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Crypto and TLS for Modern C++"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 # This specific package is for libbotan-3.
-TERMUX_PKG_VERSION="3.13.0"
+TERMUX_PKG_VERSION="3.14.1"
 TERMUX_PKG_SRCURL="https://botan.randombit.net/releases/Botan-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=12f5a8358890bbee82edfe9d2e7769b0a610b6dd0e0698aea13d20a675d84620
+TERMUX_PKG_SHA256=5b85cba0f014d344eb8e9919aee0a3bdc31e16acb05816410025be9bee1e0930
 TERMUX_PKG_DEPENDS="libbz2, libc++, liblzma, libsqlite, zlib"
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_DEPENDS="boost, boost-headers"
