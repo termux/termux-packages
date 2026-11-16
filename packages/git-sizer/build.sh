@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/github/git-sizer
 TERMUX_PKG_DESCRIPTION="Compute various size metrics for a Git repository"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <thunder-coding@termux.dev>"
-TERMUX_PKG_VERSION=1.5.0
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION=1.6.0
 TERMUX_PKG_SRCURL=https://github.com/github/git-sizer/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=07a5ac5f30401a17d164a6be8d52d3d474ee9c3fb7f60fd83a617af9f7e902bb
+TERMUX_PKG_SHA256=2c6355a9ccdaa6bbe03fa309e087483961afefcfbf354491a419e1d5e6c1bbd1
 TERMUX_PKG_DEPENDS="git"
 TERMUX_PKG_BUILD_IN_SRC=true
 
