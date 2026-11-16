@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://fmt.dev/latest/index.html
 TERMUX_PKG_DESCRIPTION="Open-source formatting library for C++"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1:12.2.0"
+TERMUX_PKG_VERSION="1:12.2.1"
 TERMUX_PKG_SRCURL="https://github.com/fmtlib/fmt/archive/refs/tags/${TERMUX_PKG_VERSION#*:}.tar.gz"
-TERMUX_PKG_SHA256=8b852bb5aa6e7d8564f9e81394055395dd1d1936d38dfd3a17792a02bebd7af0
+TERMUX_PKG_SHA256=449374d74f31b67796dece454d59b93e6f1538efcce0e9ac78000c98142c139e
 # Avoid silently breaking build of revdeps:
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_DEPENDS="libc++"
