@@ -1,6 +1,6 @@
 --- a/compiler/rustc_driver_impl/src/signal_handler.rs
 +++ b/compiler/rustc_driver_impl/src/signal_handler.rs
-@@ -24,6 +24,16 @@
+@@ -24,6 +24,16 @@ fn backtrace_stderr(buffer: &[*mut libc::c_void]) {
      unsafe { backtrace_symbols_fd(buffer.as_ptr(), size, libc::STDERR_FILENO) };
  }
  
@@ -17,7 +17,7 @@
  /// Unbuffered, unsynchronized writer to stderr.
  ///
  /// Only acceptable because everything will end soon anyways.
-@@ -66,7 +76,12 @@
+@@ -66,7 +76,12 @@ unsafe extern "C" fn print_stack_trace(signum: libc::c_int) {
          // in incredibly undesirable and unexpected ways due to e.g. the allocator deadlocking
          static mut STACK_TRACE: [*mut libc::c_void; MAX_FRAMES] = [ptr::null_mut(); MAX_FRAMES];
          // Collect return addresses
@@ -30,7 +30,7 @@
          if depth == 0 {
              return;
          }
-@@ -165,7 +180,12 @@
+@@ -167,7 +182,12 @@ pub(super) fn install() {
  #[cfg(any(target_os = "linux", target_os = "android"))]
  fn min_sigstack_size() -> usize {
      const AT_MINSIGSTKSZ: core::ffi::c_ulong = 51;
