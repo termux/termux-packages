@@ -379,7 +379,7 @@ Commit messages should describe the changes done, so that maintainers can unders
 Where:
 
 - `<repo>` may be one of `main`, `root` or `x11`. It is the repository in which the package resides.
-  Other definition for this property can be done as the name property of the package directory as defined in `repo.json` file after removing the 'termux-' prefix (if any).
+  Other definition for this property can be done as the name property of the package directory as defined in `scripts/repo.json` file after removing the 'termux-' prefix (if any).
 - `<package>` is the actual name of the package.
 
 Any line in the commit **should not exceed 80 characters**. In case it does, consider using different wordings or language style which better summarizes the changes done.

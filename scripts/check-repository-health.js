@@ -30,7 +30,7 @@ if (process.argv.length != 3) {
 
 const outputDir = process.argv[2];
 
-const repos = JSON.parse(await readFile("repo.json"));
+const repos = JSON.parse(await readFile(new URL("repo.json", import.meta.url)));
 if (repos.pkg_format != "debian") {
   console.error(`Unsupported package format: ${repos.pkg_format}`);
   process.exit(1);
@@ -42,7 +42,7 @@ for (const path in repos) {
   if (repoPathMap.has(repo.name)) {
     console.error("Multiple repository paths with same repository name.");
     console.error(
-      "This should not be happening. repo.json file needs to be fixed",
+      "This should not be happening. scripts/repo.json file needs to be fixed",
     );
     console.error(
       `Repository "${repo.name}" also exists for path "${path}" when it already existed for "${repoPathMap.get(path)}"`,
