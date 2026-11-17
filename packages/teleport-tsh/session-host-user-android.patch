@@ -1,0 +1,27 @@
+--- a/session/host/user/user_forward.go
++++ b/session/host/user/user_forward.go
+@@ -1,4 +1,4 @@
+-//go:build !linux || !cgo
++//go:build !linux || !cgo || android
+ 
+ // Teleport
+ // Copyright (C) 2026 Gravitational, Inc.
+--- a/session/host/user/user_linux_cgo.go
++++ b/session/host/user/user_linux_cgo.go
+@@ -1,4 +1,4 @@
+-//go:build linux && cgo
++//go:build linux && cgo && !android
+ 
+ // Teleport
+ // Copyright (C) 2026 Gravitational, Inc.
+--- a/session/host/user/user_other.go
++++ b/session/host/user/user_other.go
+@@ -14,7 +14,7 @@
+ // You should have received a copy of the GNU Affero General Public License
+ // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+-//go:build !darwin && !linux
++//go:build (!darwin && !linux) || android
+ 
+ package user
+ 
