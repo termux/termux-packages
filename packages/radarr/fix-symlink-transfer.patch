@@ -1,10 +1,10 @@
 diff --git a/src/NzbDrone.Common/Disk/DiskProviderBase.cs b/src/NzbDrone.Common/Disk/DiskProviderBase.cs
-index e6a861f..fb0ebad 100644
+index cc44618fa..b0a2cd41f 100644
 --- a/src/NzbDrone.Common/Disk/DiskProviderBase.cs
 +++ b/src/NzbDrone.Common/Disk/DiskProviderBase.cs
-@@ -313,6 +313,32 @@ namespace NzbDrone.Common.Disk
-             return false;
-         }
+@@ -303,6 +303,32 @@ public virtual bool TryRenameFile(string source, string destination)
+ 
+         public abstract bool TryCreateHardLink(string source, string destination);
  
 +        public virtual bool TryCreateSymbolicLink(string source, string destination)
 +        {
@@ -36,10 +36,10 @@ index e6a861f..fb0ebad 100644
          {
              Ensure.That(path, () => path).IsValidPath(PathValidationType.CurrentOs);
 diff --git a/src/NzbDrone.Common/Disk/DiskTransferService.cs b/src/NzbDrone.Common/Disk/DiskTransferService.cs
-index 607a933..fb7a760 100644
+index cf2b2ea58..645abee8a 100644
 --- a/src/NzbDrone.Common/Disk/DiskTransferService.cs
 +++ b/src/NzbDrone.Common/Disk/DiskTransferService.cs
-@@ -272,7 +272,7 @@ namespace NzbDrone.Common.Disk
+@@ -272,7 +272,7 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
  
              if (sourcePath.PathEquals(targetPath, StringComparison.InvariantCultureIgnoreCase))
              {
@@ -48,7 +48,7 @@ index 607a933..fb7a760 100644
                  {
                      throw new IOException(string.Format("Source and destination can't be the same {0}", sourcePath));
                  }
-@@ -326,6 +326,12 @@ namespace NzbDrone.Common.Disk
+@@ -326,6 +326,12 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
  
                  if (mode.HasFlag(TransferMode.Copy))
                  {
@@ -61,7 +61,7 @@ index 607a933..fb7a760 100644
                      _logger.Warn("Hardlinking from '{0}' to '{1}' failed, fallback to copy.", sourcePath, targetPath);
                  }
                  else
-@@ -334,6 +340,20 @@ namespace NzbDrone.Common.Disk
+@@ -334,6 +340,20 @@ public TransferMode TransferFile(string sourcePath, string targetPath, TransferM
                  }
              }
  
@@ -83,23 +83,29 @@ index 607a933..fb7a760 100644
              var sourceMount = _diskProvider.GetMount(sourcePath);
              var targetMount = _diskProvider.GetMount(targetPath);
 diff --git a/src/NzbDrone.Common/Disk/IDiskProvider.cs b/src/NzbDrone.Common/Disk/IDiskProvider.cs
-index 4658941..15e9e9d 100644
+index 79b624c74..454dc4e09 100644
 --- a/src/NzbDrone.Common/Disk/IDiskProvider.cs
 +++ b/src/NzbDrone.Common/Disk/IDiskProvider.cs
-@@ -35,6 +35,8 @@ namespace NzbDrone.Common.Disk
+@@ -34,6 +34,8 @@ public interface IDiskProvider
+         void MoveFolder(string source, string destination, bool overwrite = false);
          bool TryRenameFile(string source, string destination);
          bool TryCreateHardLink(string source, string destination);
-         bool TryCreateRefLink(string source, string destination);
 +        bool TryCreateSymbolicLink(string source, string destination);
 +        bool IsSymbolicLink(string path);
          void DeleteFolder(string path, bool recursive);
          string ReadAllText(string filePath);
          void WriteAllText(string filename, string contents);
 diff --git a/src/NzbDrone.Common/Disk/TransferMode.cs b/src/NzbDrone.Common/Disk/TransferMode.cs
-index f1f6cab..af777c6 100644
+index f1f6cab48..d91240ef0 100644
 --- a/src/NzbDrone.Common/Disk/TransferMode.cs
 +++ b/src/NzbDrone.Common/Disk/TransferMode.cs
-@@ -10,7 +10,9 @@ namespace NzbDrone.Common.Disk
+@@ -1,4 +1,4 @@
+-﻿using System;
++using System;
+ 
+ namespace NzbDrone.Common.Disk
+ {
+@@ -10,7 +10,9 @@ public enum TransferMode
          Move = 1,
          Copy = 2,
          HardLink = 4,
@@ -111,10 +117,10 @@ index f1f6cab..af777c6 100644
      }
  }
 diff --git a/src/NzbDrone.Mono/Disk/DiskProvider.cs b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-index 48363b0..71349bd 100644
+index 1506cbd17..3d1ea35a4 100644
 --- a/src/NzbDrone.Mono/Disk/DiskProvider.cs
 +++ b/src/NzbDrone.Mono/Disk/DiskProvider.cs
-@@ -459,6 +459,32 @@ namespace NzbDrone.Mono.Disk
+@@ -457,6 +457,32 @@ public override bool TryCreateHardLink(string source, string destination)
              }
          }
  
@@ -144,6 +150,6 @@ index 48363b0..71349bd 100644
 +            }
 +        }
 +
-         private uint GetUserId(string user)
+         private static int GetUserId(string user)
          {
-             if (user.IsNullOrWhiteSpace())
+             if (string.IsNullOrWhiteSpace(user))
