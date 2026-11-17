@@ -1,6 +1,6 @@
 --- a/configure.ac
 +++ b/configure.ac
-@@ -72,6 +72,7 @@
+@@ -72,6 +72,7 @@ dnl forcing an entire recompile.x
  AC_CONFIG_HEADERS(include/version-config.h)
  
  AM_PROG_AS
@@ -8,7 +8,7 @@
  AC_PROG_LN_S
  LT_PREREQ([2.2])
  LT_INIT([disable-static win32-dll])
-@@ -1728,6 +1729,11 @@
+@@ -1728,6 +1729,11 @@ if test "x$XVFB" = xyes; then
  	AC_SUBST([XVFB_SYS_LIBS])
  fi
  
@@ -20,7 +20,7 @@
  
  dnl Xnest DDX
  
-@@ -1763,6 +1769,8 @@
+@@ -1763,6 +1769,8 @@ if test "x$XORG" = xauto; then
  fi
  AC_MSG_RESULT([$XORG])
  
@@ -29,7 +29,7 @@
  if test "x$XORG" = xyes; then
  	PKG_CHECK_MODULES([LIBXCVT], $LIBXCVT)
  
-@@ -1971,7 +1979,6 @@
+@@ -1968,7 +1976,6 @@ if test "x$XORG" = xyes; then
  	AC_DEFINE(XORG_SERVER, 1, [Building Xorg server])
  	AC_DEFINE(XORGSERVER, 1, [Building Xorg server])
  	AC_DEFINE(XFree86Server, 1, [Building XFree86 server])
@@ -37,7 +37,7 @@
  	AC_DEFINE(NEED_XF86_TYPES, 1, [Need XFree86 typedefs])
  	AC_DEFINE(NEED_XF86_PROTOTYPES, 1, [Need XFree86 helper functions])
  	AC_DEFINE(__XSERVERNAME__, "Xorg", [Name of X server])
-@@ -2354,6 +2361,7 @@
+@@ -2351,6 +2358,7 @@ hw/xfree86/utils/man/Makefile
  hw/xfree86/utils/gtf/Makefile
  hw/vfb/Makefile
  hw/vfb/man/Makefile
@@ -45,10 +45,9 @@
  hw/xnest/Makefile
  hw/xnest/man/Makefile
  hw/xwin/Makefile
-Only in b: configure.ac.orig
 --- a/hw/Makefile.am
 +++ b/hw/Makefile.am
-@@ -34,3 +34,5 @@
+@@ -34,3 +34,5 @@ DIST_SUBDIRS = xfree86 vfb xnest xwin xquartz kdrive
  
  relink:
  	$(AM_V_at)for i in $(SUBDIRS) ; do $(MAKE) -C $$i relink || exit 1 ; done
@@ -56,7 +55,7 @@ Only in b: configure.ac.orig
 +SUBDIRS += vnc
 --- a/mi/miinitext.c
 +++ b/mi/miinitext.c
-@@ -106,8 +106,15 @@
+@@ -106,8 +106,15 @@ SOFTWARE.
  
  #include "miinitext.h"
  
