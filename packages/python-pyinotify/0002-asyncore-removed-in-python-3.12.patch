@@ -1,0 +1,21 @@
+--- a/python3/pyinotify.py
++++ b/python3/pyinotify.py
+@@ -68,7 +68,17 @@
+ from datetime import datetime, timedelta
+ import time
+ import re
+-import asyncore
++try:
++    import asyncore
++except ImportError:
++    # asyncore was removed in Python 3.12 and only AsyncNotifier
++    # needs it: stub kept so the class stays defined.
++    import types
++    asyncore = types.ModuleType("asyncore")
++    class _GoneDispatcher:
++        def __init__(self, *args, **kwargs):
++            raise ImportError("AsyncNotifier needs 'asyncore', removed in Python 3.12")
++    asyncore.file_dispatcher = _GoneDispatcher
+ import glob
+ import locale
+ import subprocess
