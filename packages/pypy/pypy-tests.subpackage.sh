@@ -1,4 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Test files for PyPy"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 TERMUX_SUBPKG_INCLUDE="
 opt/pypy/lib-python/${_MAJOR_VERSION}/test
 opt/pypy/lib-python/${_MAJOR_VERSION}/*/test
