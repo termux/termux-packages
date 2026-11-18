@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mise.jdx.dev/
 TERMUX_PKG_DESCRIPTION="dev tools, env vars, task runner"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.11.9"
+TERMUX_PKG_VERSION="2026.11.10"
 TERMUX_PKG_SRCURL="https://github.com/jdx/mise/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=0dd2fd42fddc636fae0ce8cb1344e0beaee1cbbd8c568cf35d6e0654335b4b7c
+TERMUX_PKG_SHA256=46a75ec4b9d474fd292501129f1ead99502c44a17103f97677463a57eb623e52
 TERMUX_PKG_DEPENDS="bzip2, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_MAKE_PROCESSES=1
@@ -36,7 +36,6 @@ termux_step_pre_configure() {
 	find ./vendor-termux \
 		-mindepth 1 -maxdepth 1 -type d \
 		! -wholename ./vendor-termux/cc \
-		! -wholename ./vendor-termux/decmpfs \
 		! -wholename ./vendor-termux/rustls-platform-verifier \
 		! -wholename ./vendor-termux/sonic-rs \
 		! -wholename ./vendor-termux/sonic-simd \
@@ -44,11 +43,6 @@ termux_step_pre_configure() {
 
 	local patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
 	local dir="vendor-termux/cc"
-	echo "Applying patch: $patch"
-	patch -p1 -d "$dir" < "$patch"
-
-	patch="$TERMUX_PKG_BUILDER_DIR/decmpfs-android-libc.diff"
-	dir="vendor-termux/decmpfs"
 	echo "Applying patch: $patch"
 	patch -p1 -d "$dir" < "$patch"
 
@@ -72,7 +66,6 @@ termux_step_pre_configure() {
 
 		[patch.crates-io]
 		cc = { path = "./vendor-termux/cc" }
-		decmpfs = { path = "./vendor-termux/decmpfs" }
 		rustls-platform-verifier = { path = "./vendor-termux/rustls-platform-verifier" }
 		sonic-rs = { path = "./vendor-termux/sonic-rs" }
 		sonic-simd = { path = "./vendor-termux/sonic-simd" }
