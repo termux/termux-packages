@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="21.0.13"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="21.0.13.1"
 TERMUX_PKG_SRCURL="https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-${TERMUX_PKG_VERSION}-ga.tar.gz"
-TERMUX_PKG_SHA256=a10eb756f12542b530db90e15aff44c72cd572ba02c47496affb5e3510814935
+TERMUX_PKG_SHA256=222ab0f4f790dc93fc244eca0bafaa60976154141cc77ccbd83e5012c6ce8b8d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='21\.\d+\.\d+(\.\d+)*(?=-ga)'
 TERMUX_PKG_DEPENDS="ca-certificates-java, libandroid-shmem, libandroid-spawn, libiconv, libjpeg-turbo, zlib, littlecms, alsa-plugins"
