@@ -1884,20 +1884,18 @@ index a4564d98d6..bcd069a3e0 100644
    testonly = true
    sources = [
      "examples_window_with_content.cc",
-diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-index 13fd65bff1..e2b4bc7afc 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-@@ -341,7 +341,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
-   // active, we enter this condition where `active && !is_active_` because
-   // subwindows do not get active state from the OS on some platforms (E.g.
-   // Wayland). So we need to ensure Activate is conveyed to the platform_window.
--  if (base::FeatureList::IsEnabled(features::kOzoneBubblesUsePlatformWidgets) &&
-+  if (base::FeatureList::IsEnabled(::features::kOzoneBubblesUsePlatformWidgets) &&
-       active && !is_active_ && !window_children_.empty()) {
-     Activate();
+@@ -351,7 +351,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
+   // active bubble or an inactive bubble (e.g. one shown via ShowInactive()),
+   // forward it to the platform window so key events are routed correctly.
+   if (!base::FeatureList::IsEnabled(
+-          features::kOzoneBubblesUsePlatformWidgets) ||
++          ::features::kOzoneBubblesUsePlatformWidgets) ||
+       !active || IsActive()) {
+     return;
    }
-@@ -780,7 +780,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+@@ -861,7 +861,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
      return;
    }
  

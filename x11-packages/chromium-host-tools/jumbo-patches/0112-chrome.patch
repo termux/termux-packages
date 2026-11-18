@@ -3432,25 +3432,6 @@ index 4fb15b95e3..64f3bff542 100644
 +
 +#undef GetNetworkContext
 +#undef BuildPasswordStore
-diff --git a/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc b/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-index 82a67fdd18..304a3bb311 100644
---- a/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-+++ b/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-@@ -27,6 +27,8 @@
- #include "content/public/browser/web_contents.h"
- #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
- 
-+#define GetLoggerIfAvailable GetLoggerIfAvailable_password_change_page_stability_waiter
-+
- namespace {
- 
- using Logger = password_manager::BrowserSavePasswordProgressLogger;
-@@ -170,3 +172,5 @@ void PasswordChangePageStabilityWaiter::OnTimeout() {
-     std::move(callback_).Run();
-   }
- }
-+
-+#undef GetLoggerIfAvailable
 diff --git a/chrome/browser/memory/BUILD.gn b/chrome/browser/memory/BUILD.gn
 index 8668c71e02..ca7aafa142 100644
 --- a/chrome/browser/memory/BUILD.gn
@@ -3779,8 +3760,6 @@ index 58c6a15042..78ca52fce1 100644
  }
 +
 +#undef kSubmitFormFlowStep
-diff --git a/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc b/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
-index 242b826a75..b9832874dd 100644
 --- a/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
 +++ b/chrome/browser/password_manager/password_change/change_password_form_filling_submission_helper.cc
 @@ -31,6 +31,8 @@
@@ -3792,10 +3771,11 @@ index 242b826a75..b9832874dd 100644
  namespace {
  
  using Logger = password_manager::BrowserSavePasswordProgressLogger;
-@@ -268,3 +270,4 @@ void ChangePasswordFormFillingSubmissionHelper::OnTimeout() {
+@@ -267,3 +269,5 @@ void ChangePasswordFormFillingSubmissionHelper::OnTimeout() {
+   }
    std::move(callback_).Run(base::unexpected(SubmissionError::kTimeout));
  }
- 
++
 +#undef GetAIPageContentOptions
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.cc b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
 index d4c48c003f..f59f3104e2 100644
@@ -4446,43 +4426,20 @@ index dc8f543842..8f6a44ebc4 100644
  }
 +
 +#undef TabGroupDataFromNode
-diff --git a/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc b/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-index c55bb6eeaf..b9102a9d58 100644
---- a/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-+++ b/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-@@ -20,6 +20,8 @@
- #include "ui/views/view.h"
- #include "ui/views/view_utils.h"
- 
-+#define kTabVerticalPadding kTabVerticalPadding_unpinned_tab_container_view_layout
-+
- namespace {
- constexpr int kTabVerticalPadding = 2;
- }  // namespace
-@@ -302,3 +304,5 @@ UnpinnedTabContainerViewLayout::GetGroupIdForChild(
-   }
-   return std::nullopt;
- }
-+
-+#undef kTabVerticalPadding
-diff --git a/chrome/browser/ui/webui/settings/hats_handler.cc b/chrome/browser/ui/webui/settings/hats_handler.cc
-index ff8274e224..0a92d39247 100644
 --- a/chrome/browser/ui/webui/settings/hats_handler.cc
 +++ b/chrome/browser/ui/webui/settings/hats_handler.cc
-@@ -28,9 +28,11 @@
+@@ -26,7 +26,9 @@
+ #include "content/public/browser/visibility.h"
  #include "content/public/browser/web_contents.h"
- #include "services/metrics/public/cpp/metrics_utils.h"
  
 -using safe_browsing::SafeBrowsingState;
 +using SafeBrowsingState_hats_handler = safe_browsing::SafeBrowsingState;
- using safe_browsing::SecuritySettingsBundleSetting;
- 
-+#define SafeBrowsingState SafeBrowsingState_hats_handler
 +
++#define SafeBrowsingState SafeBrowsingState_hats_handler
+ 
  namespace {
  
- // Generate the Product Specific bits data which accompanies privacy settings
-@@ -569,3 +571,5 @@ void HatsHandler::InformSentimentService(TrustSafetyInteraction interaction) {
+@@ -307,3 +309,5 @@ void HatsHandler::InformSentimentService(TrustSafetyInteraction interaction) {
  }
  
  }  // namespace settings
@@ -4552,11 +4509,9 @@ index a61e8fdd86..b21138e32f 100644
  }
 +
 +#undef GetLoggerIfAvailable
-diff --git a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-index 294e5783fd..489c6c716f 100644
---- a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-+++ b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-@@ -22,6 +22,8 @@
+--- a/components/password_manager/core/browser/remote_actor/remote_actor_credential_permission_client.cc
++++ b/components/password_manager/core/browser/remote_actor/remote_actor_credential_permission_client.cc
+@@ -25,6 +25,8 @@
  #include "url/gurl.h"
  #include "url/origin.h"
  
@@ -4565,7 +4520,7 @@ index 294e5783fd..489c6c716f 100644
  namespace password_manager {
  
  namespace {
-@@ -180,3 +182,5 @@ void RemoteActorCredentialPermissionClient::DeleteRequest(
+@@ -205,3 +207,5 @@ void RemoteActorCredentialPermissionClient::DeleteRequest(
  }
  
  }  // namespace password_manager
@@ -4891,12 +4846,12 @@ index 9fc77e09a7..b41fa76422 100644
  }
 --- a/chrome/browser/ui/passwords/remote_actor_selection_dialog_controller.cc
 +++ b/chrome/browser/ui/passwords/remote_actor_selection_dialog_controller.cc
-@@ -90,7 +90,7 @@
+@@ -97,7 +97,7 @@ void RemoteActorSelectionDialogController::OnSubtitleLinkClicked() {
    }
    content::OpenURLParams params(
        GURL(kRemoteActorDataHandlingHelpUrl), content::Referrer(),
--      WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
-+      WindowOpenDisposition::NEW_FOREGROUND_TAB, ::ui::PAGE_TRANSITION_LINK,
+-      WindowOpenDisposition::kNewForegroundTab, ui::PAGE_TRANSITION_LINK,
++      WindowOpenDisposition::kNewForegroundTab, ::ui::PAGE_TRANSITION_LINK,
        /*is_renderer_initiated=*/false);
    web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
  }
@@ -4943,34 +4898,6 @@ index 9fc77e09a7..b41fa76422 100644
  }
 +
 +#undef kResizeBorder
---- a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-+++ b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-@@ -58,7 +58,7 @@
- constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
- constexpr char kVoiceSearchQueryParameterValue[] = "1";
- 
--bool IsFuseboxEligible(Profile* profile) {
-+bool IsFuseboxEligible_omnibox_everywhere_handler(Profile* profile) {
-   if (!profile) {
-     return false;
-   }
-@@ -68,6 +68,9 @@
-          aim_eligibility_service->IsFuseboxEligible();
- }
- 
-+#define IsFuseboxEligible IsFuseboxEligible_omnibox_everywhere_handler
-+#define IsFuseboxEnabled IsFuseboxEnabled_omnibox_everywhere_handler
-+
- bool IsFuseboxEnabled(Profile* profile) {
-   if (!IsFuseboxEligible(profile)) {
-     return false;
-@@ -566,3 +569,6 @@
-         context_token, context_upload_status, error_type);
-   }
- }
-+
-+#undef IsFuseboxEligible
-+#undef IsFuseboxEnabled
 --- a/chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.cc
 +++ b/chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.cc
 @@ -48,6 +48,8 @@

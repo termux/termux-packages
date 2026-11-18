@@ -39,8 +39,6 @@ Enable jumbo build for the following component(s)/source_set(s):
  .../websocket_http3_handshake_stream.cc          |  4 ++++
  28 files changed, 162 insertions(+), 8 deletions(-)
 
-diff --git a/net/BUILD.gn b/net/BUILD.gn
-index 3b66c31a70..1c22c437d5 100644
 --- a/net/BUILD.gn
 +++ b/net/BUILD.gn
 @@ -7,6 +7,7 @@ import("//build/config/cast.gni")
@@ -48,11 +46,11 @@ index 3b66c31a70..1c22c437d5 100644
  import("//build/config/cronet/config.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
+ import("//build/rust/rust_static_library.gni")
  import("//crypto/features.gni")
  import("//net/features.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
-@@ -146,7 +147,7 @@ proto_library("device_bound_sessions_storage_proto") {
-   sources = [ "device_bound_sessions/proto/storage.proto" ]
+@@ -190,7 +191,7 @@ rust_static_library("http_chunked_decoder_rust") {
+   allow_unsafe = true
  }
  
 -component("net") {
@@ -60,7 +58,7 @@ index 3b66c31a70..1c22c437d5 100644
    sources = [
      "base/address_family.cc",
      "base/address_family.h",
-@@ -1127,6 +1128,9 @@ component("net") {
+@@ -1249,6 +1250,9 @@ component("net") {
      "url_request/websocket_handshake_userdata_key.cc",
      "url_request/websocket_handshake_userdata_key.h",
    ]
@@ -70,7 +68,7 @@ index 3b66c31a70..1c22c437d5 100644
  
    if (is_posix || is_fuchsia) {
      sources += [ "base/net_errors_posix.cc" ]
-@@ -1332,6 +1336,10 @@ component("net") {
+@@ -1489,6 +1493,10 @@ component("net") {
        "base/network_interfaces_linux.h",
        "base/platform_mime_util_linux.cc",
      ]
@@ -931,9 +929,9 @@ index 5641bd744d..5581b9e7c6 100644
 +#undef IsEchEnabled
 --- a/net/device_bound_sessions/jwk_utils.cc
 +++ b/net/device_bound_sessions/jwk_utils.cc
-@@ -34,13 +34,15 @@
- constexpr char kRsaModulus[] = "n";
- constexpr char kRsaExponent[] = "e";
+@@ -46,13 +46,15 @@ constexpr size_t kEcP256FieldElementLength = 32;
+ constexpr size_t kEcP256UncompressedPointLength =
+     1 + 2 * kEcP256FieldElementLength;
  
 -std::string Base64UrlEncode(base::span<const uint8_t> input) {
 +std::string Base64UrlEncode_jwk_utils(base::span<const uint8_t> input) {
@@ -945,10 +943,10 @@ index 5641bd744d..5581b9e7c6 100644
  
 +#define Base64UrlEncode Base64UrlEncode_jwk_utils
 +
- base::DictValue ConvertES256PkeySpkiToJwk(base::span<const uint8_t> pkey_spki) {
-   bssl::UniquePtr<EVP_PKEY> pkey = crypto::evp::PublicKeyFromBytes(pkey_spki);
-   if (!pkey || EVP_PKEY_id(pkey.get()) != EVP_PKEY_EC) {
-@@ -146,3 +148,5 @@
+ }  // namespace
+ 
+ std::optional<base::DictValue> CreateJwk(
+@@ -106,3 +108,5 @@ std::optional<std::string> GetJwkThumbprint(
  }
  
  }  // namespace net::device_bound_sessions

@@ -422,36 +422,6 @@ index 569d4438b2..d5022dfe4f 100644
  
    OpIndex REDUCE_INPUT_GRAPH(StructGet)(OpIndex ig_index,
                                          const StructGetOp& op) {
-diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
-index b92154e46f..fa1b452c2f 100644
---- a/v8/src/compiler/wasm-compiler.cc
-+++ b/v8/src/compiler/wasm-compiler.cc
-@@ -70,7 +70,7 @@ namespace {
- 
- // Use MachineType::Pointer() over Tagged() to load root pointers because they
- // do not get compressed.
--#define LOAD_ROOT(RootName, factory_name)                         \
-+#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
-   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
-                   isolate_->factory()->factory_name()))           \
-             : gasm_->LoadImmutable(                               \
-@@ -277,7 +277,7 @@ Node* WasmGraphBuilder::Int32Constant(int32_t value) {
- }
- 
- Node* WasmGraphBuilder::UndefinedValue() {
--  return LOAD_ROOT(UndefinedValue, undefined_value);
-+  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
- }
- 
- // TODO(ahaas): Merge TrapId with TrapReason.
-@@ -1231,6 +1231,6 @@ AssemblerOptions WasmStubAssemblerOptions() {
-   };
- }
- 
--#undef LOAD_ROOT
-+#undef LOAD_ROOT_IN_WASM_COMPILER
- 
- }  // namespace v8::internal::compiler
 diff --git a/v8/src/diagnostics/perf-jit.cc b/v8/src/diagnostics/perf-jit.cc
 index c509e4220c..e9ccece0d4 100644
 --- a/v8/src/diagnostics/perf-jit.cc
@@ -681,21 +651,6 @@ index 3f46599fbb..67e7cec3db 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/v8/src/objects/js-atomics-synchronization.h b/v8/src/objects/js-atomics-synchronization.h
-index 73a03828db..8b458f2fba 100644
---- a/v8/src/objects/js-atomics-synchronization.h
-+++ b/v8/src/objects/js-atomics-synchronization.h
-@@ -27,8 +27,8 @@
- class WaiterQueueNode;
- }  // namespace detail
- 
--using detail::WaiterQueueLockGuard;
--using detail::WaiterQueueNode;
-+using internal::detail::WaiterQueueLockGuard;
-+using internal::detail::WaiterQueueNode;
- 
- // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
- // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
 diff --git a/v8/src/objects/js-collator.cc b/v8/src/objects/js-collator.cc
 index 9ee693fa47..6ad43a79eb 100644
 --- a/v8/src/objects/js-collator.cc

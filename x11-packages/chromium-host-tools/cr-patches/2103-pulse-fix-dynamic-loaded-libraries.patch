@@ -3,7 +3,7 @@
 @@ -44,8 +44,12 @@
  
  #if defined(DLOPEN_PULSEAUDIO)
- static const base::FilePath::CharType kPulseLib[] =
+ constexpr base::FilePath::CharType kPulseLib[] =
 +#ifdef __TERMUX__
 +    FILE_PATH_LITERAL("libpulse.so");
 +#else
