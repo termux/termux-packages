@@ -1,5 +1,6 @@
 TERMUX_SUBPKG_INCLUDE="lib/python*"
 TERMUX_SUBPKG_DESCRIPTION="The xcbgen Python module"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 # Cannot depend on python due to circular dependency.
 TERMUX_SUBPKG_RECOMMENDS="python"
 TERMUX_SUBPKG_BREAKS="xcb-proto (<< 1.15.2)"
