@@ -3,32 +3,25 @@ TERMUX_PKG_DESCRIPTION="A command-line task management tool for sequential and p
 TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.MIT, LICENSE.APACHE"
 TERMUX_PKG_MAINTAINER="@stevenxxiu"
-TERMUX_PKG_VERSION="4.0.4"
+TERMUX_PKG_VERSION="4.0.5"
 TERMUX_PKG_SRCURL="https://github.com/Nukesor/pueue/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=236a47a1cc74721998f4de3eff5062efe8e73c56c05aa19e64fef2e5ee55700f
+TERMUX_PKG_SHA256=1df97d8253ced4b987adc1f9dcbedb03153380cd8d04eb92f6a76d9340a5cd99
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SERVICE_SCRIPT=("pueued" 'exec pueued 2>&1')
 
 termux_step_pre_configure() {
+	export CC_x86_64_unknown_linux_gnu=gcc
+
 	termux_setup_rust
 
-	cargo vendor
-	find ./vendor \
-		-mindepth 1 -maxdepth 1 -type d \
-		! -wholename ./vendor/tempfile \
-		-exec rm -rf '{}' \;
+	export CFLAGS_"${CARGO_TARGET_NAME//-/_}"="$CFLAGS"
+	unset CFLAGS
 
-	local patch="$TERMUX_PKG_BUILDER_DIR/tempfile-bump-rustix.diff"
-	local dir="vendor/tempfile"
-	echo "Applying patch: $patch"
-	patch -p1 -d "$dir" < "${patch}"
+	: "${CARGO_HOME:=$HOME/.cargo}"
+	export CARGO_HOME
 
-	echo "" >> Cargo.toml
-	echo '[patch.crates-io]' >> Cargo.toml
-	echo "tempfile = { path = \"./vendor/tempfile\" }" >> Cargo.toml
-
-	cargo update
+	cargo fetch --target "${CARGO_TARGET_NAME}"
 }
 
 termux_step_make() {

@@ -1,6 +1,6 @@
 --- a/pueue/Cargo.toml
 +++ b/pueue/Cargo.toml
-@@ -67,7 +67,7 @@ similar-asserts = "1"
+@@ -66,7 +66,7 @@ similar-asserts = "2"
  # --- Platform specific dependencies ---
  
  # Linux
@@ -8,10 +8,11 @@
 +[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
  procfs = { version = "0.18", default-features = false }
  
- # Linux + Mac OS
--- a/pueue/src/process_helper/mod.rs
+ # Mac OS libproc
+--- a/pueue/src/process_helper/mod.rs
 +++ b/pueue/src/process_helper/mod.rs
-@@ -21,6 +21,6 @@ pub use self::unix::*;
+@@ -18,7 +18,7 @@ mod unix;
+ pub use self::unix::*;
  
  // Platform specific process support
 -#[cfg_attr(target_os = "linux", path = "linux.rs")]
