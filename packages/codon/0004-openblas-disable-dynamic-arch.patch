@@ -1,14 +1,14 @@
 --- a/cmake/deps.cmake
 +++ b/cmake/deps.cmake
-@@ -157,7 +157,6 @@ CPMAddPackage(
+@@ -190,7 +190,6 @@ CPMAddPackage(
      EXCLUDE_FROM_ALL YES)
  
- if(NOT APPLE AND NOT SYSTEM_BLAS)
+ if(NOT APPLE AND NOT WIN32 AND NOT SYSTEM_BLAS)
 -    enable_language(Fortran)
      set(OPENBLAS_TARGET_OPTIONS "")
      if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
          set(OPENBLAS_TARGET_OPTIONS "TARGET PRESCOTT")
-@@ -170,7 +169,8 @@ if(NOT APPLE AND NOT SYSTEM_BLAS)
+@@ -203,7 +202,8 @@ if(NOT APPLE AND NOT WIN32 AND NOT SYSTEM_BLAS)
          GIT_TAG v0.3.33
          EXCLUDE_FROM_ALL YES
          OPTIONS ${OPENBLAS_TARGET_OPTIONS}
