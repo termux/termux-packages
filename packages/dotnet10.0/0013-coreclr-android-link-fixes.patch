@@ -63,13 +63,19 @@ index a850607a2..ec8b881a6 100644
 diff --git a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
 --- a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
 +++ b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
-@@ -192,6 +192,11 @@
+@@ -192,6 +192,17 @@
          nativeresourcestring
      )
  
-+    # Termux's <semaphore.h> maps sem_open/sem_close (used by the PAL) to libandroid-posix-semaphore
++    # Termux's <semaphore.h> maps sem_open/sem_close (used by the PAL) to libandroid-posix-semaphore.
++    # It lives outside the system library path, next to zlib (Termux: $PREFIX/lib), so add a RUNPATH.
++    if(CLR_CMAKE_TARGET_ANDROID AND NOT ANDROID_POSIX_SEMAPHORE)
++        find_library(ANDROID_POSIX_SEMAPHORE NAMES android-posix-semaphore)
++    endif()
 +    if(ANDROID_POSIX_SEMAPHORE)
 +        LIST(APPEND NATIVE_LIBS ${ANDROID_POSIX_SEMAPHORE})
++        get_filename_component(ANDROID_POSIX_SEMAPHORE_DIR "${ANDROID_POSIX_SEMAPHORE}" DIRECTORY)
++        target_link_options(singlefilehost PRIVATE "LINKER:-rpath,${ANDROID_POSIX_SEMAPHORE_DIR}")
 +    endif()
 +
      # additional requirements for System.IO.Compression.Native
