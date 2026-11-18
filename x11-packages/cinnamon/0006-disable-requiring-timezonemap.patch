@@ -60,16 +60,16 @@
      def on_map_location_changed(self, *args):
 +        if not HAS_TIMEZONEMAP:
 +            return
-         zone = self.tz_map.get_location().props.zone
-         if zone == self.zone:
-             return
-@@ -117,7 +130,8 @@ class Module:
-             return
+         self.set_timezone(self.tz_map.get_location().props.zone)
  
-         self.set_timezone(zone)
--        self.tz_map.set_timezone(zone)
-+        if HAS_TIMEZONEMAP:
-+            self.tz_map.set_timezone(zone)
+     def on_selector_location_changed(self, *args):
+@@ -119,7 +132,8 @@ class Module:
+             else:
+                 self.zone = zone
  
-     def set_timezone(self, zone):
-         self.zone = zone
+-            self.tz_map.set_timezone(self.zone)
++            if HAS_TIMEZONEMAP:
++                self.tz_map.set_timezone(self.zone)
+             self.tz_selector.set_timezone(self.zone)
+ 
+         self.proxy_handler.set_timezone(zone, on_done)
