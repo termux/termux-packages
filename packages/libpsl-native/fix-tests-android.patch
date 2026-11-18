@@ -1,6 +1,6 @@
 --- a/src/libpsl-native/test/test-createhardlink.cpp
 +++ b/src/libpsl-native/test/test-createhardlink.cpp
-@@ -13,12 +13,13 @@
+@@ -13,12 +13,13 @@ using namespace std;
  class CreateHardLinkTest : public ::testing::Test
  {
  protected:
@@ -18,7 +18,7 @@
      char *file, *dir;
      char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
  
-@@ -39,7 +40,11 @@
+@@ -39,7 +40,11 @@ protected:
  
          // Create hard link to file
          int ret = CreateHardLink(fileHardLink.c_str(), file);
@@ -31,7 +31,7 @@
  
          // Create hard link to directory - should fail
          ret = CreateHardLink(dirHardLink.c_str(), dir);
-@@ -50,8 +55,7 @@
+@@ -50,8 +55,7 @@ protected:
      {
          int ret;
  
@@ -41,7 +41,7 @@
  
          ret = unlink(file);
          EXPECT_EQ(0, ret);
-@@ -63,8 +67,9 @@
+@@ -63,8 +67,9 @@ protected:
  
  TEST_F(CreateHardLinkTest, FilePathNameDoesNotExist)
  {
@@ -53,7 +53,7 @@
  
      // make sure neither exists
      unlink(invalidFile.c_str());
-@@ -76,6 +81,7 @@
+@@ -76,6 +81,7 @@ TEST_F(CreateHardLinkTest, FilePathNameDoesNotExist)
  
  TEST_F(CreateHardLinkTest, VerifyLinkCount)
  {
@@ -63,7 +63,7 @@
      EXPECT_EQ(0, ret);
 --- a/src/libpsl-native/test/test-createsymlink.cpp
 +++ b/src/libpsl-native/test/test-createsymlink.cpp
-@@ -17,10 +17,10 @@
+@@ -17,10 +17,10 @@ class CreateSymLinkTest : public ::testing::Test
  protected:
  
      static const int bufSize = 64;
@@ -78,7 +78,7 @@
      char *file, *dir;
      char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
  
-@@ -68,8 +68,8 @@
+@@ -68,8 +68,8 @@ protected:
  
  TEST_F(CreateSymLinkTest, FilePathNameDoesNotExist)
  {
@@ -91,10 +91,10 @@
      unlink(invalidFile.c_str());
 --- a/src/libpsl-native/test/test-getcommonlstat.cpp
 +++ b/src/libpsl-native/test/test-getcommonlstat.cpp
-@@ -40,9 +40,9 @@
+@@ -40,9 +40,9 @@ TEST(GetCommonLStat, GetOwnerIdOfRoot)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %u /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %u /", "r");
  #else
@@ -103,10 +103,10 @@
  #endif
      int uid = -1;
      int result = fscanf(p, "%d", &uid);
-@@ -57,9 +57,9 @@
+@@ -57,9 +57,9 @@ TEST(GetCommonLStat, GetGroupId)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %g /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %g /", "r");
  #else
@@ -115,10 +115,10 @@
  #endif
      int gid = -1;
      int result = fscanf(p, "%d", &gid);
-@@ -74,9 +74,9 @@
+@@ -74,9 +74,9 @@ TEST(GetCommonLStat, GetInodeNumber)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %i /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %i /", "r");
  #else
@@ -127,10 +127,10 @@
  #endif
      long inode = -1;
      int result = fscanf(p, "%ld", &inode);
-@@ -91,9 +91,9 @@
+@@ -91,9 +91,9 @@ TEST(GetCommonLStat, GetSize)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %z /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %z /", "r");
  #else
@@ -139,10 +139,10 @@
  #endif
      long size = -1;
      int result = fscanf(p, "%ld", &size);
-@@ -108,9 +108,9 @@
+@@ -108,9 +108,9 @@ TEST(GetCommonLStat, GetBlockSize)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %k /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %k /", "r");
  #else
@@ -151,10 +151,10 @@
  #endif
      long bSize = -1;
      int result = fscanf(p, "%ld", &bSize);
-@@ -125,9 +125,9 @@
+@@ -125,9 +125,9 @@ TEST(GetCommonLStat, GetBlockCount)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %b /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %b /", "r");
  #else
@@ -163,10 +163,10 @@
  #endif
      int bSize = -1;
      int result = fscanf(p, "%d", &bSize);
-@@ -142,9 +142,9 @@
+@@ -142,9 +142,9 @@ TEST(GetCommonLStat, GetLinkCount)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %l /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %l /", "r");
  #else
@@ -175,10 +175,10 @@
  #endif
      int linkcount = -1;
      int result = fscanf(p, "%d", &linkcount);
-@@ -159,9 +159,9 @@
+@@ -159,9 +159,9 @@ TEST(GetCommonLStat, GetDeviceId)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %d /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %d /", "r");
  #else
@@ -187,10 +187,10 @@
  #endif
      int deviceId = -1;
      int result = fscanf(p, "%d", &deviceId);
-@@ -176,9 +176,9 @@
+@@ -176,9 +176,9 @@ TEST(GetCommonLStat, GetATime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %a /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %a /", "r");
  #else
@@ -199,10 +199,10 @@
  #endif
      long aTime = -1;
      int result = fscanf(p, "%ld", &aTime);
-@@ -193,9 +193,9 @@
+@@ -193,9 +193,9 @@ TEST(GetCommonLStat, GetMTime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %m /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %m /", "r");
  #else
@@ -211,10 +211,10 @@
  #endif
      long mTime = -1;
      int result = fscanf(p, "%ld", &mTime);
-@@ -210,9 +210,9 @@
+@@ -210,9 +210,9 @@ TEST(GetCommonLStat, GetCTime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %c /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %c /", "r");
  #else
@@ -223,7 +223,7 @@
  #endif
      long cTime = -1;
      int result = fscanf(p, "%ld", &cTime);
-@@ -224,7 +224,7 @@
+@@ -224,7 +224,7 @@ TEST(GetCommonLStat, GetCTime)
  
  TEST(GetCommonLStat, Mode001)
  {
@@ -232,7 +232,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -241,7 +241,7 @@
+@@ -241,7 +241,7 @@ TEST(GetCommonLStat, Mode001)
  
  TEST(GetCommonLStat, Mode002)
  {
@@ -241,7 +241,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -258,7 +258,7 @@
+@@ -258,7 +258,7 @@ TEST(GetCommonLStat, Mode002)
  
  TEST(GetCommonLStat, Mode003)
  {
@@ -250,7 +250,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -275,14 +275,14 @@
+@@ -275,14 +275,14 @@ TEST(GetCommonLStat, Mode003)
  
  TEST(GetCommonLStat, Mode004)
  {
@@ -269,10 +269,10 @@
      GetCommonLStat(dname, &cs);
 --- a/src/libpsl-native/test/test-getcommonstat.cpp
 +++ b/src/libpsl-native/test/test-getcommonstat.cpp
-@@ -42,9 +42,9 @@
+@@ -42,9 +42,9 @@ TEST(GetCommonStat, GetOwnerIdOfRoot)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %u /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %u /", "r");
  #else
@@ -281,10 +281,10 @@
  #endif
      int uid = -1;
      int result = fscanf(p, "%d", &uid);
-@@ -59,9 +59,9 @@
+@@ -59,9 +59,9 @@ TEST(GetCommonStat, GetGroupId)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %g /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %g /", "r");
  #else
@@ -293,10 +293,10 @@
  #endif
      int gid = -1;
      int result = fscanf(p, "%d", &gid);
-@@ -76,9 +76,9 @@
+@@ -76,9 +76,9 @@ TEST(GetCommonStat, GetInodeNumber)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %i /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %i /", "r");
  #else
@@ -305,10 +305,10 @@
  #endif
      long inode = -1;
      int result = fscanf(p, "%ld", &inode);
-@@ -94,10 +94,10 @@
+@@ -94,10 +94,10 @@ TEST(GetCommonStat, GetMode)
      CommonStat cs;
      unsigned int mode = -1;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -    p = popen("/usr/bin/stat -f %p /", "r");
 +    p = popen("@TERMUX_PREFIX@/bin/stat -f %p /", "r");
      int result = fscanf(p, "%o", &mode);
@@ -318,10 +318,10 @@
      int result = fscanf(p, "%x", &mode);
  #endif
      pclose(p);
-@@ -111,9 +111,9 @@
+@@ -111,9 +111,9 @@ TEST(GetCommonStat, GetSize)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %z /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %z /", "r");
  #else
@@ -330,10 +330,10 @@
  #endif
      long size = -1;
      int result = fscanf(p, "%ld", &size);
-@@ -128,9 +128,9 @@
+@@ -128,9 +128,9 @@ TEST(GetCommonStat, GetBlockSize)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %k /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %k /", "r");
  #else
@@ -342,10 +342,10 @@
  #endif
      long bSize = -1;
      int result = fscanf(p, "%ld", &bSize);
-@@ -145,9 +145,9 @@
+@@ -145,9 +145,9 @@ TEST(GetCommonStat, GetBlockCount)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %b /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %b /", "r");
  #else
@@ -354,10 +354,10 @@
  #endif
      int bSize = -1;
      int result = fscanf(p, "%d", &bSize);
-@@ -162,9 +162,9 @@
+@@ -162,9 +162,9 @@ TEST(GetCommonStat, GetLinkCount)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %l /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %l /", "r");
  #else
@@ -366,10 +366,10 @@
  #endif
      int linkcount = -1;
      int result = fscanf(p, "%d", &linkcount);
-@@ -179,9 +179,9 @@
+@@ -179,9 +179,9 @@ TEST(GetCommonStat, GetDeviceId)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %d /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %d /", "r");
  #else
@@ -378,10 +378,10 @@
  #endif
      int deviceId = -1;
      int result = fscanf(p, "%d", &deviceId);
-@@ -196,9 +196,9 @@
+@@ -196,9 +196,9 @@ TEST(GetCommonStat, GetATime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %a /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %a /", "r");
  #else
@@ -390,10 +390,10 @@
  #endif
      long aTime = -1;
      int result = fscanf(p, "%ld", &aTime);
-@@ -213,9 +213,9 @@
+@@ -213,9 +213,9 @@ TEST(GetCommonStat, GetMTime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %m /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %m /", "r");
  #else
@@ -402,10 +402,10 @@
  #endif
      long mTime = -1;
      int result = fscanf(p, "%ld", &mTime);
-@@ -230,9 +230,9 @@
+@@ -230,9 +230,9 @@ TEST(GetCommonStat, GetCTime)
      FILE *p;
      CommonStat cs;
- #if defined (__APPLE__)
+ #if defined (__APPLE__) || defined(__FreeBSD__)
 -     p = popen("/usr/bin/stat -f %c /", "r");
 +     p = popen("@TERMUX_PREFIX@/bin/stat -f %c /", "r");
  #else
@@ -414,7 +414,7 @@
  #endif
      long cTime = -1;
      int result = fscanf(p, "%ld", &cTime);
-@@ -244,7 +244,7 @@
+@@ -244,7 +244,7 @@ TEST(GetCommonStat, GetCTime)
  
  TEST(GetCommonStat, Mode001)
  {
@@ -423,7 +423,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -261,7 +261,7 @@
+@@ -261,7 +261,7 @@ TEST(GetCommonStat, Mode001)
  
  TEST(GetCommonStat, Mode002)
  {
@@ -432,7 +432,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -279,7 +279,7 @@
+@@ -279,7 +279,7 @@ TEST(GetCommonStat, Mode002)
  
  TEST(GetCommonStat, Mode003)
  {
@@ -441,7 +441,7 @@
      char fname[PATH_MAX];
      struct stat buffer;
      int fd;
-@@ -297,14 +297,14 @@
+@@ -297,14 +297,14 @@ TEST(GetCommonStat, Mode003)
  
  TEST(GetCommonStat, Mode004)
  {
@@ -460,7 +460,7 @@
      GetCommonStat(dname, &cs);
 --- a/src/libpsl-native/test/test-getlinkcount.cpp
 +++ b/src/libpsl-native/test/test-getlinkcount.cpp
-@@ -17,7 +17,7 @@
+@@ -17,7 +17,7 @@ class getLinkCountTest : public ::testing::Test
  protected:
  
      static const int bufSize = 64;
@@ -469,7 +469,7 @@
      char fileTemplateBuf[bufSize];
  
      int32_t count;
-@@ -46,10 +46,15 @@
+@@ -46,10 +46,15 @@ protected:
          ofs.close();
      }
  
@@ -485,7 +485,7 @@
          EXPECT_EQ(0, ret);
  
          return newFile;
-@@ -64,7 +69,7 @@
+@@ -64,7 +69,7 @@ protected:
  
  TEST_F(getLinkCountTest, FilePathNameDoesNotExist)
  {
@@ -494,7 +494,7 @@
      int32_t ret = GetLinkCount(invalidFile.c_str(), &count);
      ASSERT_EQ(-1, ret);
      EXPECT_EQ(ENOENT, errno);
-@@ -86,6 +91,10 @@
+@@ -86,6 +91,10 @@ TEST_F(getLinkCountTest, LinkCountOfMultiplyLinkedFile)
  {
      createFileForTesting(file);
      std::string newFile = createHardLink(file);
@@ -507,7 +507,7 @@
      removeFile(file);
 --- a/src/libpsl-native/test/test-isexecutable.cpp
 +++ b/src/libpsl-native/test/test-isexecutable.cpp
-@@ -16,7 +16,7 @@
+@@ -16,7 +16,7 @@ class IsExecutableTest : public ::testing::Test
  protected:
  
      static const int bufSize = 64;
@@ -516,7 +516,7 @@
      const mode_t mode_700 = S_IRUSR | S_IWUSR | S_IXUSR;
      const mode_t mode_070 = S_IRGRP | S_IWGRP | S_IXGRP;
      const mode_t mode_007 = S_IROTH | S_IWOTH | S_IXOTH;
-@@ -50,7 +50,7 @@
+@@ -50,7 +50,7 @@ protected:
  
  TEST_F(IsExecutableTest, FilePathNameDoesNotExist)
  {
@@ -527,7 +527,7 @@
  }
 --- a/src/libpsl-native/test/test-issymlink.cpp
 +++ b/src/libpsl-native/test/test-issymlink.cpp
-@@ -15,10 +15,10 @@
+@@ -15,10 +15,10 @@ class isSymLinkTest : public ::testing::Test
  protected:
  
      static const int bufSize = 64;
@@ -542,7 +542,7 @@
      char *file, *dir;
      char fileTemplateBuf[bufSize], dirTemplateBuf[bufSize];
  
-@@ -58,7 +58,7 @@
+@@ -58,7 +58,7 @@ protected:
  
  TEST_F(isSymLinkTest, FilePathNameDoesNotExist)
  {
