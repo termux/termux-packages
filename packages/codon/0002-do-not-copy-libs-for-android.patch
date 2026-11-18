@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -101,6 +101,8 @@ if(DEFINED ENV{CODON_SYSTEM_LIBRARIES})
+@@ -168,6 +168,8 @@ elseif(DEFINED ENV{CODON_SYSTEM_LIBRARIES})
    add_library(libgfortran SHARED IMPORTED)
    set_target_properties(libgfortran PROPERTIES IMPORTED_LOCATION ${copied_libgfortran})
    target_link_libraries(codonrt PRIVATE libgfortran)
@@ -9,34 +9,34 @@
  else()
    message(FATAL_ERROR "Set 'CODON_SYSTEM_LIBRARIES' to the directory containing system libraries.")
  endif()
-@@ -525,13 +527,7 @@ add_custom_target(
-   COMMAND
-     ${CMAKE_COMMAND} -E copy
-     "${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX}"
--    "${CMAKE_BINARY_DIR}/lib/codon"
--  COMMAND
--    ${CMAKE_COMMAND} -E copy ${copied_libgfortran} "${CMAKE_BINARY_DIR}/lib/codon"
--  COMMAND
--    /bin/sh -c "test -f '${copied_libquadmath}' && ${CMAKE_COMMAND} -E copy '${copied_libquadmath}' '${CMAKE_BINARY_DIR}/lib/codon' || true"
--  COMMAND
--    ${CMAKE_COMMAND} -E copy ${copied_libgcc} "${CMAKE_BINARY_DIR}/lib/codon")
-+    "${CMAKE_BINARY_DIR}/lib/codon")
+@@ -696,13 +698,7 @@ else()
+     COMMAND
+       ${CMAKE_COMMAND} -E copy
+       "${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+-      "${CMAKE_BINARY_DIR}/lib/codon"
+-    COMMAND
+-      ${CMAKE_COMMAND} -E copy ${copied_libgfortran} "${CMAKE_BINARY_DIR}/lib/codon"
+-    COMMAND
+-      /bin/sh -c "test -f '${copied_libquadmath}' && ${CMAKE_COMMAND} -E copy '${copied_libquadmath}' '${CMAKE_BINARY_DIR}/lib/codon' || true"
+-    COMMAND
+-      ${CMAKE_COMMAND} -E copy ${copied_libgcc} "${CMAKE_BINARY_DIR}/lib/codon")
++      "${CMAKE_BINARY_DIR}/lib/codon")
+ endif()
  add_dependencies(libs codonrt codonc)
  
- # Codon command-line tool
-@@ -632,15 +628,6 @@ endif()
- 
- install(TARGETS codonrt codonc codon_jupyter DESTINATION lib/codon)
- install(FILES ${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX} DESTINATION lib/codon)
--install(FILES ${copied_libgfortran} DESTINATION lib/codon)
--# only install libquadmath if it exists at build time
--install(CODE "
--  file(GLOB _quadmath \"${copied_libquadmath}\")
--  if(EXISTS \"\${_quadmath}\")
--    file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/lib/codon\" TYPE FILE FILES \"\${_quadmath}\")
--  endif()
--")
--install(FILES ${copied_libgcc} DESTINATION lib/codon)
+@@ -869,15 +865,6 @@ if(WIN32)
+ endif()
+ if(NOT WIN32)
+   install(FILES ${CMAKE_BINARY_DIR}/libomp${CMAKE_SHARED_LIBRARY_SUFFIX} DESTINATION lib/codon)
+-  install(FILES ${copied_libgfortran} DESTINATION lib/codon)
+-  # only install libquadmath if it exists at build time
+-  install(CODE "
+-    file(GLOB _quadmath \"${copied_libquadmath}\")
+-    if(EXISTS \"\${_quadmath}\")
+-      file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/lib/codon\" TYPE FILE FILES \"\${_quadmath}\")
+-    endif()
+-  ")
+-  install(FILES ${copied_libgcc} DESTINATION lib/codon)
+ endif()
  install(TARGETS codon DESTINATION bin)
  install(DIRECTORY ${CMAKE_BINARY_DIR}/include/codon DESTINATION include)
- install(DIRECTORY ${LLVM_INCLUDE_DIRS}/llvm DESTINATION include)

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python com
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	"0.20.6"
+	"0.20.7"
 	"20.1.7"
 )
 TERMUX_PKG_SRCURL=(
@@ -12,8 +12,8 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/exaloop/llvm-project/archive/refs/tags/codon-${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	b7e14597043ee363852215a3afebcadf1b829f07f15b47c37f6ebcf58d7a152d
-	688772b279465e6d6ad7269741844f17dc5834eef4333f8a7851b6446f7143b6
+	04d128b9a9b26caeb4e62bd9b4aff014caf8647e743087d16a3fb18409317cd9
+	27f677f639402e826fce65bb8e21e904e45cd6f34f46ab2b0b5591877cc091b1
 	d0f613f3e63b1f1f1c8c75822bf2b83caed48e8973c35d13bf4148d343bc8645
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
