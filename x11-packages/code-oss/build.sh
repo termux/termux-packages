@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/microsoft/vscode
 TERMUX_PKG_DESCRIPTION="Visual Studio Code - OSS"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@licy183"
-TERMUX_PKG_VERSION="1.146.0"
+TERMUX_PKG_VERSION="1.147.0"
 TERMUX_PKG_SRCURL=git+https://github.com/microsoft/vscode
 TERMUX_PKG_GIT_BRANCH="$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="electron43, libx11, libxkbfile, libsecret, ripgrep"
@@ -86,26 +86,20 @@ termux_step_post_get_source() {
 	python3 - <<PY
 import yaml
 
-files = [
-	"pnpm-workspace.yaml",
-	"extensions/pnpm-workspace.yaml",
-	"extensions/copilot/pnpm-workspace.yaml",
-]
 extra_env = {
 	"npm_config_arch": "$(__resolve_npm_arch)",
 	"npm_config_nodedir": "${TERMUX_PREFIX}/opt/electron43-host-tools/node_headers",
 }
-for path in files:
-	with open(path) as f:
-		data = yaml.safe_load(f)
+data = None
+with open("pnpm-workspace.yaml", "r") as f:
+	data = yaml.safe_load(f)
 	data["extraEnv"] = extra_env
-	if path == "pnpm-workspace.yaml":
-		allow = data.setdefault("allowBuilds", {})
-		allow["@vscode/vsce-sign"] = True
-		allow["keytar"] = True
-		allow["native-keymap@file:node-native-keymap-src"] = True
-	with open(path, "w") as f:
-		yaml.safe_dump(data, f, sort_keys=False)
+	allow = data.setdefault("allowBuilds", {})
+	allow["@vscode/vsce-sign"] = True
+	allow["keytar"] = True
+	allow["native-keymap@file:node-native-keymap-src"] = True
+with open("pnpm-workspace.yaml", "w") as f:
+	yaml.safe_dump(data, f, sort_keys=False)
 PY
 }
 
