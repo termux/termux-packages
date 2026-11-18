@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A set of simple scripts that provide basic desktop integ
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.2.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v${TERMUX_PKG_VERSION}/xdg-utils-v${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=93d510dccf328378f012fe195b4574c2fac1cd65a74d0852d6eaa72e5a2065a7
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="^v\K\d+\.\d+\.\d+$"
 TERMUX_PKG_DEPENDS="desktop-file-utils, file, make, perl, shared-mime-info, which, xorg-xprop"
@@ -26,8 +27,8 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	# `bin/xdg-open` conflicts with termux-tools.
-	mv $TERMUX_PREFIX/bin/{,xdg-utils-}xdg-open
-	mv $TERMUX_PREFIX/share/man/man1/{,xdg-utils-}xdg-open.1
+	mv "$TERMUX_PREFIX"/bin/{,xdg-utils-}xdg-open
+	mv "$TERMUX_PREFIX"/share/man/man1/{,xdg-utils-}xdg-open.1
 }
 
 termux_step_create_debscripts() {
