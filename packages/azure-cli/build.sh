@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Microsoft's command-line tool for managing Azure cloud r
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="2.93.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Azure/azure-cli/archive/refs/tags/azure-cli-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=0c88532f63331109d360dee51391236b018f3d5298afea5dc287d2b7ec5d193a
 TERMUX_PKG_AUTO_UPDATE=true
@@ -11,6 +12,7 @@ TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="python, python-pip, python-cryptography, python-psutil, python-bcrypt, python-pynacl"
 TERMUX_PKG_PYTHON_RUNTIME_DEPS="azure-cli, azure-cli-core, azure-cli-telemetry, argcomplete"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="setuptools, wheel, argcomplete"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
