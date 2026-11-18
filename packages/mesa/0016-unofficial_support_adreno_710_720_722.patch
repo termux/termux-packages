@@ -5,9 +5,9 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 
 --- a/src/freedreno/common/freedreno_devices.py
 +++ b/src/freedreno/common/freedreno_devices.py
-@@ -1149,6 +1149,66 @@ a740_raw_magic_regs = [
-         [A6XXRegs.REG_A6XX_UCHE_UNKNOWN_0E12, 0],
-     ]
+@@ -1145,6 +1145,63 @@ add_gpus([
+         raw_magic_regs = a720_raw_magic_regs,
+     ))
  
 +add_gpus([
 +        GPUId(chip_id=0x07010000, name="FD710"),
@@ -25,7 +25,6 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 +        wave_granularity = 2,
 +        fibers_per_sp = 128 * 2 * 16,
 +        highest_bank_bit = 16,
-+        magic_regs = a730_magic_regs,
 +        raw_magic_regs = a730_raw_magic_regs,
 +    ))
 +
@@ -45,7 +44,6 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 +        wave_granularity = 2,
 +        fibers_per_sp = 128 * 2 * 16,
 +        highest_bank_bit = 16,
-+        magic_regs = a730_magic_regs,
 +        raw_magic_regs = a730_raw_magic_regs,
 +    ))
 +
@@ -65,10 +63,9 @@ https://gitlab.freedesktop.org/mesa/mesa/-/issues/13036
 +        wave_granularity = 2,
 +        fibers_per_sp = 128 * 2 * 16,
 +        highest_bank_bit = 16,
-+        magic_regs = a730_magic_regs,
 +        raw_magic_regs = a730_raw_magic_regs,
 +    ))
 +
  add_gpus([
-         # These are named as Adreno730v3 or Adreno725v1.
-         GPUId(chip_id=0x07030002, name="FD725"),
+         GPUId(chip_id=0x43020100, name="Adreno (TM) 722"),
+         GPUId(chip_id=0xffff43020100, name="Adreno (TM) 722"),

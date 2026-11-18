@@ -2,7 +2,7 @@ Fix assertion error when running `eglinfo -B`.
 
 --- a/src/egl/drivers/dri2/platform_x11.c
 +++ b/src/egl/drivers/dri2/platform_x11.c
-@@ -1163,7 +1163,11 @@ platform_x11_finalize(_EGLDisplay *disp, bool force_zink)
+@@ -1092,7 +1092,11 @@ platform_x11_finalize(_EGLDisplay *disp, bool force_zink)
     if (!dri2_create_screen(disp))
        return false;
  
@@ -16,7 +16,7 @@ Fix assertion error when running `eglinfo -B`.
     }
 --- a/src/egl/drivers/dri2/platform_wayland.c
 +++ b/src/egl/drivers/dri2/platform_wayland.c
-@@ -3079,7 +3079,11 @@
+@@ -3303,7 +3303,11 @@ dri2_initialize_wayland_swrast(_EGLDisplay *disp)
     if (!dri2_create_screen(disp))
        goto cleanup;
  

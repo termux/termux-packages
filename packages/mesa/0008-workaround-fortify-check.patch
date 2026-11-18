@@ -20,7 +20,7 @@ https://github.com/termux/termux-packages/issues/18823
  #  define ONCE_FLAG_INIT PTHREAD_ONCE_INIT
 --- a/src/c11/impl/threads_posix.c
 +++ b/src/c11/impl/threads_posix.c
-@@ -120,7 +120,11 @@
+@@ -97,7 +97,11 @@ cnd_timedwait(cnd_t *cond, mtx_t *mtx, const struct timespec *abs_time)
      assert(cond != NULL);
      assert(abs_time != NULL);
  
@@ -32,7 +32,7 @@ https://github.com/termux/termux-packages/issues/18823
      if (rt == ETIMEDOUT)
          return thrd_timedout;
      return (rt == 0) ? thrd_success : thrd_error;
-@@ -132,7 +136,11 @@
+@@ -109,7 +113,11 @@ cnd_wait(cnd_t *cond, mtx_t *mtx)
  {
      assert(mtx != NULL);
      assert(cond != NULL);
@@ -44,7 +44,7 @@ https://github.com/termux/termux-packages/issues/18823
  }
  
  
-@@ -142,7 +150,12 @@
+@@ -119,7 +127,12 @@ void
  mtx_destroy(mtx_t *mtx)
  {
      assert(mtx != NULL);
@@ -57,7 +57,7 @@ https://github.com/termux/termux-packages/issues/18823
  }
  
  /*
-@@ -183,13 +196,22 @@
+@@ -160,13 +173,22 @@ mtx_init(mtx_t *mtx, int type)
          return thrd_error;
  
      if ((type & mtx_recursive) == 0) {
@@ -80,7 +80,7 @@ https://github.com/termux/termux-packages/issues/18823
      pthread_mutexattr_destroy(&attr);
      return thrd_success;
  }
-@@ -199,7 +221,11 @@
+@@ -176,7 +198,11 @@ int
  mtx_lock(mtx_t *mtx)
  {
      assert(mtx != NULL);
@@ -92,7 +92,7 @@ https://github.com/termux/termux-packages/issues/18823
  }
  
  static int
-@@ -227,7 +253,11 @@
+@@ -204,7 +230,11 @@ mtx_timedlock(mtx_t *mtx, const struct timespec *ts)
      {
  #ifdef EMULATED_THREADS_USE_NATIVE_TIMEDLOCK
      int rt;
@@ -104,7 +104,7 @@ https://github.com/termux/termux-packages/issues/18823
      if (rt == 0)
          return thrd_success;
      return (rt == ETIMEDOUT) ? thrd_timedout : thrd_error;
-@@ -252,7 +282,11 @@
+@@ -229,7 +259,11 @@ int
  mtx_trylock(mtx_t *mtx)
  {
      assert(mtx != NULL);
@@ -116,7 +116,7 @@ https://github.com/termux/termux-packages/issues/18823
  }
  
  // 7.25.4.6
-@@ -260,7 +294,11 @@
+@@ -237,7 +271,11 @@ int
  mtx_unlock(mtx_t *mtx)
  {
      assert(mtx != NULL);
@@ -130,7 +130,7 @@ https://github.com/termux/termux-packages/issues/18823
  
 --- a/src/util/cnd_monotonic.c
 +++ b/src/util/cnd_monotonic.c
-@@ -132,7 +132,11 @@
+@@ -132,7 +132,11 @@ u_cnd_monotonic_timedwait(struct u_cnd_monotonic *cond, mtx_t *mtx,
     timespec_sub_saturate(&rel_time, abs_time, &now_time);
     int rt = pthread_cond_timedwait_relative_np(&cond->cond, mtx, &rel_time);
  #else
@@ -142,7 +142,7 @@ https://github.com/termux/termux-packages/issues/18823
  #endif
     if (rt == ETIMEDOUT)
        return thrd_timedout;
-@@ -151,6 +155,10 @@
+@@ -151,6 +155,10 @@ u_cnd_monotonic_wait(struct u_cnd_monotonic *cond, mtx_t *mtx)
                              (PCRITICAL_SECTION)mtx, INFINITE);
     return thrd_success;
  #else
