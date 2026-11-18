@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An extensible toolkit for MPEG transport streams"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="3.45.4798"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/tsduck/tsduck/archive/refs/tags/v$(sed 's/\./-/2' <<< "$TERMUX_PKG_VERSION").tar.gz"
 TERMUX_PKG_SHA256=a35845430fff1385cf1cda9645bbfd0ec887ed440137fc6c26863c624c24eb63
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcurl, libedit"
