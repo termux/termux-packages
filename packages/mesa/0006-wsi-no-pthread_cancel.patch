@@ -1,7 +1,8 @@
-+++ ./src/vulkan/wsi/wsi_common_display.c
-@@ -176,6 +176,12 @@
- 
- static uint64_t fence_sequence;
+--- a/src/vulkan/wsi/wsi_common_display.c
++++ b/src/vulkan/wsi/wsi_common_display.c
+@@ -548,6 +548,12 @@ static uint64_t fence_sequence;
+ static void
+ _wsi_display_cleanup_state(struct wsi_display_swapchain *chain);
  
 +#ifdef __ANDROID__
 +static void thread_signal_handler (int signum) {
@@ -12,7 +13,7 @@
  ICD_DEFINE_NONDISP_HANDLE_CASTS(wsi_display_mode, VkDisplayModeKHR)
  ICD_DEFINE_NONDISP_HANDLE_CASTS(wsi_display_connector, VkDisplayKHR)
  
-@@ -1341,7 +1347,9 @@
+@@ -2127,7 +2133,9 @@ wsi_display_wait_thread(void *data)
        .events = POLLIN
     };
  
@@ -22,7 +23,7 @@
     for (;;) {
        int ret = poll(&pollfd, 1, -1);
        if (ret > 0) {
-@@ -1369,9 +1377,22 @@
+@@ -2155,9 +2163,22 @@ wsi_display_start_wait_thread(struct wsi_display *wsi)
  static void
  wsi_display_stop_wait_thread(struct wsi_display *wsi)
  {
@@ -45,7 +46,7 @@
        pthread_join(wsi->wait_thread, NULL);
        wsi->wait_thread = 0;
     }
-@@ -2215,7 +2236,9 @@
+@@ -3634,7 +3655,9 @@ udev_event_listener_thread(void *data)
  
     int udev_fd = udev_monitor_get_fd(mon);
  
@@ -55,7 +56,7 @@
  
     for (;;) {
        nfds_t nfds = 1;
-@@ -2340,6 +2363,15 @@
+@@ -3792,6 +3815,15 @@ wsi_display_finish_wsi(struct wsi_device *wsi_device,
     struct wsi_display *wsi =
        (struct wsi_display *) wsi_device->wsi[VK_ICD_WSI_PLATFORM_DISPLAY];
  
@@ -69,9 +70,9 @@
 +#endif
 +
     if (wsi) {
-       wsi_for_each_connector(connector, wsi) {
-          wsi_for_each_display_mode(mode, connector) {
-@@ -2351,7 +2383,11 @@
+       wsi_for_each_connector(connector, wsi)
+          wsi_display_free_connector(wsi, connector);
+@@ -3799,7 +3831,11 @@ wsi_display_finish_wsi(struct wsi_device *wsi_device,
        wsi_display_stop_wait_thread(wsi);
  
        if (wsi->hotplug_thread) {

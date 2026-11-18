@@ -13,7 +13,7 @@ a directory.
  #include <sys/syscall.h>
  #include <linux/memfd.h>
  #endif
-@@ -118,7 +118,9 @@
+@@ -118,7 +118,9 @@ get_or_create_user_temp_dir(void) {
      int n;
  
      env = os_get_option("XDG_RUNTIME_DIR");
@@ -24,7 +24,7 @@ a directory.
          n = asprintf(&buf, "%s", env);
          if (n < 0)
             return NULL;
-@@ -192,7 +194,7 @@
+@@ -192,7 +194,7 @@ os_create_anonymous_file(int64_t size, const char *debug_name)
     if (!debug_name)
        debug_name = "mesa-shared";
     fd = memfd_create(debug_name, MFD_CLOEXEC | MFD_ALLOW_SEALING);

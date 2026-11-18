@@ -1,7 +1,7 @@
 --- a/src/freedreno/vulkan/tu_shader.cc
 +++ b/src/freedreno/vulkan/tu_shader.cc
-@@ -1980,10 +1980,10 @@
-       size += vpc_size;
+@@ -3244,10 +3244,10 @@ tu_upload_shader(struct tu_device *dev,
+          size += vpc_size;
     }
  
 -   pthread_mutex_lock(&dev->pipeline_mutex);
@@ -13,7 +13,7 @@
  
     if (result != VK_SUCCESS)
        return result;
-@@ -2013,9 +2013,9 @@
+@@ -3283,9 +3283,9 @@ tu_upload_shader(struct tu_device *dev,
  
     result = tu_setup_pvtmem(dev, shader, &pvtmem_config, pvtmem_size, per_wave);
     if (result != VK_SUCCESS) {
@@ -25,7 +25,7 @@
        return result;
     }
  
-@@ -2419,10 +2419,10 @@
+@@ -4140,10 +4140,10 @@ tu_empty_shader_create(struct tu_device *dev,
     if (!shader)
        return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -38,9 +38,9 @@
  
     if (result != VK_SUCCESS) {
        vk_free(&dev->vk.alloc, shader);
-@@ -2528,9 +2528,9 @@
- {
+@@ -4254,9 +4254,9 @@ tu_shader_destroy(struct tu_device *dev,
     tu_cs_finish(&shader->cs);
+    TU_RMV(resource_destroy, dev, &shader->bo);
  
 -   pthread_mutex_lock(&dev->pipeline_mutex);
 +   mtx_lock(&dev->pipeline_mutex);
