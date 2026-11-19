@@ -15,7 +15,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	cargo build \
+	# cc-rs appends CFLAGS to CFLAGS_<target>, so target flags in CFLAGS leak into host build scripts (psm)
+	env -u CFLAGS cargo build \
 		--jobs "$TERMUX_PKG_MAKE_PROCESSES" \
 		--target "${CARGO_TARGET_NAME}" \
 		--features curl/static-ssl \
