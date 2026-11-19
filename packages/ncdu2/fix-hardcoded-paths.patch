@@ -8,13 +8,13 @@
 -        "--with-terminfo-dirs=/usr/share/terminfo:/lib/terminfo:/usr/local/share/terminfo",
 +        "--with-default-terminfo-dir=@TERMUX_PREFIX@/share/terminfo",
 +        "--with-terminfo-dirs=@TERMUX_PREFIX@/share/terminfo:@TERMUX_PREFIX@/lib/terminfo",
-         "--with-fallbacks=screen linux vt100 xterm xterm-256color",
      });
  
+     if (!target.os.tag.isDarwin()) {
 --- a/src/main.zig
 +++ b/src/main.zig
-@@ -504,7 +504,7 @@ pub fn main(init: std.process.Init.Minimal) void {
-     };
+@@ -513,7 +513,7 @@ pub fn main(init: std.process.Init.Minimal) void {
+     }
  
      if (loadConf) {
 -        tryReadArgsFile("/etc/ncdu.conf");
