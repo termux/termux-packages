@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="A file list program that supports multiple storage"
 TERMUX_PKG_LICENSE="AGPL-3.0"
 TERMUX_PKG_MAINTAINER="2096779623 <admin@utermux.dev>"
 TERMUX_PKG_VERSION=(
-	"4.2.9"
-	"4.2.9" # Web Frontend
+	"4.2.10"
+	"4.2.10" # Web Frontend
 )
 TERMUX_PKG_SRCURL=(
 	"https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
 	"https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${TERMUX_PKG_VERSION[1]}/openlist-frontend-dist-v${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	a762ff50b71b384f03af2996cac2aba471b0d5ec44aad0255e646a41c8af7f49
-	b147ff4e6c6eee5dda5785a6c3028d9896ee7522a2c66c404dd7ba97fb4e78ed
+	4e45a675ee4719a98038a64f0f2095bd82146bb7342466f42d2407f5d3e701f7
+	4e137046ef350ca847bff145824ed2ffe9948a05c39a6e269b80c69eb13fc636
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -44,14 +44,14 @@ termux_pkg_auto_update() {
 
 	local tmpdir
 	tmpdir="$(mktemp -d)"
-	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenList/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
+	curl -sLo "${tmpdir}/openlist-linux-amd64.tar.gz" "https://github.com/OpenListTeam/OpenList/releases/download/v${latest_tag}/openlist-linux-amd64.tar.gz"
 	tar -C "${tmpdir}" -xf "${tmpdir}/openlist-linux-amd64.tar.gz"
 	chmod +x "${tmpdir}/openlist"
 	local latest_web_version
 	latest_web_version="$("${tmpdir}"/openlist version | grep "WebVersion:" | cut -d ' ' -f 2 | sed 's/^v//')"
 
-	curl -sLo "${tmpdir}/src" "https://github.com/OpenList/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
-	curl -sLo "${tmpdir}/web" "https://github.com/OpenList/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
+	curl -sLo "${tmpdir}/src" "https://github.com/OpenListTeam/OpenList/archive/refs/tags/v${latest_tag}.tar.gz"
+	curl -sLo "${tmpdir}/web" "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v${latest_web_version}/openlist-frontend-dist-v${latest_web_version}.tar.gz"
 	local -a sha=(
 		"$(sha256sum "${tmpdir}/src" | cut -d ' ' -f 1)"
 		"$(sha256sum "${tmpdir}/web" | cut -d ' ' -f 1)"
