@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/XmacsLabs/mogan
 TERMUX_PKG_DESCRIPTION="A structure editor forked from GNU TeXmacs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2026.3.8"
+TERMUX_PKG_VERSION="2026.3.10"
 TERMUX_PKG_SRCURL="https://github.com/XmacsLabs/mogan/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=6ccb2b10085a742b51152dfe8ded8f10f02be1c70348716da0e9c59662a5c5b6
+TERMUX_PKG_SHA256=3bd4bb20459b246f819757c75a344cfa93da5c10f66f7c26b8206813da8e109e
 TERMUX_PKG_DEPENDS="dbus, fontconfig, freetype, ghostscript, libandroid-complex-math, libandroid-execinfo, libandroid-spawn, libandroid-wordexp, libc++, libcurl, libexpat, libffi, libiconv, libjpeg-turbo, libpng, libx11, libxkbcommon, libxml2, mupdf, openssl, otf-noto-sans-cjk, qt6-qtbase, qt6-qtdeclarative, qt6-qtnetworkauth, qt6-qtsvg, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -96,7 +96,7 @@ termux_step_make() {
 		--yes \
 		--verbose \
 		--diagnosis \
-		-m releasedbg \
+		-m release \
 		--sdk="${TERMUX_STANDALONE_TOOLCHAIN}" \
 		--qt="${TERMUX_PKG_TMPDIR}/qtsdk" \
 		--cross="${host_platform}-" \
