@@ -6,9 +6,9 @@ LICENSE-APACHE
 LICENSE-MIT
 "
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.40.1"
+TERMUX_PKG_VERSION="0.40.2"
 TERMUX_PKG_SRCURL="https://github.com/n0-computer/dumbpipe/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=17bc0190772ff20a01e90d9cda6bf9a7695cfd50c0e1c3c6e146bdc8844ab62e
+TERMUX_PKG_SHA256=a70093278dc8742946c55a58825203ffea0f380969cc2ab50563bef378f75f13
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -24,7 +24,6 @@ termux_step_pre_configure() {
 		! -wholename ./vendor/iroh-dns \
 		! -wholename ./vendor/n0-dns-resolver \
 		! -wholename ./vendor/netdev \
-		! -wholename ./vendor/netdev-0.45.1 \
 		-exec rm -rf '{}' \;
 
 	find vendor/{rustls-platform-verifier,iroh-dns,n0-dns-resolver} -type f -print0 | \
@@ -44,6 +43,5 @@ termux_step_pre_configure() {
 		iroh-dns = { path = "./vendor/iroh-dns" }
 		n0-dns-resolver = { path = "./vendor/n0-dns-resolver" }
 		netdev = { path = "./vendor/netdev" }
-		netdev-0-45 = { package = "netdev", path = "./vendor/netdev-0.45.1" }
 	EOF
 }
