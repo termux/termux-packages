@@ -6,29 +6,29 @@ TERMUX_PKG_VERSION="1:8.10.3"
 TERMUX_PKG_SRCURL="https://download.redis.io/releases/redis-${TERMUX_PKG_VERSION:2}.tar.gz"
 TERMUX_PKG_SHA256=edde778f6bdee7581e42fc139ca9e07e2822212092f7501f99989656e3629d02
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-glob, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/redis.conf"
 TERMUX_PKG_BREAKS="valkey"
 TERMUX_PKG_CONFLICTS="valkey"
 
 termux_step_pre_configure() {
-	export PREFIX="$TERMUX_PREFIX"
-	export USE_JEMALLOC=no
+        export PREFIX="$TERMUX_PREFIX"
+        export USE_JEMALLOC=no
 
-	CPPFLAGS+=" -DHAVE_BACKTRACE"
-	CFLAGS+=" $CPPFLAGS"
-	LDFLAGS+=" -landroid-execinfo -landroid-glob"
+        CPPFLAGS+=" -DHAVE_BACKTRACE"
+        CFLAGS+=" $CPPFLAGS"
+        LDFLAGS+=" -landroid-execinfo -landroid-glob"
 }
 
 termux_step_make() {
-	make -C src -j "$TERMUX_PKG_MAKE_PROCESSES"
+        make -C src -j "$TERMUX_PKG_MAKE_PROCESSES" BUILD_TLS=yes
 }
 
 termux_step_make_install() {
-	make -C src -j 1 install
+        make -C src -j 1 install
 }
 
 termux_step_post_make_install() {
-	install -Dm600 "$TERMUX_PKG_SRCDIR/redis.conf" "$TERMUX_PREFIX/etc/redis.conf"
+        install -Dm600 "$TERMUX_PKG_SRCDIR/redis.conf" "$TERMUX_PREFIX/etc/redis.conf"
 }
