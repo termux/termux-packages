@@ -1,6 +1,6 @@
 --- a/src/bio.c
 +++ b/src/bio.c
-@@ -349,7 +349,11 @@ void bioKillThreads(void) {
+@@ -371,7 +371,11 @@ void bioKillThreads(void) {
  
      for (bio_worker_data *bwd = bio_workers; bwd != bio_worker_end; ++bwd) {
          if (pthread_equal(bwd->bio_thread_id, pthread_self())) continue;
@@ -10,11 +10,11 @@
 +        if (bwd->bio_thread_id && pthread_kill(bwd->bio_thread_id, SIGUSR2) == 0) {
 +#endif
              if ((err = pthread_join(bwd->bio_thread_id, NULL)) != 0) {
-                 serverLog(LL_WARNING, "Bio worker thread #%zu can not be joined: %s", bioWorkerNum(bwd), strerror(err));
+                 serverLog(LL_WARNING, "Bio worker thread #%zu cannot be joined: %s", bioWorkerNum(bwd), strerror(err));
              } else {
 --- a/src/debug.c
 +++ b/src/debug.c
-@@ -2024,7 +2024,11 @@ int memtest_test_linux_anonymous_maps(void) {
+@@ -2331,7 +2331,11 @@ int memtest_test_linux_anonymous_maps(void) {
  
  static void killMainThread(void) {
      int err;
@@ -24,11 +24,11 @@
 +    if (pthread_self() != server.main_thread_id && pthread_kill(server.main_thread_id, SIGUSR2) == 0) {
 +#endif
          if ((err = pthread_join(server.main_thread_id, NULL)) != 0) {
-             serverLog(LL_WARNING, "main thread can not be joined: %s", strerror(err));
+             serverLog(LL_WARNING, "main thread cannot be joined: %s", strerror(err));
          } else {
 --- a/src/io_threads.c
 +++ b/src/io_threads.c
-@@ -295,8 +295,10 @@ static void *IOThreadMain(void *myid) {
+@@ -389,8 +389,10 @@ static void *IOThreadMain(void *myid) {
      int processed = 0;
      monotime work_start_time = 0;
      while (1) {
@@ -39,7 +39,7 @@
          size_t batch_count = 0;
          monotime prev_work_start_time = work_start_time;
          work_start_time = getMonotonicUs();
-@@ -289,7 +291,11 @@ static void shutdownIOThread(int id) {
+@@ -495,7 +497,11 @@ static void shutdownIOThread(int id) {
      if (id >= server.active_io_threads_num) {
          pthread_mutex_unlock(&io_threads_mutex[id]);
      }
@@ -50,10 +50,10 @@
 +#endif
  
      if ((err = pthread_join(tid, NULL)) != 0) {
-         serverLog(LL_WARNING, "IO thread(tid:%lu) can not be joined: %s", (unsigned long)tid, strerror(err));
+         serverLog(LL_WARNING, "IO thread(tid:%lu) cannot be joined: %s", (unsigned long)tid, strerror(err));
 --- a/src/server.c
 +++ b/src/server.c
-@@ -2774,12 +2774,27 @@ void resetServerStats(void) {
+@@ -3024,12 +3024,27 @@ void resetServerStats(void) {
      lazyfreeResetStats();
  }
  
