@@ -1,0 +1,11 @@
+--- a/TeXmacs/progs/kernel/gui/kbd-define.scm
++++ b/TeXmacs/progs/kernel/gui/kbd-define.scm
+@@ -159,7 +159,7 @@
+ (define (kbd-pump-log msg)
+   (when (os-linux?)
+     (when (not kbd-pump-log-inited?)
+-      (log-set-file-handler! "/tmp/kbd-pump.log")
++      (log-set-file-handler! "@TERMUX_PREFIX@/tmp/kbd-pump.log")
+       (set! kbd-pump-log-inited? #t)
+     ) ;when
+     (log-info msg)
