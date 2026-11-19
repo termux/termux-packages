@@ -1,0 +1,38 @@
+Fixes abort() in nosub_execute_epsclosure() on a regexp containing a byte
+that is invalid in the current multibyte locale.
+
+Patch from the gawk maintainers (bug-gawk).
+--- a/support/minrx.c
++++ b/support/minrx.c
+@@ -1886,11 +1886,12 @@ firstclosure(Compile *c, const Node *nodes, NInt nnode)
+ 		do {
+ 			NInt k = qset_remove(&epsq);
+ 			const Node *np = &nodes[k];
+-			if (np->type <= Cset)
++			if (np->type <= Cset)	// unsigned comparison rejects illegal input bytes
+ 				qset_insert(&firsts, k);
+ 			else
+ 				switch (np->type) {
+ 				case Exit:
++				fail:
+ 					qset_destruct(&firsts);
+ 					qset_destruct(&epsv);
+ 					qset_destruct(&epsq);
+@@ -1918,6 +1919,8 @@ firstclosure(Compile *c, const Node *nodes, NInt nnode)
+ 						break;
+ 					// fall through
+ 				default:
++					if ((WChar) np->type <= Cset)	// catch illegal input bytes here
++						goto fail;
+ 					firstinsert(&epsq, &epsv, k + 1);
+ 					break;
+ 				}
+@@ -2570,7 +2573,7 @@ inline static void
+ nosub_execute_add(Execute *e, QVec *ncsv, NInt k, WChar wcnext)
+ {
+ 	const Node *np = &e->nodes[k];
+-	if (np->type <= Cset) {
++	if ((WChar) np->type <= Cset) {
+ 		if (np->type == (NInt) wcnext || (np->type == Cset && cset_test(csets_aref(&e->r->csets, np->args[0]), wcnext)))
+ 			qset_insert(&ncsv->qset, k);
+ 	} else {
