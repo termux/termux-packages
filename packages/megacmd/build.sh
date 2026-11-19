@@ -3,17 +3,16 @@ TERMUX_PKG_DESCRIPTION="Provides non UI access to MEGA services"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(
-	"2.7.0"
-	"10.21.0"
+	"2.7.1"
+	"10.21.1"
 )
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(
 	"https://github.com/meganz/MEGAcmd/archive/refs/tags/${TERMUX_PKG_VERSION[0]}_Linux.tar.gz"
 	"https://github.com/meganz/sdk/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	ef282b4d3a18c9e1fd5c4dac61a74755bcefe865cf5abb204e22b09e067e2120
-	a3f51b18141b84b1083feb824b9901607a245ca1bb9b16ad0f4ebd91e12b3977
+	a9d636f6f812dea81c0b9ab09045cd822146cdcd3442c882558bfa4a591ae794
+	47f37912dfe86558b5be52b49e5292dec4bd00c551561943b5385723470e432d
 )
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+_Linux"
