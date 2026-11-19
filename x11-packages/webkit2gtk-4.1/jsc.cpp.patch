@@ -1,6 +1,6 @@
 --- a/Source/JavaScriptCore/jsc.cpp
 +++ b/Source/JavaScriptCore/jsc.cpp
-@@ -162,7 +162,7 @@
+@@ -164,7 +164,7 @@
  
  #if OS(DARWIN)
  #include <wtf/spi/darwin/ProcessMemoryFootprint.h>
@@ -9,7 +9,7 @@
  #include <wtf/linux/ProcessMemoryFootprint.h>
  #endif
  
-@@ -3513,7 +3513,7 @@ static BinarySemaphore waitToExit;
+@@ -3531,7 +3531,7 @@ static BinarySemaphore waitToExit;
  
  int jscmain(int argc, char** argv);
  
@@ -18,7 +18,7 @@
  static size_t memoryLimit;
  
  static void crashIfExceedingMemoryLimit()
-@@ -3548,7 +3548,7 @@ static void startMemoryMonitoringThreadIfNeeded()
+@@ -3566,7 +3566,7 @@ static void startMemoryMonitoringThreadIfNeeded()
          }
      });
  }
@@ -27,7 +27,7 @@
  
  static double s_desiredTimeout;
  static double s_timeoutMultiplier = 1.0;
-@@ -4613,7 +4613,7 @@ int jscmain(int argc, char** argv)
+@@ -4631,7 +4631,7 @@ int jscmain(int argc, char** argv)
  
      initializeTimeoutIfNeeded();
  
