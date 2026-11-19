@@ -27,7 +27,7 @@
  }
 @@ -395,6 +397,9 @@ void AcceleratedBackingStore::BufferDMABuf::release()
  
- RefPtr<AcceleratedBackingStore::Buffer> AcceleratedBackingStore::BufferEGLImage::create(WebPageProxy& webPage, uint64_t id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes)
+ RefPtr<AcceleratedBackingStore::Buffer> AcceleratedBackingStore::BufferEGLImage::create(WebPageProxy& webPage, RendererBufferIdentifier id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes)
  {
 +#if !USE(GBM)
 +    return nullptr;
@@ -42,4 +42,4 @@
 +#endif
  }
  
- AcceleratedBackingStore::BufferEGLImage::BufferEGLImage(WebPageProxy& webPage, uint64_t id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes, EGLImage image)
+ AcceleratedBackingStore::BufferEGLImage::BufferEGLImage(WebPageProxy& webPage, RendererBufferIdentifier id, uint64_t surfaceID, const IntSize& size, RendererBufferFormat::Usage usage, DMABufBufferAttributes&& dmaBufAttributes, EGLImage image)
