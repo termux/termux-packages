@@ -417,11 +417,12 @@ jobs:
           fi
         fi
 
-        for archive in debs-*/debs-{aarch64,arm,i686,x86_64}-${{ github.sha }}.tar; do
-          tar xf "$archive"
+        for arch in aarch64 arm i686 x86_64; do
+          mkdir -p "debs-by-arch/$arch"
+          tar xf "debs-$arch-${{ github.sha }}/debs-$arch-${{ github.sha }}.tar" -C "debs-by-arch/$arch"
         done
 
-        ./scripts/utils/termux_check_file_conflicts.sh debs
+        ./scripts/utils/termux_check_file_conflicts.sh debs debs-by-arch
 
   upload:
     concurrency:

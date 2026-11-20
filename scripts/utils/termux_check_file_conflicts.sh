@@ -3,10 +3,13 @@ set -euo pipefail
 
 # Checks DEBS_DIR (default ./debs) for file conflicts between built packages,
 # and against published repos for filename collisions or undeclared file conflicts.
+# If BY_ARCH_DIR (optional) is given, also checks that platform independent packages
+# are identical on all architectures.
+
+DEBS_DIR="$(realpath -m "${1:-debs}")"
+BY_ARCH_DIR="${2:+$(realpath -m "$2")}"
 
 cd "$(realpath "$(dirname "$0")")/../.."
-
-DEBS_DIR="${1:-debs}"
 
 termux_pkg_relations_match() {
 	local relations="$1" package="$2" version="$3" relation relation_regex='^([[:alnum:]][[:alnum:]+.-]*)(:[[:alnum:]][[:alnum:].-]*)?[[:space:]]*\((<<|<=|=|>=|>>)[[:space:]]*([^)]*)\)$'
@@ -26,6 +29,12 @@ termux_pkg_relations_match() {
 }
 
 shopt -s nullglob
+if [[ -n "$BY_ARCH_DIR" ]]; then
+	mkdir -p "$DEBS_DIR"
+	for deb in "$BY_ARCH_DIR"/*/debs/*.deb; do
+		ln -sf "$deb" "$DEBS_DIR"/
+	done
+fi
 debs=("${DEBS_DIR}"/*.deb)
 shopt -u nullglob
 [[ ${#debs[@]} -eq 0 ]] && exit 0
@@ -66,6 +75,52 @@ download_metadata() (
 		gunzip -k "Contents-${repo}-${arch}.gz"
 	fi
 )
+
+termux_deb_fingerprint() {
+	local deb="$1" out="$2"
+	mkdir -p "$out/data" "$out/control"
+	dpkg-deb --fsys-tarfile "$deb" | tar -x --no-same-owner --delay-directory-restore -C "$out/data"
+	dpkg-deb -e "$deb" "$out/control"
+	{
+		echo "## data"
+		dpkg-deb --fsys-tarfile "$deb" | tar -tv --numeric-owner | awk '{ $4 = ""; $5 = ""; print }' | LC_ALL=C sort
+		(cd "$out/data" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 -r sha256sum)
+		echo "## control"
+		(cd "$out/control" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 -r sha256sum)
+	} > "$out/manifest"
+	chmod -R u+rwX "$out" || true
+	rm -rf "$out/data" "$out/control"
+}
+
+# Checks that platform independent (*_all.deb) packages have identical contents,
+# ignoring modification times, on every architecture they were built for.
+# BY_ARCH_DIR holds one directory per architecture, each with a debs/ directory.
+termux_check_platform_independent() {
+	local by_arch_dir="$1" work_dir arch_dir arch deb name reference
+	local -A first_arch=()
+
+	work_dir="$(mktemp -d)"
+	shopt -s nullglob
+	for arch_dir in "$by_arch_dir"/*/; do
+		arch="$(basename "$arch_dir")"
+		for deb in "$arch_dir"debs/*_all.deb; do
+			name="$(basename "$deb")"
+			termux_deb_fingerprint "$deb" "$work_dir/$arch/$name"
+			if [[ -z "${first_arch[$name]:-}" ]]; then
+				first_arch[$name]="$arch"
+				continue
+			fi
+			reference="${first_arch[$name]}"
+			if ! cmp -s "$work_dir/$reference/$name/manifest" "$work_dir/$arch/$name/manifest"; then
+				echo "::error::\"$name\" differs between ${reference} and ${arch} although it is platform independent"
+				diff -u "$work_dir/$reference/$name/manifest" "$work_dir/$arch/$name/manifest" | head -n 20 || true
+				error=1
+			fi
+		done
+	done
+	shopt -u nullglob
+	rm -rf "$work_dir"
+}
 
 # Stage 1: Check for file conflicts between the newly built packages themselves.
 declare -a deb_arches deb_names deb_versions deb_relations
@@ -205,7 +260,14 @@ for repo in $(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json); do
 	done
 done
 
+# Stage 3: Check that platform independent packages are identical on all architectures.
+if [[ -n "$BY_ARCH_DIR" ]]; then
+	termux_check_platform_independent "$BY_ARCH_DIR"
+fi
+
 if [[ "$error" != 0 ]]; then
-	echo "::error::Found versions older than published, or conflicting files between built packages, or between built and published packages!%0APlease bump version or add an epoch, revbump package, rebase, add Conflicts/Replaces/Breaks, or tag commit with '%ci:no-build'"
+	printf '::error::%s%%0A%s\n' \
+		"Found versions older than published, or conflicting files between built packages, or between built and published packages, or platform independent packages that differ between architectures!" \
+		"Please bump version or add an epoch, revbump package, rebase, add Conflicts/Replaces/Breaks, fix the package to be really platform independent, or tag commit with '%ci:no-build'"
 	exit 1
 fi
