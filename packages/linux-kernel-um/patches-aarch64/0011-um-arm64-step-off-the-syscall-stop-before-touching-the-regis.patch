@@ -1,0 +1,202 @@
+From aa48e9327f9812acfeea2aa998564442930ff796 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 01:59:59 +0200
+Subject: [PATCH] um: arm64: step off the syscall stop before touching the
+ register set
+
+arm64's ptrace tells a tracer whether a stop came from syscall entry or
+syscall exit by overwriting a general-purpose register in the tracee -- x7
+on AArch64 -- and restoring the tracee's own value once the stop ends.
+ptrace_save_reg() spells out what that costs a tracer: writes to that
+register during the stop are discarded, and the real value is not available
+while stopped.
+
+UML's whole model is to read the guest's registers at a stop, keep them,
+and write them back later. Worse, every thread of a guest mm shares one
+stub process, so switching guest threads means installing a different
+thread's registers into that stub. Both halves break on arm64: the read
+stores the stop direction (0) into UML's copy of the thread's x7, and the
+write is silently dropped so the stub keeps whichever thread ran last. x86
+has no equivalent, so nothing here expected it.
+
+The result is guest-visible data corruption rather than a missing feature.
+A threaded guest sees a value held in x7 across a loop turn into zero or
+into another thread's value at an arbitrary point. That is how this was
+found: dpkg-deb's decompressor faulted at addresses like 0x8001 and
+0x3d1ff0, which the guest kernel reported as belonging to no VMA, because
+they were LZ dictionary offsets and liblzma keeps the dictionary base in x7
+for the whole decode loop.
+
+Read everything at the syscall stop as before, then single-step off it and
+take only the hidden register from the resulting pseudo-step trap. The step
+runs no guest code: the syscall stays emulated away and the program counter
+does not move. It also leaves the task parked on a stop where the full
+register set can be installed, which is what a guest thread switch needs.
+
+Taking only that one register matters. The pseudo-step arrives as a forced
+SIGTRAP, so the host's signal path runs before the tracer sees the stop and
+do_signal() calls forget_syscall(); reading the whole set there yields no
+syscall number and returns -ENOSYS to every guest syscall. The same path
+would rewind the program counter if the first syscall argument happened to
+look like -ERESTARTSYS.
+
+Guarded by UM_SYSCALL_STOP_HIDES_REG so only arm64 pays for it. SECCOMP
+mode never had the problem: its traps are ordinary signals, and the arm64
+comment notes that seccomp and pseudo-step traps nobble nothing.
+
+Behaviour verified against a live host rather than inferred from the
+source; see harness/probe/hostx7.c and hostx7b.c.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/shared/sysdep/ptrace_user.h | 34 ++++++++++
+ arch/um/os-Linux/skas/process.c           | 76 ++++++++++++++++++++++-
+ 2 files changed, 108 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/um/shared/sysdep/ptrace_user.h b/arch/arm64/um/shared/sysdep/ptrace_user.h
+index 1f43cf7e91f58..f3a0bd8b54328 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace_user.h
++++ b/arch/arm64/um/shared/sysdep/ptrace_user.h
+@@ -21,6 +21,40 @@
+ #define REGS_IP_INDEX HOST_PC
+ #define REGS_SP_INDEX HOST_SP
+ 
++/*
++ * arm64 makes one general-purpose register unusable at a ptrace syscall stop.
++ *
++ * To tell a tracer whether a stop came from syscall entry or syscall exit, the
++ * arm64 kernel overwrites a register in the tracee with the direction -- x7 for
++ * AArch64, r12 for AArch32 -- and puts the tracee's own value back when the stop
++ * ends. ptrace_save_reg() in arch/arm64/kernel/ptrace.c spells out the
++ * consequences: writes by the tracer to that register during the stop are
++ * discarded, and the real value is not available while stopped. Confirmed
++ * against a live 6.12 host by harness/probe/hostx7.c: x7 reads back as 0
++ * (PTRACE_SYSCALL_ENTER) rather than the value the tracee put there, and a write
++ * of 0xdeadbeef is gone by the next stop.
++ *
++ * x86 has no equivalent, so nothing in UML expected it, and the result was a
++ * guest-visible data corruption rather than a missing feature. Every thread of a
++ * guest mm shares one stub process, so UML installs a thread's registers into
++ * that stub on each switch; x7 silently kept whichever thread ran last, and the
++ * poisoned read left a zero in UML's own copy. In a threaded guest that shows up
++ * as a pointer held in x7 turning into zero mid-loop -- liblzma's LZ dictionary
++ * base, in the case that found this, so dpkg-deb faulted at what was really a
++ * dictionary offset.
++ *
++ * The escape, measured by harness/probe/hostx7b.c: resuming a PTRACE_SYSEMU
++ * entry stop with PTRACE_SINGLESTEP lands on a pseudo-step SIGTRAP where the
++ * register is both readable and writable, without executing a single guest
++ * instruction -- the syscall stays emulated away and the program counter does
++ * not move. See userspace() in arch/um/os-Linux/skas/process.c.
++ *
++ * SECCOMP mode is unaffected: its traps are ordinary signals, and the arm64
++ * comment above notes that seccomp and pseudo-step traps nobble nothing.
++ */
++#define UM_SYSCALL_STOP_HIDES_REG 1
++#define UM_SYSCALL_STOP_HIDDEN_REG HOST_X7
++
+ #ifndef PTRACE_SYSEMU
+ #define PTRACE_SYSEMU 31
+ #endif
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index 8bada4e3a7a3d..e908fb6235c59 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -661,6 +661,74 @@ void userspace(struct uml_pt_regs *regs)
+ 				fatal_sigsegv();
+ 			}
+ 
++#ifdef UM_SYSCALL_STOP_HIDES_REG
++			/*
++			 * One register is not visible at a syscall stop and
++			 * cannot be written there either -- see
++			 * UM_SYSCALL_STOP_HIDES_REG in <sysdep/ptrace_user.h>.
++			 * Everything else has just been read correctly, so step
++			 * off the stop and pick up that one register alone.
++			 *
++			 * The step runs no guest code: the syscall stays
++			 * emulated away and the program counter does not move.
++			 * It is still not a free stop to stand on -- it arrives
++			 * as a forced SIGTRAP, so the host's signal path runs
++			 * and clears the recorded syscall number, and would
++			 * rewind the program counter if the first syscall
++			 * argument happened to look like -ERESTARTSYS. Taking
++			 * only the hidden register from here, and everything
++			 * else from the syscall stop above, is immune to both:
++			 * whatever the host did to the rest is overwritten by
++			 * the register write that resumes this task.
++			 *
++			 * The other half of the reason to step is the write: the
++			 * task is left parked on a stop where the full register
++			 * set can be installed, which is what a guest thread
++			 * switch needs and what a syscall stop silently refuses.
++			 */
++			if (WIFSTOPPED(status) &&
++			    WSTOPSIG(status) == (SIGTRAP | 0x80)) {
++				unsigned long hidden[MAX_REG_NR];
++				int sstatus;
++
++				if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0)) {
++					printk(UM_KERN_ERR "%s - failed to step off a syscall stop, errno = %d\n",
++					       __func__, errno);
++					fatal_sigsegv();
++				}
++
++				CATCH_EINTR(err = waitpid(pid, &sstatus,
++							  WUNTRACED | __WALL));
++				if (err < 0) {
++					printk(UM_KERN_ERR "%s - wait after step failed, errno = %d\n",
++					       __func__, errno);
++					fatal_sigsegv();
++				}
++
++				/*
++				 * Anything else means the assumption above no
++				 * longer holds. Fail loudly rather than run a
++				 * guest on registers that are quietly wrong.
++				 */
++				if (!WIFSTOPPED(sstatus) ||
++				    WSTOPSIG(sstatus) != SIGTRAP) {
++					printk(UM_KERN_ERR "%s - unexpected status 0x%x stepping off a syscall stop\n",
++					       __func__, sstatus);
++					fatal_sigsegv();
++				}
++
++				if (get_host_regs(pid, hidden)) {
++					printk(UM_KERN_ERR "%s - get_host_regs after step failed, errno = %d\n",
++					       __func__, errno);
++					fatal_sigsegv();
++				}
++
++				regs->gp[UM_SYSCALL_STOP_HIDDEN_REG] =
++					hidden[UM_SYSCALL_STOP_HIDDEN_REG];
++			}
++#endif
++
++
+ 			if (WIFSTOPPED(status)) {
+ 				sig = WSTOPSIG(status);
+ 
+@@ -745,8 +813,12 @@ void userspace(struct uml_pt_regs *regs)
+ void new_thread(void *stack, jmp_buf *buf, void (*handler)(void))
+ {
+ 	(*buf)[0].JB_IP = (unsigned long) handler;
++	/*
++	 * How much to leave below the top of the stack is an ABI question, not a
++	 * universal one: see ARCH_INIT_SP_RESERVE in <sysdep/archsetjmp.h>.
++	 */
+ 	(*buf)[0].JB_SP = (unsigned long) stack + UM_THREAD_SIZE -
+-		sizeof(void *);
++		ARCH_INIT_SP_RESERVE;
+ }
+ 
+ #define INIT_JMP_NEW_THREAD 0
+@@ -787,7 +859,7 @@ int start_idle_thread(void *stack, jmp_buf *switch_buf)
+ 	case INIT_JMP_NEW_THREAD:
+ 		(*switch_buf)[0].JB_IP = (unsigned long) uml_finishsetup;
+ 		(*switch_buf)[0].JB_SP = (unsigned long) stack +
+-			UM_THREAD_SIZE - sizeof(void *);
++			UM_THREAD_SIZE - ARCH_INIT_SP_RESERVE;
+ 		break;
+ 	case INIT_JMP_CALLBACK:
+ 		(*cb_proc)(cb_arg);

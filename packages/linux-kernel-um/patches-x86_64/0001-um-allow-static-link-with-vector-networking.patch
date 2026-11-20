@@ -1,0 +1,48 @@
+From JesusChapman <developer@jesuschapman.me> Sun Oct 18 12:00:00 2026 -0500
+Subject: [PATCH] um: allow static link with vector networking
+
+arch/um/drivers/Kconfig made UML_NET_VECTOR select MAY_HAVE_RUNTIME_DEPS,
+which in turn makes CONFIG_STATIC_LINK unavailable to anyone enabling
+vector networking at all. That select existed for the gre/l2tpv3
+transports' getaddrinfo() use; the fd transport used on Android resolves
+nothing. Drop it so a static binary (the only kind that runs on Android,
+which has no dynamic loader) can carry the guest's only network device.
+
+This is the same change the aarch64 subarch series carries inside its
+bionic-build patch; it lives here separately so the x86_64 build does not
+need that series. Upstream UML already supports the x86_64 subarch.
+
+---
+
+diff --git a/arch/um/drivers/Kconfig b/arch/um/drivers/Kconfig
+index 6a0354ca032fb..79a6dfd43b510 100644
+--- a/arch/um/drivers/Kconfig
++++ b/arch/um/drivers/Kconfig
+@@ -126,7 +126,26 @@ menu "UML Network Devices"
+ 
+ config UML_NET_VECTOR
+ 	bool "Vector I/O high performance network devices"
+-	select MAY_HAVE_RUNTIME_DEPS
++	#
++	# Deliberately not "select MAY_HAVE_RUNTIME_DEPS".
++	#
++	# That select existed because two of this driver's transports resolve
++	# hostnames with getaddrinfo(), which in a statically linked glibc binary
++	# may need NSS modules at run time. But it applied to the whole driver,
++	# and so made CONFIG_STATIC_LINK unavailable to anyone enabling vector
++	# networking at all -- including the transports that resolve nothing.
++	#
++	# getaddrinfo() appears exactly twice, both in user_init_socket_fds(),
++	# reached only by the gre and l2tpv3 transports. The tap, raw, bess, vde
++	# and fd transports never call it. And where it is called, a static
++	# binary degrades rather than breaks: numeric addresses resolve without
++	# NSS, and a name that needs it fails with an EAI_ error like any other
++	# lookup failure.
++	#
++	# The combination this was blocking is the only way to have networking at
++	# all on a host with no glibc, which is to say on Android: the binary has
++	# to be static to run there, and the fd transport plus an unprivileged
++	# userspace network stack is what gives an unrooted guest a network.
+ 	help
+ 	  This User-Mode Linux network driver uses multi-message send
+ 	  and receive functions. The host running the UML guest must have

@@ -1,0 +1,141 @@
+From b19bd42afb8610728b8dd458fbe47524daefd6ab Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 23:20:09 +0200
+Subject: [PATCH] um: arm64: never write NT_ARM_SYSTEM_CALL during a register
+ restore
+
+On x86 the syscall number is orig_ax, an ordinary member of the register
+set, so restoring registers restores it. On arm64 NT_ARM_SYSTEM_CALL is a
+separate regset that does not describe thread state: it selects which
+syscall the *currently stopped* syscall entry will execute.
+
+Writing it from put_host_regs() therefore does not reinstate a thread's
+saved number, it redirects whatever syscall the stub is sitting in. That is
+harmless while one guest thread owns a stub process and wrong as soon as
+two do, which is what a multi-threaded guest gives you since all threads of
+an mm share one stub.
+
+Observed as dpkg-deb's threaded lzma decoder issuing syscall 0x8000 -- the
+byte count of the read() it was actually in. With this change that syscall
+number no longer appears in an strace of the same workload.
+
+Also guard UPT_RESTART_SYSCALL: the saved slot is -1 when the host declines
+to report a number outside a syscall stop, and writing that into x8 would
+make the guest re-execute the svc with a number nobody asked for.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/os-Linux/registers.c   | 56 +++++++++++++++-------------
+ arch/arm64/um/shared/sysdep/ptrace.h | 13 ++++++-
+ 2 files changed, 43 insertions(+), 26 deletions(-)
+
+diff --git a/arch/arm64/um/os-Linux/registers.c b/arch/arm64/um/os-Linux/registers.c
+index 36038f8d72178..bf263611f3b22 100644
+--- a/arch/arm64/um/os-Linux/registers.c
++++ b/arch/arm64/um/os-Linux/registers.c
+@@ -108,15 +108,31 @@ int get_host_regs(int pid, unsigned long *regs)
+ /*
+  * Write the guest's general-purpose registers back.
+  *
+- * The syscall number is written separately and only when it actually changed,
+- * because NT_ARM_SYSTEM_CALL is writable only at a syscall-entry stop and
+- * poking it unconditionally would fail on every other stop. A failure here is
+- * therefore reported but is not fatal to the GPR write that already succeeded.
++ * NT_ARM_SYSTEM_CALL is deliberately NOT written here, and that is the whole
++ * point of this comment.
++ *
++ * On x86 the syscall number is orig_ax, an ordinary member of the register set,
++ * so restoring registers restores it too and UML can treat it as part of the
++ * thread's state. On arm64 it is a separate regset that does not describe
++ * "state" at all: it selects which syscall the *currently stopped* syscall entry
++ * will execute. Writing it during a general register restore therefore does not
++ * reinstate a thread's number, it redirects whatever syscall the stub happens to
++ * be sitting in.
++ *
++ * That is harmless while one guest thread owns a stub process, and actively
++ * wrong as soon as two do -- which is exactly what a multi-threaded guest gives
++ * you, because all threads of an mm share a single stub. Restoring thread A
++ * while the stub is stopped in thread B's syscall entry rewrites B's syscall
++ * number with A's saved one, and the guest then executes a syscall nobody asked
++ * for. Observed as dpkg-deb's threaded lzma decoder issuing syscall 0x8000 --
++ * the byte count of the read() it was actually in.
++ *
++ * The number is instead set only where UML genuinely means to change the
++ * syscall in flight: ptrace_set_syscall_nr(), used for cancellation and by the
++ * boot-time capability check.
+  */
+ int put_host_regs(int pid, unsigned long *regs)
+ {
+-	int scno = (int)(long)regs[HOST_SYSCALL_NR];
+-	int cur = -1;
+ 	int err;
+ 
+ 	err = setregset(pid, NT_PRSTATUS, regs, UM_FRAME_SIZE);
+@@ -126,32 +142,22 @@ int put_host_regs(int pid, unsigned long *regs)
+ 	/*
+ 	 * TPIDR_EL0 is not part of NT_PRSTATUS on arm64, so guest TLS has to be
+ 	 * pushed separately or a switch between two guest threads in the same
+-	 * stub process would leave the previous thread's TLS in place.
++	 * stub process would leave the previous thread's TLS in place. Unlike
++	 * the syscall number, this *is* per-thread state, so restoring it here
++	 * is correct.
+ 	 */
+ 	setregset(pid, NT_ARM_TLS, &regs[HOST_TLS], sizeof(unsigned long));
+ 
+-	if (getregset(pid, NT_ARM_SYSTEM_CALL, &cur, sizeof(cur), NULL))
+-		return 0;
+-	if (cur == scno)
+-		return 0;
+-
+-	/*
+-	 * Best effort: outside a syscall-entry stop the host rejects this, and
+-	 * the value is meaningless there anyway. Returning the error would make
+-	 * callers treat a perfectly good GPR write as a failure -- for instance
+-	 * do_syscall_stub(), which sets up the stub's registers at a SIGTRAP
+-	 * stop and would panic.
+-	 */
+-	setregset(pid, NT_ARM_SYSTEM_CALL, &scno, sizeof(scno));
+ 	return 0;
+ }
+ 
+-
+ /*
+- * The syscall number is a regset of its own on arm64. x8 holds it at entry, but
+- * writing x8 does not change which syscall runs -- the kernel latched the number
+- * before the ptrace stop -- so NT_ARM_SYSTEM_CALL is the only lever, and writing
+- * -1 through it is how a syscall is cancelled.
++ * Inspect and rewrite the syscall a stopped tracee is about to make.
++ *
++ * These are the *only* places NT_ARM_SYSTEM_CALL is written, deliberately: it
++ * selects the syscall currently in flight rather than describing thread state,
++ * so it must never be touched as part of a general register restore. See the
++ * comment above put_host_regs().
+  */
+ long ptrace_get_syscall_nr(int pid)
+ {
+diff --git a/arch/arm64/um/shared/sysdep/ptrace.h b/arch/arm64/um/shared/sysdep/ptrace.h
+index 0f66208d911a9..5bf8d56579b7d 100644
+--- a/arch/arm64/um/shared/sysdep/ptrace.h
++++ b/arch/arm64/um/shared/sysdep/ptrace.h
+@@ -79,9 +79,20 @@
+  */
+ #define UPT_RESTART_SYSCALL(r)						\
+ 	do {								\
++		long __nr = (long)REGS_SYSCALL_NR((r)->gp);		\
++									\
+ 		UPT_IP(r) -= 4;						\
+ 		UPT_X(r, HOST_X0) = UPT_ORIG_X0(r);			\
+-		UPT_X(r, HOST_X8) = REGS_SYSCALL_NR((r)->gp);		\
++		/*							\
++		 * Only reload x8 when the slot really holds a syscall	\
++		 * number. It comes from NT_ARM_SYSTEM_CALL, which the	\
++		 * host declines to supply outside a syscall stop,	\
++		 * leaving -1 -- and writing that into x8 would make the	\
++		 * guest re-execute the svc with a number nobody asked	\
++		 * for.							\
++		 */							\
++		if (__nr >= 0)						\
++			UPT_X(r, HOST_X8) = (unsigned long)__nr;	\
+ 	} while (0)
+ 
+ extern unsigned long host_fp_size;

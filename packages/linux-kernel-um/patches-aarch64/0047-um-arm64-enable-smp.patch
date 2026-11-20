@@ -1,0 +1,129 @@
+From 03c57e1808f9fc3df91a770e42ce0ff7ac466269 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 17:08:46 +0200
+Subject: [PATCH] um/arm64: enable SMP
+
+The subarch pieces SMP needs are already correct rather than merely
+untested: setjmp_aarch64.S saves the AAPCS64 callee-saved set and nothing
+thread-local, so a switch_buf built on one CPU thread is safe to longjmp
+from another; barrier.h gives real dmb ish rather than UP stubs; and the
+two pieces of per-thread state a shared stub would otherwise lose --
+TPIDR_EL0 as its own regset, and the in-flight syscall number via
+NT_ARM_SYSTEM_CALL -- are already carried in os-Linux/registers.c.
+
+The select alone does not build, though, which is why this is one patch
+rather than a one-liner. kernel/bpf/rqspinlock.c pulls in
+arch/arm64/include/asm/rqspinlock.h, which builds
+res_smp_cond_load_acquire() on smp_cond_load_acquire_timewait(): that
+waits in WFE and so asks arch_timer_evtstrm_available() whether the
+architected timer's event stream will wake it. A UML guest is an ordinary
+userspace process with no architected timer, so the symbol is not merely
+missing but meaningless:
+
+	arch/arm64/include/asm/rqspinlock.h:72:14: error: call to
+	undeclared function 'arch_timer_evtstrm_available'
+
+Override it with the generic header. Defining nothing is the fix rather
+than a workaround: kernel/bpf/rqspinlock.c guards the macro with an
+ifndef and falls back to plain smp_cond_load_acquire, which is what a
+guest wants anyway, since spinning in the guest is spinning in a host
+thread and it is the host scheduler that eventually runs the lock holder.
+
+Only SMP together with BPF reaches this, which is the ordinary
+configuration for running containers and was not reachable while the
+docker config still turned BPF off.
+
+Verified on a Raspberry Pi 5 (4x Cortex-A76, 16K host pages): boots with
+"smp: Brought up 1 node, 4 CPUs", the guest reports nproc=4, dockerd
+starts inside it, and a parallel compile scales -- 3000ms on one CPU
+against 1483ms on three.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/Kconfig            | 15 +++++++++++++++
+ arch/arm64/um/asm/rqspinlock.h   | 30 ++++++++++++++++++++++++++++++
+ tools/um-arm64/config/smp.config | 12 ++++++++++++
+ 3 files changed, 57 insertions(+)
+ create mode 100644 arch/arm64/um/asm/rqspinlock.h
+ create mode 100644 tools/um-arm64/config/smp.config
+
+diff --git a/arch/arm64/um/Kconfig b/arch/arm64/um/Kconfig
+index 366ac9c022773..b9efdab28288a 100644
+--- a/arch/arm64/um/Kconfig
++++ b/arch/arm64/um/Kconfig
+@@ -3,6 +3,21 @@
+ config UML_ARM64
+ 	def_bool y
+ 	select ARCH_SUPPORTS_ATOMIC_RMW
++	#
++	# SMP. The subarch pieces it needs are already correct rather than
++	# merely untested: setjmp_aarch64.S saves the AAPCS64 callee-saved set
++	# and nothing thread-local, so a switch_buf built on one CPU thread is
++	# safe to longjmp from another; barrier.h gives real dmb ish rather
++	# than UP stubs; and the two pieces of per-thread state a shared stub
++	# would otherwise lose -- TPIDR_EL0 as its own regset, and the
++	# in-flight syscall number via NT_ARM_SYSTEM_CALL -- are carried in
++	# os-Linux/registers.c.
++	#
++	# NR_CPUS is only a ceiling: the count that is actually brought up is
++	# the ncpus= boot argument, clamped to it. So one binary serves any
++	# host, and a host that cannot do SMP at all (ptrace userspace) boots
++	# on one CPU rather than refusing to boot.
++	select UML_SUBARCH_SUPPORTS_SMP
+ 	select ARCH_USE_QUEUED_RWLOCKS
+ 	select ARCH_USE_QUEUED_SPINLOCKS
+ 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+diff --git a/arch/arm64/um/asm/rqspinlock.h b/arch/arm64/um/asm/rqspinlock.h
+new file mode 100644
+index 0000000000000..bd0781f1cfba7
+--- /dev/null
++++ b/arch/arm64/um/asm/rqspinlock.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_UM_ARM64_RQSPINLOCK_H_
++#define _ASM_UM_ARM64_RQSPINLOCK_H_
++
++/*
++ * Take the generic resilient queued spinlock, not arm64's.
++ *
++ * arch/arm64/include/asm/rqspinlock.h builds res_smp_cond_load_acquire() on
++ * smp_cond_load_acquire_timewait(), which waits in WFE and therefore has to ask
++ * arch_timer_evtstrm_available() whether the architected timer's event stream
++ * is running to wake it. Neither exists here: a UML guest is an ordinary
++ * userspace process with no architected timer of its own, and the symbol is not
++ * merely missing but meaningless.
++ *
++ * Without this the build breaks the moment SMP and BPF are both on, which is
++ * the ordinary configuration for running containers:
++ *
++ *	arch/arm64/include/asm/rqspinlock.h:72:14: error: call to undeclared
++ *	function 'arch_timer_evtstrm_available'
++ *	  int __wfe = arch_timer_evtstrm_available();
++ *
++ * Defining nothing is the fix rather than a workaround: kernel/bpf/rqspinlock.c
++ * guards the macro with #ifndef and falls back to plain smp_cond_load_acquire,
++ * which is correct on any architecture and is what a guest wants anyway --
++ * spinning in the guest is spinning in a host thread, and the host scheduler,
++ * not an event stream, is what eventually runs the lock holder.
++ */
++#include <asm-generic/rqspinlock.h>
++
++#endif
+diff --git a/tools/um-arm64/config/smp.config b/tools/um-arm64/config/smp.config
+new file mode 100644
+index 0000000000000..2e7dde54d05eb
+--- /dev/null
++++ b/tools/um-arm64/config/smp.config
+@@ -0,0 +1,12 @@
++# SMP for the arm64 UML guest.
++#
++# NR_CPUS is a compile-time ceiling for static arrays and cpumasks, not the
++# number of CPUs that get brought up: that is the ncpus= boot argument, clamped
++# to this. So one binary serves any host, and the ceiling costs array size
++# rather than time -- the kernel iterates nr_cpu_ids, the runtime count.
++#
++# 16 rather than 4 or 8 because the ceiling is nearly free and a guest that has
++# to be rebuilt to use a bigger machine is the thing this avoids. Server
++# distributions ship NR_CPUS in the thousands for the same reason.
++CONFIG_SMP=y
++CONFIG_NR_CPUS=16

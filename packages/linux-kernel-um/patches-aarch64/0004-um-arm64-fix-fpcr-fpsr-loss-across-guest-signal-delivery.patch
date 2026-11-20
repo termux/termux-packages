@@ -1,0 +1,152 @@
+From f269a74e545da0a0726c43623f6e80c7351cc0a0 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 20:27:28 +0200
+Subject: [PATCH] um: arm64: fix FPCR/FPSR loss across guest signal delivery
+
+struct user_fpsimd_state is { vregs, fpsr, fpcr } but struct fpsimd_context
+is { head, fpsr, fpcr, vregs }. signal.c copied vregs+fpsr+fpcr as one
+block between them, which transferred the vector registers correctly and
+silently dropped FPCR and FPSR on every signal.
+
+Also restrict the FP regset to NT_PRFPREG: NT_ARM_SVE has a different
+layout (user_sve_header first, VL-dependent registers) and every consumer
+of uml_pt_regs.fp reads it as user_fpsimd_state.
+
+Found by harness/probe/fptorture.c, which checks all 32 V registers plus
+FPCR/FPSR bit-exactly across syscalls, task switches and 500 signals. Gates
+1-5 do not touch FP and did not notice.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/os-Linux/registers.c | 28 ++++++++++-----
+ arch/arm64/um/signal.c             | 56 +++++++++++++++++++++++-------
+ 2 files changed, 63 insertions(+), 21 deletions(-)
+
+diff --git a/arch/arm64/um/os-Linux/registers.c b/arch/arm64/um/os-Linux/registers.c
+index b97b88f3866cd..36038f8d72178 100644
+--- a/arch/arm64/um/os-Linux/registers.c
++++ b/arch/arm64/um/os-Linux/registers.c
+@@ -219,9 +219,24 @@ const char *ptrace_reg_name(int idx)
+ /*
+  * Size the FP regset once, against a live stub process.
+  *
+- * NT_ARM_SVE is tried first: on a host with SVE the FPSIMD registers are the
+- * bottom 128 bits of the Z registers, so saving only NT_PRFPREG would silently
+- * drop guest state. NT_PRFPREG is the fallback and is always present.
++ * NT_PRFPREG only, deliberately. It yields struct user_fpsimd_state --
++ * { vregs[32], fpsr, fpcr } -- and every consumer of uml_pt_regs.fp in this
++ * port reads it as exactly that: the ptrace regset view in arch/arm64/um/ptrace.c,
++ * the signal frame marshalling in arch/arm64/um/signal.c, and the stub state
++ * copies in os-Linux/mcontext.c.
++ *
++ * NT_ARM_SVE is *not* used even where the host supports it. Its buffer begins
++ * with a struct user_sve_header and its register layout depends on the current
++ * vector length, so treating it as a user_fpsimd_state would misread every
++ * field. Supporting SVE properly means teaching all three of those places about
++ * the header and the VL, plus emitting an sve_context record in the guest's
++ * signal frame; until that exists, quietly selecting the SVE regset would be
++ * the same class of bug as the fpsr/fpcr mix-up this comment sits next to --
++ * correct-looking vector data with silently wrong control state.
++ *
++ * The consequence is that a UML/arm64 guest sees FPSIMD and not SVE, which is
++ * accurate: nothing in this port saves or restores Z or P registers, so the
++ * guest must not be told it has them.
+  *
+  * The buffer is deliberately oversized and the kernel reports back how much it
+  * actually wrote, which is the same trick x86 uses for XSTATE.
+@@ -238,13 +253,8 @@ int arch_init_registers(int pid)
+ 	if (buf == MAP_FAILED)
+ 		return -ENOMEM;
+ 
+-	ptrace_fpregset = NT_ARM_SVE;
++	ptrace_fpregset = NT_PRFPREG;
+ 	ret = getregset(pid, ptrace_fpregset, buf, probe_len, &got);
+-	if (ret) {
+-		ptrace_fpregset = NT_PRFPREG;
+-		got = 0;
+-		ret = getregset(pid, ptrace_fpregset, buf, probe_len, &got);
+-	}
+ 
+ 	munmap(buf, probe_len);
+ 
+diff --git a/arch/arm64/um/signal.c b/arch/arm64/um/signal.c
+index 4d0e4e9c21a1c..0b4b737deb987 100644
+--- a/arch/arm64/um/signal.c
++++ b/arch/arm64/um/signal.c
+@@ -48,6 +48,48 @@ struct frame_record {
+ 	u64 lr;
+ };
+ 
++/*
++ * Move FP state between the guest's register file and a signal frame.
++ *
++ * These two structures order their fields differently and it is not a detail
++ * that can be papered over with one memcpy:
++ *
++ *   struct user_fpsimd_state (what regs->fp holds, i.e. the host's NT_PRFPREG
++ *                             layout):     { vregs[32], fpsr, fpcr }
++ *   struct fpsimd_context    (what goes in mcontext.__reserved[], i.e. the
++ *                             guest-visible signal ABI):
++ *                                          { head, fpsr, fpcr, vregs[32] }
++ *
++ * Copying vregs+fpsr+fpcr as one block from the start of one into the vregs of
++ * the other transfers the vector registers correctly and silently drops FPCR
++ * and FPSR -- which is invisible to anything that does not check the control
++ * registers after taking a signal, and shows up much later as a guest whose
++ * rounding mode or denormal handling resets at random.
++ */
++static void fpstate_to_sigctx(struct fpsimd_context *fp, struct pt_regs *regs)
++{
++	struct user_fpsimd_state *st = (struct user_fpsimd_state *)regs->regs.fp;
++
++	if (host_fp_size < sizeof(*st))
++		return;
++
++	memcpy(&fp->vregs, &st->vregs, sizeof(fp->vregs));
++	fp->fpsr = st->fpsr;
++	fp->fpcr = st->fpcr;
++}
++
++static void sigctx_to_fpstate(struct pt_regs *regs, const struct fpsimd_context *fp)
++{
++	struct user_fpsimd_state *st = (struct user_fpsimd_state *)regs->regs.fp;
++
++	if (host_fp_size < sizeof(*st))
++		return;
++
++	memcpy(&st->vregs, &fp->vregs, sizeof(fp->vregs));
++	st->fpsr = fp->fpsr;
++	st->fpcr = fp->fpcr;
++}
++
+ static int copy_sc_from_user(struct pt_regs *regs,
+ 			     struct sigcontext __user *from)
+ {
+@@ -93,13 +135,7 @@ static int copy_sc_from_user(struct pt_regs *regs,
+ 			if (head.size < sizeof(fpsimd))
+ 				break;
+ 			memcpy(&fpsimd, &sc.__reserved[offset], sizeof(fpsimd));
+-			if (host_fp_size >= sizeof(fpsimd.vregs) +
+-					    sizeof(fpsimd.fpsr) +
+-					    sizeof(fpsimd.fpcr))
+-				memcpy(regs->regs.fp, &fpsimd.vregs,
+-				       sizeof(fpsimd.vregs) +
+-				       sizeof(fpsimd.fpsr) +
+-				       sizeof(fpsimd.fpcr));
++			sigctx_to_fpstate(regs, &fpsimd);
+ 			break;
+ 		}
+ 		offset += head.size;
+@@ -131,11 +167,7 @@ static int copy_sc_to_user(struct sigcontext __user *to, struct pt_regs *regs,
+ 	fpsimd = (struct fpsimd_context *)&sc.__reserved[0];
+ 	fpsimd->head.magic = FPSIMD_MAGIC;
+ 	fpsimd->head.size = sizeof(*fpsimd);
+-	if (host_fp_size >= sizeof(fpsimd->vregs) + sizeof(fpsimd->fpsr) +
+-			    sizeof(fpsimd->fpcr))
+-		memcpy(&fpsimd->vregs, regs->regs.fp,
+-		       sizeof(fpsimd->vregs) + sizeof(fpsimd->fpsr) +
+-		       sizeof(fpsimd->fpcr));
++	fpstate_to_sigctx(fpsimd, regs);
+ 
+ 	/* Null terminator, so a parser knows where the chain ends. */
+ 	term = (struct _aarch64_ctx *)&sc.__reserved[sizeof(*fpsimd)];

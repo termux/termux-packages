@@ -1,0 +1,116 @@
+From JesusChapman <developer@jesuschapman.me> Sun Oct 18 12:00:00 2026 -0500
+Subject: [PATCH] um: avoid rwonce.h and support stub_exe= path on bionic
+
+<asm-generic/rwonce.h> needs the kernel's compiler attributes, unreachable
+to USER_CFLAGS objects when the sysroot shadows linux/compiler_types.h
+(the NDK does). This TU uses one macro from it, so define __READ_ONCE
+locally with the kernel's own uninstrumented definition instead.
+
+Also support stub_exe=<path>: execute the stub from a file instead of an
+anonymous memfd, which Android forbids (untrusted_app SELinux + W^X), with
+an MFD_EXEC-less retry for older hosts. Same changes the aarch64 subarch
+series carries inside its bionic-build patch; they live here separately so
+the x86_64 build does not need that series. Nothing in them is
+arch-specific (the PTRACE_SYSEMU fallback elsewhere in that patch is
+x86-irrelevant and intentionally left out).
+
+---
+
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -31,7 +32,25 @@
+ #include <linux/futex.h>
+ #include <linux/threads.h>
+ #include <timetravel.h>
+-#include <asm-generic/rwonce.h>
++/*
++ * __READ_ONCE, without <asm-generic/rwonce.h>.
++ *
++ * That header needs the kernel's compiler attributes, and a USER_CFLAGS object
++ * cannot rely on reaching them: arch/um/Makefile adds the kernel's include
++ * directory with -idirafter, i.e. *after* the system directories, so a sysroot
++ * that ships its own linux/compiler_types.h wins. The Android NDK's sysroot
++ * does exactly that, and rwonce.h then fails on __no_sanitize_or_inline.
++ *
++ * Force-including the kernel's compiler_types.h instead is not an option: it
++ * defines __private, which bionic uses as a struct member name in
++ * <bits/pthread_types.h>, so every pthread type stops compiling.
++ *
++ * This file uses one macro from that header and nothing else, and this is the
++ * kernel's own uninstrumented definition of it.
++ */
++#ifndef __READ_ONCE
++#define __READ_ONCE(x)	(*(const volatile __typeof__(x) *)&(x))
++#endif
+ #include "../internal.h"
+ 
+ int is_skas_winch(int pid, int fd, void *data)
+@@ -323,14 +342,67 @@ extern char *tempdir;
+ #define MFD_EXEC 0x0010U
+ #endif
+ 
++static char *stub_exe_path __initdata;
++
++static int __init uml_stub_exe_setup(char *line, int *add)
++{
++	*add = 0;
++	stub_exe_path = line;
++	return 0;
++}
++
++__uml_setup("stub_exe=", uml_stub_exe_setup,
++"stub_exe=<path>\n"
++"    Execute the stub from this file instead of from an anonymous memfd.\n"
++"\n"
++"    UML normally writes its embedded stub into a memfd and execs that, which\n"
++"    needs nothing from the filesystem. Android forbids it: an app process runs\n"
++"    in the untrusted_app SELinux domain under a W^X policy, where the only\n"
++"    place it may execute from is the native library directory unpacked from\n"
++"    its APK. Neither a memfd nor a file the app wrote itself is executable\n"
++"    there.\n"
++"\n"
++"    Point this at a copy of arch/um/kernel/skas/stub_exe shipped as one of\n"
++"    those libraries. The file must be exactly that stub: it is exec'd as the\n"
++"    userspace half of every guest address space.\n\n"
++);
++
+ static int __init init_stub_exe_fd(void)
+ {
+ 	size_t written = 0;
+ 	char *tmpfile = NULL;
+ 
++	/*
++	 * An explicit path bypasses the memfd entirely -- there is nothing to
++	 * write, because the file already holds the stub.
++	 */
++	if (stub_exe_path) {
++		stub_exe_fd = open(stub_exe_path, O_RDONLY | O_CLOEXEC);
++		if (stub_exe_fd < 0)
++			panic("Could not open stub binary '%s': %d",
++			      stub_exe_path, -errno);
++		return 0;
++	}
++
+ 	stub_exe_fd = memfd_create("uml-userspace",
+ 				   MFD_EXEC | MFD_CLOEXEC | MFD_ALLOW_SEALING);
+ 
++	/*
++	 * MFD_EXEC only exists from 6.3. Older kernels reject unknown
++	 * memfd_create flags with EINVAL -- and on those a memfd is executable
++	 * anyway, since MFD_EXEC was introduced precisely to make that default
++	 * something a process could opt out of. Retry without it.
++	 *
++	 * Worth the retry rather than accepting the temporary-file fallback:
++	 * that path needs a tmpdir that permits execution, and on Android the
++	 * obvious candidate is /tmp, which is tmpfs and whose SELinux label the
++	 * shell domain may not be allowed to execute from. The memfd works
++	 * there today; a file on disk is one policy decision away from not.
++	 */
++	if (stub_exe_fd < 0 && errno == EINVAL)
++		stub_exe_fd = memfd_create("uml-userspace",
++					   MFD_CLOEXEC | MFD_ALLOW_SEALING);
++
+ 	if (stub_exe_fd < 0) {
+ 		printk(UM_KERN_INFO "Could not create executable memfd, using temporary file!");
+ 

@@ -1,0 +1,158 @@
+From 008b0a6f3eb0e941513545b81826693d13097556 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 07:17:42 +0200
+Subject: [PATCH] um: read AT_MINSIGSTKSZ and report the stub's signal stack
+ against it
+
+The stub takes its signals on an alternate stack that is a fixed-size
+member of struct stub_data. The frame written there is built by the host,
+from the host's CPU features and from what the guest has executed inside
+the stub -- neither of which UML chooses.
+
+On arm64 that size is not a constant and the kernel says so by publishing
+AT_MINSIGSTKSZ. setup_sigframe_layout() sizes the frame from what the CPU
+supports and the signalled task's state: the SVE record scales with the
+vector length, and SME adds za and zt records on top. Two run domains
+differing only in qemu's -cpu report 4720 and 9984, for the same
+architecture and the same host kernel. A compile-time size taken from a
+measurement on one machine is therefore not a design.
+
+Parse it, and print both numbers at boot so the comparison is visible
+rather than assumed:
+
+    Stub signal stack: 8192 bytes, host AT_MINSIGSTKSZ 9984
+        -- SMALLER than this host's worst case
+
+Deliberately not fatal. AT_MINSIGSTKSZ is the host's worst case, computed
+with every optional record present at the maximum vector length, and the
+frames actually written are far smaller -- 4576 bytes on both hosts
+measured, including one with 512-bit SVE, because
+fpsimd_save_and_flush_current_state() flushes SVE state before the frame is
+laid out. A frame that genuinely does not fit already fails loudly: the
+host cannot write it and the stub dies. What was missing was any way to see
+the margin.
+
+SECCOMP mode is stricter -- there the frame must land inside sigstack[]
+alone -- and init_seccomp() checks that separately.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/os-Linux/elf_aux.c  | 29 +++++++++++++++++++++++++
+ arch/um/os-Linux/start_up.c | 43 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
+
+diff --git a/arch/um/os-Linux/elf_aux.c b/arch/um/os-Linux/elf_aux.c
+index 592c491d221b2..0d0a61c0a5c6e 100644
+--- a/arch/um/os-Linux/elf_aux.c
++++ b/arch/um/os-Linux/elf_aux.c
+@@ -16,6 +16,10 @@
+ #include "internal.h"
+ #include <linux/swab.h>
+ 
++#ifndef AT_MINSIGSTKSZ
++#define AT_MINSIGSTKSZ 51
++#endif
++
+ #if __BITS_PER_LONG == 64
+ typedef Elf64_auxv_t elf_auxv_t;
+ #else
+@@ -32,6 +36,28 @@ long elf_aux_hwcap;
+  */
+ long elf_aux_hwcap2;
+ 
++/*
++ * AT_MINSIGSTKSZ: the smallest alternate signal stack this host will accept as
++ * sufficient, published by the kernel because on some architectures it is not a
++ * constant.
++ *
++ * It is not a constant on arm64. setup_sigframe_layout() sizes a signal frame
++ * from what the CPU supports and from what the signalled task has executed --
++ * an SVE record scales with the vector length, and SME adds za and zt records
++ * on top. Two run domains differing only in -cpu report 4720 and 9984 here,
++ * for the same architecture and the same kernel.
++ *
++ * UML cares because the stub takes its signals on an alternate stack that is a
++ * fixed-size member of struct stub_data, and the frame written there is sized
++ * by the host, not by UML. Anything that reasons about that buffer must reason
++ * from this number rather than from a measurement taken on one machine; see
++ * check_stub_sigstack().
++ *
++ * Zero if the host does not publish it, which is the pre-5.5 case and also
++ * everything that is not arm64.
++ */
++long elf_aux_min_sigstack;
++
+ __init void scan_elf_aux( char **envp)
+ {
+ 	elf_auxv_t * auxv;
+@@ -46,6 +72,9 @@ __init void scan_elf_aux( char **envp)
+ 			case AT_HWCAP2:
+ 				elf_aux_hwcap2 = auxv->a_un.a_val;
+ 				break;
++			case AT_MINSIGSTKSZ:
++				elf_aux_min_sigstack = auxv->a_un.a_val;
++				break;
+ 			case AT_PLATFORM:
+                                 /* elf.h removed the pointer elements from
+                                  * a_un, so we have to use a_val, which is
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index e5a8e8004c6b1..5f953f5dc013a 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -549,6 +549,47 @@ __uml_setup("seccomp=", uml_seccomp_config,
+ "    This is insecure and should only be used with a trusted userspace\n\n"
+ );
+ 
++extern long elf_aux_min_sigstack;
++
++/*
++ * Report, and sanity-check, the size of the alternate signal stack the stub
++ * gets against what this host says a signal frame can need.
++ *
++ * The stub takes its signals on an alternate stack that is part of struct
++ * stub_data, whose size is fixed at compile time. The frame written there is
++ * built by the host from the host's CPU features and from what the guest has
++ * executed inside the stub -- neither of which UML chooses. On arm64 the same
++ * kernel reports AT_MINSIGSTKSZ of 4720 on one CPU model and 9984 on another,
++ * so a compile-time size taken from a measurement on one machine is not a
++ * design, it is a coincidence waiting to end.
++ *
++ * This does not refuse to boot when the area is smaller than AT_MINSIGSTKSZ,
++ * because that number is the host's worst case (it is computed with every
++ * optional record present at the maximum vector length) and the frames actually
++ * written are usually far smaller -- 4576 bytes on both hosts measured. A frame
++ * that genuinely does not fit fails loudly on its own: the host cannot write it,
++ * the stub dies, and UML reports that. What is worth avoiding is being
++ * surprised, so say the numbers out loud at boot instead.
++ *
++ * SECCOMP mode is stricter and is handled separately: there the frame has to
++ * land inside sigstack[] alone, and init_seccomp() checks that it did.
++ */
++static void __init check_stub_sigstack(void)
++{
++	unsigned long have = STUB_DATA_PAGES * UM_KERN_PAGE_SIZE;
++
++	if (!elf_aux_min_sigstack) {
++		os_info("Stub signal stack: %lu bytes (host publishes no AT_MINSIGSTKSZ)\n",
++			have);
++		return;
++	}
++
++	os_info("Stub signal stack: %lu bytes, host AT_MINSIGSTKSZ %ld%s\n",
++		have, elf_aux_min_sigstack,
++		have < (unsigned long)elf_aux_min_sigstack ?
++			" -- SMALLER than this host's worst case" : "");
++}
++
+ void __init os_early_checks(void)
+ {
+ 	int pid;
+@@ -556,6 +597,8 @@ void __init os_early_checks(void)
+ 	/* Print out the core dump limits early */
+ 	check_coredump_limit();
+ 
++	check_stub_sigstack();
++
+ 	/* Need to check this early because mmapping happens before the
+ 	 * kernel is running.
+ 	 */

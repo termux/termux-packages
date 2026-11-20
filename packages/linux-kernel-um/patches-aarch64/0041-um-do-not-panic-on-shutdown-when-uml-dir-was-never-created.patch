@@ -1,0 +1,64 @@
+From a528aeed4c2830217b26f5943b2b513a4117607b Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 12:34:30 +0200
+Subject: [PATCH] um: do not panic on shutdown when uml_dir was never created
+
+remove_umid_dir() is an exitcall, so it runs on every shutdown whatever
+happened at boot, and it calls strlen(uml_dir) without looking.
+make_uml_dir() leaves uml_dir NULL whenever it could not create the
+directory, so a kernel that failed to make its umid directory panics as
+it halts:
+
+	Kernel panic - not syncing: Kernel mode fault at addr 0x0
+	 [<...>] do_uml_exitcalls
+	 [<...>] machine_halt
+
+with the backtrace pointing at the exitcall loop and nothing at the
+directory that was never made.
+
+This is the ordinary case rather than a corner: the default uml_dir is
+under $HOME, and running the kernel straight from a shell with no
+writable home is how anyone tries it the first time. It was found by
+running the exact command line shipped with the prebuilt binaries, which
+panicked on every clean shutdown.
+
+Every other user of uml_dir is downstream of a make_umid() whose error it
+already checks, so this is the only site that needs the test.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/os-Linux/umid.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/arch/um/os-Linux/umid.c b/arch/um/os-Linux/umid.c
+index 705c09c86f1c1..f9f2bc32cdf3f 100644
+--- a/arch/um/os-Linux/umid.c
++++ b/arch/um/os-Linux/umid.c
+@@ -413,6 +413,27 @@ static void remove_umid_dir(void)
+ {
+ 	char *dir, err;
+ 
++	/*
++	 * make_uml_dir() leaves uml_dir NULL when it could not create the
++	 * directory, and this is an exitcall: it runs on every shutdown
++	 * whatever happened at boot. Without this check the strlen() below
++	 * faults at address zero and the kernel panics as it halts --
++	 *
++	 *	Kernel panic - not syncing: Kernel mode fault at addr 0x0
++	 *	 [<...>] do_uml_exitcalls
++	 *
++	 * -- with the backtrace pointing at the exitcall loop and nothing at
++	 * the directory that was never made. Every other user of uml_dir is
++	 * downstream of a make_umid() that has already returned an error, so
++	 * this is the only one that has to look.
++	 *
++	 * It is the ordinary case, not a corner: the default uml_dir sits
++	 * under $HOME, and a bare shell with no writable home is exactly how
++	 * someone runs this the first time.
++	 */
++	if (uml_dir == NULL)
++		return;
++
+ 	dir = malloc(strlen(uml_dir) + UMID_LEN + 1);
+ 	if (!dir)
+ 		return;

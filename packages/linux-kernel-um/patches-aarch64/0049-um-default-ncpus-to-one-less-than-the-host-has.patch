@@ -1,0 +1,170 @@
+From 7d1b5396f151b5990acfa791ebcc9bd552b9a51a Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 17:09:03 +0200
+Subject: [PATCH] um: default ncpus to one less than the host has
+
+ncpus= defaulted to 1, so a guest stayed uniprocessor unless the operator
+knew the option existed. Derive it from the host instead.
+
+One less than the host has, not the same: UML's CPUs are host threads and
+they are not the only threads it runs -- the kernel thread and the stub
+processes need to be scheduled too -- so asking for exactly as many CPUs
+as the host has oversubscribes it and the guest's threads start evicting
+each other. Measured on a Raspberry Pi 5 (4x Cortex-A76), parallel
+compile inside the guest, medians of 3 rounds, milliseconds:
+
+	ncpus=		1	2	3	4
+	make -jN	3000	1717	1483	1587
+	make -j1	2969	2928	2977	3002
+
+Three CPUs beat four on a four-CPU host. The flat -j1 row is the control:
+the same work forced serial does not change with the CPU count, so the
+-jN row is parallelism and not a machine that moved under the
+measurement.
+
+uml_ncpus starts at 0 rather than 1 so that "the operator said 1" and
+"the operator said nothing" are distinguishable; an explicit ncpus= still
+wins. The count is resolved before os_early_checks(), which is where a
+ptrace-only host clamps it back to one -- that check has to see the
+number we intend to use, not the unset zero.
+
+sysconf(_SC_NPROCESSORS_ONLN) rather than parsing /proc/cpuinfo, because
+UML has to work where /proc is not mounted, which is ordinary inside an
+app sandbox.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/include/shared/os.h  |  1 +
+ arch/um/include/shared/smp.h |  2 ++
+ arch/um/kernel/smp.c         | 46 ++++++++++++++++++++++++++++++++++--
+ arch/um/kernel/um_arch.c     |  7 ++++++
+ arch/um/os-Linux/util.c      | 12 ++++++++++
+ 5 files changed, 66 insertions(+), 2 deletions(-)
+
+diff --git a/arch/um/include/shared/os.h b/arch/um/include/shared/os.h
+index 9b828648361a7..24b56cde23a94 100644
+--- a/arch/um/include/shared/os.h
++++ b/arch/um/include/shared/os.h
+@@ -305,6 +305,7 @@ extern int os_waiting_for_events_epoll(void);
+ extern void *os_epoll_get_data_pointer(int index);
+ extern int os_epoll_triggered(int index, int events);
+ extern int os_event_mask(enum um_irq_type irq_type);
++extern int os_nr_cpus_online(void);
+ extern int os_setup_epoll(void);
+ extern int os_add_epoll_fd(int events, int fd, void *data);
+ extern int os_mod_epoll_fd(int events, int fd, void *data);
+diff --git a/arch/um/include/shared/smp.h b/arch/um/include/shared/smp.h
+index 06e3faa950913..ed667ee832eb6 100644
+--- a/arch/um/include/shared/smp.h
++++ b/arch/um/include/shared/smp.h
+@@ -5,6 +5,7 @@
+ #if IS_ENABLED(CONFIG_SMP)
+ 
+ extern int uml_ncpus;
++void um_ncpus_init(void);
+ 
+ int uml_curr_cpu(void);
+ void uml_start_secondary(void *opaque);
+@@ -14,6 +15,7 @@ void uml_ipi_handler(int vector);
+ 
+ #define uml_ncpus 1
+ #define uml_curr_cpu() 0
++static inline void um_ncpus_init(void) { }
+ 
+ #endif /* CONFIG_SMP */
+ 
+diff --git a/arch/um/kernel/smp.c b/arch/um/kernel/smp.c
+index f1e52b7348fb8..6890b3bc14e18 100644
+--- a/arch/um/kernel/smp.c
++++ b/arch/um/kernel/smp.c
+@@ -205,8 +205,50 @@ void __init smp_cpus_done(unsigned int max_cpus)
+ {
+ }
+ 
+-/* Set in uml_ncpus_setup */
+-int uml_ncpus = 1;
++/*
++ * Set by ncpus= if given, otherwise by um_ncpus_init() from the host's CPU
++ * count. Zero means "nobody has decided yet", which is why the default is not
++ * simply written here.
++ */
++int uml_ncpus;
++
++/*
++ * Choose a CPU count when the command line did not.
++ *
++ * One less than the host has, because UML's CPUs are host threads and they are
++ * not the only threads it runs: the kernel thread and the stub processes need
++ * to be scheduled too, so asking for exactly as many CPUs as the host has
++ * oversubscribes it and the guest's own threads start evicting each other.
++ *
++ * Measured on a Raspberry Pi 5 (4x Cortex-A76, 16K pages, guest built from this
++ * tree), parallel compile in the guest, medians of 3 rounds, milliseconds:
++ *
++ *	ncpus=	1	2	3	4
++ *	make -jN	3000	1717	1483	1587
++ *	make -j1	2969	2928	2977	3002
++ *
++ * -- so three CPUs beat four on a four-CPU host, and the flat -j1 column is the
++ * control saying the machine did not move under the measurement. Defaulting to
++ * 1, as this did, left all of that unclaimed unless the operator knew the
++ * option existed.
++ *
++ * A host that only supports ptrace userspace cannot run more than one CPU
++ * thread; start_up.c clamps this back to 1 there, with a message, rather than
++ * refusing to boot.
++ */
++void __init um_ncpus_init(void)
++{
++	int host;
++
++	if (uml_ncpus)		/* ncpus= was given; the operator decides */
++		return;
++
++	host = os_nr_cpus_online();
++	uml_ncpus = clamp(host - 1, 1, NR_CPUS);
++
++	os_info("Using %d CPUs of the host's %d (ncpus= to override)\n",
++		uml_ncpus, host);
++}
+ 
+ void __init prefill_possible_map(void)
+ {
+diff --git a/arch/um/kernel/um_arch.c b/arch/um/kernel/um_arch.c
+index 171561c5ddf77..88b7ed3895378 100644
+--- a/arch/um/kernel/um_arch.c
++++ b/arch/um/kernel/um_arch.c
+@@ -410,6 +410,13 @@ int __init linux_main(int argc, char **argv, char **envp)
+ 	os_info("Address space: host top 0x%lx, stub at 0x%lx, guest TASK_SIZE 0x%lx\n",
+ 		stub_start + STUB_SIZE, stub_start, task_size);
+ 
++	/*
++	 * Before os_early_checks(), which is where a host that can only offer
++	 * ptrace userspace clamps the count back to one: it has to see the
++	 * number we actually intend to use, not the unset zero.
++	 */
++	um_ncpus_init();
++
+ 	/* OS sanity checks that need to happen before the kernel runs */
+ 	os_early_checks();
+ 
+diff --git a/arch/um/os-Linux/util.c b/arch/um/os-Linux/util.c
+index 8c1edb7a6eb19..177a7c44d6081 100644
+--- a/arch/um/os-Linux/util.c
++++ b/arch/um/os-Linux/util.c
+@@ -233,3 +233,15 @@ void os_warn(const char *fmt, ...)
+ 	os_write_stderr(buf, len);
+ 	va_end(list);
+ }
++
++/*
++ * CPUs the host will actually run us on. Used to pick a default for ncpus=;
++ * sysconf() rather than parsing /proc/cpuinfo because UML must work where /proc
++ * is not mounted, which is the ordinary case inside an app sandbox.
++ */
++int os_nr_cpus_online(void)
++{
++	long n = sysconf(_SC_NPROCESSORS_ONLN);
++
++	return n > 0 ? (int)n : 1;
++}

@@ -1,0 +1,151 @@
+From JesusChapman <developer@jesuschapman.me> Sun Oct 18 12:00:00 2026 -0500
+Subject: [PATCH] um/x86: rename kernel symbols colliding with bionic at link
+
+Which kernel symbols collide with the target libc is a property of that
+libc, not of this tree: derive the intersection of kernel-defined with
+libc-defined-or-referenced at link time (llvm-nm + comm) and rename those
+via objcopy, seeding from the checked-in list (also the fallback when nm
+or libc.a cannot be found, and the home of the silent-reference class
+like sched_getaffinity that produces no link error at all). Same design
+the aarch64 subarch series uses; the derivation itself is arch-agnostic.
+A rename for a name the kernel does not define is a no-op.
+
+---
+
+diff --git a/arch/x86/Makefile.um b/arch/x86/Makefile.um
+--- a/arch/x86/Makefile.um
++++ b/arch/x86/Makefile.um
+@@ -71,3 +71,15 @@ vdso-install-y += arch/x86/um/vdso/vdso.so.dbg
+ vdso-install-y += arch/x86/um/vdso/vdso.so.dbg
+ 
+ endif
++#
++# Building against bionic collides with the kernel own definitions of
++# standard-library names: its libc.a is coarse, so needed objects also
++# define these and the static link fails with duplicate symbols. Rename
++# them on the objects at link time (see link-vmlinux.sh, which extends
++# this list automatically from the libc actually linked).
++#
++UM_BIONIC := $(shell echo | $(CC) -dM -E - 2>/dev/null | grep -c __ANDROID__)
++
++ifeq ($(UM_BIONIC),1)
++export UM_REDEF_SYMS := $(srctree)/arch/x86/um/bionic-syms.redef
++endif
+diff --git a/arch/x86/um/bionic-syms.redef b/arch/x86/um/bionic-syms.redef
+new file mode 100644
+--- /dev/null
++++ b/arch/x86/um/bionic-syms.redef
+@@ -0,0 +1,41 @@
++# Kernel symbols renamed when linking the x86_64 UML binary against bionic.
++#
++# Names the kernel defines that bionic also defines (duplicate-symbol
++# error, loud) or merely references (silent bad binding, e.g.
++# sched_getaffinity reaching the kernel task_struct-less). Seeded from
++# NDK r30 link errors; scripts/link-vmlinux.sh extends this automatically
++# from the libc actually linked, so NDK drift adds renames, not bugs.
++# Format is "<name> kernel_<name>", one per line; objcopy renames
++# definitions and references together.
++sem_init kernel_sem_init
++strlcat kernel_strlcat
++strpbrk kernel_strpbrk
++strsep kernel_strsep
++getrusage kernel_getrusage
++sched_setaffinity kernel_sched_setaffinity
++sched_setattr kernel_sched_setattr
++sched_setscheduler kernel_sched_setscheduler
++sync_file_range kernel_sync_file_range
++arch_prctl kernel_arch_prctl
++memchr kernel_memchr
++strlen kernel_strlen
++strnlen kernel_strnlen
++snprintf kernel_snprintf
++vsnprintf kernel_vsnprintf
++sprintf kernel_sprintf
++vsprintf kernel_vsprintf
++sscanf kernel_sscanf
++vsscanf kernel_vsscanf
++timer_delete kernel_timer_delete
++stpcpy kernel_stpcpy
++sched_getaffinity kernel_sched_getaffinity
++abort kernel_abort
++strcasecmp kernel_strcasecmp
++strncasecmp kernel_strncasecmp
++strcspn kernel_strcspn
++strstr kernel_strstr
++bsearch kernel_bsearch
++strcat kernel_strcat
++strncat kernel_strncat
++strspn kernel_strspn
++sched_getattr kernel_sched_getattr
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -80,3 +80,8 @@ vmlinux_link()
+ 	if [ "${SRCARCH}" = "um" ]; then
+-		# Rename the kernel symbols that the target libc also references,
++		# Rename the kernel symbols that the target libc also uses,
++		#
++		# The colliding set is a property of the libc being linked, not of
++		# this tree: derived below with llvm-nm + comm, seeded by the
++		# checked-in list (also the fallback, and the home of the silent
++		# bad-binding class like sched_getaffinity).
+ 		# before it gets a chance to bind to them. Doing it here rather
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -87,11 +87,46 @@
+ 		# for which names and why.
+-		if [ -n "${UM_REDEF_SYMS}" ] && [ -f "${UM_REDEF_SYMS}" ]; then
+-			for a in ${objs} ${libs}; do
+-				case "${a}" in
+-				*.a|*.o)
+-					${OBJCOPY} --redefine-syms="${UM_REDEF_SYMS}" \
+-						"${a}" || exit 1
+-					;;
+-				esac
+-			done
++		if [ -n "${UM_REDEF_SYMS}" ]; then
++			um_redef=.tmp_um_redef_syms
++			: > "${um_redef}"
++			if [ -f "${UM_REDEF_SYMS}" ]; then
++				sed -e 's/#.*//' -e '/^[[:space:]]*$/d' \
++					"${UM_REDEF_SYMS}" > "${um_redef}"
++			fi
++
++			um_libc=$(${CC} ${KBUILD_CFLAGS} -print-file-name=libc.a \
++				  2>/dev/null)
++			if [ -n "${NM}" ] && [ -f "${um_libc}" ]; then
++				# Anything the kernel defines...
++				${NM} --defined-only --extern-only \
++					${objs} ${libs} 2>/dev/null |
++					awk '$2 ~ /^[TWDBR]$/ { print $3 }' |
++					sort -u > .tmp_um_kdef
++				# ...that libc defines or references. Undefined
++				# entries print as "U name", defined ones as
++				# "addr T name"; archive member headers end in
++				# ':' and match neither.
++				${NM} "${um_libc}" 2>/dev/null |
++					awk '$1 == "U" { print $2 }
++					     $2 ~ /^[TWDBR]$/ { print $3 }' |
++					sort -u > .tmp_um_libc
++				comm -12 .tmp_um_kdef .tmp_um_libc |
++				while read -r sym; do
++					grep -q "^${sym}[[:space:]]" \
++						"${um_redef}" && continue
++					echo "${sym} kernel_${sym}"
++				done >> "${um_redef}"
++				rm -f .tmp_um_kdef .tmp_um_libc
++			fi
++
++			if [ -s "${um_redef}" ]; then
++				for a in ${objs} ${libs}; do
++					case "${a}" in
++					*.a|*.o)
++						${OBJCOPY} \
++						  --redefine-syms="${um_redef}" \
++						  "${a}" || exit 1
++						;;
++					esac
++				done
++			fi
+ 		fi

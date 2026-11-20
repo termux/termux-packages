@@ -1,0 +1,93 @@
+From a72587df0610b8496c302fe9545e4a0bbfe22623 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 23:30:54 +0200
+Subject: [PATCH] um: fix x86 build regressions from the subarch cpuinfo split
+
+Two things my arch/um changes broke for x86, both caught by building
+ARCH=um SUBARCH=x86 as a control:
+
+ - cpuinfo_um's feature bitmap moved into struct arch_cpuinfo, so x86's
+   cpu_has()/set_cpu_cap() and cpuinfo.c must go through ->arch.
+ - the link steps were passing all of CLANG_FLAGS, which includes
+   -Werror=unused-command-line-argument; the -m flags KBUILD_CFLAGS carries
+   are meaningless at link time and were then rejected. Pass only the target
+   triple, which is all these steps actually need.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/vdso/Makefile  | 2 +-
+ arch/um/Makefile             | 2 +-
+ arch/um/kernel/skas/Makefile | 2 +-
+ arch/x86/um/asm/cpufeature.h | 6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/um/vdso/Makefile b/arch/arm64/um/vdso/Makefile
+index afd68cc919737..390ce4db5698c 100644
+--- a/arch/arm64/um/vdso/Makefile
++++ b/arch/arm64/um/vdso/Makefile
+@@ -32,7 +32,7 @@ VDSO_LDFLAGS = -fPIC -shared -Wl,--hash-style=sysv -z noexecstack \
+ # instead. Without it clang picks the build machine's linker emulation and fails
+ # with "cannot represent machine `aarch64'".
+ quiet_cmd_vdso = VDSO    $@
+-      cmd_vdso = $(CC) -nostdlib -o $@ $(CLANG_FLAGS) \
++      cmd_vdso = $(CC) -nostdlib -o $@ $(filter --target=%,$(CLANG_FLAGS)) \
+ 		       $(CC_FLAGS_LTO) $(VDSO_LDFLAGS) \
+ 		       $(VDSO_LDFLAGS_$(filter %.lds,$(^F))) \
+ 		       -Wl,-T,$(filter %.lds,$^) $(filter %.o,$^)
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index 30de40e0696a8..f505cd3d3086e 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -149,7 +149,7 @@ LD_FLAGS_CMDLINE = $(foreach opt,$(KBUILD_LDFLAGS) $(LDFLAGS_EXECSTACK),-Wl,$(op
+ # scripts/link-vmlinux.sh links UML with "$(CC) $(CFLAGS_vmlinux)" rather than
+ # with $(LD), so the compiler needs the target triple here too -- see the
+ # USER_CFLAGS comment above for why KBUILD_CPPFLAGS does not reach this point.
+-export CFLAGS_vmlinux := $(CLANG_FLAGS) $(LINK-y) $(LINK_WRAPS) $(LD_FLAGS_CMDLINE) $(CC_FLAGS_LTO)
++export CFLAGS_vmlinux := $(filter --target=%,$(CLANG_FLAGS)) $(LINK-y) $(LINK_WRAPS) $(LD_FLAGS_CMDLINE) $(CC_FLAGS_LTO)
+ 
+ # When cleaning we don't include .config, so we don't include
+ # TT or skas makefiles and don't clean skas_ptregs.h.
+diff --git a/arch/um/kernel/skas/Makefile b/arch/um/kernel/skas/Makefile
+index 97c695008550d..1de51b3905187 100644
+--- a/arch/um/kernel/skas/Makefile
++++ b/arch/um/kernel/skas/Makefile
+@@ -28,7 +28,7 @@ $(obj)/stub_exe: $(obj)/stub_exe.dbg FORCE
+ # machine's default linker and it fails with "file in wrong format" as soon as
+ # the host and target architectures differ. Empty under gcc.
+ quiet_cmd_stub_exe = STUB_EXE $@
+-      cmd_stub_exe = $(CC) -nostdlib -o $@ $(CLANG_FLAGS) \
++      cmd_stub_exe = $(CC) -nostdlib -o $@ $(filter --target=%,$(CLANG_FLAGS)) \
+ 			   $(filter-out $(UM_GPROF_OPT) $(UM_GCOV_OPT),$(KBUILD_CFLAGS)) $(STUB_EXE_LDFLAGS) \
+ 			   $(filter %.o,$^)
+ 
+diff --git a/arch/x86/um/asm/cpufeature.h b/arch/x86/um/asm/cpufeature.h
+index 4354f6984271c..f340168a7ca03 100644
+--- a/arch/x86/um/asm/cpufeature.h
++++ b/arch/x86/um/asm/cpufeature.h
+@@ -21,7 +21,7 @@ extern const char * const x86_power_flags[32];
+ extern const char * const x86_bug_flags[NBUGINTS*32];
+ 
+ #define test_cpu_cap(c, bit)						\
+-	 test_bit(bit, (unsigned long *)((c)->x86_capability))
++	 test_bit(bit, (unsigned long *)((c)->arch.x86_capability))
+ 
+ /*
+  * There are 32 bits/features in each mask word.  The high bits
+@@ -53,7 +53,7 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+ 
+ #define boot_cpu_has(bit)	cpu_has(&boot_cpu_data, bit)
+ 
+-#define set_cpu_cap(c, bit)	set_bit(bit, (unsigned long *)((c)->x86_capability))
++#define set_cpu_cap(c, bit)	set_bit(bit, (unsigned long *)((c)->arch.x86_capability))
+ 
+ extern void setup_clear_cpu_cap(unsigned int bit);
+ 
+@@ -108,7 +108,7 @@ static __always_inline bool _static_cpu_has(u16 bit)
+ 		 : : [feature]  "i" (bit),
+ 		     [always]   "i" (X86_FEATURE_ALWAYS),
+ 		     [bitnum]   "i" (1 << (bit & 7)),
+-		     [cap_byte] "m" (((const char *)boot_cpu_data.x86_capability)[bit >> 3])
++		     [cap_byte] "m" (((const char *)boot_cpu_data.arch.x86_capability)[bit >> 3])
+ 		 : : t_yes, t_no);
+ t_yes:
+ 	return true;

@@ -1,0 +1,138 @@
+From d06cc2a4ec6fae227dadfebb70059ae320e2da3e Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 20:13:31 +0200
+Subject: [PATCH] um: hand dead stubs to the reaper instead of waiting for them
+
+destroy_context() kills the stub process for a dying mm and then blocks
+in waitpid() with signals off, so the whole kernel stops for as long as
+the host takes to reap it. Measured on a Galaxy S26 at 54.5-55.0us, and
+flat at 0, 32, 128 and 512 mappings -- it is the reap latency itself, not
+work being done -- and this path runs twice for every guest execve.
+
+The wait is not gratuitous, which is why it cannot simply be dropped:
+free_pages() below it returns the page the stub shares with us, and doing
+that while the stub is still alive is a use-after-free on the other side.
+
+So keep the ordering and lose the wait. Hand the pid and the pages it
+still holds to the SIGCHLD reaper, which already runs and already knows
+how to collect dead stubs, and let it release them once the host confirms
+the process is gone. The mm is off mm_list by then, so the reaper's
+search for an unexpectedly dead MM does not find it and stays quiet.
+
+The fields are copied rather than referenced: the mm_struct is freed as
+soon as destroy_context() returns, so a pointer into mm->context would
+dangle. In ptrace mode there is no SIGCHLD handler registered at all, so
+there is nobody to hand to and the synchronous path stays; the same
+applies if the small allocation fails.
+
+Verified on a Galaxy S26: containers start and stop, and the host is left
+with no zombies, which is the failure this would show as -- an unreaped
+stub is both a leak and, on Android 12+, another phantom process counting
+against the limit that gets an app's children killed.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/kernel/skas/mmu.c | 76 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+
+diff --git a/arch/um/kernel/skas/mmu.c b/arch/um/kernel/skas/mmu.c
+index b62eee6ec65c7..2ef58ee9b91e3 100644
+--- a/arch/um/kernel/skas/mmu.c
++++ b/arch/um/kernel/skas/mmu.c
+@@ -90,6 +90,38 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
+ 	return ret;
+ }
+ 
++/*
++ * A stub that has been killed but not yet reaped, and the resources that
++ * cannot be released until the host says it is gone. destroy_context() cannot
++ * keep a pointer into mm->context for this: the mm_struct is freed as soon as
++ * it returns, so the few fields that matter are copied out.
++ */
++struct dying_stub {
++	struct list_head list;
++	int pid;
++	unsigned long stack;
++	int sock;
++};
++
++static LIST_HEAD(dying_stubs);
++
++/* Release what destroy_context() deferred, now that @pid is confirmed dead. */
++static void reap_dying_stub(pid_t pid)
++{
++	struct dying_stub *d, *tmp;
++
++	list_for_each_entry_safe(d, tmp, &dying_stubs, list) {
++		if (d->pid != pid)
++			continue;
++		list_del(&d->list);
++		if (d->sock)
++			os_close_file(d->sock);
++		free_pages(d->stack, ilog2(STUB_DATA_PAGES));
++		kfree(d);
++		return;
++	}
++}
++
+ void destroy_context(struct mm_struct *mm)
+ {
+ 	struct mm_context *mmu = &mm->context;
+@@ -111,6 +143,42 @@ void destroy_context(struct mm_struct *mm)
+ 	scoped_guard(spinlock_irqsave, &mm_list_lock)
+ 		list_del(&mm->context.list);
+ 
++	/*
++	 * Killing a stub is cheap; waiting for it to die is not, and this path
++	 * runs twice for every guest execve. os_kill_ptraced_process() with
++	 * reap_child set blocks in waitpid() with signals off, so the whole
++	 * kernel stops for as long as the host takes to reap: measured on a
++	 * Galaxy S26 at 54.5-55.0us, and flat at 0, 32, 128 and 512 mappings,
++	 * so it is the reap latency itself rather than any work being done.
++	 *
++	 * The wait is not gratuitous, though, which is why this is not simply
++	 * dropped: the free_pages() below hands back the page the stub shares
++	 * with us, and doing that while the stub is still alive is a
++	 * use-after-free on the other side.
++	 *
++	 * So keep the ordering and lose the wait: hand the pid and its pages to
++	 * the SIGCHLD reaper, which already runs and already knows how to
++	 * collect dead stubs, and let it free them once the host confirms the
++	 * process is gone. In ptrace mode there is no SIGCHLD handler
++	 * registered at all (see arch/um/os-Linux/signal.c), so there is nobody
++	 * to hand to and the synchronous path stays.
++	 */
++	if (mmu->id.pid > 0 && using_seccomp) {
++		struct dying_stub *d = kmalloc(sizeof(*d), GFP_ATOMIC);
++
++		if (d) {
++			d->pid = mmu->id.pid;
++			d->stack = mmu->id.stack;
++			d->sock = mmu->id.sock;
++			scoped_guard(spinlock_irqsave, &mm_list_lock)
++				list_add(&d->list, &dying_stubs);
++			os_kill_ptraced_process(mmu->id.pid, 0);
++			mmu->id.pid = -1;
++			return;
++		}
++		/* Out of memory: do it the slow, safe way below instead. */
++	}
++
+ 	if (mmu->id.pid > 0) {
+ 		os_kill_ptraced_process(mmu->id.pid, 1);
+ 		mmu->id.pid = -1;
+@@ -130,6 +198,14 @@ static irqreturn_t mm_sigchld_irq(int irq, void* dev)
+ 	guard(spinlock)(&mm_list_lock);
+ 
+ 	while ((pid = os_reap_child()) > 0) {
++		/*
++		 * Most reaped children are stubs destroy_context() killed and
++		 * handed over rather than waited for. Release those first; the
++		 * search below is for a stub that died without being asked to,
++		 * and a handed-over one is no longer on mm_list to be found.
++		 */
++		reap_dying_stub(pid);
++
+ 		/*
+ 		* A child died, check if we have an MM with the PID. This is
+ 		* only relevant in SECCOMP mode (as ptrace will fail anyway).
