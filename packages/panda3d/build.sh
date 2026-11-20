@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A framework for 3D rendering and game development for Py
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.10.16"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/panda3d/panda3d/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=25d04b2b6ab2c45a0b0cc3ba7a01aa66aabc0e4473b2aa83038e1d61ce1ece2e
 TERMUX_PKG_AUTO_UPDATE=true
@@ -11,6 +11,7 @@ TERMUX_PKG_DEPENDS="libc++, python"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-glob"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
@@ -18,14 +19,29 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib/panda3d"
 }
 
+termux_step_host_build() {
+	# makepanda cannot run the target interrogate tools when cross-compiling,
+	# so build host-native ones from the same source revision.
+	cd "$TERMUX_PKG_SRCDIR"
+	python makepanda/makepanda.py \
+		--nothing \
+		--outputdir "$TERMUX_PKG_HOSTBUILD_DIR/built" \
+		--threads "${TERMUX_PKG_MAKE_PROCESSES}"
+}
+
 termux_step_make() {
+	export TERMUX_PREFIX="${TERMUX_PREFIX:-${TERMUX__PREFIX:-$PREFIX}}"
+	export PATH="$TERMUX_PKG_HOSTBUILD_DIR/built/bin:$PATH"
 	local PANDA_ARCH="${TERMUX_ARCH}"
 	if [[ "${TERMUX_ARCH}" == "i686" ]]; then
 		PANDA_ARCH="x86"
 	fi
 	python makepanda/makepanda.py \
 		--arch "$PANDA_ARCH" \
+		--target "android-${TERMUX_PKG_API_LEVEL}" \
 		--nothing \
+		--use-python \
+		--use-direct \
 		--threads "${TERMUX_PKG_MAKE_PROCESSES}"
 }
 
