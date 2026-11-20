@@ -1,0 +1,24 @@
+--- a/src/gig_callback.c
++++ b/src/gig_callback.c
+@@ -183,8 +183,9 @@
+ // It converts FFI arguments to SCM arguments, calls a SCM function
+ // and then returns the result.
+ static void *
+-callback_binding_inner(struct callback_binding_args *args)
++callback_binding_inner(void *data)
+ {
++    struct callback_binding_args *args = data;
+     ffi_cif *cif = args->cif;
+     gpointer ret = args->ret;
+     gpointer *ffi_args = args->ffi_args;
+@@ -320,8 +321,9 @@
+ }
+ 
+ void *
+-c_callback_binding_inner(struct callback_binding_args *args)
++c_callback_binding_inner(void *data)
+ {
++    struct callback_binding_args *args = data;
+ 
+     ffi_cif *cif = args->cif;
+     gpointer ret = args->ret;

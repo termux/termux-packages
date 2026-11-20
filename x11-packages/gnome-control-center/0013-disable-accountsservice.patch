@@ -1,0 +1,123 @@
+diff --git a/meson.build b/meson.build
+index 7841741..779aa81 100644
+--- a/meson.build
++++ b/meson.build
+@@ -181,7 +181,6 @@ subproject('libgxdp',
+   default_options: 'tests=false',
+ )
+ 
+-accounts_dep = dependency('accountsservice', version: '>= 23.11.69')
+ colord_dep = dependency('colord', version: '>= 0.1.34', required: false)
+ gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: '>= 2.23.0')
+ gio_dep = dependency('gio-2.0')
+diff --git a/panels/system/meson.build b/panels/system/meson.build
+index db0897f..4ba9b20 100644
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -68,7 +68,6 @@ krb_dep = dependency('krb5', required: false)
+ assert(krb_dep.found(), 'kerberos libraries not found in your path')
+ 
+ deps = common_deps + [
+-  accounts_dep,
+   gcr_dep,
+   gdk_pixbuf_dep,
+   gnome_desktop_dep,
+diff --git a/panels/system/region/cc-region-page.c b/panels/system/region/cc-region-page.c
+index f32c2ad..e63dc93 100644
+--- a/panels/system/region/cc-region-page.c
++++ b/panels/system/region/cc-region-page.c
+@@ -34,7 +34,6 @@
+ #include "cc-list-row.h"
+ #include "cc-region-page.h"
+ 
+-#include <act/act.h>
+ #include <errno.h>
+ #include <glib/gi18n.h>
+ #include <gio/gio.h>
+@@ -78,8 +78,6 @@ struct _CcRegionPage {
+         GDBusProxy        *localed;
+         GDBusProxy        *session;
+ 
+-        ActUserManager    *user_manager;
+-        ActUser           *user;
+         GSettings         *locale_settings;
+ 
+         gchar             *language;
+@@ -303,7 +302,6 @@ set_accountservice_languages (CcRegionPage *self)
+         if (g_strcmp0 (self->language, self->region) != 0 && self->region[0] != '\0')
+                 languages[1] = self->region;
+ 
+-        act_user_set_languages (self->user, languages);
+ }
+ 
+ static void update_user_language_row (CcRegionPage *self);
+@@ -547,8 +545,6 @@ update_language_from_user (CcRegionPage *self)
+ {
+         const gchar *language = NULL;
+ 
+-        if (act_user_is_loaded (self->user))
+-                language = act_user_get_language (self->user);
+ 
+         if (language == NULL || *language == '\0')
+                 language = setlocale (LC_MESSAGES, NULL);
+@@ -569,12 +565,6 @@ update_region_from_setting (CcRegionPage *self)
+ static void
+ setup_language_section (CcRegionPage *self)
+ {
+-        self->user = act_user_manager_get_user_by_id (self->user_manager, getuid ());
+-        g_signal_connect_object (self->user, "notify::language",
+-                                 G_CALLBACK (update_language_from_user), self, G_CONNECT_SWAPPED);
+-        g_signal_connect_object (self->user, "notify::is-loaded",
+-                                 G_CALLBACK (update_language_from_user), self, G_CONNECT_SWAPPED);
+-
+         self->locale_settings = g_settings_new (GNOME_SYSTEM_LOCALE_DIR);
+         g_signal_connect_object (self->locale_settings, "changed::" KEY_REGION,
+                                  G_CALLBACK (update_region_from_setting), self, G_CONNECT_SWAPPED);
+@@ -619,11 +609,7 @@ set_login_button_visibility (CcRegionPage *self)
+         gboolean has_multiple_users;
+         gboolean loaded;
+ 
+-        g_object_get (self->user_manager, "is-loaded", &loaded, NULL);
+-        if (!loaded)
+-          return;
+-
+-        g_object_get (self->user_manager, "has-multiple-users", &has_multiple_users, NULL);
++        return;
+ 
+ #ifdef HAVE_POLKIT_SUPPORT
+         self->login_auto_apply = !has_multiple_users && g_permission_get_allowed (self->permission);
+@@ -631,8 +617,6 @@ set_login_button_visibility (CcRegionPage *self)
+ #else
+         gtk_widget_set_visible (self->login_group, TRUE);
+ #endif
+-
+-        g_signal_handlers_disconnect_by_func (self->user_manager, set_login_button_visibility, self);
+ }
+ 
+ /* Callbacks */
+@@ -821,16 +805,6 @@ cc_region_page_finalize (GObject *object)
+ {
+         CcRegionPage *self = CC_REGION_PAGE (object);
+ 
+-        if (self->user_manager) {
+-                g_signal_handlers_disconnect_by_data (self->user_manager, self);
+-                self->user_manager = NULL;
+-        }
+-
+-        if (self->user) {
+-                g_signal_handlers_disconnect_by_data (self->user, self);
+-                self->user = NULL;
+-        }
+-
+         g_clear_object (&self->permission);
+         g_clear_object (&self->localed);
+         g_clear_object (&self->session);
+@@ -881,8 +855,6 @@ cc_region_page_init (CcRegionPage *self)
+ 
+         self->cancellable = g_cancellable_new ();
+ 
+-        self->user_manager = act_user_manager_get_default ();
+-
+         g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+                                   G_DBUS_PROXY_FLAGS_NONE,
+                                   NULL,
