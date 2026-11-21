@@ -1,0 +1,20 @@
+--- a/games/guile-compile
++++ b/games/guile-compile
+@@ -12,6 +12,17 @@
+ export GUILE_LOAD_COMPILED_PATH=.
+ export GUILE_WARN_DEPRECATED="detailed"
+ 
++TARGET_PLATFORM=""
++if [ -n "$TARGET_PLATFORM" ]; then
++	GUILE="$(PATH="/usr/bin:/usr/local/bin:/bin" command -v guile-3.0 2>/dev/null || PATH="/usr/bin:/usr/local/bin:/bin" command -v guile 2>/dev/null || echo /usr/bin/guile-3.0)"
++	if [ "$1" = "compile" ]; then
++		shift
++		exec "$GUILE" -e '(@@ (guild) main)' -s "$this" compile --target="$TARGET_PLATFORM" "$@"
++	else
++		exec "$GUILE" -e '(@@ (guild) main)' -s "$this" "$@"
++	fi
++fi
++
+ exec ${GUILE:-/bin/false} -e '(@@ (guild) main)' -s "$this" "$@"
+ !#
+ 
