@@ -1,0 +1,12 @@
+--- a/src/com/sun/jna/Native.java
++++ b/src/com/sun/jna/Native.java
+@@ -1019,6 +1019,9 @@ public final class Native implements Version {
+ 
+         String libName = System.getProperty("jna.boot.library.name", "jnidispatch");
+         String bootPath = System.getProperty("jna.boot.library.path");
++        if (bootPath == null) {
++            bootPath = "@TERMUX_PREFIX@/lib/jna";
++        }
+         if (bootPath != null) {
+             // String.split not available in 1.4
+             StringTokenizer dirs = new StringTokenizer(bootPath, File.pathSeparator);

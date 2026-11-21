@@ -1,0 +1,35 @@
+Author: Emmanuel Bourg <ebourg@apache.org>
+--- a/build.xml
++++ b/build.xml
+@@ -325,6 +325,7 @@ com.sun.jna.win32;version=&quot;${osgi.version}&quot;;uses:=&quot;com.sun.jna&qu
+               <!-- Note that no terminal "*" is included in this list,
+                  which will force failure on unsupported platforms.
+               -->
++<!--
+               <attribute name="Bundle-NativeCode"
+                          value="
+ com/sun/jna/win32-x86/jnidispatch.dll;
+@@ -421,6 +422,7 @@ osname=macosx;processor=x86-64,
+ com/sun/jna/darwin-aarch64/libjnidispatch.jnilib;
+ osname=macosx;processor=aarch64
+ "/>
++-->
+           </manifest>
+           <manifest file="@{target}" mode="update" if:true="@{module-info}">
+               <attribute name="Multi-Release" value="true"/>
+@@ -453,6 +455,7 @@ osname=macosx;processor=aarch64
+       <fileset dir="${classes}" excludes="${jar.omitted}">
+         <patternset refid="jar-compiled"/>
+       </fileset>
++<!--
+       <zipfileset src="${lib.native}/win32-x86.jar"
+                   includes="*jnidispatch*"
+                   prefix="com/sun/jna/win32-x86"/>
+@@ -570,6 +573,7 @@ osname=macosx;processor=aarch64
+       <zipfileset src="${lib.native}/w32ce-arm.jar"
+                   includes="*jnidispatch*"
+                   prefix="com/sun/jna/w32ce-arm"/>
++-->
+       <zipfileset dir="."
+                   includes="LICENSE,LGPL2.1,AL2.0"
+                   prefix="META-INF"/>
