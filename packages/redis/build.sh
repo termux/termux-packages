@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="In-memory data structure store used as a database, cache
 TERMUX_PKG_LICENSE="AGPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1:8.10.3"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.redis.io/releases/redis-${TERMUX_PKG_VERSION:2}.tar.gz"
 TERMUX_PKG_SHA256=edde778f6bdee7581e42fc139ca9e07e2822212092f7501f99989656e3629d02
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-glob"
+TERMUX_PKG_DEPENDS="libandroid-execinfo, libandroid-glob, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/redis.conf"
 TERMUX_PKG_BREAKS="valkey"
@@ -22,7 +23,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -C src -j "$TERMUX_PKG_MAKE_PROCESSES"
+	make -C src -j "$TERMUX_PKG_MAKE_PROCESSES" BUILD_TLS=yes
 }
 
 termux_step_make_install() {
