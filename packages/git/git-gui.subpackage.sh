@@ -1,5 +1,6 @@
 TERMUX_SUBPKG_DESCRIPTION="A graphical interface to Git"
 TERMUX_SUBPKG_DEPENDS="tk"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 TERMUX_SUBPKG_INCLUDE="
 libexec/git-core/git-gui
 libexec/git-core/git-citool
