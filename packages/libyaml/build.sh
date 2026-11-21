@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://pyyaml.org/wiki/LibYAML
 TERMUX_PKG_DESCRIPTION="LibYAML is a YAML 1.1 parser and emitter written in C"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.2.5
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION="0.2.6"
 TERMUX_PKG_SRCURL=https://github.com/yaml/libyaml/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=fa240dbf262be053f3898006d502d514936c818e422afdcf33921c63bed9bf2e
+TERMUX_PKG_SHA256=d872e14e3439245919bc0ec2793182e89b4dc6dcc156ef7db47fe3510dee8bc7
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libyaml-dev"
 TERMUX_PKG_REPLACES="libyaml-dev"
@@ -14,7 +13,7 @@ termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after RELEASE / SOVERSION is changed.
 	local _RELEASE=0
-	local _SOVERSION=2
+	local _SOVERSION=1
 
 	local a
 	for a in YAML_RELEASE YAML_CURRENT YAML_AGE; do
