@@ -18,12 +18,12 @@ and start menu failing to load
  
 -        let user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
 +        let user = null;
-         this.userIcon = new UserWidget.UserWidget(user, Clutter.Orientation.VERTICAL, false);
+         this.userIcon = new UserWidget.UserWidget(user, Clutter.Orientation.VERTICAL, { hideDefaultImage: true });
          this.userIcon.set_reactive(true);
          this.userIcon.track_hover = true;
 --- a/js/ui/userWidget.js
 +++ b/js/ui/userWidget.js
-@@ -161,6 +161,9 @@ class UserWidget extends St.BoxLayout {
+@@ -165,6 +165,9 @@ class UserWidget extends St.BoxLayout {
          this._label.y_align = Clutter.ActorAlign.CENTER;
          this.add_child(this._label);
  
