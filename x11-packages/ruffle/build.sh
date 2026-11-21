@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.md"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.8.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/ruffle-rs/ruffle/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=e9c10f7144ac712a5b0642070f71b2fd2254cd4a8b29b726fd5c210a30eac570
 TERMUX_PKG_DEPENDS="alsa-lib, alsa-plugins, fontconfig, gtk3, openh264"
