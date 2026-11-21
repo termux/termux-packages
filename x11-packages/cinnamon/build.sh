@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/linuxmint/cinnamon
 TERMUX_PKG_DESCRIPTION="Cinnamon shell"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.8.3"
+TERMUX_PKG_VERSION="6.8.4"
 TERMUX_PKG_SRCURL="https://github.com/linuxmint/cinnamon/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=535446888ee38d0f6dc1a12d2204fd85cacd1f4d77b4b17b7e4dcf9c43cecdaa
+TERMUX_PKG_SHA256=d9cf68046c5d115f38d18b734dbd2dfad53c67a861942282e17cdd4688b5cf8d
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP="\d+\.\d+\.\d+(?!-)"
 TERMUX_PKG_DEPENDS="atk, cinnamon-control-center, cinnamon-menus, cinnamon-session, cinnamon-settings-daemon, cjs, clutter, clutter-gtk, cogl, dbus, gcr, gdk-pixbuf, gettext, glib, gnome-backgrounds, gobject-introspection, gsound, gtk3, gtk4, ibus, libadapta, libcairo, libx11, libxml2, mint-themes, mint-y-icon-theme, muffin, nemo, opengl, pango, python-pillow, python-pip, python-xapp, sassc, xapp, xdotool"
@@ -45,10 +45,11 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	# disabling this sections because they will not work in termux
-	mv $TERMUX_PREFIX/share/cinnamon/cinnamon-settings/modules/cs_user.py $TERMUX_PREFIX//share/cinnamon/cinnamon-settings/modules/cs_user.py.bak
-	rm -rf $TERMUX_PREFIX/share/cinnamon/applets/user@cinnamon.org
-	rm -rf $TERMUX_PREFIX/share/cinnamon/applets/network@cinnamon.org
-	rm -rf $TERMUX_PREFIX/share/cinnamon/applets/printers@cinnamon.org
+	mv "$TERMUX_PREFIX"/share/cinnamon/cinnamon-settings/modules/cs_user.py \
+		"$TERMUX_PREFIX"/share/cinnamon/cinnamon-settings/modules/cs_user.py.bak
+	rm -rf "$TERMUX_PREFIX"/share/cinnamon/applets/user@cinnamon.org
+	rm -rf "$TERMUX_PREFIX"/share/cinnamon/applets/network@cinnamon.org
+	rm -rf "$TERMUX_PREFIX"/share/cinnamon/applets/printers@cinnamon.org
 
 	########################################################################
 	# Based on :- https://src.fedoraproject.org/rpms/cinnamon/tree/rawhide #
