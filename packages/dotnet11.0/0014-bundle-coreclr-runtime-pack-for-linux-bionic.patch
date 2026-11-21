@@ -1,0 +1,17 @@
+Backport of https://github.com/dotnet/runtime/pull/137159
+
+diff --git a/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj b/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
+index ca964ce66..a5ea3ffb8 100644
+--- a/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
++++ b/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bundle.bundleproj
+@@ -32,8 +32,8 @@
+   </ItemGroup>
+ 
+   <ItemGroup>
+-    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.CoreCLR.sfxproj" Condition="'$(RuntimeFlavor)' == 'CoreCLR' and '$(TargetsLinuxBionic)' != 'true'" />
+-    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.Mono.sfxproj" Condition="'$(RuntimeFlavor)' == 'Mono' or '$(TargetsLinuxBionic)' == 'true'" />
++    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.CoreCLR.sfxproj" Condition="'$(RuntimeFlavor)' == 'CoreCLR' and ('$(TargetsLinuxBionic)' != 'true' or '$(PrimaryRuntimeFlavor)' == 'CoreCLR')" />
++    <BundleComponentReference Include="../Microsoft.NETCore.App/Microsoft.NETCore.App.Runtime.Mono.sfxproj" Condition="'$(RuntimeFlavor)' == 'Mono' or ('$(TargetsLinuxBionic)' == 'true' and '$(PrimaryRuntimeFlavor)' != 'CoreCLR')" />
+     <BundleComponentReference Include="../installers/dotnet-hostfxr.proj" Condition="'$(TestReadyToRun)' != 'true'" />
+     <BundleComponentReference Include="../installers/dotnet-host.proj" Condition="'$(TestReadyToRun)' != 'true'" />
+   </ItemGroup>

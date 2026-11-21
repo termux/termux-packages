@@ -1,0 +1,20 @@
+Keep the native shims next to a single-file app on linux-bionic. Its
+singlefilehost is built without NATIVE_LIBS_EMBEDDED (dotnet/runtime#111523),
+so the runtime loads them from disk.
+
+diff --git a/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Directory.Build.props b/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Directory.Build.props
+index 5c36a463c..2163b558b 100644
+--- a/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Directory.Build.props
++++ b/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Directory.Build.props
+@@ -19,6 +19,11 @@
+     <SingleFileHostIncludeFilename Include="NONE" />
+ 
+     <!-- LINUX -->
++    <!-- linux-bionic's singlefilehost doesn't embed the native shims (no NATIVE_LIBS_EMBEDDED, see
++         https://github.com/dotnet/runtime/issues/111523), so keep them next to the app. Globalization
++         is statically linked into coreclr and resolved there. -->
++    <SingleFileHostIncludeFilename Include="libSystem.Native.so;libSystem.IO.Compression.Native.so;libSystem.Net.Security.Native.so;libSystem.Security.Cryptography.Native.Android.so;libSystem.Security.Cryptography.Native.OpenSsl.so"
++                                   Condition="'$(TargetsLinuxBionic)' == 'true'" />
+ 
+     <!-- OSX -->
+ 

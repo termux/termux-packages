@@ -1,0 +1,84 @@
+diff --git a/src/runtime/src/coreclr/CMakeLists.txt b/src/runtime/src/coreclr/CMakeLists.txt
+index 483f6caee..8d1935c57 100644
+--- a/src/runtime/src/coreclr/CMakeLists.txt
++++ b/src/runtime/src/coreclr/CMakeLists.txt
+@@ -128,6 +128,20 @@ if(CLR_CMAKE_HOST_UNIX)
+         endif()
+     endif()
+ 
++    # Termux's <semaphore.h> maps sem_open/sem_close to libandroid-posix-semaphore.
++    # Optional: stock NDK builds don't have it and don't need it.
++    if(CLR_CMAKE_TARGET_ANDROID)
++        find_library(ANDROID_POSIX_SEMAPHORE NAMES android-posix-semaphore)
++        if(NOT ANDROID_POSIX_SEMAPHORE)
++            set(ANDROID_POSIX_SEMAPHORE "")
++        else()
++            # It lives outside the system library path (Termux: $PREFIX/lib), so the
++            # runtime libraries need a RUNPATH to load it and other libraries there.
++            get_filename_component(ANDROID_POSIX_SEMAPHORE_DIR "${ANDROID_POSIX_SEMAPHORE}" DIRECTORY)
++            add_link_options("LINKER:-rpath,${ANDROID_POSIX_SEMAPHORE_DIR}")
++        endif()
++    endif()
++
+     if(CLR_CMAKE_TARGET_LINUX AND (CLR_CMAKE_TARGET_ARCH_I386 OR CLR_CMAKE_TARGET_ARCH_RISCV64))
+       add_linker_flag(-Wl,-z,notext)
+     endif()
+diff --git a/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt b/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
+index d51051987..372fe6ab9 100644
+--- a/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
++++ b/src/runtime/src/coreclr/dlls/mscoree/coreclr/CMakeLists.txt
+@@ -210,13 +210,17 @@ if (CLR_CMAKE_HOST_ANDROID OR CLR_CMAKE_HOST_IOS OR CLR_CMAKE_HOST_TVOS OR CLR_C
+         PRIVATE
+         coreclrminipal_objects
+         coreclrpal_objects
+-        eventprovider_objects
+         gcinfo
+         libunwind
+         log
+         minipal_objects
+         nativeresourcestring_objects
++        ${ANDROID_POSIX_SEMAPHORE}
+     )
++    # eventprovider is only built with FEATURE_EVENT_TRACE (off on Android: no lttng)
++    if (FEATURE_EVENT_TRACE)
++        target_link_libraries(coreclr_static PRIVATE eventprovider_objects)
++    endif()
+ elseif (TARGET coreclrpal)
+     # If we aren't linking in the PAL directly into coreclr_static, we need to propagate it up to targets
+     # that link to coreclr_static
+diff --git a/src/runtime/src/coreclr/pal/src/CMakeLists.txt b/src/runtime/src/coreclr/pal/src/CMakeLists.txt
+index 545ba6550..70f21a65f 100644
+--- a/src/runtime/src/coreclr/pal/src/CMakeLists.txt
++++ b/src/runtime/src/coreclr/pal/src/CMakeLists.txt
+@@ -322,7 +322,8 @@ if(CLR_CMAKE_TARGET_LINUX)
+   else(NOT CLR_CMAKE_TARGET_ANDROID)
+     target_link_libraries(coreclrpal
+       PUBLIC
+-      ${ANDROID_GLOB})
++      ${ANDROID_GLOB}
++      ${ANDROID_POSIX_SEMAPHORE})
+   endif(NOT CLR_CMAKE_TARGET_ANDROID)
+ 
+   target_link_libraries(coreclrpal
+diff --git a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+index 0b1eaacd0..ced2bffb7 100644
+--- a/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
++++ b/src/runtime/src/native/corehost/apphost/static/CMakeLists.txt
+@@ -183,6 +183,17 @@ else()
+         nativeresourcestring
+     )
+ 
++    # Termux's <semaphore.h> maps sem_open/sem_close (used by the PAL) to libandroid-posix-semaphore.
++    # It lives outside the system library path, next to zlib (Termux: $PREFIX/lib), so add a RUNPATH.
++    if(CLR_CMAKE_TARGET_ANDROID AND NOT ANDROID_POSIX_SEMAPHORE)
++        find_library(ANDROID_POSIX_SEMAPHORE NAMES android-posix-semaphore)
++    endif()
++    if(ANDROID_POSIX_SEMAPHORE)
++        LIST(APPEND NATIVE_LIBS ${ANDROID_POSIX_SEMAPHORE})
++        get_filename_component(ANDROID_POSIX_SEMAPHORE_DIR "${ANDROID_POSIX_SEMAPHORE}" DIRECTORY)
++        target_link_options(singlefilehost PRIVATE "LINKER:-rpath,${ANDROID_POSIX_SEMAPHORE_DIR}")
++    endif()
++
+     # additional requirements for System.IO.Compression.Native
+     include(${CLR_SRC_NATIVE_DIR}/libs/System.IO.Compression.Native/extra_libs.cmake)
+     append_extra_compression_libs(NATIVE_LIBS)
