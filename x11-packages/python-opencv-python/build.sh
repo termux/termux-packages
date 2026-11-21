@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="opencv, opencv-python, python, python-pip"
 TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="scikit-build"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_pre_configure() {
 	termux_setup_cmake

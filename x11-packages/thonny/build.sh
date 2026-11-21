@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python IDE for beginners (Tkinter based, learning-focuse
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="5.0.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/thonny/thonny/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=abe8afa81f0fd4df07da17e6a23b89fdec12006b35849712dbe7ac2d4a31af21
 TERMUX_PKG_DEPENDS="python, python-tkinter, python-pip, xdg-utils"
@@ -10,6 +11,7 @@ TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="uv_build, wheel"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
 	pip install . --no-deps --prefix="$TERMUX_PREFIX" -vv --no-build-isolation
