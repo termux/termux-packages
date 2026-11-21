@@ -1,0 +1,13 @@
+# Send text-input enter to the focused client even without an input method so that text delivered by the backend is accepted.
+
+--- a/src/input/ime.c
++++ b/src/input/ime.c
+@@ -156,7 +156,7 @@ update_text_inputs_focused_surface(struct input_method_relay *relay)
+ 		struct wlr_text_input_v3 *input = text_input->input;
+ 
+ 		struct wlr_surface *new_focused_surface;
+-		if (relay->input_method && relay->focused_surface
++		if (relay->focused_surface
+ 				&& SAME_CLIENT(input, relay->focused_surface)) {
+ 			new_focused_surface = relay->focused_surface;
+ 		} else {

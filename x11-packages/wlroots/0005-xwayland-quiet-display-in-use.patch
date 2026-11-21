@@ -1,0 +1,13 @@
+# Log an X11 display socket that is already in use at debug level instead of error.
+
+--- a/xwayland/sockets.c
++++ b/xwayland/sockets.c
+@@ -44,7 +44,7 @@ static int open_socket(struct sockaddr_un *addr, size_t path_size) {
+ 	}
+ 	if (bind(fd, (struct sockaddr*)addr, size) < 0) {
+ 		rc = errno;
+-		wlr_log_errno(WLR_ERROR, "Failed to bind socket %c%s",
++		wlr_log_errno(rc == EADDRINUSE ? WLR_DEBUG : WLR_ERROR, "Failed to bind socket %c%s",
+ 			addr->sun_path[0] ? addr->sun_path[0] : '@',
+ 			addr->sun_path + 1);
+ 		goto cleanup;
