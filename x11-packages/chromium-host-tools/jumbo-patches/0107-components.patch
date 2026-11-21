@@ -1066,19 +1066,6 @@ index 0a5934d76a..754b43b0c3 100644
  }
 +
 +#undef kIsDesktop
-diff --git a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
-index 8926ab1615..a6eb773ab7 100644
---- a/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
-+++ b/components/optimization_guide/core/delivery/prediction_model_download_manager.cc
-@@ -206,7 +206,7 @@ bool PredictionModelDownloadManager::ShouldFetchModels() const {
-   }
-   return (switches::ShouldSkipGoogleApiKeyConfigurationCheck() ||
-           google_apis::HasAPIKeyConfigured()) &&
--         local_state_->GetBoolean(prefs::kComponentUpdatesEnabled);
-+         local_state_->GetBoolean(::prefs::kComponentUpdatesEnabled);
- }
- 
- void PredictionModelDownloadManager::AddObserver(
 diff --git a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc b/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
 index 3baefef84c..6bc630e266 100644
 --- a/components/password_manager/core/browser/actor_login/internal/actor_login_password_credentials_fetcher.cc
@@ -1244,126 +1231,6 @@ index 1fcbfe5283..6a0288ec12 100644
      CHECK_EQ(page_node, new_page_node);
    } else {
      CHECK_EQ(new_page_node->GetType(), performance_manager::PageType::kUnknown);
-diff --git a/components/performance_manager/execution_context_priority/frame_audible_voter.cc b/components/performance_manager/execution_context_priority/frame_audible_voter.cc
-index f892dbf9d5..bebd18be00 100644
---- a/components/performance_manager/execution_context_priority/frame_audible_voter.cc
-+++ b/components/performance_manager/execution_context_priority/frame_audible_voter.cc
-@@ -9,6 +9,9 @@
- #include "components/performance_manager/public/execution_context/execution_context_registry.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_FrameAudibleVoter
-+#define GetVote             GetVote_FrameAudibleVoter
-+
- namespace performance_manager {
- namespace execution_context_priority {
- 
-@@ -73,3 +76,6 @@ void FrameAudibleVoter::OnIsAudibleChanged(const FrameNode* frame_node) {
- 
- }  // namespace execution_context_priority
- }  // namespace performance_manager
-+
-+#undef GetExecutionContext
-+#undef GetVote
-diff --git a/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc b/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
-index 0f8a1fc664..9c4654e844 100644
---- a/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
-+++ b/components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.cc
-@@ -9,6 +9,9 @@
- #include "components/performance_manager/public/execution_context/execution_context.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_FrameCapturingMediaStreamVoter
-+#define GetVote             GetVote_FrameCapturingMediaStreamVoter
-+
- namespace performance_manager::execution_context_priority {
- 
- namespace {
-@@ -74,3 +77,6 @@ void FrameCapturingMediaStreamVoter::OnIsCapturingMediaStreamChanged(
- }
- 
- }  // namespace performance_manager::execution_context_priority
-+
-+#undef GetExecutionContext
-+#undef GetVote
-diff --git a/components/performance_manager/execution_context_priority/frame_visibility_voter.cc b/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
-index 19dc5063f8..ee3d2771f4 100644
---- a/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
-+++ b/components/performance_manager/execution_context_priority/frame_visibility_voter.cc
-@@ -11,6 +11,8 @@
- #include "components/performance_manager/public/graph/graph.h"
- #include "url/gurl.h"
- 
-+#define GetExecutionContext GetExecutionContext_FrameVisibilityVoter
-+
- namespace performance_manager {
- namespace execution_context_priority {
- 
-@@ -113,3 +115,5 @@ void FrameVisibilityVoter::OnIsImportantChanged(const FrameNode* frame_node) {
- 
- }  // namespace execution_context_priority
- }  // namespace performance_manager
-+
-+#undef GetExecutionContext
-diff --git a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
-index dbacdb2f63..5cf232cfc6 100644
---- a/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
-+++ b/components/performance_manager/execution_context_priority/inherit_client_priority_voter.cc
-@@ -12,6 +12,8 @@
- #include "components/performance_manager/public/execution_context/execution_context_registry.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_InheritClientPriorityVoter
-+
- namespace performance_manager {
- namespace execution_context_priority {
- 
-@@ -227,3 +229,5 @@ void InheritClientPriorityVoter::OnPriorityAndReasonChanged(
- 
- }  // namespace execution_context_priority
- }  // namespace performance_manager
-+
-+#undef GetExecutionContext
-diff --git a/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc b/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
-index 5033d78ced..2431ff679a 100644
---- a/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
-+++ b/components/performance_manager/execution_context_priority/inherit_parent_priority_voter.cc
-@@ -11,6 +11,9 @@
- #include "components/performance_manager/public/execution_context/execution_context_registry.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_InheritParentPriorityVoter
-+#define GetVote             GetVote_InheritParentPriorityVoter
-+
- namespace performance_manager::execution_context_priority {
- 
- namespace {
-@@ -127,3 +130,6 @@ void InheritParentPriorityVoter::OnPriorityAndReasonChanged(
- }
- 
- }  // namespace performance_manager::execution_context_priority
-+
-+#undef GetExecutionContext
-+#undef GetVote
-diff --git a/components/performance_manager/execution_context_priority/loading_page_voter.cc b/components/performance_manager/execution_context_priority/loading_page_voter.cc
-index d3f9c5d902..1ef7aa6865 100644
---- a/components/performance_manager/execution_context_priority/loading_page_voter.cc
-+++ b/components/performance_manager/execution_context_priority/loading_page_voter.cc
-@@ -9,6 +9,8 @@
- #include "components/performance_manager/public/execution_context/execution_context_registry.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_LoadingPageVoter
-+
- namespace performance_manager::execution_context_priority {
- 
- namespace {
-@@ -136,3 +138,5 @@ void LoadingPageVoter::InvalidateVoteForSubtree(const FrameNode* frame_node) {
- }
- 
- }  // namespace performance_manager::execution_context_priority
-+
-+#undef GetExecutionContext
 diff --git a/components/performance_manager/freezing/frozen_frame_aggregator.cc b/components/performance_manager/freezing/frozen_frame_aggregator.cc
 index 2c123b112a..49595e3b98 100644
 --- a/components/performance_manager/freezing/frozen_frame_aggregator.cc
@@ -2393,7 +2260,7 @@ diff --git a/components/page_load_metrics/browser/BUILD.gn b/components/page_loa
 index fc705624c5..240fd7d298 100644
 --- a/components/page_load_metrics/browser/BUILD.gn
 +++ b/components/page_load_metrics/browser/BUILD.gn
-@@ -95,6 +95,11 @@ jumbo_source_set("browser") {
+@@ -98,6 +98,11 @@ jumbo_source_set("browser") {
      "soft_navigation_tracker.cc",
      "soft_navigation_tracker.h",
    ]
@@ -2402,9 +2269,9 @@ index fc705624c5..240fd7d298 100644
 +    "observers/use_counter_page_load_metrics_observer.cc",
 +    "observers/soft_navigation_page_load_metrics_observer.cc",
 +  ]
-   configs += [
-     "//build/config/compiler:wexit_time_destructors",
-     "//build/config/compiler:wglobal_constructors",
+   configs += [ "//build/config/compiler:wglobal_constructors" ]
+   deps = [
+     "//base",
 diff --git a/components/sessions/core/tab_restore_service_helper.cc b/components/sessions/core/tab_restore_service_helper.cc
 index 14a14d2f9c..9f674da33a 100644
 --- a/components/sessions/core/tab_restore_service_helper.cc
@@ -2456,25 +2323,6 @@ index f87b14d162..d784273910 100644
  }  // namespace webcrypto
 +
 +#undef SynthesizeImportAlgorithmForClone
-diff --git a/components/performance_manager/execution_context_priority/closing_page_voter.cc b/components/performance_manager/execution_context_priority/closing_page_voter.cc
-index 1b2f363b04..13f12f952f 100644
---- a/components/performance_manager/execution_context_priority/closing_page_voter.cc
-+++ b/components/performance_manager/execution_context_priority/closing_page_voter.cc
-@@ -10,6 +10,8 @@
- #include "components/performance_manager/public/execution_context/execution_context_registry.h"
- #include "components/performance_manager/public/graph/graph.h"
- 
-+#define GetExecutionContext GetExecutionContext_closing_page_voter
-+
- namespace performance_manager::execution_context_priority {
- 
- namespace {
-@@ -105,3 +107,5 @@ void ClosingPageVoter::AdjustVotesForSubtree(const FrameNode* frame_node,
- }
- 
- }  // namespace performance_manager::execution_context_priority
-+
-+#undef GetExecutionContext
 diff --git a/components/safe_browsing/core/browser/db/v5_store.cc b/components/safe_browsing/core/browser/db/v5_store.cc
 index 895ed53013..dedbddf469 100644
 --- a/components/safe_browsing/core/browser/db/v5_store.cc
@@ -2788,3 +2636,105 @@ index 61ae85a6db..a968e6a632 100644
  }  // namespace page_content_annotations
 +
 +#undef TruncateUTF8ToByteLimit
+--- a/components/private_ai/websocket_client.cc
++++ b/components/private_ai/websocket_client.cc
+@@ -25,6 +25,8 @@
+ #include "third_party/oak/chromium/proto/session/session.pb.h"
+ #include "url/gurl.h"
+ 
++#define kTrafficAnnotation kTrafficAnnotation_websocket_client
++
+ namespace private_ai {
+ namespace {
+ 
+@@ -257,3 +259,5 @@
+ }
+ 
+ }  // namespace private_ai
++
++#undef kTrafficAnnotation
+--- a/components/policy/core/common/policy_logger.h
++++ b/components/policy/core/common/policy_logger.h
+@@ -68,7 +68,7 @@
+ #define OIDC_ENROLLMENT ::policy::PolicyLogger::Log::Source::kOidcEnrollment
+ #define EXTENSIBLE_SSO ::policy::PolicyLogger::Log::Source::kExtensibleSSO
+ #define REPORTING ::policy::PolicyLogger::Log::Source::kReporting
+-#define ENTERPRISE_PROXY ::policy::PolicyLogger::Log::Source::kEnterpriseProxy
++#define ENTERPRISE_PROXY_LOG ::policy::PolicyLogger::Log::Source::kEnterpriseProxy
+ 
+ namespace policy {
+ 
+--- a/components/enterprise/net/core/enterprise_proxy_service.cc
++++ b/components/enterprise/net/core/enterprise_proxy_service.cc
+@@ -34,6 +34,10 @@
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ #include "url/gurl.h"
+ 
++#pragma push_macro("ENTERPRISE_PROXY")
++#undef ENTERPRISE_PROXY
++#define ENTERPRISE_PROXY ENTERPRISE_PROXY_LOG
++
+ namespace enterprise_net {
+ 
+ namespace {
+@@ -670,3 +674,6 @@
+ }
+ 
+ }  // namespace enterprise_net
++
++#undef ENTERPRISE_PROXY
++#pragma pop_macro("ENTERPRISE_PROXY")
+--- a/components/enterprise/net/core/proxy_provisioning_domain_manager.cc
++++ b/components/enterprise/net/core/proxy_provisioning_domain_manager.cc
+@@ -21,6 +21,10 @@
+ #include "net/http/http_status_code.h"
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ 
++#pragma push_macro("ENTERPRISE_PROXY")
++#undef ENTERPRISE_PROXY
++#define ENTERPRISE_PROXY ENTERPRISE_PROXY_LOG
++
+ namespace enterprise_net {
+ 
+ namespace {
+@@ -456,3 +460,6 @@
+ }
+ 
+ }  // namespace enterprise_net
++
++#undef ENTERPRISE_PROXY
++#pragma pop_macro("ENTERPRISE_PROXY")
+--- a/components/performance_manager/priority/frame_capturing_media_stream_voter.cc
++++ b/components/performance_manager/priority/frame_capturing_media_stream_voter.cc
+@@ -8,6 +8,8 @@
+ 
+ #include "components/performance_manager/public/graph/graph.h"
+ 
++#define GetVote GetVote_frame_capturing_media_stream_voter
++
+ namespace performance_manager::priority {
+ 
+ namespace {
+@@ -72,3 +74,5 @@
+ }
+ 
+ }  // namespace performance_manager::priority
++
++#undef GetVote
+--- a/components/password_manager/core/browser/remote_actor/remote_actor_credential_store_client.cc
++++ b/components/password_manager/core/browser/remote_actor/remote_actor_credential_store_client.cc
+@@ -37,6 +37,8 @@
+ #include "services/network/public/cpp/shared_url_loader_factory.h"
+ #include "url/gurl.h"
+ 
++#define GetEndpointUrlBase GetEndpointUrlBase_remote_actor_credential_store_client
++
+ namespace password_manager {
+ 
+ namespace {
+@@ -238,3 +240,5 @@
+ }
+ 
+ }  // namespace password_manager
++
++#undef GetEndpointUrlBase

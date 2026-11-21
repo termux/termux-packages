@@ -919,25 +919,6 @@ index 0891416a55..96872813e5 100644
  }  // namespace blink
 +
 +#undef g_create_function
-diff --git a/third_party/blink/renderer/core/css/box_shadow_paint_image_generator.cc b/third_party/blink/renderer/core/css/box_shadow_paint_image_generator.cc
-index 8554ef0667..a52dae973d 100644
---- a/third_party/blink/renderer/core/css/box_shadow_paint_image_generator.cc
-+++ b/third_party/blink/renderer/core/css/box_shadow_paint_image_generator.cc
-@@ -6,6 +6,8 @@
- 
- #include "third_party/blink/renderer/core/frame/local_frame.h"
- 
-+#define g_create_function g_create_function_box_shadow_paint_image_generator
-+
- namespace blink {
- 
- namespace {
-@@ -30,3 +32,5 @@ BoxShadowPaintImageGenerator* BoxShadowPaintImageGenerator::Create(
- }
- 
- }  // namespace blink
-+
-+#undef g_create_function
 diff --git a/third_party/blink/renderer/core/css/css_dynamic_range_limit_mix_value.cc b/third_party/blink/renderer/core/css/css_dynamic_range_limit_mix_value.cc
 index 3783ddc5e9..a1638715ec 100644
 --- a/third_party/blink/renderer/core/css/css_dynamic_range_limit_mix_value.cc
@@ -4026,27 +4007,6 @@ index 5987071336..caf1abbe28 100644
 +#ifdef __clang__
 +#pragma clang diagnostic pop
 +#endif
-diff --git a/third_party/blink/renderer/platform/media/BUILD.gn b/third_party/blink/renderer/platform/media/BUILD.gn
-index 0d5a0c694d..09a4060e9b 100644
---- a/third_party/blink/renderer/platform/media/BUILD.gn
-+++ b/third_party/blink/renderer/platform/media/BUILD.gn
-@@ -2,6 +2,7 @@
- # Use of this source code is governed by a BSD-style license that can be
- # found in the LICENSE file.
- 
-+import("//build/config/jumbo.gni")
- import("//media/media_options.gni")
- import("//third_party/blink/renderer/platform/platform.gni")
- 
-@@ -27,7 +28,7 @@ blink_platform_sources("media_final") {
-   deps = [ "//third_party/blink/renderer/platform:allow_discouraged_type" ]
- }
- 
--component("media") {
-+jumbo_component("media") {
-   visibility = [
-     # Note: this is here because web_media_player_impl_unittest.cc needs core
-     # and web, and platform should not depend on either.
 diff --git a/third_party/blink/renderer/platform/media/cache_util.cc b/third_party/blink/renderer/platform/media/cache_util.cc
 index fc2967d1a7..59872b1958 100644
 --- a/third_party/blink/renderer/platform/media/cache_util.cc
@@ -4883,3 +4843,14 @@ index ed1acb2f99..99f5a7052a 100644
  
    deps = [
      ":generated",
+--- a/third_party/blink/renderer/platform/graphics/begin_frame_provider.cc
++++ b/third_party/blink/renderer/platform/graphics/begin_frame_provider.cc
+@@ -124,7 +124,7 @@
+                                                                is_webview);
+   return !throttled_interval.is_zero() &&
+          args.frame_time - last_begin_frame_time < throttled_interval &&
+-         base::FeatureList::IsEnabled(features::kThrottleOffscreenCanvasTo60Hz);
++         base::FeatureList::IsEnabled(::features::kThrottleOffscreenCanvasTo60Hz);
+ }
+ 
+ void BeginFrameProvider::OnBeginFrame(

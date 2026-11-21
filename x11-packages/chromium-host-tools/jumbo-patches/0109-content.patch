@@ -1269,15 +1269,6 @@ index f09e714362..c83cd4487a 100644
          }
          SpareRenderProcessHostManagerImpl::Get().WarmupSpare(browser_context,
                                                               timeout);
-@@ -2710,7 +2710,7 @@ void RenderFrameHostManager::CleanupSpeculativeRfhForRenderProcessGone() {
-                               may_resume);
-     if (!may_resume ||
-         !base::FeatureList::IsEnabled(
--            features::kResumeNavigationWithSpeculativeRFHProcessGone)) {
-+            ::features::kResumeNavigationWithSpeculativeRFHProcessGone)) {
-       // TODO(crbug.com/41268960): This might cancel an unrelated
-       // NavigationRequest. Maybe check if the navigation request uses the
-       // speculative RFH first?
 @@ -2946,8 +2946,8 @@ RenderFrameHostManager::ShouldSwapBrowsingInstancesForNavigation(
              current_instance->GetRelatedActiveContentsCount()),
          51);
@@ -1349,6 +1340,15 @@ index f09e714362..c83cd4487a 100644
                        kSwapForCrossBrowsingInstanceNavigations
                ? render_frame_host_->browsing_context_state()
                : nullptr,
+@@ -5135,7 +5135,7 @@
+   CHECK(render_frame_host->IsRenderFrameLive());
+ 
+   if (!base::FeatureList::IsEnabled(
+-          features::kRemoveEnsureRFHVisibilityConsistent)) {
++          ::features::kRemoveEnsureRFHVisibilityConsistent)) {
+     // The RenderWidgetHostView goes away with the render process. Initializing
+     // a RenderFrame means we'll be creating (or reusing,
+     // https://crbug.com/419087) a RenderWidgetHostView. The new
 @@ -5191,8 +5191,8 @@ RenderFrameHostManager::GetFrameTokenForSiteInstanceGroup(
    // instance after a browsing instance swap, and we want to ensure that this
    // doesn't break anything, so we tie it to the GetBrowsingContextMode which
