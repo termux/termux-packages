@@ -4,9 +4,8 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="llvm/LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@finagolfin"
 # Keep flang version and revision in sync when updating (enforced by check in termux_step_pre_configure).
-TERMUX_PKG_VERSION="21.1.8"
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142
+TERMUX_PKG_VERSION="23.1.3"
+TERMUX_PKG_SHA256=c44186a7762ed28954be72e5ff6df9808e0779d4f1bf014ecc4e7e211d31ee34
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_SRCURL="https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION}/llvm-project-${TERMUX_PKG_VERSION}.src.tar.xz"
 TERMUX_PKG_HOSTBUILD=true
@@ -111,8 +110,10 @@ termux_step_pre_configure() {
 	fi
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDEFAULT_SYSROOT=$default_sysroot"
 
-	local llvm_projects="clang;clang-tools-extra;compiler-rt;lld;lldb;mlir;openmp;polly"
+	local llvm_projects="clang;clang-tools-extra;lld;lldb;mlir;polly"
+	local llvm_runtimes="compiler-rt;openmp"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_ENABLE_PROJECTS=$llvm_projects"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_ENABLE_RUNTIMES=$llvm_runtimes"
 
 	# see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$llvm_target_arch"
