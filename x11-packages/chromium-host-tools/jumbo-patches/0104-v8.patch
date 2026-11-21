@@ -373,30 +373,23 @@ diff --git a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc b/v8/src/compi
 index cc5b406f1b..9fac217286 100644
 --- a/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
 +++ b/v8/src/compiler/turboshaft/loop-unrolling-reducer.cc
-@@ -12,12 +12,12 @@
+@@ -11,6 +11,9 @@
+ #include "src/compiler/turboshaft/index.h"
  #include "src/compiler/turboshaft/loop-finder.h"
  
++#pragma push_macro("TRACE")
++#undef TRACE
++
  #ifdef DEBUG
--#define TRACE(x)                                                               \
-+#define TRACE_IN_LOOP_UNROLLING_REDUCER(x)                                                               \
+ #define TRACE(x)                                                               \
    do {                                                                         \
-     if (v8_flags.turboshaft_trace_unrolling) StdoutStream() << x << std::endl; \
-   } while (false)
- #else
--#define TRACE(x)
-+#define TRACE_IN_LOOP_UNROLLING_REDUCER(x)
- #endif
+@@ -611,3 +614,6 @@
+ }
  
- namespace v8::internal::compiler::turboshaft {
-@@ -28,7 +28,7 @@
- void LoopUnrollingAnalyzer::DetectUnrollableLoops() {
-   for (const auto& [start, info] : loop_finder_.LoopHeaders()) {
-     IterationCount iter_count = GetLoopIterationCount(info);
--    TRACE("LoopUnrollingAnalyzer: loop at "
-+    TRACE_IN_LOOP_UNROLLING_REDUCER("LoopUnrollingAnalyzer: loop at "
-           << start->index() << " ==> iter_count=" << iter_count
-           << " op_count=" << loop_finder_.GetLoopInfo(start).op_count
-           << " has_any_call=" << loop_finder_.GetLoopInfo(start).has_any_call);
+ }  // namespace v8::internal::compiler::turboshaft
++
++#undef TRACE
++#pragma pop_macro("TRACE")
 diff --git a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h b/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
 index 580cc321a0..29c3f8e648 100644
 --- a/v8/src/compiler/turboshaft/wasm-in-js-inlining-reducer-inl.h
@@ -426,32 +419,23 @@ diff --git a/v8/src/compiler/wasm-compiler.cc b/v8/src/compiler/wasm-compiler.cc
 index b92154e46f..fa1b452c2f 100644
 --- a/v8/src/compiler/wasm-compiler.cc
 +++ b/v8/src/compiler/wasm-compiler.cc
-@@ -70,7 +70,7 @@ namespace {
+@@ -63,6 +63,9 @@
+ #include "src/wasm/wasm-subtyping.h"
+ #include "src/wasm/wasm-tracing.h"
  
- // Use MachineType::Pointer() over Tagged() to load root pointers because they
- // do not get compressed.
--#define LOAD_ROOT(RootName, factory_name)                         \
-+#define LOAD_ROOT_IN_WASM_COMPILER(RootName, factory_name)                         \
-   (isolate_ ? graph()->NewNode(mcgraph()->common()->HeapConstant( \
-                   isolate_->factory()->factory_name()))           \
-             : gasm_->LoadImmutable(                               \
-@@ -277,7 +277,7 @@ Node* WasmGraphBuilder::Int32Constant(int32_t value) {
++#pragma push_macro("TRACE")
++#undef TRACE
++
+ namespace v8::internal::compiler {
+ 
+ namespace {
+@@ -649,3 +652,6 @@
  }
- 
- Node* WasmGraphBuilder::UndefinedValue() {
--  return LOAD_ROOT(UndefinedValue, undefined_value);
-+  return LOAD_ROOT_IN_WASM_COMPILER(UndefinedValue, undefined_value);
- }
- 
- // TODO(ahaas): Merge TrapId with TrapReason.
-@@ -1231,6 +1231,6 @@ AssemblerOptions WasmStubAssemblerOptions() {
-   };
- }
- 
--#undef LOAD_ROOT
-+#undef LOAD_ROOT_IN_WASM_COMPILER
  
  }  // namespace v8::internal::compiler
++
++#undef TRACE
++#pragma pop_macro("TRACE")
 diff --git a/v8/src/diagnostics/perf-jit.cc b/v8/src/diagnostics/perf-jit.cc
 index c509e4220c..e9ccece0d4 100644
 --- a/v8/src/diagnostics/perf-jit.cc
@@ -491,63 +475,24 @@ diff --git a/v8/src/heap/code-range.cc b/v8/src/heap/code-range.cc
 index 246dd07b86..8b6170db92 100644
 --- a/v8/src/heap/code-range.cc
 +++ b/v8/src/heap/code-range.cc
-@@ -64,7 +64,7 @@ size_t CodeRange::GetWritableReservedAreaSize() {
-   return kReservedCodeRangePages * MemoryAllocator::GetCommitPageSize();
+@@ -21,6 +21,9 @@
+ #include "src/diagnostics/unwinding-info-win64.h"
+ #endif  // V8_OS_WIN64
+ 
++#pragma push_macro("TRACE")
++#undef TRACE
++
+ namespace v8 {
+ namespace internal {
+ 
+@@ -643,6 +646,7 @@
+   return embedded_blob_code_copy;
  }
+ #undef TRACE
++#pragma pop_macro("TRACE")
  
--#define TRACE(...) \
-+#define TRACE_IN_CODE_RANGE(...) \
-   if (v8_flags.trace_code_range_allocation) PrintF(__VA_ARGS__)
- 
- bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-@@ -123,7 +123,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-       kMaxPCRelativeCodeRangeInMB > 1024 ? kMaxPCRelativeCodeRangeInMB : 4096;
-   auto preferred_region = GetPreferredRegion(kRadiusInMB, kPageSize);
- 
--  TRACE("=== Preferred region: [%p, %p)\n",
-+  TRACE_IN_CODE_RANGE("=== Preferred region: [%p, %p)\n",
-         reinterpret_cast<void*>(preferred_region.begin()),
-         reinterpret_cast<void*>(preferred_region.end()));
- 
-@@ -148,10 +148,10 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-     Address step =
-         RoundDown(preferred_region.size() / kAllocationTries, kPageSize);
-     for (int i = 0; i < kAllocationTries; i++) {
--      TRACE("=== Attempt #%d, hint=%p\n", i,
-+      TRACE_IN_CODE_RANGE("=== Attempt #%d, hint=%p\n", i,
-             reinterpret_cast<void*>(params.requested_start_hint));
-       if (candidate_cage.InitReservation(params)) {
--        TRACE("=== Attempt #%d (%p): [%p, %p)\n", i,
-+        TRACE_IN_CODE_RANGE("=== Attempt #%d (%p): [%p, %p)\n", i,
-               reinterpret_cast<void*>(params.requested_start_hint),
-               reinterpret_cast<void*>(candidate_cage.region().begin()),
-               reinterpret_cast<void*>(candidate_cage.region().end()));
-@@ -176,7 +176,7 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-       params.requested_start_hint = kNullAddress;
-       if (!VirtualMemoryCage::InitReservation(params)) return false;
-     }
--    TRACE("=== Fallback attempt, hint=%p: [%p, %p)\n",
-+    TRACE_IN_CODE_RANGE("=== Fallback attempt, hint=%p: [%p, %p)\n",
-           reinterpret_cast<void*>(params.requested_start_hint),
-           reinterpret_cast<void*>(region().begin()),
-           reinterpret_cast<void*>(region().end()));
-@@ -212,14 +212,14 @@ bool CodeRange::InitReservation(v8::PageAllocator* page_allocator,
-     // the BoundedPageAllocator. Use it if it's big enough.
-     const Address non_allocatable_size = page_allocator_->begin() - base();
- 
--    TRACE("=== non-allocatable region: [%p, %p)\n",
-+    TRACE_IN_CODE_RANGE("=== non-allocatable region: [%p, %p)\n",
-           reinterpret_cast<void*>(base()),
-           reinterpret_cast<void*>(base() + non_allocatable_size));
- 
-     // Exclude the first page from allocatable pages if the required writable
-     // area doesn't fit into the non-allocatable area.
-     if (non_allocatable_size < required_writable_area_size) {
--      TRACE("=== Exclude the first page from allocatable area\n");
-+      TRACE_IN_CODE_RANGE("=== Exclude the first page from allocatable area\n");
-       excluded_allocatable_area_size = kPageSize;
-       CHECK(page_allocator_->AllocatePagesAt(page_allocator_->begin(),
-                                              excluded_allocatable_area_size,
+ }  // namespace internal
+ }  // namespace v8
 diff --git a/v8/src/heap/minor-mark-sweep.cc b/v8/src/heap/minor-mark-sweep.cc
 index 7dfcaa336c..278397237f 100644
 --- a/v8/src/heap/minor-mark-sweep.cc
@@ -681,21 +626,6 @@ index 3f46599fbb..67e7cec3db 100644
  }  // namespace maglev
  }  // namespace internal
  }  // namespace v8
-diff --git a/v8/src/objects/js-atomics-synchronization.h b/v8/src/objects/js-atomics-synchronization.h
-index 73a03828db..8b458f2fba 100644
---- a/v8/src/objects/js-atomics-synchronization.h
-+++ b/v8/src/objects/js-atomics-synchronization.h
-@@ -27,8 +27,8 @@
- class WaiterQueueNode;
- }  // namespace detail
- 
--using detail::WaiterQueueLockGuard;
--using detail::WaiterQueueNode;
-+using internal::detail::WaiterQueueLockGuard;
-+using internal::detail::WaiterQueueNode;
- 
- // JSSynchronizationPrimitive is the base class for JSAtomicsMutex and
- // JSAtomicsCondition. It contains a 32-bit state field and a pointer to a
 diff --git a/v8/src/objects/js-collator.cc b/v8/src/objects/js-collator.cc
 index 9ee693fa47..6ad43a79eb 100644
 --- a/v8/src/objects/js-collator.cc
@@ -763,16 +693,16 @@ diff --git a/v8/src/objects/js-plural-rules.cc b/v8/src/objects/js-plural-rules.
 index 60041add16..1094a8d5a5 100644
 --- a/v8/src/objects/js-plural-rules.cc
 +++ b/v8/src/objects/js-plural-rules.cc
-@@ -222,6 +222,8 @@ MaybeDirectHandle<String> JSPluralRules::ResolvePluralRange(
-   return Intl::ToString(isolate, result);
- }
+@@ -21,6 +21,8 @@
+ #include "unicode/strenum.h"
+ #pragma GCC diagnostic pop
  
 +#define CreateDataPropertyForOptions CreateDataPropertyForOptions_JSPluralRules
 +
- namespace {
+ namespace v8 {
+ namespace internal {
  
- void CreateDataPropertyForOptions(Isolate* isolate,
-@@ -386,3 +388,5 @@ const std::set<std::string>& JSPluralRules::GetAvailableLocales() {
+@@ -235,3 +237,5 @@
  
  }  // namespace internal
  }  // namespace v8
@@ -1027,3 +957,42 @@ index a02a5ef742..fa5e8f8795 100644
        "src/wasm/wasm-module.cc",
  
        # Too many marco conflictions
+--- a/v8/src/maglev/turbolev-escape-analysis.cc
++++ b/v8/src/maglev/turbolev-escape-analysis.cc
+@@ -22,6 +22,9 @@
+ #include "src/maglev/maglev-ir.h"
+ #include "src/objects/fixed-primitive-array.h"
+ 
++#pragma push_macro("TRACE")
++#undef TRACE
++
+ namespace v8::internal::maglev {
+ 
+ #define TRACE TRACE_ESCAPE_ANALYSIS
+@@ -2075,3 +2078,6 @@
+ }  // namespace
+ 
+ }  // namespace v8::internal::maglev
++
++#undef TRACE
++#pragma pop_macro("TRACE")
+--- a/v8/src/heap/memory-allocator.cc
++++ b/v8/src/heap/memory-allocator.cc
+@@ -26,6 +26,7 @@
+ 
+ #if V8_OS_LINUX
+ #include <sys/mman.h>
++#undef MAP_TYPE
+ #endif
+ 
+ namespace v8::internal {
+--- a/v8/src/sandbox/sandbox.cc
++++ b/v8/src/sandbox/sandbox.cc
+@@ -30,6 +30,7 @@
+ 
+ #if V8_OS_LINUX
+ #include <sys/mman.h>
++#undef MAP_TYPE
+ #endif
+ 
+ namespace v8 {

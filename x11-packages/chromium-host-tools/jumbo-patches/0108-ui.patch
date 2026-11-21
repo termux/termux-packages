@@ -1888,16 +1888,16 @@ diff --git a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc b
 index 13fd65bff1..e2b4bc7afc 100644
 --- a/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
 +++ b/ui/views/widget/desktop_aura/desktop_window_tree_host_platform.cc
-@@ -341,7 +341,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
-   // active, we enter this condition where `active && !is_active_` because
-   // subwindows do not get active state from the OS on some platforms (E.g.
-   // Wayland). So we need to ensure Activate is conveyed to the platform_window.
--  if (base::FeatureList::IsEnabled(features::kOzoneBubblesUsePlatformWidgets) &&
-+  if (base::FeatureList::IsEnabled(::features::kOzoneBubblesUsePlatformWidgets) &&
-       active && !is_active_ && !window_children_.empty()) {
-     Activate();
+@@ -351,7 +351,7 @@ void DesktopWindowTreeHostPlatform::OnActiveWindowChanged(bool active) {
+   // active bubble or an inactive bubble (e.g. one shown via ShowInactive()),
+   // forward it to the platform window so key events are routed correctly.
+   if (!base::FeatureList::IsEnabled(
+-          features::kOzoneBubblesUsePlatformWidgets) ||
++          ::features::kOzoneBubblesUsePlatformWidgets) ||
+       !active || IsActive()) {
+     return;
    }
-@@ -780,7 +780,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
+@@ -861,7 +861,7 @@ void DesktopWindowTreeHostPlatform::SetFullscreen(bool fullscreen,
      return;
    }
  
@@ -2076,3 +2076,32 @@ index d6274d19a8..8c8df95282 100644
                                          : vector_icons::kSubmenuArrowOldIcon,
        color_utils::DeriveDefaultIconColor(
            drawing_provider()->GetTextColorForNode(this, nullptr)));
+--- a/ui/views/controls/menu/menu_item_view.cc
++++ b/ui/views/controls/menu/menu_item_view.cc
+@@ -1900,7 +1900,7 @@
+                                    : ui::kColorMenuIconDisabled)
+             : ui::ColorVariant(colors.icon_color);
+     submenu_arrow_image_view_->SetImage(ui::ImageModel::FromVectorIcon(
+-        features::IsRoundedIconsEnabled()
++        ::features::IsRoundedIconsEnabled()
+             ? vector_icons::kKeyboardArrowRightFlippableIcon
+             : vector_icons::kSubmenuArrowChromeRefreshOldIcon,
+         arrow_color));
+@@ -1909,14 +1909,14 @@
+   if (type_ == Type::kCheckbox && delegate &&
+       delegate->IsItemChecked(GetCommand())) {
+     radio_check_image_view_->SetImage(ui::ImageModel::FromVectorIcon(
+-        features::IsRoundedIconsEnabled() ? kCheckIcon : kMenuCheckOldIcon,
++        ::features::IsRoundedIconsEnabled() ? kCheckIcon : kMenuCheckOldIcon,
+         colors.icon_color));
+   } else if (type_ == Type::kRadio) {
+     const bool toggled = delegate && delegate->IsItemChecked(GetCommand());
+     const gfx::VectorIcon& radio_icon =
+-        toggled ? features::IsRoundedIconsEnabled() ? kRadioButtonCheckedIcon
++        toggled ? ::features::IsRoundedIconsEnabled() ? kRadioButtonCheckedIcon
+                                                     : kMenuRadioSelectedOldIcon
+-        : features::IsRoundedIconsEnabled() ? kCircleIcon
++        : ::features::IsRoundedIconsEnabled() ? kCircleIcon
+                                             : kMenuRadioEmptyOldIcon;
+     const SkColor radio_icon_color = GetColorProvider()->GetColor(
+         toggled ? ui::kColorRadioButtonForegroundChecked

@@ -1,9 +1,9 @@
 --- a/media/audio/pulse/pulse_util.cc
 +++ b/media/audio/pulse/pulse_util.cc
-@@ -44,8 +44,12 @@
+@@ -43,8 +43,12 @@
  
  #if defined(DLOPEN_PULSEAUDIO)
- static const base::FilePath::CharType kPulseLib[] =
+ constexpr base::FilePath::CharType kPulseLib[] =
 +#ifdef __TERMUX__
 +    FILE_PATH_LITERAL("libpulse.so");
 +#else

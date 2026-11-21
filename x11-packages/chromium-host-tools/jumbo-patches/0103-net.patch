@@ -48,9 +48,9 @@ index 3b66c31a70..1c22c437d5 100644
  import("//build/config/cronet/config.gni")
  import("//build/config/features.gni")
 +import("//build/config/jumbo.gni")
+ import("//build/rust/rust_static_library.gni")
  import("//crypto/features.gni")
  import("//net/features.gni")
- import("//testing/libfuzzer/fuzzer_test.gni")
 @@ -146,7 +147,7 @@ proto_library("device_bound_sessions_storage_proto") {
    sources = [ "device_bound_sessions/proto/storage.proto" ]
  }
@@ -931,9 +931,9 @@ index 5641bd744d..5581b9e7c6 100644
 +#undef IsEchEnabled
 --- a/net/device_bound_sessions/jwk_utils.cc
 +++ b/net/device_bound_sessions/jwk_utils.cc
-@@ -34,13 +34,15 @@
- constexpr char kRsaModulus[] = "n";
- constexpr char kRsaExponent[] = "e";
+@@ -46,13 +46,15 @@
+ constexpr size_t kEcP256UncompressedPointLength =
+     1 + 2 * kEcP256FieldElementLength;
  
 -std::string Base64UrlEncode(base::span<const uint8_t> input) {
 +std::string Base64UrlEncode_jwk_utils(base::span<const uint8_t> input) {
@@ -945,9 +945,9 @@ index 5641bd744d..5581b9e7c6 100644
  
 +#define Base64UrlEncode Base64UrlEncode_jwk_utils
 +
- base::DictValue ConvertES256PkeySpkiToJwk(base::span<const uint8_t> pkey_spki) {
-   bssl::UniquePtr<EVP_PKEY> pkey = crypto::evp::PublicKeyFromBytes(pkey_spki);
-   if (!pkey || EVP_PKEY_id(pkey.get()) != EVP_PKEY_EC) {
+ }  // namespace
+ 
+ std::optional<base::DictValue> CreateJwk(
 @@ -146,3 +148,5 @@
  }
  

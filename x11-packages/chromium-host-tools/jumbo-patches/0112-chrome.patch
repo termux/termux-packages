@@ -3432,25 +3432,6 @@ index 4fb15b95e3..64f3bff542 100644
 +
 +#undef GetNetworkContext
 +#undef BuildPasswordStore
-diff --git a/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc b/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-index 82a67fdd18..304a3bb311 100644
---- a/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-+++ b/chrome/browser/password_manager/password_change/password_change_page_stability_waiter.cc
-@@ -27,6 +27,8 @@
- #include "content/public/browser/web_contents.h"
- #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
- 
-+#define GetLoggerIfAvailable GetLoggerIfAvailable_password_change_page_stability_waiter
-+
- namespace {
- 
- using Logger = password_manager::BrowserSavePasswordProgressLogger;
-@@ -170,3 +172,5 @@ void PasswordChangePageStabilityWaiter::OnTimeout() {
-     std::move(callback_).Run();
-   }
- }
-+
-+#undef GetLoggerIfAvailable
 diff --git a/chrome/browser/memory/BUILD.gn b/chrome/browser/memory/BUILD.gn
 index 8668c71e02..ca7aafa142 100644
 --- a/chrome/browser/memory/BUILD.gn
@@ -3792,10 +3773,11 @@ index 242b826a75..b9832874dd 100644
  namespace {
  
  using Logger = password_manager::BrowserSavePasswordProgressLogger;
-@@ -268,3 +270,4 @@ void ChangePasswordFormFillingSubmissionHelper::OnTimeout() {
+@@ -267,3 +269,5 @@
+   }
    std::move(callback_).Run(base::unexpected(SubmissionError::kTimeout));
  }
- 
++
 +#undef GetAIPageContentOptions
 diff --git a/chrome/browser/extensions/api/tabs/tabs_event_router.cc b/chrome/browser/extensions/api/tabs/tabs_event_router.cc
 index d4c48c003f..f59f3104e2 100644
@@ -4446,42 +4428,21 @@ index dc8f543842..8f6a44ebc4 100644
  }
 +
 +#undef TabGroupDataFromNode
-diff --git a/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc b/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-index c55bb6eeaf..b9102a9d58 100644
---- a/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-+++ b/chrome/browser/ui/views/tabs/common/unpinned_tab_container_view_layout.cc
-@@ -20,6 +20,8 @@
- #include "ui/views/view.h"
- #include "ui/views/view_utils.h"
- 
-+#define kTabVerticalPadding kTabVerticalPadding_unpinned_tab_container_view_layout
-+
- namespace {
- constexpr int kTabVerticalPadding = 2;
- }  // namespace
-@@ -302,3 +304,5 @@ UnpinnedTabContainerViewLayout::GetGroupIdForChild(
-   }
-   return std::nullopt;
- }
-+
-+#undef kTabVerticalPadding
 diff --git a/chrome/browser/ui/webui/settings/hats_handler.cc b/chrome/browser/ui/webui/settings/hats_handler.cc
 index ff8274e224..0a92d39247 100644
 --- a/chrome/browser/ui/webui/settings/hats_handler.cc
 +++ b/chrome/browser/ui/webui/settings/hats_handler.cc
-@@ -28,9 +28,11 @@
+@@ -26,7 +26,9 @@
+ #include "content/public/browser/visibility.h"
  #include "content/public/browser/web_contents.h"
- #include "services/metrics/public/cpp/metrics_utils.h"
  
 -using safe_browsing::SafeBrowsingState;
 +using SafeBrowsingState_hats_handler = safe_browsing::SafeBrowsingState;
- using safe_browsing::SecuritySettingsBundleSetting;
- 
-+#define SafeBrowsingState SafeBrowsingState_hats_handler
 +
++#define SafeBrowsingState SafeBrowsingState_hats_handler
+ 
  namespace {
  
- // Generate the Product Specific bits data which accompanies privacy settings
 @@ -569,3 +571,5 @@ void HatsHandler::InformSentimentService(TrustSafetyInteraction interaction) {
  }
  
@@ -4552,25 +4513,6 @@ index a61e8fdd86..b21138e32f 100644
  }
 +
 +#undef GetLoggerIfAvailable
-diff --git a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-index 294e5783fd..489c6c716f 100644
---- a/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-+++ b/chrome/browser/password_manager/remote_actor/remote_actor_credential_permission_client.cc
-@@ -22,6 +22,8 @@
- #include "url/gurl.h"
- #include "url/origin.h"
- 
-+#define GetEndpointUrlBase GetEndpointUrlBase_remote_actor_credential_permission_client
-+
- namespace password_manager {
- 
- namespace {
-@@ -180,3 +182,5 @@ void RemoteActorCredentialPermissionClient::DeleteRequest(
- }
- 
- }  // namespace password_manager
-+
-+#undef GetEndpointUrlBase
 diff --git a/chrome/browser/ui/tabs/recent_tabs_builder.cc b/chrome/browser/ui/tabs/recent_tabs_builder.cc
 index c4eb8624ab..899963491a 100644
 --- a/chrome/browser/ui/tabs/recent_tabs_builder.cc
@@ -4706,8 +4648,12 @@ diff --git a/chrome/browser/glic/suggestions/glic_cue_target.cc b/chrome/browser
 index 6317969cd3..48249cd2ff 100644
 --- a/chrome/browser/glic/suggestions/glic_cue_target.cc
 +++ b/chrome/browser/glic/suggestions/glic_cue_target.cc
-@@ -77,7 +77,7 @@ void GlicCueTarget::Register(tabs::TabInterface& tab) {
-       tab.GetTabFeatures()->contextual_cueing_controller();
+@@ -73,10 +73,10 @@ void GlicCueTarget::Register(tabs::TabInterface& tab) {
+   }
+ 
+   auto* contextual_cueing_controller =
+-      contextual_cueing::ContextualCueingController::From(&tab);
++      ::contextual_cueing::ContextualCueingController::From(&tab);
    CHECK(contextual_cueing_controller);
    contextual_cueing_controller->RegisterCueTarget(
 -      contextual_cueing::CueTargetType::kGlic,
@@ -4895,8 +4841,8 @@ index 9fc77e09a7..b41fa76422 100644
    }
    content::OpenURLParams params(
        GURL(kRemoteActorDataHandlingHelpUrl), content::Referrer(),
--      WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
-+      WindowOpenDisposition::NEW_FOREGROUND_TAB, ::ui::PAGE_TRANSITION_LINK,
+-      WindowOpenDisposition::kNewForegroundTab, ui::PAGE_TRANSITION_LINK,
++      WindowOpenDisposition::kNewForegroundTab, ::ui::PAGE_TRANSITION_LINK,
        /*is_renderer_initiated=*/false);
    web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
  }
@@ -4943,34 +4889,6 @@ index 9fc77e09a7..b41fa76422 100644
  }
 +
 +#undef kResizeBorder
---- a/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-+++ b/chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.cc
-@@ -58,7 +58,7 @@
- constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
- constexpr char kVoiceSearchQueryParameterValue[] = "1";
- 
--bool IsFuseboxEligible(Profile* profile) {
-+bool IsFuseboxEligible_omnibox_everywhere_handler(Profile* profile) {
-   if (!profile) {
-     return false;
-   }
-@@ -68,6 +68,9 @@
-          aim_eligibility_service->IsFuseboxEligible();
- }
- 
-+#define IsFuseboxEligible IsFuseboxEligible_omnibox_everywhere_handler
-+#define IsFuseboxEnabled IsFuseboxEnabled_omnibox_everywhere_handler
-+
- bool IsFuseboxEnabled(Profile* profile) {
-   if (!IsFuseboxEligible(profile)) {
-     return false;
-@@ -566,3 +569,6 @@
-         context_token, context_upload_status, error_type);
-   }
- }
-+
-+#undef IsFuseboxEligible
-+#undef IsFuseboxEnabled
 --- a/chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.cc
 +++ b/chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.cc
 @@ -48,6 +48,8 @@
@@ -5005,17 +4923,6 @@ index 9fc77e09a7..b41fa76422 100644
  }  // namespace actor
 +
 +#undef GetActiveWindowId
---- a/chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_service_factory.cc
-+++ b/chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_service_factory.cc
-@@ -41,7 +41,7 @@
- std::unique_ptr<KeyedService> RemoteActorCredentialSharingServiceFactory::
-     BuildServiceInstanceForBrowserContext(
-         content::BrowserContext* context) const {
--  if (!features::RemoteActorCredentialSharingEnabled()) {
-+  if (!::features::RemoteActorCredentialSharingEnabled()) {
-     return nullptr;
-   }
-   Profile* profile = Profile::FromBrowserContext(context);
 --- a/chrome/browser/extensions/app_tab_helper.cc
 +++ b/chrome/browser/extensions/app_tab_helper.cc
 @@ -60,7 +60,7 @@
@@ -5261,3 +5168,192 @@ index 9fc77e09a7..b41fa76422 100644
  }  // namespace autofill
 +
 +#undef g_ignore_window_activation_for_testing
+--- a/chrome/browser/extensions/api/image_writer_private/zstd_extractor.cc
++++ b/chrome/browser/extensions/api/image_writer_private/zstd_extractor.cc
+@@ -18,6 +18,8 @@
+ #include "chrome/browser/extensions/api/image_writer_private/error_constants.h"
+ #include "chrome/browser/file_util_service.h"
+ 
++#define kExtractedBinFileName kExtractedBinFileName_zstd_extractor
++
+ namespace extensions::image_writer {
+ 
+ namespace {
+@@ -172,3 +174,5 @@
+ }
+ 
+ }  // namespace extensions::image_writer
++
++#undef kExtractedBinFileName
+--- a/chrome/browser/actor/tools/scroll_tool_request.cc
++++ b/chrome/browser/actor/tools/scroll_tool_request.cc
+@@ -15,6 +15,8 @@
+ #include "third_party/blink/public/mojom/input/scroll_direction.mojom-shared.h"
+ #include "ui/events/types/scroll_types.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_scroll_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -176,3 +178,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/scroll_to_tool_request.cc
++++ b/chrome/browser/actor/tools/scroll_to_tool_request.cc
+@@ -13,6 +13,8 @@
+ #include "chrome/browser/actor/tools/tool_request_visitor_functor.h"
+ #include "chrome/common/actor.mojom.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_scroll_to_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -64,3 +66,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/move_mouse_tool_request.cc
++++ b/chrome/browser/actor/tools/move_mouse_tool_request.cc
+@@ -14,6 +14,8 @@
+ #include "chrome/browser/actor/tools/tool_request_visitor_functor.h"
+ #include "chrome/common/actor.mojom.h"
+ 
++#define kDomNodeIdParamDescription kDomNodeIdParamDescription_move_mouse_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -65,3 +67,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kDomNodeIdParamDescription
+--- a/chrome/browser/actor/tools/open_url_tool_request.cc
++++ b/chrome/browser/actor/tools/open_url_tool_request.cc
+@@ -20,6 +20,8 @@
+ #include "components/actor/public/mojom/actor_types.mojom.h"
+ #include "url/origin.h"
+ 
++#define kUrlParamDescription kUrlParamDescription_open_url_tool_request
++
+ namespace actor {
+ 
+ namespace {
+@@ -107,3 +109,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef kUrlParamDescription
+--- a/chrome/browser/actor/tools/password_manager/change_password/change_password_tool.cc
++++ b/chrome/browser/actor/tools/password_manager/change_password/change_password_tool.cc
+@@ -30,6 +30,8 @@
+ #include "mojo/public/cpp/bindings/callback_helpers.h"
+ #include "third_party/abseil-cpp/absl/strings/str_format.h"
+ 
++#define MaybeTargetDebugString MaybeTargetDebugString_change_password_tool
++
+ namespace actor {
+ 
+ namespace {
+@@ -241,3 +243,5 @@
+ }
+ 
+ }  // namespace actor
++
++#undef MaybeTargetDebugString
+--- a/chrome/browser/ai/ai_embedding_gemma_v1_decision_model.cc
++++ b/chrome/browser/ai/ai_embedding_gemma_v1_decision_model.cc
+@@ -21,6 +21,8 @@
+ #include "third_party/blink/public/mojom/ai/ai_common.mojom.h"
+ #include "third_party/blink/public/mojom/ai/model_streaming_responder.mojom.h"
+ 
++#define DecideError DecideError_ai_embedding_gemma_v1_decision_model
++
+ namespace {
+ 
+ base::unexpected<blink::mojom::AIDecisionModelDecideErrorPtr> DecideError(
+@@ -211,3 +213,5 @@
+   }
+   std::move(callback).Run(std::move(result));
+ }
++
++#undef DecideError
+--- a/chrome/browser/enterprise/client_certificates/browser_context_delegate.cc
++++ b/chrome/browser/enterprise/client_certificates/browser_context_delegate.cc
+@@ -20,6 +20,8 @@
+ #include "net/cert/x509_certificate.h"
+ #include "services/network/public/mojom/network_context.mojom.h"
+ 
++#define kLoggingContext kLoggingContext_browser_context_delegate
++
+ namespace client_certificates {
+ 
+ namespace {
+@@ -80,3 +82,5 @@
+ }
+ 
+ }  // namespace client_certificates
++
++#undef kLoggingContext
+--- a/chrome/browser/ui/views/tabs/common/tab_group_unfocus_button.cc
++++ b/chrome/browser/ui/views/tabs/common/tab_group_unfocus_button.cc
+@@ -32,6 +32,8 @@
+ #include "ui/views/view_class_properties.h"
+ #include "ui/views/widget/widget.h"
+ 
++#define kIconSize kIconSize_tab_group_unfocus_button
++
+ namespace {
+ constexpr int kIconSize = 16;
+ }  // namespace
+@@ -197,3 +199,5 @@
+ 
+ BEGIN_METADATA(TabGroupUnfocusButton)
+ END_METADATA
++
++#undef kIconSize
+--- a/chrome/browser/ui/views/tabs/common/tab_group_view_vertical_layout.cc
++++ b/chrome/browser/ui/views/tabs/common/tab_group_view_vertical_layout.cc
+@@ -17,6 +17,9 @@
+ #include "ui/views/layout/proposed_layout.h"
+ #include "ui/views/view.h"
+ 
++#define kTabVerticalPadding kTabVerticalPadding_tab_group_view_vertical_layout
++#define kFocusedHeadersGap kFocusedHeadersGap_tab_group_view_vertical_layout
++
+ namespace {
+ constexpr int kTabVerticalPadding = 2;
+ constexpr int kGroupLineWidth = 2;
+@@ -172,3 +175,6 @@
+                  : std::max(height, dragged_view_bottom));
+   return layouts;
+ }
++
++#undef kTabVerticalPadding
++#undef kFocusedHeadersGap
+--- a/chrome/browser/ui/webui/organizer_panel/foreign_tabs_page_handler.cc
++++ b/chrome/browser/ui/webui/organizer_panel/foreign_tabs_page_handler.cc
+@@ -29,6 +29,8 @@
+ #include "ui/base/window_open_disposition.h"
+ #include "url/gurl.h"
+ 
++#define GetLastActiveElapsedText GetLastActiveElapsedText_foreign_tabs_page_handler
++
+ namespace {
+ 
+ std::string GetLastActiveElapsedText(const base::Time& last_active_time) {
+@@ -173,3 +175,5 @@
+ 
+   std::move(callback).Run(std::move(result));
+ }
++
++#undef GetLastActiveElapsedText
