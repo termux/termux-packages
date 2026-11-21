@@ -47,3 +47,15 @@ diff --git a/src/runtime/src/installer/pkg/sfx/bundle/Microsoft.NETCore.App.Bund
      <BundleComponentReference Include="../installers/dotnet-hostfxr.proj" Condition="'$(TestReadyToRun)' != 'true'" />
      <BundleComponentReference Include="../installers/dotnet-host.proj" Condition="'$(TestReadyToRun)' != 'true'" />
    </ItemGroup>
+diff --git a/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Microsoft.NETCore.App.Host.sfxproj b/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Microsoft.NETCore.App.Host.sfxproj
+--- a/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Microsoft.NETCore.App.Host.sfxproj
++++ b/src/runtime/src/installer/pkg/sfx/Microsoft.NETCore.App/Microsoft.NETCore.App.Host.sfxproj
+@@ -30,7 +30,7 @@
+     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/hostfxr.h" />
+     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/coreclr_delegates.h" />
+   </ItemGroup>
+-  <ItemGroup Condition="'$(RuntimeFlavor)' != 'Mono' and '$(TargetsLinuxBionic)' != 'true'">
++  <ItemGroup Condition="'$(RuntimeFlavor)' != 'Mono'">
+     <NativeRuntimeAsset Include="$(DotNetHostBinDir)/singlefilehost$(ExeSuffix)" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(TargetOS)' == 'windows'">
