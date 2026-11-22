@@ -1,0 +1,139 @@
+--- a/src/vulkan/wrapper/wrapper_device_memory.c
++++ b/src/vulkan/wrapper/wrapper_device_memory.c
+@@ -5,6 +5,7 @@
+ #include "util/os_file.h"
+ #include "vk_util.h"
+ 
++#include <fcntl.h>
+ #include <android/hardware_buffer.h>
+ #include <vndk/hardware_buffer.h>
+ #include <sys/mman.h>
+@@ -313,6 +314,114 @@ wrapper_device_memory_from_handle(struct wrapper_device *device,
+    return mem;
+ }
+ 
++static int
++wrapper_ahardware_buffer_dmabuf_fd(AHardwareBuffer *ahb) {
++   const native_handle_t *handle = AHardwareBuffer_getNativeHandle(ahb);
++   int best = -1;
++   off_t best_size = 0;
++
++   for (int i = 0; i < handle->numFds; i++) {
++      off_t size = lseek(handle->data[i], 0, SEEK_END);
++      if (size > best_size) {
++         best = handle->data[i];
++         best_size = size;
++      }
++   }
++   return best;
++}
++
++static VkResult
++wrapper_allocate_memory_dmabuf_export(struct wrapper_device *device,
++                                      const VkMemoryAllocateInfo* pAllocateInfo,
++                                      const VkAllocationCallbacks* pAllocator,
++                                      VkDeviceMemory* pMemory) {
++   struct wrapper_device_memory *mem;
++   VkMemoryAllocateInfo allocate_info = *pAllocateInfo;
++   VkMemoryDedicatedAllocateInfo dedicated_info;
++   const VkMemoryDedicatedAllocateInfo *dedicated =
++      vk_find_struct_const(pAllocateInfo->pNext, MEMORY_DEDICATED_ALLOCATE_INFO);
++   AHardwareBuffer_Desc desc = {
++      .width = pAllocateInfo->allocationSize,
++      .height = 1,
++      .layers = 1,
++      .format = AHARDWAREBUFFER_FORMAT_BLOB,
++      .usage = AHARDWAREBUFFER_USAGE_GPU_DATA_BUFFER,
++   };
++   VkImportMemoryFdInfoKHR import_info = {
++      .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
++      .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
++   };
++   VkResult result;
++   int fd;
++
++   allocate_info.pNext = &import_info;
++   if (dedicated) {
++      dedicated_info = *dedicated;
++      dedicated_info.pNext = NULL;
++      import_info.pNext = &dedicated_info;
++   }
++
++   simple_mtx_lock(&device->resource_mutex);
++
++   result = wrapper_device_memory_create(device, pAllocator, &mem);
++   if (result != VK_SUCCESS)
++      goto out;
++
++   if (pAllocateInfo->allocationSize > UINT32_MAX ||
++       AHardwareBuffer_allocate(&desc, &mem->ahardware_buffer) != 0) {
++      WRAPPER_LOG(error, "Failed to allocate ahb for dma-buf export");
++      result = VK_ERROR_OUT_OF_DEVICE_MEMORY;
++      goto fail;
++   }
++
++   fd = wrapper_ahardware_buffer_dmabuf_fd(mem->ahardware_buffer);
++   import_info.fd = fd < 0 ? -1 : fcntl(fd, F_DUPFD_CLOEXEC, 0);
++   if (import_info.fd < 0) {
++      result = VK_ERROR_INVALID_EXTERNAL_HANDLE;
++      goto fail;
++   }
++
++   result = device->dispatch_table.AllocateMemory(device->dispatch_handle,
++      &allocate_info, pAllocator, &mem->dispatch_handle);
++   if (result != VK_SUCCESS) {
++      WRAPPER_LOG(error, "Failed to import ahb dma-buf, res %d", result);
++      close(import_info.fd);
++      goto fail;
++   }
++
++   *pMemory = mem->dispatch_handle;
++   goto out;
++
++fail:
++   wrapper_device_memory_destroy(mem);
++out:
++   simple_mtx_unlock(&device->resource_mutex);
++   return result;
++}
++
++VKAPI_ATTR VkResult VKAPI_CALL
++wrapper_GetMemoryFdKHR(VkDevice _device,
++                       const VkMemoryGetFdInfoKHR* pGetFdInfo,
++                       int* pFd) {
++   VK_FROM_HANDLE(wrapper_device, device, _device);
++   struct wrapper_device_memory *mem = NULL;
++   int fd;
++
++   if (pGetFdInfo->handleType == VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT)
++      mem = wrapper_device_memory_from_handle(device, pGetFdInfo->memory);
++
++   if (!mem || !mem->ahardware_buffer)
++      return device->dispatch_table.GetMemoryFdKHR(device->dispatch_handle,
++                                                   pGetFdInfo, pFd);
++
++   fd = wrapper_ahardware_buffer_dmabuf_fd(mem->ahardware_buffer);
++   if (fd < 0)
++      return VK_ERROR_INVALID_EXTERNAL_HANDLE;
++
++   *pFd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
++   return *pFd < 0 ? VK_ERROR_OUT_OF_HOST_MEMORY : VK_SUCCESS;
++}
++
+ VKAPI_ATTR VkResult VKAPI_CALL
+ wrapper_AllocateMemory(VkDevice _device,
+                        const VkMemoryAllocateInfo* pAllocateInfo,
+@@ -322,6 +431,13 @@ wrapper_AllocateMemory(VkDevice _device,
+    struct wrapper_device_memory *mem;
+    VkResult result;
+ 
++   const VkExportMemoryAllocateInfo *export_info =
++      vk_find_struct_const(pAllocateInfo->pNext, EXPORT_MEMORY_ALLOCATE_INFO);
++   if (export_info &&
++       (export_info->handleTypes & VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT))
++      return wrapper_allocate_memory_dmabuf_export(device, pAllocateInfo,
++                                                   pAllocator, pMemory);
++
+    VkMemoryPropertyFlags property_flags =
+       device->physical->memory_properties.memoryTypes[
+          pAllocateInfo->memoryTypeIndex].propertyFlags;

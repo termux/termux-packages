@@ -1,0 +1,92 @@
+--- a/src/vulkan/wrapper/wrapper_physical_device.c
++++ b/src/vulkan/wrapper/wrapper_physical_device.c
+@@ -321,10 +321,7 @@ VkResult enumerate_physical_device(struct vk_instance *_instance)
+ 
+       pdevice->resource_type = wrapper_resource_type ? wrapper_resource_type : "auto";
+ 
+-	  if (pdevice->driver_properties.driverID == VK_DRIVER_ID_ARM_PROPRIETARY)
+-      	 pdevice->wsi_device.force_rgba8_unorm_first = true;
+-      else
+-         pdevice->wsi_device.force_bgra8_unorm_first = true;
++      pdevice->wsi_device.force_bgra8_unorm_first = true;
+ 
+ 	  const char *wrapper_surface_format = getenv("WRAPPER_SURFACE_FORMAT");
+ 	  if (wrapper_surface_format) {
+--- a/src/vulkan/wsi/wsi_common_android.c
++++ b/src/vulkan/wsi/wsi_common_android.c
+@@ -91,6 +91,42 @@ wsi_get_ahardware_buffer_blit_type(const struct wsi_device *wsi,
+    return WSI_SWAPCHAIN_NO_BLIT;
+ }
+ */
++bool
++wsi_android_bgra_is_native(const struct wsi_device *wsi, VkDevice device)
++{
++   static int native = -1;
++
++   if (native >= 0)
++      return native;
++
++   AHardwareBuffer *ahardware_buffer;
++   native = 0;
++   if (AHardwareBuffer_allocate(&(AHardwareBuffer_Desc){
++          .width = 16,
++          .height = 16,
++          .layers = 1,
++          .format = AHARDWAREBUFFER_FORMAT_B8G8R8A8_UNORM,
++          .usage = AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER |
++                   AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE },
++       &ahardware_buffer) != 0)
++      return false;
++
++   VkAndroidHardwareBufferFormatPropertiesANDROID format_props = {
++      .sType = VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_FORMAT_PROPERTIES_ANDROID,
++   };
++   VkAndroidHardwareBufferPropertiesANDROID props = {
++      .sType = VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_PROPERTIES_ANDROID,
++      .pNext = &format_props,
++   };
++   if (wsi->GetAndroidHardwareBufferPropertiesANDROID(device, ahardware_buffer,
++                                                      &props) == VK_SUCCESS)
++      native = format_props.format == VK_FORMAT_B8G8R8A8_UNORM &&
++               (format_props.formatFeatures & VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT);
++
++   AHardwareBuffer_release(ahardware_buffer);
++   return native;
++}
++
+ enum wsi_swapchain_blit_type
+ wsi_get_android_blit_type(const struct wsi_device *wsi,
+                           const struct wsi_base_image_params *params,
+--- a/src/vulkan/wsi/wsi_common_private.h
++++ b/src/vulkan/wsi/wsi_common_private.h
+@@ -457,6 +457,9 @@ void wsi_headless_finish_wsi(struct wsi_device *wsi_device,
+ VK_DEFINE_NONDISP_HANDLE_CASTS(wsi_swapchain, base, VkSwapchainKHR,
+                                VK_OBJECT_TYPE_SWAPCHAIN_KHR)
+ 
++bool
++wsi_android_bgra_is_native(const struct wsi_device *wsi, VkDevice device);
++
+ enum wsi_swapchain_blit_type
+ wsi_get_android_blit_type(const struct wsi_device *wsi,
+                           const struct wsi_base_image_params *params,
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -3122,7 +3122,7 @@ wsi_wl_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+    struct wsi_drm_image_params drm_image_params;
+    struct wsi_base_image_params android_image_params = {
+       .image_type = WSI_IMAGE_TYPE_ANDROID,
+-      .android_alias = true,
++      .android_alias = !wsi_android_bgra_is_native(wsi_device, device),
+    };
+    uint32_t num_drm_modifiers = 0;
+    const uint64_t *drm_modifiers = NULL;
+--- a/src/vulkan/wsi/wsi_common_x11.c
++++ b/src/vulkan/wsi/wsi_common_x11.c
+@@ -2673,6 +2673,7 @@ x11_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+    } else {
+       image_params = &(struct wsi_base_image_params){
+          .image_type = WSI_IMAGE_TYPE_ANDROID,
++         .android_alias = !wsi_android_bgra_is_native(wsi_device, device),
+       };
+    }
+ #else

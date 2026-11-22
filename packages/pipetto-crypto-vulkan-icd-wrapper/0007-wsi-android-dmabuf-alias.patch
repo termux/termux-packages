@@ -1,0 +1,181 @@
+--- a/src/vulkan/wsi/wsi_common_android.c
++++ b/src/vulkan/wsi/wsi_common_android.c
+@@ -4,6 +4,10 @@
+ #include "../wrapper/wrapper_log.h"
+ 
+ #include <android/hardware_buffer.h>
++#include <vndk/hardware_buffer.h>
++#include <fcntl.h>
++#include <strings.h>
++#include <unistd.h>
+ 
+ #define AHARDWAREBUFFER_FORMAT_B8G8R8A8_UNORM 5
+ /*
+@@ -92,12 +96,100 @@ wsi_get_android_blit_type(const struct wsi_device *wsi,
+                           const struct wsi_base_image_params *params,
+                           VkDevice device)
+ {
+-   if (wsi->needs_blit)
++   if (wsi->needs_blit && !params->android_alias)
+       return WSI_SWAPCHAIN_IMAGE_BLIT;
+ 
+    return WSI_SWAPCHAIN_NO_BLIT;
+ }
+ 
++static VkResult
++wsi_create_ahardware_buffer_alias_mem(const struct wsi_swapchain *chain,
++                                      const struct wsi_image_info *info,
++                                      struct wsi_image *image)
++{
++   const struct wsi_device *wsi = chain->wsi;
++   VkImage old_image = image->image;
++   VkResult result;
++
++   const native_handle_t *handle = AHardwareBuffer_getNativeHandle(image->ahardware_buffer);
++   AHardwareBuffer_Desc desc;
++   AHardwareBuffer_describe(image->ahardware_buffer, &desc);
++
++   int fd = -1;
++   off_t best = 0;
++   for (int i = 0; handle && i < handle->numFds; i++) {
++      off_t size = lseek(handle->data[i], 0, SEEK_END);
++      if (size > best) {
++         best = size;
++         fd = handle->data[i];
++      }
++   }
++   if (fd < 0) {
++      WRAPPER_LOG(error, "No dma-buf fd in ahardware buffer");
++      return VK_ERROR_OUT_OF_DEVICE_MEMORY;
++   }
++
++   const VkSubresourceLayout plane_layout = {
++      .offset = 0,
++      .rowPitch = (VkDeviceSize) desc.stride * 4,
++   };
++   const VkImageDrmFormatModifierExplicitCreateInfoEXT modifier_info = {
++      .sType = VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_EXPLICIT_CREATE_INFO_EXT,
++      .drmFormatModifier = 0,
++      .drmFormatModifierPlaneCount = 1,
++      .pPlaneLayouts = &plane_layout,
++   };
++   const VkExternalMemoryImageCreateInfo external_memory_info = {
++      .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO,
++      .pNext = &modifier_info,
++      .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
++   };
++   VkImageCreateInfo image_info = info->create;
++   image_info.pNext = &external_memory_info;
++   image_info.flags &= ~VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
++   image_info.tiling = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
++
++   result = wsi->CreateImage(chain->device, &image_info,
++                             &chain->alloc, &image->image);
++   if (result != VK_SUCCESS) {
++      WRAPPER_LOG(error, "Failed to create alias image, res %d", result);
++      return result;
++   }
++   wsi->DestroyImage(chain->device, old_image, &chain->alloc);
++
++   VkMemoryRequirements reqs;
++   wsi->GetImageMemoryRequirements(chain->device, image->image, &reqs);
++
++   const VkImportMemoryFdInfoKHR import_fd_info = {
++      .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
++      .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_DMA_BUF_BIT_EXT,
++      .fd = fcntl(fd, F_DUPFD_CLOEXEC, 0),
++   };
++   const VkMemoryDedicatedAllocateInfo dedicated_info = {
++      .sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO,
++      .pNext = &import_fd_info,
++      .image = image->image,
++   };
++   const VkMemoryAllocateInfo memory_info = {
++      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
++      .pNext = &dedicated_info,
++      .allocationSize = best,
++      .memoryTypeIndex = ffs(reqs.memoryTypeBits) - 1,
++   };
++   result = wsi->AllocateMemory(chain->device, &memory_info,
++                                &chain->alloc, &image->memory);
++   if (result != VK_SUCCESS) {
++      WRAPPER_LOG(error, "Failed to import alias image memory, res %d", result);
++      close(import_fd_info.fd);
++      return result;
++   }
++
++   image->num_planes = 1;
++   image->drm_modifier = 1255;
++
++   return VK_SUCCESS;
++}
++
+ static VkResult
+ wsi_create_ahardware_buffer_image_mem(const struct wsi_swapchain *chain,
+                                       const struct wsi_image_info *info,
+@@ -320,15 +412,16 @@ static VkResult
+ wsi_configure_ahardware_buffer_image(const struct wsi_swapchain *chain,
+                                      const VkSwapchainCreateInfoKHR *pCreateInfo,
+                                      const bool blit,
++                                     const bool alias,
+                                      struct wsi_image_info *info)
+ {
+    VkResult result;
+ 
+    VkExternalMemoryHandleTypeFlags handle_type =
+       VK_EXTERNAL_MEMORY_HANDLE_TYPE_ANDROID_HARDWARE_BUFFER_BIT_ANDROID;
+-   
++
+    result = wsi_configure_image(chain, pCreateInfo,
+-                                blit ? 0 : handle_type, info);
++                                blit || alias ? 0 : handle_type, info);
+    if (result != VK_SUCCESS)
+       return result;
+    
+@@ -343,14 +436,15 @@ wsi_configure_ahardware_buffer_image(const struct wsi_swapchain *chain,
+       .width = pCreateInfo->imageExtent.width,
+       .height = pCreateInfo->imageExtent.height,
+       .layers = pCreateInfo->imageArrayLayers,
+-      .format = blit
++      .format = blit || alias
+          ? AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM
+          : to_ahardware_buffer_format(info->create.format),
+       .usage = AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE |
+                AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER |
+-               AHARDWAREBUFFER_USAGE_COMPOSER_OVERLAY |
+-               AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
+-               AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN,
++               (alias ? 0 :
++                        AHARDWAREBUFFER_USAGE_COMPOSER_OVERLAY |
++                        AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
++                        AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN),
+    };
+ 
+    return VK_SUCCESS;
+@@ -371,12 +465,14 @@ wsi_configure_android_image(
+ 
+    const bool blit = chain->blit.type == WSI_SWAPCHAIN_IMAGE_BLIT;
+ 
+-   if ((result = wsi_configure_ahardware_buffer_image(chain, pCreateInfo, blit, info)) != VK_SUCCESS) {
++   if ((result = wsi_configure_ahardware_buffer_image(chain, pCreateInfo, blit, params->android_alias, info)) != VK_SUCCESS) {
+       WRAPPER_LOG(error, "Failed to configure ahardware buffer image, res %d", result);
+       return result;
+    }
+ 
+-   if (blit) {
++   if (params->android_alias) {
++      info->create_mem = wsi_create_ahardware_buffer_alias_mem;
++   } else if (blit) {
+       wsi_configure_image_blit_image(chain, info);
+       info->create_mem = wsi_create_ahardware_buffer_blit_context;
+    } else {
+--- a/src/vulkan/wsi/wsi_common_private.h
++++ b/src/vulkan/wsi/wsi_common_private.h
+@@ -55,6 +55,7 @@ enum wsi_image_type {
+ 
+ struct wsi_base_image_params {
+    enum wsi_image_type image_type;
++   bool android_alias;
+ };
+ 
+ struct wsi_cpu_image_params {

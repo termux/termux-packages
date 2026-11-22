@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE=docs/license.rst
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.0.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/Pipetto-crypto/mesa/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=3e00a79184dfb1d3a8e35941a8a9efa35e0f77cdd5b066c168e067b14e425a70
 TERMUX_PKG_DEPENDS="libadrenotools, libandroid-shmem, libc++, libdrm, libwayland, libx11, libxcb, libxshmfence, vulkan-loader-generic"

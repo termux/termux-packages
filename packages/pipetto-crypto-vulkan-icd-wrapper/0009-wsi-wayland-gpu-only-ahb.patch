@@ -1,0 +1,63 @@
+--- a/src/vulkan/wsi/wsi_common_android.c
++++ b/src/vulkan/wsi/wsi_common_android.c
+@@ -449,6 +449,7 @@ wsi_configure_ahardware_buffer_image(const struct wsi_swapchain *chain,
+                                      const VkSwapchainCreateInfoKHR *pCreateInfo,
+                                      const bool blit,
+                                      const bool alias,
++                                     const bool gpu_only,
+                                      struct wsi_image_info *info)
+ {
+    VkResult result;
+@@ -477,7 +478,7 @@ wsi_configure_ahardware_buffer_image(const struct wsi_swapchain *chain,
+          : to_ahardware_buffer_format(info->create.format),
+       .usage = AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE |
+                AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER |
+-               (alias ? 0 :
++               (alias || gpu_only ? 0 :
+                         AHARDWAREBUFFER_USAGE_COMPOSER_OVERLAY |
+                         AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
+                         AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN),
+@@ -501,7 +502,7 @@ wsi_configure_android_image(
+ 
+    const bool blit = chain->blit.type == WSI_SWAPCHAIN_IMAGE_BLIT;
+ 
+-   if ((result = wsi_configure_ahardware_buffer_image(chain, pCreateInfo, blit, params->android_alias, info)) != VK_SUCCESS) {
++   if ((result = wsi_configure_ahardware_buffer_image(chain, pCreateInfo, blit, params->android_alias, params->android_gpu_only, info)) != VK_SUCCESS) {
+       WRAPPER_LOG(error, "Failed to configure ahardware buffer image, res %d", result);
+       return result;
+    }
+--- a/src/vulkan/wsi/wsi_common_private.h
++++ b/src/vulkan/wsi/wsi_common_private.h
+@@ -56,6 +56,7 @@ enum wsi_image_type {
+ struct wsi_base_image_params {
+    enum wsi_image_type image_type;
+    bool android_alias;
++   bool android_gpu_only;
+ };
+ 
+ struct wsi_cpu_image_params {
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -3122,7 +3122,7 @@ wsi_wl_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+    struct wsi_drm_image_params drm_image_params;
+    struct wsi_base_image_params android_image_params = {
+       .image_type = WSI_IMAGE_TYPE_ANDROID,
+-      .android_alias = !wsi_android_bgra_is_native(wsi_device, device),
++      .android_gpu_only = true,
+    };
+    uint32_t num_drm_modifiers = 0;
+    const uint64_t *drm_modifiers = NULL;
+@@ -3180,7 +3180,13 @@ wsi_wl_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+            pCreateInfo->imageFormat == VK_FORMAT_B8G8R8A8_SRGB) &&
+           wsi_wl_surface->display->wl_dmabuf &&
+           wsi_wl_ahb_supported(wsi_wl_surface->display))
++      {
++         android_image_params.android_alias =
++            (pCreateInfo->imageFormat == VK_FORMAT_B8G8R8A8_UNORM ||
++             pCreateInfo->imageFormat == VK_FORMAT_B8G8R8A8_SRGB) &&
++            !wsi_android_bgra_is_native(wsi_device, device);
+          image_params = &android_image_params;
++      }
+    }
+ 
+    result = wsi_swapchain_init(wsi_device, &chain->base, device,
