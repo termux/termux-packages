@@ -1,25 +1,11 @@
---- a/pnpm/crates/fs/src/open_dir/unix.rs
-+++ b/pnpm/crates/fs/src/open_dir/unix.rs
-@@ -82,6 +82,11 @@ pub(super) fn stat_file_at(
-     let Some(stat) = lstat_at(parent, name)? else {
-         return Ok(None);
-     };
-+    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+    if (stat.st_mode & libc::S_IFMT as u32) != libc::S_IFREG as u32 {
-+        return Ok(None);
-+    }
-+    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-     if (stat.st_mode & libc::S_IFMT) != libc::S_IFREG {
-         return Ok(None);
-     }
-@@ -89,6 +94,9 @@ pub(super) fn stat_file_at(
- }
- 
- pub(super) fn is_symlink_at(parent: BorrowedFd<'_>, name: &CStr) -> io::Result<bool> {
--    Ok(lstat_at(parent, name)?.is_some_and(|stat| (stat.st_mode & libc::S_IFMT) == libc::S_IFLNK))
-+    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
-+    { Ok(lstat_at(parent, name)?.is_some_and(|stat| (stat.st_mode & libc::S_IFMT as u32) == libc::S_IFLNK as u32)) }
-+    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
-+    { Ok(lstat_at(parent, name)?.is_some_and(|stat| (stat.st_mode & libc::S_IFMT) == libc::S_IFLNK)) }
+--- a/pnpm/crates/ffi-fs/src/dir_handle.rs
++++ b/pnpm/crates/ffi-fs/src/dir_handle.rs
+@@ -337,7 +337,7 @@ pub fn entry_metadata_at(parent: &File, name: &OsStr) -> io::Result<Option<Entry
+         len: u64::try_from(stat.st_size).unwrap_or(0),
+         modified: entry_time(stat.st_mtime, modified_nanoseconds),
+         accessed: entry_time(stat.st_atime, accessed_nanoseconds),
+-        kind: entry_kind(stat.st_mode),
++        kind: entry_kind(stat.st_mode as libc::mode_t),
+     }))
  }
  
