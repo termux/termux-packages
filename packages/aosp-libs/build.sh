@@ -14,8 +14,8 @@ external/iputils/NOTICE
 "
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="9.0.0-r76"
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://android.googlesource.com/platform/manifest
+TERMUX_PKG_REVISION=5
+TERMUX_PKG_SRCURL=git+https://android.googlesource.com/platform/manifest
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -35,8 +35,8 @@ termux_step_get_source() {
 	local TMP_CHECKOUT="$TERMUX_PKG_CACHEDIR/tmp-checkout"
 	local TMP_CHECKOUT_VERSION="$TERMUX_PKG_CACHEDIR/tmp-checkout-version"
 
-	if [[ ! -f "$TMP_CHECKOUT_VERSION" || "$(cat $TMP_CHECKOUT_VERSION)" != "$TERMUX_PKG_VERSION" ]]; then
-		echo "Downloading AOSP source from '$TERMUX_PKG_SRCURL'"
+	if [[ ! -f "$TMP_CHECKOUT_VERSION" || "$(< "$TMP_CHECKOUT_VERSION")" != "$TERMUX_PKG_VERSION" ]]; then
+		echo "Downloading AOSP source from '${TERMUX_PKG_SRCURL#git+}'"
 
 		rm -rf "$TMP_CHECKOUT"
 
@@ -64,7 +64,7 @@ termux_step_get_source() {
 		[[ "$(git config --get user.name)" != '' ]] || git config --global user.name "Termux Github Actions"
 		[[ "$(git config --get user.email)" != '' ]] || git config --global user.email "contact@termux.dev"
 		"${TERMUX_PKG_CACHEDIR}"/repo init \
-			-u "${TERMUX_PKG_SRCURL}" \
+			-u "${TERMUX_PKG_SRCURL#git+}" \
 			-b main -m "${TERMUX_PKG_BUILDER_DIR}/default.xml" <<< 'n'
 		"${TERMUX_PKG_CACHEDIR}"/repo sync -c -j32
 
@@ -72,7 +72,7 @@ termux_step_get_source() {
 
 		echo "$TERMUX_PKG_VERSION" > "$TMP_CHECKOUT_VERSION"
 	else
-		echo "Skipped downloading of AOSP source from '$TERMUX_PKG_SRCURL'"
+		echo "Skipped downloading of AOSP source from '${TERMUX_PKG_SRCURL#git+}'"
 	fi
 
 	rm -rf "$TERMUX_PKG_SRCDIR"
