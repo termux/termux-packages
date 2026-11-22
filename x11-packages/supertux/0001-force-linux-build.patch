@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -41,7 +41,7 @@
+@@ -41,7 +41,7 @@ cmake_minimum_required(VERSION 3.22)
  
  option(FLATPAK "Produce a flatpak optimized build" OFF)
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/mk/cmake)
@@ -9,7 +9,7 @@
    include(SuperTux/Android)
  endif()
  
-@@ -117,14 +117,14 @@
+@@ -122,14 +122,14 @@ endif()
  option(SUPERTUX_LTO "Use link-time optimizations (Takes more RAM at compilation, gives smaller and faster executables)" OFF)
  
  # Mobile builds
@@ -21,12 +21,12 @@
  endif()
  
  ## Determine whether static linking for SimpleSquirrel should be defaulted to
--if(MSVC OR ANDROID)
-+if(MSVC OR 0)
+-if(MSVC OR ANDROID OR EMSCRIPTEN)
++if(MSVC OR 0 OR EMSCRIPTEN)
    option(USE_STATIC_SIMPLESQUIRREL "Statically link the SimpleSquirrel library" ON)
  else()
    option(USE_STATIC_SIMPLESQUIRREL "Statically link the SimpleSquirrel library" OFF)
-@@ -244,7 +244,7 @@
+@@ -249,7 +249,7 @@ set(HAVE_GLEW NO)
  set(HAVE_EPOXY NO)
  if(NOT ENABLE_OPENGL)
    message(STATUS "OpenGL support is disabled, as requested.")
@@ -35,7 +35,7 @@
    # SDL already adds OpenGLES to the linker command
    set(HAVE_OPENGL YES)
    set(USE_OPENGLES2 YES)
-@@ -308,7 +308,7 @@
+@@ -313,7 +313,7 @@ list(SORT SUPERTUX_RESOURCES)
  include(SuperTux/CompileAmalgation)
  
  ## Add target for supertux binary
@@ -44,7 +44,7 @@
    add_library(supertux2 SHARED ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_C} ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_SOURCES_HXX} src/main.cpp)
  else()
    add_executable(supertux2 ${SUPERTUX_WIN32_OPTION} ${CMAKE_BINARY_DIR}/version.h ${SUPERTUX_SOURCES_C} ${SUPERTUX_SOURCES_CXX} ${SUPERTUX_SOURCES_HXX} ${SUPERTUX_RESOURCES} src/main.cpp)
-@@ -460,7 +460,7 @@
+@@ -465,7 +465,7 @@ if(NOT EMSCRIPTEN)
      set(HAVE_CURL YES)
    endif()
  
@@ -53,7 +53,7 @@
      target_link_libraries(supertux2 PUBLIC OpenGL::GL)
      if(USE_GL_LIBRARY STREQUAL "glew")
        target_link_libraries(supertux2 PUBLIC GLEW)
-@@ -474,7 +474,7 @@
+@@ -479,7 +479,7 @@ if(NOT EMSCRIPTEN)
    endif()
  endif()
  
@@ -62,7 +62,7 @@
    target_link_libraries(supertux2 PUBLIC log)
    target_compile_definitions(supertux2 PUBLIC -D__ANDROID__ -DANDROID)
  endif()
-@@ -486,7 +486,7 @@
+@@ -499,7 +499,7 @@ include(SuperTux/BuildInstall)
  configure_file(config.h.in ${CMAKE_BINARY_DIR}/config.h)
  
  # Make android data.zip
@@ -91,7 +91,7 @@
  // To print only SuperTux logs in Android logcat output, use command:
  // adb logcat -s 'SuperTux:V' 'SDL:V' 'DEBUG:V'
  class _android_debugbuf: public std::streambuf
-@@ -105,7 +105,7 @@
+@@ -105,7 +105,7 @@ std::ostream& get_logging_instance(bool use_console_buffer)
    if (ConsoleBuffer::current() && use_console_buffer)
      return (ConsoleBuffer::output);
    else
@@ -102,7 +102,7 @@
      return (std::cerr);
 --- a/src/video/sdl/sdl_video_system.cpp
 +++ b/src/video/sdl/sdl_video_system.cpp
-@@ -86,7 +86,7 @@
+@@ -86,7 +86,7 @@ SDLVideoSystem::apply_config()
    apply_video_mode();
  
    { // apply_viewport
@@ -113,7 +113,7 @@
        g_config->window_size;
 --- a/src/video/sdlbase_video_system.cpp
 +++ b/src/video/sdlbase_video_system.cpp
-@@ -31,11 +31,11 @@
+@@ -31,11 +31,11 @@ SDLBaseVideoSystem::SDLBaseVideoSystem() :
    m_desktop_size(),
    m_last_fullscreen_state(g_config->use_fullscreen)
  {
@@ -127,7 +127,7 @@
    SDL_DisplayMode mode;
    if (SDL_GetDesktopDisplayMode(0, &mode) != 0)
    {
-@@ -110,7 +110,7 @@
+@@ -110,7 +110,7 @@ SDLBaseVideoSystem::create_sdl_window(Uint32 flags)
  #if SDL_VERSION_ATLEAST(2,0,10)
    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
@@ -138,7 +138,7 @@
           Android.
 --- a/src/video/gl/gl_video_system.cpp
 +++ b/src/video/gl/gl_video_system.cpp
-@@ -311,7 +311,7 @@
+@@ -311,7 +311,7 @@ GLVideoSystem::apply_config()
  
    m_viewport = Viewport::from_size(target_size, m_desktop_size);
  
@@ -149,7 +149,7 @@
    // instead of the display resolution, or the video will be rendered partly outside of the screen.
 --- a/src/supertux/gameconfig.cpp
 +++ b/src/supertux/gameconfig.cpp
-@@ -47,7 +47,7 @@
+@@ -47,7 +47,7 @@ Config::Config() :
    fit_window(true),
  #endif
    magnification(0.0f),
@@ -158,7 +158,7 @@
    use_fullscreen(true),
  #else
    use_fullscreen(false),
-@@ -86,7 +86,7 @@
+@@ -86,7 +86,7 @@ Config::Config() :
    transitions_enabled(true),
    confirmation_dialog(false),
    pause_on_focusloss(true),
@@ -169,7 +169,7 @@
    custom_mouse_cursor(true),
 --- a/src/supertux/menu/addon_menu.cpp
 +++ b/src/supertux/menu/addon_menu.cpp
-@@ -161,7 +161,7 @@
+@@ -161,7 +161,7 @@ AddonMenu::rebuild_menu()
  #ifdef NETWORKING
    add_entry(MNID_BROWSE, m_langpacks_only ? _("Browse language packs") : _("Browse Add-ons"));
  #endif
@@ -191,7 +191,7 @@
  
 --- a/external/findlocale/findlocale.c
 +++ b/external/findlocale/findlocale.c
-@@ -439,7 +439,7 @@
+@@ -439,7 +439,7 @@ FL_FindLocale(FL_Locale **locale) {
        }
      }
    }

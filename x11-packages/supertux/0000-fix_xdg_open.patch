@@ -1,6 +1,6 @@
 --- a/src/util/file_system.cpp
 +++ b/src/util/file_system.cpp
-@@ -266,7 +266,7 @@
+@@ -266,7 +266,7 @@ rename(const std::string& old_filename, const std::string& new_filename)
  
  void open_path(const std::string& path)
  {
@@ -9,12 +9,12 @@
    // SDL >= 2.0.14 is strictly required for Android
    SDL_OpenURL(("file://" + path).c_str());
  #elif defined(_WIN32) || defined (_WIN64)
-@@ -278,7 +278,7 @@
+@@ -277,7 +277,7 @@ void open_path(const std::string& path)
    #if defined(__APPLE__)
-   std::string cmd = "open \"" + path + "\"";
+   std::string cmd = "open";
    #else
--  std::string cmd = "xdg-open \"" + path + "\"";
-+  std::string cmd = "xdg-utils-xdg-open \"" + path + "\"";
+-  std::string cmd = "xdg-open";
++  std::string cmd = "xdg-utils-xdg-open";
    #endif
  
-   int ret = system(cmd.c_str());
+   const char *argv[] = { cmd.c_str(), path.c_str(), nullptr };
