@@ -1,0 +1,61 @@
+From 696ea716816c3067cd502bd2756fa3b7d7da9762 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 12:56:17 +0900
+Subject: [PATCH 2/3] fix file paths for Termux
+
+---
+ synfig-core/src/modules/lyr_freetype/lyr_freetype.cpp | 5 +++++
+ synfig-core/src/synfig/filesystemtemporary.cpp        | 4 ++++
+ synfig-studio/CMakeLists.txt                          | 2 +-
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/synfig-core/src/modules/lyr_freetype/lyr_freetype.cpp b/synfig-core/src/modules/lyr_freetype/lyr_freetype.cpp
+index 9eec179..cfeb77a 100644
+--- a/synfig-core/src/modules/lyr_freetype/lyr_freetype.cpp
++++ b/synfig-core/src/modules/lyr_freetype/lyr_freetype.cpp
+@@ -782,8 +782,13 @@ Layer_Freetype::get_possible_font_directories(const std::string& canvas_path)
+ 	possible_font_directories.push_back("/Library/Fonts/");
+ #endif
+ 
++#ifdef __ANDROID__
++	possible_font_directories.push_back("@TERMUX_PREFIX@/share/fonts/");
++	possible_font_directories.push_back("/system/fonts/");
++#else
+ 	possible_font_directories.push_back("/usr/share/fonts/truetype/");
+ 	possible_font_directories.push_back("/usr/share/fonts/opentype/");
++#endif
+ 
+ #endif
+ 
+diff --git a/synfig-core/src/synfig/filesystemtemporary.cpp b/synfig-core/src/synfig/filesystemtemporary.cpp
+index 63e0872..02dfec3 100644
+--- a/synfig-core/src/synfig/filesystemtemporary.cpp
++++ b/synfig-core/src/synfig/filesystemtemporary.cpp
+@@ -85,7 +85,11 @@ FileSystemTemporary::get_system_temporary_directory()
+ 	if (!(tmpdir = getenv("TEMP")))
+ 	if (!(tmpdir = getenv("TMP")))
+ 	if (!(tmpdir = getenv("TMPDIR")))
++#ifdef __ANDROID__
++		tmpdir = "@TERMUX_PREFIX@/tmp";
++#else
+     	 tmpdir = "/tmp";
++#endif
+     return String(tmpdir);
+ }
+ 
+diff --git a/synfig-studio/CMakeLists.txt b/synfig-studio/CMakeLists.txt
+index 2fccc97..ba895ad 100644
+--- a/synfig-studio/CMakeLists.txt
++++ b/synfig-studio/CMakeLists.txt
+@@ -43,7 +43,7 @@ endif()
+ if(TARGET desktop_file)
+     add_custom_command(
+         TARGET desktop_file POST_BUILD
+-        COMMAND sed -i -E \"s|^Icon=\(.*\)|Icon=/usr/share/icons/hicolor/scalable/apps/org.synfig.SynfigStudio.svg|g\"
++        COMMAND sed -i -E \"s|^Icon=\(.*\)|Icon=${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/org.synfig.SynfigStudio.svg|g\"
+             ${SYNFIG_BUILD_ROOT}/share/applications/org.synfig.SynfigStudio.desktop
+     )
+ endif()
+-- 
+2.56.1
+

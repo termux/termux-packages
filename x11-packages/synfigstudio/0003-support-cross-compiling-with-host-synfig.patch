@@ -1,0 +1,73 @@
+From a0b79c7489cdcf90550d2d0a2dd0b52e1b2a7c08 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 21:42:34 +0900
+Subject: [PATCH 3/3] support cross-compiling with host synfig
+
+---
+ synfig-core/src/modules/CMakeLists.txt |  2 +-
+ synfig-studio/images/CMakeLists.txt    | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/synfig-core/src/modules/CMakeLists.txt b/synfig-core/src/modules/CMakeLists.txt
+index 0d913fe..edbd184 100644
+--- a/synfig-core/src/modules/CMakeLists.txt
++++ b/synfig-core/src/modules/CMakeLists.txt
+@@ -23,7 +23,7 @@ set(MODS_ENABLED
+     lyr_freetype
+     lyr_std
+     mod_bmp
+-    mod_dv
++    #mod_dv
+     mod_example
+     mod_ffmpeg
+     mod_filter
+diff --git a/synfig-studio/images/CMakeLists.txt b/synfig-studio/images/CMakeLists.txt
+index 3b69fe1..34e9114 100644
+--- a/synfig-studio/images/CMakeLists.txt
++++ b/synfig-studio/images/CMakeLists.txt
+@@ -307,10 +307,10 @@ foreach (IMAGE IN ITEMS ${IMAGES})
+ 	add_custom_command(
+ 		OUTPUT ${PIXMAPS_DIR}/${IMAGE}.png
+ 		# Wait for Gtk::IconTheme
+-#		COMMAND synfig_bin ${SRC}.sif -o ${PIXMAPS_DIR}/${IMAGE}.png --time ${TIME}f -w ${W} -h ${H} --quiet
+-		COMMAND synfig_bin ${SRC}.sif -o ${PIXMAPS_DIR}/${IMAGE}.png --time ${TIME}f --quiet
++#		COMMAND ${CMAKE_COMMAND} -E env SYNFIG_ROOT=${SYNFIG_HOST_BUILD_DIR}/output/Release LD_LIBRARY_PATH=${SYNFIG_HOST_BUILD_DIR}/output/Release/lib:${SYNFIG_HOST_BUILD_DIR}/host-prefix/lib ${SYNFIG_HOST_BUILD_DIR}/output/Release/bin/synfig ${SRC}.sif -o ${PIXMAPS_DIR}/${IMAGE}.png --time ${TIME}f -w ${W} -h ${H} --quiet
++		COMMAND ${CMAKE_COMMAND} -E env SYNFIG_ROOT=${SYNFIG_HOST_BUILD_DIR}/output/Release LD_LIBRARY_PATH=${SYNFIG_HOST_BUILD_DIR}/output/Release/lib:${SYNFIG_HOST_BUILD_DIR}/host-prefix/lib ${SYNFIG_HOST_BUILD_DIR}/output/Release/bin/synfig ${SRC}.sif -o ${PIXMAPS_DIR}/${IMAGE}.png --time ${TIME}f --quiet
+ 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC}.sif synfig_bin
++		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SRC}.sif
+ 	)
+ 
+ 	list(APPEND PIXMAPS ${PIXMAPS_DIR}/${IMAGE}.png)
+@@ -354,8 +354,8 @@ set(SPLASH_SCREEN_DIR ${SYNFIG_BUILD_ROOT}/share/synfig/images)
+ file(MAKE_DIRECTORY ${SPLASH_SCREEN_DIR})
+ add_custom_command(
+ 	OUTPUT ${SPLASH_SCREEN_DIR}/splash_screen.png
+-	COMMAND synfig_bin ${SYNFIG_SPLASH_SCREEN} -o ${SPLASH_SCREEN_DIR}/splash_screen.png --time 0f --quiet
+-	DEPENDS ${SYNFIG_SPLASH_SCREEN} synfig_bin
++	COMMAND ${CMAKE_COMMAND} -E env SYNFIG_ROOT=${SYNFIG_HOST_BUILD_DIR}/output/Release LD_LIBRARY_PATH=${SYNFIG_HOST_BUILD_DIR}/output/Release/lib:${SYNFIG_HOST_BUILD_DIR}/host-prefix/lib ${SYNFIG_HOST_BUILD_DIR}/output/Release/bin/synfig ${SYNFIG_SPLASH_SCREEN} -o ${SPLASH_SCREEN_DIR}/splash_screen.png --time 0f --quiet
++	DEPENDS ${SYNFIG_SPLASH_SCREEN}
+ )
+ 
+ list(APPEND PIXMAPS ${SPLASH_SCREEN_DIR}/splash_screen.png)
+@@ -368,8 +368,8 @@ install(
+ if(WIN32)
+ 	add_custom_command(
+ 		OUTPUT ${THEME_DIR}/synfig_icon.ico
+-		COMMAND synfig_bin ${CMAKE_CURRENT_SOURCE_DIR}/synfig_icon.sif -o ${THEME_DIR}/synfig_icon.ico --time 0f --quiet
+-		DEPENDS ${SYNFIG_SPLASH_SCREEN} synfig_bin
++		COMMAND ${CMAKE_COMMAND} -E env SYNFIG_ROOT=${SYNFIG_HOST_BUILD_DIR}/output/Release LD_LIBRARY_PATH=${SYNFIG_HOST_BUILD_DIR}/output/Release/lib:${SYNFIG_HOST_BUILD_DIR}/host-prefix/lib ${SYNFIG_HOST_BUILD_DIR}/output/Release/bin/synfig ${CMAKE_CURRENT_SOURCE_DIR}/synfig_icon.sif -o ${THEME_DIR}/synfig_icon.ico --time 0f --quiet
++		DEPENDS ${SYNFIG_SPLASH_SCREEN}
+ 	)
+ 
+ 	list(APPEND PIXMAPS ${THEME_DIR}/synfig_icon.ico)
+@@ -381,5 +381,5 @@ endif()
+ 
+ add_custom_target(
+ 	build_images
+-	DEPENDS synfig_bin ${PIXMAPS}
++	DEPENDS ${PIXMAPS}
+ )
+-- 
+2.56.1
+

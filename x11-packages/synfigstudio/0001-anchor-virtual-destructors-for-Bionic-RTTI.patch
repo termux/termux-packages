@@ -1,0 +1,301 @@
+From 037e00af7a760bad5d04ead530ebed2207de9562 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 12:53:15 +0900
+Subject: [PATCH 1/3] anchor virtual destructors for Bionic RTTI
+
+---
+ synfig-core/src/synfig/exception.cpp                   | 10 ++++++++++
+ synfig-core/src/synfig/exception.h                     |  9 +++++++++
+ .../src/synfig/rendering/common/task/taskblend.cpp     |  2 ++
+ .../src/synfig/rendering/common/task/taskblend.h       |  1 +
+ .../rendering/common/task/taskpixelprocessor.cpp       |  4 ++++
+ .../synfig/rendering/common/task/taskpixelprocessor.h  |  3 +++
+ .../rendering/common/task/tasktransformation.cpp       |  4 ++++
+ .../synfig/rendering/common/task/tasktransformation.h  |  6 +++---
+ .../src/synfig/rendering/software/task/tasksw.cpp      |  2 ++
+ .../src/synfig/rendering/software/task/tasksw.h        |  1 +
+ synfig-core/src/synfig/rendering/task.cpp              |  4 ++++
+ synfig-core/src/synfig/rendering/task.h                |  8 ++++----
+ 12 files changed, 47 insertions(+), 7 deletions(-)
+
+diff --git a/synfig-core/src/synfig/exception.cpp b/synfig-core/src/synfig/exception.cpp
+index 0363036..b64f731 100644
+--- a/synfig-core/src/synfig/exception.cpp
++++ b/synfig-core/src/synfig/exception.cpp
+@@ -110,3 +110,13 @@ Exception::IDAlreadyExists::IDAlreadyExists(const String &what):
+ {
+ 	synfig::error("EXCEPTION: id already exists: "+what);
+ }
++
++Exception::Exception::~Exception() { }
++Exception::BadLinkName::~BadLinkName() { }
++Exception::BadType::~BadType() { }
++Exception::IDAlreadyExists::~IDAlreadyExists() { }
++Exception::NotFound::~NotFound() { }
++Exception::IDNotFound::~IDNotFound() { }
++Exception::FileNotFound::~FileNotFound() { }
++Exception::BadTime::~BadTime() { }
++Exception::BadFrameRate::~BadFrameRate() { }
+diff --git a/synfig-core/src/synfig/exception.h b/synfig-core/src/synfig/exception.h
+index 61b1363..e772374 100644
+--- a/synfig-core/src/synfig/exception.h
++++ b/synfig-core/src/synfig/exception.h
+@@ -47,54 +47,63 @@ class Exception : public std::runtime_error
+ {
+ public:
+ 	Exception(const String &what);
++	virtual ~Exception();
+ };
+ 
+ class BadLinkName : public Exception
+ {
+ public:
+ 	BadLinkName(const String &what);
++	virtual ~BadLinkName();
+ }; // END of class BadLinkName
+ 
+ class BadType : public Exception
+ {
+ public:
+ 	BadType(const String &what);
++	virtual ~BadType();
+ }; // END of class BadType
+ 
+ class IDAlreadyExists : public Exception
+ {
+ public:
+ 	IDAlreadyExists(const String &what);
++	virtual ~IDAlreadyExists();
+ };
+ 
+ class NotFound : public Exception
+ {
+ public:
+ 	NotFound(const String &what);
++	virtual ~NotFound();
+ };
+ 
+ class IDNotFound : public NotFound
+ {
+ public:
+ 	IDNotFound(const String &what);
++	virtual ~IDNotFound();
+ };
+ 
+ class FileNotFound : public NotFound
+ {
+ public:
+ 	FileNotFound(const String &what);
++	virtual ~FileNotFound();
+ };
+ 
+ class BadTime : public Exception
+ {
+ public:
+ 	BadTime(const String &what);
++	virtual ~BadTime();
+ };
+ 
+ class BadFrameRate : public Exception
+ {
+ public:
+ 	BadFrameRate(const String &what);
++	virtual ~BadFrameRate();
+ };
+ 
+ }; // END of namespace Exception
+diff --git a/synfig-core/src/synfig/rendering/common/task/taskblend.cpp b/synfig-core/src/synfig/rendering/common/task/taskblend.cpp
+index 98da4fa..ae78da8 100644
+--- a/synfig-core/src/synfig/rendering/common/task/taskblend.cpp
++++ b/synfig-core/src/synfig/rendering/common/task/taskblend.cpp
+@@ -51,6 +51,8 @@ using namespace rendering;
+ SYNFIG_EXPORT Task::Token TaskBlend::token(
+ 	DescAbstract<TaskBlend>("Blend") );
+ 
++TaskInterfaceBlendToTarget::~TaskInterfaceBlendToTarget() { }
++
+ int
+ TaskBlend::get_pass_subtask_index() const
+ {
+diff --git a/synfig-core/src/synfig/rendering/common/task/taskblend.h b/synfig-core/src/synfig/rendering/common/task/taskblend.h
+index 42813f1..aa2e302 100644
+--- a/synfig-core/src/synfig/rendering/common/task/taskblend.h
++++ b/synfig-core/src/synfig/rendering/common/task/taskblend.h
+@@ -58,6 +58,7 @@ public:
+ 		blend(),
+ 		blend_method(Color::BLEND_COMPOSITE),
+ 		amount() { }
++	virtual ~TaskInterfaceBlendToTarget();
+ 	virtual Color::BlendMethodFlags get_supported_blend_methods() const
+ 		{ return 0; }
+ 	bool is_blend_method_supported(Color::BlendMethod blend_method)
+diff --git a/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.cpp b/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.cpp
+index c7ff6bc..1d5bafe 100644
+--- a/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.cpp
++++ b/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.cpp
+@@ -57,6 +57,10 @@ Task::Token TaskPixelGamma::token(
+ SYNFIG_EXPORT Task::Token TaskPixelColorMatrix::token(
+ 	DescAbstract<TaskPixelColorMatrix, TaskPixelProcessor>("PixelColorMatrix") );
+ 
++TaskPixelProcessor::~TaskPixelProcessor() { }
++TaskPixelGamma::~TaskPixelGamma() { }
++TaskPixelColorMatrix::~TaskPixelColorMatrix() { }
++
+ 
+ Rect
+ TaskPixelProcessorBase::calc_bounds() const
+diff --git a/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.h b/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.h
+index 3b2704f..4f7fc3a 100644
+--- a/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.h
++++ b/synfig-core/src/synfig/rendering/common/task/taskpixelprocessor.h
+@@ -93,6 +93,7 @@ class TaskPixelProcessor: public TaskPixelProcessorBase,
+ {
+ public:
+ 	typedef etl::handle<TaskPixelProcessor> Handle;
++	virtual ~TaskPixelProcessor();
+ 	SYNFIG_EXPORT static Token token;
+ 	virtual Token::Handle get_token() const { return token.handle(); }
+ };
+@@ -101,6 +102,7 @@ class TaskPixelGamma: public TaskPixelProcessor
+ {
+ public:
+ 	typedef etl::handle<TaskPixelGamma> Handle;
++	virtual ~TaskPixelGamma();
+ 	SYNFIG_EXPORT static Token token;
+ 	virtual Token::Handle get_token() const { return token.handle(); }
+ 
+@@ -120,6 +122,7 @@ class TaskPixelColorMatrix: public TaskPixelProcessor
+ {
+ public:
+ 	typedef etl::handle<TaskPixelColorMatrix> Handle;
++	virtual ~TaskPixelColorMatrix();
+ 	SYNFIG_EXPORT static Token token;
+ 	virtual Token::Handle get_token() const { return token.handle(); }
+ 
+diff --git a/synfig-core/src/synfig/rendering/common/task/tasktransformation.cpp b/synfig-core/src/synfig/rendering/common/task/tasktransformation.cpp
+index 79a9aab..1ec7bee 100644
+--- a/synfig-core/src/synfig/rendering/common/task/tasktransformation.cpp
++++ b/synfig-core/src/synfig/rendering/common/task/tasktransformation.cpp
+@@ -53,6 +53,10 @@ Task::Token TaskTransformation::token(
+ SYNFIG_EXPORT Task::Token TaskTransformationAffine::token(
+ 	DescAbstract<TaskTransformationAffine, TaskTransformation>("TransformationAffine") );
+ 
++TaskInterfaceTransformationPass::~TaskInterfaceTransformationPass() { }
++TaskInterfaceTransformationGetAndPass::~TaskInterfaceTransformationGetAndPass() { }
++TaskInterfaceTransformation::~TaskInterfaceTransformation() { }
++
+ 
+ TaskTransformation::TaskTransformation():
+ 	interpolation(Color::INTERPOLATION_CUBIC),
+diff --git a/synfig-core/src/synfig/rendering/common/task/tasktransformation.h b/synfig-core/src/synfig/rendering/common/task/tasktransformation.h
+index 70d1bfb..a81e4fa 100644
+--- a/synfig-core/src/synfig/rendering/common/task/tasktransformation.h
++++ b/synfig-core/src/synfig/rendering/common/task/tasktransformation.h
+@@ -50,7 +50,7 @@ namespace rendering
+ class TaskInterfaceTransformationPass
+ {
+ public:
+-	virtual ~TaskInterfaceTransformationPass() { }
++	virtual ~TaskInterfaceTransformationPass();
+ };
+ 
+ 
+@@ -61,7 +61,7 @@ public:
+ class TaskInterfaceTransformationGetAndPass
+ {
+ public:
+-	virtual ~TaskInterfaceTransformationGetAndPass() { }
++	virtual ~TaskInterfaceTransformationGetAndPass();
+ 
+ 	virtual Transformation::Handle get_transformation() const
+ 		{ return Transformation::Handle(); }
+@@ -71,7 +71,7 @@ public:
+ class TaskInterfaceTransformation
+ {
+ public:
+-	virtual ~TaskInterfaceTransformation() { }
++	virtual ~TaskInterfaceTransformation();
+ 	virtual Transformation::Handle get_transformation() const
+ 		{ return Transformation::Handle(); }
+ };
+diff --git a/synfig-core/src/synfig/rendering/software/task/tasksw.cpp b/synfig-core/src/synfig/rendering/software/task/tasksw.cpp
+index 7bafa75..feb6f09 100644
+--- a/synfig-core/src/synfig/rendering/software/task/tasksw.cpp
++++ b/synfig-core/src/synfig/rendering/software/task/tasksw.cpp
+@@ -52,4 +52,6 @@ using namespace rendering;
+ 
+ SYNFIG_EXPORT ModeToken TaskSW::mode_token("software");
+ 
++TaskSW::~TaskSW() { }
++
+ /* === E N T R Y P O I N T ================================================= */
+diff --git a/synfig-core/src/synfig/rendering/software/task/tasksw.h b/synfig-core/src/synfig/rendering/software/task/tasksw.h
+index 8ecff41..3f1d675 100644
+--- a/synfig-core/src/synfig/rendering/software/task/tasksw.h
++++ b/synfig-core/src/synfig/rendering/software/task/tasksw.h
+@@ -52,6 +52,7 @@ public:
+ 	typedef Task::LockWriteGeneric<TargetSurface> LockWrite;
+ 
+ 	SYNFIG_EXPORT static ModeToken mode_token;
++	virtual ~TaskSW();
+ 	virtual Surface::Token::Handle get_mode_target_token() const
+ 		{ return TargetSurface::token.handle(); }
+ 	virtual bool get_mode_allow_source_as_target() const
+diff --git a/synfig-core/src/synfig/rendering/task.cpp b/synfig-core/src/synfig/rendering/task.cpp
+index 63f553f..3e09521 100644
+--- a/synfig-core/src/synfig/rendering/task.cpp
++++ b/synfig-core/src/synfig/rendering/task.cpp
+@@ -52,6 +52,10 @@ using namespace rendering;
+ 
+ 
+ synfig::Token Mode::mode_token;
++Mode::~Mode() { }
++TaskInterfaceConstant::~TaskInterfaceConstant() { }
++TaskInterfaceSplit::~TaskInterfaceSplit() { }
++TaskInterfaceTargetAsSource::~TaskInterfaceTargetAsSource() { }
+ SYNFIG_EXPORT synfig::Token Task::token;
+ 
+ SYNFIG_EXPORT const Task::Handle Task::blank;
+diff --git a/synfig-core/src/synfig/rendering/task.h b/synfig-core/src/synfig/rendering/task.h
+index d2db769..db45ff4 100644
+--- a/synfig-core/src/synfig/rendering/task.h
++++ b/synfig-core/src/synfig/rendering/task.h
+@@ -100,7 +100,7 @@ public:
+ class Mode {
+ public:
+ 	static synfig::Token mode_token;
+-	virtual ~Mode() { }
++	virtual ~Mode();
+ 	virtual Surface::Token::Handle get_mode_target_token() const
+ 		{ return Surface::Token::Handle(); }
+ 	virtual bool get_mode_allow_multithreading() const
+@@ -483,7 +483,7 @@ class TaskInterfaceConstant
+ public:
+ 	virtual bool is_constant() const
+ 		{ return true; }
+-	virtual ~TaskInterfaceConstant() { }
++	virtual ~TaskInterfaceConstant();
+ };
+ 
+ 
+@@ -492,7 +492,7 @@ class TaskInterfaceSplit
+ public:
+ 	virtual bool is_splittable() const
+ 		{ return true; }
+-	virtual ~TaskInterfaceSplit() { }
++	virtual ~TaskInterfaceSplit();
+ };
+ 
+ 
+@@ -506,7 +506,7 @@ public:
+ 	//! sometimes when source replaced task may reduce self draw bounds (TaskBlendSW for example)
+ 	virtual void on_target_set_as_source()
+ 		{ }
+-	virtual ~TaskInterfaceTargetAsSource() { }
++	virtual ~TaskInterfaceTargetAsSource();
+ 
+ 	Task::Handle& target_subtask() {
+ 		Task *task = dynamic_cast<Task*>(this);
+-- 
+2.56.1
+
