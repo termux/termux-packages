@@ -1,0 +1,48 @@
+Pass Boost prefix and cache variables to bundled liborcus configure when using system Boost, and specify cross_compiling=yes.
+
+When LibreOffice is built with system Boost (--with-system-boost) and bundled
+liborcus (--without-system-orcus), ExternalProject_liborcus.mk does not pass
+--with-boost to liborcus's configure script. In Termux's cross-compilation
+environment, Boost headers and libraries are located in @TERMUX_PREFIX@ rather
+than standard host /usr paths, causing liborcus configure to fail with:
+"configure: error: cannot find Boost headers version >= 1.36.0".
+
+Furthermore, when building for x86_64 target on an x86_64 Linux host,
+liborcus's configure script tests whether the compiled binary runs on the host.
+Because Android Bionic binaries cannot execute on a Linux glibc host, this fails with:
+"configure: error: cannot run C++ compiled programs."
+Pass cross_compiling=yes to force cross-compilation mode without execution tests.
+
+--- a/external/liborcus/ExternalProject_liborcus.mk
++++ b/external/liborcus/ExternalProject_liborcus.mk
+@@ -65,9 +65,8 @@ liborcus_CXXFLAGS+=$(call gb_ExternalProject_get_build_flags,liborcus)
+ ifeq ($(COM),MSC)
+ liborcus_CXXFLAGS+=$(BOOST_CXXFLAGS)
+ endif
+-ifeq ($(SYSTEM_BOOST),)
+ liborcus_CXXFLAGS+=${BOOST_CPPFLAGS}
+-else
++ifneq ($(SYSTEM_BOOST),)
+ liborcus_LDFLAGS+=$(BOOST_LDFLAGS)
+ endif
+ ifneq (,$(PTHREAD_LIBS))
+@@ -103,12 +105,15 @@ $(call gb_ExternalProject_get_state_target,liborcus,build) :
+                        --disable-werror \
+                        $(if $(WITH_PARQUET_FILTER),--with-parquet-filter) \
+                        $(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
+-                       $(if $(SYSTEM_BOOST),,\
++                       $(if $(SYSTEM_BOOST),\
++				--with-boost=@TERMUX_PREFIX@ \
++			,\
+ 				--with-boost=$(WORKDIR)/UnpackedTarball/boost \
+-				boost_cv_lib_iostreams=yes \
+-				boost_cv_lib_system=yes \
+-				boost_cv_lib_filesystem=yes \
+ 			) \
++			boost_cv_lib_iostreams=yes \
++			boost_cv_lib_system=yes \
++			boost_cv_lib_filesystem=yes \
++			cross_compiling=yes \
+ 			$(gb_CONFIGURE_PLATFORMS) \
+ 		&& $(if $(verbose),V=1) \
+ 		   $(MAKE) \

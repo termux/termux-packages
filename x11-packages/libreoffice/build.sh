@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Free and open source cross-platform office suite"
 TERMUX_PKG_LICENSE="MPL-2.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="26.8.3.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://download.documentfoundation.org/libreoffice/src/${TERMUX_PKG_VERSION%.*}/libreoffice-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=83006a81376988d04a73eaa4dcf44f6f12774a81fd763726406a831905a9de28
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="abseil-cpp, argon2, bison, boost, box2d, clucene, cups, curl, dbus, desktop-file-utils, doxygen, fontconfig, freetype, glib, glm, gpgme, gst-plugins-base, gstreamer, harfbuzz-icu, hicolor-icon-theme, hunspell, libabw, libatomic-ops, libcairo, libcdr, libcmis, libcurl, libe-book, libeot, libepoxy, libepubgen, libetonyek, libexpat, libexttextcat, libfreehand, libglvnd, libgraphite, libhyphen, libicu, libjpeg-turbo, liblangtag, libmspub, libmwaw, libneon, libnspr, libnss, libnumbertext, libodfgen, liborcus, libpagemaker, libpng, libqxp, libraptor2, librevenge, libstaroffice, libtiff, libtommath, libvisio, libwebp, libwpd, libwpg, libwps, libx11, libxext, libxinerama, libxml2, libxrandr, libxslt, libzmf, libzxing-cpp, littlecms, lpsolve, mdds, openjpeg, openldap, openssl, pango, poppler, python, redland, shared-mime-info, which, xdg-utils, xmlsec, zlib"
+TERMUX_PKG_DEPENDS="abseil-cpp, argon2, bison, boost, box2d, clucene, cups, curl, dbus, desktop-file-utils, doxygen, fontconfig, freetype, glib, glm, gpgme, gst-plugins-base, gstreamer, harfbuzz-icu, hicolor-icon-theme, hunspell, libabw, libatomic-ops, libcairo, libcdr, libcmis, libcurl, libe-book, libeot, libepoxy, libepubgen, libetonyek, libexpat, libexttextcat, libfreehand, libglvnd, libgraphite, libhyphen, libicu, libjpeg-turbo, liblangtag, libmspub, libmwaw, libneon, libnspr, libnss, libnumbertext, libodfgen, libpagemaker, libpng, libqxp, libraptor2, librevenge, libstaroffice, libtiff, libtommath, libvisio, libwebp, libwpd, libwpg, libwps, libx11, libxext, libxinerama, libxml2, libxrandr, libxslt, libzmf, libzxing-cpp, littlecms, lpsolve, openjpeg, openldap, openssl, pango, poppler, python, redland, shared-mime-info, which, xdg-utils, xmlsec, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ant, boost-headers, cppunit, gtk3, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kio, kf6-kwindowsystem, qt6-qtbase, qt6-qtbase-cross-tools, qt6-qtmultimedia, postgresql, openjdk-21, openjdk-21-x, unixodbc, mariadb, libc++"
 TERMUX_PKG_RECOMMENDS="gtk3, kf6-kconfig, kf6-kcoreaddons, kf6-ki18n, kf6-kio, kf6-kwindowsystem, openjdk-21, openjdk-21-x, qt6-qtbase, qt6-qtmultimedia"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -15,6 +15,7 @@ TERMUX_PKG_MAKE_INSTALL_TARGET="distro-pack-install"
 # TODO: remove --disable-skia, some vulkan related compilation error I couldn't solve.
 # TODO: see if we want to add junit pacakge for java unit test and remove --without-junit
 # TODO: remove --disable-python and install python site-packages files if we get any issue related to it in future
+# TODO: switch back to --with-system-mdds and --with-system-orcus (and re-add mdds, liborcus to TERMUX_PKG_DEPENDS) once upstream migrates to mdds 4.x and liborcus 0.22.x
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_ARCH-linux
 --with-extra-buildid=$TERMUX_PKG_VERSION
@@ -42,13 +43,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-fonts
 --with-system-libxml
 --with-system-libcdr
---with-system-mdds
+--without-system-mdds
 --without-myspell-dicts
 --with-system-libvisio
 --with-system-libcmis
 --with-system-libmspub
 --with-system-libexttextcat
---with-system-orcus
+--without-system-orcus
 --with-system-liblangtag
 --with-system-libodfgen
 --with-system-libmwaw
