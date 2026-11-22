@@ -70,11 +70,21 @@ for package_dir in "$@"; do
 			dl_tmpdir="$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")"
 
 			if [[ -d "${dl_tmpdir}" ]]; then
-				if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url" >&2; then
-					rm -rf "${dl_tmpdir}"
+				downloaded=false
+				if curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$url" >&2; then
+					downloaded=true
+				elif (( ${#TERMUX_PKG_SRCURL[@]} == 1 )) && [[ -n "${TERMUX_PKG_SRCURL_FALLBACKS[*]-}" ]]; then
+					for fallback_url in "${TERMUX_PKG_SRCURL_FALLBACKS[@]}"; do
+						[[ -z "$fallback_url" ]] && continue
+						echo "Primary failed, trying fallback: ${fallback_url}" >&2
+						if curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" "$fallback_url" >&2; then
+							downloaded=true
+							break
+						fi
+					done
 				fi
 
-				if [[ -f "${dl_tmpdir}/source-bundle" ]]; then
+				if [[ "$downloaded" == true && -f "${dl_tmpdir}/source-bundle" ]]; then
 					sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
 				fi
 
