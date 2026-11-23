@@ -1,10 +1,10 @@
 # shellcheck shell=bash disable=SC2155
 termux_setup_zig() {
-	# TODO need to figure out if zig supports android targets
+	# default zig targets
 	export ZIG_TARGET_NAME="${TERMUX_ARCH}-linux-musl"
 	case "${TERMUX_ARCH}" in
-	arm) ZIG_TARGET_NAME="arm-linux-musleabihf" ;;
-	i686) ZIG_TARGET_NAME="x86-linux-musl" ;;
+		arm) ZIG_TARGET_NAME="arm-linux-musleabihf" ;;
+		i686) ZIG_TARGET_NAME="x86-linux-musl" ;;
 	esac
 
 	if [[ -z "${TERMUX_ZIG_VERSION-}" ]]; then
@@ -91,4 +91,26 @@ termux_setup_zig() {
 	if [[ -z "$(command -v zig)" ]]; then
 		termux_error_exit "termux_setup_zig: No zig executable found!"
 	fi
+}
+
+termux_setup_zig_android() {
+	# https://github.com/ziglang/zig/issues/23906
+	# zig does not have official android support
+	export ZIG_TARGET_NAME="${TERMUX_ARCH}-linux-android"
+	case "${TERMUX_ARCH}" in
+		arm) ZIG_TARGET_NAME="arm-linux-androideabi" ;;
+		i686) ZIG_TARGET_NAME="x86-linux-android" ;;
+	esac
+
+	local sysroot="${NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+	export ZIG_LIBC="${TERMUX_PKG_TMPDIR}/zig-libc.txt"
+	cat > "${ZIG_LIBC}" <<-EOF
+		include_dir=${sysroot}/usr/include
+		sys_include_dir=${sysroot}/usr/include/${TERMUX_HOST_PLATFORM}
+		crt_dir=${sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
+		msvc_lib_dir=
+		kernel32_lib_dir=
+		cc_dir=${sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
+		darwin_sdk_dir=
+	EOF
 }
