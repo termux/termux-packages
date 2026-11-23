@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, feature-rich, GPU-accelerated terminal emulator (G
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_REVISION=1
 # Release tarball ships prebuilt GTK resources
 TERMUX_PKG_SRCURL="https://release.files.ghostty.org/${TERMUX_PKG_VERSION}/ghostty-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=cb188ac6c3a8278d5fd7bfef15d8c017104c87f638b5560eb38024a71ae0f005
@@ -18,6 +19,7 @@ share/systemd
 
 termux_step_pre_configure() {
 	termux_setup_zig
+	termux_setup_zig_android
 
 	# NDK flags must not leak into zig
 	unset CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
@@ -46,19 +48,6 @@ termux_step_make() {
 	# GTK4 and libadwaita are built against Bionic, so target the Android ABI instead of musl.
 	# Ghostty's pkg/android-ndk looks up the NDK path through ANDROID_NDK_HOME.
 	export ANDROID_NDK_HOME="${NDK}"
-	local _sysroot="${NDK}/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
-	local _libc_file="${TERMUX_PKG_TMPDIR}/zig-libc.txt"
-	cat > "${_libc_file}" <<-EOF
-		include_dir=${_sysroot}/usr/include
-		sys_include_dir=${_sysroot}/usr/include/${TERMUX_HOST_PLATFORM}
-		crt_dir=${_sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
-		msvc_lib_dir=
-		kernel32_lib_dir=
-		cc_dir=${_sysroot}/usr/lib/${TERMUX_HOST_PLATFORM}/${TERMUX_PKG_API_LEVEL}
-		darwin_sdk_dir=
-	EOF
-
-	export ZIG_LIBC="${_libc_file}"
 	export ZIG_ANDROID_API="${TERMUX_PKG_API_LEVEL}"
 
 	# Ghostty links -lbzip2, Termux ships libbz2. Alias kept outside $TERMUX_PREFIX
@@ -69,10 +58,10 @@ termux_step_make() {
 	# Wayland off: Termux only has gtk-layer-shell for GTK3
 	zig build \
 		--prefix "${TERMUX_PKG_TMPDIR}/ghostty-prefix" \
-		--libc "${_libc_file}" \
+		--libc "${ZIG_LIBC}" \
 		--search-prefix "${TERMUX_PREFIX}" \
 		--search-prefix "${_bz2_compat}" \
-		-Dtarget="${TERMUX_ARCH}-linux-android.${TERMUX_PKG_API_LEVEL}" \
+		-Dtarget="${ZIG_TARGET_NAME}.${TERMUX_PKG_API_LEVEL}" \
 		-Dcpu=baseline \
 		-Doptimize=ReleaseFast \
 		-Dapp-runtime=gtk \
@@ -88,6 +77,8 @@ termux_step_make() {
 		-fsys=libpng \
 		-fsys=zlib \
 		-fsys=oniguruma
+
+	unset ZIG_LIBC
 }
 
 termux_step_make_install() {
