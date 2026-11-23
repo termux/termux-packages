@@ -50,7 +50,7 @@ diff --git a/src/server.c b/src/server.c
 index 41607356d..501cb3833 100644
 --- a/src/server.c
 +++ b/src/server.c
-@@ -2756,12 +2756,27 @@ void resetServerStats(void) {
+@@ -3059,12 +3059,27 @@ void resetServerStats(void) {
      lazyfreeResetStats();
  }
  
@@ -61,7 +61,7 @@ index 41607356d..501cb3833 100644
 +#endif
 +
  /* Make the thread killable at any time, so that kill threads functions
-  * can work reliably (default cancelability type is PTHREAD_CANCEL_DEFERRED).
+  * can work reliably (default cancellability type is PTHREAD_CANCEL_DEFERRED).
   * Needed for pthread_cancel used by the fast memory test used by the crash report. */
  void makeThreadKillable(void) {
 +#ifndef __ANDROID__
@@ -77,4 +77,4 @@ index 41607356d..501cb3833 100644
 +#endif
  }
  
- void initServer(void) {
+ /* printf-alike handed to monotonicInit(), so clock detection fallbacks end up
