@@ -24,7 +24,9 @@ __dbeaver_resolve_source_pins() {
 	local datadam_repo="https://github.com/dbeaver/datadam-api"
 	local swt_repo="https://github.com/eclipse-platform/eclipse.platform.swt"
 	local raw="https://raw.githubusercontent.com/dbeaver"
-	local branch="release_${version//./_}"
+	local branch _major _minor _patch
+	IFS=. read -r _major _minor _patch _ <<< "${version}"
+	branch="release_${_major}_${_minor}_${_patch}"
 
 	# Pinned by hash, branch tarballs are not stable.
 	_NEW_COMMON_COMMIT="$(git ls-remote --heads "${common_repo}.git" "refs/heads/${branch}" | cut -f1)"
