@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -141,7 +141,7 @@ if (COUCHBASE_SERVER_BUILD)
+ else()
+   # If building outside CB server build, set required flags for the selected compiler.
+     if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${STD_VERSION} -Qunused-arguments -g -fomit-frame-pointer -pthread")
++        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${STD_VERSION} -Qunused-arguments -g -fomit-frame-pointer -pthread")
+     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${STD_VERSION} -g -fomit-frame-pointer -pthread")
+     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
