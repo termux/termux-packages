@@ -12,3 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make() {
 	./gradlew build
 }
+
+termux_step_make_install() {
+	./gradlew installDebug
+}
