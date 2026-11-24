@@ -1,19 +1,17 @@
-diff --git a/scripts/build/build.mts b/scripts/build/build.mts
-index 79002c7..5c27933 100644
 --- a/scripts/build/build.mts
 +++ b/scripts/build/build.mts
-@@ -39,38 +39,11 @@ async function createContext(options: BuildOptions) {
+@@ -63,18 +63,7 @@ async function createContext(options: BuildOptions) {
  }
  
  async function copyVenmic() {
 -    if (process.platform !== "linux") return;
 -
 -    return Promise.all([
--        copyFile(
+-        copyNativeModule(
 -            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-x64/node-napi-v7.node",
 -            "./static/dist/venmic-x64.node"
 -        ),
--        copyFile(
+-        copyNativeModule(
 -            "./node_modules/@vencord/venmic/prebuilds/venmic-addon-linux-arm64/node-napi-v7.node",
 -            "./static/dist/venmic-arm64.node"
 -        )
@@ -21,11 +19,15 @@ index 79002c7..5c27933 100644
 +    return;
  }
  
+ async function copyUiohook() {
+@@ -104,26 +93,7 @@ async function copyGameDetection() {
+ }
+ 
  async function copyLibVesktop() {
 -    if (process.platform !== "linux") return;
 -
 -    try {
--        await copyFile(
+-        await copyNativeModule(
 -            "./packages/libvesktop/build/Release/vesktop.node",
 -            `./static/dist/libvesktop-${process.arch}.node`
 -        );
@@ -35,8 +37,11 @@ index 79002c7..5c27933 100644
 -            "Using prebuilt libvesktop binaries. Run `pnpm buildLibVesktop` and build again to build from source - see README.md for more details"
 -        );
 -        return Promise.all([
--            copyFile("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
--            copyFile("./packages/libvesktop/prebuilds/vesktop-arm64.node", "./static/dist/libvesktop-arm64.node")
+-            copyNativeModule("./packages/libvesktop/prebuilds/vesktop-x64.node", "./static/dist/libvesktop-x64.node"),
+-            copyNativeModule(
+-                "./packages/libvesktop/prebuilds/vesktop-arm64.node",
+-                "./static/dist/libvesktop-arm64.node"
+-            )
 -        ]).catch(() => console.warn("Failed to copy libvesktop. Building without libvesktop support"));
 -    }
 +    return;
