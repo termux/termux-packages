@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://calibre-ebook.com
 TERMUX_PKG_DESCRIPTION="The one stop solution to all your e-book needs"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="9.15.0"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION="9.19.0"
 TERMUX_PKG_SRCURL="https://download.calibre-ebook.com/${TERMUX_PKG_VERSION}/calibre-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=9f02d36decaf46b176a1bef74349232508bcc2b4b06d1662bbd1fd426c57d559
+TERMUX_PKG_SHA256=15e4e4e30e16fed0c2aae8a59dd536cb90648b37789f50011bab1d1897796fff
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="ffmpeg, fontconfig, freetype, hunspell, libhyphen, libicu, libmtp, libstemmer, libuchardet, libusb, libxml2, libxslt, openssl, podofo, pyqt6, python, python-apsw, python-brotli, python-lxml, python-msgpack, python-pillow, python-pip, python-psutil, python-pycryptodomex, python-pyppmd, python-pyqt6-webengine, zlib"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtbase-cross-tools, qt6-qtdeclarative-cross-tools, qt6-qttools-cross-tools"
@@ -18,7 +17,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 	CXXFLAGS+=" $CPPFLAGS"
-	LDFLAGS+=" -L$TERMUX_PREFIX/lib"
+	LDFLAGS+=" -L$TERMUX_PREFIX/lib -lm"
 	if [[ "$TERMUX_ON_DEVICE_BUILD" == "true" ]]; then
 		export QMAKE="$TERMUX_PREFIX/bin/qmake6"
 	else
