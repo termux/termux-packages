@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A custom launcher for Minecraft that allows you to easil
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@CosmyBeyondStars"
 TERMUX_PKG_VERSION="11.1.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}"
 # Has submodules. Must be cloned from Git.
 TERMUX_PKG_SRCURL="git+https://github.com/PrismLauncher/PrismLauncher"

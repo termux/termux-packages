@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java Native Access"
 TERMUX_PKG_LICENSE="Apache-2.0, LGPL-2.1-or-later"
 TERMUX_PKG_MAINTAINER="@CosmyBeyondStars"
 TERMUX_PKG_VERSION="5.19.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/java-native-access/jna/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=33a9e27b5a6eaa024bb117325392d1ccba7ca63f95d201230ad7c33d60f54c23
 TERMUX_PKG_DEPENDS="openjdk-21, openjdk-21-x"
@@ -48,4 +49,11 @@ termux_step_make_install() {
 		-t "${TERMUX__PREFIX__LIB_DIR}"/jna
 	install -Dm644 $TERMUX_PKG_SRCDIR/build/headers/*.h \
 		-t $TERMUX_PREFIX/include/jna
+}
+
+termux_step_create_debscripts() {
+	sed \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"${TERMUX_PKG_BUILDER_DIR}/postinst.sh" > postinst
+	chmod u+x postinst
 }

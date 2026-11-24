@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.0, BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="BSD-3Clause, COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="1.25.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL="https://github.com/kcat/openal-soft/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=fb27e5839aa11f0e5b9d33756965291fad5d6909ab928ea1f796f4a1a6877894
 TERMUX_PKG_AUTO_UPDATE=true
@@ -26,4 +26,11 @@ termux_step_pre_configure() {
 	fi
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DOPENSL_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libOpenSLES.so"
+}
+
+termux_step_create_debscripts() {
+	sed \
+		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		"${TERMUX_PKG_BUILDER_DIR}/postinst.sh" > postinst
+	chmod u+x postinst
 }
