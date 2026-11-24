@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://pyyaml.org/wiki/LibYAML
 TERMUX_PKG_DESCRIPTION="LibYAML is a YAML 1.1 parser and emitter written in C"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.2.6"
+TERMUX_PKG_VERSION="0.2.7"
 TERMUX_PKG_SRCURL=https://github.com/yaml/libyaml/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=d872e14e3439245919bc0ec2793182e89b4dc6dcc156ef7db47fe3510dee8bc7
+TERMUX_PKG_SHA256=7f76964485c67dc4e1537fdfd4ad5c8772bcef501c5451b617e43f831034994e
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libyaml-dev"
 TERMUX_PKG_REPLACES="libyaml-dev"
@@ -13,7 +13,7 @@ termux_step_post_get_source() {
 	# Do not forget to bump revision of reverse dependencies and rebuild them
 	# after RELEASE / SOVERSION is changed.
 	local _RELEASE=0
-	local _SOVERSION=1
+	local _SOVERSION=2
 
 	local a
 	for a in YAML_RELEASE YAML_CURRENT YAML_AGE; do
@@ -23,7 +23,7 @@ termux_step_post_get_source() {
 	local v=$(( _YAML_CURRENT - _YAML_AGE ))
 	if [ "${_RELEASE}" != "${_YAML_RELEASE}" ] || \
 		[ ! "${_YAML_CURRENT}" ] || [ "${_SOVERSION}" != "${v}" ]; then
-		termux_error_exit "SOVERSION guard check failed."
+		termux_error_exit "SOVERSION guard check failed. Expected ${_SOVERSION}, got ${v}."
 	fi
 }
 
