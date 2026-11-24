@@ -2,17 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://vencord.dev
 TERMUX_PKG_DESCRIPTION="Vesktop is a custom Discord desktop app"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(
-	"1.6.8"
-	"7.2.3"
-)
+TERMUX_PKG_VERSION="1.7.0"
+_VENMIC_VERSION=7.2.5
 TERMUX_PKG_SRCURL=(
-	"https://github.com/Vencord/Vesktop/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
-	"https://github.com/Vencord/venmic/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz"
+	"https://github.com/Vencord/Vesktop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+	"https://github.com/Vencord/venmic/archive/refs/tags/v${_VENMIC_VERSION}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	"91dd4630fb5fff153586056451a9587f4c5fbeb048c6d570a35056460415f22f"
-	"5bed271f1777e5e794273899a590e7f511e6131a8122e3c83f85bc3bf22cfc50"
+	"f3feadb58133a6e4555eee878f7e1ce3128abc93ba5203ace18ceafd1856e4a4"
+	"25a458a183dbcfb34aed648dee904ca5082ca3f47c8d7f9ac7e5cdc8a9d836a4"
 )
 TERMUX_PKG_DEPENDS="electron43, glib, libx11, pipewire, pulseaudio, xdg-utils"
 TERMUX_PKG_BUILD_DEPENDS="electron43-headers, pkg-config"
@@ -23,7 +21,7 @@ TERMUX_PKG_EXCLUDED_ARCHES="i686"
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_post_get_source() {
-	mv "${TERMUX_PKG_SRCDIR}/venmic-${TERMUX_PKG_VERSION[1]}" "${TERMUX_PKG_SRCDIR}/venmic"
+	mv "${TERMUX_PKG_SRCDIR}/venmic-${_VENMIC_VERSION}" "${TERMUX_PKG_SRCDIR}/venmic"
 }
 
 termux_step_make() {
@@ -33,7 +31,7 @@ termux_step_make() {
 
 	local tool_dir="$TERMUX_PKG_TMPDIR/tools"
 	mkdir -p "$tool_dir"
-	npm install --prefix "$tool_dir" pnpm@11.9.0 @electron/asar node-gyp
+	npm install --prefix "$tool_dir" pnpm@12.21.0 @electron/asar node-gyp
 	export PATH="$tool_dir/node_modules/.bin:$PATH"
 
 	pnpm install --frozen-lockfile --ignore-scripts
