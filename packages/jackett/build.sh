@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE="https://github.com/jackett/jackett"
 TERMUX_PKG_DESCRIPTION="API Support for your favorite torrent trackers"
 TERMUX_PKG_LICENSE="GPL-2.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.24.3078"
+TERMUX_PKG_VERSION="0.25.34"
 TERMUX_PKG_SRCURL="https://github.com/Jackett/Jackett/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=3f4d981f35ae26caa20f3c824a8c88b996069fd9137bd484add5fa94a8eea112
-TERMUX_PKG_DEPENDS="aspnetcore-runtime-9.0, dotnet-host, dotnet-runtime-9.0"
-TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-9.0, dotnet-targeting-pack-9.0"
+TERMUX_PKG_SHA256=eb3114f39814162537803eb383a103309f7756d5232766c1f6eaff363c1bd19a
+TERMUX_PKG_DEPENDS="aspnetcore-runtime-10.0, dotnet-host, dotnet-runtime-10.0"
+TERMUX_PKG_BUILD_DEPENDS="aspnetcore-targeting-pack-10.0, dotnet-targeting-pack-10.0"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXCLUDED_ARCHES="arm"
 TERMUX_PKG_SERVICE_SCRIPT=("jackett" "exec ${TERMUX_PREFIX}/bin/jackett --DataFolder ${TERMUX_ANDROID_HOME}/.config/jackett 2>&1")
@@ -68,7 +68,7 @@ termux_pkg_auto_update() {
 }
 
 termux_step_pre_configure() {
-	TERMUX_DOTNET_VERSION=9.0
+	TERMUX_DOTNET_VERSION=10.0
 	termux_setup_dotnet
 }
 
