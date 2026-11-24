@@ -1,0 +1,54 @@
+From 261d0451f0a15df934f48f21eab401bd6f670053 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 22:33:18 +0900
+Subject: [PATCH 6/9] remove absl ParseCommandLine from host tool
+
+---
+ mediapipe/framework/tool/message_type_util.cc | 30 +++++++++++++------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/mediapipe/framework/tool/message_type_util.cc b/mediapipe/framework/tool/message_type_util.cc
+index 9fa3b43..b78703a 100644
+--- a/mediapipe/framework/tool/message_type_util.cc
++++ b/mediapipe/framework/tool/message_type_util.cc
+@@ -155,16 +155,28 @@ class DescriptorReader {
+ 
+ int main(int argc, char** argv) {
+   google::InitGoogleLogging(argv[0]);
+-  absl::ParseCommandLine(argc, argv);
+-  auto files = mediapipe::DescriptorReader::ReadFileDescriptorSet(
+-      absl::GetFlag(FLAGS_input_path));
+-  if (!absl::GetFlag(FLAGS_root_type_name_output_path).empty()) {
+-    mediapipe::DescriptorReader::WriteMessageTypeName(
+-        absl::GetFlag(FLAGS_root_type_name_output_path), files);
++  std::string input_path, name_out, macro_out;
++  auto parse_arg = [&](int& i, const std::string& flag, std::string& out) -> bool {
++    const std::string eq = flag + "=";
++    std::string arg = argv[i];
++    if (arg.rfind(eq, 0) == 0) { out = arg.substr(eq.size()); return true; }
++    if (arg == flag && i + 1 < argc) { out = argv[++i]; return true; }
++    return false;
++  };
++  for (int i = 1; i < argc; ++i) {
++    parse_arg(i, "--input_path", input_path) ||
++    parse_arg(i, "--root_type_name_output_path", name_out) ||
++    parse_arg(i, "--root_type_macro_output_path", macro_out);
+   }
+-  if (!absl::GetFlag(FLAGS_root_type_macro_output_path).empty()) {
+-    mediapipe::DescriptorReader::WriteMessageTypeMacro(
+-        absl::GetFlag(FLAGS_root_type_macro_output_path), files);
++  absl::SetFlag(&FLAGS_input_path, input_path);
++  absl::SetFlag(&FLAGS_root_type_name_output_path, name_out);
++  absl::SetFlag(&FLAGS_root_type_macro_output_path, macro_out);
++  auto files = mediapipe::DescriptorReader::ReadFileDescriptorSet(input_path);
++  if (!name_out.empty()) {
++    mediapipe::DescriptorReader::WriteMessageTypeName(name_out, files);
++  }
++  if (!macro_out.empty()) {
++    mediapipe::DescriptorReader::WriteMessageTypeMacro(macro_out, files);
+   }
+   return EXIT_SUCCESS;
+ }
+-- 
+2.56.1
+

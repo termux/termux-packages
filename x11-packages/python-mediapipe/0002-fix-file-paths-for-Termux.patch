@@ -1,0 +1,46 @@
+From f4f0f96e71b4153e12ad7366c289b6fd1177c4a8 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 22:21:48 +0900
+Subject: [PATCH 2/9] fix file paths for Termux
+
+---
+ WORKSPACE                                              | 4 ++--
+ mediapipe/framework/profiler/profiler_resource_util.cc | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/WORKSPACE b/WORKSPACE
+index ce5c5c9..9cd2e18 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -534,13 +534,13 @@ http_archive(
+ new_local_repository(
+     name = "linux_opencv",
+     build_file = "@//third_party:opencv_linux.BUILD",
+-    path = "/usr",
++    path = "@TERMUX_PREFIX@",
+ )
+ 
+ new_local_repository(
+     name = "linux_ffmpeg",
+     build_file = "@//third_party:ffmpeg_linux.BUILD",
+-    path = "/usr",
++    path = "@TERMUX_PREFIX@",
+ )
+ 
+ new_local_repository(
+diff --git a/mediapipe/framework/profiler/profiler_resource_util.cc b/mediapipe/framework/profiler/profiler_resource_util.cc
+index 5a2223c..045e660 100644
+--- a/mediapipe/framework/profiler/profiler_resource_util.cc
++++ b/mediapipe/framework/profiler/profiler_resource_util.cc
+@@ -19,7 +19,7 @@
+ namespace mediapipe {
+ 
+ absl::StatusOr<std::string> GetDefaultTraceLogDirectory() {
+-  return std::string("/tmp");
++  return std::string("@TERMUX_PREFIX@/tmp");
+ }
+ 
+ }  // namespace mediapipe
+-- 
+2.56.1
+

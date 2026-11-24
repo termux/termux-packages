@@ -1,0 +1,48 @@
+From 970e42b100f34cb621b23d585e2cbc8a2f5228d2 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 21:57:58 +0900
+Subject: [PATCH 8/9] include Android ARM properties in cpuinfo
+
+---
+ WORKSPACE                                       |  6 ++++++
+ third_party/cpuinfo_android_arm_properties.diff | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
+ create mode 100644 third_party/cpuinfo_android_arm_properties.diff
+
+diff --git a/WORKSPACE b/WORKSPACE
+index 665bdb1..805b5b1 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -234,6 +234,12 @@ http_archive(
+ 
+ http_archive(
+     name = "cpuinfo",
++    patch_args = [
++        "-p1",
++    ],
++    patches = [
++        "@//third_party:cpuinfo_android_arm_properties.diff",
++    ],
+     sha256 = "9213f6f81784eb8679f0621ad1c20eac711e063cb9c7712738720609cbdf1c33",
+     strip_prefix = "cpuinfo-ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d",
+     urls = [
+diff --git a/third_party/cpuinfo_android_arm_properties.diff b/third_party/cpuinfo_android_arm_properties.diff
+new file mode 100644
+index 0000000..46a410b
+--- /dev/null
++++ b/third_party/cpuinfo_android_arm_properties.diff
+@@ -0,0 +1,11 @@
++--- a/BUILD.bazel
+++++ b/BUILD.bazel
++@@ -149,7 +149,7 @@ cc_library(
++         ":linux_armhf": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM32_SRCS,
++         ":linux_armv7a": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM32_SRCS,
++         ":linux_armeabi": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM32_SRCS,
++-        ":linux_aarch64": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM64_SRCS,
+++        ":linux_aarch64": COMMON_SRCS + ARM_SRCS + LINUX_SRCS + LINUX_ARM64_SRCS + ANDROID_ARM_SRCS,
++         ":linux_mips64": COMMON_SRCS + LINUX_SRCS,
++         ":linux_ppc64le": COMMON_SRCS + LINUX_SRCS,
++         ":linux_riscv32": COMMON_SRCS + RISCV_SRCS + LINUX_SRCS + LINUX_RISCV_SRCS,
+-- 
+2.56.1
+
