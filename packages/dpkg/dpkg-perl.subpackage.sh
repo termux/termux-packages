@@ -1,5 +1,8 @@
 TERMUX_SUBPKG_DESCRIPTION="Perl modules for dpkg"
-TERMUX_SUBPKG_INCLUDE="share/perl5"
+TERMUX_SUBPKG_INCLUDE="
+lib/perl5/site_perl
+share/dpkg
+"
 TERMUX_SUBPKG_DEPENDS="perl, clang, make"
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
 
