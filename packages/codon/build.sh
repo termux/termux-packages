@@ -2,18 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://github.com/exaloop/codon
 TERMUX_PKG_DESCRIPTION="A high-performance, zero-overhead, extensible Python compiler using LLVM"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(
-	"0.20.7"
-	"20.1.7"
-)
+TERMUX_PKG_VERSION=0.20.8
+_LLVM_VERSION=20.1.7
 TERMUX_PKG_SRCURL=(
-	"https://github.com/exaloop/codon/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
-	"https://github.com/exaloop/codon/releases/download/v${TERMUX_PKG_VERSION[0]}/codon-linux-x86_64.tar.gz"
-	"https://github.com/exaloop/llvm-project/archive/refs/tags/codon-${TERMUX_PKG_VERSION[1]}.tar.gz"
+	"https://github.com/exaloop/codon/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+	"https://github.com/exaloop/codon/releases/download/v${TERMUX_PKG_VERSION}/codon-linux-x86_64.tar.gz"
+	"https://github.com/exaloop/llvm-project/archive/refs/tags/codon-${_LLVM_VERSION}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	04d128b9a9b26caeb4e62bd9b4aff014caf8647e743087d16a3fb18409317cd9
-	27f677f639402e826fce65bb8e21e904e45cd6f34f46ab2b0b5591877cc091b1
+	1089487d1ff65a01b607a7c0e28356920e916d8e7297f5417ea1d465d729486d
+	523e59e9cd9dc55c08eccf478214968aa1c71f93455ae502c2658c08040e7672
 	d0f613f3e63b1f1f1c8c75822bf2b83caed48e8973c35d13bf4148d343bc8645
 )
 TERMUX_PKG_DEPENDS="libc++, libxml2, zlib, zstd"
@@ -60,8 +58,8 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm, i686"
 termux_step_post_get_source() {
 	# Check llvm version
 	local _llvm_version="$(strings codon-deploy-linux-x86_64/bin/codon | grep 'clang version' | cut -d' ' -f3)"
-	if [ "${TERMUX_PKG_VERSION[1]}" != "$_llvm_version" ]; then
-		termux_error_exit "LLVM version mismatch: current ${TERMUX_PKG_VERSION[1]}, expected $_llvm_version."
+	if [ "$_LLVM_VERSION" != "$_llvm_version" ]; then
+		termux_error_exit "LLVM version mismatch: current $_LLVM_VERSION, expected $_llvm_version."
 	fi
 	mv llvm-project-codon-"$_llvm_version" llvm-project
 }
