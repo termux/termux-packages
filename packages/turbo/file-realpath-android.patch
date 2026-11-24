@@ -1,0 +1,23 @@
+The opened-file path lookup is only built for target_os "linux", so on
+Android it falls back to an unsupported stub and file hashing fails.
+
+--- a/crates/turborepo-paths/src/file_realpath.rs
++++ b/crates/turborepo-paths/src/file_realpath.rs
+@@ -2,7 +2,7 @@ use std::{fs::File, io, path::PathBuf};
+ 
+ /// Resolve the opened object, rather than reopening a path that may have
+ /// changed.
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub fn file_realpath(file: &File) -> io::Result<PathBuf> {
+     use std::os::fd::AsRawFd;
+     std::fs::read_link(format!("/proc/self/fd/{}", file.as_raw_fd()))
+@@ -74,7 +74,7 @@ mod tests {
+     }
+ }
+ 
+-#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
++#[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos", windows)))]
+ pub fn file_realpath(_: &File) -> io::Result<PathBuf> {
+     Err(io::Error::new(
+         io::ErrorKind::Unsupported,

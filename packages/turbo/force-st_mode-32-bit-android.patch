@@ -1,9 +1,9 @@
 --- a/crates/turborepo-cache/src/cache_archive/create.rs
 +++ b/crates/turborepo-cache/src/cache_archive/create.rs
-@@ -305,8 +305,30 @@ fn archive_source(
+@@ -585,8 +585,34 @@ fn archive_source(
  
-     let (parent, file_name) = open_parent_dir(anchor, file_path)?;
-     let file_info = fstatat_no_follow(parent.as_raw_fd(), &file_name)?;
+     let (parent, file_name) = open_parent_dir(anchor, dir_stack, file_path)?;
+     let file_info = fstatat_no_follow(parent.as_raw_fd(), file_name)?;
 +    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
 +    let file_type = file_info.st_mode & libc::S_IFMT as u32;
 +    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
@@ -11,16 +11,20 @@
  
 +    #[cfg(all(target_os = "android", target_pointer_width = "32"))]
 +    if file_type == libc::S_IFREG as u32 {
-+        let file = open_file_at(parent.as_raw_fd(), &file_name)?;
++        let file = open_file_at(parent.as_raw_fd(), file_name)?;
 +        let file_info = file.metadata()?;
 +        if !file_info.is_file() {
 +            return Err(CacheError::CreateUnsupportedFileType(Backtrace::capture()));
 +        }
 +
 +        let header = CacheWriter::create_header(&file_info)?;
-+        Ok(ArchiveSource::Regular { file, header })
++        Ok(ArchiveSource::Regular {
++            file,
++            file_info,
++            header,
++        })
 +    } else if file_type == libc::S_IFLNK as u32 {
-+        let target = read_link_at(parent.as_raw_fd(), &file_name)?;
++        let target = read_link_at(parent.as_raw_fd(), file_name)?;
 +        let header = create_header_from_stat(&file_info)?;
 +        Ok(ArchiveSource::Symlink { target, header })
 +    } else {
@@ -29,9 +33,9 @@
 +    }
 +    #[cfg(not(all(target_os = "android", target_pointer_width = "32")))]
      if file_type == libc::S_IFREG {
-         let file = open_file_at(parent.as_raw_fd(), &file_name)?;
+         let file = open_file_at(parent.as_raw_fd(), file_name)?;
          let file_info = file.metadata()?;
-@@ -449,7 +471,27 @@ fn create_header_from_stat(file_info: &libc::stat) -> Result<Header, CacheError>
+@@ -809,7 +835,27 @@ fn create_header_from_stat(file_info: &libc::stat) -> Result<Header, CacheError>
      let mut header = Header::new_gnu();
      header.set_mode(unix_mode_to_u32(file_info.st_mode));
  
@@ -59,7 +63,7 @@
      if file_type == libc::S_IFLNK {
          header.set_entry_type(EntryType::Symlink);
          header.set_size(0);
-@@ -491,12 +533,28 @@ fn unix_mode_to_u32(mode: libc::mode_t) -> u32 {
+@@ -851,12 +897,28 @@ fn unix_mode_to_u32(mode: libc::mode_t) -> u32 {
          target_os = "ios",
          target_os = "tvos",
          target_os = "watchos"
@@ -89,3 +93,23 @@
  fn set_consistent_header_metadata(header: &mut Header) {
      header.set_uid(0);
      header.set_gid(0);
+--- a/crates/turborepo-cache/src/cache_archive/restore_directory.rs
++++ b/crates/turborepo-cache/src/cache_archive/restore_directory.rs
+@@ -711,7 +711,7 @@ fn open_or_create_directory_at(parent_fd: i32, component: &str, mode: u32) -> io
+                 }
+             }
+             Err(open_error) => match fstat_at_no_follow(parent_fd, &component) {
+-                Ok(stat) if stat.st_mode & libc::S_IFMT == libc::S_IFLNK => {
++                Ok(stat) if stat.st_mode & libc::S_IFMT as u32 == libc::S_IFLNK as u32 => {
+                     match unlink_at(parent_fd, &component, 0) {
+                         Ok(()) => continue,
+                         Err(error) if error.kind() == io::ErrorKind::NotFound => continue,
+@@ -820,7 +820,7 @@ fn remove_entry_at(parent_fd: i32, name: &CString, allow_empty_directory: bool)
+ 
+     // Unlinking a directory fails with EISDIR on Linux and EPERM on macOS.
+     let is_directory = fstat_at_no_follow(parent_fd, name)
+-        .is_ok_and(|stat| stat.st_mode & libc::S_IFMT == libc::S_IFDIR);
++        .is_ok_and(|stat| stat.st_mode & libc::S_IFMT as u32 == libc::S_IFDIR as u32);
+     if !is_directory {
+         return Err(error);
+     }

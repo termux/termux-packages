@@ -1,0 +1,331 @@
+Replace turborepo-ghostty, whose libghostty-vt build needs zig and
+symbols missing before Android API 29, with a pure-Rust stand-in that
+renders task output as plain text.
+
+--- a/crates/turborepo-ui/Cargo.toml
++++ b/crates/turborepo-ui/Cargo.toml
+@@ -24,7 +24,6 @@ tui = [
+   "dep:nix",
+   "dep:ratatui",
+   "dep:tempfile",
+-  "dep:turborepo-ghostty",
+   "dep:which",
+   "dep:clipboard-win",
+   "dep:windows-sys",
+@@ -47,7 +46,6 @@ thiserror = { workspace = true }
+ tokio = { workspace = true }
+ tracing = { workspace = true }
+ turbopath = { workspace = true }
+-turborepo-ghostty = { workspace = true, optional = true }
+ turborepo-log = { workspace = true }
+ turborepo-types = { workspace = true }
+ which = { workspace = true, optional = true }
+--- a/crates/turborepo-ui/src/tui/mod.rs
++++ b/crates/turborepo-ui/src/tui/mod.rs
+@@ -16,6 +16,7 @@ mod spinner;
+ mod table;
+ mod task;
+ mod term_output;
++mod vt;
+ 
+ pub use app::{run_app, spawn_run_app, terminal_big_enough};
+ use clipboard::copy_to_clipboard;
+@@ -45,7 +46,7 @@ pub enum Error {
+     #[error("Unable to persist preferences.")]
+     Preferences(#[from] preferences::Error),
+     #[error(transparent)]
+-    Ghostty(#[from] turborepo_ghostty::Error),
++    Ghostty(#[from] vt::Error),
+     #[error("Failed to spawn TUI thread: {0}")]
+     ThreadSpawn(std::io::Error),
+     #[error("TUI thread exited unexpectedly")]
+--- a/crates/turborepo-ui/src/tui/pane.rs
++++ b/crates/turborepo-ui/src/tui/pane.rs
+@@ -4,7 +4,7 @@ use ratatui::{
+     text::Line,
+     widgets::{Block, Widget},
+ };
+-use turborepo_ghostty::TerminalWidget;
++use super::vt::TerminalWidget;
+ 
+ use super::{PANE_LEFT_PADDING_WITH_SIDEBAR, TerminalOutput, app::LayoutSections};
+ 
+--- a/crates/turborepo-ui/src/tui/term_output.rs
++++ b/crates/turborepo-ui/src/tui/term_output.rs
+@@ -3,7 +3,7 @@ use std::{
+     io::{BufWriter, Seek, SeekFrom, Write},
+ };
+ 
+-use turborepo_ghostty as ghostty;
++use super::vt as ghostty;
+ 
+ use super::{
+     Error,
+--- /dev/null
++++ b/crates/turborepo-ui/src/tui/vt.rs
+@@ -0,0 +1,265 @@
++#![allow(
++    clippy::all,
++    missing_docs,
++    dead_code,
++    reason = "stand-in for the libghostty-vt bindings"
++)]
++
++use ratatui::{buffer::Buffer, layout::Rect, style::Style, widgets::Widget};
++
++pub type Result<T> = std::result::Result<T, Error>;
++
++#[derive(Debug, thiserror::Error)]
++pub enum Error {
++    #[error("invalid terminal state")]
++    Invalid,
++}
++
++pub struct RenderState;
++
++pub struct Terminal {
++    rows: u16,
++    cols: u16,
++    max_scrollback: usize,
++    output: Vec<u8>,
++}
++
++impl Terminal {
++    fn push(&mut self, bytes: &[u8]) {
++        self.output.extend_from_slice(bytes);
++        let budget = self
++            .max_scrollback
++            .saturating_mul(self.cols as usize)
++            .max(1);
++        if self.output.len() > budget {
++            let excess = self.output.len() - budget;
++            self.output.drain(..excess);
++        }
++    }
++
++    fn lines(&self) -> Vec<String> {
++        let text = strip_ansi(&self.output);
++        let mut lines: Vec<String> = text
++            .split('\n')
++            .map(|line| line.trim_end_matches('\r').to_string())
++            .collect();
++        if lines.last().is_some_and(|line| line.is_empty()) {
++            lines.pop();
++        }
++        lines
++    }
++
++    fn visible_lines(&self) -> Vec<String> {
++        let lines = self.lines();
++        let start = lines.len().saturating_sub(self.rows as usize);
++        lines[start..].to_vec()
++    }
++}
++
++pub struct Parser {
++    pub terminal: Terminal,
++    pub render_state: RenderState,
++    selection_start: Option<(u16, u16)>,
++    selection_range: Option<(u16, u16, u16, u16)>,
++    max_scrollback: usize,
++}
++
++impl Parser {
++    pub fn try_new(rows: u16, cols: u16, scrollback_len: usize) -> Result<Self> {
++        Ok(Self {
++            terminal: Terminal {
++                rows,
++                cols,
++                max_scrollback: scrollback_len,
++                output: Vec::new(),
++            },
++            render_state: RenderState,
++            selection_start: None,
++            selection_range: None,
++            max_scrollback: scrollback_len,
++        })
++    }
++
++    pub fn process(&mut self, bytes: &[u8]) {
++        self.terminal.push(bytes);
++    }
++
++    pub fn size(&self) -> Result<(u16, u16)> {
++        Ok((self.terminal.rows, self.terminal.cols))
++    }
++
++    pub fn resize(&mut self, rows: u16, cols: u16) -> Result<()> {
++        self.terminal.rows = rows;
++        self.terminal.cols = cols;
++        Ok(())
++    }
++
++    pub fn scroll_by(&mut self, _up: bool, _magnitude: usize) -> Result<()> {
++        Ok(())
++    }
++
++    pub fn scroll_to_top(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    pub fn scroll_to_bottom(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    pub fn format_screen_vt(&self) -> Result<Vec<u8>> {
++        Ok(self.terminal.output.clone())
++    }
++
++    pub fn clear_selection(&mut self) -> Result<()> {
++        self.selection_start = None;
++        self.selection_range = None;
++        Ok(())
++    }
++
++    pub fn begin_selection(&mut self, row: u16, col: u16) -> Result<()> {
++        self.clear_selection()?;
++        self.selection_start = Some((row, col));
++        Ok(())
++    }
++
++    pub fn cancel_incomplete_selection(&mut self) {
++        if self.selection_range.is_none() {
++            self.selection_start = None;
++        }
++    }
++
++    pub fn update_selection(
++        &mut self,
++        start_row: u16,
++        start_col: u16,
++        end_row: u16,
++        end_col: u16,
++    ) -> Result<()> {
++        if self.selection_start.is_none() {
++            self.begin_selection(start_row, start_col)?;
++        }
++        self.update_selection_end(end_row, end_col)
++    }
++
++    pub fn update_selection_end(&mut self, end_row: u16, end_col: u16) -> Result<()> {
++        let Some((start_row, start_col)) = self.selection_start else {
++            return Ok(());
++        };
++        self.selection_range = Some((start_row, start_col, end_row, end_col));
++        Ok(())
++    }
++
++    pub fn selected_text(&mut self) -> Result<Option<String>> {
++        let Some((start_row, start_col, end_row, end_col)) = self.selection_range else {
++            return Ok(None);
++        };
++        let ((first_row, first_col), (last_row, last_col)) =
++            if (start_row, start_col) <= (end_row, end_col) {
++                ((start_row, start_col), (end_row, end_col))
++            } else {
++                ((end_row, end_col), (start_row, start_col))
++            };
++        let lines = self.terminal.visible_lines();
++        let mut selected = Vec::new();
++        for row in first_row..=last_row {
++            let Some(line) = lines.get(row as usize) else {
++                break;
++            };
++            let from = if row == first_row { first_col as usize } else { 0 };
++            let to = if row == last_row {
++                last_col as usize + 1
++            } else {
++                usize::MAX
++            };
++            let text: String = line
++                .chars()
++                .skip(from)
++                .take(to.saturating_sub(from))
++                .collect();
++            selected.push(text.trim_end().to_string());
++        }
++        Ok(Some(selected.join("\n")))
++    }
++
++    pub fn has_selection(&self) -> bool {
++        self.selection_range.is_some()
++    }
++
++    pub fn selection_range(&self) -> Option<(u16, u16, u16, u16)> {
++        self.selection_range
++    }
++
++    pub fn prepare_render(&mut self) -> Result<()> {
++        Ok(())
++    }
++
++    pub fn set_selection_start(&mut self, row: u16, col: u16) {
++        self.selection_start = Some((row, col));
++    }
++
++    pub fn selection_start(&self) -> Option<(u16, u16)> {
++        self.selection_start
++    }
++
++    pub fn clear_selection_start(&mut self) {
++        self.selection_start = None;
++    }
++
++    pub fn reset(&mut self) {
++        self.terminal.output.clear();
++        self.selection_start = None;
++        self.selection_range = None;
++    }
++
++    pub fn max_scrollback(&self) -> usize {
++        self.max_scrollback
++    }
++}
++
++pub struct TerminalWidget<'a> {
++    terminal: &'a mut Terminal,
++    render_state: &'a mut RenderState,
++}
++
++impl<'a> TerminalWidget<'a> {
++    pub fn new(terminal: &'a mut Terminal, render_state: &'a mut RenderState) -> Self {
++        Self {
++            terminal,
++            render_state,
++        }
++    }
++}
++
++impl Widget for &mut TerminalWidget<'_> {
++    fn render(self, area: Rect, buf: &mut Buffer) {
++        let _ = &self.render_state;
++        for (index, line) in self.terminal.visible_lines().iter().enumerate() {
++            let y = area.y.saturating_add(index as u16);
++            if y >= area.bottom() {
++                break;
++            }
++            buf.set_stringn(area.x, y, line, area.width as usize, Style::default());
++        }
++    }
++}
++
++fn strip_ansi(bytes: &[u8]) -> String {
++    let mut out = Vec::with_capacity(bytes.len());
++    let mut i = 0;
++    while i < bytes.len() {
++        if bytes[i] == 0x1b {
++            i += 1;
++            if i < bytes.len() && bytes[i] == b'[' {
++                i += 1;
++                while i < bytes.len() && !(0x40..=0x7e).contains(&bytes[i]) {
++                    i += 1;
++                }
++                i += 1;
++            }
++            continue;
++        }
++        out.push(bytes[i]);
++        i += 1;
++    }
++    String::from_utf8_lossy(&out).into_owned()
++}
