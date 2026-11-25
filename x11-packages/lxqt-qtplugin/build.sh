@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="LXQt platform integration plugin for Qt"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2.5.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-qtplugin/releases/download/${TERMUX_PKG_VERSION}/lxqt-qtplugin-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=451b891d5adb946bd785e34f785dff3efc0487f92effb927f9294efee1704d22
 TERMUX_PKG_DEPENDS="libc++, libdbusmenu-lxqt, libfm-qt, libqtxdg, qt6-qtbase"
