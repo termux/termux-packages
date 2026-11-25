@@ -1,12 +1,31 @@
 --- a/libvbisam/isdecimal.c
 +++ b/libvbisam/isdecimal.c
-@@ -134,6 +134,9 @@
+@@ -134,6 +134,27 @@
  	int		decpt;
  	int		sign;
++	char		digits[32];
  
-+#ifdef __ANDROID__
-+	char *ecvt(double, int, int *, int *);
-+#endif
- 	str = (unsigned char *)ecvt (dbl, ndigits, &decpt, &sign);
+-	str = (unsigned char *)ecvt (dbl, ndigits, &decpt, &sign);
++	{
++		char		tmp[48];
++		const char	*p;
++		int		n = 0;
++
++		/* reject NaN and +/-Inf */
++		if (dbl != dbl || dbl > DBL_MAX || dbl < -DBL_MAX) {
++			return -1203; /* similar to other returns that should not happen */
++		}
++		/* portable replacement for ecvt (dbl, ndigits, &decpt, &sign) */
++		snprintf (tmp, sizeof (tmp), "%.*e", ndigits - 1, dbl);
++		sign = (tmp[0] == '-');
++		for (p = tmp; *p && *p != 'e' && *p != 'E'; p++) {
++			if (*p >= '0' && *p <= '9') {
++				digits[n++] = *p;
++			}
++		}
++		digits[n] = '\0';
++		decpt = (*p) ? atoi (p + 1) + 1 : 0;
++	}
++	str = (unsigned char *)digits;
  
  	dp->dec_pos = sign ? 0 : 1;
