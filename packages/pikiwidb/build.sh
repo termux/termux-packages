@@ -2,15 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://github.com/OpenAtomFoundation/pikiwidb
 TERMUX_PKG_DESCRIPTION="Redis-Compatible database developed by Qihoo's infrastructure team"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(3.5.6
-					1.0.7)
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=("https://github.com/OpenAtomFoundation/pikiwidb/archive/refs/tags/v${TERMUX_PKG_VERSION[0]}.tar.gz"
-					"https://github.com/pikiwidb/rediscache/archive/refs/tags/v${TERMUX_PKG_VERSION[1]}.tar.gz")
-TERMUX_PKG_SHA256=(b8081375426d1769ecc4a5fe70c5109589ef374f5d9030ea0adc4ea5a1dab9fa
-					6d09b5699030e74914da085a10fd6010336572b30894d93e4f024fa67d36f2a8)
+TERMUX_PKG_VERSION=3.5.7
+_REDISCACHE_VERSION=1.0.7
+TERMUX_PKG_SRCURL=(
+	"https://github.com/OpenAtomFoundation/pikiwidb/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
+	"https://github.com/pikiwidb/rediscache/archive/refs/tags/v${_REDISCACHE_VERSION}.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	358c82c3eb893e3bd13445ea7f187eabd8029d5a74cee83d22925b1b1fcdc82c
+	6d09b5699030e74914da085a10fd6010336572b30894d93e4f024fa67d36f2a8
+)
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d+(?!-)'
+TERMUX_PKG_UPDATE_VERSION_REGEXP='^v\K3\.\d+\.\d+$'
 TERMUX_PKG_DEPENDS="abseil-cpp, fmt, gflags, google-glog, libc++, libprotobuf, librocksdb, zlib"
 # required during build, but binary does not become linked to them
 TERMUX_PKG_BUILD_DEPENDS="googletest, liblz4, libsnappy, zstd"
@@ -26,7 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# build and install rediscache component
 	(
-	export TERMUX_PKG_SRCDIR+="/rediscache-${TERMUX_PKG_VERSION[1]}"
+	export TERMUX_PKG_SRCDIR+="/rediscache-${_REDISCACHE_VERSION}"
 	export TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR/build"
 	export TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCMAKE_C_COMPILER_TARGET=$CCTERMUX_HOST_PLATFORM"
 	mkdir -p "$TERMUX_PKG_BUILDDIR"

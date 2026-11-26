@@ -4,7 +4,7 @@ I just changed things until it works for Android
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -67,15 +67,15 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+@@ -67,22 +67,22 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
       set(CMAKE_CXX_FLAGS "-pthread -Wl,--no-as-needed -ldl")
     endif()
     add_definitions(-DOS_LINUX)
@@ -22,7 +22,6 @@ I just changed things until it works for Android
  
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
  
-@@ -82,7 +80,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
  set(EP_BASE_SUFFIX "buildtrees")
  set_property(DIRECTORY PROPERTY EP_BASE ${CMAKE_CURRENT_SOURCE_DIR}/${EP_BASE_SUFFIX})
  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/")
@@ -39,7 +38,7 @@ I just changed things until it works for Android
  ExternalProject_Add(gtest
    URL
    https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
-@@ -159,6 +160,7 @@ ExternalProject_Add(gtest
+@@ -159,15 +160,16 @@ ExternalProject_Add(gtest
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -47,7 +46,6 @@ I just changed things until it works for Android
  
  if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
    set(GTEST_LIBRARY ${INSTALL_LIBDIR_64}/libgtest.a)
-@@ -165,9 +163,9 @@ if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
    set(GTEST_MAIN_LIBRARY ${INSTALL_LIBDIR_64}/libgtest_main.a)
    set(GMOCK_LIBRARY ${INSTALL_LIBDIR_64}/libgmock.a)
  else()
@@ -60,7 +58,7 @@ I just changed things until it works for Android
  endif()
  
  set(GTEST_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
-@@ -175,6 +173,7 @@ set(GTEST_MAIN_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
+@@ -175,6 +177,7 @@ set(GTEST_MAIN_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  set(GMOCK_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  
  
@@ -68,7 +66,7 @@ I just changed things until it works for Android
  ExternalProject_Add(gflags
    URL
    https://github.com/gflags/gflags/archive/refs/tags/v2.2.2.tar.gz
-@@ -203,11 +202,12 @@ ExternalProject_Add(gflags
+@@ -203,11 +206,12 @@ ExternalProject_Add(gflags
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -82,7 +80,7 @@ I just changed things until it works for Android
  endif()
  
  set(GFLAGS_LIBRARY ${INSTALL_LIBDIR}/${LIB_GFLAGS})
-@@ -247,6 +247,7 @@ else()
+@@ -247,6 +251,7 @@ else()
    set(LIBUNWIND_ON OFF)
  endif()
  
@@ -90,7 +88,7 @@ I just changed things until it works for Android
  ExternalProject_Add(glog
    DEPENDS
    gflags
-@@ -281,11 +282,12 @@ ExternalProject_Add(glog
+@@ -281,11 +286,12 @@ ExternalProject_Add(glog
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -104,7 +102,7 @@ I just changed things until it works for Android
  endif()
  
  if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
-@@ -295,6 +297,7 @@ else()
+@@ -295,6 +301,7 @@ else()
  endif()
  set(GLOG_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  
@@ -112,7 +110,7 @@ I just changed things until it works for Android
  ExternalProject_Add(snappy
    DEPENDS
    URL
-@@ -324,15 +327,17 @@ ExternalProject_Add(snappy
+@@ -324,15 +331,17 @@ ExternalProject_Add(snappy
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -131,7 +129,7 @@ I just changed things until it works for Android
  ExternalProject_Add(zstd
    DEPENDS
    URL
-@@ -364,15 +369,17 @@ ExternalProject_Add(zstd
+@@ -364,15 +373,17 @@ ExternalProject_Add(zstd
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -150,7 +148,7 @@ I just changed things until it works for Android
  ExternalProject_Add(fmt
    DEPENDS
    URL
-@@ -399,11 +406,12 @@ ExternalProject_Add(fmt
+@@ -399,11 +410,12 @@ ExternalProject_Add(fmt
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -164,7 +162,7 @@ I just changed things until it works for Android
  endif()
  
  if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
-@@ -414,6 +422,7 @@ endif()
+@@ -414,6 +426,7 @@ endif()
  
  set(FMT_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  
@@ -172,7 +170,7 @@ I just changed things until it works for Android
  ExternalProject_Add(lz4
    DEPENDS
    URL
-@@ -445,15 +454,17 @@ ExternalProject_Add(lz4
+@@ -445,15 +458,17 @@ ExternalProject_Add(lz4
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -191,7 +189,7 @@ I just changed things until it works for Android
  ExternalProject_Add(zlib
    DEPENDS
    URL
-@@ -481,8 +492,9 @@ ExternalProject_Add(zlib
+@@ -481,8 +496,9 @@ ExternalProject_Add(zlib
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -202,7 +200,7 @@ I just changed things until it works for Android
  set(ZLIB_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  
  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-@@ -554,6 +566,7 @@ else()
+@@ -554,6 +570,7 @@ else()
    set(JEMALLOC_ON OFF)
  endif()
  
@@ -210,7 +208,7 @@ I just changed things until it works for Android
  ExternalProject_Add(protobuf
    DEPENDS
    zlib
-@@ -587,17 +600,19 @@ ExternalProject_Add(protobuf
+@@ -587,17 +604,19 @@ ExternalProject_Add(protobuf
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -232,7 +230,7 @@ I just changed things until it works for Android
  ExternalProject_Add(rocksdb
    DEPENDS
    gflags
-@@ -679,6 +694,7 @@ ExternalProject_Add(rediscache
+@@ -679,6 +698,7 @@ ExternalProject_Add(rediscache
    BUILD_COMMAND
    make -j${CPU_CORE}
  )
@@ -240,7 +238,7 @@ I just changed things until it works for Android
  set(REDISCACHE_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
  set(REDISCACHE_LIBRARY ${INSTALL_LIBDIR}/librediscache.a)
  
-@@ -744,7 +760,7 @@ endif()
+@@ -744,7 +764,7 @@ endif()
  if(${OS_VERSION} MATCHES "Rocky" OR ${OS_VERSION} MATCHES "CentOS")
    set(ROCKSDB_LIBRARY ${INSTALL_LIBDIR_64}/librocksdb.a)
  else()
@@ -249,7 +247,7 @@ I just changed things until it works for Android
  endif()
  
  set(ROCKSDB_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
-@@ -825,6 +825,7 @@ target_link_directories(${PROJECT_NAME}
+@@ -821,6 +841,7 @@ target_link_directories(${PROJECT_NAME}
    PUBLIC ${INSTALL_LIBDIR_64}
    PUBLIC ${INSTALL_LIBDIR})
  
@@ -257,7 +255,7 @@ I just changed things until it works for Android
  add_dependencies(${PROJECT_NAME}
    gflags
    gtest
-@@ -845,6 +846,7 @@ add_dependencies(${PROJECT_NAME}
+@@ -841,6 +862,7 @@ add_dependencies(${PROJECT_NAME}
    storage
    cache
  )
@@ -265,7 +263,7 @@ I just changed things until it works for Android
  
  target_include_directories(${PROJECT_NAME}
    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
-@@ -842,14 +858,14 @@ target_link_libraries(${PROJECT_NAME}
+@@ -854,14 +876,14 @@ target_link_libraries(${PROJECT_NAME}
    net
    pstd
    ${GLOG_LIBRARY}
@@ -300,7 +298,7 @@ I just changed things until it works for Android
  
  add_compile_options(-W -Wextra -Wall -Wsign-compare)
  add_compile_options(-Wno-unused-parameter -Wno-redundant-decls -Wwrite-strings)
-@@ -30,12 +30,14 @@ aux_source_directory(./src  DIR_SRCS)
+@@ -30,12 +32,14 @@ aux_source_directory(./src  DIR_SRCS)
  
  add_library(pstd STATIC ${DIR_SRCS})
  
@@ -398,7 +396,7 @@ I just changed things until it works for Android
      PUBLIC net
 --- a/src/storage/CMakeLists.txt
 +++ b/src/storage/CMakeLists.txt
-@@ -11,10 +11,12 @@ add_subdirectory(benchmark)
+@@ -11,16 +11,20 @@ add_subdirectory(benchmark)
  add_definitions(-DROCKSDB_PLATFORM_POSIX -DROCKSDB_LIB_IO_POSIX)
  add_compile_options("-fno-builtin-memcmp")
  
@@ -410,8 +408,6 @@ I just changed things until it works for Android
 +endif()
  
  aux_source_directory(./src  DIR_SRCS)
- 
-@@ -20,7 +20,9 @@ aux_source_directory(./src  DIR_SRCS)
  
  add_library(storage STATIC ${DIR_SRCS} )
  
