@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$(realpath "$(dirname "$0")")/../.." || { echo "cd failed"; exit 1; }
-readarray -t TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' repo.json)
+readarray -t TERMUX_PACKAGE_DIRECTORIES < <(jq --raw-output 'del(.pkg_format) | keys | .[]' scripts/repo.json)
 
 usage() {
 	echo "USAGE: $0 ARCH PACKAGES [list|batch_number]"

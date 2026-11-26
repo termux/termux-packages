@@ -236,7 +236,9 @@ def read_packages_from_directories(directories, fast_build_mode, full_buildmode)
 
     if full_buildmode:
         # Ignore directories and get all folders from repo.json file
-        with open ('repo.json') as f:
+        repo_json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'repo.json')
+
+        with open(repo_json_path) as f:
             data = json.load(f)
         directories = []
         for d in data.keys():
