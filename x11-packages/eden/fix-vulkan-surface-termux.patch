@@ -1,0 +1,36 @@
+diff -ur a/src/video_core/vulkan_common/vulkan.h b/src/video_core/vulkan_common/vulkan.h
+--- a/src/video_core/vulkan_common/vulkan.h	2026-07-28 17:58:42.332191520 +0200
++++ b/src/video_core/vulkan_common/vulkan.h	2026-07-29 12:26:43.449613143 +0200
+@@ -11,7 +11,7 @@
+ #define VK_USE_PLATFORM_WIN32_KHR
+ #elif defined(__APPLE__)
+ #define VK_USE_PLATFORM_METAL_EXT
+-#elif defined(__ANDROID__)
++#elif 0
+ #define VK_USE_PLATFORM_ANDROID_KHR
+ #elif defined(__HAIKU__)
+ #define VK_USE_PLATFORM_XCB_KHR
+diff -ur a/src/video_core/vulkan_common/vulkan_instance.cpp b/src/video_core/vulkan_common/vulkan_instance.cpp
+--- a/src/video_core/vulkan_common/vulkan_instance.cpp	2026-07-28 17:58:42.332191520 +0200
++++ b/src/video_core/vulkan_common/vulkan_instance.cpp	2026-07-29 13:42:38.249896694 +0200
+@@ -51,7 +51,7 @@
+     case Core::Frontend::WindowSystemType::Cocoa:
+         extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
+         break;
+-#elif defined(__ANDROID__)
++#elif 0
+     case Core::Frontend::WindowSystemType::Android:
+         extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+         break;
+diff -ur a/src/video_core/vulkan_common/vulkan_surface.cpp b/src/video_core/vulkan_common/vulkan_surface.cpp
+--- a/src/video_core/vulkan_common/vulkan_surface.cpp	2026-07-28 17:58:42.332191520 +0200
++++ b/src/video_core/vulkan_common/vulkan_surface.cpp	2026-07-29 13:43:04.719612159 +0200
+@@ -45,7 +45,7 @@
+             throw vk::Exception(VK_ERROR_INITIALIZATION_FAILED);
+         }
+     }
+-#elif defined(__ANDROID__)
++#elif 0
+     if (window_info.type == Core::Frontend::WindowSystemType::Android) {
+         const VkAndroidSurfaceCreateInfoKHR android_ci{
+             VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR, nullptr, 0,
