@@ -1,0 +1,15 @@
+diff --git a/newIDE/electron-app/app/main.js b/newIDE/electron-app/app/main.js
+index e8f1f3c..5a67eb4 100644
+--- a/newIDE/electron-app/app/main.js
++++ b/newIDE/electron-app/app/main.js
+@@ -60,6 +60,10 @@ const {
+ // Initialize `@electron/remote` module
+ require('@electron/remote/main').initialize();
+ 
++electron.app.on('remote-require', (event, webContents, moduleName) => {
++  event.returnValue = require(moduleName);
++});
++
+ log.info('GDevelop Electron app starting...');
+ 
+ // Logs made with electron-logs can be found

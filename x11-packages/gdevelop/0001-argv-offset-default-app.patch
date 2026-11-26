@@ -1,0 +1,22 @@
+diff --git a/newIDE/electron-app/app/main.js b/newIDE/electron-app/app/main.js
+index e8f1f3c..eed31c8 100644
+--- a/newIDE/electron-app/app/main.js
++++ b/newIDE/electron-app/app/main.js
+@@ -76,7 +76,7 @@ let mainWindows = new Set();
+ let mainWindow = null; // Primary window reference for backwards compatibility
+ let windowCounter = 0; // Counter for creating unique session partitions
+ 
+-const args = parseGDevelopArgs(process.argv.slice(isDev ? 2 : 1));
++const args = parseGDevelopArgs(process.argv.slice(process.defaultApp ? 2 : 1));
+ 
+ const devTools = !!args['dev-tools'];
+ 
+@@ -107,7 +107,7 @@ if (!gotTheLock) {
+     const secondInstanceArgs = parseSecondInstanceArgs({
+       commandLine,
+       additionalData,
+-      isDev,
++      isDev: !!process.defaultApp,
+     });
+ 
+     if (routeCliCommandToLiveEditor({ parsedArgs: secondInstanceArgs, mainWindows })) {
