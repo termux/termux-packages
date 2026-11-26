@@ -1,0 +1,44 @@
+From a4079a8d0311e774ac684d903ef1109b3ef10f60 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 02:11:13 +0200
+Subject: [PATCH] um: x86: add the missing 32-bit stub_seccomp_save_state
+
+The generic stub now calls stub_seccomp_save_state() on entry, symmetric
+with the existing restore, so every subarch has to provide one. x86-64 got
+an empty version; x86-32 was missed and would fail to build.
+
+Empty for the same reason as x86-64: the TLS entries can only change
+through set_thread_area(), a syscall the kernel already sees, so its idea
+of them is never stale.
+
+Not build-tested: no 32-bit libc headers are available in this environment,
+and none can be fetched. Compile-tested by inspection only, which is worth
+stating plainly rather than implying more.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/x86/um/shared/sysdep/stub_32.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/x86/um/shared/sysdep/stub_32.h b/arch/x86/um/shared/sysdep/stub_32.h
+index b249198e4dfdc..c8f5014ea35c3 100644
+--- a/arch/x86/um/shared/sysdep/stub_32.h
++++ b/arch/x86/um/shared/sysdep/stub_32.h
+@@ -134,6 +134,17 @@ static __always_inline void *get_stub_data(void)
+ 		:: "i" (STUB_SIZE),					\
+ 		   "i" (&fn))
+ 
++/*
++ * Nothing to capture: the TLS entries can only be changed through
++ * set_thread_area(), which is a syscall the kernel already intercepts, so its
++ * idea of them is never stale. See the arm64 version, where the guest can
++ * change its thread pointer without any syscall at all.
++ */
++static __always_inline void
++stub_seccomp_save_state(struct stub_data_arch *arch)
++{
++}
++
+ static __always_inline void
+ stub_seccomp_restore_state(struct stub_data_arch *arch)
+ {

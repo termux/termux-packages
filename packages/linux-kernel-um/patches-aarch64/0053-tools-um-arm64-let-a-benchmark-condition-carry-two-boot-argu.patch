@@ -1,0 +1,1450 @@
+From 344bf24d389abfe62a6e5810c63312ff24b5919a Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 20:13:32 +0200
+Subject: [PATCH] tools/um-arm64: let a benchmark condition carry two boot
+ arguments
+
+KERNELS entries were split on whitespace, so a condition could hold one
+boot argument and no more. That is not a corner case: a Galaxy S26 needs
+stub_exe= on every condition just to boot, because Android 16 refuses to
+execve a memfd, so every sweep on that device is stub_exe= plus whatever
+is being swept.
+
+Splitting the second argument off does not fail. It quietly becomes an
+extra kernel named `prefault` at path `0`, and the run produces a table
+with the wrong conditions in it -- worse than an error, because the
+numbers look fine. Switch to newline separation when any entry contains a
+space, and leave the whitespace form working for everything that already
+uses it.
+
+Staging changes with it. The boot-argument form exists so one binary can
+be several conditions, so a five-condition sweep pushed the same bytes
+five times; over TCP adb the second push wedges the transport and the run
+dies before a round is measured. Push each distinct binary once and copy
+it on the device for the labels that share it.
+
+The probes are from the same measurement work and go in with it. Each
+answers one question that the whole-kernel benchmarks cannot separate:
+
+	handoff.c	one seccomp round trip, stage by stage
+	spawnprobe.c	what a per-mm host process costs to make and reap
+	shmemfault.c	one host page fault, by mapping kind
+	scmprobe.c	re-passing the physmem fd on every mapping handoff
+	childfaults.c	what the host spent, not what the guest thinks
+	pagetouch.c	a controlled walk of fresh anonymous guest pages
+	forkexecrss.c	whether fork+execve scales with parent RSS
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ tools/um-arm64/harness/probe/childfaults.c |  65 ++++
+ tools/um-arm64/harness/probe/forkexecrss.c | 127 ++++++++
+ tools/um-arm64/harness/probe/handoff.c     | 338 +++++++++++++++++++++
+ tools/um-arm64/harness/probe/pagetouch.c   | 113 +++++++
+ tools/um-arm64/harness/probe/scmprobe.c    | 184 +++++++++++
+ tools/um-arm64/harness/probe/shmemfault.c  | 184 +++++++++++
+ tools/um-arm64/harness/probe/spawnprobe.c  | 254 ++++++++++++++++
+ tools/um-arm64/harness/verifybench.sh      |  48 ++-
+ 8 files changed, 1308 insertions(+), 5 deletions(-)
+ create mode 100644 tools/um-arm64/harness/probe/childfaults.c
+ create mode 100644 tools/um-arm64/harness/probe/forkexecrss.c
+ create mode 100644 tools/um-arm64/harness/probe/handoff.c
+ create mode 100644 tools/um-arm64/harness/probe/pagetouch.c
+ create mode 100644 tools/um-arm64/harness/probe/scmprobe.c
+ create mode 100644 tools/um-arm64/harness/probe/shmemfault.c
+ create mode 100644 tools/um-arm64/harness/probe/spawnprobe.c
+
+diff --git a/tools/um-arm64/harness/probe/childfaults.c b/tools/um-arm64/harness/probe/childfaults.c
+new file mode 100644
+index 000000000000..9010ce80f4da
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/childfaults.c
+@@ -0,0 +1,65 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Run a command and report what the HOST spent on it, not what it says about
++ * itself: getrusage(RUSAGE_CHILDREN) after the whole descendant tree has been
++ * reaped, so a UML run's minor faults, major faults and context switches -- the
++ * UML kernel process and every stub it forked -- come out as one number.
++ *
++ * The point is the fault cost model. It claims the UML kernel process takes one
++ * host minor fault per HOST page behind each guest page it zeroes, four per 16K
++ * guest page on a 4K host, because clear_page() is the first write through the
++ * MAP_SHARED physmem mapping. Run a guest that touches a controlled number of
++ * pages (harness/probe/pagetouch.c) at two footprints under this wrapper, and
++ * the slope of ru_minflt against guest pages touched is that claim, measured.
++ * A slope near 5 (4 in the kernel process + 1 in the stub) confirms it; a slope
++ * near 1 refutes it and takes 60% of the fault row's cost model with it.
++ *
++ * ru_nvcsw is reported too, because the "the futex handoff is already gone"
++ * claim says a spinning handoff performs zero voluntary context switches per
++ * guest syscall, and that has never been counted either.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o childfaults childfaults.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <sys/wait.h>
++#include <sys/resource.h>
++#include <sys/time.h>
++
++int main(int argc, char **argv)
++{
++	struct rusage ru;
++	pid_t pid;
++	int st;
++
++	if (argc < 2) {
++		fprintf(stderr, "usage: %s <cmd> [args...]\n", argv[0]);
++		return 2;
++	}
++
++	pid = fork();
++	if (pid == 0) {
++		execvp(argv[1], argv + 1);
++		perror("exec");
++		_exit(127);
++	}
++	if (pid < 0) {
++		perror("fork");
++		return 1;
++	}
++	waitpid(pid, &st, 0);
++
++	if (getrusage(RUSAGE_CHILDREN, &ru)) {
++		perror("getrusage");
++		return 1;
++	}
++	printf("CHILDRUSAGE minflt=%ld majflt=%ld nvcsw=%ld nivcsw=%ld "
++	       "utime=%ld.%06ld stime=%ld.%06ld status=%d\n",
++	       ru.ru_minflt, ru.ru_majflt, ru.ru_nvcsw, ru.ru_nivcsw,
++	       (long)ru.ru_utime.tv_sec, (long)ru.ru_utime.tv_usec,
++	       (long)ru.ru_stime.tv_sec, (long)ru.ru_stime.tv_usec, st);
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/forkexecrss.c b/tools/um-arm64/harness/probe/forkexecrss.c
+new file mode 100644
+index 000000000000..183b330b897b
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/forkexecrss.c
+@@ -0,0 +1,127 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Is a guest fork()+execve() O(parent RSS)?
++ *
++ * UML's set_pte() marks every PTE _PAGE_NEEDSYNC, and copy_present_ptes() runs
++ * set_ptes() on the child's mm, so after a fork the child's ENTIRE inherited
++ * resident set is marked and um_tlb_sync() replays it as host mmap()s into a
++ * brand-new stub at the child's first userspace entry -- for a child whose only
++ * act is to execve and throw all of it away. The parent is wrprotected in the
++ * same pass and re-published a second time. Two proposals in flight rest on
++ * that being expensive: "don't publish a forked child's address space until it
++ * touches it" and "make a guest fork map onto a host fork".
++ *
++ * perfbench cannot see any of it: it munmaps its 64 MB fault buffer before the
++ * forkexec loop, so its parent RSS is tiny and constant. Run this instead with
++ * RSS_MB swept and the answer is direct -- if us/exec is flat in parent RSS the
++ * eager publication costs nothing worth removing, and if it rises linearly the
++ * slope IS the per-resident-page tax, in us per guest page.
++ *
++ * Runs as the guest's init. RSS_MB, N and EXE come from the environment because
++ * unrecognised key=value boot arguments are handed to init.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o forkexecrss forkexecrss.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <sys/mman.h>
++#include <sys/wait.h>
++#include <sys/reboot.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++int main(void)
++{
++	const char *e;
++	long rss_mb = (e = getenv("RSS_MB")) ? atol(e) : 0;
++	long n = (e = getenv("N")) ? atol(e) : 200;
++	const char *exe = (e = getenv("EXE")) ? e : "/true";
++	long pgsz = sysconf(_SC_PAGESIZE);
++	char *argvv[] = { (char *)"true", NULL };
++	char *p = NULL;
++	double t0, t1;
++	long i;
++
++	printf("FORKEXECRSS_START rss_mb=%ld n=%ld exe=%s pagesize=%ld\n",
++	       rss_mb, n, exe, pgsz);
++	fflush(stdout);
++
++	if (rss_mb > 0) {
++		size_t len = (size_t)rss_mb * 1024 * 1024;
++		long pages = len / pgsz;
++
++		p = mmap(NULL, len, PROT_READ | PROT_WRITE,
++			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++		if (p == MAP_FAILED) {
++			printf("FORKEXECRSS_FAIL mmap\n");
++			fflush(stdout);
++			goto out;
++		}
++		/* Make it resident and writable-private, so the fork has to copy
++		 * the PTEs and wrprotect them -- the case the proposals target. */
++		for (i = 0; i < pages; i++)
++			p[i * pgsz] = 1;
++	}
++
++	/* One warm-up exec so the binary's pages are in the guest page cache. */
++	{
++		pid_t pid = fork();
++
++		if (pid == 0) {
++			execve(exe, argvv, NULL);
++			_exit(127);
++		}
++		waitpid(pid, NULL, 0);
++	}
++
++	t0 = now();
++	for (i = 0; i < n; i++) {
++		pid_t pid = fork();
++
++		if (pid == 0) {
++			execve(exe, argvv, NULL);
++			_exit(127);
++		}
++		if (pid < 0)
++			break;
++		waitpid(pid, NULL, 0);
++	}
++	t1 = now();
++
++	printf("forkexec %10.3f us/exec  (rss_mb=%ld, %ld ops in %.3fs)\n",
++	       (t1 - t0) * 1e6 / i, rss_mb, i, t1 - t0);
++
++	/* fork+_exit alone, same RSS: separates the exec from the fork. */
++	t0 = now();
++	for (i = 0; i < n; i++) {
++		pid_t pid = fork();
++
++		if (pid == 0)
++			_exit(0);
++		if (pid < 0)
++			break;
++		waitpid(pid, NULL, 0);
++	}
++	t1 = now();
++	printf("forkexit %10.3f us/op    (rss_mb=%ld, %ld ops in %.3fs)\n",
++	       (t1 - t0) * 1e6 / i, rss_mb, i, t1 - t0);
++
++	printf("FORKEXECRSS_DONE\n");
++	fflush(stdout);
++out:
++	sync();
++	reboot(RB_POWER_OFF);
++	for (;;)
++		pause();
++}
+diff --git a/tools/um-arm64/harness/probe/handoff.c b/tools/um-arm64/harness/probe/handoff.c
+new file mode 100644
+index 000000000000..7d6130803d20
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/handoff.c
+@@ -0,0 +1,338 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * What does one SECCOMP_RET_TRAP guest syscall actually cost, stage by stage?
++ *
++ * The cost model for UML's seccomp handoff splits into three groups:
++ *
++ *   host signal machinery   svc -> BPF -> force_sig(SIGSYS) -> setup_rt_frame
++ *                           -> handler -> rt_sigreturn -> frame teardown
++ *   cross-core handoff      release-exchange of the protocol word, peer's
++ *                           acquire-spin observing it, and the same back
++ *   kernel marshalling      get_stub_state/set_stub_state: 272 B GP + 520 B FP
++ *                           each way, plus a 128 B siginfo copy
++ *
++ * Nothing in the tree measures those separately, so every proposal to trim the
++ * kernel side has been argued against an estimate. This binary measures them
++ * with no kernel involved at all, by rebuilding each stage on top of the last:
++ *
++ *   getppid      raw host syscall -- validates the pinning against perfbench
++ *   sigsys       SECCOMP_RET_TRAP + a handler that returns. This alone IS the
++ *                host signal machinery, and it is the floor under any scheme
++ *                that keeps SECCOMP_RET_TRAP as the trap mechanism.
++ *   handoff      sigsys + a release-exchange ping-pong with a peer process on
++ *                the other core, peer doing nothing
++ *   handoff32    the same, but the peer's spin reads the architected counter
++ *                once per 32 iterations instead of every iteration
++ *   marshal      handoff + 272+520 B each way and a 128 B siginfo copy
++ *
++ * Differences between adjacent rows are the stages. Run it pinned exactly as
++ * harness/verifybench.sh pins (taskset 30, keeper on core 6) or the numbers
++ * are not comparable to that table.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o handoff handoff.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <stddef.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <sched.h>
++#include <signal.h>
++#include <errno.h>
++#include <sys/mman.h>
++#include <sys/wait.h>
++#include <sys/prctl.h>
++#include <sys/syscall.h>
++#include <linux/filter.h>
++#include <linux/seccomp.h>
++#include <linux/audit.h>
++
++/* The syscall we make the filter trap. Never actually executed. */
++#define TRAP_NR __NR_getcpu
++
++/* Protocol word states, mirroring FUTEX_IN_KERN / owner semantics. */
++#define OWN_ME	0u
++#define OWN_PEER 1u
++
++struct shared {
++	volatile unsigned int futex;
++	char pad[128];
++	/* Marshalling payload: the sizes arch/arm64/um/os-Linux/mcontext.c moves. */
++	char gp[272];
++	char fp[520];
++	char si[128];
++	char pad2[128];
++	volatile unsigned int stop;
++};
++
++static struct shared *sh;
++static int spin_stride = 1;	/* counter reads per this many poll iterations */
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++static inline unsigned long cntvct(void)
++{
++	unsigned long v;
++
++	asm volatile("mrs %0, cntvct_el0" : "=r"(v));
++	return v;
++}
++
++static inline unsigned long cntfrq(void)
++{
++	unsigned long v;
++
++	asm volatile("mrs %0, cntfrq_el0" : "=r"(v));
++	return v;
++}
++
++/* Release-exchange: publish everything written before handing ownership over. */
++static inline unsigned int xchg_release(volatile unsigned int *p, unsigned int v)
++{
++	return __atomic_exchange_n(p, v, __ATOMIC_ACQ_REL);
++}
++
++static inline unsigned int load_acquire(volatile unsigned int *p)
++{
++	return __atomic_load_n(p, __ATOMIC_ACQUIRE);
++}
++
++/*
++ * Spin until the word says we own it. Budget is wall time via CNTVCT_EL0,
++ * exactly as stub_futex_spin() does; `stride` controls how often the counter
++ * is sampled, which is the thing proposal "take the counter read out of the
++ * spin loop" wants priced.
++ */
++static void spin_until(volatile unsigned int *p, unsigned int want,
++		       unsigned long budget, int stride)
++{
++	unsigned long start = cntvct();
++	int i = 0;
++
++	for (;;) {
++		if (load_acquire(p) == want)
++			return;
++		asm volatile("yield");
++		if (++i % stride == 0 && cntvct() - start > budget)
++			break;
++	}
++	/* Budget blown: keep polling anyway, this probe never parks. */
++	while (load_acquire(p) != want)
++		asm volatile("yield");
++}
++
++static int pin(int cpu)
++{
++	cpu_set_t set;
++
++	CPU_ZERO(&set);
++	CPU_SET(cpu, &set);
++	return sched_setaffinity(0, sizeof(set), &set);
++}
++
++/* ---- the SIGSYS side ------------------------------------------------------ */
++
++static volatile int mode;	/* 0 = return only, 1 = handoff, 2 = marshal */
++static unsigned long spin_budget;
++
++static void sigsys_handler(int sig, siginfo_t *si, void *uc)
++{
++	(void)sig; (void)si; (void)uc;
++
++	if (mode == 0)
++		return;
++
++	if (mode == 2) {
++		/* What get_stub_state() moves out of the mcontext. */
++		memcpy(sh->gp, (char *)uc + 64, sizeof(sh->gp));
++		memcpy(sh->fp, (char *)uc + 64, sizeof(sh->fp));
++		memcpy(sh->si, si, sizeof(sh->si));
++	}
++
++	/* Hand the word to the peer and wait for it to hand it back. */
++	xchg_release(&sh->futex, OWN_PEER);
++	spin_until(&sh->futex, OWN_ME, spin_budget, spin_stride);
++
++	if (mode == 2) {
++		/* What set_stub_state() writes back. */
++		memcpy((char *)uc + 64, sh->gp, sizeof(sh->gp));
++		memcpy((char *)uc + 64, sh->fp, sizeof(sh->fp));
++	}
++}
++
++static int install_filter(void)
++{
++	struct sock_filter f[] = {
++		BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
++			 offsetof(struct seccomp_data, arch)),
++		BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_AARCH64, 1, 0),
++		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
++		BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
++			 offsetof(struct seccomp_data, nr)),
++		BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, TRAP_NR, 0, 1),
++		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_TRAP),
++		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
++	};
++	struct sock_fprog prog = { .len = sizeof(f) / sizeof(f[0]), .filter = f };
++
++	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0))
++		return -1;
++	return syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, &prog);
++}
++
++/* ---- the peer ------------------------------------------------------------- */
++
++static pid_t peer_pid;
++
++static void peer_loop(int cpu, int stride)
++{
++	pin(cpu);
++	while (!sh->stop) {
++		/* Wait to be handed the word, then hand it straight back. */
++		unsigned long start = cntvct();
++		int i = 0;
++
++		while (load_acquire(&sh->futex) != OWN_PEER) {
++			if (sh->stop)
++				_exit(0);
++			asm volatile("yield");
++			if (++i % stride == 0 && cntvct() - start > spin_budget * 100)
++				start = cntvct();	/* never park, just re-arm */
++		}
++		xchg_release(&sh->futex, OWN_ME);
++	}
++	_exit(0);
++}
++
++/* ---- measurement ---------------------------------------------------------- */
++
++static double bench(long iters, int raw)
++{
++	double t0, t1;
++	long i;
++
++	t0 = now();
++	for (i = 0; i < iters; i++) {
++		if (raw)
++			syscall(__NR_getppid);
++		else
++			syscall(TRAP_NR, NULL, NULL, NULL);
++	}
++	t1 = now();
++	return (t1 - t0) * 1e6 / iters;
++}
++
++static int cmpd(const void *a, const void *b)
++{
++	double x = *(const double *)a, y = *(const double *)b;
++
++	return x < y ? -1 : x > y ? 1 : 0;
++}
++
++static void report(const char *name, double *v, int n)
++{
++	qsort(v, n, sizeof(*v), cmpd);
++	printf("%-12s %8.3f us/op   min %8.3f  max %8.3f  n=%d\n",
++	       name, v[n / 2], v[0], v[n - 1], n);
++	fflush(stdout);
++}
++
++int main(int argc, char **argv)
++{
++	long iters = argc > 1 ? atol(argv[1]) : 200000;
++	int rounds = argc > 2 ? atoi(argv[2]) : 7;
++	double v[64];
++	int r;
++	struct sigaction sa;
++
++	if (rounds > 64)
++		rounds = 64;
++
++	sh = mmap(NULL, sizeof(*sh), PROT_READ | PROT_WRITE,
++		  MAP_SHARED | MAP_ANONYMOUS, -1, 0);
++	if (sh == MAP_FAILED) {
++		perror("mmap");
++		return 1;
++	}
++	memset(sh, 0, sizeof(*sh));
++	sh->futex = OWN_ME;
++
++	printf("HANDOFF_START cntfrq=%lu Hz\n", cntfrq());
++	/* 10 us, the SECCOMP_SPIN_DEFAULT_US the kernel ships. */
++	spin_budget = cntfrq() / 100000;
++
++	if (pin(4))
++		perror("pin cpu4 (continuing unpinned)");
++
++	/* Row 1: raw syscall, before any filter exists. */
++	for (r = 0; r < rounds; r++)
++		v[r] = bench(iters, 1);
++	report("getppid", v, rounds);
++
++	memset(&sa, 0, sizeof(sa));
++	sa.sa_sigaction = sigsys_handler;
++	sa.sa_flags = SA_SIGINFO | SA_NODEFER;
++	sigfillset(&sa.sa_mask);
++	if (sigaction(SIGSYS, &sa, NULL)) {
++		perror("sigaction");
++		return 1;
++	}
++	if (install_filter()) {
++		perror("seccomp");
++		return 1;
++	}
++
++	/* Row 2: the host signal machinery alone. */
++	mode = 0;
++	for (r = 0; r < rounds; r++)
++		v[r] = bench(iters, 0);
++	report("sigsys", v, rounds);
++
++	/* Rows 3-5 need the peer. */
++	peer_pid = fork();
++	if (peer_pid == 0)
++		peer_loop(5, 1);
++
++	mode = 1;
++	spin_stride = 1;
++	for (r = 0; r < rounds; r++)
++		v[r] = bench(iters, 0);
++	report("handoff", v, rounds);
++
++	mode = 2;
++	for (r = 0; r < rounds; r++)
++		v[r] = bench(iters, 0);
++	report("marshal", v, rounds);
++
++	sh->stop = 1;
++	xchg_release(&sh->futex, OWN_PEER);
++	waitpid(peer_pid, NULL, 0);
++
++	/* Row 5: same handoff, counter sampled once per 32 poll iterations. */
++	sh->stop = 0;
++	sh->futex = OWN_ME;
++	peer_pid = fork();
++	if (peer_pid == 0)
++		peer_loop(5, 32);
++	mode = 1;
++	spin_stride = 32;
++	for (r = 0; r < rounds; r++)
++		v[r] = bench(iters, 0);
++	report("handoff32", v, rounds);
++
++	sh->stop = 1;
++	xchg_release(&sh->futex, OWN_PEER);
++	waitpid(peer_pid, NULL, 0);
++
++	printf("HANDOFF_DONE\n");
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/pagetouch.c b/tools/um-arm64/harness/probe/pagetouch.c
+new file mode 100644
+index 000000000000..434347833350
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/pagetouch.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Touch a controlled number of fresh anonymous guest pages, one byte each, and
++ * say how long it took. Meant to be run as the guest's init (init=/pagetouch)
++ * so that the *host* side of the same run can be counted: the fault cost model
++ * claims the UML kernel process takes one host minor fault per host page behind
++ * every guest page it zeroes -- four of them per 16K guest page on a 4K host --
++ * because clear_page() writes through the MAP_SHARED physmem mapping before the
++ * stub ever sees the page.
++ *
++ * That claim has only ever been checked on an x86_64 UML build where guest and
++ * host page sizes are equal, which is precisely the configuration in which the
++ * amplification cannot show up. Running this at two different footprints and
++ * differencing the host's getrusage(RUSAGE_CHILDREN).ru_minflt across the two
++ * runs gives host minor faults per guest page directly, with no instrumentation
++ * in the kernel and no rebuild.
++ *
++ * MB comes from the environment because unrecognised key=value boot arguments
++ * are handed to init as environment variables, so the footprint is a boot
++ * argument and one initramfs serves every point on the curve.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o pagetouch pagetouch.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <sys/mman.h>
++#include <sys/reboot.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++int main(void)
++{
++	const char *e = getenv("MB");
++	long mb = e ? atol(e) : 64;
++	long pgsz = sysconf(_SC_PAGESIZE);
++	size_t len = (size_t)mb * 1024 * 1024;
++	long pages = len / pgsz;
++	char *p;
++	long i;
++	double t0, t1;
++
++	printf("PAGETOUCH_START mb=%ld pagesize=%ld pages=%ld\n", mb, pgsz, pages);
++	fflush(stdout);
++
++	p = mmap(NULL, len, PROT_READ | PROT_WRITE,
++		 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	if (p == MAP_FAILED) {
++		printf("PAGETOUCH_FAIL mmap\n");
++		fflush(stdout);
++		goto out;
++	}
++
++	t0 = now();
++	for (i = 0; i < pages; i++)
++		p[i * pgsz] = 1;
++	t1 = now();
++
++	printf("touch %10.3f us/page  (%ld pages in %.3fs)\n",
++	       (t1 - t0) * 1e6 / pages, pages, t1 - t0);
++
++	/*
++	 * The vDSO question, measured rather than argued. arm64 UML exports only
++	 * __kernel_rt_sigreturn, so a guest clock_gettime is a full seccomp round
++	 * trip; on real hardware it is a counter read of ~25-40 ns. Print it next
++	 * to a getppid from the same loop so the difference between "the trap" and
++	 * "the trap plus UML's own timer_read" is visible.
++	 */
++	{
++		struct timespec ts;
++		long n = 200000, k;
++
++		t0 = now();
++		for (k = 0; k < n; k++)
++			clock_gettime(CLOCK_MONOTONIC, &ts);
++		t1 = now();
++		printf("clock_gettime %6.3f us/call (%ld ops)\n",
++		       (t1 - t0) * 1e6 / n, n);
++
++		t0 = now();
++		for (k = 0; k < n; k++)
++			clock_gettime(CLOCK_MONOTONIC_COARSE, &ts);
++		t1 = now();
++		printf("clock_coarse  %6.3f us/call (%ld ops)\n",
++		       (t1 - t0) * 1e6 / n, n);
++
++		t0 = now();
++		for (k = 0; k < n; k++)
++			getppid();
++		t1 = now();
++		printf("getppid       %6.3f us/call (%ld ops)\n",
++		       (t1 - t0) * 1e6 / n, n);
++	}
++
++	printf("PAGETOUCH_DONE\n");
++	fflush(stdout);
++
++out:
++	sync();
++	reboot(RB_POWER_OFF);
++	for (;;)
++		pause();
++}
+diff --git a/tools/um-arm64/harness/probe/scmprobe.c b/tools/um-arm64/harness/probe/scmprobe.c
+new file mode 100644
+index 000000000000..b03f3d2a87ee
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/scmprobe.c
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * What does re-passing the physmem fd on every mapping handoff cost?
++ *
++ * Every handoff that carries a queued stub syscall costs three extra host
++ * syscalls: sendmsg(SCM_RIGHTS) on the kernel side, recvmsg on the stub side,
++ * and one close() per received fd. There is normally exactly one physmem fd,
++ * and userspace() resets mm_id->syscall_fd_num to 0 after every handoff, so the
++ * same fd is installed and torn down again forever. The proposal to make the
++ * stub's fd table sticky is worth building or not depending purely on what that
++ * costs on this phone, which nobody has measured.
++ *
++ * Rows:
++ *   scm_rights   sendmsg(SCM_RIGHTS, 1 fd) + recvmsg + close, round trip
++ *   plain        the same round trip with no ancillary data, so the difference
++ *                is the fd install and teardown rather than the socket
++ *   recvmsg_eagain  a nonblocking recvmsg on an empty socket -- the stub issues
++ *                one of these whenever syscall_data_len != 0 but the kernel
++ *                sent no fds, which is the other half of the same proposal
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o scmprobe scmprobe.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <sched.h>
++#include <sys/socket.h>
++#include <sys/wait.h>
++#include <sys/mman.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++static int cmpd(const void *a, const void *b)
++{
++	double x = *(const double *)a, y = *(const double *)b;
++
++	return x < y ? -1 : x > y ? 1 : 0;
++}
++
++static void report(const char *name, double *v, int n)
++{
++	qsort(v, n, sizeof(*v), cmpd);
++	printf("%-16s %8.3f us/op   min %8.3f  max %8.3f  n=%d\n",
++	       name, v[n / 2], v[0], v[n - 1], n);
++	fflush(stdout);
++}
++
++static int pin(int cpu)
++{
++	cpu_set_t s;
++
++	CPU_ZERO(&s);
++	CPU_SET(cpu, &s);
++	return sched_setaffinity(0, sizeof(s), &s);
++}
++
++static int sv[2];
++static int payload_fd;
++
++/* One send + one receive + close, all in this process: no peer scheduling in
++ * the measurement, which is what we want -- the question is the fd install
++ * cost, not the handoff latency (handoff.c measures that). */
++static double bench_scm(long iters, int with_fd)
++{
++	char buf[8] = { 0 };
++	union {
++		char b[CMSG_SPACE(sizeof(int))];
++		struct cmsghdr align;
++	} ctrl;
++	double t0 = now();
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		struct msghdr mh;
++		struct iovec iov = { buf, sizeof(buf) };
++		struct cmsghdr *cm;
++
++		memset(&mh, 0, sizeof(mh));
++		mh.msg_iov = &iov;
++		mh.msg_iovlen = 1;
++		if (with_fd) {
++			memset(&ctrl, 0, sizeof(ctrl));
++			mh.msg_control = ctrl.b;
++			mh.msg_controllen = sizeof(ctrl.b);
++			cm = CMSG_FIRSTHDR(&mh);
++			cm->cmsg_level = SOL_SOCKET;
++			cm->cmsg_type = SCM_RIGHTS;
++			cm->cmsg_len = CMSG_LEN(sizeof(int));
++			memcpy(CMSG_DATA(cm), &payload_fd, sizeof(int));
++		}
++		if (sendmsg(sv[0], &mh, 0) < 0)
++			return -1;
++
++		memset(&mh, 0, sizeof(mh));
++		mh.msg_iov = &iov;
++		mh.msg_iovlen = 1;
++		if (with_fd) {
++			memset(&ctrl, 0, sizeof(ctrl));
++			mh.msg_control = ctrl.b;
++			mh.msg_controllen = sizeof(ctrl.b);
++		}
++		if (recvmsg(sv[1], &mh, 0) < 0)
++			return -1;
++		if (with_fd) {
++			cm = CMSG_FIRSTHDR(&mh);
++			if (cm && cm->cmsg_type == SCM_RIGHTS) {
++				int got;
++
++				memcpy(&got, CMSG_DATA(cm), sizeof(int));
++				close(got);
++			}
++		}
++	}
++	return (now() - t0) * 1e6 / iters;
++}
++
++/* The recvmsg the stub issues when there is nothing to receive. */
++static double bench_eagain(long iters)
++{
++	char buf[8];
++	struct iovec iov = { buf, sizeof(buf) };
++	double t0 = now();
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		struct msghdr mh;
++
++		memset(&mh, 0, sizeof(mh));
++		mh.msg_iov = &iov;
++		mh.msg_iovlen = 1;
++		recvmsg(sv[1], &mh, MSG_DONTWAIT);
++	}
++	return (now() - t0) * 1e6 / iters;
++}
++
++int main(int argc, char **argv)
++{
++	long iters = argc > 1 ? atol(argv[1]) : 200000;
++	int rounds = argc > 2 ? atoi(argv[2]) : 7;
++	double v[64];
++	int r;
++
++	if (rounds > 64)
++		rounds = 64;
++	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv)) {
++		perror("socketpair");
++		return 1;
++	}
++	payload_fd = open("/dev/zero", O_RDONLY);
++	if (payload_fd < 0) {
++		perror("open");
++		return 1;
++	}
++	pin(4);
++
++	printf("SCMPROBE_START\n");
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_scm(iters, 1);
++	report("scm_rights", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_scm(iters, 0);
++	report("plain", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_eagain(iters);
++	report("recvmsg_eagain", v, rounds);
++
++	printf("SCMPROBE_DONE\n");
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/shmemfault.c b/tools/um-arm64/harness/probe/shmemfault.c
+new file mode 100644
+index 000000000000..1abef783f642
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/shmemfault.c
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * What does one host page fault cost, by mapping kind, on this phone?
++ *
++ * UML's guest RAM is an unlinked tmpfs file mapped MAP_SHARED into both the UML
++ * kernel process and the stub. clear_page() is the first write to a fresh
++ * offset, so the UML kernel takes a cold sparse-shmem write fault per HOST page
++ * behind every guest page -- four of them per 16K guest page on a 4K host, which
++ * harness/probe/childfaults.c has now measured directly at 5.03 host minor
++ * faults per guest page (4 in the kernel process, 1 in the stub).
++ *
++ * Turning that count into microseconds needs the price of one such fault, and
++ * the only numbers on record for it were taken on an x86-64 workstation. Rows:
++ *
++ *   anon_private   MAP_PRIVATE|MAP_ANONYMOUS write fault -- what native pays,
++ *                  and what perfbench's own native fault row measures
++ *   shmem_cold     first write to a fresh offset of a sparse tmpfs file mapped
++ *                  MAP_SHARED -- what the UML kernel pays per host page
++ *   shmem_warm     a second MAP_SHARED mapping of an offset already allocated
++ *                  and page-cache resident -- what the stub pays
++ *   shmem_falloc   fallocate the range first, then take the write fault -- the
++ *                  "fallocate ahead of the frontier" idea, priced including the
++ *                  fallocate itself
++ *
++ * TMPDIR picks where the file lives; pass the same directory UML uses.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o shmemfault shmemfault.c
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <sched.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++
++static long pgsz;
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++static int cmpd(const void *a, const void *b)
++{
++	double x = *(const double *)a, y = *(const double *)b;
++
++	return x < y ? -1 : x > y ? 1 : 0;
++}
++
++static void report(const char *name, double *v, int n)
++{
++	qsort(v, n, sizeof(*v), cmpd);
++	printf("%-14s %8.3f us/page  min %8.3f  max %8.3f  n=%d\n",
++	       name, v[n / 2], v[0], v[n - 1], n);
++	fflush(stdout);
++}
++
++static double bench_anon(long pages)
++{
++	size_t len = (size_t)pages * pgsz;
++	char *p = mmap(NULL, len, PROT_READ | PROT_WRITE,
++		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	double t0, t1;
++	long i;
++
++	if (p == MAP_FAILED)
++		return -1;
++	t0 = now();
++	for (i = 0; i < pages; i++)
++		p[i * pgsz] = 1;
++	t1 = now();
++	munmap(p, len);
++	return (t1 - t0) * 1e6 / pages;
++}
++
++/*
++ * `round` advances the file offset so every call touches a region that has
++ * never been written, which is what makes the fault a cold allocating one.
++ */
++static double bench_shmem(int fd, long pages, int round, int warm, int falloc)
++{
++	size_t len = (size_t)pages * pgsz;
++	off_t off = (off_t)round * len;
++	char *p, *q = NULL;
++	double t0, t1, fa = 0;
++	long i;
++
++	if (falloc) {
++		double f0 = now();
++
++		if (fallocate(fd, 0, off, len))
++			return -1;
++		fa = now() - f0;
++	}
++
++	p = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, off);
++	if (p == MAP_FAILED)
++		return -1;
++
++	if (warm) {
++		/* Allocate and populate through a first mapping, then measure a
++		 * second one: the page cache is warm, only the PTE is missing. */
++		for (i = 0; i < pages; i++)
++			p[i * pgsz] = 1;
++		q = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, off);
++		if (q == MAP_FAILED) {
++			munmap(p, len);
++			return -1;
++		}
++	}
++
++	t0 = now();
++	for (i = 0; i < pages; i++)
++		(warm ? q : p)[i * pgsz] = 2;
++	t1 = now();
++
++	munmap(p, len);
++	if (q)
++		munmap(q, len);
++	return ((t1 - t0) + fa) * 1e6 / pages;
++}
++
++int main(int argc, char **argv)
++{
++	long pages = argc > 1 ? atol(argv[1]) : 8192;
++	int rounds = argc > 2 ? atoi(argv[2]) : 7;
++	const char *dir = getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp";
++	char path[256];
++	double v[64];
++	int fd, r;
++	cpu_set_t s;
++
++	pgsz = sysconf(_SC_PAGESIZE);
++	if (rounds > 64)
++		rounds = 64;
++
++	CPU_ZERO(&s);
++	CPU_SET(4, &s);
++	sched_setaffinity(0, sizeof(s), &s);
++
++	snprintf(path, sizeof(path), "%s/shmemfault-XXXXXX", dir);
++	fd = mkstemp(path);
++	if (fd < 0) {
++		perror("mkstemp");
++		return 1;
++	}
++	unlink(path);
++	/* Room for every round of every test at a distinct offset. */
++	if (ftruncate(fd, (off_t)pages * pgsz * (rounds + 2) * 4)) {
++		perror("ftruncate");
++		return 1;
++	}
++
++	printf("SHMEMFAULT_START pagesize=%ld pages=%ld dir=%s\n",
++	       pgsz, pages, dir);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_anon(pages);
++	report("anon_private", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_shmem(fd, pages, r, 0, 0);
++	report("shmem_cold", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_shmem(fd, pages, rounds + 1 + r, 1, 0);
++	report("shmem_warm", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_shmem(fd, pages, 2 * rounds + 2 + r, 0, 1);
++	report("shmem_falloc", v, rounds);
++
++	printf("SHMEMFAULT_DONE\n");
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/probe/spawnprobe.c b/tools/um-arm64/harness/probe/spawnprobe.c
+new file mode 100644
+index 000000000000..2f1ae6ef4884
+--- /dev/null
++++ b/tools/um-arm64/harness/probe/spawnprobe.c
+@@ -0,0 +1,254 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * What does UML's per-mm host process actually cost on this phone?
++ *
++ * Every guest mm gets its own host process. A guest fork()+execve() therefore
++ * costs the host TWO clone+execveat of the stub binary and TWO SIGKILL +
++ * blocking waitpid, where a native kernel would do one fork and one exec. The
++ * "recycle stubs instead of creating one per mm" proposal removes exactly that,
++ * and its whole case rests on how much those four operations cost -- a number
++ * nobody has measured on an arm64 phone. Estimates in the tree span 350-700 us
++ * for the creates and 180-380 us for the destroys, which is wide enough that
++ * the proposal is either the largest win available or barely worth building.
++ *
++ * Rows, each the previous plus one thing:
++ *
++ *   clone_exit   clone(CLONE_VM|CLONE_VFORK|SIGCHLD) + _exit + waitpid
++ *                the bare host process lifecycle, no exec
++ *   fork_exit    fork() + _exit + waitpid, for reference
++ *   clone_tiny   clone + execveat(a 200-byte nostdlib binary) + waitpid
++ *                adds one Android execve, SELinux and audit included
++ *   clone_stub   clone + execveat(the real uml-userspace stub) + waitpid
++ *                the actual binary start_userspace() execs. The stub dies
++ *                early reading its init_data from a closed fd 0, so this is
++ *                create + exec + its first few syscalls, not a full stub.
++ *   kill_wait_N  SIGKILL + blocking waitpid of a live child holding N private
++ *                mappings, N in {0, 32, 128, 512}. This is destroy_context()'s
++ *                os_kill_ptraced_process(pid, 1), which the UML kernel thread
++ *                sits inside with signals blocked, twice per guest fork+exec.
++ *
++ * Build:
++ *   clang --target=aarch64-linux-gnu -static -O2 -o spawnprobe spawnprobe.c
++ *
++ * Usage: spawnprobe <tiny-exe> <stub-exe> [iters] [rounds]
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++#include <fcntl.h>
++#include <sched.h>
++#include <signal.h>
++#include <errno.h>
++#include <sys/mman.h>
++#include <sys/wait.h>
++#include <sys/syscall.h>
++
++static double now(void)
++{
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	return ts.tv_sec + ts.tv_nsec / 1e9;
++}
++
++static int cmpd(const void *a, const void *b)
++{
++	double x = *(const double *)a, y = *(const double *)b;
++
++	return x < y ? -1 : x > y ? 1 : 0;
++}
++
++static void report(const char *name, double *v, int n)
++{
++	qsort(v, n, sizeof(*v), cmpd);
++	printf("%-14s %9.2f us/op   min %9.2f  max %9.2f  n=%d\n",
++	       name, v[n / 2], v[0], v[n - 1], n);
++	fflush(stdout);
++}
++
++/*
++ * start_userspace() uses CLONE_VFORK|CLONE_VM|SIGCHLD and a stack it allocated
++ * itself; reproduce that rather than plain fork(), because CLONE_VFORK suspends
++ * the parent for the whole clone->execve window and that suspension is part of
++ * what pooling would remove.
++ */
++static long do_clone(void *stack_top)
++{
++	return syscall(__NR_clone, CLONE_VFORK | CLONE_VM | SIGCHLD,
++		       stack_top, NULL, NULL, NULL);
++}
++
++static char *stack_alloc(void)
++{
++	char *s = mmap(NULL, 256 * 1024, PROT_READ | PROT_WRITE,
++		       MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
++
++	return s == MAP_FAILED ? NULL : s + 256 * 1024;
++}
++
++static double bench_clone_exit(long iters)
++{
++	char *st = stack_alloc();
++	double t0 = now();
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		long pid = do_clone(st);
++
++		if (pid == 0)
++			syscall(__NR_exit, 0);
++		if (pid < 0)
++			return -1;
++		waitpid(pid, NULL, 0);
++	}
++	return (now() - t0) * 1e6 / iters;
++}
++
++static double bench_fork_exit(long iters)
++{
++	double t0 = now();
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		pid_t pid = fork();
++
++		if (pid == 0)
++			syscall(__NR_exit, 0);
++		if (pid < 0)
++			return -1;
++		waitpid(pid, NULL, 0);
++	}
++	return (now() - t0) * 1e6 / iters;
++}
++
++/*
++ * clone + execveat(fd) + wait. Uses raw execveat on an already-open fd, which
++ * is exactly what userspace_tramp() does, so the path-resolution cost is out of
++ * the measurement and only the exec itself is in it.
++ */
++static double bench_clone_exec(long iters, int fd)
++{
++	char *st = stack_alloc();
++	char *argv[] = { (char *)"stub", NULL };
++	double t0 = now();
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		long pid = do_clone(st);
++
++		if (pid == 0) {
++			syscall(__NR_execveat, fd, (unsigned long)"",
++				(unsigned long)argv, NULL, AT_EMPTY_PATH);
++			syscall(__NR_exit, 5);
++		}
++		if (pid < 0)
++			return -1;
++		waitpid(pid, NULL, 0);
++	}
++	return (now() - t0) * 1e6 / iters;
++}
++
++/*
++ * SIGKILL + blocking waitpid of a child that has just built `maps` private
++ * mappings, which is what a stub carrying a guest address space looks like to
++ * the host's exit_mmap(). The child signals readiness through a pipe so the
++ * mapping work is outside the timed region.
++ */
++static double bench_kill_wait(long iters, int maps)
++{
++	double total = 0;
++	long i;
++
++	for (i = 0; i < iters; i++) {
++		int p[2];
++		pid_t pid;
++		char c;
++		double t0;
++
++		if (pipe(p))
++			return -1;
++		pid = fork();
++		if (pid == 0) {
++			int m;
++
++			close(p[0]);
++			for (m = 0; m < maps; m++)
++				mmap(NULL, 16384, PROT_READ | PROT_WRITE,
++				     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++			c = 'r';
++			if (write(p[1], &c, 1) != 1)
++				syscall(__NR_exit, 1);
++			for (;;)
++				pause();
++		}
++		close(p[1]);
++		if (read(p[0], &c, 1) != 1)
++			return -1;
++		close(p[0]);
++
++		t0 = now();
++		kill(pid, SIGKILL);
++		waitpid(pid, NULL, 0);
++		total += now() - t0;
++	}
++	return total * 1e6 / iters;
++}
++
++int main(int argc, char **argv)
++{
++	long iters = argc > 3 ? atol(argv[3]) : 300;
++	int rounds = argc > 4 ? atoi(argv[4]) : 7;
++	int tiny_fd = -1, stub_fd = -1;
++	double v[64];
++	int r;
++	static const int mapcounts[] = { 0, 32, 128, 512 };
++	size_t mi;
++
++	if (argc < 3) {
++		fprintf(stderr, "usage: %s <tiny-exe> <stub-exe> [iters] [rounds]\n",
++			argv[0]);
++		return 2;
++	}
++	if (rounds > 64)
++		rounds = 64;
++
++	tiny_fd = open(argv[1], O_RDONLY);
++	stub_fd = open(argv[2], O_RDONLY);
++	if (tiny_fd < 0 || stub_fd < 0) {
++		perror("open");
++		return 1;
++	}
++
++	printf("SPAWNPROBE_START iters=%ld rounds=%d\n", iters, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_clone_exit(iters);
++	report("clone_exit", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_fork_exit(iters);
++	report("fork_exit", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_clone_exec(iters, tiny_fd);
++	report("clone_tiny", v, rounds);
++
++	for (r = 0; r < rounds; r++)
++		v[r] = bench_clone_exec(iters, stub_fd);
++	report("clone_stub", v, rounds);
++
++	for (mi = 0; mi < sizeof(mapcounts) / sizeof(mapcounts[0]); mi++) {
++		char name[32];
++
++		for (r = 0; r < rounds; r++)
++			v[r] = bench_kill_wait(iters / 3 + 1, mapcounts[mi]);
++		snprintf(name, sizeof(name), "kill_wait_%d", mapcounts[mi]);
++		report(name, v, rounds);
++	}
++
++	printf("SPAWNPROBE_DONE\n");
++	return 0;
++}
+diff --git a/tools/um-arm64/harness/verifybench.sh b/tools/um-arm64/harness/verifybench.sh
+index c8b0e89dd7e8..bbf0834b9949 100644
+--- a/tools/um-arm64/harness/verifybench.sh
++++ b/tools/um-arm64/harness/verifybench.sh
+@@ -71,6 +71,27 @@ done
+ # boot argument certainly does (ubd0=...).
+ KERNELS=${KERNELS:?set KERNELS="label=/path/to/linux[%extra args] ..."}
+ 
++# Entries are separated by whitespace when no entry contains a space, and by
++# NEWLINES otherwise.
++#
++# The whitespace form is what everything in the tree uses and it stays working.
++# It cannot express a condition with *two* boot arguments, though, and that is
++# not a corner case: an S26 Ultra needs stub_exe= on every condition just to
++# boot (Android 16 refuses to execve a memfd), so every sweep on that device is
++# "stub_exe=... plus the thing being swept". Split on whitespace and the second
++# argument silently becomes a fourth kernel named `prefault` at path `0`, which
++# does not fail -- it produces a table with the wrong conditions in it.
++#
++#   KERNELS="a=/k%stub_exe=/p prefault=0
++#   b=/k%stub_exe=/p prefault=512K"
++#
++# Detected rather than switched on, so no caller has to change.
++case "$KERNELS" in
++*$'\n'*) KERNEL_IFS=$'\n' ;;
++*)	 KERNEL_IFS=' 	' ;;
++esac
++IFS=$KERNEL_IFS read -r -d '' -a KERNEL_LIST < <(printf '%s\0' "$KERNELS")
++
+ # kernel_path/kernel_args - split one KERNELS entry
+ kernel_path() { local v=${1#*=}; printf '%s' "${v%%\%*}"; }
+ kernel_args() { local v=${1#*=}; case "$v" in *%*) printf '%s' "${v#*%}" ;; *) : ;; esac; }
+@@ -87,7 +108,7 @@ log() { printf '[verify] %s\n' "$*"; }
+ 	echo "### rounds: $ROUNDS  mask: $MASK  keeper: $KEEPMASK"
+ 	echo
+ 	echo "### kernels under test"
+-	for k in $KERNELS; do
++	for k in "${KERNEL_LIST[@]}"; do
+ 		lbl=${k%%=*}; path=$(kernel_path "$k")
+ 		echo "  $lbl"
+ 		echo "    path : $path"
+@@ -116,9 +137,26 @@ env_snapshot() {
+ env_snapshot > "$OUT/env-before.txt"
+ 
+ # ---- stage the kernels ------------------------------------------------------
+-for k in $KERNELS; do
++#
++# Push each DISTINCT binary once and copy it on the device for the remaining
++# labels that share it. The boot-argument form of KERNELS exists precisely so
++# one binary can be several conditions, so the common sweep pushes the same
++# bytes five times; on an S26 Ultra over TCP adb that is not merely wasteful,
++# it hangs -- the first push succeeds and the second wedges until the transport
++# is reset, which fails the run before a single round is measured. An on-device
++# cp is local, instant and cannot hit that.
++declare -A pushed=()
++for k in "${KERNEL_LIST[@]}"; do
+ 	lbl=${k%%=*}; path=$(kernel_path "$k")
+-	adb push "$path" "$DEV/k-$lbl" >/dev/null 2>&1 || { echo "push failed: $path" >&2; exit 2; }
++	src=${pushed[$path]:-}
++	if [ -n "$src" ]; then
++		adb shell "cp $DEV/k-$src $DEV/k-$lbl && chmod 755 $DEV/k-$lbl" >/dev/null 2>&1 \
++			|| { echo "on-device copy failed: k-$src -> k-$lbl" >&2; exit 2; }
++	else
++		adb push "$path" "$DEV/k-$lbl" >/dev/null 2>&1 \
++			|| { echo "push failed: $path" >&2; exit 2; }
++		pushed[$path]=$lbl
++	fi
+ done
+ 
+ # ---- the run ----------------------------------------------------------------
+@@ -140,7 +178,7 @@ run_uml() {
+ }
+ 
+ CONDS="native proot"
+-for k in $KERNELS; do
++for k in "${KERNEL_LIST[@]}"; do
+ 	lbl=${k%%=*}
+ 	for m in $MODES; do
+ 		CONDS="$CONDS ${lbl}-${m}"
+@@ -152,7 +190,7 @@ for r in $(seq 1 "$ROUNDS"); do
+ 	log "round $r/$ROUNDS"
+ 	run_native > "$OUT/native.$r" 2>&1
+ 	run_proot  > "$OUT/proot.$r"  2>&1
+-	for k in $KERNELS; do
++	for k in "${KERNEL_LIST[@]}"; do
+ 		lbl=${k%%=*}; xargs=$(kernel_args "$k")
+ 		for m in $MODES; do
+ 			[ "$m" = sec ] && sc=on || sc=off

@@ -1,0 +1,410 @@
+From JesusChapman <developer@jesuschapman.me> Sun Oct 18 12:00:00 2026 -0500
+Subject: [PATCH] um: link against bionic with lld
+
+Probe for -lutil/-lrt/-lpthread instead of assuming glibc's split
+(bionic folds all three into libc); drop stdio stdout/stderr references
+for direct write(2) (their copy relocations have no aligned home in UML's
+linker scripts against bionic); merge rodata into text for the stub and
+give vmlinux one loadable segment plus constructor arrays (lld otherwise
+emits sharing segments that die with MAP_FIXED_NOREPLACE, and bionic's
+__libc_init walks preinit_array first). Same changes the aarch64 subarch
+series carries inside its bionic-build patch; they live here separately so
+the x86_64 build does not need that series. Nothing in them is
+arch-specific (the redefined-symbols hook stays inert without its list).
+
+---
+
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -78,10 +78,41 @@ vmlinux_link()
+ 	objs="${objs} init/version-timestamp.o"
+ 
+ 	if [ "${SRCARCH}" = "um" ]; then
++		# Rename the kernel symbols that the target libc also references,
++		# before it gets a chance to bind to them. Doing it here rather
++		# than with -D during compilation keeps the preprocessor out of
++		# it: these names also occur as bare tokens that other headers
++		# paste into identifiers, and rewriting those breaks builds in
++		# places that have nothing to do with libc. See the list itself
++		# for which names and why.
++		if [ -n "${UM_REDEF_SYMS}" ] && [ -f "${UM_REDEF_SYMS}" ]; then
++			for a in ${objs} ${libs}; do
++				case "${a}" in
++				*.a|*.o)
++					${OBJCOPY} --redefine-syms="${UM_REDEF_SYMS}" \
++						"${a}" || exit 1
++					;;
++				esac
++			done
++		fi
++
+ 		wl=-Wl,
+ 		ld="${CC}"
+ 		ldflags="${CFLAGS_vmlinux}"
+-		ldlibs="-lutil -lrt -lpthread"
++		# glibc keeps these in separate archives; bionic folds all
++		# three into libc, so -lutil, -lrt and -lpthread name libraries
++		# that do not exist and the link fails outright. Ask the
++		# compiler which of them can actually be linked rather than
++		# assuming a libc -- UML links with $(CC), so this is the same
++		# driver that will do the real link.
++		ldlibs=""
++		for lib in util rt pthread; do
++			if echo 'int main(void){return 0;}' | \
++			   ${CC} ${CFLAGS_vmlinux} -x c - -l${lib} \
++				 -o /dev/null >/dev/null 2>&1; then
++				ldlibs="${ldlibs} -l${lib}"
++			fi
++		done
+ 	else
+ 		wl=
+ 		ld="${LD}"
+
+diff --git a/arch/um/kernel/dyn.lds.S b/arch/um/kernel/dyn.lds.S
+--- a/arch/um/kernel/dyn.lds.S
++++ b/arch/um/kernel/dyn.lds.S
+@@ -157,6 +157,16 @@ SECTIONS
+   PROVIDE (edata = .);
+   .bss            : {
+    __bss_start = .;
++   /*
++    * Copy relocations land in .dynbss, and with an explicit linker script the
++    * linker places them at the current location rather than re-aligning for
++    * them. A libc whose exported data needs 8-byte alignment then fails to
++    * link: bionic's stderr is a pointer, and lld rejects the reference with
++    * "improper alignment for relocation R_AARCH64_LDST64_ABS_LO12_NC".
++    * glibc does not show this because UML has historically been linked
++    * statically against it here, and a static link has no copy relocations.
++    */
++   . = ALIGN(16);
+    *(.dynbss)
+    *(.bss .bss.* .gnu.linkonce.b.*)
+    *(COMMON)
+diff --git a/arch/um/kernel/uml.lds.S b/arch/um/kernel/uml.lds.S
+--- a/arch/um/kernel/uml.lds.S
++++ b/arch/um/kernel/uml.lds.S
+@@ -13,6 +13,29 @@ VERSION {
+   };
+ }
+ 
++/*
++ * One loadable segment for the whole binary.
++ *
++ * Without this, lld gives every permission group its own PT_LOAD and takes the
++ * addresses from this script, so any group that starts mid-page yields two
++ * segments sharing a page. load_elf_binary() maps ET_EXEC segments with
++ * MAP_FIXED_NOREPLACE; the second mmap of a shared page returns -EEXIST, and
++ * since that happens after the point of no return the kernel can only SIGSEGV
++ * the process. It presents as a bare "Segmentation fault" with no output and a
++ * PC that is already unmapped.
++ *
++ * bfd ld merged these into a single RWE segment, which is why UML never had to
++ * think about it and why this only shows up when linking with lld -- as the
++ * Android NDK does. Asking for one segment explicitly reproduces the layout
++ * that has always worked, rather than page-aligning a dozen boundaries that
++ * come from macros and will drift.
++ */
++PHDRS {
++  all PT_LOAD FILEHDR PHDRS FLAGS(7);   /* RWX, and map the ELF headers too */
++  note PT_NOTE FLAGS(4);
++  tls PT_TLS FLAGS(4);
++}
++
+ SECTIONS
+ {
+   /* This must contain the right address - not quite the default ELF one.*/
+@@ -28,7 +51,7 @@ SECTIONS
+   . = ALIGN(PAGE_SIZE);
+ 
+   _text = .;
+-  INIT_TEXT_SECTION(0)
++  INIT_TEXT_SECTION(0) :all
+ 
+   .text      :
+   {
+@@ -74,6 +97,46 @@ SECTIONS
+   init.data : { INIT_DATA }
+   __init_end = .;
+ 
++  /*
++   * The C runtime's constructor arrays, placed exactly as dyn.lds.S places
++   * them. This script -- the static one -- omitted them entirely, leaving the
++   * linker to put them wherever its default rules chose, which lands them in a
++   * segment of their own whose file offset does not match its virtual address.
++   *
++   * glibc tolerated that. bionic does not: __libc_init walks preinit_array
++   * before anything else runs, so a statically linked UML against bionic
++   * segfaults before main() with no output at all. The section was there in
++   * the ELF -- correctly sized, at a plausible address -- which is what makes
++   * this one hard to see.
++   *
++   * The alignment comment below is inherited from dyn.lds.S and is the reason
++   * the label sits outside the section.
++   */
++  /*
++   * Page-align every point where the segment permissions change.
++   *
++   * lld gives each permission group its own PT_LOAD, and takes the addresses
++   * from this script -- so a group that starts mid-page produces two segments
++   * sharing one page. load_elf_binary() maps ET_EXEC segments with
++   * MAP_FIXED_NOREPLACE, the second mmap of that shared page returns -EEXIST,
++   * and because this happens after the point of no return the kernel can only
++   * SIGSEGV the process. The symptom is a bare "Segmentation fault" with no
++   * output at all and a PC that is no longer mapped, which says nothing about
++   * the cause.
++   *
++   * bfd ld merged these groups into one RWE segment and the question never
++   * arose, which is why this only appears when linking with lld against the
++   * Android NDK.
++   */
++  . = ALIGN(PAGE_SIZE);
++  .preinit_array  : { *(.preinit_array) }
++  .init_array     : {
++    *(.kasan_init)
++    *(.init_array.*)
++    *(.init_array)
++  }
++  .fini_array     : { *(.fini_array) }
++
+   .data    :
+   {
+     INIT_TASK_DATA(KERNEL_STACK_SIZE)
+@@ -92,14 +155,16 @@ SECTIONS
+   }
+ 
+   .got           : { *(.got.plt) *(.got) }
++  . = ALIGN(PAGE_SIZE);
+   .eh_frame       : { KEEP (*(.eh_frame)) }
+   .dynamic       : { *(.dynamic) }
+-  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
+-  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
++  . = ALIGN(PAGE_SIZE);
++  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) } :all :tls
++  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) } :all :tls
+   /* We want the small data sections together, so single-instruction offsets
+      can access them all, and initialized data all before uninitialized, so
+      we can shorten the on-disk segment size.  */
+-  .sdata     : { *(.sdata) }
++  .sdata     : { *(.sdata) } :all
+   _edata  =  .;
+   PROVIDE (edata = .);
+   . = ALIGN(PAGE_SIZE);
+diff --git a/arch/um/kernel/skas/Makefile b/arch/um/kernel/skas/Makefile
+--- a/arch/um/kernel/skas/Makefile
++++ b/arch/um/kernel/skas/Makefile
+@@ -32,7 +32,14 @@ quiet_cmd_stub_exe = STUB_EXE $@
+ 			   $(filter-out $(UM_GPROF_OPT) $(UM_GCOV_OPT),$(KBUILD_CFLAGS)) $(STUB_EXE_LDFLAGS) \
+ 			   $(filter %.o,$^)
+ 
+-STUB_EXE_LDFLAGS = -Wl,-n -static
++# --no-rosegment: lld gives read-only data its own PT_LOAD, and with -n
++# (nmagic, no page alignment) the two segments end up sharing a page. The
++# kernel maps ET_EXEC segments with MAP_FIXED_NOREPLACE, so the second mmap of
++# that page returns -EEXIST and the exec fails after the point of no return --
++# which surfaces as the *guest* failing to start with -ENOMEM, because
++# start_userspace() cannot exec the stub. Merging rodata into the text segment
++# leaves one loadable segment, which is what -n was written for.
++STUB_EXE_LDFLAGS = -Wl,-n -Wl,--no-rosegment -static
+ 
+ targets += stub_exe.dbg stub_exe $(stub_exe_objs-y)
+ 
+diff --git a/arch/um/os-Linux/file.c b/arch/um/os-Linux/file.c
+--- a/arch/um/os-Linux/file.c
++++ b/arch/um/os-Linux/file.c
+@@ -568,7 +568,13 @@ int os_create_unix_socket(const char *file, int len, int close_on_exec)
+ 
+ void os_flush_stdout(void)
+ {
+-	fflush(stdout);
++	/*
++	 * Nothing to flush: UML's own output goes to fd 1 and fd 2 with
++	 * write(2), deliberately, because referencing the stdio stdout/stderr
++	 * objects pulls copy relocations into the binary that the UML linker
++	 * script has no aligned home for -- which is what makes linking
++	 * against bionic fail. See os_write_stderr() in util.c.
++	 */
+ }
+ 
+ int os_lock_file(int fd, int excl)
+diff --git a/arch/um/os-Linux/util.c b/arch/um/os-Linux/util.c
+--- a/arch/um/os-Linux/util.c
++++ b/arch/um/os-Linux/util.c
+@@ -181,6 +181,32 @@ __uml_setup("quiet", quiet_cmd_param,
+  */
+ int vscnprintf(char *buf, size_t size, const char *fmt, va_list args);
+ 
++/*
++ * Write straight to fd 2 rather than through stderr.
++ *
++ * Referencing stdio's stderr object pulls a copy relocation into the UML
++ * binary, and UML's linker script gives the linker no aligned home for one:
++ * linking against bionic then fails with "improper alignment for relocation
++ * R_AARCH64_LDST64_ABS_LO12_NC" on stderr, because bionic's is an 8-byte
++ * pointer and the script places the copy at a 4-byte boundary. glibc builds
++ * never showed it because UML is linked statically against glibc here, and a
++ * static link has no copy relocations at all.
++ *
++ * Nothing is lost: this output is diagnostics, it is line-at-a-time, and it
++ * was already unbuffered in effect.
++ */
++static void os_write_stderr(const char *buf, int len)
++{
++	while (len > 0) {
++		ssize_t n = write(2, buf, len);
++
++		if (n <= 0)
++			return;
++		buf += n;
++		len -= n;
++	}
++}
++
+ void os_info(const char *fmt, ...)
+ {
+ 	char buf[256];
+@@ -192,7 +218,7 @@ void os_info(const char *fmt, ...)
+ 
+ 	va_start(list, fmt);
+ 	len = vscnprintf(buf, sizeof(buf), fmt, list);
+-	fwrite(buf, len, 1, stderr);
++	os_write_stderr(buf, len);
+ 	va_end(list);
+ }
+ 
+@@ -204,6 +230,6 @@ void os_warn(const char *fmt, ...)
+ 
+ 	va_start(list, fmt);
+ 	len = vscnprintf(buf, sizeof(buf), fmt, list);
+-	fwrite(buf, len, 1, stderr);
++	os_write_stderr(buf, len);
+ 	va_end(list);
+ }
+diff --git a/arch/um/kernel/um_arch.c b/arch/um/kernel/um_arch.c
+--- a/arch/um/kernel/um_arch.c
++++ b/arch/um/kernel/um_arch.c
+@@ -302,15 +302,32 @@ static int __init parse_host_cpu_line(char *line)
+ 	return arch_parse_host_cpu_flags(line);
+ }
+ 
++/*
++ * Strip an address tag before using a pointer as an address limit.
++ *
++ * arm64 implements top-byte-ignore, and Android turns it on: pointers there
++ * routinely carry a non-zero tag in bits 56-63, which the hardware discards on
++ * access but which is very much present in the value. Deriving the top of the
++ * address space from a tagged stack pointer therefore produces something like
++ * 0xb400007e76fe7000, and everything computed from it -- stub placement, guest
++ * TASK_SIZE -- is nonsense. The untagged value here is 0x7e76fe7000, which is a
++ * plausible stack address on this host's 39-bit user address space.
++ *
++ * Masking is unconditional because an untagged pointer is unchanged by it.
++ */
++#define UM_ADDR_TAG_MASK	((1UL << 56) - 1)
++
+ static unsigned long __init get_top_address(char **envp)
+ {
+-	unsigned long top_addr = (unsigned long) &top_addr;
++	unsigned long top_addr = (unsigned long) &top_addr & UM_ADDR_TAG_MASK;
+ 	int i;
+ 
+ 	/* The earliest variable should be after the program name in ELF */
+ 	for (i = 0; envp[i]; i++) {
+-		if ((unsigned long) envp[i] > top_addr)
+-			top_addr = (unsigned long) envp[i];
++		unsigned long e = (unsigned long) envp[i] & UM_ADDR_TAG_MASK;
++
++		if (e > top_addr)
++			top_addr = e;
+ 	}
+ 
+ 	return PAGE_ALIGN(top_addr + 1);
+@@ -353,7 +370,45 @@ int __init linux_main(int argc, char **argv, char **envp)
+ 	 * TASK_SIZE needs to be PGDIR_SIZE aligned or else exit_mmap craps
+ 	 * out
+ 	 */
+-	task_size = task_size & PGDIR_MASK;
++	if (task_size & PGDIR_MASK) {
++		task_size = task_size & PGDIR_MASK;
++	} else {
++		/*
++		 * The host's entire user address space is smaller than one
++		 * guest PGDIR, so rounding down to PGDIR_SIZE lands on zero --
++		 * and a zero TASK_SIZE fails every guest mmap, so the first
++		 * exec returns -ENOMEM and the boot dies with "Requested init
++		 * failed (error -12)" and no other clue.
++		 *
++		 * This is not a corner case. A 64-bit UML guest has
++		 * PGDIR_SIZE == 512 GiB, and arm64 hosts built with
++		 * CONFIG_ARM64_VA_BITS_39 -- the usual choice for a 4 KiB-page
++		 * kernel, and what Android devices overwhelmingly ship -- have
++		 * exactly 512 GiB of user address space. The subtraction for
++		 * the stub then puts the top just below the only aligned value
++		 * that would have fit.
++		 *
++		 * Align to the next level down instead. UML's page tables are
++		 * software structures walked by UML itself -- the host does the
++		 * real translation through mmap -- so the granularity is a
++		 * choice, not a hardware constraint, and one PGDIR entry
++		 * covering a partially used range is exactly what the topmost
++		 * entry looks like on any host anyway.
++		 */
++		task_size = task_size & PUD_MASK;
++	}
++
++	/*
++	 * Every guest mapping is bounded by task_size, and task_size is derived
++	 * from where the *host* put this process's stack. When that derivation
++	 * goes wrong the failure is silent and total: every guest mmap returns
++	 * -ENOMEM, so the first exec fails with -12 and nothing anywhere says
++	 * why. Print the three numbers -- one line, once, at boot -- because
++	 * reconstructing them afterwards requires a debugger on a host that may
++	 * be a phone.
++	 */
++	os_info("Address space: host top 0x%lx, stub at 0x%lx, guest TASK_SIZE 0x%lx\n",
++		stub_start + STUB_SIZE, stub_start, task_size);
+ 
+ 	/* OS sanity checks that need to happen before the kernel runs */
+ 	os_early_checks();
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -83,29 +84,35 @@ static void fatal_perror(const char *str)
+ 
+ static void fatal(char *fmt, ...)
+ {
++	char buf[512];
+ 	va_list list;
+ 
+ 	va_start(list, fmt);
+-	vfprintf(stderr, fmt, list);
++	vsnprintf(buf, sizeof(buf), fmt, list);
+ 	va_end(list);
++	write(2, buf, strlen(buf));
+ 
+ 	exit(1);
+ }
+ 
+ static void non_fatal(char *fmt, ...)
+ {
++	char buf[512];
+ 	va_list list;
+ 
+ 	va_start(list, fmt);
+-	vfprintf(stderr, fmt, list);
++	vsnprintf(buf, sizeof(buf), fmt, list);
+ 	va_end(list);
++	write(2, buf, strlen(buf));
+ }
+ 
+ static int start_ptraced_child(void)
+ {
+ 	int pid, n, status;
+ 
+-	fflush(stdout);
++	/* No fflush(stdout): referencing the stdio object pulls in a copy
++	 * relocation the UML linker script cannot align. Nothing here uses
++	 * buffered stdout. */
+ 
+ 	pid = fork();
+ 	if (pid == 0)

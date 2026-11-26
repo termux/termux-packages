@@ -1,0 +1,18 @@
+--- a/util.c
++++ b/util.c
+@@ -390,8 +390,13 @@ bool ns_is_init(void)
+ 	bool ret = true;
+ 	int fd;
+ 
+-	if ((fd = open("/proc/self/uid_map", O_RDONLY | O_CLOEXEC)) < 0)
+-		die_perror("Can't determine if we're in init namespace");
++	if ((fd = open("/proc/self/uid_map", O_RDONLY | O_CLOEXEC)) < 0) {
++		/* No user namespaces on this kernel, Android for example: there
++		 * is exactly one user namespace and we are in it. */
++		if (errno == ENOENT)
++			return true;
++		die_perror("Can't determine if we're in init namespace");
++	}
+ 
+ 	if (read(fd, buf, sizeof(root_uid_map)) != sizeof(root_uid_map) - 1 ||
+ 	    strncmp(buf, root_uid_map, sizeof(root_uid_map)))

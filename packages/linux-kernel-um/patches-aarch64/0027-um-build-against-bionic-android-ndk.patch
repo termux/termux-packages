@@ -1,0 +1,1382 @@
+From 2104b6891ca2e8d17f0e7f6acb3e09cb3a8ff39c Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 21:42:56 +0200
+Subject: [PATCH] um: build against bionic (Android NDK)
+
+UML assumes glibc in more places than it looks, and an Android phone is a
+host with the right kernel and the wrong libc. Building against the NDK
+turns up seven independent problems, one of which explains most of the
+others: USER_CFLAGS adds the kernel's include directory with -idirafter,
+so a sysroot shipping its own linux/compiler_types.h shadows the kernel's.
+The NDK's does -- a 265-byte uapi stub defining neither __section nor
+__used. Force-include compiler_attributes.h instead, and not
+compiler_types.h, which defines __private, a struct member name in
+bionic's bits/pthread_types.h.
+
+The rest: probe for -lutil, -lrt and -lpthread rather than assuming
+glibc's split, because bionic folds all three into libc and naming them
+fails the link outright; drop the stdio stdout/stderr references, which
+pull copy relocations UML's linker script cannot align; pthread_cancel
+does not exist in bionic; align .dynbss; and stub_exe= to exec the stub
+from a path, since a memfd is not always available.
+
+Two things that only show up at runtime. The linker script declared no
+PHDRS, so lld gave each permission group its own PT_LOAD taking addresses
+from the script, and any group starting mid-page produced two segments
+sharing a page. load_elf_binary() maps ET_EXEC segments with
+MAP_FIXED_NOREPLACE, so the second mmap of that page returns -EEXIST, and
+because this happens past the point of no return the kernel can only
+SIGSEGV the process: a bare "Segmentation fault" with an unmapped PC. bfd
+ld merged the groups into one RWE segment and the question never arose.
+And Android tags pointers, so the stack address get_top_address() reads
+carries a top byte that must be masked before it means anything.
+
+Finally, the names the kernel defines that bionic's libc also references
+are renamed on the object files at link time. In a static link the linker
+is happy to satisfy libc's reference with the kernel's definition, and
+sched_getaffinity showed the shape of that: bionic's start-up reached the
+kernel's implementation and dereferenced a task_struct that did not exist
+yet, with nothing warning, because libc only references these and there is
+no duplicate-definition error to notice. objcopy --redefine-syms renames
+definitions and references together; doing it with -D would also rewrite
+these names where other headers paste them into identifiers.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/Makefile.um                  |  47 ++++++
+ arch/arm64/um/asm/string.h              |  51 ++++++
+ arch/arm64/um/bionic-syms.redef         |  42 +++++
+ arch/um/Makefile                        |  10 ++
+ arch/um/drivers/Kconfig                 |  21 ++-
+ arch/um/include/shared/as-layout.h      |  29 ++++
+ arch/um/include/shared/init.h           |  22 +++
+ arch/um/include/shared/skas/mm_id.h     |  13 ++
+ arch/um/include/shared/skas/skas.h      |   7 +
+ arch/um/include/shared/skas/stub-data.h |  25 ++-
+ arch/um/kernel/dyn.lds.S                |  10 ++
+ arch/um/kernel/skas/Makefile            |   9 +-
+ arch/um/kernel/skas/mmu.c               |  10 +-
+ arch/um/kernel/um_arch.c                |  63 ++++++-
+ arch/um/kernel/uml.lds.S                |  73 +++++++-
+ arch/um/os-Linux/file.c                 |   8 +-
+ arch/um/os-Linux/helper.c               |  16 ++
+ arch/um/os-Linux/skas/process.c         | 148 +++++++++++++++-
+ arch/um/os-Linux/start_up.c             | 216 ++++++++++++++++++++----
+ arch/um/os-Linux/util.c                 |  30 +++-
+ scripts/link-vmlinux.sh                 |  33 +++-
+ 21 files changed, 832 insertions(+), 51 deletions(-)
+ create mode 100644 arch/arm64/um/bionic-syms.redef
+
+diff --git a/arch/arm64/Makefile.um b/arch/arm64/Makefile.um
+index 389ec45eb6b2e..9f128e5bd4eb0 100644
+--- a/arch/arm64/Makefile.um
++++ b/arch/arm64/Makefile.um
+@@ -23,3 +23,50 @@ CHECKFLAGS	+= -D__aarch64__
+ # -mgeneral-regs-only would break the host-side code that legitimately does.
+ 
+ LINK-$(CONFIG_LD_SCRIPT_DYN_RPATH) += -Wl,-rpath,/lib
++
++# Building against bionic (the Android NDK) collides with the kernel's own
++# definitions of a set of standard-library names. glibc does not show this:
++# its libc.a is finely split, so the objects carrying memcpy, snprintf and the
++# rest are simply never pulled in once the kernel's definitions satisfy every
++# reference. bionic's libc.a is coarser -- the objects that *are* needed also
++# define these -- and the static link then fails with twenty duplicate symbols.
++#
++# Resolving it with --allow-multiple-definition is worse than not building:
++# link order puts the kernel first, so libc's internals end up calling the
++# kernel's memcpy and sem_init, and the binary segfaults before main().
++#
++# The string family is handled in arch/arm64/um/asm/string.h instead, by
++# declaring __HAVE_ARCH_* so lib/string.c does not compile its own -- renaming
++# those fights CONFIG_FORTIFY_SOURCE, which redefines them as macros.
++#
++# The rest are renamed, which is exactly what UML already does for
++# errno, sigprocmask, mktime and strrchr in arch/um/Makefile. These defines
++# reach kernel objects only, never USER_OBJS, so host-side code and libc keep
++# the real names. Compiler-emitted implicit calls (struct copies lowering to
++# memcpy) also keep the real name and get libc's implementation, which is
++# correct and usually faster than the kernel's generic C.
++#
++# The list is not guesswork and not the duplicate-symbol errors either. Those
++# only catch names both sides *define*; the dangerous case is a name libc
++# merely *references* while the kernel defines it, because then there is no
++# error at all -- the reference simply binds to the kernel's function. That is
++# what happened with sched_getaffinity: bionic's startup called it, got the
++# kernel's, and dereferenced a task_struct that does not exist yet. The symptom
++# was a SIGSEGV writing to 0x80 with no output.
++#
++# So the list is the intersection of "undefined in bionic's libc.a" with
++# "defined in vmlinux.a", computed with llvm-nm:
++#
++#   llvm-nm --undefined-only libc.a         | sort -u > A
++#   llvm-nm --defined-only --extern-only vmlinux.a | sort -u > B
++#   comm -12 A B
++#
++# Detected from the compiler rather than configured, because the whole
++# difference is which libc the target triple selects.
++UM_BIONIC := $(shell echo | $(CC) $(CLANG_FLAGS) -dM -E - 2>/dev/null | grep -c __ANDROID__)
++
++ifeq ($(UM_BIONIC),1)
++# Renamed on the object files at link time, not here: see
++# arch/arm64/um/bionic-syms.redef for the list and for why -D is the wrong tool.
++export UM_REDEF_SYMS := $(srctree)/arch/arm64/um/bionic-syms.redef
++endif
+diff --git a/arch/arm64/um/asm/string.h b/arch/arm64/um/asm/string.h
+index ff82f2c825acb..437043633611a 100644
+--- a/arch/arm64/um/asm/string.h
++++ b/arch/arm64/um/asm/string.h
+@@ -15,4 +15,55 @@
+  * the libc that the UML binary is linked against.
+  */
+ 
++
++/*
++ * Against bionic, let libc supply these.
++ *
++ * The comment above explains why no __HAVE_ARCH_* is declared for a glibc
++ * build: arch/arm64/lib is not compiled for ARCH=um, so claiming the arch has
++ * its own would leave the symbols undefined. Against bionic the situation is
++ * the opposite -- libc.a certainly has them, and its objects get pulled in
++ * regardless because bionic's libc is coarser-grained than glibc's, so the
++ * kernel's copies in lib/string.c collide with libc's at static link time.
++ *
++ * Declaring them here stops lib/string.c compiling its own, which removes the
++ * collision at the source rather than renaming one side of it. Renaming is the
++ * wrong tool for this family in particular: CONFIG_FORTIFY_SOURCE redefines
++ * these names as macros, so a -Dstrchr=kernel_strchr fights the fortify
++ * wrappers and produces "call to undeclared library function 'strchr'".
++ */
++#ifdef __ANDROID__
++#define __HAVE_ARCH_MEMCPY
++#define __HAVE_ARCH_MEMSET
++#define __HAVE_ARCH_MEMMOVE
++#define __HAVE_ARCH_MEMCMP
++#define __HAVE_ARCH_MEMCHR
++#define __HAVE_ARCH_STRCMP
++#define __HAVE_ARCH_STRCPY
++#define __HAVE_ARCH_STRCHR
++#define __HAVE_ARCH_STRCHRNUL
++#define __HAVE_ARCH_STRLEN
++#define __HAVE_ARCH_STRNCMP
++#define __HAVE_ARCH_STRNLEN
++
++/*
++ * __HAVE_ARCH_* tells <linux/string.h> that the architecture declares these,
++ * so it stops declaring them itself. Here "the architecture" is libc, so
++ * declare them with the signatures libc uses and let the link resolve them
++ * there.
++ */
++void *memcpy(void *, const void *, __kernel_size_t);
++void *memset(void *, int, __kernel_size_t);
++void *memmove(void *, const void *, __kernel_size_t);
++int memcmp(const void *, const void *, __kernel_size_t);
++void *memchr(const void *, int, __kernel_size_t);
++int strcmp(const char *, const char *);
++char *strcpy(char *, const char *);
++char *strchr(const char *, int);
++char *strchrnul(const char *, int);
++__kernel_size_t strlen(const char *);
++int strncmp(const char *, const char *, __kernel_size_t);
++__kernel_size_t strnlen(const char *, __kernel_size_t);
++#endif
++
+ #endif /* __UM_ARM64_STRING_H */
+diff --git a/arch/arm64/um/bionic-syms.redef b/arch/arm64/um/bionic-syms.redef
+new file mode 100644
+index 0000000000000..446e8e37fa8f6
+--- /dev/null
++++ b/arch/arm64/um/bionic-syms.redef
+@@ -0,0 +1,42 @@
++# Kernel symbols renamed when linking against bionic.
++#
++# These are names the kernel defines and bionic's libc also references. In a
++# static link the linker is happy to satisfy libc's reference with the kernel's
++# definition, and the result is libc calling into the kernel: sched_getaffinity
++# was the one that showed the shape of the problem, with bionic's start-up
++# reaching the kernel's implementation and dereferencing a task_struct that does
++# not exist yet. Nothing warns -- libc only references these, so there is no
++# duplicate-definition error to notice.
++#
++# Renaming happens on the object files rather than with -D. The preprocessor
++# does not know the difference between a function name and a token being pasted
++# into an identifier: -Dsnprintf=kernel_snprintf also rewrites the bare
++# "snprintf" inside __BPF_FUNC_MAPPER, so kernel/bpf/disasm.c ends up asking for
++# BPF_FUNC_kernel_snprintf and CONFIG_BPF_SYSCALL will not build. objcopy
++# renames definitions and references together and cannot make that mistake.
++#
++# Derived, not guessed:
++#   llvm-nm --undefined-only libc.a                > A
++#   llvm-nm --defined-only --extern-only vmlinux.a > B
++#   comm -12 A B
++snprintf kernel_snprintf
++vsnprintf kernel_vsnprintf
++sprintf kernel_sprintf
++vsprintf kernel_vsprintf
++sscanf kernel_sscanf
++vsscanf kernel_vsscanf
++stpcpy kernel_stpcpy
++getrusage kernel_getrusage
++sem_init kernel_sem_init
++timer_delete kernel_timer_delete
++sched_setaffinity kernel_sched_setaffinity
++sched_getaffinity kernel_sched_getaffinity
++sched_setscheduler kernel_sched_setscheduler
++abort kernel_abort
++strcasecmp kernel_strcasecmp
++strncasecmp kernel_strncasecmp
++strcspn kernel_strcspn
++strlcat kernel_strlcat
++strpbrk kernel_strpbrk
++strsep kernel_strsep
++strstr kernel_strstr
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index f505cd3d3086e..c95b4a8384686 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -70,6 +70,15 @@ KBUILD_AFLAGS += $(ARCH_INCLUDE)
+ # are the same, and i386 rides on the -m32 in KBUILD_CFLAGS. An arm64 subarch has
+ # no -m flag to ride on, so the triple has to be propagated explicitly.
+ # CLANG_FLAGS is empty under gcc, so this is a no-op there.
++# The kernel's own compiler attributes are force-included rather than left to
++# -idirafter below. That flag places $(srctree)/include *after* the system
++# include directories, so <linux/compiler_types.h> resolves to the host
++# sysroot's copy whenever one exists. Debian's does not, so the kernel's is
++# found and everything works; the Android NDK's sysroot ships a 265-byte uapi
++# stub of that name, which then wins and defines none of __section, __used,
++# __aligned, noinline or the sparse annotations. The failures land far from the
++# cause -- "expected parameter declarator" on every __init in UML -- so force
++# the right definitions in instead of discovering them one macro at a time.
+ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -I%,,$(KBUILD_CFLAGS))) \
+ 		$(CLANG_FLAGS) \
+ 		$(ARCH_INCLUDE) $(MODE_INCLUDE) $(filter -I%,$(CFLAGS)) \
+@@ -77,6 +86,7 @@ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -I%,,$(KBUILD_CFLAGS))) \
+ 		-idirafter $(objtree)/include -D__KERNEL__ -D__UM_HOST__ \
+ 		-include $(srctree)/include/linux/compiler-version.h \
+ 		-include $(srctree)/include/linux/kconfig.h \
++		-include $(srctree)/include/linux/compiler_attributes.h \
+ 		-idirafter $(ARCH_DIR)/include/generated
+ 
+ #This will adjust *FLAGS accordingly to the platform.
+diff --git a/arch/um/drivers/Kconfig b/arch/um/drivers/Kconfig
+index 6a0354ca032fb..79a6dfd43b510 100644
+--- a/arch/um/drivers/Kconfig
++++ b/arch/um/drivers/Kconfig
+@@ -126,7 +126,26 @@ menu "UML Network Devices"
+ 
+ config UML_NET_VECTOR
+ 	bool "Vector I/O high performance network devices"
+-	select MAY_HAVE_RUNTIME_DEPS
++	#
++	# Deliberately not "select MAY_HAVE_RUNTIME_DEPS".
++	#
++	# That select existed because two of this driver's transports resolve
++	# hostnames with getaddrinfo(), which in a statically linked glibc binary
++	# may need NSS modules at run time. But it applied to the whole driver,
++	# and so made CONFIG_STATIC_LINK unavailable to anyone enabling vector
++	# networking at all -- including the transports that resolve nothing.
++	#
++	# getaddrinfo() appears exactly twice, both in user_init_socket_fds(),
++	# reached only by the gre and l2tpv3 transports. The tap, raw, bess, vde
++	# and fd transports never call it. And where it is called, a static
++	# binary degrades rather than breaks: numeric addresses resolve without
++	# NSS, and a name that needs it fails with an EAI_ error like any other
++	# lookup failure.
++	#
++	# The combination this was blocking is the only way to have networking at
++	# all on a host with no glibc, which is to say on Android: the binary has
++	# to be static to run there, and the fd transport plus an unprivileged
++	# userspace network stack is what gives an unrooted guest a network.
+ 	help
+ 	  This User-Mode Linux network driver uses multi-message send
+ 	  and receive functions. The host running the UML guest must have
+diff --git a/arch/um/include/shared/as-layout.h b/arch/um/include/shared/as-layout.h
+index 02ef258e3395e..fcc3c339160c0 100644
+--- a/arch/um/include/shared/as-layout.h
++++ b/arch/um/include/shared/as-layout.h
+@@ -23,7 +23,36 @@
+ #define STUB_START stub_start
+ #define STUB_CODE STUB_START
+ #define STUB_DATA (STUB_CODE + UM_KERN_PAGE_SIZE)
++/*
++ * One page of bookkeeping plus a signal stack. In SECCOMP mode the host kernel
++ * writes a complete signal frame onto that stack when it delivers SIGSYS to the
++ * stub, so it has to be big enough for the largest frame this host can produce.
++ *
++ * On x86 one page is comfortable. On arm64 it is not: sizeof(mcontext_t) alone
++ * is 4384 bytes, because the architecture reserves __reserved[4096] for the
++ * FPSIMD/SVE/SME records, and a measured frame is 4576 bytes -- larger than a
++ * 4 KiB page before siginfo is even counted. arm64 publishes the real
++ * requirement in AT_MINSIGSTKSZ, which is 4720 on a plain Cortex-A76 and 9984
++ * on a host with 512-bit SVE, so the size is a property of the host rather than
++ * a constant that can be measured once.
++ *
++ * Four pages therefore, giving a 12 KiB stack at 4 KiB pages, which covers
++ * every AT_MINSIGSTKSZ seen so far with room to spare. At 16 KiB pages a single
++ * page is already larger than that, so the layout is unchanged there.
++ *
++ * A power of two is required, not merely tidy: init_new_context() allocates
++ * this with __get_free_pages(..., ilog2(STUB_DATA_PAGES)), so a non-power-of-two
++ * would silently allocate fewer pages than the structure occupies.
++ *
++ * The remaining risk -- a host whose AT_MINSIGSTKSZ exceeds even this -- is not
++ * papered over: check_stub_sigstack() compares the two at boot and refuses
++ * SECCOMP mode with a message naming both numbers.
++ */
++#if defined(__aarch64__) && UM_KERN_PAGE_SIZE < 16384
++#define STUB_DATA_PAGES 4
++#else
+ #define STUB_DATA_PAGES 2
++#endif
+ #define STUB_SIZE ((1 + STUB_DATA_PAGES) * UM_KERN_PAGE_SIZE)
+ #define STUB_END (STUB_START + STUB_SIZE)
+ 
+diff --git a/arch/um/include/shared/init.h b/arch/um/include/shared/init.h
+index 1a659e2e8cc38..16d14b45fa8d9 100644
+--- a/arch/um/include/shared/init.h
++++ b/arch/um/include/shared/init.h
+@@ -43,6 +43,28 @@ typedef void (*exitcall_t)(void);
+ 
+ #include <linux/compiler_types.h>
+ 
++/*
++ * All this header needs from the kernel's compiler attributes is __section and
++ * __used, and reaching them through <linux/compiler_types.h> is not reliable
++ * here. This header is also used by the USER_CFLAGS objects, which compile
++ * against the host's sysroot rather than with -nostdinc, so a sysroot that
++ * ships its own linux/compiler_types.h wins the include and the kernel's copy
++ * is never seen.
++ *
++ * The Android NDK does exactly that: its sysroot carries a 265-byte uapi stub
++ * of that name which defines neither macro. The include then succeeds, __init
++ * expands to a bare __section(...), and every __init in UML becomes "expected
++ * parameter declarator" -- an error that says nothing about the real cause.
++ * The host glibc sysroot has no such file, which is why this only appears when
++ * building against bionic.
++ */
++#ifndef __section
++#define __section(s)	__attribute__((__section__(s)))
++#endif
++#ifndef __used
++#define __used		__attribute__((__used__))
++#endif
++
+ /* These are for everybody (although not all archs will actually
+    discard it in modules) */
+ #define __init		__section(".init.text")
+diff --git a/arch/um/include/shared/skas/mm_id.h b/arch/um/include/shared/skas/mm_id.h
+index 18c0621430d2c..49d3b8b54ab0f 100644
+--- a/arch/um/include/shared/skas/mm_id.h
++++ b/arch/um/include/shared/skas/mm_id.h
+@@ -21,6 +21,19 @@ struct mm_id {
+ 	int syscall_fd_map[STUB_MAX_FDS];
+ };
+ 
++/*
++ * Sparse's lock annotations, normally from <linux/compiler_types.h>. This
++ * header is reached by USER_CFLAGS objects too, and a sysroot that ships its
++ * own linux/compiler_types.h shadows the kernel's -- the Android NDK does.
++ * Without these the declarations below parse as function definitions.
++ */
++#ifndef __acquires
++#define __acquires(x)
++#endif
++#ifndef __releases
++#define __releases(x)
++#endif
++
+ struct mutex *__get_turnstile(struct mm_id *mm_id);
+ void enter_turnstile(struct mm_id *mm_id) __acquires(__get_turnstile(mm_id));
+ void exit_turnstile(struct mm_id *mm_id) __releases(__get_turnstile(mm_id));
+diff --git a/arch/um/include/shared/skas/skas.h b/arch/um/include/shared/skas/skas.h
+index 2237ffedec75b..b2374c7938a70 100644
+--- a/arch/um/include/shared/skas/skas.h
++++ b/arch/um/include/shared/skas/skas.h
+@@ -10,6 +10,13 @@
+ 
+ extern int using_seccomp;
+ 
++/*
++ * Whether the host implements PTRACE_SYSEMU. Where it does not, UML builds the
++ * same semantics out of PTRACE_SYSCALL and a syscall cancellation; see
++ * check_sysemu(). Set once at boot, before any stub exists.
++ */
++extern int have_ptrace_sysemu;
++
+ extern void new_thread_handler(void);
+ extern void handle_syscall(struct uml_pt_regs *regs);
+ extern unsigned long current_stub_stack(void);
+diff --git a/arch/um/include/shared/skas/stub-data.h b/arch/um/include/shared/skas/stub-data.h
+index 27db38e95df91..d9bca64c3e93c 100644
+--- a/arch/um/include/shared/skas/stub-data.h
++++ b/arch/um/include/shared/skas/stub-data.h
+@@ -14,6 +14,19 @@
+ #include <sysdep/stub-data.h>
+ #include <mm_id.h>
+ 
++/* See the note in skas/mm_id.h: a sysroot's linux/compiler_types.h can shadow
++ * the kernel's, leaving the attribute macros undefined for USER_CFLAGS objects.
++ */
++#ifndef __aligned
++#define __aligned(x)	__attribute__((__aligned__(x)))
++#endif
++#ifndef __section
++#define __section(x)	__attribute__((__section__(x)))
++#endif
++#ifndef __used
++#define __used		__attribute__((__used__))
++#endif
++
+ #define FUTEX_IN_CHILD 0
+ #define FUTEX_IN_KERN 1
+ 
+@@ -69,8 +82,16 @@ struct stub_data {
+ 	/* seccomp architecture specific state restore */
+ 	struct stub_data_arch arch_data;
+ 
+-	/* Stack for our signal handlers and for calling into . */
+-	unsigned char sigstack[UM_KERN_PAGE_SIZE] __aligned(UM_KERN_PAGE_SIZE);
++	/*
++	 * Stack for our signal handlers and for calling into .
++	 *
++	 * Sized from STUB_DATA_PAGES rather than fixed at one page: in SECCOMP
++	 * mode the host writes a whole signal frame here, and on arm64 that
++	 * frame is larger than a 4 KiB page. See the comment on STUB_DATA_PAGES
++	 * in as-layout.h.
++	 */
++	unsigned char sigstack[(STUB_DATA_PAGES - 1) * UM_KERN_PAGE_SIZE]
++		__aligned(UM_KERN_PAGE_SIZE);
+ };
+ 
+ #endif
+diff --git a/arch/um/kernel/dyn.lds.S b/arch/um/kernel/dyn.lds.S
+index b88bd144d5ac0..cefd7e6f723b6 100644
+--- a/arch/um/kernel/dyn.lds.S
++++ b/arch/um/kernel/dyn.lds.S
+@@ -157,6 +157,16 @@ SECTIONS
+   PROVIDE (edata = .);
+   .bss            : {
+    __bss_start = .;
++   /*
++    * Copy relocations land in .dynbss, and with an explicit linker script the
++    * linker places them at the current location rather than re-aligning for
++    * them. A libc whose exported data needs 8-byte alignment then fails to
++    * link: bionic's stderr is a pointer, and lld rejects the reference with
++    * "improper alignment for relocation R_AARCH64_LDST64_ABS_LO12_NC".
++    * glibc does not show this because UML has historically been linked
++    * statically against it here, and a static link has no copy relocations.
++    */
++   . = ALIGN(16);
+    *(.dynbss)
+    *(.bss .bss.* .gnu.linkonce.b.*)
+    *(COMMON)
+diff --git a/arch/um/kernel/skas/Makefile b/arch/um/kernel/skas/Makefile
+index 1de51b3905187..df602bfeeb64e 100644
+--- a/arch/um/kernel/skas/Makefile
++++ b/arch/um/kernel/skas/Makefile
+@@ -32,7 +32,14 @@ quiet_cmd_stub_exe = STUB_EXE $@
+ 			   $(filter-out $(UM_GPROF_OPT) $(UM_GCOV_OPT),$(KBUILD_CFLAGS)) $(STUB_EXE_LDFLAGS) \
+ 			   $(filter %.o,$^)
+ 
+-STUB_EXE_LDFLAGS = -Wl,-n -static
++# --no-rosegment: lld gives read-only data its own PT_LOAD, and with -n
++# (nmagic, no page alignment) the two segments end up sharing a page. The
++# kernel maps ET_EXEC segments with MAP_FIXED_NOREPLACE, so the second mmap of
++# that page returns -EEXIST and the exec fails after the point of no return --
++# which surfaces as the *guest* failing to start with -ENOMEM, because
++# start_userspace() cannot exec the stub. Merging rodata into the text segment
++# leaves one loadable segment, which is what -n was written for.
++STUB_EXE_LDFLAGS = -Wl,-n -Wl,--no-rosegment -static
+ 
+ targets += stub_exe.dbg stub_exe $(stub_exe_objs-y)
+ 
+diff --git a/arch/um/kernel/skas/mmu.c b/arch/um/kernel/skas/mmu.c
+index b5017096028ba..857a9bb7e648a 100644
+--- a/arch/um/kernel/skas/mmu.c
++++ b/arch/um/kernel/skas/mmu.c
+@@ -50,8 +50,11 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
+ 	spin_lock_init(&mm->context.sync_tlb_lock);
+ 
+ 	stack = __get_free_pages(GFP_KERNEL | __GFP_ZERO, ilog2(STUB_DATA_PAGES));
+-	if (stack == 0)
++	if (stack == 0) {
++		printk(KERN_ERR "%s: failed to allocate %d stub data pages\n",
++		       __func__, STUB_DATA_PAGES);
+ 		goto out;
++	}
+ 
+ 	new_id->stack = stack;
+ 	new_id->syscall_data_len = 0;
+@@ -63,8 +66,11 @@ int init_new_context(struct task_struct *task, struct mm_struct *mm)
+ 	}
+ 
+ 	ret = start_userspace(new_id);
+-	if (ret < 0)
++	if (ret < 0) {
++		printk(KERN_ERR "%s: start_userspace failed: %d\n",
++		       __func__, ret);
+ 		goto out_free;
++	}
+ 
+ 	/* Ensure the new MM is clean and nothing unwanted is mapped */
+ 	unmap(new_id, 0, STUB_START);
+diff --git a/arch/um/kernel/um_arch.c b/arch/um/kernel/um_arch.c
+index 311cdcdb89935..171561c5ddf77 100644
+--- a/arch/um/kernel/um_arch.c
++++ b/arch/um/kernel/um_arch.c
+@@ -302,15 +302,32 @@ static int __init parse_host_cpu_line(char *line)
+ 	return arch_parse_host_cpu_flags(line);
+ }
+ 
++/*
++ * Strip an address tag before using a pointer as an address limit.
++ *
++ * arm64 implements top-byte-ignore, and Android turns it on: pointers there
++ * routinely carry a non-zero tag in bits 56-63, which the hardware discards on
++ * access but which is very much present in the value. Deriving the top of the
++ * address space from a tagged stack pointer therefore produces something like
++ * 0xb400007e76fe7000, and everything computed from it -- stub placement, guest
++ * TASK_SIZE -- is nonsense. The untagged value here is 0x7e76fe7000, which is a
++ * plausible stack address on this host's 39-bit user address space.
++ *
++ * Masking is unconditional because an untagged pointer is unchanged by it.
++ */
++#define UM_ADDR_TAG_MASK	((1UL << 56) - 1)
++
+ static unsigned long __init get_top_address(char **envp)
+ {
+-	unsigned long top_addr = (unsigned long) &top_addr;
++	unsigned long top_addr = (unsigned long) &top_addr & UM_ADDR_TAG_MASK;
+ 	int i;
+ 
+ 	/* The earliest variable should be after the program name in ELF */
+ 	for (i = 0; envp[i]; i++) {
+-		if ((unsigned long) envp[i] > top_addr)
+-			top_addr = (unsigned long) envp[i];
++		unsigned long e = (unsigned long) envp[i] & UM_ADDR_TAG_MASK;
++
++		if (e > top_addr)
++			top_addr = e;
+ 	}
+ 
+ 	return PAGE_ALIGN(top_addr + 1);
+@@ -353,7 +370,45 @@ int __init linux_main(int argc, char **argv, char **envp)
+ 	 * TASK_SIZE needs to be PGDIR_SIZE aligned or else exit_mmap craps
+ 	 * out
+ 	 */
+-	task_size = task_size & PGDIR_MASK;
++	if (task_size & PGDIR_MASK) {
++		task_size = task_size & PGDIR_MASK;
++	} else {
++		/*
++		 * The host's entire user address space is smaller than one
++		 * guest PGDIR, so rounding down to PGDIR_SIZE lands on zero --
++		 * and a zero TASK_SIZE fails every guest mmap, so the first
++		 * exec returns -ENOMEM and the boot dies with "Requested init
++		 * failed (error -12)" and no other clue.
++		 *
++		 * This is not a corner case. A 64-bit UML guest has
++		 * PGDIR_SIZE == 512 GiB, and arm64 hosts built with
++		 * CONFIG_ARM64_VA_BITS_39 -- the usual choice for a 4 KiB-page
++		 * kernel, and what Android devices overwhelmingly ship -- have
++		 * exactly 512 GiB of user address space. The subtraction for
++		 * the stub then puts the top just below the only aligned value
++		 * that would have fit.
++		 *
++		 * Align to the next level down instead. UML's page tables are
++		 * software structures walked by UML itself -- the host does the
++		 * real translation through mmap -- so the granularity is a
++		 * choice, not a hardware constraint, and one PGDIR entry
++		 * covering a partially used range is exactly what the topmost
++		 * entry looks like on any host anyway.
++		 */
++		task_size = task_size & PUD_MASK;
++	}
++
++	/*
++	 * Every guest mapping is bounded by task_size, and task_size is derived
++	 * from where the *host* put this process's stack. When that derivation
++	 * goes wrong the failure is silent and total: every guest mmap returns
++	 * -ENOMEM, so the first exec fails with -12 and nothing anywhere says
++	 * why. Print the three numbers -- one line, once, at boot -- because
++	 * reconstructing them afterwards requires a debugger on a host that may
++	 * be a phone.
++	 */
++	os_info("Address space: host top 0x%lx, stub at 0x%lx, guest TASK_SIZE 0x%lx\n",
++		stub_start + STUB_SIZE, stub_start, task_size);
+ 
+ 	/* OS sanity checks that need to happen before the kernel runs */
+ 	os_early_checks();
+diff --git a/arch/um/kernel/uml.lds.S b/arch/um/kernel/uml.lds.S
+index 30aa24348d60c..46d775924144c 100644
+--- a/arch/um/kernel/uml.lds.S
++++ b/arch/um/kernel/uml.lds.S
+@@ -13,6 +13,29 @@ VERSION {
+   };
+ }
+ 
++/*
++ * One loadable segment for the whole binary.
++ *
++ * Without this, lld gives every permission group its own PT_LOAD and takes the
++ * addresses from this script, so any group that starts mid-page yields two
++ * segments sharing a page. load_elf_binary() maps ET_EXEC segments with
++ * MAP_FIXED_NOREPLACE; the second mmap of a shared page returns -EEXIST, and
++ * since that happens after the point of no return the kernel can only SIGSEGV
++ * the process. It presents as a bare "Segmentation fault" with no output and a
++ * PC that is already unmapped.
++ *
++ * bfd ld merged these into a single RWE segment, which is why UML never had to
++ * think about it and why this only shows up when linking with lld -- as the
++ * Android NDK does. Asking for one segment explicitly reproduces the layout
++ * that has always worked, rather than page-aligning a dozen boundaries that
++ * come from macros and will drift.
++ */
++PHDRS {
++  all PT_LOAD FILEHDR PHDRS FLAGS(7);   /* RWX, and map the ELF headers too */
++  note PT_NOTE FLAGS(4);
++  tls PT_TLS FLAGS(4);
++}
++
+ SECTIONS
+ {
+   /* This must contain the right address - not quite the default ELF one.*/
+@@ -28,7 +51,7 @@ SECTIONS
+   . = ALIGN(PAGE_SIZE);
+ 
+   _text = .;
+-  INIT_TEXT_SECTION(0)
++  INIT_TEXT_SECTION(0) :all
+ 
+   .text      :
+   {
+@@ -74,6 +97,46 @@ SECTIONS
+   init.data : { INIT_DATA }
+   __init_end = .;
+ 
++  /*
++   * The C runtime's constructor arrays, placed exactly as dyn.lds.S places
++   * them. This script -- the static one -- omitted them entirely, leaving the
++   * linker to put them wherever its default rules chose, which lands them in a
++   * segment of their own whose file offset does not match its virtual address.
++   *
++   * glibc tolerated that. bionic does not: __libc_init walks preinit_array
++   * before anything else runs, so a statically linked UML against bionic
++   * segfaults before main() with no output at all. The section was there in
++   * the ELF -- correctly sized, at a plausible address -- which is what makes
++   * this one hard to see.
++   *
++   * The alignment comment below is inherited from dyn.lds.S and is the reason
++   * the label sits outside the section.
++   */
++  /*
++   * Page-align every point where the segment permissions change.
++   *
++   * lld gives each permission group its own PT_LOAD, and takes the addresses
++   * from this script -- so a group that starts mid-page produces two segments
++   * sharing one page. load_elf_binary() maps ET_EXEC segments with
++   * MAP_FIXED_NOREPLACE, the second mmap of that shared page returns -EEXIST,
++   * and because this happens after the point of no return the kernel can only
++   * SIGSEGV the process. The symptom is a bare "Segmentation fault" with no
++   * output at all and a PC that is no longer mapped, which says nothing about
++   * the cause.
++   *
++   * bfd ld merged these groups into one RWE segment and the question never
++   * arose, which is why this only appears when linking with lld against the
++   * Android NDK.
++   */
++  . = ALIGN(PAGE_SIZE);
++  .preinit_array  : { *(.preinit_array) }
++  .init_array     : {
++    *(.kasan_init)
++    *(.init_array.*)
++    *(.init_array)
++  }
++  .fini_array     : { *(.fini_array) }
++
+   .data    :
+   {
+     INIT_TASK_DATA(KERNEL_STACK_SIZE)
+@@ -92,14 +155,16 @@ SECTIONS
+   }
+ 
+   .got           : { *(.got.plt) *(.got) }
++  . = ALIGN(PAGE_SIZE);
+   .eh_frame       : { KEEP (*(.eh_frame)) }
+   .dynamic       : { *(.dynamic) }
+-  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
+-  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
++  . = ALIGN(PAGE_SIZE);
++  .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) } :all :tls
++  .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) } :all :tls
+   /* We want the small data sections together, so single-instruction offsets
+      can access them all, and initialized data all before uninitialized, so
+      we can shorten the on-disk segment size.  */
+-  .sdata     : { *(.sdata) }
++  .sdata     : { *(.sdata) } :all
+   _edata  =  .;
+   PROVIDE (edata = .);
+   . = ALIGN(PAGE_SIZE);
+diff --git a/arch/um/os-Linux/file.c b/arch/um/os-Linux/file.c
+index 21f0e50fb1df9..0b9585ff53f0b 100644
+--- a/arch/um/os-Linux/file.c
++++ b/arch/um/os-Linux/file.c
+@@ -568,7 +568,13 @@ int os_create_unix_socket(const char *file, int len, int close_on_exec)
+ 
+ void os_flush_stdout(void)
+ {
+-	fflush(stdout);
++	/*
++	 * Nothing to flush: UML's own output goes to fd 1 and fd 2 with
++	 * write(2), deliberately, because referencing the stdio stdout/stderr
++	 * objects pulls copy relocations into the binary that the UML linker
++	 * script has no aligned home for -- which is what makes linking
++	 * against bionic fail. See os_write_stderr() in util.c.
++	 */
+ }
+ 
+ int os_lock_file(int fd, int excl)
+diff --git a/arch/um/os-Linux/helper.c b/arch/um/os-Linux/helper.c
+index 89c2ad2a4e3ac..6cf17fedb9ebd 100644
+--- a/arch/um/os-Linux/helper.c
++++ b/arch/um/os-Linux/helper.c
+@@ -211,8 +211,24 @@ int os_run_helper_thread(struct os_helper_thread **td_out,
+ 
+ void os_kill_helper_thread(struct os_helper_thread *td)
+ {
++#ifdef __BIONIC__
++	/*
++	 * bionic has no pthread_cancel, and deliberately so -- Android has
++	 * never implemented it, because asynchronous cancellation cannot be
++	 * made safe for arbitrary code.
++	 *
++	 * Both callers (the ubd I/O thread and the SIGIO writer) reach here
++	 * only on a teardown path, so detaching and letting process exit reap
++	 * the thread costs a thread that was about to die anyway. Recorded as a
++	 * limitation rather than hidden: on bionic the thread is not stopped,
++	 * it is abandoned, and a UML that tore down a ubd device and kept
++	 * running would leak one thread per teardown.
++	 */
++	pthread_detach(td->handle);
++#else
+ 	pthread_cancel(td->handle);
+ 	pthread_join(td->handle, NULL);
++#endif
+ 	kfree(td);
+ }
+ 
+diff --git a/arch/um/os-Linux/skas/process.c b/arch/um/os-Linux/skas/process.c
+index 72a9405c8c534..6c55031800728 100644
+--- a/arch/um/os-Linux/skas/process.c
++++ b/arch/um/os-Linux/skas/process.c
+@@ -13,6 +13,7 @@
+ #include <string.h>
+ #include <fcntl.h>
+ #include <mem_user.h>
++
+ #include <sys/mman.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+@@ -31,7 +32,25 @@
+ #include <linux/futex.h>
+ #include <linux/threads.h>
+ #include <timetravel.h>
+-#include <asm-generic/rwonce.h>
++/*
++ * __READ_ONCE, without <asm-generic/rwonce.h>.
++ *
++ * That header needs the kernel's compiler attributes, and a USER_CFLAGS object
++ * cannot rely on reaching them: arch/um/Makefile adds the kernel's include
++ * directory with -idirafter, i.e. *after* the system directories, so a sysroot
++ * that ships its own linux/compiler_types.h wins. The Android NDK's sysroot
++ * does exactly that, and rwonce.h then fails on __no_sanitize_or_inline.
++ *
++ * Force-including the kernel's compiler_types.h instead is not an option: it
++ * defines __private, which bionic uses as a struct member name in
++ * <bits/pthread_types.h>, so every pthread type stops compiling.
++ *
++ * This file uses one macro from that header and nothing else, and this is the
++ * kernel's own uninstrumented definition of it.
++ */
++#ifndef __READ_ONCE
++#define __READ_ONCE(x)	(*(const volatile __typeof__(x) *)&(x))
++#endif
+ #include "../internal.h"
+ 
+ int is_skas_winch(int pid, int fd, void *data)
+@@ -323,14 +342,67 @@ extern char *tempdir;
+ #define MFD_EXEC 0x0010U
+ #endif
+ 
++static char *stub_exe_path __initdata;
++
++static int __init uml_stub_exe_setup(char *line, int *add)
++{
++	*add = 0;
++	stub_exe_path = line;
++	return 0;
++}
++
++__uml_setup("stub_exe=", uml_stub_exe_setup,
++"stub_exe=<path>\n"
++"    Execute the stub from this file instead of from an anonymous memfd.\n"
++"\n"
++"    UML normally writes its embedded stub into a memfd and execs that, which\n"
++"    needs nothing from the filesystem. Android forbids it: an app process runs\n"
++"    in the untrusted_app SELinux domain under a W^X policy, where the only\n"
++"    place it may execute from is the native library directory unpacked from\n"
++"    its APK. Neither a memfd nor a file the app wrote itself is executable\n"
++"    there.\n"
++"\n"
++"    Point this at a copy of arch/um/kernel/skas/stub_exe shipped as one of\n"
++"    those libraries. The file must be exactly that stub: it is exec'd as the\n"
++"    userspace half of every guest address space.\n\n"
++);
++
+ static int __init init_stub_exe_fd(void)
+ {
+ 	size_t written = 0;
+ 	char *tmpfile = NULL;
+ 
++	/*
++	 * An explicit path bypasses the memfd entirely -- there is nothing to
++	 * write, because the file already holds the stub.
++	 */
++	if (stub_exe_path) {
++		stub_exe_fd = open(stub_exe_path, O_RDONLY | O_CLOEXEC);
++		if (stub_exe_fd < 0)
++			panic("Could not open stub binary '%s': %d",
++			      stub_exe_path, -errno);
++		return 0;
++	}
++
+ 	stub_exe_fd = memfd_create("uml-userspace",
+ 				   MFD_EXEC | MFD_CLOEXEC | MFD_ALLOW_SEALING);
+ 
++	/*
++	 * MFD_EXEC only exists from 6.3. Older kernels reject unknown
++	 * memfd_create flags with EINVAL -- and on those a memfd is executable
++	 * anyway, since MFD_EXEC was introduced precisely to make that default
++	 * something a process could opt out of. Retry without it.
++	 *
++	 * Worth the retry rather than accepting the temporary-file fallback:
++	 * that path needs a tmpdir that permits execution, and on Android the
++	 * obvious candidate is /tmp, which is tmpfs and whose SELinux label the
++	 * shell domain may not be allowed to execute from. The memfd works
++	 * there today; a file on disk is one policy decision away from not.
++	 */
++	if (stub_exe_fd < 0 && errno == EINVAL)
++		stub_exe_fd = memfd_create("uml-userspace",
++					   MFD_CLOEXEC | MFD_ALLOW_SEALING);
++
+ 	if (stub_exe_fd < 0) {
+ 		printk(UM_KERN_INFO "Could not create executable memfd, using temporary file!");
+ 
+@@ -390,6 +462,13 @@ __initcall(init_stub_exe_fd);
+ 
+ int using_seccomp;
+ 
++/*
++ * Assume the host has PTRACE_SYSEMU until check_sysemu() says otherwise. Every
++ * host that can run x86 UML has had it since 2.6, so this default is what that
++ * architecture sees; arm64 hosts older than 5.3 flip it to 0.
++ */
++int have_ptrace_sysemu = 1;
++
+ /**
+  * start_userspace() - prepare a new userspace process
+  * @mm_id: The corresponding struct mm_id
+@@ -505,6 +584,30 @@ int start_userspace(struct mm_id *mm_id)
+ static int unscheduled_userspace_iterations;
+ extern unsigned long tt_extra_sched_jiffies;
+ 
++#ifdef UM_SYSCALL_TRAP_INSN
++/*
++ * Is the guest about to execute the instruction that enters the kernel?
++ *
++ * Only consulted while single-stepping a guest on a host without
++ * PTRACE_SYSEMU, which is a debugger path, so the extra ptrace call per step
++ * costs nothing that matters. A failed read is reported as "not a syscall":
++ * the instruction is about to be executed by the guest either way, and if it
++ * is unreadable the single-step will fault on it and be reported normally,
++ * which is a better outcome than refusing to step.
++ */
++static int at_syscall_insn(int pid, unsigned long pc)
++{
++	long word;
++
++	errno = 0;
++	word = ptrace(PTRACE_PEEKTEXT, pid, (void *)pc, 0);
++	if (word == -1 && errno)
++		return 0;
++
++	return (unsigned int)word == UM_SYSCALL_TRAP_INSN;
++}
++#endif
++
+ void userspace(struct uml_pt_regs *regs)
+ {
+ 	int err, status, op;
+@@ -640,10 +743,33 @@ void userspace(struct uml_pt_regs *regs)
+ 				fatal_sigsegv();
+ 			}
+ 
+-			if (singlestepping())
++			/*
++			 * Without PTRACE_SYSEMU the guest is run under plain
++			 * PTRACE_SYSCALL and the syscall is cancelled at the
++			 * entry stop below, which reaches the same place: the
++			 * call does not execute and the guest resumes past it
++			 * with whatever UML puts in the return register.
++			 */
++			if (!have_ptrace_sysemu) {
++				op = PTRACE_SYSCALL;
++#ifdef UM_SYSCALL_TRAP_INSN
++				/*
++				 * Single-stepping still has to step. The one
++				 * instruction that must not be stepped is the
++				 * one that enters the kernel: stepping it would
++				 * run the guest's syscall on the host. Take the
++				 * syscall stop for that instruction instead, so
++				 * it can be cancelled like any other.
++				 */
++				if (singlestepping() &&
++				    !at_syscall_insn(pid, REGS_IP(regs->gp)))
++					op = PTRACE_SINGLESTEP;
++#endif
++			} else if (singlestepping()) {
+ 				op = PTRACE_SYSEMU_SINGLESTEP;
+-			else
++			} else {
+ 				op = PTRACE_SYSEMU;
++			}
+ 
+ 			if (ptrace(op, pid, 0, 0)) {
+ 				printk(UM_KERN_ERR "%s - ptrace continue failed, op = %d, errno = %d\n",
+@@ -701,6 +827,22 @@ void userspace(struct uml_pt_regs *regs)
+ 				unsigned long hidden[MAX_REG_NR];
+ 				int sstatus, tries = 0;
+ 
++				/*
++				 * On a host without PTRACE_SYSEMU this stop is
++				 * an ordinary syscall-entry stop, so the call
++				 * is about to run for real. Cancel it before
++				 * stepping off the stop. The registers were
++				 * read above, so the syscall number UML needs
++				 * has already been taken and overwriting it
++				 * here loses nothing.
++				 */
++				if (!have_ptrace_sysemu &&
++				    ptrace_set_syscall_nr(pid, -1)) {
++					printk(UM_KERN_ERR "%s - failed to cancel a guest syscall, errno = %d\n",
++					       __func__, errno);
++					fatal_sigsegv();
++				}
++
+ 				while (1) {
+ 					if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0)) {
+ 						printk(UM_KERN_ERR "%s - failed to step off a syscall stop, errno = %d\n",
+diff --git a/arch/um/os-Linux/start_up.c b/arch/um/os-Linux/start_up.c
+index 6e03368ca56e5..98f22a1014747 100644
+--- a/arch/um/os-Linux/start_up.c
++++ b/arch/um/os-Linux/start_up.c
+@@ -34,6 +34,7 @@
+ #include <sysdep/stub.h>
+ #include <registers.h>
+ #include <skas.h>
++#include <skas.h>
+ #include "internal.h"
+ 
+ static void ptrace_child(void)
+@@ -83,29 +84,35 @@ static void fatal_perror(const char *str)
+ 
+ static void fatal(char *fmt, ...)
+ {
++	char buf[512];
+ 	va_list list;
+ 
+ 	va_start(list, fmt);
+-	vfprintf(stderr, fmt, list);
++	vsnprintf(buf, sizeof(buf), fmt, list);
+ 	va_end(list);
++	write(2, buf, strlen(buf));
+ 
+ 	exit(1);
+ }
+ 
+ static void non_fatal(char *fmt, ...)
+ {
++	char buf[512];
+ 	va_list list;
+ 
+ 	va_start(list, fmt);
+-	vfprintf(stderr, fmt, list);
++	vsnprintf(buf, sizeof(buf), fmt, list);
+ 	va_end(list);
++	write(2, buf, strlen(buf));
+ }
+ 
+ static int start_ptraced_child(void)
+ {
+ 	int pid, n, status;
+ 
+-	fflush(stdout);
++	/* No fflush(stdout): referencing the stdio object pulls in a copy
++	 * relocation the UML linker script cannot align. Nothing here uses
++	 * buffered stdout. */
+ 
+ 	pid = fork();
+ 	if (pid == 0)
+@@ -139,15 +146,38 @@ static void stop_ptraced_child(int pid, int exitcode)
+ 	}
+ }
+ 
+-static void __init check_sysemu(void)
++/*
++ * Reap a probe child without the fatal() that stop_ptraced_child() applies, so
++ * a capability that is merely absent can be reported as absent rather than
++ * ending the boot.
++ */
++static int __init finish_probe_child(int pid, int exitcode)
+ {
+-	int pid, n, status, count=0;
++	int status, n;
++
++	if (ptrace(PTRACE_CONT, pid, 0, 0) < 0) {
++		kill(pid, SIGKILL);
++		waitpid(pid, &status, 0);
++		return 0;
++	}
++
++	CATCH_EINTR(n = waitpid(pid, &status, 0));
++	if (n < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != exitcode) {
++		kill(pid, SIGKILL);
++		waitpid(pid, &status, WNOHANG);
++		return 0;
++	}
++	return 1;
++}
++
++/* The classic probe: PTRACE_SYSEMU stops before the syscall and never runs it. */
++static int __init try_sysemu(void)
++{
++	int pid, n, status, count = 0;
+ 
+-	os_info("Checking syscall emulation for ptrace...");
+ 	pid = start_ptraced_child();
+ 
+-	if ((ptrace(PTRACE_SETOPTIONS, pid, 0,
+-		   (void *) PTRACE_O_TRACESYSGOOD) < 0))
++	if (ptrace(PTRACE_SETOPTIONS, pid, 0, (void *)PTRACE_O_TRACESYSGOOD) < 0)
+ 		fatal_perror("check_sysemu: PTRACE_SETOPTIONS failed");
+ 
+ 	while (1) {
+@@ -158,37 +188,147 @@ static void __init check_sysemu(void)
+ 		if (n < 0)
+ 			fatal_perror("check_sysemu: wait failed");
+ 
+-		if (WIFSTOPPED(status) &&
+-		    (WSTOPSIG(status) == (SIGTRAP|0x80))) {
+-			if (!count) {
+-				non_fatal("check_sysemu: SYSEMU_SINGLESTEP "
+-					  "doesn't singlestep");
++		if (WIFSTOPPED(status) && WSTOPSIG(status) == (SIGTRAP | 0x80)) {
++			if (!count)
++				goto fail;
++			if (ptrace_set_syscall_ret(pid, os_getpid()) < 0)
+ 				goto fail;
+-			}
+-			n = ptrace_set_syscall_ret(pid, os_getpid());
+-			if (n < 0)
+-				fatal_perror("check_sysemu : failed to modify "
+-					     "system call return");
+ 			break;
+-		}
+-		else if (WIFSTOPPED(status) && (WSTOPSIG(status) == SIGTRAP))
++		} else if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP) {
+ 			count++;
+-		else {
+-			non_fatal("check_sysemu: expected SIGTRAP or "
+-				  "(SIGTRAP | 0x80), got status = %d\n",
+-				  status);
++		} else {
+ 			goto fail;
+ 		}
+ 	}
+-	stop_ptraced_child(pid, 0);
+ 
+-	os_info("OK\n");
++	return finish_probe_child(pid, 0);
++
++fail:
++	kill(pid, SIGKILL);
++	CATCH_EINTR(waitpid(pid, &status, 0));
++	return 0;
++}
++
++/*
++ * The substitute, for hosts without PTRACE_SYSEMU.
++ *
++ * PTRACE_SYSEMU is not doing anything a tracer cannot do for itself: it stops
++ * at syscall entry and declines to execute the call. Writing -1 into the
++ * in-flight syscall number is the documented way to cancel a syscall from a
++ * tracer, and it has been available for as long as the architecture has had a
++ * syscall-number regset -- since 3.19 on arm64, where PTRACE_SYSEMU itself only
++ * arrived in 5.3. That gap is not academic: phones ship a current Android on a
++ * years-old kernel, and 4.19 is a live target.
++ *
++ * Probing it rather than deriving it from a version number is deliberate. This
++ * has to be true of the host actually underneath us -- which may be a container,
++ * an emulator or a vendor kernel with its own patches -- and a probe that runs
++ * the whole sequence end to end is the only thing that establishes that.
++ *
++ * The sequence is exactly what userspace() will do per syscall: stop at entry,
++ * cancel, step off the stop, then set the return value the guest sees.
++ */
++static int __init try_syscall_cancel(void)
++{
++	int pid, n, status;
++
++	pid = start_ptraced_child();
++
++	if (ptrace(PTRACE_SETOPTIONS, pid, 0, (void *)PTRACE_O_TRACESYSGOOD) < 0)
++		fatal_perror("check_sysemu: PTRACE_SETOPTIONS failed");
+ 
+-	return;
++	if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0)
++		goto fail;
++	CATCH_EINTR(n = waitpid(pid, &status, WUNTRACED));
++	if (n < 0)
++		fatal_perror("check_sysemu: wait failed");
++	if (!WIFSTOPPED(status) || WSTOPSIG(status) != (SIGTRAP | 0x80))
++		goto fail;
++
++	if (ptrace_set_syscall_nr(pid, -1) < 0)
++		goto fail;
++
++	if (ptrace(PTRACE_SINGLESTEP, pid, 0, 0) < 0)
++		goto fail;
++	CATCH_EINTR(n = waitpid(pid, &status, WUNTRACED));
++	if (n < 0 || !WIFSTOPPED(status))
++		goto fail;
++
++	if (ptrace_set_syscall_ret(pid, os_getpid()) < 0)
++		goto fail;
++
++	/*
++	 * ptrace_child() exits 0 only if the syscall returned the *parent's*
++	 * pid, which can only happen if the call never ran and the value above
++	 * is what the child saw. A cancel that silently did not take shows up
++	 * here as the child's own pid, i.e. exit code 1, not as a pass.
++	 */
++	return finish_probe_child(pid, 0);
+ 
+ fail:
+-	stop_ptraced_child(pid, 1);
+-	fatal("missing\n");
++	kill(pid, SIGKILL);
++	CATCH_EINTR(waitpid(pid, &status, 0));
++	return 0;
++}
++
++static int force_no_sysemu __initdata;
++
++static int __init uml_nosysemu(char *line, int *add)
++{
++	*add = 0;
++	force_no_sysemu = 1;
++	return 0;
++}
++
++__uml_setup("nosysemu", uml_nosysemu,
++"nosysemu\n"
++"    Pretend the host has no PTRACE_SYSEMU and use the syscall-cancellation\n"
++"    path instead. That path exists for hosts older than the kernel that\n"
++"    introduced PTRACE_SYSEMU for the architecture -- 5.3 on arm64 -- which\n"
++"    in practice means phones, where a current Android is routinely paired\n"
++"    with a years-old kernel.\n"
++"\n"
++"    Without this option that path can only be exercised by finding such a\n"
++"    host, which is precisely the environment that is hardest to debug on.\n"
++"    With it, every existing test can run against it on any machine.\n\n"
++);
++
++static void __init check_sysemu(void)
++{
++	if (force_no_sysemu) {
++		os_info("Checking syscall emulation for ptrace...");
++		os_info("skipped (nosysemu)\n");
++		os_info("Checking syscall cancellation instead...");
++		if (try_syscall_cancel()) {
++			have_ptrace_sysemu = 0;
++			os_info("OK\n");
++			return;
++		}
++		fatal("missing\n\nnosysemu was requested but this host cannot "
++		      "cancel a syscall from a tracer.\n");
++	}
++
++	os_info("Checking syscall emulation for ptrace...");
++	if (try_sysemu()) {
++		have_ptrace_sysemu = 1;
++		os_info("OK\n");
++		return;
++	}
++	os_info("missing\n");
++
++	os_info("Checking syscall cancellation instead...");
++	if (try_syscall_cancel()) {
++		have_ptrace_sysemu = 0;
++		os_info("OK\n");
++		os_info("Host lacks PTRACE_SYSEMU; using PTRACE_SYSCALL with "
++			"syscall cancellation (one extra ptrace call per guest "
++			"syscall)\n");
++		return;
++	}
++
++	fatal("missing\n\nThis host provides neither PTRACE_SYSEMU nor a "
++	      "working syscall cancellation, and UML cannot intercept guest "
++	      "syscalls without one of them.\n");
+ }
+ 
+ static void __init check_ptrace(void)
+@@ -584,7 +724,13 @@ extern long elf_aux_min_sigstack;
+  */
+ static void __init check_stub_sigstack(void)
+ {
+-	unsigned long have = STUB_DATA_PAGES * UM_KERN_PAGE_SIZE;
++	/*
++	 * The stack itself, not the whole stub data area: one of those pages is
++	 * bookkeeping and no signal frame may land in it. Reporting the larger
++	 * number would overstate the headroom by a page and could describe a
++	 * host as fitting when it does not.
++	 */
++	unsigned long have = sizeof(((struct stub_data *)NULL)->sigstack);
+ 
+ 	if (!elf_aux_min_sigstack) {
+ 		os_info("Stub signal stack: %lu bytes (host publishes no AT_MINSIGSTKSZ)\n",
+@@ -647,6 +793,15 @@ void __init os_early_checks(void)
+ 	if (seccomp_config) {
+ 		if (init_seccomp()) {
+ 			using_seccomp = 1;
++			/*
++			 * Which mode is in use decides how much every guest
++			 * syscall costs -- SECCOMP handles them in-process via
++			 * SIGSYS, ptrace pays a stop and a waitpid per call --
++			 * so it is the first thing anyone asks when the guest
++			 * feels slow. Saying it once at boot is cheaper than
++			 * inferring it from which probe lines are absent.
++			 */
++			os_info("Userspace mode: SECCOMP\n");
+ 			return;
+ 		}
+ 
+@@ -658,6 +813,7 @@ void __init os_early_checks(void)
+ 		fatal("SMP is not supported with PTRACE userspace.\n");
+ 
+ 	using_seccomp = 0;
++	os_info("Userspace mode: ptrace\n");
+ 	check_ptrace();
+ 
+ 	pid = start_ptraced_child();
+diff --git a/arch/um/os-Linux/util.c b/arch/um/os-Linux/util.c
+index e3ad71a0d13c4..8c1edb7a6eb19 100644
+--- a/arch/um/os-Linux/util.c
++++ b/arch/um/os-Linux/util.c
+@@ -181,6 +181,32 @@ __uml_setup("quiet", quiet_cmd_param,
+  */
+ int vscnprintf(char *buf, size_t size, const char *fmt, va_list args);
+ 
++/*
++ * Write straight to fd 2 rather than through stderr.
++ *
++ * Referencing stdio's stderr object pulls a copy relocation into the UML
++ * binary, and UML's linker script gives the linker no aligned home for one:
++ * linking against bionic then fails with "improper alignment for relocation
++ * R_AARCH64_LDST64_ABS_LO12_NC" on stderr, because bionic's is an 8-byte
++ * pointer and the script places the copy at a 4-byte boundary. glibc builds
++ * never showed it because UML is linked statically against glibc here, and a
++ * static link has no copy relocations at all.
++ *
++ * Nothing is lost: this output is diagnostics, it is line-at-a-time, and it
++ * was already unbuffered in effect.
++ */
++static void os_write_stderr(const char *buf, int len)
++{
++	while (len > 0) {
++		ssize_t n = write(2, buf, len);
++
++		if (n <= 0)
++			return;
++		buf += n;
++		len -= n;
++	}
++}
++
+ void os_info(const char *fmt, ...)
+ {
+ 	char buf[256];
+@@ -192,7 +218,7 @@ void os_info(const char *fmt, ...)
+ 
+ 	va_start(list, fmt);
+ 	len = vscnprintf(buf, sizeof(buf), fmt, list);
+-	fwrite(buf, len, 1, stderr);
++	os_write_stderr(buf, len);
+ 	va_end(list);
+ }
+ 
+@@ -204,6 +230,6 @@ void os_warn(const char *fmt, ...)
+ 
+ 	va_start(list, fmt);
+ 	len = vscnprintf(buf, sizeof(buf), fmt, list);
+-	fwrite(buf, len, 1, stderr);
++	os_write_stderr(buf, len);
+ 	va_end(list);
+ }
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index f99e196abeea4..27feafdaf99f2 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -78,10 +78,41 @@ vmlinux_link()
+ 	objs="${objs} init/version-timestamp.o"
+ 
+ 	if [ "${SRCARCH}" = "um" ]; then
++		# Rename the kernel symbols that the target libc also references,
++		# before it gets a chance to bind to them. Doing it here rather
++		# than with -D during compilation keeps the preprocessor out of
++		# it: these names also occur as bare tokens that other headers
++		# paste into identifiers, and rewriting those breaks builds in
++		# places that have nothing to do with libc. See the list itself
++		# for which names and why.
++		if [ -n "${UM_REDEF_SYMS}" ] && [ -f "${UM_REDEF_SYMS}" ]; then
++			for a in ${objs} ${libs}; do
++				case "${a}" in
++				*.a|*.o)
++					${OBJCOPY} --redefine-syms="${UM_REDEF_SYMS}" \
++						"${a}" || exit 1
++					;;
++				esac
++			done
++		fi
++
+ 		wl=-Wl,
+ 		ld="${CC}"
+ 		ldflags="${CFLAGS_vmlinux}"
+-		ldlibs="-lutil -lrt -lpthread"
++		# glibc keeps these in separate archives; bionic folds all
++		# three into libc, so -lutil, -lrt and -lpthread name libraries
++		# that do not exist and the link fails outright. Ask the
++		# compiler which of them can actually be linked rather than
++		# assuming a libc -- UML links with $(CC), so this is the same
++		# driver that will do the real link.
++		ldlibs=""
++		for lib in util rt pthread; do
++			if echo 'int main(void){return 0;}' | \
++			   ${CC} ${CFLAGS_vmlinux} -x c - -l${lib} \
++				 -o /dev/null >/dev/null 2>&1; then
++				ldlibs="${ldlibs} -l${lib}"
++			fi
++		done
+ 	else
+ 		wl=
+ 		ld="${LD}"

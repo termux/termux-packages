@@ -1,0 +1,96 @@
+From 3a32202a04111821b9608537b918462b268df06d Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Fri, 14 Aug 2026 20:01:01 +0200
+Subject: [PATCH] um: arm64: do not clobber guest TLS on context switch
+
+arm64 userspace owns TPIDR_EL0 and sets it itself. arch_switch_to() was
+reinstating thread.arch.tp_value, which is only set by CLONE_SETTLS and is
+therefore zero for a thread that set its own TLS -- wiping the guest thread
+pointer on the first context switch. musl's __dls3 traps on this
+immediately.
+
+Gate 2 now passes: Alpine busybox initramfs boots, uname -m reports
+aarch64.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/arm64/um/asm/ptrace.h |  1 -
+ arch/arm64/um/syscalls.c   | 28 ++++++++++++++++++----------
+ arch/arm64/um/tls.c        | 14 --------------
+ 3 files changed, 18 insertions(+), 25 deletions(-)
+
+diff --git a/arch/arm64/um/asm/ptrace.h b/arch/arm64/um/asm/ptrace.h
+index 0f9f1477b48d3..eca32f9ce65e0 100644
+--- a/arch/arm64/um/asm/ptrace.h
++++ b/arch/arm64/um/asm/ptrace.h
+@@ -99,6 +99,5 @@ static inline int ptrace_set_thread_area(struct task_struct *child, int idx,
+ }
+ 
+ extern void arch_switch_to(struct task_struct *to);
+-extern void arch_switch_tls(struct task_struct *to);
+ 
+ #endif /* __UM_ARM64_PTRACE_H */
+diff --git a/arch/arm64/um/syscalls.c b/arch/arm64/um/syscalls.c
+index 34587f83a5306..d3331afadc654 100644
+--- a/arch/arm64/um/syscalls.c
++++ b/arch/arm64/um/syscalls.c
+@@ -26,16 +26,24 @@ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
+ 	return ksys_mmap_pgoff(addr, len, prot, flags, fd, off >> PAGE_SHIFT);
+ }
+ 
+-/*
+- * Install this task's TLS before it runs.
+- *
+- * On x86-64 this function is empty, because FS_BASE lives inside the ptrace
+- * register set and is therefore restored along with everything else. arm64's
+- * TPIDR_EL0 is a separate regset, so it has to be pushed across explicitly: the
+- * value is copied into the stub's arch data and flagged, and the stub reinstates
+- * it with a single "msr tpidr_el0" on resume (see stub_seccomp_restore_state()).
+- */
+ void arch_switch_to(struct task_struct *to)
+ {
+-	arch_switch_tls(to);
++	/*
++	 * Nothing to do, and it is important that nothing is done.
++	 *
++	 * arm64 userspace owns TPIDR_EL0 outright: the guest sets its own thread
++	 * pointer with "msr tpidr_el0, xN" and never asks the kernel. UML
++	 * captures whatever the guest put there in get_host_regs() (from
++	 * NT_ARM_TLS) or get_regs_from_mc(), stores it in the task's own
++	 * HOST_TLS register slot, and writes it back in put_host_regs(). Since
++	 * that slot is part of the per-task register file, switching tasks
++	 * already switches the TLS.
++	 *
++	 * Reinstating thread.arch.tp_value here instead would be actively wrong:
++	 * that field is only ever set by CLONE_SETTLS, so for a thread that set
++	 * its own TLS -- which is every normal thread -- it is zero, and copying
++	 * it over the live value wipes the guest's thread pointer on the first
++	 * context switch. musl notices immediately: __dls3 compares
++	 * __pthread_self() against TPIDR_EL0 and traps.
++	 */
+ }
+diff --git a/arch/arm64/um/tls.c b/arch/arm64/um/tls.c
+index 00ab5b8b5223c..225e46559d42b 100644
+--- a/arch/arm64/um/tls.c
++++ b/arch/arm64/um/tls.c
+@@ -15,20 +15,6 @@ void clear_flushed_tls(struct task_struct *task)
+ {
+ }
+ 
+-/*
+- * Make sure @to's TPIDR_EL0 is what will be in the register when it runs.
+- *
+- * Guest threads sharing an mm share one stub process, so the TLS register has
+- * to be reinstated on every switch between them -- it is not part of the GPR
+- * set that gets restored wholesale. Recording it in the register shadow slot is
+- * enough: the ptrace path writes NT_ARM_TLS from there in put_host_regs(), and
+- * the seccomp path hands it to the stub in set_stub_state().
+- */
+-void arch_switch_tls(struct task_struct *to)
+-{
+-	to->thread.regs.regs.gp[HOST_TLS] = to->thread.arch.tp_value;
+-}
+-
+ int arch_set_tls(struct task_struct *t, unsigned long tls)
+ {
+ 	/*

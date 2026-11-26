@@ -1,0 +1,33 @@
+diff --git a/tcp.c b/tcp.c
+index e279f8a..3617842 100644
+--- a/tcp.c
++++ b/tcp.c
+@@ -270,6 +270,7 @@
+  */
+ 
+ #include <sched.h>
++#include <inttypes.h>
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <unistd.h>
+@@ -327,8 +328,9 @@
+  */
+ #define OPTLEN_MAX (((1UL << 4) - 1 - 5) * 4UL)
+ 
+-#ifndef __USE_MISC
+-/* From Linux UAPI, missing in netinet/tcp.h provided by musl */
++#if !defined(__USE_MISC) && !defined(__ANDROID__)
++/* From Linux UAPI, missing in netinet/tcp.h provided by musl.
++ * Bionic's netinet/tcp.h takes these from Linux UAPI instead. */
+ struct tcp_repair_opt {
+ 	__u32	opt_code;
+ 	__u32	opt_val;
+@@ -764,7 +766,7 @@ static void tcp_rtt_dst_check(const struct tcp_tap_conn *conn,
+ 	for (i = 0; i < LOW_RTT_TABLE_SIZE; i++) {
+ 		if (inany_equals(&tapside->oaddr, low_rtt_dst + i))
+ 			return;
+-		if (hole == -1 && IN6_IS_ADDR_UNSPECIFIED(low_rtt_dst + i))
++		if (hole == -1 && IN6_IS_ADDR_UNSPECIFIED((const struct in6_addr *)(low_rtt_dst + i)))
+ 			hole = i;
+ 	}
+ 

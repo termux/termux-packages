@@ -1,0 +1,68 @@
+From 1df1e8f2c1b0a320cb4fc95b0f4270415e09ccf6 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sat, 15 Aug 2026 19:26:40 +0200
+Subject: [PATCH] um: let the IOMEM and DMA emulations be selected on their own
+
+Both were hidden symbols, reachable only because UML_PCI selects them. So a
+subsystem that merely needs HAS_IOMEM had to enable a PCI bus it never uses
+-- and on UML that bus is not free: UML_PCI without a configured virtio
+device ID warns at boot with "No virtio device ID configured for PCI - no
+PCI support" and a stack trace, on a kernel that wanted no PCI in the first
+place.
+
+The case in hand is USB. usbcore depends on HAS_IOMEM, but USB/IP's virtual
+host controller is a socket, not a device: vhci_hcd.c contains no MMIO and
+no DMA at all. With a prompt on each emulation, a UML kernel can have
+usbcore and vhci-hcd -- and so a real USB device passed in from outside --
+without PCI.
+
+Verified: ARCH=um SUBARCH=arm64 with USB, USBIP_VHCI_HCD and RTW88_8821AU
+builds and boots to userspace with no warnings, registering the virtual
+controller and the wireless driver.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/Kconfig | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/arch/um/Kconfig b/arch/um/Kconfig
+index d9541d13d9eb0..5b2d6172c2d33 100644
+--- a/arch/um/Kconfig
++++ b/arch/um/Kconfig
+@@ -51,7 +51,14 @@ config MMU
+ 	default y
+ 
+ config UML_DMA_EMULATION
+-	bool
++	bool "Emulate the DMA API"
++	help
++	  Provide the DMA API on top of ordinary memory, for driver stacks that
++	  require it. UML has no bus and no device doing real transfers, so this
++	  is bookkeeping rather than emulation of anything.
++
++	  Say Y if you need a subsystem that depends on HAS_DMA. It is selected
++	  automatically by UML_PCI.
+ 
+ config NO_IOMEM
+ 	bool "disable IOMEM" if EXPERT
+@@ -59,9 +66,19 @@ config NO_IOMEM
+ 	default y
+ 
+ config UML_IOMEM_EMULATION
+-	bool
++	bool "Emulate MMIO accessors"
+ 	select INDIRECT_IOMEM
+ 	select GENERIC_PCI_IOMAP
++	help
++	  Provide readl()/writel() and friends, so subsystems that depend on
++	  HAS_IOMEM can be built.
++
++	  This was reachable only as a side effect of enabling UML_PCI, which
++	  meant that anything wanting HAS_IOMEM had to drag in a PCI bus it did
++	  not use -- USB/IP's virtual host controller, for instance, needs
++	  HAS_IOMEM through usbcore but touches neither MMIO nor PCI, and
++	  enabling UML_PCI to reach it warns at boot that no virtio device ID
++	  is configured. Say Y to get the accessors on their own.
+ 
+ config ISA
+ 	bool

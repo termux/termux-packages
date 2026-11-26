@@ -1,0 +1,53 @@
+From 2fd75ba864f8acfc35f8f6f49d72ddbefe61f384 Mon Sep 17 00:00:00 2001
+From: Oleksii Zakharov <contact@zalexdev.com>
+Date: Sun, 16 Aug 2026 03:15:30 +0200
+Subject: [PATCH] um: offer 16K pages on the arm64 subarch
+
+A guest page is a host mmap(), so it can never be smaller than the
+host's page size, and os_early_checks() refuses to boot when it is --
+telling the user to rebuild with CONFIG_PAGE_SIZE_16KB. ARCH=um selected
+HAVE_PAGE_SIZE_4KB and nothing else, so that option did not exist and
+the advice could not be followed.
+
+This is not hypothetical: Android 15 and later ship 16K host kernels, so
+a 4K UML cannot run on a current phone at all. The other direction costs
+nothing -- one guest page is simply four host pages -- so a single 16K
+build serves both, which is what makes this worth having rather than a
+second configuration to maintain.
+
+arm64 only, because that is where 16K hosts exist; x86_64 has no 16K
+page size to host one.
+
+Signed-off-by: Oleksii Zakharov <contact@zalexdev.com>
+---
+ arch/um/Kconfig | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/arch/um/Kconfig b/arch/um/Kconfig
+index 5b2d6172c2d33..23be046b9b49b 100644
+--- a/arch/um/Kconfig
++++ b/arch/um/Kconfig
+@@ -27,6 +27,23 @@ config UML
+ 	select HAVE_DEBUG_KMEMLEAK
+ 	select HAVE_DEBUG_BUGVERBOSE
+ 	select HAVE_PAGE_SIZE_4KB
++	#
++	# 16 KB guest pages, on arm64 only.
++	#
++	# Not a tuning knob: a guest page is a host mmap(), so it can never be
++	# smaller than the host's page size, and Android 15 and later ship 16 KB
++	# host kernels. A 4 KB UML on such a host cannot map its own stub and
++	# os_early_checks() refuses to continue -- correctly, but until now it
++	# pointed at a CONFIG_PAGE_SIZE_16KB that ARCH=um did not offer.
++	#
++	# The other direction costs nothing, which is what makes one binary
++	# enough: a 16 KB guest on a 4 KB host simply uses four host pages per
++	# guest page.
++	#
++	# arm64 only because that is where 16 KB hosts exist. x86_64 has no 16 KB
++	# page size to host one, so offering the choice there would only produce a
++	# configuration nobody can run.
++	select HAVE_PAGE_SIZE_16KB if UML_ARM64
+ 	select NO_DMA if !UML_DMA_EMULATION
+ 	select OF_EARLY_FLATTREE if OF
+ 	select GENERIC_IRQ_SHOW
