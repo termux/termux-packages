@@ -1,0 +1,14 @@
+--- a/src/lib9/readcons.c
++++ b/src/lib9/readcons.c
+@@ -2,9 +2,11 @@
+ #define NOPLAN9DEFINES
+ #include <libc.h>
+ #include <termios.h>
++#ifndef __ANDROID__
+ #ifdef HAS_SYS_TERMIOS
+ #include <sys/termios.h>
+ #endif
++#endif
+ 
+ static int
+ rawx(int fd, int echoing)
