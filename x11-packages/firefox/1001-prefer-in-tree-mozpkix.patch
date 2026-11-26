@@ -1,0 +1,13 @@
+# Prefer the in-tree mozpkix headers over the system NSS ones, which can be newer than the bundled mozpkix library.
+
+--- a/build/moz.configure/nss.configure
++++ b/build/moz.configure/nss.configure
+@@ -49,7 +49,7 @@ def nss_config(nss_pkg, build_env):
+     cflags = ["-I%s" % os.path.join(build_env.dist, "include", "nss")]
+     libs = None
+     if nss_pkg:
+-        cflags = list(nss_pkg.cflags) + cflags
++        cflags = cflags + list(nss_pkg.cflags)
+         libs = nss_pkg.libs
+     return namespace(cflags=cflags, libs=libs)
+ 
