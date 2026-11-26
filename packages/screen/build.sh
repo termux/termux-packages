@@ -18,7 +18,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_pkg_auto_update() {
-	read -r latest < <(curl -fsSL "https://mirrors.kernel.org/gnu/screen" | sed -rn 's/.*screen-([0-9]+(\.[0-9]+)*).*/\1/p' | sort -Vr);
+	read -r latest < <(curl -fsSL --retry 3 --retry-all-errors "https://mirrors.kernel.org/gnu/screen" | sed -rn 's/.*screen-([0-9]+(\.[0-9]+)*).*/\1/p' | sort -Vr);
+	[[ -n "${latest}" ]] || termux_error_exit "Unable to get the latest version from https://mirrors.kernel.org/gnu/screen"
 	termux_pkg_upgrade_version "${latest}"
 }
 
