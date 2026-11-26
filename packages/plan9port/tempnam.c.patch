@@ -1,0 +1,11 @@
+--- a/src/cmd/postscript/common/tempnam.c
++++ b/src/cmd/postscript/common/tempnam.c
+@@ -15,7 +15,7 @@ mkfname(char *tmpdir, char *prefix)
+ 		goto Mktemp;
+ 	if((p = tmpdir) != nil)
+ 		goto Mktemp;
+-	p = "/tmp";
++	p = "@TERMUX_PREFIX@/tmp";
+ 
+  Mktemp:
+ 	n = strlen(p)+1+strlen(prefix)+1+8+1;

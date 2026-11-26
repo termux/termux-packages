@@ -1,0 +1,11 @@
+--- a/src/cmd/tar.c
++++ b/src/cmd/tar.c
+@@ -1160,7 +1160,7 @@ main(int argc, char *argv[])
+ 		break;
+ 	case Replace:
+ 		if (getwd(origdir, sizeof origdir) == nil)
+-			strcpy(origdir, "/tmp");
++			strcpy(origdir, "@TERMUX_PREFIX@/tmp");
+ 		ret = replace(argv);
+ 		break;
+ 	default:

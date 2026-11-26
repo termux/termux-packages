@@ -1,0 +1,20 @@
+--- a/dist/manweb
++++ b/dist/manweb
+@@ -71,13 +71,13 @@ for (i in */[~.]*.[0-9]*){
+ 	if(~ $p 0intro)
+ 		p=intro
+ 	if(~ $verbose yes) echo $d/$p
+-	troff -manhtml $i | troff2html -t 'Plan 9 from User Space'>/tmp/manweb.html |[2] silencer
++	troff -manhtml $i | troff2html -t 'Plan 9 from User Space'>@TERMUX_PREFIX@/tmp/manweb.html |[2] silencer
+ 	{
+-		sed '/<!-- TRAILER -->/q' /tmp/manweb.html
++		sed '/<!-- TRAILER -->/q' @TERMUX_PREFIX@/tmp/manweb.html
+ 		cat $PLAN9/dist/mantrailer.html
+-		sed -n '/<!-- TRAILER -->/,$p' /tmp/manweb.html
++		sed -n '/<!-- TRAILER -->/,$p' @TERMUX_PREFIX@/tmp/manweb.html
+ 	} | $PLAN9/dist/addsrclinks >$d/$p.html
+ }
+-rm /tmp/manweb.html
++rm @TERMUX_PREFIX@/tmp/manweb.html
+ cd $PLAN9/dist
+ ./fixurls $PLAN9/man/man*/*.html

@@ -1,0 +1,21 @@
+--- a/src/cmd/ed.c
++++ b/src/cmd/ed.c
+@@ -1,6 +1,9 @@
+ /*
+  * Editor
+  */
++#define _STDIO_H_ 1
++#define _STDLIB_H 1
++
+ #include <u.h>
+ #include <libc.h>
+ #include <bio.h>
+@@ -131,7 +134,7 @@ void	substitute(int);
+ Rune La[] = { 'a', 0 };
+ Rune Lr[] = { 'r', 0 };
+ 
+-char tmp[] = "/var/tmp/eXXXXX";
++char tmp[] = "@TERMUX_PREFIX@/var/tmp/eXXXXX";
+ 
+ void
+ main(int argc, char *argv[])
