@@ -1,8 +1,6 @@
-diff --git a/src/thread/Util.cxx~ b/src/thread/Util.cxx
-index 0dbf818..671eb6a 100644
---- a/src/thread/Util.cxx~
+--- a/src/thread/Util.cxx
 +++ b/src/thread/Util.cxx
-@@ -40,7 +40,7 @@
+@@ -14,7 +14,7 @@
  
  #ifdef __linux__
  
@@ -10,8 +8,8 @@ index 0dbf818..671eb6a 100644
 +#if !defined(ANDROID) && !defined(TERMUX)
  
  static int
- linux_ioprio_set(int which, int who, int ioprio)
-@@ -60,7 +60,7 @@ ioprio_set_idle()
+ linux_ioprio_set(int which, int who, int ioprio) noexcept
+@@ -34,7 +34,7 @@ ioprio_set_idle() noexcept
  	linux_ioprio_set(_IOPRIO_WHO_PROCESS, 0, _IOPRIO_IDLE);
  }
  
@@ -20,7 +18,7 @@ index 0dbf818..671eb6a 100644
  
  /**
   * Wrapper for the "sched_setscheduler" system call.  We don't use the
-@@ -84,7 +84,7 @@ SetThreadIdlePriority()
+@@ -59,7 +59,7 @@ SetThreadIdlePriority() noexcept
  	linux_sched_setscheduler(0, SCHED_IDLE, &sched_param);
  #endif
  
