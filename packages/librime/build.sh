@@ -3,19 +3,28 @@ TERMUX_PKG_DESCRIPTION="A modular, extensible input method engine in cross-platf
 TERMUX_PKG_LICENSE="BSD 3-Clause, LGPL-3.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE, data/preset/LICENSE.PRELUDE"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.17.0"
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="https://github.com/rime/librime/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=a60274da5d8b8a7187e6c7e9ba5023334ed7bdd182535e93c4e96de8cf188377
+TERMUX_PKG_VERSION="1.18.0"
+_SPDLOG_COMMIT=79524ddd08a4ec981b7fea76afd08ee05f83755d
+TERMUX_PKG_SRCURL=(
+	"https://github.com/rime/librime/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz"
+	"https://github.com/gabime/spdlog/archive/${_SPDLOG_COMMIT}.tar.gz"
+)
+TERMUX_PKG_SHA256=(
+	5768b3ac14b9b033891771d48d78fdb399860672cb864a937c5a1050068ab72c
+	c6dee844e35a54cc80e3ab76aae2310763e0b49c7397549dfa4d4657d9737138
+)
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="boost, google-glog, leveldb, libc++, libopencc, libyaml-cpp, marisa"
-TERMUX_PKG_BUILD_DEPENDS="boost-headers, gflags, openssl"
+TERMUX_PKG_DEPENDS="boost, leveldb, libc++, libopencc, libyaml-cpp, marisa"
+TERMUX_PKG_BUILD_DEPENDS="boost-headers"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_TEST=OFF
 -DBUILD_DATA=ON
 "
 
 termux_step_post_get_source() {
+	rmdir "$TERMUX_PKG_SRCDIR"/deps/spdlog
+	mv "$TERMUX_PKG_SRCDIR/spdlog-${_SPDLOG_COMMIT}" "$TERMUX_PKG_SRCDIR"/deps/spdlog
+
 	local _presetdir="$TERMUX_PKG_SRCDIR"/data/preset/
 	local _baseurl="https://raw.githubusercontent.com/rime/rime-prelude/dd84abecc33f0b05469f1d744e32d2b60b3529e3"
 	mkdir -p "$_presetdir"
