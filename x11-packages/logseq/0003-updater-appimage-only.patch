@@ -1,0 +1,13 @@
+diff --git a/src/electron/electron/updater.cljs b/src/electron/electron/updater.cljs
+index fdcfd6d..b5ef241 100644
+--- a/src/electron/electron/updater.cljs
++++ b/src/electron/electron/updater.cljs
+@@ -125,7 +125,7 @@
+ 
+ (defn- init-auto-updater!
+   [^js win]
+-  (when (and prod? (not= false (cfgs/get-item :auto-update)))
++  (when (and prod? (.-APPIMAGE js/process.env) (not= false (cfgs/get-item :auto-update)))
+     (debug "init-auto-updater")
+     (set! (.-autoDownload autoUpdater) true)
+     (-> (.checkForUpdates autoUpdater)

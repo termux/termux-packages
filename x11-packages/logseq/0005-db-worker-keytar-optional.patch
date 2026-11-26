@@ -1,0 +1,21 @@
+--- a/src/main/frontend/worker/platform/node.cljs
++++ b/src/main/frontend/worker/platform/node.cljs
+@@ -16,8 +16,16 @@
+             [lambdaisland.glogi :as log]
+             [logseq.common.config :as common-config]
+             [logseq.db.sqlite.backup :as sqlite-backup]
+-            [promesa.core :as p]
+-            ["keytar" :as keytar]))
++            [promesa.core :as p]))
++
++;; keytar has no Android build and may be absent. Fall back to a stub whose
++;; calls reject, so secrets are kept in the kv store instead.
++(def ^:private ^js keytar
++  (or (try (js/require "keytar") (catch :default _ nil))
++      (let [unavailable (fn [& _] (js/Promise.reject (js/Error. "keytar unavailable")))]
++        #js {:setPassword unavailable
++             :getPassword unavailable
++             :deletePassword unavailable})))
+ 
+ (defkeyword ::drain-writes! "Stops new graph resource work and waits for pending writes.")
+ 
