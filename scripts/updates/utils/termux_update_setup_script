@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+##
+##  Package update helper script to update the version and checksum of
+##  termux_setup_${toolchain} scripts
+##
+##  Licensed under the Apache License, Version 2.0 (the "License");
+##  you may not use this file except in compliance with the License.
+##  You may obtain a copy of the License at
+##
+##  http://www.apache.org/licenses/LICENSE-2.0
+##
+##  Unless required by applicable law or agreed to in writing, software
+##  distributed under the License is distributed on an "AS IS" BASIS,
+##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+##  See the License for the specific language governing permissions and
+##  limitations under the License.
+##
+
+set -e
+
+# We'll need these later when sourcing build scripts.
+# shellcheck source=scripts/properties.sh
+source "$REPO_ROOT/scripts/properties.sh"
+
+termux_update_setup_script() {
+### Validate inputs
+
+	if (( $# != 3 )); then
+		printf '%s\n' \
+			"Usage: ${FUNCNAME[0]} [toolchain name] [new version] [sha256sum]" \
+			"" \
+			"Update TERMUX_\${TOOLCHAIN}_VERSION and TERMUX_\${TOOLCHAIN}_SHA256 " \
+			"Of termux_setup_\${TOOLCHAIN} and optionally stage changes." \
+			"" >&2
+		return 1
+	fi
+
+	local REPO_ROOT
+	REPO_ROOT="$(realpath "$(dirname "$0")/../../")"
+	local IS_GIT_REPOSITORY=false
+	if [[ "$(git rev-parse --absolute-git-dir 2> /dev/null)" == "$REPO_ROOT" ]]; then
+		IS_GIT_REPOSITORY=true
+	fi
+
+	local SETUP_SCRIPT="${1:-}" NEW_VERSION="${2:-}" NEW_SHA256="${3:-}"
+
+	# Does what we got for $NEW_SHA256 look like a valid checksum?
+	if [[ ! "$NEW_SHA256" =~ [0-9a-f]{64} ]]; then
+		echo "The passed checksum '$NEW_SHA256' is not a valid SHA256 checksum." >&2
+		return 1
+	fi
+
+	# Extract the toolchain name, extrapolate the file path and check that it exists.
+	local toolchain_name="${SETUP_SCRIPT#termux_setup_}"
+	local setup_script_path="${REPO_ROOT}/scripts/build/setup/termux_setup_${toolchain_name}.sh"
+	if [[ ! -e "$setup_script_path" ]]; then
+		echo "No such setup script: '${setup_script_path#"$REPO_ROOT/"}'" >&2
+		return 1
+	fi
+
+	# Check that the variables follow the expected naming convention.
+	local var error=""
+	for var in "TERMUX_${toolchain_name}_VERSION" "TERMUX_${toolchain_name}_SHA256"; do
+		[[ "$(<"${setup_script_path}")" == *"local ${var}="* ]] || \
+		error+="termux_setup_${toolchain_name} does not contain the expected 'local ${var}' variable declaration."$'\n'
+	done
+
+	if [[ -n "${error:-}" ]]; then
+		printf 'ERROR:\n%s' "${error}" >&2
+		return 1
+	fi
+
+### Update setup script
+
+	sed -i \
+		-e "s|local TERMUX_${toolchain_name}_VERSION=.*|local TERMUX_${toolchain_name}_VERSION=${NEW_VERSION}|" \
+		-e "s|local TERMUX_${toolchain_name}_SHA256=.*|local TERMUX_${toolchain_name}_SHA256=${NEW_SHA256}|" \
+		"${setup_script_path}"
+
+### Stage changes
+
+	# If we are in the Git repository, prompt for staging changes.
+	if [[ "${IS_GIT_REPOSITORY}" == "true" ]]; then
+		echo
+		echo "You are about to stage these changes:"
+		echo
+		echo "--------------------"
+		git --no-pager diff --patch -- "${setup_script_path}"
+		echo "--------------------"
+		echo
+		# On the CI always choose to stage changes
+		if [[ "${CI-false}" == "true" ]]; then
+			CHOICE=y
+		else
+			read -re -p "Do you want to stage changes? (y/n) " CHOICE
+		fi
+		echo
+		case "${CHOICE}" in
+			y|Y) git add "${setup_script_path}";;
+			*) echo "Not committing to Git!";;
+		esac
+		echo
+	fi
+}
+
+termux_update_setup_script "$@"

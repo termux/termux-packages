@@ -29,7 +29,7 @@ REPO_ROOT="$(realpath "$(dirname "$0")/../../")"
 IS_GIT_REPOSITORY=false
 error=false
 
-if git status >/dev/null 2>&1; then
+if git rev-parse --git-dir &> /dev/null; then
 	IS_GIT_REPOSITORY=true
 fi
 
@@ -38,8 +38,8 @@ fi
 source "$REPO_ROOT/scripts/properties.sh"
 
 for package_dir in "$@"; do
-	buildsh_path=
-	repo=
+	buildsh_path=""
+	repo=""
 	# Did we get the package in the form of ${channel}/${package_dir}?
 	if [[ -d "${package_dir}" && -f "${package_dir}/build.sh" ]]; then
 		repo="${package_dir%\/*}"
