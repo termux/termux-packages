@@ -1,0 +1,20 @@
+Backport of https://github.com/dotnet/runtime/pull/137198
+diff --git a/src/runtime/src/native/libs/configure.cmake b/src/runtime/src/native/libs/configure.cmake
+index 9cd22cfa5..54fcf597c 100644
+--- a/src/runtime/src/native/libs/configure.cmake
++++ b/src/runtime/src/native/libs/configure.cmake
+@@ -257,10 +257,14 @@ check_symbol_exists(
+     sys/uio.h
+     HAVE_PWRITEV)
+ 
++cmake_push_check_state()
++# Bionic also declares an overloaded ioctl, whose address can't be taken.
++list(APPEND CMAKE_REQUIRED_DEFINITIONS -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
+ check_symbol_exists(
+     ioctl
+     sys/ioctl.h
+     HAVE_IOCTL)
++cmake_pop_check_state()
+ 
+ check_symbol_exists(
+     sched_getaffinity

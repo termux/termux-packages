@@ -1,0 +1,35 @@
+diff --git a/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt b/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
+index d3a1132b5..c8cb78b5a 100644
+--- a/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.IO.Compression.Native/CMakeLists.txt
+@@ -83,7 +83,7 @@ if (CLR_CMAKE_TARGET_UNIX OR CLR_CMAKE_TARGET_BROWSER OR CLR_CMAKE_TARGET_WASI)
+             target_link_libraries(System.IO.Compression.Native PRIVATE libzstd_static)
+         endif()
+ 
+-        if (NOT CLR_CMAKE_TARGET_ARCH_WASM AND NOT CLR_CMAKE_TARGET_APPLE_MOBILE AND NOT CLR_CMAKE_TARGET_ANDROID AND NOT CLR_CMAKE_USE_SYSTEM_BROTLI AND NOT CLR_CMAKE_USE_SYSTEM_ZSTD)
++        if (NOT CLR_CMAKE_TARGET_ARCH_WASM AND NOT CLR_CMAKE_TARGET_APPLE_MOBILE AND NOT CLR_CMAKE_USE_SYSTEM_BROTLI AND NOT CLR_CMAKE_USE_SYSTEM_ZSTD)
+             set(DEF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/System.IO.Compression.Native_unixexports.src)
+             set(EXPORTS_FILE ${CMAKE_CURRENT_BINARY_DIR}/System.IO.Compression.Native.exports)
+             generate_exports_file(${DEF_SOURCES} ${EXPORTS_FILE})
+@@ -180,7 +180,7 @@ else ()
+         target_link_libraries(System.IO.Compression.Native PUBLIC ${BROTLI_LIBRARIES})
+     endif ()
+ 
+-    if (NOT GEN_SHARED_LIB AND NOT CLR_CMAKE_TARGET_APPLE_MOBILE AND NOT CLR_CMAKE_TARGET_ANDROID)
++    if (NOT GEN_SHARED_LIB AND NOT CLR_CMAKE_TARGET_APPLE_MOBILE)
+         set(NATIVECOMPRESSION_SOURCES ${NATIVECOMPRESSION_SOURCES} entrypoints.c)
+     endif ()
+ 
+diff --git a/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake b/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake
+index 88bcf5641..cde9f717a 100644
+--- a/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake
++++ b/src/runtime/src/native/libs/System.IO.Compression.Native/extra_libs.cmake
+@@ -16,7 +16,7 @@ macro(append_extra_compression_libs NativeLibsExtra)
+     # 'zlib' represents our in-tree zlib, and is used in all other platforms
+     # that don't meet any of the previous special requirements, like most
+     # regular Unix and Windows builds.
+-    list(APPEND ZLIB_LIBRARIES $<IF:$<BOOL:${CLR_CMAKE_USE_SYSTEM_ZLIB}>,z,zlib>)
++    list(APPEND ZLIB_LIBRARIES $<IF:$<BOOL:${CLR_CMAKE_USE_SYSTEM_ZLIB}>,z,zlib> m)
+   endif ()
+   list(APPEND ${NativeLibsExtra} ${ZLIB_LIBRARIES})
+ 

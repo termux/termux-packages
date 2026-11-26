@@ -1,0 +1,36 @@
+diff --git a/src/sdk/src/Layout/Directory.Build.props b/src/sdk/src/Layout/Directory.Build.props
+index 5b0d75f72..51d8e955e 100644
+--- a/src/sdk/src/Layout/Directory.Build.props
++++ b/src/sdk/src/Layout/Directory.Build.props
+@@ -60,7 +60,7 @@
+          no arm64 sysroot, would try to cross-link and fail. -->
+     <_DotnetAotIsCrossBuild Condition="'$(_DotnetAotIsSameOSBuild)' == 'true' and '$(TargetArchitecture)' != '$(BuildArchitecture)' and '$(OSName)' != 'linux-musl' and !('$(TargetOS)' == 'linux' and '$(CrossBuild)' != 'true')">true</_DotnetAotIsCrossBuild>
+ 
+-    <_ShouldPublishDotnetAot Condition="'$(_ShouldPublishDotnetAot)' == '' and '$(_DotnetAotTargetOSSupported)' == 'true' and '$(NativeAotSupported)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and ('$(_DotnetAotIsNativeBuild)' == 'true' or '$(_DotnetAotIsCrossBuild)' == 'true')">true</_ShouldPublishDotnetAot>
++    <_ShouldPublishDotnetAot Condition="'$(_ShouldPublishDotnetAot)' == '' and '$(_DotnetAotTargetOSSupported)' == 'true' and '$(NativeAotSupported)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and !$(TargetRid.StartsWith('linux-bionic')) and ('$(_DotnetAotIsNativeBuild)' == 'true' or '$(_DotnetAotIsCrossBuild)' == 'true')">true</_ShouldPublishDotnetAot>
+     <_ShouldPublishDotnetAot Condition="'$(_ShouldPublishDotnetAot)' == ''">false</_ShouldPublishDotnetAot>
+   </PropertyGroup>
+ 
+@@ -103,7 +103,7 @@
+   <PropertyGroup>
+     <GenerateSdkBundleOnly Condition="'$(DotNetBuildPass)' == '3' and '$(OS)' == 'Windows_NT'">true</GenerateSdkBundleOnly>
+     <BundleRuntimePacks Condition="'$(BundleRuntimePacks)' == '' and '$(DotNetBuildSourceOnly)' == 'true'">true</BundleRuntimePacks>
+-    <BundleNativeAotCompiler Condition="'$(BundleNativeAotCompiler)' == '' and '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and '$(NativeAotSupported)' == 'true'">true</BundleNativeAotCompiler>
++    <BundleNativeAotCompiler Condition="'$(BundleNativeAotCompiler)' == '' and '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildUseMonoRuntime)' != 'true' and '$(NativeAotSupported)' == 'true' and !$(TargetRid.StartsWith('linux-bionic'))">true</BundleNativeAotCompiler>
+ 
+     <!-- Crossgen2 is not bundled by default on platforms where Microsoft provides a package on nuget.org,
+          because it is large (100MB+). -->
+diff --git a/src/sdk/src/Layout/redist/targets/Crossgen.targets b/src/sdk/src/Layout/redist/targets/Crossgen.targets
+index fdc75d1d0..afcd1710a 100644
+--- a/src/sdk/src/Layout/redist/targets/Crossgen.targets
++++ b/src/sdk/src/Layout/redist/targets/Crossgen.targets
+@@ -5,7 +5,8 @@
+     <IsCrossgenSupported Condition="'$(SkipUsingCrossgen)' != 'true' and
+                                     '$(TargetArchitecture)' != 's390x' and
+                                     '$(TargetArchitecture)' != 'ppc64le' and
+-                                    '$(DotNetBuildUseMonoRuntime)' != 'true'">true</IsCrossgenSupported>
++                                    '$(DotNetBuildUseMonoRuntime)' != 'true' and
++                                    !$(TargetRid.StartsWith('linux-bionic'))">true</IsCrossgenSupported>
+ 
+     <RuntimeNETCrossgenPackageName>microsoft.netcore.app.crossgen2.$(NETCoreSdkRuntimeIdentifier)</RuntimeNETCrossgenPackageName>
+   </PropertyGroup>

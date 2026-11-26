@@ -1,0 +1,19 @@
+diff --git a/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.c b/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.c
+index 594735ac7..898a14b43 100644
+--- a/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.c
++++ b/src/runtime/src/native/libs/System.Security.Cryptography.Native/opensslshim.c
+@@ -161,13 +161,7 @@ static void OpenLibraryOnce(void)
+ #endif
+     }
+ 
+-#ifdef TARGET_ANDROID
+-    if (libssl == NULL)
+-    {
+-        // Android OpenSSL has no soname
+-        DlOpen(LIBNAME);
+-    }
+-#elif defined(__FreeBSD__)
++#if defined(__FreeBSD__)
+     // The ports version of OpenSSL is used over base where possible
+     if (libssl == NULL)
+     {

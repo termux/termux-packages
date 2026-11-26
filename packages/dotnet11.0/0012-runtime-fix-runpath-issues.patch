@@ -1,0 +1,38 @@
+System.Security.Cryptography.Native needs libssl.so and libcrypto.so, both of which are provided by Termux
+System.Net.Security.Native needs libgssapi_krb5.so.2
+Mono CoreCLR needs to be able to find libraries in "$TERMUX_PREFIX/lib"
+This sets rpath to help the linker find them during runtime
+diff --git a/src/runtime/src/mono/mono/mini/CMakeLists.txt b/src/runtime/src/mono/mono/mini/CMakeLists.txt
+index a0aea1ea3..d7a670c47 100644
+--- a/src/runtime/src/mono/mono/mini/CMakeLists.txt
++++ b/src/runtime/src/mono/mono/mini/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ project(mini C)
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ 
+ if(ENABLE_LLVM OR ENABLE_LLVM_RUNTIME OR HOST_BROWSER)
+   enable_language(CXX)
+diff --git a/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt b/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt
+index 7fffeae94..9aba4c1eb 100644
+--- a/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.Net.Security.Native/CMakeLists.txt
+@@ -4,6 +4,7 @@ if(CLR_CMAKE_TARGET_ARCH_WASM)
+     message(FATAL_ERROR "Not implemented for WASM")
+ endif()
+ 
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ add_compile_options(-Wno-incompatible-pointer-types-discards-qualifiers)
+ 
+ include(${CMAKE_CURRENT_LIST_DIR}/extra_libs.cmake)
+diff --git a/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt b/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt
+index 8c6605503..0cde2b72d 100644
+--- a/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt
++++ b/src/runtime/src/native/libs/System.Security.Cryptography.Native/CMakeLists.txt
+@@ -8,6 +8,7 @@ if(CLR_CMAKE_TARGET_ARCH_WASM)
+ endif()
+ 
+ # These are happening inside of OpenSSL-defined macros out of our control
++add_link_options("-Wl,-rpath,@TERMUX_PREFIX@/lib")
+ add_compile_options(-Wno-cast-align)
+ add_compile_options(-Wno-reserved-id-macro)
+ add_compile_options(-Wno-documentation)
