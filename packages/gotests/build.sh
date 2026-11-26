@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cweill/gotests
 TERMUX_PKG_DESCRIPTION="Generates Go tests from your source code"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.10.0"
 TERMUX_PKG_SRCURL=https://github.com/cweill/gotests/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=1a36874dd5beec211e9b9aaf7d72be8839e76b5ad0a002cb4e83b80ad948697b
+TERMUX_PKG_SHA256=9a2261435dae1002bafa596be86ab50b180f4d4642ed5bc293471a2c150b8115
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
