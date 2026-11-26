@@ -1,0 +1,225 @@
+--- a/src/platform/fallback.rs
++++ b/src/platform/fallback.rs
+@@ -0,0 +1,211 @@
++use std::{
++	borrow::Cow,
++	io::Write,
++	path::{Path, PathBuf},
++	process::{Command, Stdio},
++	sync::Mutex,
++};
++
++#[cfg(feature = "image-data")]
++use crate::ImageData;
++use crate::Error;
++
++#[derive(Default)]
++struct FallbackState {
++	text: Option<String>,
++	html: Option<String>,
++	file_list: Option<Vec<PathBuf>>,
++	#[cfg(feature = "image-data")]
++	image: Option<ImageData<'static>>,
++}
++
++static CLIPBOARD_FALLBACK: Mutex<FallbackState> = Mutex::new(FallbackState {
++	text: None,
++	html: None,
++	file_list: None,
++	#[cfg(feature = "image-data")]
++	image: None,
++});
++
++pub(crate) struct Clipboard;
++
++impl Clipboard {
++	pub(crate) fn new() -> Result<Self, Error> {
++		Ok(Self)
++	}
++}
++
++pub(crate) struct Get<'clipboard> {
++	_clipboard: &'clipboard mut Clipboard,
++}
++
++impl<'clipboard> Get<'clipboard> {
++	pub(crate) fn new(clipboard: &'clipboard mut Clipboard) -> Self {
++		Self { _clipboard: clipboard }
++	}
++
++	pub(crate) fn text(self) -> Result<String, Error> {
++		if let Ok(output) = Command::new("termux-clipboard-get").output() {
++			if output.status.success() {
++				if let Ok(text) = String::from_utf8(output.stdout) {
++					return if text.is_empty() {
++						Err(Error::ContentNotAvailable)
++					} else {
++						Ok(text)
++					};
++				}
++			}
++		}
++
++		if let Ok(guard) = CLIPBOARD_FALLBACK.lock() {
++			if let Some(ref text) = guard.text {
++				return Ok(text.clone());
++			}
++		}
++		Err(Error::ContentNotAvailable)
++	}
++
++	#[cfg(feature = "image-data")]
++	pub(crate) fn image(self) -> Result<ImageData<'static>, Error> {
++		if let Ok(guard) = CLIPBOARD_FALLBACK.lock() {
++			if let Some(ref image) = guard.image {
++				return Ok(image.clone());
++			}
++		}
++		Err(Error::ContentNotAvailable)
++	}
++
++	pub(crate) fn html(self) -> Result<String, Error> {
++		if let Ok(guard) = CLIPBOARD_FALLBACK.lock() {
++			if let Some(ref html) = guard.html {
++				return Ok(html.clone());
++			}
++		}
++		Err(Error::ContentNotAvailable)
++	}
++
++	pub(crate) fn file_list(self) -> Result<Vec<PathBuf>, Error> {
++		if let Ok(guard) = CLIPBOARD_FALLBACK.lock() {
++			if let Some(ref files) = guard.file_list {
++				return Ok(files.clone());
++			}
++		}
++		Err(Error::ContentNotAvailable)
++	}
++}
++
++pub(crate) struct Set<'clipboard> {
++	_clipboard: &'clipboard mut Clipboard,
++}
++
++impl<'clipboard> Set<'clipboard> {
++	pub(crate) fn new(clipboard: &'clipboard mut Clipboard) -> Self {
++		Self { _clipboard: clipboard }
++	}
++
++	pub(crate) fn text(self, text: Cow<'_, str>) -> Result<(), Error> {
++		let _ = set_termux_clipboard(text.as_ref());
++		if let Ok(mut guard) = CLIPBOARD_FALLBACK.lock() {
++			guard.text = Some(text.into_owned());
++			guard.html = None;
++			guard.file_list = None;
++			#[cfg(feature = "image-data")]
++			{
++				guard.image = None;
++			}
++		}
++		Ok(())
++	}
++
++	pub(crate) fn html(self, html: Cow<'_, str>, alt: Option<Cow<'_, str>>) -> Result<(), Error> {
++		if let Some(ref alt_text) = alt {
++			let _ = set_termux_clipboard(alt_text.as_ref());
++		}
++		if let Ok(mut guard) = CLIPBOARD_FALLBACK.lock() {
++			guard.html = Some(html.into_owned());
++			guard.text = alt.map(|a| a.into_owned());
++			guard.file_list = None;
++			#[cfg(feature = "image-data")]
++			{
++				guard.image = None;
++			}
++		}
++		Ok(())
++	}
++
++	#[cfg(feature = "image-data")]
++	pub(crate) fn image(self, image: ImageData) -> Result<(), Error> {
++		if let Ok(mut guard) = CLIPBOARD_FALLBACK.lock() {
++			guard.image = Some(ImageData {
++				width: image.width,
++				height: image.height,
++				bytes: Cow::Owned(image.bytes.into_owned()),
++			});
++			guard.text = None;
++			guard.html = None;
++			guard.file_list = None;
++		}
++		Ok(())
++	}
++
++	pub(crate) fn file_list(self, file_list: &[impl AsRef<Path>]) -> Result<(), Error> {
++		if let Ok(mut guard) = CLIPBOARD_FALLBACK.lock() {
++			guard.file_list = Some(file_list.iter().map(|p| p.as_ref().to_path_buf()).collect());
++			guard.text = None;
++			guard.html = None;
++			#[cfg(feature = "image-data")]
++			{
++				guard.image = None;
++			}
++		}
++		Ok(())
++	}
++}
++
++fn set_termux_clipboard(text: &str) -> bool {
++	if let Ok(mut child) = Command::new("termux-clipboard-set")
++		.stdin(Stdio::piped())
++		.spawn()
++	{
++		let write_res = if let Some(mut stdin) = child.stdin.take() {
++			stdin.write_all(text.as_bytes())
++		} else {
++			return false;
++		};
++
++		if write_res.is_err() {
++			let _ = child.kill();
++			let _ = child.wait();
++			return false;
++		}
++
++		if let Ok(status) = child.wait() {
++			return status.success();
++		}
++	}
++	false
++}
++
++pub(crate) struct Clear<'clipboard> {
++	_clipboard: &'clipboard mut Clipboard,
++}
++
++impl<'clipboard> Clear<'clipboard> {
++	pub(crate) fn new(clipboard: &'clipboard mut Clipboard) -> Self {
++		Self { _clipboard: clipboard }
++	}
++
++	pub(crate) fn clear(self) -> Result<(), Error> {
++		let _ = set_termux_clipboard("");
++		if let Ok(mut guard) = CLIPBOARD_FALLBACK.lock() {
++			guard.text = None;
++			guard.html = None;
++			guard.file_list = None;
++			#[cfg(feature = "image-data")]
++			{
++				guard.image = None;
++			}
++		}
++		Ok(())
++	}
++}
+--- a/src/platform/mod.rs
++++ b/src/platform/mod.rs
+@@ -15,3 +15,8 @@ pub use windows::*;
+ mod osx;
+ #[cfg(target_os = "macos")]
+ pub use osx::*;
++
++#[cfg(target_os = "android")]
++mod fallback;
++#[cfg(target_os = "android")]
++pub(crate) use fallback::*;
