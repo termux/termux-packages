@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	BUILD_DIR="$TERMUX_PKG_BUILDDIR/server-build" \
+	ANDROID_HOME="$ANDROID_HOME" \
 	ANDROID_PLATFORM=35 \
 	ANDROID_BUILD_TOOLS="$TERMUX_ANDROID_BUILD_TOOLS_VERSION" \
 		./server/build_without_gradle.sh
