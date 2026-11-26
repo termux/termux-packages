@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://nheko.im/nheko-reborn/blurhash
+TERMUX_PKG_DESCRIPTION="C++ blurhash encoder/decoder"
+TERMUX_PKG_LICENSE="BSL-1.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION="0.2.0"
+TERMUX_PKG_SRCURL="https://nheko.im/nheko-reborn/blurhash/-/archive/v${TERMUX_PKG_VERSION}/blurhash-v${TERMUX_PKG_VERSION}.tar.bz2"
+TERMUX_PKG_SHA256=53e3199d7586e300231150a4dd386d27474a420bea837f96a8e050e075467bea
+TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_AUTO_UPDATE=true
