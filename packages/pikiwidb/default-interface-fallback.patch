@@ -1,0 +1,80 @@
+Fall back to the first usable IPv4 interface when the default route cannot
+be read: /proc/net/route is not accessible on Android, so the hardcoded
+"eth0" made the server abort at startup.
+
+--- a/src/net/src/net_interfaces.cc
++++ b/src/net/src/net_interfaces.cc
+@@ -21,6 +21,8 @@
+ #  include "pstd/include/pstd_defer.h"
+ 
+ #else
++#  include <net/if.h>
++
+ #  include <fstream>
+ #  include <iterator>
+ #  include <sstream>
+@@ -30,6 +32,34 @@
+ 
+ #include "pstd/include/xdebug.h"
+ 
++#if !defined(__APPLE__)
++static std::string FirstUsableInterface(const std::string& fallback) {
++  struct ifaddrs* ifAddrStruct = nullptr;
++  if (getifaddrs(&ifAddrStruct) == -1) {
++    return fallback;
++  }
++
++  std::string name;
++  std::string loopback;
++  for (struct ifaddrs* ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
++    if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_INET || !(ifa->ifa_flags & IFF_UP)) {
++      continue;
++    }
++    if (ifa->ifa_flags & IFF_LOOPBACK) {
++      loopback = ifa->ifa_name;
++    } else if (name.empty()) {
++      name = ifa->ifa_name;
++    }
++  }
++  freeifaddrs(ifAddrStruct);
++
++  if (!name.empty()) {
++    return name;
++  }
++  return loopback.empty() ? fallback : loopback;
++}
++#endif
++
+ std::string GetDefaultInterface() {
+ #if defined(__APPLE__)
+   std::string name("lo0");
+@@ -72,11 +102,12 @@ std::string GetDefaultInterface() {
+   std::string name("eth0");
+   std::ifstream routeFile("/proc/net/route", std::ios_base::in);
+   if (!routeFile.good()) {
+-    return name;
++    return FirstUsableInterface(name);
+   }
+ 
+   std::string line;
+   std::vector<std::string> tokens;
++  bool found = false;
+   while (std::getline(routeFile, line)) {
+     std::istringstream stream(line);
+     std::copy(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>(),
+@@ -86,13 +117,14 @@ std::string GetDefaultInterface() {
+     // field, Destination, set to "00000000"
+     if ((tokens.size() >= 2) && (tokens[1] == std::string("00000000"))) {
+       name = tokens[0];
++      found = true;
+       break;
+     }
+ 
+     tokens.clear();
+   }
+ 
+-  return name;
++  return found ? name : FirstUsableInterface(name);
+ #endif
+ }
+ 
