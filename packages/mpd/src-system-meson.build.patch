@@ -1,0 +1,15 @@
+--- a/src/system/meson.build
++++ b/src/system/meson.build
+@@ -12,6 +12,12 @@ if host_machine.system() == 'linux'
+   ]
+ endif
+ 
++if host_machine.system() == 'android'
++  system_sources += [
++    'PageAllocator.cxx',
++  ]
++endif
++
+ if host_machine.system() == 'windows'
+   system_sources += [
+     'windows/Clock.cxx',
