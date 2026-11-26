@@ -1,0 +1,39 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 06577bf..aed9c05 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -256,3 +256,34 @@ if (MSVC)
+         disable_msvc_warnings(vad-speech-segments)
+     endif()
+ endif()
++
++include(GNUInstallDirs)
++
++install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/models/download-ggml-model.sh" DESTINATION ${CMAKE_INSTALL_BINDIR} RENAME whisper-download-model)
++
++file(GLOB MODEL_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/models/*.sh")
++foreach(script ${MODEL_SCRIPTS})
++    get_filename_component(script_name ${script} NAME)
++    if(NOT script_name STREQUAL "download-ggml-model.sh")
++        install(PROGRAMS ${script} DESTINATION share/whisper-cpp)
++    endif()
++endforeach()
++
++if(WHISPER_BUILD_EXAMPLES)
++    file(GLOB EXAMPLE_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/*.sh")
++    foreach(script ${EXAMPLE_SCRIPTS})
++        get_filename_component(script_name ${script} NAME_WE)
++        install(PROGRAMS ${script} DESTINATION ${CMAKE_INSTALL_BINDIR} RENAME "whisper-${script_name}")
++    endforeach()
++endif()
++
++if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
++    file(GLOB UTILITY_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/*.sh")
++    install(PROGRAMS ${UTILITY_SCRIPTS} DESTINATION share/whisper-cpp)
++endif()
++
++file(GLOB PYTHON_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/models/*.py")
++foreach(script ${PYTHON_SCRIPTS})
++    get_filename_component(script_name ${script} NAME_WE)
++    install(PROGRAMS ${script} DESTINATION ${CMAKE_INSTALL_BINDIR} RENAME ${script_name})
++endforeach()
