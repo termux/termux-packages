@@ -112,13 +112,22 @@ static void process_render(void *userdata) {
 }
 
 static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offset, pa_memchunk *memchunk) {
+    struct userdata *u = PA_SINK(o)->userdata;
     switch (code) {
         case SINK_MESSAGE_RENDER:
             process_render(data);
             return 0;
-        case PA_SINK_MESSAGE_GET_LATENCY:
-            code = PA_SINK_MESSAGE_GET_FIXED_LATENCY; // FIXME: is there a way to get the real latency?
+        case PA_SINK_MESSAGE_GET_LATENCY: {
+            SLBufferQueueState state;
+
+            if (u && u->BufferQueueItf && (*u->BufferQueueItf)->GetState(u->BufferQueueItf, &state) == SL_RESULT_SUCCESS) {
+                *(pa_usec_t *)data = (pa_usec_t)state.count * u->block_usec;
+                return 0;
+            }
+
+            code = PA_SINK_MESSAGE_GET_FIXED_LATENCY;
             break;
+        }
     }
 
     return pa_sink_process_msg(o, code, data, offset, memchunk);
@@ -567,7 +576,7 @@ int pa__init(pa_module*m) {
         goto fail;
     }
 
-    if (!(u->sink = pa_sink_new(m->core, &sink_data, 0))) {
+    if (!(u->sink = pa_sink_new(m->core, &sink_data, PA_SINK_LATENCY))) {
         pa_log("Failed to create sink object.");
         pa_sink_new_data_done(&sink_data);
         goto fail;
