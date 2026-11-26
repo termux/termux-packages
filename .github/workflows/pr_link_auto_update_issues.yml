@@ -11,14 +11,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  link-auto-update-issues:
+  analyze:
     if: github.repository == 'termux/termux-packages'
     runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {} # reads untrusted pull request data: must not be able to change anything
+    outputs:
+      pr: ${{ steps.analyze.outputs.pr }}
+      actions: ${{ steps.analyze.outputs.actions }}
     steps:
-      - name: Link the auto-update issues resolved by the pull request
+      - name: Find the auto-update issues resolved by the pull request
+        id: analyze
         continue-on-error: true # auxiliary, must not fail CI
         env:
-          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
@@ -34,11 +40,12 @@ jobs:
 
           sys.excepthook = report_error
 
-          MAX_ITEMS = 20 # packages per pull request and issue links per run
+          MAX_ITEMS = 100 # packages per pull request and issue links per run
 
           repo = os.environ["REPO"]
           pr_number = int(os.environ["PR_NUMBER"])
           owner, name = repo.split("/")
+          me ="github-actions" # timeline events name the actor of github.token this way
 
           last_request = float("-inf")
 
@@ -58,9 +65,12 @@ jobs:
 
           def is_at_least(version, target):
               # True if version is not older than target, by dpkg rules (the epoch of version is ignored).
-              return subprocess.run(["dpkg", "--compare-versions", version.split(":", 1)[-1], "ge", target], capture_output=True).returncode == 0
+              version = version.split(":", 1)[-1]
+              if not all(re.fullmatch(r"[0-9][A-Za-z0-9.+~-]*", value) for value in (version, target)):
+                  return False
+              return subprocess.run(["dpkg", "--compare-versions", version, "ge", target], capture_output=True).returncode == 0
 
-          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages)/([^/]+)/build\.sh$")
+          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages)/([a-z0-9][a-z0-9.+-]*)/build\.sh\Z")
           version_re = re.compile(r"^\+TERMUX_PKG_VERSION=[\"'(]*([^\"'\s]+)[\"']?\s*$", re.M)
 
           # 1. Find packages whose TERMUX_PKG_VERSION is changed by the pull request.
@@ -81,11 +91,10 @@ jobs:
           declarations = "".join(f", $query{i}: String!" for i in range(len(updates)))
           data = graphql("""
               query($owner: String!, $name: String!, $number: Int!%s) {
-                viewer { login }
                 repository(owner: $owner, name: $name) {
                   pullRequest(number: $number) {
                     id
-                    closingIssuesReferences(first: 50) { nodes { id number } }
+                    closingIssuesReferences(first: 100) { nodes { id number } }
                     timelineItems(last: 100, itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT]) {
                       nodes { __typename %s %s }
                     }
@@ -96,7 +105,6 @@ jobs:
               {"owner": owner, "name": name, "number": pr_number,
                **{f"query{i}": f'repo:{repo} is:issue is:open label:"auto update failing" in:title "Auto update failing for {package}"' for i, package in enumerate(updates)}})
 
-          me = data["viewer"]["login"].removesuffix("[bot]") # timeline events name bot actors without the suffix
           pull_request = data["repository"]["pullRequest"]
           linked = {node["number"]: node["id"] for node in pull_request["closingIssuesReferences"]["nodes"]}
 
@@ -131,11 +139,46 @@ jobs:
           to_remove = [node_id for number, node_id in linked.items()
                        if number not in wanted and last_link_event.get(number) == ("ConnectedEvent", me)]
 
-          actions = ([("addCloseIssueReferences", issue_id) for issue_id in to_add] + [("removeCloseIssueReferences", issue_id) for issue_id in to_remove])[:MAX_ITEMS]
+          actions = ([["add", issue_id] for issue_id in to_add] + [["remove", issue_id] for issue_id in to_remove])[:MAX_ITEMS]
           print(f"Linking issues: {to_add}, unlinking issues: {to_remove}")
-          if actions:
-              variables = {"pr": pull_request["id"], **{f"issue{i}": issue_id for i, (_, issue_id) in enumerate(actions)}}
-              mutations = [f"m{i}: {field}(input: {{issueId: $issue{i}, pullRequestIds: [$pr]}}) {{ clientMutationId }}" for i, (field, _) in enumerate(actions)]
-              declarations = "".join(f", $issue{i}: ID!" for i in range(len(actions)))
-              graphql(f"mutation($pr: ID!{declarations}) {{ {' '.join(mutations)} }}", variables)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"pr={pull_request['id']}\n")
+              output.write("actions=" + json.dumps(actions) + "\n")
+          EOF
+
+  link:
+    needs: analyze
+    if: needs.analyze.outputs.actions != '' && needs.analyze.outputs.actions != '[]'
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Link and unlink the issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_ID: ${{ needs.analyze.outputs.pr }}
+          ACTIONS: ${{ needs.analyze.outputs.actions }}
+        run: |
+          python3 <<'EOF'
+          import json, os, re, subprocess
+
+          MAX_ITEMS = 100
+          node_id_re = re.compile(r"[A-Za-z0-9_=-]{1,100}")
+          fields = {"add": "addCloseIssueReferences", "remove": "removeCloseIssueReferences"}
+
+          # The input comes from a job that reads untrusted data: check it strictly.
+          pr_id = os.environ["PR_ID"]
+          actions = json.loads(os.environ["ACTIONS"])
+          assert node_id_re.fullmatch(pr_id)
+          assert isinstance(actions, list) and 0 < len(actions) <= MAX_ITEMS
+          for action in actions:
+              assert isinstance(action, list) and len(action) == 2
+              assert action[0] in fields and isinstance(action[1], str) and node_id_re.fullmatch(action[1])
+
+          variables = {"pr": pr_id, **{f"issue{i}": issue_id for i, (_, issue_id) in enumerate(actions)}}
+          mutations = [f"m{i}: {fields[kind]}(input: {{issueId: $issue{i}, pullRequestIds: [$pr]}}) {{ clientMutationId }}" for i, (kind, _) in enumerate(actions)]
+          declarations = "".join(f", $issue{i}: ID!" for i in range(len(actions)))
+          query = f"mutation($pr: ID!{declarations}) {{ {' '.join(mutations)} }}"
+          subprocess.run(["gh", "api", "graphql", "--input", "-"], input=json.dumps({"query": query, "variables": variables}), text=True, check=True)
           EOF

@@ -10,10 +10,13 @@ jobs:
   lint-pr:
     if: github.repository == 'termux/termux-packages' && github.event.pull_request.head.repo.fork
     runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
     steps:
       - name: Warn if maintainer edits are disabled
         env:
-          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
@@ -23,16 +26,22 @@ jobs:
             gh pr comment "$PR_NUMBER" --repo "$REPO" --body "Please enable [\"Allow edits by maintainers\"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for this pull request. It lets maintainers push small fixes directly to your branch instead of going back and forth, which speeds up review and merging."
           fi
 
-  check-new-package-source:
+  analyze-new-package-source:
     if: github.repository == 'termux/termux-packages'
     runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {} # reads untrusted pull request data: must not be able to change anything
+    outputs:
+      flagged: ${{ steps.analyze.outputs.flagged }}
     steps:
       - name: Check trustworthiness of newly packaged projects
+        id: analyze
         env:
-          GH_TOKEN: ${{ secrets.TERMUXBOT2_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
           HEAD_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
           HEAD_REPO: ${{ github.event.pull_request.head.repo.name }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -45,20 +54,18 @@ jobs:
               return subprocess.run(["gh", "api", *args], capture_output=True, text=True, check=True)
 
           repo = os.environ["REPO"]
-          owner = repo.split("/")[0]
           pr_number = os.environ["PR_NUMBER"]
           pr_author = os.environ["PR_AUTHOR"]
           head_owner = os.environ["HEAD_OWNER"]
           head_repo = os.environ["HEAD_REPO"]
           head_sha = os.environ["HEAD_SHA"]
 
-          member = subprocess.run(["gh", "api", f"orgs/{owner}/memberships/{pr_author}"], capture_output=True)
-          if member.returncode == 0:
+          if os.environ["PR_AUTHOR_ASSOCIATION"] in ("MEMBER", "OWNER"):
               sys.exit(0)  # trusted org member, skip this check
 
           files = json.loads(gh_api(["--paginate", f"repos/{repo}/pulls/{pr_number}/files"]).stdout)
 
-          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages|disabled-packages)/[^/]+/build\.sh$")
+          build_sh_re = re.compile(r"^(?:packages|x11-packages|root-packages|disabled-packages)/[a-z0-9][a-z0-9.+-]*/build\.sh\Z")
           added = [f for f in files if f["status"] == "added" and build_sh_re.match(f["filename"])]
 
           flagged = []
@@ -76,6 +83,8 @@ jobs:
               if not gh_match:
                   continue
               upstream_owner, upstream_repo = gh_match.group(1), gh_match.group(2)
+              if {upstream_owner, upstream_repo} & {".", ".."}:
+                  continue
 
               try:
                   repo_data = json.loads(gh_api([f"repos/{upstream_owner}/{upstream_repo}"]).stdout)
@@ -96,8 +105,42 @@ jobs:
                       "parent": repo_data["parent"]["full_name"] if repo_data.get("parent") else None,
                   })
 
-          if not flagged:
-              sys.exit(0)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("flagged=" + json.dumps(flagged) + "\n")
+          EOF
+
+  comment-new-package-source:
+    needs: analyze-new-package-source
+    if: needs.analyze-new-package-source.outputs.flagged != '' && needs.analyze-new-package-source.outputs.flagged != '[]'
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment on and close the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          FLAGGED: ${{ needs.analyze-new-package-source.outputs.flagged }}
+        run: |
+          python3 <<'EOF'
+          import json, os, re, subprocess
+
+          name_re = re.compile(r"[A-Za-z0-9_.-]{1,100}")
+
+          repo = os.environ["REPO"]
+          pr_number = int(os.environ["PR_NUMBER"])
+
+          # The input comes from a job that reads untrusted data: check it strictly.
+          flagged = json.loads(os.environ["FLAGGED"])
+          assert isinstance(flagged, list) and 0 < len(flagged) <= 20
+          for pkg in flagged:
+              assert set(pkg) == {"owner", "repo", "is_fork", "parent"}
+              for value in (pkg["owner"], pkg["repo"]):
+                  assert isinstance(value, str) and name_re.fullmatch(value) and value not in (".", "..")
+              assert isinstance(pkg["is_fork"], bool)
+              assert pkg["parent"] is None or (isinstance(pkg["parent"], str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,100}/[A-Za-z0-9_.-]{1,100}", pkg["parent"]))
 
           intro = ("Thanks for the contribution! This PR can't be accepted as-is.\n\n"
                    "Our [packaging policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy) "
