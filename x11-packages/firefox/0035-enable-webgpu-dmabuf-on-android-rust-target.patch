@@ -1,0 +1,235 @@
+# Rust sees the Termux target as android while the C++ side builds as Linux, so the Linux dma-buf WebGPU path has to be enabled for android too.
+
+--- a/gfx/wgpu_bindings/cbindgen.toml
++++ b/gfx/wgpu_bindings/cbindgen.toml
+@@ -138,4 +138,5 @@ bitflags = true
+ [defines]
+ "target_os = windows" = "XP_WIN"
+ "target_os = macos" = "XP_MACOSX"
++"target_os = linux" = "XP_LINUX"
+ "target_os = android" = "ANDROID"
+--- a/gfx/wgpu_bindings/src/lib.rs
++++ b/gfx/wgpu_bindings/src/lib.rs
+@@ -423,7 +423,7 @@ struct RequestDeviceError {
+ 
+ impl RequestDeviceError {
+     /// Only the Vulkan/dmabuf device-creation path constructs these directly.
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn operation_error(message: String) -> Self {
+         Self {
+             ty: FfiRequestDeviceErrorType::OperationError,
+--- a/gfx/wgpu_bindings/src/server.rs
++++ b/gfx/wgpu_bindings/src/server.rs
+@@ -36,7 +36,7 @@ use std::borrow::Cow;
+ use std::collections::HashMap;
+ #[allow(unused_imports)]
+ use std::mem;
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use std::os::fd::{AsRawFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
+ use std::os::raw::{c_char, c_void};
+ use std::ptr;
+@@ -49,7 +49,7 @@ use std::ffi::CString;
+ #[cfg(target_os = "windows")]
+ use windows::Win32::{Foundation, Graphics::Direct3D12};
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ use ash::{khr, vk};
+ 
+ // The seemingly redundant u64 suffix helps cbindgen with generating the right C++ code.
+@@ -83,7 +83,7 @@ fn emit_critical_invalid_note(what: &'static str) {
+     unsafe { gfx_critical_note(msg.as_ptr()) }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn get_linux_dmabuf_modifiers() -> Option<Vec<u64>> {
+     let mut modifiers_ptr: *const u64 = ptr::null();
+     let mut modifier_count = 0u32;
+@@ -105,7 +105,7 @@ fn get_linux_dmabuf_modifiers() -> Option<Vec<u64>> {
+     Some(modifiers.to_vec())
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ const DMABUF_DEVICE_EXTENSIONS: &[&'static std::ffi::CStr] = &[
+     khr::external_memory_fd::NAME,
+     ash::ext::external_memory_dma_buf::NAME,
+@@ -115,7 +115,7 @@ const DMABUF_DEVICE_EXTENSIONS: &[&'static std::ffi::CStr] = &[
+     khr::get_memory_requirements2::NAME,
+ ];
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn unsupported_dmabuf_extensions(
+     hal_adapter: &wgh::vulkan::Adapter,
+ ) -> Vec<&'static std::ffi::CStr> {
+@@ -463,7 +463,7 @@ fn support_use_shared_texture_in_swap_chain(
+         return true;
+     }
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     {
+         if backend != wgt::Backend::Vulkan {
+             log::info!(concat!(
+@@ -606,7 +606,7 @@ fn adapter_request_device(
+         }
+     }
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     {
+         let adapter = global.resolve_adapter_id(self_id);
+         let hal_adapter = unsafe { adapter.as_hal::<wgc::api::Vulkan>() }
+@@ -1293,14 +1293,14 @@ pub struct DMABufInfo {
+ 
+ /// Destroys a `VkImage` and its dedicated `VkDeviceMemory` unless ownership has
+ /// been handed over with [`ScopedVkImage::release`].
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ struct ScopedVkImage<'a> {
+     device: &'a ash::Device,
+     image: vk::Image,
+     memory: vk::DeviceMemory,
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl<'a> ScopedVkImage<'a> {
+     fn new(device: &'a ash::Device, image: vk::Image) -> Self {
+         Self {
+@@ -1316,7 +1316,7 @@ impl<'a> ScopedVkImage<'a> {
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ impl Drop for ScopedVkImage<'_> {
+     fn drop(&mut self) {
+         if self.image != vk::Image::null() {
+@@ -1335,7 +1335,7 @@ impl Drop for ScopedVkImage<'_> {
+ /// Queries the memory requirements of `image` through
+ /// `vkGetImageMemoryRequirements2`. The caller always makes a dedicated
+ /// allocation, so the dedicated requirements are only reported, never acted on.
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ unsafe fn dedicated_image_memory_requirements(
+     instance: &ash::Instance,
+     device: &ash::Device,
+@@ -1375,7 +1375,7 @@ unsafe fn dedicated_image_memory_requirements(
+ /// `VUID-vkDestroyImage-image-01000` or `VUID-vkFreeMemory-memory-00677` to
+ /// wait on.
+ #[no_mangle]
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub extern "C" fn wgpu_vkimage_create_with_dma_buf(
+     global: &Global,
+     device_id: id::DeviceId,
+@@ -1396,7 +1396,7 @@ pub extern "C" fn wgpu_vkimage_create_with_dma_buf(
+     }
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn create_dma_buf(
+     global: &Global,
+     device_id: id::DeviceId,
+@@ -1701,11 +1701,11 @@ extern "C" {
+         parent: WebGPUParentPtr,
+         id: id::TextureId,
+     ) -> *mut core::ffi::c_void;
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn wgpu_server_get_dma_buf_info(parent: WebGPUParentPtr, id: id::TextureId) -> DMABufInfo;
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn wgpu_server_get_dma_buf_fd(parent: WebGPUParentPtr, id: id::TextureId) -> i32;
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn wgpu_server_get_linux_dmabuf_modifiers(
+         modifiers: *mut *const u64,
+         modifier_count: *mut u32,
+@@ -1803,7 +1803,7 @@ extern "C" {
+     fn wgpu_texture_format_is_valid_for_webidl(format: *const nsCString) -> bool;
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub unsafe fn is_dmabuf_supported(
+     instance: &ash::Instance,
+     physical_device: vk::PhysicalDevice,
+@@ -1859,7 +1859,7 @@ pub unsafe fn is_dmabuf_supported(
+         )
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub fn select_memory_type(
+     props: &vk::PhysicalDeviceMemoryProperties,
+     flags: vk::MemoryPropertyFlags,
+@@ -1967,7 +1967,7 @@ impl Global {
+         None
+     }
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     fn create_texture_with_imported_dmabuf<'a, F: FnOnce(()) + 'a>(
+         &self,
+         device_id: id::DeviceId,
+@@ -2282,7 +2282,7 @@ impl Global {
+             )
+         }
+ 
+-        #[cfg(target_os = "linux")]
++        #[cfg(any(target_os = "linux", target_os = "android"))]
+         {
+             self.create_texture_with_imported_dmabuf(device_id, texture_id, &desc, guard)
+         }
+@@ -2309,7 +2309,7 @@ impl Global {
+             )
+         }
+ 
+-        #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
++        #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "android", target_os = "macos")))]
+         {
+             unreachable!()
+         }
+@@ -3321,7 +3321,7 @@ pub struct VkSemaphoreHandle(pub u64);
+ /// the submission they belong to has been attempted. The actual
+ /// `vkDestroySemaphore` calls happen later, from an `on_submitted_work_done`
+ /// closure.
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn enqueue_signal_semaphores_destruction(
+     queue: &Arc<wgc::device::queue::Queue>,
+     device: Arc<wgc::device::Device>,
+@@ -3385,7 +3385,7 @@ pub unsafe extern "C" fn wgpu_server_queue_submit(
+     let submission_index_opt =
+         global.queue_submit(queue_id, unsafe { command_buffer_ids.as_slice() });
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "android"))]
+     {
+         use wgc::resource::ParentDevice as _;
+ 
+@@ -3395,7 +3395,7 @@ pub unsafe extern "C" fn wgpu_server_queue_submit(
+             signal_semaphores.as_slice()
+         });
+     }
+-    #[cfg(not(target_os = "linux"))]
++    #[cfg(not(any(target_os = "linux", target_os = "android")))]
+     let _ = signal_semaphores;
+ 
+     // NOTE: `0` means "no index to follow up with".
+@@ -3414,7 +3414,7 @@ pub struct SubmittedWorkDoneClosure {
+ /// Ownership of the semaphore itself stays here: `wgpu_server_queue_submit`
+ /// destroys it once the submission it signals has completed.
+ #[no_mangle]
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub extern "C" fn wgpu_vksemaphore_create_signal_semaphore(
+     global: &Global,
+     queue_id: id::QueueId,
