@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dungeon crawl game"
 TERMUX_PKG_LICENSE="Nethack"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SRCURL=(
 	"https://www.nethack.org/download/${TERMUX_PKG_VERSION}/nethack-${TERMUX_PKG_VERSION//./}-src.tgz"
@@ -34,7 +35,10 @@ termux_step_host_build() {
 	else
 		HOST_CC="gcc"
 	fi
-	CFLAGS="" CC="$HOST_CC" LD="ld" make makedefs dlb
+	(
+		unset CFLAGS CPPFLAGS LDFLAGS
+		CC="$HOST_CC" LD="ld" make makedefs dlb
+	)
 }
 
 termux_step_pre_configure() {
