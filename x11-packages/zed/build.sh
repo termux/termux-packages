@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="High-performance, multiplayer code editor"
 TERMUX_PKG_LICENSE="GPL-3.0, Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE-GPL, LICENSE-APACHE"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
-TERMUX_PKG_VERSION="1.29.3"
+TERMUX_PKG_VERSION="1.30.2"
 TERMUX_PKG_SRCURL="https://github.com/zed-industries/zed/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=dd3556ea8d5edaf6336b924c42997a0313070b428561cf32c776a3d5d744506a
+TERMUX_PKG_SHA256=4278dd5692451d7a6227439cb353edf261803f3a45716f794eec0bf36f3928c4
 TERMUX_PKG_DEPENDS="alsa-lib, fontconfig, freetype, libwayland, libx11, libxcb, libxkbcommon, openssl, vulkan-loader-generic, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, vulkan-headers"
 TERMUX_PKG_RECOMMENDS="git, vulkan-icd"
@@ -43,8 +43,11 @@ termux_step_pre_configure() {
 	find crates \( -name '*.rs' -o -name Cargo.toml \) \
 		! -path crates/livekit_client/Cargo.toml \
 		! -path crates/livekit_client/src/livekit_client.rs \
+		! -path 'crates/sandbox_linux/*' \
 		-exec sed -i \
 		's|target_os = "linux"|any(target_os = "linux", target_os = "android")|g' '{}' +
+	# The seccomp sandbox needs definitions that libc lacks for Android, keep only its entrypoint
+	printf 'pub fn run_hidden_entrypoint_if_invoked() {}\n' > crates/sandbox_linux/src/sandbox_linux.rs
 	# Reuse the FreeBSD stubs where Linux needs a prebuilt libwebrtc (livekit_client)
 	find crates/audio crates/call crates/livekit_client \( -name '*.rs' -o -name Cargo.toml \) \
 		-exec sed -i \
