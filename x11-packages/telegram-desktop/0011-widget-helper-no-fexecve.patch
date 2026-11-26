@@ -1,0 +1,18 @@
+--- a/Telegram/SourceFiles/platform/linux/widget_helper_linux.cpp
++++ b/Telegram/SourceFiles/platform/linux/widget_helper_linux.cpp
+@@ -409,10 +409,13 @@ int SpawnChild(void *raw) {
+ 		FailChild(slot, ChildStep::SignalMask);
+ 	}
+ 	if (executed) {
+-		fexecve(
++		syscall(
++			SYS_execveat,
+ 			kExecutedDescriptor,
++			"",
+ 			plan.argv.data(),
+-			plan.environment.data());
++			plan.environment.data(),
++			AT_EMPTY_PATH);
+ 		FailChild(slot, ChildStep::ExecuteDescriptor);
+ 	}
+ 	execve(plan.exe.c_str(), plan.argv.data(), plan.environment.data());

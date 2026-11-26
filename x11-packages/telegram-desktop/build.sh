@@ -4,9 +4,9 @@ TERMUX_PKG_DESCRIPTION="Telegram Desktop Client"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LEGAL"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="7.4.4"
+TERMUX_PKG_VERSION="7.4.6"
 TERMUX_PKG_SRCURL="https://github.com/telegramdesktop/tdesktop/releases/download/v$TERMUX_PKG_VERSION/tdesktop-$TERMUX_PKG_VERSION-full.tar.gz"
-TERMUX_PKG_SHA256=b563b3a35a5589f70f317297aa8dc4f19da065c393c3ae663ae11841b5ab0891
+TERMUX_PKG_SHA256=259afdd1a3a99c1f5155f856e92c55eff038d2639fba19fcfd91b27664a82370
 TERMUX_PKG_DEPENDS="abseil-cpp, boost, ffmpeg, glib, hicolor-icon-theme, hunspell, kf6-kcoreaddons, libandroid-shmem, libc++, libdispatch, libdrm, libjxl, liblz4, libminizip, protobuf, librnnoise, libsigc++-3.0, libx11, libxcomposite, libxdamage, libxrandr, libxtst, openal-soft, opengl, openh264, openssl, pipewire, pulseaudio, qt6-qtbase, qt6-qtimageformats, qt6-qtshadertools, qt6-qtsvg, qt6-qtwayland, xxhash, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ada, aosp-libs, boost-headers, glib-cross, qt6-qtbase-cross-tools, qt6-qtshadertools-cross-tools"
 TERMUX_PKG_VERSIONED_GIR=false
@@ -47,11 +47,11 @@ __tdesktop_rust_fetch_source() {
 	mkdir -p "$TERMUX_PKG_SRCDIR/wallet-engine"
 	tar -xf "$_wallet_engine_archive" --strip-components=1 -C "$TERMUX_PKG_SRCDIR/wallet-engine"
 
-	local _wallet_engine_patch="$TERMUX_PKG_CACHEDIR/wallet-engine-aec47495.patch"
+	local _wallet_engine_patch="$TERMUX_PKG_CACHEDIR/wallet-engine-8a28b843.patch"
 	termux_download \
-		"https://raw.githubusercontent.com/desktop-app/patches/aec474953ff7ee9b6e4cd9b8658288ea86d124f3/wallet-engine.patch" \
+		"https://raw.githubusercontent.com/desktop-app/patches/8a28b8433af70771c3d101c776ad837a94bd47ec/wallet-engine.patch" \
 		"$_wallet_engine_patch" \
-		"b40aba82c39a42d0526a85ecfa40d613baa57b1a2d6600e601a42a1576b3b822"
+		"47dcde3477e056de86ba13c8cf55eadf4b1309d0e904bbe06ab0592f0fbe2cfe"
 	patch -p1 -d "$TERMUX_PKG_SRCDIR/wallet-engine" -i "$_wallet_engine_patch"
 }
 

@@ -1,0 +1,13 @@
+--- a/Telegram/cmake/build_widget_helper_rust.cmake
++++ b/Telegram/cmake/build_widget_helper_rust.cmake
+@@ -72,8 +72,8 @@ if (DEFINED HELPER_ARCHS)
+     file(REMOVE "${HELPER_OUT}/libtwidget_helper_ffi.a.new")
+     return()
+ elseif (NOT DEFINED HELPER_TARGET)
+-    build()
+-    publish("${HELPER_OUT}/target/release/libtwidget_helper_ffi.a" "${HELPER_OUT}/libtwidget_helper_ffi.a")
++    build(--target $ENV{CARGO_TARGET_NAME})
++    publish("${HELPER_OUT}/target/$ENV{CARGO_TARGET_NAME}/release/libtwidget_helper_ffi.a" "${HELPER_OUT}/libtwidget_helper_ffi.a")
+     return()
+ endif()
+ 
