@@ -1,0 +1,26 @@
+diff --git a/bsh/bsh.c b/bsh/bsh.c
+index 50da49d..a93c9d4 100644
+--- a/bsh/bsh.c
++++ b/bsh/bsh.c
+@@ -317,7 +317,7 @@ main(ac, av, ev)
+ 	 * der bsh tatsächlich suid root installiert ist.
+ 	 */
+ #if	!defined(__EMX__) && !defined(__DJGPP__) && \
+-	!defined(_MSC_VER) && !defined(__MINGW32__) && !defined(__BEOS__)
++	!defined(_MSC_VER) && !defined(__MINGW32__) && !defined(__BEOS__) && !defined(__ANDROID__)
+ error  No function to set uid available
+ #endif
+ 
+diff --git a/bsh/idops.c b/bsh/idops.c
+index f993970..806d31c 100644
+--- a/bsh/idops.c
++++ b/bsh/idops.c
+@@ -240,7 +240,7 @@ bsuid(vp, std, flag)
+ 	 * Hier sollte nur dann eine Warnung/Abbruch kommen, wenn
+ 	 * der bsh tatsächlich suid root installiert ist.
+ 	 */
+-#if !defined(__EMX__) && !defined(__DJGPP__) && !defined(__BEOS__)
++#if !defined(__EMX__) && !defined(__DJGPP__) && !defined(__BEOS__) && !defined(__ANDROID__)
+ error  No function to set uid available
+ #endif
+ 
