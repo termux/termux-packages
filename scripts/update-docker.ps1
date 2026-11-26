@@ -9,6 +9,13 @@ Set-Variable -Name IMAGE -Value "ghcr.io/termux/package-builder"
 
 docker pull $IMAGE
 
+$containerExists = docker container inspect $CONTAINER 2>&1 | Out-Null; $?
+
+if (-Not $containerExists) {
+    Write-Output "Container '$CONTAINER' does not exist yet. It will be created on next run."
+    exit 0
+}
+
 Set-Variable -Name LATEST -Value (docker inspect --format "{{.Id}}" $IMAGE)
 Set-Variable -Name RUNNING -Value (docker inspect --format "{{.Image}}" $CONTAINER)
 
