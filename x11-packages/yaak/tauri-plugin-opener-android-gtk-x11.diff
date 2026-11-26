@@ -1,0 +1,33 @@
+diff -ruN tauri-plugin-opener-src-orig/build.rs tauri-plugin-opener-src/build.rs
+--- tauri-plugin-opener-src-orig/build.rs	2026-09-28 10:00:00.000000000 +0000
++++ tauri-plugin-opener-src/build.rs	2026-09-28 10:00:15.000000000 +0000
+@@ -117,7 +117,7 @@
+         .build();
+ 
+     let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+-    let mobile = target_os == "ios" || target_os == "android";
++    let mobile = target_os == "ios";
+     alias("desktop", !mobile);
+     alias("mobile", mobile);
+ }
+diff -ruN tauri-plugin-opener-src-orig/src/lib.rs tauri-plugin-opener-src/src/lib.rs
+--- tauri-plugin-opener-src-orig/src/lib.rs	2026-09-28 10:00:00.000000000 +0000
++++ tauri-plugin-opener-src/src/lib.rs	2026-09-28 10:00:15.000000000 +0000
+@@ -8,7 +8,7 @@
+ 
+ #[cfg(mobile)]
+ use tauri::plugin::PluginHandle;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ const PLUGIN_IDENTIFIER: &str = "app.tauri.opener";
+ #[cfg(target_os = "ios")]
+ tauri::ios_plugin_binding!(init_plugin_opener);
+@@ -209,7 +209,7 @@
+     pub fn build<R: Runtime>(self) -> TauriPlugin<R, Option<config::Config>> {
+         let mut builder = tauri::plugin::Builder::<R, Option<config::Config>>::new("opener")
+             .setup(|app, api| {
+-                #[cfg(target_os = "android")]
++                #[cfg(all(target_os = "android", not(target_os = "android")))]
+                 let handle = api.register_android_plugin(PLUGIN_IDENTIFIER, "OpenerPlugin")?;
+                 #[cfg(target_os = "ios")]
+                 let handle = api.register_ios_plugin(init_plugin_opener)?;

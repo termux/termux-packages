@@ -1,0 +1,33 @@
+diff -ruN tauri-plugin-shell-src-orig/build.rs tauri-plugin-shell-src/build.rs
+--- tauri-plugin-shell-src-orig/build.rs	2026-09-28 10:00:00.000000000 +0000
++++ tauri-plugin-shell-src/build.rs	2026-09-28 10:00:15.000000000 +0000
+@@ -174,7 +174,7 @@
+         .build();
+ 
+     let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+-    let mobile = target_os == "ios" || target_os == "android";
++    let mobile = target_os == "ios";
+     alias("desktop", !mobile);
+     alias("mobile", mobile);
+ }
+diff -ruN tauri-plugin-shell-src-orig/src/lib.rs tauri-plugin-shell-src/src/lib.rs
+--- tauri-plugin-shell-src-orig/src/lib.rs	2026-09-28 10:00:00.000000000 +0000
++++ tauri-plugin-shell-src/src/lib.rs	2026-09-28 10:00:15.000000000 +0000
+@@ -38,7 +38,7 @@
+ 
+ #[cfg(mobile)]
+ use tauri::plugin::PluginHandle;
+-#[cfg(target_os = "android")]
++#[cfg(all(target_os = "android", not(target_os = "android")))]
+ const PLUGIN_IDENTIFIER: &str = "app.tauri.shell";
+ #[cfg(target_os = "ios")]
+ tauri::ios_plugin_binding!(init_plugin_shell);
+@@ -114,7 +114,7 @@
+             let default_config = config::Config::default();
+             let config = api.config().as_ref().unwrap_or(&default_config);
+ 
+-            #[cfg(target_os = "android")]
++            #[cfg(all(target_os = "android", not(target_os = "android")))]
+             let handle = api.register_android_plugin(PLUGIN_IDENTIFIER, "ShellPlugin")?;
+             #[cfg(target_os = "ios")]
+             let handle = api.register_ios_plugin(init_plugin_shell)?;

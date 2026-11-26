@@ -1,0 +1,186 @@
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/Cargo.toml tao-0.35.2/Cargo.toml
+--- tao-0.35.2-orig/Cargo.toml	2026-09-26 12:40:59.748564882 +0000
++++ tao-0.35.2/Cargo.toml	2026-09-26 12:42:15.117937712 +0000
+@@ -254,27 +254,27 @@
+ [target.'cfg(any(target_os = "ios", target_os = "macos"))'.dependencies.objc2]
+ version = "0.6"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dbus]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dbus]
+ version = "0.9"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dlopen2]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.dlopen2]
+ version = "0.8.0"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkwayland-sys]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkwayland-sys]
+ version = "0.18.0"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkx11-sys]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gdkx11-sys]
+ version = "0.18"
+ optional = true
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gtk]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.gtk]
+ version = "0.18"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.parking_lot]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.parking_lot]
+ version = "0.12"
+ 
+-[target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.x11-dl]
++[target.'cfg(any(target_os = "linux", target_os = "android", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies.x11-dl]
+ version = "2.21"
+ optional = true
+ 
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/Cargo.toml.orig tao-0.35.2/Cargo.toml.orig
+--- tao-0.35.2-orig/Cargo.toml.orig	2026-09-26 12:40:59.748583629 +0000
++++ tao-0.35.2/Cargo.toml.orig	2026-09-26 12:42:25.835319601 +0000
+@@ -162,7 +162,7 @@
+   "NSProcessInfo",
+ ] }
+ 
+-[target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
++[target."cfg(any(target_os = \"linux\", target_os = \"android\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
+ gtk = "0.18"
+ gdkx11-sys = { version = "0.18", optional = true }
+ gdkwayland-sys = "0.18.0"
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/event.rs tao-0.35.2/src/event.rs
+--- tao-0.35.2-orig/src/event.rs	2026-09-26 12:40:59.749132314 +0000
++++ tao-0.35.2/src/event.rs	2026-09-26 12:41:36.228770306 +0000
+@@ -779,7 +779,7 @@
+   pub(crate) platform_specific: platform_impl::KeyEventExtra,
+ }
+ 
+-#[cfg(not(any(target_os = "android", target_os = "ios")))]
++#[cfg(not(target_os = "ios"))]
+ impl KeyEvent {
+   /// Identical to `KeyEvent::text` but this is affected by <kbd>Ctrl</kbd>.
+   ///
+@@ -803,7 +803,7 @@
+   }
+ }
+ 
+-#[cfg(any(target_os = "android", target_os = "ios"))]
++#[cfg(target_os = "ios")]
+ impl KeyEvent {
+   /// Identical to `KeyEvent::text`.
+   pub fn text_with_all_modifiers(&self) -> Option<&str> {
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/event_loop.rs tao-0.35.2/src/event_loop.rs
+--- tao-0.35.2-orig/src/event_loop.rs	2026-09-26 12:40:59.749152453 +0000
++++ tao-0.35.2/src/event_loop.rs	2026-09-26 12:42:00.906093312 +0000
+@@ -306,7 +306,7 @@
+   /// - **iOS / Android:** Unsupported.
+   #[inline]
+   pub fn set_progress_bar(&self, _progress: ProgressBarState) {
+-    #[cfg(any(target_os = "linux", target_os = "macos"))]
++    #[cfg(any(target_os = "linux", target_os = "android", target_os = "macos"))]
+     self.p.set_progress_bar(_progress)
+   }
+ 
+@@ -320,6 +320,7 @@
+     #[cfg(any(
+       windows,
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/platform/android.rs tao-0.35.2/src/platform/android.rs
+--- tao-0.35.2-orig/src/platform/android.rs	2026-09-26 12:40:59.749305756 +0000
++++ tao-0.35.2/src/platform/android.rs	2026-09-26 12:41:22.774880080 +0000
+@@ -2,7 +2,9 @@
+ // Copyright 2021-2023 Tauri Programme within The Commons Conservancy
+ // SPDX-License-Identifier: Apache-2.0
+ 
+-#![cfg(target_os = "android")]
++// Disabled: android target now uses the linux (GTK/X11) platform_impl backend
++// (via Termux X11), not the real NativeActivity/ndk_glue backend this file assumes.
++#![cfg(any())]
+ 
+ pub mod prelude {
+   pub use crate::platform_impl::ndk_glue::*;
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/platform/linux.rs tao-0.35.2/src/platform/linux.rs
+--- tao-0.35.2-orig/src/platform/linux.rs	2026-09-26 12:40:59.749339115 +0000
++++ tao-0.35.2/src/platform/linux.rs	2026-09-26 12:41:24.952862195 +0000
+@@ -2,4 +2,4 @@
+ // Copyright 2021-2023 Tauri Programme within The Commons Conservancy
+ // SPDX-License-Identifier: Apache-2.0
+ 
+-#![cfg(target_os = "linux")]
++#![cfg(any(target_os = "linux", target_os = "android"))]
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/platform/unix.rs tao-0.35.2/src/platform/unix.rs
+--- tao-0.35.2-orig/src/platform/unix.rs	2026-09-26 12:40:59.749385988 +0000
++++ tao-0.35.2/src/platform/unix.rs	2026-09-26 12:41:27.616229442 +0000
+@@ -4,6 +4,7 @@
+ 
+ #![cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/platform_impl/linux/event_loop.rs tao-0.35.2/src/platform_impl/linux/event_loop.rs
+--- tao-0.35.2-orig/src/platform_impl/linux/event_loop.rs	2026-09-26 12:40:59.749766129 +0000
++++ tao-0.35.2/src/platform_impl/linux/event_loop.rs	2026-09-26 17:33:23.620062193 +0000
+@@ -1222,7 +1222,7 @@
+   );
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ fn is_main_thread() -> bool {
+   use libc::{c_long, getpid, syscall, SYS_gettid};
+ 
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/platform_impl/mod.rs tao-0.35.2/src/platform_impl/mod.rs
+--- tao-0.35.2-orig/src/platform_impl/mod.rs	2026-09-26 12:40:59.750334923 +0000
++++ tao-0.35.2/src/platform_impl/mod.rs	2026-09-26 12:41:17.927307569 +0000
+@@ -7,6 +7,7 @@
+ mod platform;
+ #[cfg(any(
+   target_os = "linux",
++  target_os = "android",
+   target_os = "dragonfly",
+   target_os = "freebsd",
+   target_os = "netbsd",
+@@ -17,9 +18,6 @@
+ #[cfg(target_os = "macos")]
+ #[path = "macos/mod.rs"]
+ mod platform;
+-#[cfg(target_os = "android")]
+-#[path = "android/mod.rs"]
+-mod platform;
+ #[cfg(target_os = "ios")]
+ #[path = "ios/mod.rs"]
+ mod platform;
+diff -ruN '--exclude=Cargo.lock' tao-0.35.2-orig/src/window.rs tao-0.35.2/src/window.rs
+--- tao-0.35.2-orig/src/window.rs	2026-09-26 12:40:59.750676475 +0000
++++ tao-0.35.2/src/window.rs	2026-09-26 12:41:53.557056423 +0000
+@@ -1153,6 +1153,7 @@
+     #[cfg(any(
+       windows,
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -1200,6 +1201,7 @@
+     #[cfg(any(
+       windows,
+       target_os = "linux",
++      target_os = "android",
+       target_os = "dragonfly",
+       target_os = "freebsd",
+       target_os = "netbsd",
+@@ -1225,7 +1227,7 @@
+   ///
+   /// - **iOS / Android / Windows:** Unsupported.
+   pub fn set_visible_on_all_workspaces(&self, #[allow(unused)] visible: bool) {
+-    #[cfg(any(target_os = "macos", target_os = "linux"))]
++    #[cfg(any(target_os = "macos", target_os = "linux", target_os = "android"))]
+     self.window.set_visible_on_all_workspaces(visible)
+   }
+ 

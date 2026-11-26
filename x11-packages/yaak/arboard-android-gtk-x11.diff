@@ -1,0 +1,71 @@
+diff -ruN arboard-src-orig/Cargo.toml arboard-src/Cargo.toml
+--- arboard-src-orig/Cargo.toml	2026-09-21 14:13:20.000000000 +0000
++++ arboard-src/Cargo.toml	2026-09-21 14:13:35.000000000 +0000
+@@ -75,26 +75,26 @@
+ [dev-dependencies.env_logger]
+ version = "0.10.2"
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.image]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.image]
+ version = "0.25"
+ features = ["png"]
+ optional = true
+ default-features = false
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.log]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.log]
+ version = "0.4"
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.parking_lot]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.parking_lot]
+ version = "0.12"
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.percent-encoding]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.percent-encoding]
+ version = "2.3.1"
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.wl-clipboard-rs]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.wl-clipboard-rs]
+ version = "0.9.0"
+ optional = true
+ 
+-[target.'cfg(all(unix, not(any(target_os="macos", target_os="android", target_os="emscripten"))))'.dependencies.x11rb]
++[target.'cfg(all(unix, not(any(target_os="macos", target_os="emscripten"))))'.dependencies.x11rb]
+ version = "0.13"
+ 
+ [target.'cfg(target_os = "macos")'.dependencies.image]
+diff -ruN arboard-src-orig/src/lib.rs arboard-src/src/lib.rs
+--- arboard-src-orig/src/lib.rs	2026-09-21 14:13:20.000000000 +0000
++++ arboard-src/src/lib.rs	2026-09-21 14:13:35.000000000 +0000
+@@ -23,7 +23,7 @@
+ 
+ #[cfg(all(
+ 	unix,
+-	not(any(target_os = "macos", target_os = "android", target_os = "emscripten")),
++	not(any(target_os = "macos", target_os = "emscripten")),
+ ))]
+ pub use platform::{ClearExtLinux, GetExtLinux, LinuxClipboardKind, SetExtLinux};
+ 
+@@ -413,7 +413,7 @@
+ 		}
+ 		#[cfg(all(
+ 			unix,
+-			not(any(target_os = "macos", target_os = "android", target_os = "emscripten")),
++			not(any(target_os = "macos", target_os = "emscripten")),
+ 		))]
+ 		{
+ 			use crate::{LinuxClipboardKind, SetExtLinux};
+diff -ruN arboard-src-orig/src/platform/mod.rs arboard-src/src/platform/mod.rs
+--- arboard-src-orig/src/platform/mod.rs	2026-09-21 14:13:20.000000000 +0000
++++ arboard-src/src/platform/mod.rs	2026-09-21 14:13:35.000000000 +0000
+@@ -1,8 +1,8 @@
+-#[cfg(all(unix, not(any(target_os = "macos", target_os = "android", target_os = "emscripten"))))]
++#[cfg(all(unix, not(any(target_os = "macos", target_os = "emscripten"))))]
+ mod linux;
+ #[cfg(all(
+ 	unix,
+-	not(any(target_os = "macos", target_os = "android", target_os = "emscripten"))
++	not(any(target_os = "macos", target_os = "emscripten"))
+ ))]
+ pub use linux::*;
+ 
