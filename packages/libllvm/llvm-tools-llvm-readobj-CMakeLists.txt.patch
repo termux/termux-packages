@@ -1,0 +1,14 @@
+statically link llvm-readelf to libLLVM, significantly increasing the runtime performance
+of llvm-readelf for use with the Termux implementation of ldd,
+making it similar to the performance of GNU readelf.
+
+--- a/llvm/tools/llvm-readobj/CMakeLists.txt
++++ b/llvm/tools/llvm-readobj/CMakeLists.txt
+@@ -28,6 +28,7 @@ add_llvm_tool(llvm-readobj
+   DEPENDS
+   ReadobjOptsTableGen
+   GENERATE_DRIVER
++  DISABLE_LLVM_LINK_LLVM_DYLIB
+   )
+ 
+ setup_host_tool(llvm-readobj LLVM_READOBJ llvm_readobj_exe llvm_readobj_target)
