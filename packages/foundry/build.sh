@@ -199,6 +199,7 @@ termux_step_pre_configure() {
 		! -wholename ./vendor/rustls-platform-verifier \
 		! -wholename ./vendor/svm-rs \
 		! -wholename ./vendor/waitpid-any \
+		! -wholename ./vendor/mpp \
 		-exec rm -rf '{}' \;
 
 	local cc_patch="$TERMUX_PKG_BUILDER_DIR/rust-cc-do-not-concatenate-all-the-CFLAGS.diff"
@@ -229,11 +230,15 @@ termux_step_pre_configure() {
 	local waitpid_any_patch="$TERMUX_PKG_BUILDER_DIR/waitpid-any-patch.diff"
 	patch -p1 -d vendor/waitpid-any < "$waitpid_any_patch"
 
+	local mpp_patch="$TERMUX_PKG_BUILDER_DIR/mpp-st-mode-32bit.diff"
+	patch -p1 -d vendor/mpp < "$mpp_patch"
+
 	sed -i '/\[patch.crates-io\]/a cc = { path = "./vendor/cc" }' Cargo.toml
 	sed -i '/\[patch.crates-io\]/a aws-lc-sys = { path = "./vendor/aws-lc-sys" }' Cargo.toml
 	sed -i '/\[patch.crates-io\]/a rustls-platform-verifier = { path = "./vendor/rustls-platform-verifier" }' Cargo.toml
 	sed -i '/\[patch.crates-io\]/a waitpid-any = { path = "./vendor/waitpid-any" }' Cargo.toml
 	sed -i '/\[patch.crates-io\]/a svm-rs = { path = "./vendor/svm-rs" }' Cargo.toml
+	printf '\n[patch."https://github.com/tempoxyz/mpp-rs"]\nmpp = { path = "./vendor/mpp" }\n' >> Cargo.toml
 }
 
 termux_step_make() {

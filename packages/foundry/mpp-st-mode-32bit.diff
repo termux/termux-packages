@@ -1,0 +1,11 @@
+--- a/src/client/tempo/session/store.rs
++++ b/src/client/tempo/session/store.rs
+@@ -1181,7 +1181,7 @@ mod sqlite {
+         }
+         // SAFETY: successful fstatat initialized stat; geteuid takes no pointers.
+         let (stat, owner) = unsafe { (stat.assume_init(), libc::geteuid()) };
+-        if stat.st_mode & libc::S_IFMT != libc::S_IFREG {
++        if stat.st_mode & u32::from(libc::S_IFMT) != u32::from(libc::S_IFREG) {
+             return Err(std::io::Error::new(
+                 std::io::ErrorKind::InvalidInput,
+                 "SQLite permission repair requires a regular file",
