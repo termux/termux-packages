@@ -14,6 +14,11 @@ termux_step_pre_configure() {
 
 	go mod init || :
 	go mod tidy
+
+	cp -r "$(go list -m -f '{{.Dir}}' github.com/jdkato/rstgo)" "$TERMUX_PKG_SRCDIR/rstgo"
+	chmod -R u+w "$TERMUX_PKG_SRCDIR/rstgo"
+	patch -p1 -d "$TERMUX_PKG_SRCDIR/rstgo" < "$TERMUX_PKG_BUILDER_DIR/rstgo-32bit.diff"
+	go mod edit -replace github.com/jdkato/rstgo=./rstgo
 }
 
 termux_step_make() {

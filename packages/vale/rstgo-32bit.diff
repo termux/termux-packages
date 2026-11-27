@@ -1,0 +1,24 @@
+Compare as int64 so the constants do not overflow int on 32-bit architectures.
+
+--- a/roles.go
++++ b/roles.go
+@@ -248,7 +248,7 @@ func pyInt(s string) (int, bool) {
+ 			return 0, false
+ 		}
+ 		prevUnderscore = false
+-		if n < 1<<55 {
++		if int64(n) < 1<<55 {
+ 			n = n*10 + int(c-'0')
+ 		}
+ 	}
+--- a/states.go
++++ b/states.go
+@@ -682,7 +682,7 @@ func (s *rstState) parseEnumerator(m lineMatch, expectedSequence string) (format
+ func atoiBig(s string) int {
+ 	n := 0
+ 	for i := 0; i < len(s); i++ {
+-		if n > 1<<55 {
++		if int64(n) > 1<<55 {
+ 			return n
+ 		}
+ 		n = n*10 + int(s[i]-'0')
