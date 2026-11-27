@@ -11,9 +11,9 @@ ld.lld: error: undefined symbol: nsLinuxSysTrayHandlerConstructor
  
 -[target.'cfg(target_os = "linux")'.dependencies]
 +[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+ dbus = "0.9.6"
  ksni = "0.2.2"
  png = { version = "0.18.1" }
- 
 --- a/comm/rust/sys_tray/src/lib.rs
 +++ b/comm/rust/sys_tray/src/lib.rs
 @@ -2,11 +2,11 @@
