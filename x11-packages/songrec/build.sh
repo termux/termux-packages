@@ -2,12 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://github.com/marin-m/SongRec
 TERMUX_PKG_DESCRIPTION="Open-source, unofficial Shazam client"
 TERMUX_PKG_LICENSE="GPL-3.0-only"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="0.8.2"
+TERMUX_PKG_VERSION="0.8.3"
 TERMUX_PKG_SRCURL="https://github.com/marin-m/SongRec/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=167eed70b477b01180d388d5ff1c9d07b0e73e1af3568737b06aecacb5003745
+TERMUX_PKG_SHA256=0e3264ee77994970b2d1276de0affaea993c9a72373d329ff33e9db107270821
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="gtk4, alsa-lib, alsa-plugins, openssl, ffmpeg, libc++, gettext, glib, pango, libcairo, dbus, hicolor-icon-theme, gdk-pixbuf, libadwaita, pulseaudio, libsoup3"
+
+termux_step_configure() {
+	:
+}
 
 termux_step_make() {
 	termux_setup_rust
@@ -66,16 +70,16 @@ termux_step_make_install() {
 	fi
 	install -Dm 755 "target/${CARGO_TARGET_NAME}/$_dir/songrec" "$TERMUX_PREFIX/bin/songrec"
 
-	install -Dm 644 packaging/rootfs/usr/share/applications/re.fossplant.songrec.desktop \
+	install -Dm 644 packaging/freedesktop/re.fossplant.songrec.desktop \
 					"$TERMUX_PREFIX/share/applications/re.fossplant.songrec.desktop"
 
-	install -Dm 644 packaging/rootfs/usr/share/icons/hicolor/scalable/apps/re.fossplant.songrec.svg \
+	install -Dm 644 packaging/icons/hicolor/scalable/apps/re.fossplant.songrec.svg \
 					"$TERMUX_PREFIX/share/icons/hicolor/scalable/apps/re.fossplant.songrec.svg"
 
-	install -Dm 644 packaging/rootfs/usr/share/metainfo/re.fossplant.songrec.metainfo.xml \
+	install -Dm 644 packaging/freedesktop/re.fossplant.songrec.metainfo.xml \
 					"$TERMUX_PREFIX/share/metainfo/re.fossplant.songrec.metainfo.xml"
 
-	cp -r packaging/rootfs/usr/share/man -t "$TERMUX_PREFIX/share/"
+	install -Dm 644 -t "$TERMUX_PREFIX/share/man/man1" packaging/manpages-autogen/*.1
 
 	install -Dm 644 README.md -t "$TERMUX_PREFIX/share/doc/songrec"
 }
