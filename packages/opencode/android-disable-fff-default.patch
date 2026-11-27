@@ -1,0 +1,13 @@
+diff --git a/packages/cli/src/server-process.ts b/packages/cli/src/server-process.ts
+index 28ae682..9d8ba8a 100644
+--- a/packages/cli/src/server-process.ts
++++ b/packages/cli/src/server-process.ts
+@@ -126,7 +126,7 @@ const processEffect = Effect.fnUntraced(function* (options: Options) {
+             filewatcher: !truthy(process.env.OPENCODE_FILEWATCHER_DISABLE ?? process.env.OPENCODE_DISABLE_FILEWATCHER),
+             fff:
+               process.env.OPENCODE_DISABLE_FFF === undefined
+-                ? process.platform !== "win32"
++                ? process.platform !== "win32" && process.platform !== "android"
+                 : !truthy(process.env.OPENCODE_DISABLE_FFF),
+           },
+         },

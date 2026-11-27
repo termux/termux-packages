@@ -1,0 +1,23 @@
+diff --git a/chunk.js b/chunk.js
+index 4b632a6..b55b72b 100644
+--- a/chunk.js
++++ b/chunk.js
+@@ -8085,6 +8085,9 @@ function getNativeAssetDescriptor(target) {
+   };
+ }
+ function getCurrentNodeAssetTarget() {
++  if (process.platform === "android") {
++    return { platform: "linux", arch: process.arch, libc: "musl" };
++  }
+   const libc = process.env.OPENTUI_LIBC;
+   if (process.platform === "linux" && libc !== undefined && libc !== "" && libc !== "glibc" && libc !== "musl") {
+     throw new Error(`On Linux, OPENTUI_LIBC must be unset, empty, "glibc", or "musl", got ${JSON.stringify(libc)}`);
+@@ -8124,7 +8127,7 @@ async function resolveNativeLibraryPath() {
+       return (await import("@opentui/core-darwin-arm64")).default;
+     }
+   }
+-  if (process.platform === "linux") {
++  if (process.platform === "linux" || process.platform === "android") {
+     if (process.arch === "x64") {
+       if (process.env.OPENTUI_LIBC === "musl") {
+         return (await import("@opentui/core-linux-x64-musl")).default;
