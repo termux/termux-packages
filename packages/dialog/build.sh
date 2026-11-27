@@ -15,10 +15,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_pkg_auto_update() {
-	local latest_version="$(curl --silent --fail \
-		https://invisible-mirror.net/datafiles/release/dialog.tar.gz | \
-		tar --exclude='*/*' -tz | \
-		sed 's|dialog-\(.*\)/|\1|')"
+	local latest_version="$(curl --silent --fail --retry 3 --retry-all-errors \
+		https://invisible-mirror.net/archives/dialog/ | \
+		grep -oP 'dialog-\K[0-9][^"<]*(?=\.tgz)' | sort -uV | tail -n 1)"
+	[[ -n "${latest_version}" ]] || termux_error_exit "Unable to get the latest version from https://invisible-mirror.net/archives/dialog/"
 
 	termux_pkg_upgrade_version "${latest_version}"
 }
