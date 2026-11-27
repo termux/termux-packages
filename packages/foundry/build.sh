@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A blazing fast, portable and modular toolkit for Ethereu
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="LICENSE-MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.10.0"
+TERMUX_PKG_VERSION="1.10.1"
 # The Solidity compilers bundled with the package.
 TERMUX_PKG_SOLC_VERSIONS=(
 	0.8.28
@@ -21,7 +21,7 @@ TERMUX_PKG_SRCURL=(
 	"https://github.com/foundry-rs/foundry/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	5c6763ce2fa9824aa99d47a8edacef372d03e6b90e2a68b049f7001bd8a2925e
+	1e841bfbafff399d002168dec44e0ea5cf1b6221836249482c8dd0a870f0ae31
 	ec756e30f26a5a38d028fd6f401ef0a7f5cfbf4a1ce71f76c2e3e1ffb8730672
 	fe76237f513b7d6727a93cd5b83f92747650c8dc5f8f89457a41e8f54119ed38
 	5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d
