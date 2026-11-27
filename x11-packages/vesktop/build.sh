@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://vencord.dev
 TERMUX_PKG_DESCRIPTION="Vesktop is a custom Discord desktop app"
 TERMUX_PKG_LICENSE="GPL-3.0-or-later"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.7.0"
+TERMUX_PKG_VERSION="1.7.2"
 _VENMIC_VERSION=7.2.5
 TERMUX_PKG_SRCURL=(
 	"https://github.com/Vencord/Vesktop/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz"
 	"https://github.com/Vencord/venmic/archive/refs/tags/v${_VENMIC_VERSION}.tar.gz"
 )
 TERMUX_PKG_SHA256=(
-	"f3feadb58133a6e4555eee878f7e1ce3128abc93ba5203ace18ceafd1856e4a4"
-	"25a458a183dbcfb34aed648dee904ca5082ca3f47c8d7f9ac7e5cdc8a9d836a4"
+	48f38100d7135626d880be366c126f26f9cfa81d3c266209c87d7f4de791ba66
+	25a458a183dbcfb34aed648dee904ca5082ca3f47c8d7f9ac7e5cdc8a9d836a4
 )
 TERMUX_PKG_DEPENDS="electron43, glib, libx11, pipewire, pulseaudio, xdg-utils"
 TERMUX_PKG_BUILD_DEPENDS="electron43-headers, pkg-config"
