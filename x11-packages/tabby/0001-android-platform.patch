@@ -1,0 +1,110 @@
+diff --git a/app/lib/app.ts b/app/lib/app.ts
+index d0be20a..538b988 100644
+--- a/app/lib/app.ts
++++ b/app/lib/app.ts
+@@ -68,7 +68,7 @@ export class Application {
+             }
+         })
+ 
+-        if (process.platform === 'linux') {
++        if (process.platform === 'linux' || process.platform === 'android') {
+             app.commandLine.appendSwitch('no-sandbox')
+             if ((this.configStore.appearance?.opacity || 1) !== 1) {
+                 app.commandLine.appendSwitch('enable-transparent-visuals')
+@@ -189,7 +189,7 @@ export class Application {
+     }
+ 
+     enableTray (): void {
+-        if (!!this.tray || process.platform === 'linux' || (this.configStore.hideTray ?? false) === true) {
++        if (!!this.tray || process.platform === 'linux' || process.platform === 'android' || (this.configStore.hideTray ?? false) === true) {
+             return
+         }
+ 
+@@ -215,7 +215,7 @@ export class Application {
+     }
+ 
+     disableTray (): void {
+-        if (process.platform === 'linux') {
++        if (process.platform === 'linux' || process.platform === 'android') {
+             return
+         }
+         this.tray?.destroy()
+@@ -232,7 +232,7 @@ export class Application {
+             return !hotkeyMode
+         }
+ 
+-        if (process.platform !== 'linux' || !this.isWaylandSession() || !this.isPlasmaSession()) {
++        if ((process.platform !== 'linux' && process.platform !== 'android') || !this.isWaylandSession() || !this.isPlasmaSession()) {
+             return true
+         }
+ 
+diff --git a/app/lib/window.ts b/app/lib/window.ts
+index 6088767..d2d02f5 100644
+--- a/app/lib/window.ts
++++ b/app/lib/window.ts
+@@ -208,7 +208,7 @@ export class Window {
+                     console.error('Failed to set window blur', error)
+                 }
+             }
+-        } else if (process.platform === 'linux') {
++        } else if (process.platform === 'linux' || process.platform === 'android') {
+             this.window.setBackgroundColor(enabled ? '#00000000' : '#131d27')
+             this.window.setBlur?.(enabled)
+         } else {
+diff --git a/tabby-core/src/components/appRoot.component.ts b/tabby-core/src/components/appRoot.component.ts
+index e97975d..ecbc367 100644
+--- a/tabby-core/src/components/appRoot.component.ts
++++ b/tabby-core/src/components/appRoot.component.ts
+@@ -68,7 +68,7 @@ export class AppRootComponent {
+     @Input() rightToolbarButtons: Command[]
+     @HostBinding('class.platform-win32') platformClassWindows = process.platform === 'win32'
+     @HostBinding('class.platform-darwin') platformClassMacOS = process.platform === 'darwin'
+-    @HostBinding('class.platform-linux') platformClassLinux = process.platform === 'linux'
++    @HostBinding('class.platform-linux') platformClassLinux = process.platform === 'linux' || process.platform === 'android'
+     @HostBinding('class.no-tabs') noTabs = true
+     @ViewChildren(TabBodyComponent) tabBodies: TabBodyComponent[]
+     @ViewChild('activeTransfersDropdown') activeTransfersDropdown: NgbDropdown
+diff --git a/tabby-core/src/services/hotkeys.util.ts b/tabby-core/src/services/hotkeys.util.ts
+index f177fd1..c0f6a43 100644
+--- a/tabby-core/src/services/hotkeys.util.ts
++++ b/tabby-core/src/services/hotkeys.util.ts
+@@ -3,12 +3,14 @@ export const metaKeyName = {
+     darwin: '⌘',
+     win32: 'Win',
+     linux: 'Super',
++    android: 'Super',
+ }[process.platform]
+ 
+ export const altKeyName = {
+     darwin: '⌥',
+     win32: 'Alt',
+     linux: 'Alt',
++    android: 'Alt',
+ }[process.platform]
+ 
+ export interface KeyEventData {
+diff --git a/tabby-electron/src/services/hostApp.service.ts b/tabby-electron/src/services/hostApp.service.ts
+index 299a4d1..67b58b7 100644
+--- a/tabby-electron/src/services/hostApp.service.ts
++++ b/tabby-electron/src/services/hostApp.service.ts
+@@ -14,6 +14,7 @@ export class ElectronHostAppService extends HostAppService {
+             win32: Platform.Windows,
+             darwin: Platform.macOS,
+             linux: Platform.Linux,
++            android: Platform.Linux,
+         }[process.platform]
+     }
+ 
+diff --git a/tabby-electron/src/services/updater.service.ts b/tabby-electron/src/services/updater.service.ts
+index 3b5431b..a13615b 100644
+--- a/tabby-electron/src/services/updater.service.ts
++++ b/tabby-electron/src/services/updater.service.ts
+@@ -22,7 +22,7 @@ export class ElectronUpdaterService extends UpdaterService {
+         super()
+         this.logger = log.create('updater')
+ 
+-        if (process.platform === 'linux' || process.env.PORTABLE_EXECUTABLE_FILE) {
++        if (process.platform === 'linux' || process.platform === 'android' || process.env.PORTABLE_EXECUTABLE_FILE) {
+             this.electronUpdaterAvailable = false
+             return
+         }

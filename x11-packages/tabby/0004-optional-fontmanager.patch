@@ -1,0 +1,29 @@
+diff --git a/app/package.json b/app/package.json
+index 8df8718..45e528b 100644
+--- a/app/package.json
++++ b/app/package.json
+@@ -24,7 +24,6 @@
+     "electron-debug": "^3",
+     "electron-promise-ipc": "^2",
+     "electron-updater": "^5",
+-    "fontmanager-redux": "1.1.0",
+     "glasstron": "0.1.1",
+     "js-yaml": "4.1.0",
+     "keytar": "^7",
+diff --git a/tabby-electron/src/services/platform.service.ts b/tabby-electron/src/services/platform.service.ts
+index 3956641..e0e9119 100644
+--- a/tabby-electron/src/services/platform.service.ts
++++ b/tabby-electron/src/services/platform.service.ts
+@@ -11,7 +11,11 @@ import { ElectronHostWindow } from './hostWindow.service'
+ import { ShellIntegrationService } from './shellIntegration.service'
+ import { ElectronHostAppService } from './hostApp.service'
+ import { configPath } from '../../../app/lib/config'
+-const fontManager = require('fontmanager-redux') // eslint-disable-line
++let fontManager: any = null
++try {
++    // Only used on Windows and macOS, fonts are listed with fc-list on Linux
++    fontManager = require('fontmanager-redux') // eslint-disable-line
++} catch { }
+ 
+ /* eslint-disable block-scoped-var */
+ 
