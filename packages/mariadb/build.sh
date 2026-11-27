@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
-TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
+TERMUX_PKG_DESCRIPTION="A fast, stable and multi-user, multi-threaded SQL database server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="2:13.1.2"
-TERMUX_PKG_SRCURL=https://archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="https://mirror.mariadb.org/mariadb-${TERMUX_PKG_VERSION#*:}/source/mariadb-${TERMUX_PKG_VERSION#*:}.tar.gz"
 TERMUX_PKG_SHA256=097bf3b7692ebbe8106a854af4ada1f4ecb0759c93ebd946b536fe9ef78eaa7a
 TERMUX_PKG_DEPENDS="libandroid-support, libbz2, libc++, libcrypt, libedit, liblz4, libxml2, liblzma, ncurses, openssl, pcre2, zlib, zstd"
 TERMUX_PKG_BREAKS="mariadb-dev"
@@ -72,7 +73,7 @@ sql-bench
 
 termux_step_host_build() {
 	termux_setup_cmake
-	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
+
 	cmake -G "Unix Makefiles" \
 		$TERMUX_PKG_SRCDIR \
 		-DWITH_SSL=bundled \
@@ -93,8 +94,6 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		CPPFLAGS+=" -D__off64_t_defined"
 	fi
-
-	sed -i 's/^\s*END[(][)]/ENDIF()/g' $TERMUX_PKG_SRCDIR/libmariadb/cmake/ConnectorName.cmake
 
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/strings:$PATH
 }
