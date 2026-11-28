@@ -1,0 +1,32 @@
+From 4f24aa3f97a8c3ee4db131e109f8f5ce117fb6bc Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 22:26:37 +0900
+Subject: [PATCH 5/9] remove non-portable retrieval deps
+
+---
+ mediapipe/tasks/c/BUILD | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/mediapipe/tasks/c/BUILD b/mediapipe/tasks/c/BUILD
+index f8e83c1..d4fef43 100644
+--- a/mediapipe/tasks/c/BUILD
++++ b/mediapipe/tasks/c/BUILD
+@@ -147,7 +147,6 @@ mediapipe_tasks_c_shared_library(
+     version_script = ":mediapipe_tasks_retrieval_version_script.lds",
+     visibility = ["//visibility:public"],
+     deps = MEDIAPIPE_TASKS_C_CORE_DEPS +
+-           MEDIAPIPE_TASKS_C_RETRIEVAL_DEPS +
+            MEDIAPIPE_TASKS_C_RETRIEVAL_BORROWED_DEPS,
+ )
+ 
+@@ -176,7 +175,6 @@ cc_binary(
+            MEDIAPIPE_TASKS_C_CORE_DEPS +
+            MEDIAPIPE_TASKS_C_MODEL_MAKER_DEPS +
+            MEDIAPIPE_TASKS_C_AUDIO_DEPS +
+-           MEDIAPIPE_TASKS_C_RETRIEVAL_DEPS +
+            MEDIAPIPE_TASKS_C_TEXT_DEPS +
+            MEDIAPIPE_TASKS_C_VISION_DEPS,
+ )
+-- 
+2.56.1
+

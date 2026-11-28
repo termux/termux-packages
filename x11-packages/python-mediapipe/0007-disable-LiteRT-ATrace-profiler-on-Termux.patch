@@ -1,0 +1,52 @@
+From 007ecd4ccddef41919eae79de5b3314bf5b947e3 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Thu, 26 Nov 2026 11:04:24 +0900
+Subject: [PATCH 7/9] disable LiteRT ATrace profiler on Termux
+
+---
+ WORKSPACE                                     |  1 +
+ .../litert_disable_atrace_on_termux.diff      | 20 +++++++++++++++++++
+ 2 files changed, 21 insertions(+)
+ create mode 100644 third_party/litert_disable_atrace_on_termux.diff
+
+diff --git a/WORKSPACE b/WORKSPACE
+index 9cd2e18..665bdb1 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -863,6 +863,7 @@ http_archive(
+         "@//third_party:litert_rules_python_and_strict_deps.diff",
+         "@//third_party:litert_custom_ops.diff",
+         "@//third_party:litert_internal_fbs_fix.diff",
++        "@//third_party:litert_disable_atrace_on_termux.diff",
+     ],
+     sha256 = "ec32db733e93501c693a8ab99e413c2d5d746dee7d452a8d6912046d7bc5c04e",
+     strip_prefix = "LiteRT-2.3.0",
+diff --git a/third_party/litert_disable_atrace_on_termux.diff b/third_party/litert_disable_atrace_on_termux.diff
+new file mode 100644
+index 0000000..e8fdd2e
+--- /dev/null
++++ b/third_party/litert_disable_atrace_on_termux.diff
+@@ -0,0 +1,20 @@
++--- a/tflite/profiling/platform_profiler.cc
+++++ b/tflite/profiling/platform_profiler.cc
++@@ -18,7 +18,7 @@
++ 
++ #include "tflite/core/api/profiler.h"
++ 
++-#if defined(__ANDROID__)
+++#if defined(__ANDROID__) && !defined(__TERMUX__)
++ #include "tflite/profiling/atrace_profiler.h"
++ #elif defined(__APPLE__)
++ #include "TargetConditionals.h"
++@@ -34,7 +34,7 @@
++ namespace profiling {
++ 
++ std::unique_ptr<tflite::Profiler> MaybeCreatePlatformProfiler() {
++-#if defined(__ANDROID__)
+++#if defined(__ANDROID__) && !defined(__TERMUX__)
++   return MaybeCreateATraceProfiler();
++ #elif defined(SIGNPOST_PLATFORM_PROFILER)
++   return MaybeCreateSignpostProfiler();
+-- 
+2.56.1
+

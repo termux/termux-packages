@@ -1,0 +1,53 @@
+From 040047d805517b946df05e01e064034b7dc9046a Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 22:20:51 +0900
+Subject: [PATCH 1/9] decouple Termux from Android NDK paths
+
+---
+ mediapipe/framework/port.h | 4 ++--
+ mediapipe/util/cpu_util.cc | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mediapipe/framework/port.h b/mediapipe/framework/port.h
+index 2018b83..7fea0b7 100644
+--- a/mediapipe/framework/port.h
++++ b/mediapipe/framework/port.h
+@@ -23,11 +23,11 @@
+ // of projects that may want to build MediaPipe using alternative build systems,
+ // we also try to set platform-specific defines in this header if missing.
+ #if !defined(MEDIAPIPE_MOBILE) && \
+-    (defined(__ANDROID__) || defined(__EMSCRIPTEN__))
++    ((defined(__ANDROID__) && !defined(__TERMUX__)) || defined(__EMSCRIPTEN__))
+ #define MEDIAPIPE_MOBILE
+ #endif
+ 
+-#if !defined(MEDIAPIPE_ANDROID) && defined(__ANDROID__)
++#if !defined(MEDIAPIPE_ANDROID) && defined(__ANDROID__) && !defined(__TERMUX__)
+ #define MEDIAPIPE_ANDROID
+ #endif
+ 
+diff --git a/mediapipe/util/cpu_util.cc b/mediapipe/util/cpu_util.cc
+index c9d99fc..6f9bcc1 100644
+--- a/mediapipe/util/cpu_util.cc
++++ b/mediapipe/util/cpu_util.cc
+@@ -21,7 +21,7 @@
+ #include <utility>
+ #include <vector>
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include "ndk/sources/android/cpufeatures/cpu-features.h"
+ #elif _WIN32
+ #include <windows.h>
+@@ -111,7 +111,7 @@ std::set<int> InferLowerOrHigherCoreIds(bool lower) {
+ }  // namespace
+ 
+ int NumCPUCores() {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+   return android_getCpuCount();
+ #elif _WIN32
+   SYSTEM_INFO sysinfo;
+-- 
+2.56.1
+

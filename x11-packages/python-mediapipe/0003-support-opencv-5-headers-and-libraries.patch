@@ -1,0 +1,39 @@
+From 4aee49b9c275e466729e6e52d9581789d2b5f755 Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Tue, 24 Nov 2026 22:22:41 +0900
+Subject: [PATCH 3/9] support opencv 5 headers and libraries
+
+---
+ third_party/opencv_linux.BUILD | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/third_party/opencv_linux.BUILD b/third_party/opencv_linux.BUILD
+index 0c26995..b0163c3 100644
+--- a/third_party/opencv_linux.BUILD
++++ b/third_party/opencv_linux.BUILD
+@@ -21,6 +21,7 @@ cc_library(
+             "include/arm-linux-gnueabihf/opencv4/opencv2/cvconfig.h",
+             "include/x86_64-linux-gnu/opencv4/opencv2/cvconfig.h",
+             "include/opencv4/opencv2/**/*.h*",
++            "include/opencv5/opencv2/**/*.h*",
+         ],
+         allow_empty = True,
+     ),
+@@ -30,11 +31,12 @@ cc_library(
+         "include/arm-linux-gnueabihf/opencv4/",
+         "include/x86_64-linux-gnu/opencv4/",
+         "include/opencv4/",
++        "include/opencv5/",
+     ],
+     linkopts = [
+         "-l:libopencv_core.so",
+-        "-l:libopencv_calib3d.so",
+-        "-l:libopencv_features2d.so",
++        "-l:libopencv_calib.so",
++        "-l:libopencv_features.so",
+         "-l:libopencv_highgui.so",
+         "-l:libopencv_imgcodecs.so",
+         "-l:libopencv_imgproc.so",
+-- 
+2.56.1
+
