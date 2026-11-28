@@ -1,0 +1,19 @@
+--- a/makefiles/install.zuo	2026-05-11 19:29:03.000000000 +0200
++++ b/makefiles/install.zuo	2026-08-12 23:12:47.317436574 +0200
+@@ -179,12 +179,11 @@
+     (shell/wait* "rm" "-f" f))
+   (define (rm-rf d)
+     (shell/wait* "rm" "-rf" d))
+-  (define haiku? (glob-match? "*hk" m))
+   (define (ln-f from to)
+-    (if haiku?
+-        ;; no hard links on BeFS
+-        (shell/wait* "ln" "-s" from to)
+-        (shell/wait* "ln" "-f" from to)))
++    ;; Android does not permit hard links to app executables. Use relative
++    ;; symbolic links for all aliases installed by Chez Scheme.
++    (define to-dir (car (split-path to)))
++    (shell/wait* "ln" "-sf" (find-relative-path to-dir from) to))
+   (define (ln-s from to)
+     (shell/wait* "ln" "-s" from to))
+ 
