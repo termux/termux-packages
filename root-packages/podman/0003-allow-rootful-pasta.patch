@@ -1,0 +1,87 @@
+diff --git a/libpod/networking_pasta_linux.go b/libpod/networking_pasta_linux.go
+index af173e8ecc..e6d41039b0 100644
+--- a/libpod/networking_pasta_linux.go
++++ b/libpod/networking_pasta_linux.go
+@@ -9,14 +9,49 @@
+ 
+ package libpod
+ 
+-import "go.podman.io/common/libnetwork/pasta"
++import (
++	"net"
++	"os"
++	"strings"
++
++	"go.podman.io/common/libnetwork/pasta"
++)
+ 
+ func (r *Runtime) setupPasta(ctr *Container, netns string) error {
++	extraOpts := ctr.config.NetworkOptions[pasta.BinaryName]
++	if os.Geteuid() == 0 {
++		var autoOpts []string
++		hasRunas := false
++		hasOutbound := false
++		for _, opt := range extraOpts {
++			if opt == "--runas" || strings.HasPrefix(opt, "--runas=") {
++				hasRunas = true
++			}
++			if opt == "--outbound-if4" || strings.HasPrefix(opt, "--outbound-if4=") || opt == "-o" {
++				hasOutbound = true
++			}
++		}
++		if !hasRunas {
++			autoOpts = append(autoOpts, "--runas", "0")
++		}
++		if !hasOutbound {
++			for _, ifName := range []string{"tun0", "tun1", "wg0"} {
++				if iface, err := net.InterfaceByName(ifName); err == nil && (iface.Flags&net.FlagUp) != 0 {
++					if addrs, err := iface.Addrs(); err == nil && len(addrs) > 0 {
++						autoOpts = append(autoOpts, "--outbound-if4", ifName)
++						break
++					}
++				}
++			}
++		}
++		extraOpts = append(autoOpts, extraOpts...)
++	}
++
+ 	res, err := pasta.Setup(&pasta.SetupOptions{
+ 		Config:       r.config,
+ 		Netns:        netns,
+ 		Ports:        ctr.convertPortMappings(),
+-		ExtraOptions: ctr.config.NetworkOptions[pasta.BinaryName],
++		ExtraOptions: extraOpts,
+ 	})
+ 	if err != nil {
+ 		return err
+diff --git a/pkg/specgen/namespaces.go b/pkg/specgen/namespaces.go
+index 94ea3835fb..71fc68e6c2 100644
+--- a/pkg/specgen/namespaces.go
++++ b/pkg/specgen/namespaces.go
+@@ -16,7 +16,6 @@ import (
+ 	"go.podman.io/podman/v6/pkg/rootless"
+ 	"go.podman.io/podman/v6/pkg/util"
+ 	"go.podman.io/storage/pkg/fileutils"
+-	"go.podman.io/storage/pkg/unshare"
+ 	storageTypes "go.podman.io/storage/types"
+ )
+ 
+@@ -154,17 +153,7 @@ func validateNetNS(n *Namespace) error {
+ 		return nil
+ 	}
+ 	switch n.NSMode {
+-	case Pasta:
+-		// Check if we run rootless/in a userns. Do not use rootless.IsRootless() here.
+-		// Pasta switches to nobody when running as root which causes it to fail while
+-		// opening the netns owned by root. However when pasta is already in a userns
+-		// it doesn't switch to nobody so it works there.
+-		// https://github.com/containers/podman/issues/17840
+-		if unshare.IsRootless() {
+-			break
+-		}
+-		return fmt.Errorf("pasta networking is only supported for rootless mode or when inside a nested userns")
+-	case "", Default, Host, Path, FromContainer, FromPod, Private, NoNetwork, Bridge:
++	case Pasta, "", Default, Host, Path, FromContainer, FromPod, Private, NoNetwork, Bridge:
+ 		break
+ 	default:
+ 		return fmt.Errorf("invalid network %q", n.NSMode)
