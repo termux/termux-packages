@@ -1,0 +1,69 @@
+# Do official build to decrease file size
+is_official_build = true
+is_debug = false
+symbol_level = 0
+# Use our custom toolchain
+clang_version = "@HOST_CLANG_VERSION@"
+use_sysroot = false
+target_cpu = "@TARGET_CPU@"
+target_rpath = "@TERMUX_PREFIX@/lib"
+target_sysroot = "@TARGET_SYSROOT@"
+custom_toolchain = "//build/toolchain/linux/unbundle:default"
+custom_toolchain_clang_base_path = "@TARGET_CLANG_BASE_PATH@"
+custom_toolchain_clang_version = "@TARGET_CLANG_VERSION@"
+host_toolchain = "@TERMUX_PKG_CACHEDIR@/custom-toolchain:host"
+v8_snapshot_toolchain = "@TERMUX_PKG_CACHEDIR@/custom-toolchain:@V8_TOOLCHAIN_NAME@"
+clang_use_chrome_plugins = false
+dcheck_always_on = false
+chrome_pgo_phase = 0
+treat_warnings_as_errors = false
+# Use system libraries as little as possible
+use_system_freetype = false
+use_custom_libcxx = false
+use_custom_libcxx_for_host = true
+use_clang_modules = false
+use_allocator_shim = false
+use_partition_alloc_as_malloc = false
+enable_backup_ref_ptr_slow_checks = false
+enable_dangling_raw_ptr_checks = false
+enable_dangling_raw_ptr_feature_flag = false
+backup_ref_ptr_extra_oob_checks = false
+enable_backup_ref_ptr_support = false
+enable_pointer_compression_support = false
+use_nss_certs = true
+use_udev = false
+use_ozone = true
+ozone_auto_platforms = false
+ozone_platform = "x11"
+ozone_platform_x11 = true
+ozone_platform_wayland = true
+ozone_platform_headless = true
+angle_enable_vulkan = true
+angle_enable_swiftshader = true
+angle_enable_abseil = false
+# Disable vulkan validation layers, which is almost useless
+angle_enable_vulkan_validation_layers = false
+dawn_enable_vulkan_validation_layers = false
+# Use Chrome-branded ffmpeg for more codecs
+is_component_ffmpeg = true
+ffmpeg_branding = "Chrome"
+proprietary_codecs = true
+use_qt5 = false
+use_qt6 = false
+use_libpci = false
+use_alsa = false
+use_pulseaudio = true
+rtc_use_pipewire = false
+use_vaapi = false
+# Host compiler (clang-13) doesn't support LTO well
+is_cfi = false
+use_cfi_icall = false
+use_thin_lto = false
+# Enable rust
+custom_target_rust_abi_target = "@CARGO_TARGET_NAME@"
+clang_warning_suppression_file = ""
+exclude_unwind_tables = false
+# Compile pdfium as a static library
+pdf_is_complete_lib = true
+# Disable v8's metagen
+v8_use_metagen = false

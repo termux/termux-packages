@@ -1,0 +1,16 @@
+Report the stable channel when CHROME_VERSION_EXTRA is unset, so a direct run of the binary is not seen as an unknown channel.
+
+diff --git a/brave/common/brave_channel_info_posix.cc b/brave/common/brave_channel_info_posix.cc
+index c9082b9..56d2eaf 100644
+--- a/brave/common/brave_channel_info_posix.cc
++++ b/brave/common/brave_channel_info_posix.cc
+@@ -19,8 +19,7 @@ version_info::Channel GetChannelImpl(std::string* modifier_out,
+ 
+ #if defined(OFFICIAL_BUILD)
+   char* env = getenv("CHROME_VERSION_EXTRA");
+-  if (env)
+-    modifier = env;
++  modifier = env ? env : LINUX_CHANNEL_STABLE;
+ 
+   if (modifier == LINUX_CHANNEL_DEV)
+     modifier = BRAVE_LINUX_CHANNEL_DEV;

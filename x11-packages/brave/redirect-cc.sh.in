@@ -1,0 +1,34 @@
+#!/bin/bash
+# Compiler wrapper (gn arg cc_wrapper) that emulates brave's siso "redirect_cc"
+# handler (brave-core build/config/siso/brave_siso_config.star): when a C/C++
+# source file has an override under //brave/chromium_src, compile the override
+# instead of the chromium original. Plain ninja can't do this on its own.
+# Header overrides already work through the -iquote flag brave adds.
+src_dir="@SRCDIR@"
+
+args=("$@")
+for ((i = 1; i < ${#args[@]} - 1; i++)); do
+	[[ "${args[i]}" == "-c" ]] || continue
+	f="${args[i + 1]}"
+	rel=""
+	if [[ "$f" == gen/* ]]; then
+		# Generated file, e.g. gen/base/buildflags.h
+		rel="${f#gen/}"
+		override="${src_dir}/brave/chromium_src/${rel}"
+		new="${src_dir}/brave/chromium_src/${rel}"
+	else
+		abs="$(realpath -ms -- "$f")"
+		if [[ "$abs" == "$src_dir"/* ]]; then
+			rel="${abs#"$src_dir"/}"
+			override="${src_dir}/brave/chromium_src/${rel}"
+			# Keep the relative form of the original path.
+			new="${f%"$rel"}brave/chromium_src/${rel}"
+		fi
+	fi
+	if [[ -n "$rel" && -f "$override" ]]; then
+		args[i + 1]="$new"
+	fi
+	break
+done
+
+exec "${args[@]}"

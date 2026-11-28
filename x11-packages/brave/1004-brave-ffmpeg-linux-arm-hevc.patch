@@ -1,0 +1,61 @@
+Enable the ffmpeg HEVC decoder and parser for linux arm, like brave-core does for linux arm64 and x64.
+The arm dsp init source is added too, since hevc/dsp.c calls ff_hevc_dsp_init_arm on arm.
+
+diff --git a/brave/third_party/ffmpeg/sources.gni b/brave/third_party/ffmpeg/sources.gni
+index 57c5943..e035214 100644
+--- a/brave/third_party/ffmpeg/sources.gni
++++ b/brave/third_party/ffmpeg/sources.gni
+@@ -76,4 +76,8 @@ if (enable_ffmpeg_hevc_support) {
+       "libavcodec/aarch64/hevcpred_neon.S",
+     ]
+   }
++
++  if (current_cpu == "arm") {
++    brave_third_party_ffmpeg_c_sources += [ "libavcodec/arm/hevcdsp_init_arm.c" ]
++  }
+ }
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
+index e05905e..cde19e8 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/config_components.h
+@@ -142,7 +142,7 @@
+ #define CONFIG_H264_QSV_DECODER 0
+ #define CONFIG_H264_RKMPP_DECODER 0
+ #define CONFIG_HAP_DECODER 0
+-#define CONFIG_HEVC_DECODER 0
++#define CONFIG_HEVC_DECODER 1
+ #define CONFIG_HEVC_QSV_DECODER 0
+ #define CONFIG_HEVC_RKMPP_DECODER 0
+ #define CONFIG_HEVC_V4L2M2M_DECODER 0
+@@ -1045,7 +1045,7 @@
+ #define CONFIG_H261_PARSER 0
+ #define CONFIG_H263_PARSER 0
+ #define CONFIG_H264_PARSER 1
+-#define CONFIG_HEVC_PARSER 0
++#define CONFIG_HEVC_PARSER 1
+ #define CONFIG_HDR_PARSER 0
+ #define CONFIG_IPU_PARSER 0
+ #define CONFIG_JPEG2000_PARSER 0
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
+index fe5adb0..8e616c6 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/codec_list.c
+@@ -1,5 +1,6 @@
+ static const FFCodec * const codec_list[] = {
+     &ff_h264_decoder,
++    &ff_hevc_decoder,
+     &ff_aac_decoder,
+     &ff_flac_decoder,
+     &ff_mp3_decoder,
+diff --git a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
+index e3684b3..93c86ea 100644
+--- a/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
++++ b/third_party/ffmpeg/chromium/config/Chrome/linux/arm/libavcodec/parser_list.c
+@@ -2,6 +2,7 @@ static const FFCodecParser * const parser_list[] = {
+     &ff_aac_parser,
+     &ff_flac_parser,
+     &ff_h264_parser,
++    &ff_hevc_parser,
+     &ff_mpegaudio_parser,
+     &ff_opus_parser,
+     &ff_vorbis_parser,

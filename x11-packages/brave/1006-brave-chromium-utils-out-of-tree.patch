@@ -1,0 +1,24 @@
+Let brave_chromium_utils.get_chromium_src_override() accept paths outside of src/.
+Brave expects the out dir to be inside src/ (src/out/Release), but the termux build
+keeps it in a sibling directory, so generated inputs such as `gen/...` made the assertion
+fail in preprocess_if_expr.py. Such paths can never have an override, so return a
+path that does not exist, which is what an in-tree out dir ends up with as well.
+
+diff --git a/brave/script/brave_chromium_utils.py b/brave/script/brave_chromium_utils.py
+index 396260d..f067d25 100644
+--- a/brave/script/brave_chromium_utils.py
++++ b/brave/script/brave_chromium_utils.py
+@@ -62,7 +62,12 @@ def get_chromium_src_override(path: str) -> str:
+     assert os.path.exists(path), path
+     src_dir = get_src_dir()
+     src_path = os.path.relpath(path, src_dir)
+-    assert not src_path.startswith('..'), (path, src_dir)
++    if src_path.startswith('..'):
++        # The path is outside of src/ (e.g. generated files of an out dir that
++        # lives next to the source tree). Such paths can't have an override.
++        return wspath(
++            f'//brave/chromium_src/__outside_src__/{os.path.basename(path)}'
++        )
+     override_path = wspath(f'//brave/chromium_src/{src_path}')
+     if not os.path.exists(override_path):
+         for override_extension in get_additional_extensions():
