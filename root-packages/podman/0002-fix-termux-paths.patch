@@ -1,0 +1,519 @@
+diff --git a/cmd/podman/main.go b/cmd/podman/main.go
+index 5a2605e814..aa97217a3e 100644
+--- a/cmd/podman/main.go
++++ b/cmd/podman/main.go
+@@ -48,6 +48,9 @@ func (l logrusLogger) Debugf(format string, args ...any) {
+ }
+ 
+ func main() {
++if os.Getenv("SSL_CERT_FILE") == "" {
++		_ = os.Setenv("SSL_CERT_FILE", "@TERMUX_PREFIX@/etc/tls/cert.pem")
++	}
+ 	if reexec.Init() {
+ 		// We were invoked with a different argv[0] indicating that we
+ 		// had a specific job to do as a subprocess, and it's done.
+diff --git a/cmd/podman/registry/registry_common.go b/cmd/podman/registry/registry_common.go
+index 75a92cd93f..5b7ae33d46 100644
+--- a/cmd/podman/registry/registry_common.go
++++ b/cmd/podman/registry/registry_common.go
+@@ -3,4 +3,4 @@
+ package registry
+ 
+ // DefaultRootAPIPath is the default path of the REST socket
+-const DefaultRootAPIPath = "/run/podman/podman.sock"
++const DefaultRootAPIPath = "@TERMUX_PREFIX@/var/run/podman/podman.sock"
+diff --git a/pkg/api/handlers/libpod/swagger_spec.go b/pkg/api/handlers/libpod/swagger_spec.go
+index 636c8e309c..7a47dabf87 100644
+--- a/pkg/api/handlers/libpod/swagger_spec.go
++++ b/pkg/api/handlers/libpod/swagger_spec.go
+@@ -13,7 +13,7 @@ import (
+ )
+ 
+ // DefaultPodmanSwaggerSpec provides the default path to the podman swagger spec file
+-const DefaultPodmanSwaggerSpec = "/usr/share/containers/podman/swagger.yaml"
++const DefaultPodmanSwaggerSpec = "@TERMUX_PREFIX@/share/containers/podman/swagger.yaml"
+ 
+ func ServeSwagger(w http.ResponseWriter, r *http.Request) {
+ 	path := DefaultPodmanSwaggerSpec
+diff --git a/pkg/domain/infra/abi/system_linux.go b/pkg/domain/infra/abi/system_linux.go
+index 02ed8e1c95..844191003d 100644
+--- a/pkg/domain/infra/abi/system_linux.go
++++ b/pkg/domain/infra/abi/system_linux.go
+@@ -19,7 +19,7 @@ import (
+ )
+ 
+ // Default path for system runtime state
+-const defaultRunPath = "/run"
++const defaultRunPath = "@TERMUX_PREFIX@/var/run"
+ 
+ func (ic *ContainerEngine) SetupRootless(_ context.Context, noMoveProcess bool, cgroupMode string) error {
+ 	runsUnderSystemd := systemd.RunsOnSystemd()
+diff --git a/pkg/rootless/rootless_linux.c b/pkg/rootless/rootless_linux.c
+index 778668c3ae..730531ac4d 100644
+--- a/pkg/rootless/rootless_linux.c
++++ b/pkg/rootless/rootless_linux.c
+@@ -23,8 +23,8 @@
+ #include <sys/file.h>
+ #include <stdio.h>
+ 
+-#define ETC_PREEXEC_HOOKS "/etc/containers/pre-exec-hooks"
+-#define LIBEXECPODMAN "/usr/libexec/podman"
++#define ETC_PREEXEC_HOOKS "@TERMUX_PREFIX@/etc/containers/pre-exec-hooks"
++#define LIBEXECPODMAN "@TERMUX_PREFIX@/libexec/podman"
+ 
+ #ifndef FD_NSFS_ROOT
+ /* Copied from /usr/include/linux/fcntl.h.  */
+@@ -496,7 +496,7 @@ do_preexec_hooks (char **argv, int argc)
+ {
+   // Access the preexec_hooks_dir indicator file
+   // return without processing if the file doesn't exist
+-  char preexec_hooks_path[] = "/etc/containers/podman_preexec_hooks.txt";
++  char preexec_hooks_path[] = "@TERMUX_PREFIX@/etc/containers/podman_preexec_hooks.txt";
+   if (access(preexec_hooks_path, F_OK) != 0) {
+     return;
+   }
+@@ -526,7 +526,7 @@ do_pause ()
+ 
+   /* Attempt to execv catatonit to keep the pause process alive.  */
+   execl (LIBEXECPODMAN "/catatonit", "catatonit", "-P", NULL);
+-  execl ("/usr/bin/catatonit", "catatonit", "-P", NULL);
++  execl ("@TERMUX_PREFIX@/bin/catatonit", "catatonit", "-P", NULL);
+   /* and if the catatonit executable could not be found, fallback here... */
+ 
+   prctl (PR_SET_NAME, "podman pause", NULL, NULL, NULL);
+diff --git a/pkg/systemd/quadlet/quadlet.go b/pkg/systemd/quadlet/quadlet.go
+index f3b7fa4a1b..b0a8d1bcd6 100644
+--- a/pkg/systemd/quadlet/quadlet.go
++++ b/pkg/systemd/quadlet/quadlet.go
+@@ -20,11 +20,11 @@ const (
+ 	// but it is causing bloat
+ 	autoUpdateLabel = "io.containers.autoupdate"
+ 	// Directory for temporary Quadlet files (sysadmin owned)
+-	UnitDirTemp = "/run/containers/systemd"
++	UnitDirTemp = "@TERMUX_PREFIX@/var/run/containers/systemd"
+ 	// Directory for global Quadlet files (sysadmin owned)
+-	UnitDirAdmin = "/etc/containers/systemd"
++	UnitDirAdmin = "@TERMUX_PREFIX@/etc/containers/systemd"
+ 	// Directory for global Quadlet files (distro owned)
+-	UnitDirDistro = "/usr/share/containers/systemd"
++	UnitDirDistro = "@TERMUX_PREFIX@/share/containers/systemd"
+ 
+ 	// Names of commonly used systemd/quadlet group names
+ 	ArtifactGroup   = "Artifact"
+diff --git a/pkg/trust/registries.go b/pkg/trust/registries.go
+index 043c89062a..8b6c66f4c6 100644
+--- a/pkg/trust/registries.go
++++ b/pkg/trust/registries.go
+@@ -30,7 +30,7 @@ type registryNamespace struct {
+ }
+ 
+ // systemRegistriesDirPath is the path to registries.d.
+-const systemRegistriesDirPath = "/etc/containers/registries.d"
++const systemRegistriesDirPath = "@TERMUX_PREFIX@/etc/containers/registries.d"
+ 
+ // userRegistriesDir is the path to the per user registries.d.
+ var userRegistriesDir = filepath.FromSlash(".config/containers/registries.d")
+diff --git a/pkg/util/utils.go b/pkg/util/utils.go
+index e2e373efa5..21e5d4b3e7 100644
+--- a/pkg/util/utils.go
++++ b/pkg/util/utils.go
+@@ -1081,7 +1081,7 @@ func ParseInputTime(inputTime string, since bool) (time.Time, error) {
+ func Tmpdir() string {
+ 	tmpdir := os.Getenv("TMPDIR")
+ 	if tmpdir == "" {
+-		tmpdir = "/var/tmp"
++		tmpdir = "@TERMUX_PREFIX@/var/tmp"
+ 	}
+ 
+ 	return tmpdir
+diff --git a/vendor/go.podman.io/buildah/define/mount_unsupported.go b/vendor/go.podman.io/buildah/define/mount_unsupported.go
+index 3feab28c35..36f1cf69b9 100644
+--- a/vendor/go.podman.io/buildah/define/mount_unsupported.go
++++ b/vendor/go.podman.io/buildah/define/mount_unsupported.go
+@@ -7,7 +7,7 @@ const (
+ 	TypeBind = "bind"
+ 
+ 	// TempDir is the default for storing temporary files
+-	TempDir = "/var/tmp"
++	TempDir = "@TERMUX_PREFIX@/var/tmp"
+ )
+ 
+ // Mount potions for bind
+diff --git a/vendor/go.podman.io/buildah/internal/tmpdir/tmpdir.go b/vendor/go.podman.io/buildah/internal/tmpdir/tmpdir.go
+index 27b435d2f9..2a024f7eb8 100644
+--- a/vendor/go.podman.io/buildah/internal/tmpdir/tmpdir.go
++++ b/vendor/go.podman.io/buildah/internal/tmpdir/tmpdir.go
+@@ -22,5 +22,5 @@ func GetTempDir() string {
+ 			return tmpdir
+ 		}
+ 	}
+-	return "/var/tmp"
++	return "@TERMUX_PREFIX@/var/tmp"
+ }
+diff --git a/vendor/go.podman.io/common/libnetwork/netavark/const.go b/vendor/go.podman.io/common/libnetwork/netavark/const.go
+index fd975a1f85..1c792979ce 100644
+--- a/vendor/go.podman.io/common/libnetwork/netavark/const.go
++++ b/vendor/go.podman.io/common/libnetwork/netavark/const.go
+@@ -4,4 +4,4 @@ package netavark
+ 
+ const defaultBridgeName = "podman"
+ 
+-const defaultRootLockPath = "/run/lock/netavark.lock"
++const defaultRootLockPath = "@TERMUX_PREFIX@/var/run/lock/netavark.lock"
+diff --git a/vendor/go.podman.io/common/libnetwork/network/interface.go b/vendor/go.podman.io/common/libnetwork/network/interface.go
+index e7eb0e71b8..2c3d900c43 100644
+--- a/vendor/go.podman.io/common/libnetwork/network/interface.go
++++ b/vendor/go.podman.io/common/libnetwork/network/interface.go
+@@ -70,7 +70,7 @@ func netavarkBackendFromConf(store storage.Store, conf *config.Config, syslog bo
+ }
+ 
+ // getDefaultNetavarkConfigDir return the netavark config dir. For rootful it will
+-// use "/etc/containers/networks" and for rootless "$graphroot/networks". We cannot
++// use "@TERMUX_PREFIX@/etc/containers/networks" and for rootless "$graphroot/networks". We cannot
+ // use the graphroot for rootful since the network namespace is shared for all
+ // libpod instances.
+ func getDefaultNetavarkConfigDir(store storage.Store) string {
+diff --git a/vendor/go.podman.io/common/libnetwork/network/interface_linux.go b/vendor/go.podman.io/common/libnetwork/network/interface_linux.go
+index f89acfd102..f16e400ca9 100644
+--- a/vendor/go.podman.io/common/libnetwork/network/interface_linux.go
++++ b/vendor/go.podman.io/common/libnetwork/network/interface_linux.go
+@@ -2,7 +2,7 @@ package network
+ 
+ const (
+ 	// netavarkConfigDir is the config directory for the rootful network files.
+-	netavarkConfigDir = "/etc/containers/networks"
++	netavarkConfigDir = "@TERMUX_PREFIX@/etc/containers/networks"
+ 	// netavarkRunDir is the run directory for the rootful temporary network files such as the ipam db.
+-	netavarkRunDir = "/run/containers/networks"
++	netavarkRunDir = "@TERMUX_PREFIX@/var/run/containers/networks"
+ )
+diff --git a/vendor/go.podman.io/common/pkg/config/config_linux.go b/vendor/go.podman.io/common/pkg/config/config_linux.go
+index e0b4672e71..8e048d5971 100644
+--- a/vendor/go.podman.io/common/pkg/config/config_linux.go
++++ b/vendor/go.podman.io/common/pkg/config/config_linux.go
+@@ -7,8 +7,8 @@ import (
+ var defaultHelperBinariesDir = []string{
+ 	"/usr/local/libexec/podman",
+ 	"/usr/local/lib/podman",
+-	"/usr/libexec/podman",
+-	"/usr/lib/podman",
++	"@TERMUX_PREFIX@/lib/podman",
++	"@TERMUX_PREFIX@/libexec/podman",
+ }
+ 
+ // Capabilities returns the capabilities parses the Add and Drop capability
+diff --git a/vendor/go.podman.io/common/pkg/config/default.go b/vendor/go.podman.io/common/pkg/config/default.go
+index fcd20b3003..66eaa02d34 100644
+--- a/vendor/go.podman.io/common/pkg/config/default.go
++++ b/vendor/go.podman.io/common/pkg/config/default.go
+@@ -22,7 +22,7 @@ import (
+ 
+ const (
+ 	// _defaultGraphRoot points to the default path of the graph root.
+-	_defaultGraphRoot = "/var/lib/containers/storage"
++	_defaultGraphRoot = "@TERMUX_PREFIX@/var/lib/containers/storage"
+ 
+ 	// _defaultTransport is a prefix that we apply to an image name to check
+ 	// docker hub first for the image.
+@@ -98,9 +98,9 @@ var (
+ 	// ErrInvalidArg indicates that an invalid argument was passed.
+ 	ErrInvalidArg = errors.New("invalid argument")
+ 	// DefaultHooksDirs defines the default hooks directory.
+-	DefaultHooksDirs = []string{"/usr/share/containers/oci/hooks.d"}
++	DefaultHooksDirs = []string{"@TERMUX_PREFIX@/share/containers/oci/hooks.d"}
+ 	// DefaultCdiSpecDirs defines the default cdi spec directories.
+-	DefaultCdiSpecDirs = []string{"/etc/cdi", "/var/run/cdi"}
++	DefaultCdiSpecDirs = []string{"@TERMUX_PREFIX@/etc/cdi", "@TERMUX_PREFIX@/var/run/cdi"}
+ 	// DefaultCapabilities is the default for the default_capabilities option in the containers.conf file.
+ 	DefaultCapabilities = []string{
+ 		"CAP_CHOWN",
+@@ -118,7 +118,7 @@ var (
+ 
+ 	DefaultNetavarkPluginDirs = []string{
+ 		"/usr/local/libexec/netavark",
+-		"/usr/libexec/netavark",
++		"@TERMUX_PREFIX@/libexec/netavark",
+ 		"/usr/local/lib/netavark",
+ 		"/usr/lib/netavark",
+ 	}
+@@ -135,7 +135,7 @@ var (
+ 	// helper binary in a different location.
+ 	additionalHelperBinariesDir string
+ 
+-	defaultContainerEnv = []string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"}
++	defaultContainerEnv = []string{"PATH=@TERMUX_PREFIX@/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"}
+ )
+ 
+ func parseSubnetPool(subnet string, size int) SubnetPool { //nolint:unparam // Suppress "size always receives 24".
+@@ -149,7 +149,7 @@ func parseSubnetPool(subnet string, size int) SubnetPool { //nolint:unparam // S
+ const (
+ 	// _etcDir is the sysconfdir where podman should look for system config files.
+ 	// It can be overridden at build time.
+-	_etcDir = "/etc"
++	_etcDir = "@TERMUX_PREFIX@/etc"
+ 	// InstallPrefix is the prefix where podman will be installed.
+ 	// It can be overridden at build time.
+ 	_installPrefix = "/usr"
+@@ -369,7 +369,7 @@ func defaultEngineConfig() (*EngineConfig, error) {
+ 	c.Retry = 3
+ 	c.OCIRuntimes = map[string][]string{
+ 		"crun": {
+-			"/usr/bin/crun",
++			"@TERMUX_PREFIX@/bin/crun",
+ 			"/usr/sbin/crun",
+ 			"/usr/local/bin/crun",
+ 			"/usr/local/sbin/crun",
+@@ -395,7 +395,7 @@ func defaultEngineConfig() (*EngineConfig, error) {
+ 			"/run/current-system/sw/bin/crun-wasm",
+ 		},
+ 		"runc": {
+-			"/usr/bin/runc",
++			"@TERMUX_PREFIX@/bin/runc",
+ 			"/usr/sbin/runc",
+ 			"/usr/local/bin/runc",
+ 			"/usr/local/sbin/runc",
+@@ -449,19 +449,19 @@ func defaultEngineConfig() (*EngineConfig, error) {
+ 	// Needs to be called after populating c.OCIRuntimes.
+ 	c.OCIRuntime = c.findRuntime()
+ 
+-	c.ConmonEnvVars.Set([]string{"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"})
++	c.ConmonEnvVars.Set([]string{"PATH=@TERMUX_PREFIX@/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"})
+ 	c.ConmonPath.Set([]string{
+-		"/usr/libexec/podman/conmon",
++		"@TERMUX_PREFIX@/libexec/podman/conmon",
+ 		"/usr/local/libexec/podman/conmon",
+ 		"/usr/local/lib/podman/conmon",
+-		"/usr/bin/conmon",
++		"@TERMUX_PREFIX@/bin/conmon",
+ 		"/usr/sbin/conmon",
+ 		"/usr/local/bin/conmon",
+ 		"/usr/local/sbin/conmon",
+ 		"/run/current-system/sw/bin/conmon",
+ 	})
+ 	c.ConmonRsPath.Set([]string{
+-		"/usr/libexec/podman/conmonrs",
++		"@TERMUX_PREFIX@/libexec/podman/conmonrs",
+ 		"/usr/local/libexec/podman/conmonrs",
+ 		"/usr/local/lib/podman/conmonrs",
+ 		"/usr/bin/conmonrs",
+diff --git a/vendor/go.podman.io/common/pkg/config/default_common.go b/vendor/go.podman.io/common/pkg/config/default_common.go
+index ea5ded363b..2c9b57648a 100644
+--- a/vendor/go.podman.io/common/pkg/config/default_common.go
++++ b/vendor/go.podman.io/common/pkg/config/default_common.go
+@@ -3,4 +3,4 @@
+ package config
+ 
+ // DefaultInitPath is the default path to the container-init binary.
+-var DefaultInitPath = "/usr/libexec/podman/catatonit"
++var DefaultInitPath = "@TERMUX_PREFIX@/libexec/podman/catatonit"
+diff --git a/vendor/go.podman.io/common/pkg/config/default_linux.go b/vendor/go.podman.io/common/pkg/config/default_linux.go
+index fdcc6f3912..0e56261014 100644
+--- a/vendor/go.podman.io/common/pkg/config/default_linux.go
++++ b/vendor/go.podman.io/common/pkg/config/default_linux.go
+@@ -14,7 +14,7 @@ func getDefaultTmpDir() string {
+ 	if path, found := os.LookupEnv("TMPDIR"); found {
+ 		return path
+ 	}
+-	return "/var/tmp"
++	return "@TERMUX_PREFIX@/var/tmp"
+ }
+ 
+ func getDefaultLockType() string {
+@@ -22,7 +22,7 @@ func getDefaultLockType() string {
+ }
+ 
+ func getLibpodTmpDir() string {
+-	return "/run/libpod"
++	return "@TERMUX_PREFIX@/var/run/libpod"
+ }
+ 
+ // getDefaultMachineVolumes returns default mounted volumes (possibly with env vars, which will be expanded).
+diff --git a/vendor/go.podman.io/common/pkg/config/default_unsupported.go b/vendor/go.podman.io/common/pkg/config/default_unsupported.go
+index 6b0ed468f0..6ed267c2d1 100644
+--- a/vendor/go.podman.io/common/pkg/config/default_unsupported.go
++++ b/vendor/go.podman.io/common/pkg/config/default_unsupported.go
+@@ -10,5 +10,5 @@ func getDefaultTmpDir() string {
+ 	if path, found := os.LookupEnv("TMPDIR"); found {
+ 		return path
+ 	}
+-	return "/var/tmp"
++	return "@TERMUX_PREFIX@/var/tmp"
+ }
+diff --git a/vendor/go.podman.io/common/pkg/hooks/hooks.go b/vendor/go.podman.io/common/pkg/hooks/hooks.go
+index cdcc7b8953..031bc13928 100644
+--- a/vendor/go.podman.io/common/pkg/hooks/hooks.go
++++ b/vendor/go.podman.io/common/pkg/hooks/hooks.go
+@@ -21,10 +21,10 @@ const Version = current.Version
+ 
+ const (
+ 	// DefaultDir is the default directory containing system hook configuration files.
+-	DefaultDir = "/usr/share/containers/oci/hooks.d"
++	DefaultDir = "@TERMUX_PREFIX@/share/containers/oci/hooks.d"
+ 
+ 	// OverrideDir is the directory for hook configuration files overriding the default entries.
+-	OverrideDir = "/etc/containers/oci/hooks.d"
++	OverrideDir = "@TERMUX_PREFIX@/etc/containers/oci/hooks.d"
+ )
+ 
+ // Manager provides an opaque interface for managing CRI-O hooks.
+diff --git a/vendor/go.podman.io/common/pkg/machine/machine.go b/vendor/go.podman.io/common/pkg/machine/machine.go
+index 566fefc0ac..551e2bc9aa 100644
+--- a/vendor/go.podman.io/common/pkg/machine/machine.go
++++ b/vendor/go.podman.io/common/pkg/machine/machine.go
+@@ -17,7 +17,7 @@ const (
+ 	// New marker file as of podman 6.0 since /etc/containers get overmounted.
+ 	markerFile = "/etc/podman-machine"
+ 	// Marker file prior to podman 6.0.
+-	markerFileOld = "/etc/containers/podman-machine"
++	markerFileOld = "@TERMUX_PREFIX@/etc/containers/podman-machine"
+ 	Wsl           = "wsl"
+ 	Qemu          = "qemu"
+ 	AppleHV       = "applehv"
+diff --git a/vendor/go.podman.io/common/pkg/netns/netns_linux.go b/vendor/go.podman.io/common/pkg/netns/netns_linux.go
+index cfa9dff44d..216947b23b 100644
+--- a/vendor/go.podman.io/common/pkg/netns/netns_linux.go
++++ b/vendor/go.podman.io/common/pkg/netns/netns_linux.go
+@@ -254,7 +254,7 @@ func GetNSRunDir() (string, error) {
+ 		}
+ 		return filepath.Join(rootlessDir, "netns"), nil
+ 	}
+-	return "/run/netns", nil
++	return "@TERMUX_PREFIX@/var/run/netns", nil
+ }
+ 
+ // NewNSAtPath creates a new persistent (bind-mounted) network namespace
+diff --git a/vendor/go.podman.io/common/pkg/subscriptions/subscriptions.go b/vendor/go.podman.io/common/pkg/subscriptions/subscriptions.go
+index a7f1b3f641..2251ddf6b6 100644
+--- a/vendor/go.podman.io/common/pkg/subscriptions/subscriptions.go
++++ b/vendor/go.podman.io/common/pkg/subscriptions/subscriptions.go
+@@ -20,10 +20,10 @@ import (
+ var (
+ 	// DefaultMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path".
+-	DefaultMountsFile = "/usr/share/containers/mounts.conf"
++	DefaultMountsFile = "@TERMUX_PREFIX@/share/containers/mounts.conf"
+ 	// OverrideMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path" overridden by the user.
+-	OverrideMountsFile = "/etc/containers/mounts.conf"
++	OverrideMountsFile = "@TERMUX_PREFIX@/etc/containers/mounts.conf"
+ 	// UserOverrideMountsFile holds the default mount paths in the form
+ 	// "host_path:container_path" overridden by the rootless user.
+ 	UserOverrideMountsFile = filepath.Join(os.Getenv("HOME"), ".config/containers/mounts.conf")
+diff --git a/vendor/go.podman.io/image/v5/docker/paths_common.go b/vendor/go.podman.io/image/v5/docker/paths_common.go
+index d9993630bc..ba6366ddfe 100644
+--- a/vendor/go.podman.io/image/v5/docker/paths_common.go
++++ b/vendor/go.podman.io/image/v5/docker/paths_common.go
+@@ -2,4 +2,4 @@
+ 
+ package docker
+ 
+-const etcDir = "/etc"
++const etcDir = "@TERMUX_PREFIX@/etc"
+diff --git a/vendor/go.podman.io/image/v5/docker/registries_d.go b/vendor/go.podman.io/image/v5/docker/registries_d.go
+index 4312ebb9bd..ac224ef99e 100644
+--- a/vendor/go.podman.io/image/v5/docker/registries_d.go
++++ b/vendor/go.podman.io/image/v5/docker/registries_d.go
+@@ -23,7 +23,7 @@ import (
+ var defaultUserDockerDir = filepath.FromSlash(".local/share/containers/sigstore")
+ 
+ // defaultDockerDir is the default lookaside directory for root
+-var defaultDockerDir = "/var/lib/containers/sigstore"
++var defaultDockerDir = "@TERMUX_PREFIX@/var/lib/containers/sigstore"
+ 
+ // registryConfiguration is one of the files configuring lookaside locations, or the result of merging them all.
+ // NOTE: Keep this in sync with docs/registries.d.md!
+diff --git a/vendor/go.podman.io/image/v5/internal/tmpdir/tmpdir.go b/vendor/go.podman.io/image/v5/internal/tmpdir/tmpdir.go
+index 634b2d0624..0ecd824310 100644
+--- a/vendor/go.podman.io/image/v5/internal/tmpdir/tmpdir.go
++++ b/vendor/go.podman.io/image/v5/internal/tmpdir/tmpdir.go
+@@ -15,7 +15,7 @@ var unixTempDirForBigFiles = builtinUnixTempDirForBigFiles
+ // builtinUnixTempDirForBigFiles is the directory path to store big files.
+ // Do not use the system default of os.TempDir(), usually /tmp, because with systemd it could be a tmpfs.
+ // DO NOT change this, instead see unixTempDirForBigFiles above.
+-const builtinUnixTempDirForBigFiles = "/var/tmp"
++const builtinUnixTempDirForBigFiles = "@TERMUX_PREFIX@/var/tmp"
+ 
+ const prefix = "container_images_"
+ 
+diff --git a/vendor/go.podman.io/image/v5/pkg/blobinfocache/default.go b/vendor/go.podman.io/image/v5/pkg/blobinfocache/default.go
+index e3c28d58c9..5014b7d051 100644
+--- a/vendor/go.podman.io/image/v5/pkg/blobinfocache/default.go
++++ b/vendor/go.podman.io/image/v5/pkg/blobinfocache/default.go
+@@ -17,7 +17,7 @@ const (
+ 	// If the format changes in an incompatible way, increase the version number.
+ 	blobInfoCacheFilename = "blob-info-cache-v1.sqlite"
+ 	// systemBlobInfoCacheDir is the directory containing the blob info cache (in blobInfocacheFilename) for root-running processes.
+-	systemBlobInfoCacheDir = "/var/lib/containers/cache"
++	systemBlobInfoCacheDir = "@TERMUX_PREFIX@/var/lib/containers/cache"
+ )
+ 
+ // blobInfoCacheDir returns a path to a blob info cache appropriate for sys and euid.
+diff --git a/vendor/go.podman.io/image/v5/pkg/docker/config/config.go b/vendor/go.podman.io/image/v5/pkg/docker/config/config.go
+index 755a495541..f2006fb07f 100644
+--- a/vendor/go.podman.io/image/v5/pkg/docker/config/config.go
++++ b/vendor/go.podman.io/image/v5/pkg/docker/config/config.go
+@@ -38,7 +38,7 @@ type dockerConfigFile struct {
+ }
+ 
+ var (
+-	defaultPerUIDPathFormat = filepath.FromSlash("/run/containers/%d/auth.json")
++	defaultPerUIDPathFormat = filepath.FromSlash("@TERMUX_PREFIX@/var/run/containers/%d/auth.json")
+ 	xdgConfigHomePath       = filepath.FromSlash("containers/auth.json")
+ 	xdgRuntimeDirPath       = filepath.FromSlash("containers/auth.json")
+ 	dockerHomePath          = filepath.FromSlash(".docker/config.json")
+diff --git a/vendor/go.podman.io/image/v5/pkg/sysregistriesv2/shortnames.go b/vendor/go.podman.io/image/v5/pkg/sysregistriesv2/shortnames.go
+index b0f9b55f25..5f2e8272c9 100644
+--- a/vendor/go.podman.io/image/v5/pkg/sysregistriesv2/shortnames.go
++++ b/vendor/go.podman.io/image/v5/pkg/sysregistriesv2/shortnames.go
+@@ -37,7 +37,7 @@ func shortNameAliasesConfPath(ctx *types.SystemContext) (string, error) {
+ 
+ 	if rootless.GetRootlessEUID() == 0 {
+ 		// Root user or in a non-conforming user NS
+-		return filepath.Join("/var/cache", userShortNamesFile), nil
++		return filepath.Join("@TERMUX_PREFIX@/var/cache", userShortNamesFile), nil
+ 	}
+ 
+ 	// Rootless user
+diff --git a/vendor/go.podman.io/storage/pkg/configfile/path.go b/vendor/go.podman.io/storage/pkg/configfile/path.go
+index d9443dd081..38f0fc2fb7 100644
+--- a/vendor/go.podman.io/storage/pkg/configfile/path.go
++++ b/vendor/go.podman.io/storage/pkg/configfile/path.go
+@@ -4,10 +4,10 @@ package configfile
+ 
+ const (
+ 	// builtinSystemConfigPath is the location for the default config files shipped by the distro/vendor.
+-	builtinSystemConfigPath = "/usr/share/containers"
++	builtinSystemConfigPath = "@TERMUX_PREFIX@/share/containers"
+ 
+ 	// builtinAdminOverrideConfigPath is the location for admin local override config files.
+-	builtinAdminOverrideConfigPath = "/etc/containers"
++	builtinAdminOverrideConfigPath = "@TERMUX_PREFIX@/etc/containers"
+ )
+ 
+ func getAdminOverrideConfigPath() string {
+diff --git a/vendor/go.podman.io/storage/pkg/homedir/homedir_unix.go b/vendor/go.podman.io/storage/pkg/homedir/homedir_unix.go
+index b088c2a85d..252599c3bf 100644
+--- a/vendor/go.podman.io/storage/pkg/homedir/homedir_unix.go
++++ b/vendor/go.podman.io/storage/pkg/homedir/homedir_unix.go
+@@ -153,7 +153,7 @@ func GetRuntimeDir() (string, error) {
+ 
+ 		uid := strconv.Itoa(unshare.GetRootlessUID())
+ 		if runtimeDir == "" {
+-			tmpDir := filepath.Join("/run", "user", uid)
++			tmpDir := filepath.Join("@TERMUX_PREFIX@/var/run", "user", uid)
+ 			if err := os.MkdirAll(tmpDir, 0o700); err != nil {
+ 				logrus.Debug(err)
+ 			}
+diff --git a/vendor/go.podman.io/storage/types/options_linux.go b/vendor/go.podman.io/storage/types/options_linux.go
+index 1f70b9c7a2..00f950d721 100644
+--- a/vendor/go.podman.io/storage/types/options_linux.go
++++ b/vendor/go.podman.io/storage/types/options_linux.go
+@@ -3,6 +3,6 @@ package types
+ const (
+ 	// these are default path for run and graph root for rootful users
+ 	// for rootless path is constructed via getRootlessStorageOpts
+-	defaultRunRoot   string = "/run/containers/storage"
+-	defaultGraphRoot string = "/var/lib/containers/storage"
++	defaultRunRoot   string = "@TERMUX_PREFIX@/var/run/containers/storage"
++	defaultGraphRoot string = "@TERMUX_PREFIX@/var/lib/containers/storage"
+ )

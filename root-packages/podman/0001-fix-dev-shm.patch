@@ -1,0 +1,135 @@
+diff --git a/libpod/lock/shm/shm_lock.go b/libpod/lock/shm/shm_lock.go
+index fcb3374d53..ded5a5b7aa 100644
+--- a/libpod/lock/shm/shm_lock.go
++++ b/libpod/lock/shm/shm_lock.go
+@@ -2,7 +2,6 @@
+ 
+ package shm
+ 
+-// #cgo LDFLAGS: -lrt -lpthread
+ // #cgo CFLAGS: -Wall -Werror
+ // #include <stdlib.h>
+ // #include <sys/types.h>
+diff --git a/libpod/lock/shm/shm_lock.h b/libpod/lock/shm/shm_lock.h
+index a09cc81e2c..066f8f371f 100644
+--- a/libpod/lock/shm/shm_lock.h
++++ b/libpod/lock/shm/shm_lock.h
+@@ -3,7 +3,64 @@
+ 
+ #include <pthread.h>
+ #include <stdint.h>
++#ifdef __ANDROID__
++#include <errno.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <unistd.h>
+ 
++#if __ANDROID_API__ < 28
++#ifndef PTHREAD_MUTEX_ROBUST
++#define PTHREAD_MUTEX_ROBUST 1
++#endif
++
++__attribute__((unused))
++static int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness) {
++	(void)attr;
++	(void)robustness;
++	return 0;
++}
++
++__attribute__((unused))
++static int pthread_mutex_consistent(pthread_mutex_t *mutex) {
++	(void)mutex;
++	return 0;
++}
++#endif
++
++__attribute__((unused))
++static int android_shm_path(const char *name, char *buf, size_t len) {
++	while (*name == '/') name++;
++	if (*name == '\0' || strchr(name, '/') != NULL) {
++		errno = EINVAL;
++		return -1;
++	}
++	(void)mkdir("@TERMUX_PREFIX@/var/run/shm", 0755);
++	int n = snprintf(buf, len, "@TERMUX_PREFIX@/var/run/shm/%s", name);
++	if (n < 0 || (size_t)n >= len) {
++		errno = ENAMETOOLONG;
++		return -1;
++	}
++	return 0;
++}
++
++__attribute__((unused))
++static int shm_open(const char *name, int oflag, mode_t mode) {
++	char path[PATH_MAX];
++	if (android_shm_path(name, path, sizeof(path)) < 0) return -1;
++	return open(path, oflag | O_NOFOLLOW | O_CLOEXEC, mode);
++}
++
++__attribute__((unused))
++static int shm_unlink(const char *name) {
++	char path[PATH_MAX];
++	if (android_shm_path(name, path, sizeof(path)) < 0) return -1;
++	return unlink(path);
++}
++#endif
+ // Magic number to ensure we open the right SHM segment
+ #define MAGIC 0x87D1
+ 
+diff --git a/pkg/rootless/rootless_linux.c b/pkg/rootless/rootless_linux.c
+index 778668c3ae..1f3043ce79 100644
+--- a/pkg/rootless/rootless_linux.c
++++ b/pkg/rootless/rootless_linux.c
+@@ -30,6 +30,12 @@
+ /* Copied from /usr/include/linux/fcntl.h.  */
+ #define FD_NSFS_ROOT -10003
+ #endif
++#ifdef __ANDROID__
++#include <sys/syscall.h>
++#ifndef MAX_HANDLE_SZ
++#define MAX_HANDLE_SZ 128
++#endif
++#endif
+ 
+ /* Used by name_to_handle_at/open_by_handle_at.  */
+ struct ns_file_handle
+@@ -38,7 +44,18 @@ struct ns_file_handle
+   int handle_type;
+   unsigned char f_handle[MAX_HANDLE_SZ];
+ };
++#ifdef __ANDROID__
++__attribute__((unused))
++static int name_to_handle_at(int dirfd, const char *pathname,
++                             struct ns_file_handle *handle, int *mount_id, int flags) {
++	return (int)syscall(__NR_name_to_handle_at, dirfd, pathname, handle, mount_id, flags);
++}
+ 
++__attribute__((unused))
++static int open_by_handle_at(int mount_fd, struct ns_file_handle *handle, int flags) {
++	return (int)syscall(__NR_open_by_handle_at, mount_fd, handle, flags);
++}
++#endif
+ struct ns_handles
+ {
+   struct ns_file_handle userns;
+diff --git a/vendor/go.podman.io/storage/pkg/unshare/unshare.c b/vendor/go.podman.io/storage/pkg/unshare/unshare.c
+index a2800654f9..7d6bfb3d52 100644
+--- a/vendor/go.podman.io/storage/pkg/unshare/unshare.c
++++ b/vendor/go.podman.io/storage/pkg/unshare/unshare.c
+@@ -50,6 +50,13 @@
+ #ifndef F_SEAL_WRITE
+ #define F_SEAL_WRITE  0x0008LU
+ #endif
++#if defined(__ANDROID__) && __ANDROID_API__ < 28
++static int fexecve(int fd, char *const argv[], char *const envp[]) {
++	char buf[64];
++	snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fd);
++	return execve(buf, argv, envp);
++}
++#endif
+ 
+ #define BUFSTEP 1024
+ 
