@@ -551,6 +551,15 @@ separated by commas.
 `TERMUX_PKG_SRCURL` should contain URL only for the official source bundle.
 Use of forks is allowed only under a good reason.
 
+`TERMUX_PKG_SRCURL_FALLBACKS` can optionally define an array of fallback mirror URLs for the source archive if the primary host is temporarily unreachable or experiencing downtime:
+```sh
+TERMUX_PKG_SRCURL_FALLBACKS=(
+	"https://mirror1.example.org/foo-${TERMUX_PKG_VERSION}.tar.gz"
+	"https://mirror2.example.org/foo-${TERMUX_PKG_VERSION}.tar.gz"
+)
+```
+Fallback archives must be bit-for-bit identical to the official source archive to match `TERMUX_PKG_SHA256`. Fallback mirrors are currently only supported for single-archive packages, and cannot be used with `git+` repositories.
+
 Variable assignments containing `$VARIABLE` or `$(command substition)` expansions should be "quoted".
 
 For more about `build.sh` variables read the [developer's wiki](https://github.com/termux/termux-packages/wiki/Creating-new-package#table-of-available-package-control-fields).

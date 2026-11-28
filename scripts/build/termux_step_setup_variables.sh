@@ -161,6 +161,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_SHA256=""
+	TERMUX_PKG_SRCURL_FALLBACKS=()
 	TERMUX_PKG_SRCDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/src
 	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp

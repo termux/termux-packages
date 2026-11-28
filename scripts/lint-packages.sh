@@ -614,6 +614,43 @@ lint_package() {
 			fi
 		fi
 
+		if (( ${#TERMUX_PKG_SRCURL_FALLBACKS[@]} )); then
+			echo -n "TERMUX_PKG_SRCURL_FALLBACKS: "
+			if (( ${#TERMUX_PKG_SRCURL} == 0 )); then
+				echo "INVALID (TERMUX_PKG_SRCURL_FALLBACKS cannot be used when TERMUX_PKG_SRCURL is not set)"
+				pkg_lint_error=true
+			elif [[ "${TERMUX_PKG_SRCURL:0:4}" == 'git+' ]]; then
+				echo "INVALID (TERMUX_PKG_SRCURL_FALLBACKS cannot be used with git repositories)"
+				pkg_lint_error=true
+			elif (( ${#TERMUX_PKG_SRCURL[@]} > 1 )); then
+				echo "INVALID (TERMUX_PKG_SRCURL_FALLBACKS is not supported for packages with multiple TERMUX_PKG_SRCURL entries)"
+				pkg_lint_error=true
+			else
+				local fallbacks_ok=true
+				for i in "${!TERMUX_PKG_SRCURL_FALLBACKS[@]}"; do
+					fallback_url="${TERMUX_PKG_SRCURL_FALLBACKS[$i]}"
+					if (( ${#fallback_url} == 0 )); then
+						echo "NOT SET (\${TERMUX_PKG_SRCURL_FALLBACKS[$i]} has no value)"
+						pkg_lint_error=true
+						fallbacks_ok=false
+						break
+					elif [[ "$fallback_url" =~ [[:space:]] ]]; then
+						echo "MALFORMED (\${TERMUX_PKG_SRCURL_FALLBACKS[$i]} contains whitespace)"
+						pkg_lint_error=true
+						fallbacks_ok=false
+						break
+					elif [[ ! "$fallback_url" =~ ^(https?|ftp):// ]]; then
+						echo "MALFORMED (\${TERMUX_PKG_SRCURL_FALLBACKS[$i]} must use http(s):// or ftp://)"
+						pkg_lint_error=true
+						fallbacks_ok=false
+						break
+					fi
+				done
+				[[ "$fallbacks_ok" == 'true' ]] && echo "PASS"
+				unset i fallbacks_ok fallback_url
+			fi
+		fi
+
 		if (( ${#TERMUX_PKG_METAPACKAGE} )); then
 		echo -n "TERMUX_PKG_METAPACKAGE: "
 
