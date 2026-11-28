@@ -1,0 +1,14 @@
+To fix error `dlopen failed: cannot locate symbol "meta_plugin_get_type"`
+
+See https://github.com/android-ndk/ndk/issues/201
+
+--- a/src/compositor/plugins/meson.build
++++ b/src/compositor/plugins/meson.build
+@@ -12,6 +12,7 @@
+     glib_dep,
+     gsettings_desktop_schemas_dep,
+     libmutter_clutter_dep,
++    libmutter_dep,
+   ],
+   install_dir: pkglibdir / 'plugins',
+   install_rpath: pkglibdir,

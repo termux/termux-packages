@@ -1,0 +1,35 @@
+From 4726c280cea4ef689119415aa96ccf98b9229aeb Mon Sep 17 00:00:00 2001
+From: Md Arif <111168803+sabamdarif@users.noreply.github.com>
+Date: Fri, 11 Jul 2025 10:12:34 +0530
+Subject: [PATCH] getpwent
+
+---
+ src/nautilus-file.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/nautilus-file.c b/src/nautilus-file.c
+index 5a7629c..8270569 100644
+--- a/src/nautilus-file.c
++++ b/src/nautilus-file.c
+@@ -5846,6 +5846,10 @@ nautilus_file_set_owner (NautilusFile                  *file,
+ GList *
+ nautilus_get_user_names (void)
+ {
++#ifdef __ANDROID__
++    /* Not supported on Android. */
++    return NULL;
++#else
+     GList *list;
+     char *real_name, *name;
+     struct passwd *user;
+@@ -5872,6 +5876,7 @@ nautilus_get_user_names (void)
+     endpwent ();
+ 
+     return g_list_sort (list, (GCompareFunc) g_utf8_collate);
++#endif
+ }
+ 
+ /**
+-- 
+2.48.1
+

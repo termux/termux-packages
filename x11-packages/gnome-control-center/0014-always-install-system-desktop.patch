@@ -1,0 +1,18 @@
+--- a/panels/system/meson.build
++++ b/panels/system/meson.build
+@@ -1,7 +1,6 @@
+ panels_list += cappletname
+ desktop = 'gnome-@0@-panel.desktop'.format(cappletname)
+ 
+-if build_with_polkit
+ i18n.merge_file(
+   type: 'desktop',
+   input: desktop + '.in',
+@@ -11,6 +10,7 @@
+   install_dir: control_center_desktopdir
+ )
+ 
++if build_with_polkit
+ polkit = 'org.gnome.controlcenter.user-accounts.policy'.format(cappletname)
+ i18n.merge_file(
+   input: 'users/' + polkit + '.in',
