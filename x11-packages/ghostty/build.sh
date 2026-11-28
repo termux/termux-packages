@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, feature-rich, GPU-accelerated terminal emulator (G
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Gouranga Das Samrat <gouranga.das.khulna@gmail.com>"
 TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_REVISION=1
 # Release tarball ships prebuilt GTK resources
 TERMUX_PKG_SRCURL="https://release.files.ghostty.org/${TERMUX_PKG_VERSION}/ghostty-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=cb188ac6c3a8278d5fd7bfef15d8c017104c87f638b5560eb38024a71ae0f005
@@ -95,6 +96,15 @@ termux_step_make_install() {
 	local _staging="${TERMUX_PKG_TMPDIR}/ghostty-prefix"
 	grep -rIl --null -F "${_staging}" "${_staging}/share" "${_staging}/lib" 2>/dev/null |
 		xargs -0 -r sed -i "s|${_staging}|${TERMUX_PREFIX}|g"
+
+	# Provided by the libghostty-vt package
+	rm -rf "${_staging}"/lib/libghostty-vt.* \
+		"${_staging}"/lib/cmake/ghostty-vt \
+		"${_staging}"/share/pkgconfig/libghostty-vt.pc \
+		"${_staging}"/share/pkgconfig/libghostty-vt-static.pc \
+		"${_staging}"/include/ghostty/vt.h \
+		"${_staging}"/include/ghostty/vt
+	rmdir --ignore-fail-on-non-empty "${_staging}"/include/ghostty "${_staging}"/include 2>/dev/null || :
 
 	cp -a "${_staging}/." "${TERMUX_PREFIX}/"
 }
