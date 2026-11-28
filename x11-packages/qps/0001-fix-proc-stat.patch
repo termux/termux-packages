@@ -1,0 +1,71 @@
+From 33a603fab75c5f5cad773a41ef389331e3b80c4f Mon Sep 17 00:00:00 2001
+From: lumaparallax <257510328+lumaparallax@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 14:35:02 +0900
+Subject: [PATCH] fix proc stat
+
+---
+ src/proc.cpp | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+diff --git a/src/proc.cpp b/src/proc.cpp
+index 8ade56a..ac030e7 100644
+--- a/src/proc.cpp
++++ b/src/proc.cpp
+@@ -113,7 +113,54 @@ inline int read_file(char *name, char *buf, int max)
+ {
+     int fd = open(name, O_RDONLY);
+     if (fd < 0)
++    {
++#ifdef __ANDROID__
++        if (strcmp(name, "/proc/loadavg") == 0)
++            return snprintf(buf, max, "0.00 0.00 0.00 1/1 1\n");
++        if (strcmp(name, "/proc/stat") == 0)
++        {
++            static struct timespec prev_ts = {0, 0};
++            static unsigned idle_ticks = 0;
++            struct timespec now_ts;
++            clock_gettime(CLOCK_MONOTONIC, &now_ts);
++            long ticks = sysconf(_SC_CLK_TCK);
++            if (ticks <= 0)
++                ticks = 100;
++            if (prev_ts.tv_sec == 0 && prev_ts.tv_nsec == 0)
++            {
++                idle_ticks = (unsigned)ticks;
++            }
++            else
++            {
++                double elapsed = (now_ts.tv_sec - prev_ts.tv_sec) +
++                                 (now_ts.tv_nsec - prev_ts.tv_nsec) / 1e9;
++                unsigned delta = (unsigned)(elapsed * ticks);
++                idle_ticks += delta > 0 ? delta : 1;
++            }
++            prev_ts = now_ts;
++
++            struct timespec boot_ts;
++            unsigned btime = (clock_gettime(CLOCK_BOOTTIME, &boot_ts) == 0)
++                                 ? (unsigned)(time(nullptr) - boot_ts.tv_sec)
++                                 : (unsigned)time(nullptr);
++
++            int ncpus = (int)sysconf(_SC_NPROCESSORS_CONF);
++            if (ncpus <= 0)
++                ncpus = 1;
++            if (ncpus > 128)
++                ncpus = 128;
++
++            int len = snprintf(buf, max, "cpu  0 0 0 %u 0 0 0 0 0\n", idle_ticks);
++            for (int i = 0; i < ncpus && len < max; i++)
++                len += snprintf(buf + len, max - len, "cpu%d 0 0 0 %u 0 0 0 0 0\n",
++                                i, idle_ticks / ncpus);
++            if (len < max)
++                len += snprintf(buf + len, max - len, "btime %u\n", btime);
++            return len < max ? len : max - 1;
++        }
++#endif
+         return -1;
++    }
+     int r = read(fd, buf, max);
+     close(fd);
+     //	buf[r]=0;
+-- 
+2.56.1
+
