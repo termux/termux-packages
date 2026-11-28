@@ -1,0 +1,20 @@
+--- a/ip.h
++++ b/ip.h
+@@ -64,6 +64,7 @@
+ 		.daddr		= IN6ADDR_ANY_INIT,			\
+ 	}
+ 
++#ifndef _UAPI_IPV6_H
+ struct ipv6hdr {
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+@@ -91,7 +92,8 @@
+ 	/*
+ 	 * TLV encoded option data follows.
+ 	 */
+-} __attribute__((packed));	/* required for some archs */
++} __attribute__((packed));
++#endif	/* required for some archs */
+ 
+ /**
+  * ip6_set_flow_lbl() - Set flow label in an IPv6 header

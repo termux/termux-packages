@@ -1,0 +1,18 @@
+diff '--color=auto' -ruN a/isolation.c b/isolation.c
+--- a/isolation.c	2026-10-03 05:05:26.000000000 +0800
++++ b/isolation.c	2026-11-28 19:05:36.752252451 +0800
+@@ -454,8 +454,13 @@
+ 		ns_caps |= BIT(CAP_NET_BIND_SERVICE);
+ 		/* Keep CAP_SYS_PTRACE to join the netns of an
+ 		 * existing process */
+-		if (*userns || !use_userns)
++		if (*userns || !use_userns) {
+ 			ns_caps |= BIT(CAP_SYS_PTRACE);
++#ifdef __BIONIC__
++			if (!geteuid())
++				ns_caps |= BIT(CAP_DAC_OVERRIDE);
++#endif
++		}
+ 	}
+ 
+ 	drop_caps_ep_except(ns_caps);
