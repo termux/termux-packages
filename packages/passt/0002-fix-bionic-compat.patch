@@ -1,0 +1,69 @@
+diff '--color=auto' -ruN a/checksum.c b/checksum.c
+--- a/checksum.c	2026-10-03 05:05:26.000000000 +0800
++++ b/checksum.c	2026-11-28 18:02:13.691951135 +0800
+@@ -58,6 +58,7 @@
+ 
+ #include "util.h"
+ #include "ip.h"
++#include <netinet/udp.h>
+ #include "checksum.h"
+ #include "iov.h"
+ 
+diff '--color=auto' -ruN a/passt.h b/passt.h
+--- a/passt.h	2026-10-03 05:05:26.000000000 +0800
++++ b/passt.h	2026-11-28 18:02:13.691843105 +0800
+@@ -27,6 +27,16 @@
+ #include "tcp.h"
+ #include "udp.h"
+ #include "vhost_user.h"
++#include <inttypes.h>
++#ifndef MAXNS
++#define MAXNS 3
++#endif
++#ifndef MAXDNSRCH
++#define MAXDNSRCH 6
++#endif
++#ifndef _PATH_LOG
++#define _PATH_LOG "/dev/log"
++#endif
+ 
+ /* Default address for our end on the tap interface.  Bit 0 of byte 0 must be 0
+  * (unicast) and bit 1 of byte 1 must be 1 (locally administered).  Otherwise
+diff '--color=auto' -ruN a/tcp.c b/tcp.c
+--- a/tcp.c	2026-10-03 05:05:26.000000000 +0800
++++ b/tcp.c	2026-11-28 18:02:13.695890671 +0800
+@@ -327,7 +327,7 @@
+  */
+ #define OPTLEN_MAX (((1UL << 4) - 1 - 5) * 4UL)
+ 
+-#ifndef __USE_MISC
++#if !defined(__USE_MISC) && !defined(__BIONIC__)
+ /* From Linux UAPI, missing in netinet/tcp.h provided by musl */
+ struct tcp_repair_opt {
+ 	__u32	opt_code;
+@@ -764,7 +764,7 @@
+ 	for (i = 0; i < LOW_RTT_TABLE_SIZE; i++) {
+ 		if (inany_equals(&tapside->oaddr, low_rtt_dst + i))
+ 			return;
+-		if (hole == -1 && IN6_IS_ADDR_UNSPECIFIED(low_rtt_dst + i))
++		if (hole == -1 && IN6_IS_ADDR_UNSPECIFIED((const struct in6_addr *)(low_rtt_dst + i)))
+ 			hole = i;
+ 	}
+ 
+diff '--color=auto' -ruN a/virtio.c b/virtio.c
+--- a/virtio.c	2026-10-03 05:05:26.000000000 +0800
++++ b/virtio.c	2026-11-28 18:02:13.696094167 +0800
+@@ -183,6 +183,13 @@
+ 	return le16toh(*virtq_used_event(vq));
+ }
+ 
++#ifdef __BIONIC__
++static inline int vring_need_event(uint16_t event_idx, uint16_t new_idx, uint16_t old)
++{
++	return (uint16_t)(new_idx - event_idx - 1) < (uint16_t)(new_idx - old);
++}
++#endif
++
+ /**
+  * virtqueue_get_head() - Get the head of the descriptor chain for a given
+  *                        index
