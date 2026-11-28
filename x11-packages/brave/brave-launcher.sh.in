@@ -1,0 +1,35 @@
+#!@TERMUX_PREFIX@/bin/sh
+
+# Based on the chromium launcher of Alpine aports.
+
+# Read user flag overrides from the config directory.
+for f in @TERMUX_PREFIX@/etc/brave/*.conf; do
+    [ -f "${f}" ] && . "${f}"
+done
+
+# Prefer flags from the environment over the system defaults.
+BRAVE_FLAGS=${BRAVE_USER_FLAGS:-"$BRAVE_FLAGS"}
+
+export CHROME_WRAPPER=$(readlink -f "$0")
+PROGDIR=${CHROME_WRAPPER%/*}
+
+case ":$PATH:" in
+  *:$PROGDIR:*)
+    ;;
+  *)
+    export PATH="$PATH:$PROGDIR"
+    ;;
+esac
+
+# Brave reads its release channel from this variable.
+export CHROME_VERSION_EXTRA=stable
+
+# Chromium refuses to start as root unless the data dir is given.
+if [ $(id -u) -eq 0 ] && [ $(stat -c %u -L ${XDG_CONFIG_HOME:-${HOME}}) -eq 0 ]; then
+	BRAVE_FLAGS="--user-data-dir=${XDG_CONFIG_HOME:-${HOME}/.config}/BraveSoftware/Brave-Browser
+		${BRAVE_FLAGS}"
+fi
+
+export CHROME_DESKTOP="brave-browser.desktop"
+
+exec "$PROGDIR/brave" ${BRAVE_FLAGS} "$@"

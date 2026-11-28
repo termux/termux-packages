@@ -1,0 +1,17 @@
+Do not list web-discovery-project/.git/HEAD as an input of the WDP build action.
+The sources come from a release tarball, so there is no .git directory and ninja
+fails with "missing and no known rule to make it". The build itself does not use git
+(fern builds with --version package and no versionDistance); package.json stays as
+the rebuild trigger.
+
+diff --git a/brave/components/brave_extension/BUILD.gn b/brave/components/brave_extension/BUILD.gn
+--- a/brave/components/brave_extension/BUILD.gn
++++ b/brave/components/brave_extension/BUILD.gn
+@@ -36,7 +36,6 @@
+     # TODO(petemill): Have WDP use webpack (or another way) to spit out
+     # a depfile which automatically lists all the input files used to generate
+     # the WDP build.
+-    "//brave/vendor/web-discovery-project/.git/HEAD",
+     "//brave/vendor/web-discovery-project/package.json",
+   ]
+ 

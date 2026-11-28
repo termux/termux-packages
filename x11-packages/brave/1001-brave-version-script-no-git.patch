@@ -1,0 +1,31 @@
+Let brave/build/util/version.py work on a source tarball that has no git metadata,
+by falling back to the .chromium sidecar or the current chrome/VERSION.
+
+diff --git a/brave/build/util/version.py b/brave/build/util/version.py
+index d489e54..8412256 100755
+--- a/brave/build/util/version.py
++++ b/brave/build/util/version.py
+@@ -164,6 +164,14 @@ class Versioner:
+             encoding='utf-8',
+         )
+ 
++    def _upstream_contents(self) -> str:
++        try:
++            return self._git_head_contents()
++        except (subprocess.CalledProcessError, FileNotFoundError, ValueError):
++            if self._sidecar.exists():
++                return self._sidecar.read_text(encoding='utf-8')
++            return self._version_file.read_text(encoding='utf-8')
++
+     def gen(self) -> None:
+         """Generates //brave/build/version.gni from the version files.
+ 
+@@ -215,7 +223,7 @@ class Versioner:
+ 
+         # MAJOR (the Chromium milestone) comes from the unpatched git HEAD copy;
+         # MINOR/BUILD/PATCH hold the Brave major/minor/build.
+-        upstream = self._git_head_contents()
++        upstream = self._upstream_contents()
+         current = _parse_version(upstream)
+         values = {
+             'MAJOR': current['MAJOR'],

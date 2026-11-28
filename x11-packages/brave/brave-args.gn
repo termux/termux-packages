@@ -1,0 +1,19 @@
+import("//brave/build/args/brave_defaults.gni")
+import("//brave/build/args/blink_platform_defaults.gni")
+import("//brave/build/args/branding_defaults.gni")
+import("//brave/build/args/desktop_defaults.gni")
+# Widevine and Tor ship glibc binaries that cannot run here
+enable_widevine = false
+enable_tor = false
+# Updates come from the package manager
+enable_update_notifications = false
+enable_hangout_services_extension = false
+enable_cdm_host_verification = false
+skip_signing = true
+brave_channel = ""
+# Official builds assert that these service keys are set. The real keys are Brave's
+# secrets, so use placeholders; the services they guard won't accept them.
+brave_services_key = "dummy"
+service_key_search = "dummy"
+service_key_stt = "dummy"
+service_key_aichat = "dummy"
