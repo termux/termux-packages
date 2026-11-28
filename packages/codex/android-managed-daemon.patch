@@ -1,0 +1,517 @@
+diff --git a/codex-rs/app-server-daemon/src/backend/pid.rs b/codex-rs/app-server-daemon/src/backend/pid.rs
+index 97738dd..f342478 100644
+--- a/codex-rs/app-server-daemon/src/backend/pid.rs
++++ b/codex-rs/app-server-daemon/src/backend/pid.rs
+@@ -23,7 +23,7 @@ use serde::Serialize;
+ use tokio::fs;
+ use tokio::io::AsyncReadExt;
+ use tokio::io::AsyncSeekExt;
+-#[cfg(unix)]
++#[cfg(all(unix, not(target_os = "android")))]
+ use tokio::process::Command;
+ use tokio::time::sleep;
+ 
+@@ -616,14 +616,25 @@ async fn process_matches_record(record: &PidRecord) -> Result<bool> {
+     }
+ 
+     let details = async {
+-        #[cfg(any(target_os = "linux", target_os = "macos"))]
++        #[cfg(any(target_os = "linux", target_os = "macos", target_os = "android"))]
+         if let Some(expected) = &record.process_identity {
+             return expected.matches_process(record.pid).await;
+         }
+         let (state, start_time) = read_process_details(record.pid).await?;
+-        let matches = start_time == record.process_start_time;
++        #[allow(unused_mut)] // Android legacy tick records refine this comparison.
++        let mut matches = start_time == record.process_start_time;
+         let is_zombie = state.starts_with('Z');
+         if !matches && !is_zombie {
++            #[cfg(target_os = "android")]
++            match legacy_ticks_match(&record.process_start_time, &start_time) {
++                Some(ticks_match) => matches = ticks_match,
++                None => bail!(
++                    "cannot verify pid-managed process {}: legacy start time changed; PID record retained. \
++                     Retry after stopping the original process if its start time cannot be verified",
++                    record.pid
++                ),
++            }
++            #[cfg(not(target_os = "android"))]
+             bail!(
+                 "cannot verify pid-managed process {}: legacy start time changed; PID record retained. \
+                  Retry with the locale and timezone used to start the daemon. If the system clock \
+@@ -652,6 +663,11 @@ async fn process_matches_record(record: &PidRecord) -> Result<bool> {
+     }
+ }
+ 
++#[cfg(any(test, target_os = "android"))]
++fn legacy_ticks_match(recorded: &str, live: &str) -> Option<bool> {
++    Some(recorded.trim().parse::<u64>().ok()? == live.trim().parse::<u64>().ok()?)
++}
++
+ #[cfg(not(any(unix, windows)))]
+ async fn process_matches_record(_record: &PidRecord) -> Result<bool> {
+     Ok(false)
+@@ -814,7 +830,31 @@ async fn read_process_start_time(pid: u32) -> Result<String> {
+     Ok(read_process_details(pid).await?.1)
+ }
+ 
+-#[cfg(unix)]
++#[cfg(target_os = "android")]
++async fn read_process_details(pid: u32) -> Result<(String, String)> {
++    let stat = tokio::fs::read_to_string(format!("/proc/{pid}/stat"))
++        .await
++        .with_context(|| format!("failed to read /proc/{pid}/stat"))?;
++    parse_proc_stat_details(&stat, pid)
++}
++
++#[cfg(any(test, target_os = "android"))]
++fn parse_proc_stat_details(stat: &str, pid: u32) -> Result<(String, String)> {
++    let after_comm = stat
++        .rfind(')')
++        .with_context(|| format!("malformed /proc/{pid}/stat: missing closing paren"))?;
++    let fields: Vec<&str> = stat[after_comm + 1..].split_whitespace().collect();
++    let state = fields
++        .first()
++        .with_context(|| format!("malformed /proc/{pid}/stat: state field missing"))?;
++    // Field 22 overall is index 19 after the PID and comm fields.
++    let starttime = fields
++        .get(19)
++        .with_context(|| format!("malformed /proc/{pid}/stat: starttime field missing"))?;
++    Ok(((*state).to_string(), (*starttime).to_string()))
++}
++
++#[cfg(all(unix, not(target_os = "android")))]
+ async fn read_process_details(pid: u32) -> Result<(String, String)> {
+     let output = Command::new("ps")
+         .args(["-p", &pid.to_string(), "-o", "stat=", "-o", "lstart="])
+diff --git a/codex-rs/app-server-daemon/src/backend/pid_identity.rs b/codex-rs/app-server-daemon/src/backend/pid_identity.rs
+index ea631a3..e717ed5 100644
+--- a/codex-rs/app-server-daemon/src/backend/pid_identity.rs
++++ b/codex-rs/app-server-daemon/src/backend/pid_identity.rs
+@@ -1,9 +1,9 @@
+ //! Native process identities and zombie state, independent of locale and timezone.
+ //! Boot IDs prevent records surviving reboot from matching reused process identifiers.
+ 
+-#[cfg(any(target_os = "linux", target_os = "macos", test))]
++#[cfg(any(target_os = "linux", target_os = "macos", target_os = "android", test))]
+ use anyhow::Context;
+-#[cfg(any(target_os = "linux", target_os = "macos", test))]
++#[cfg(any(target_os = "linux", target_os = "macos", target_os = "android", test))]
+ use anyhow::Result;
+ use serde::Deserialize;
+ use serde::Serialize;
+@@ -28,7 +28,7 @@ pub(super) enum ProcessIdentity {
+     },
+ }
+ 
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "macos", target_os = "android"))]
+ impl ProcessIdentity {
+     pub(super) async fn matches_process(&self, pid: u32) -> Result<(bool, bool)> {
+         // A different boot proves staleness even when the reused PID is inaccessible.
+@@ -65,7 +65,7 @@ impl ProcessIdentity {
+     }
+ }
+ 
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "macos", target_os = "android"))]
+ impl super::PidBackend {
+     pub(crate) async fn promote_legacy_identity(&self) -> Result<()> {
+         let _reservation = self.acquire_reservation_lock().await?;
+@@ -193,7 +193,7 @@ async fn read_boot_id() -> Result<String> {
+         .to_owned())
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ pub(super) async fn read_process_details(pid: u32) -> Result<(bool, ProcessIdentity)> {
+     let stat = tokio::fs::read(format!("/proc/{pid}/stat"))
+         .await
+@@ -208,7 +208,7 @@ pub(super) async fn read_process_details(pid: u32) -> Result<(bool, ProcessIdent
+     ))
+ }
+ 
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "android"))]
+ async fn read_boot_id() -> Result<String> {
+     let boot_id = tokio::fs::read_to_string("/proc/sys/kernel/random/boot_id")
+         .await
+@@ -218,7 +218,7 @@ async fn read_boot_id() -> Result<String> {
+     Ok(boot_id.to_owned())
+ }
+ 
+-#[cfg(any(target_os = "linux", test))]
++#[cfg(any(target_os = "linux", target_os = "android", test))]
+ fn parse_stat(stat: &[u8]) -> Result<(String, u64)> {
+     // comm (field 2) can contain spaces and closing parentheses. The final ')'
+     // terminates it; splitting the whole line on whitespace miscounts fields.
+diff --git a/codex-rs/app-server-daemon/src/backend/pid_identity_tests.rs b/codex-rs/app-server-daemon/src/backend/pid_identity_tests.rs
+index 0454e52..68fbca9 100644
+--- a/codex-rs/app-server-daemon/src/backend/pid_identity_tests.rs
++++ b/codex-rs/app-server-daemon/src/backend/pid_identity_tests.rs
+@@ -25,7 +25,7 @@ fn reads_earlier_linux_identity_field() {
+     assert_eq!(serde_json::to_value(record).unwrap(), expected);
+ }
+ 
+-#[cfg(any(target_os = "linux", target_os = "macos"))]
++#[cfg(any(target_os = "linux", target_os = "macos", target_os = "android"))]
+ #[tokio::test]
+ async fn previous_boot_does_not_require_process_inspection() {
+     let (_, identity) = super::read_process_details(std::process::id())
+diff --git a/codex-rs/app-server-daemon/src/backend/pid_start.rs b/codex-rs/app-server-daemon/src/backend/pid_start.rs
+index e6a3998..f67dcf7 100644
+--- a/codex-rs/app-server-daemon/src/backend/pid_start.rs
++++ b/codex-rs/app-server-daemon/src/backend/pid_start.rs
+@@ -242,12 +242,12 @@ impl PidBackend {
+         let started = std::time::Instant::now();
+         let record = async {
+             let process_start_time = read_process_start_time(pid).await?;
+-            #[cfg(any(target_os = "linux", target_os = "macos"))]
++            #[cfg(any(target_os = "linux", target_os = "macos", target_os = "android"))]
+             let process_identity = super::identity::read_process_details(pid)
+                 .await
+                 .ok()
+                 .map(|(_, identity)| identity);
+-            #[cfg(not(any(target_os = "linux", target_os = "macos")))]
++            #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "android")))]
+             let process_identity = None;
+             anyhow::Ok(PidRecord {
+                 pid,
+diff --git a/codex-rs/app-server-daemon/src/backend/pid_tests.rs b/codex-rs/app-server-daemon/src/backend/pid_tests.rs
+index 928192b..56df4d0 100644
+--- a/codex-rs/app-server-daemon/src/backend/pid_tests.rs
++++ b/codex-rs/app-server-daemon/src/backend/pid_tests.rs
+@@ -20,6 +20,23 @@ use super::read_stderr_log_tail;
+ use super::stderr_log_file_for_pid_file;
+ use super::try_lock_file;
+ 
++#[test]
++fn legacy_tick_mismatch_identifies_reused_pid() {
++    assert_eq!(super::legacy_ticks_match("12345", "12345"), Some(true));
++    assert_eq!(super::legacy_ticks_match("12345", "67890"), Some(false));
++    assert_eq!(super::legacy_ticks_match("legacy timestamp", "67890"), None);
++}
++
++#[test]
++fn proc_stat_details_parse_start_ticks_after_final_comm_paren() {
++    let stat =
++        "123 (name with ) paren) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 987654321 20";
++    assert_eq!(
++        super::parse_proc_stat_details(stat, 123).unwrap(),
++        ("S".to_string(), "987654321".to_string())
++    );
++}
++
+ #[cfg(windows)]
+ fn is_elevated_test_process() -> anyhow::Result<bool> {
+     let output = std::process::Command::new("powershell.exe")
+diff --git a/codex-rs/app-server-daemon/src/lib.rs b/codex-rs/app-server-daemon/src/lib.rs
+index ce7d58e..e4ecc52 100644
+--- a/codex-rs/app-server-daemon/src/lib.rs
++++ b/codex-rs/app-server-daemon/src/lib.rs
+@@ -68,7 +68,10 @@ const DAEMON_PID_FILE_NAME: &str = "daemon.pid";
+ const DAEMON_UPDATE_PID_FILE_NAME: &str = "daemon-updater.pid";
+ const OPERATION_LOCK_FILE_NAME: &str = "daemon.lock";
+ const SETTINGS_FILE_NAME: &str = "settings.json";
++#[cfg(not(target_os = "android"))]
+ const STATE_DIR_NAME: &str = "app-server-daemon";
++#[cfg(target_os = "android")]
++const STATE_DIR_NAME: &str = "app-server-daemon-termux-apt";
+ 
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub enum LifecycleCommand {
+@@ -322,6 +325,10 @@ pub fn maintain_stderr_log() -> Result<()> {
+ pub async fn update(
+     http_client_factory: codex_http_client::HttpClientFactory,
+ ) -> Result<UpdateOutput> {
++    anyhow::ensure!(
++        !cfg!(target_os = "android"),
++        "this Android runtime is locally packaged; update it through the package manager"
++    );
+     ensure_supported_platform()?;
+     #[cfg(windows)]
+     backend::windows::ensure_not_elevated()?;
+@@ -1015,6 +1022,10 @@ impl Daemon {
+     }
+ 
+     async fn ensure_managed_updater(&self, settings: &DaemonSettings) -> Result<bool> {
++        // The package manager owns Termux's selected Android executable.
++        if cfg!(target_os = "android") {
++            return Ok(false);
++        }
+         let updater = backend::pid_update_loop_backend(self.backend_paths(settings));
+         if !settings.auto_update_enabled {
+             updater.stop().await?;
+@@ -1099,6 +1110,8 @@ impl Daemon {
+ 
+     fn ensure_managed_codex_bin(&self) -> Result<()> {
+         if self.managed_codex_bin.is_file() {
++            #[cfg(target_os = "android")]
++            managed_install::ensure_android_package(&self.managed_codex_bin)?;
+             #[cfg(windows)]
+             backend::windows::ensure_detached_launch(&self.managed_codex_bin)?;
+             return Ok(());
+diff --git a/codex-rs/app-server-daemon/src/managed_install.rs b/codex-rs/app-server-daemon/src/managed_install.rs
+index 1afe10c..501edfd 100644
+--- a/codex-rs/app-server-daemon/src/managed_install.rs
++++ b/codex-rs/app-server-daemon/src/managed_install.rs
+@@ -57,6 +57,14 @@ pub(crate) fn package_root(codex_home: &Path) -> PathBuf {
+ 
+ /// Resolve both packaged and legacy binaries without requiring a valid install.
+ pub(crate) fn managed_codex_bin(codex_home: &Path) -> PathBuf {
++    #[cfg(target_os = "android")]
++    {
++        // Termux installs both executables in the package's bin directory.
++        // The package manager owns this ELF and performs all replacements.
++        if let Ok(selected) = std::env::current_exe() {
++            return selected;
++        }
++    }
+     let root = package_root(codex_home);
+     let current = root.join("current");
+     let packaged = current.join("bin").join(managed_codex_file_name());
+@@ -70,8 +78,43 @@ pub(crate) fn managed_codex_bin(codex_home: &Path) -> PathBuf {
+     }
+ }
+ 
++/// Validate the official Termux package layout selected by this process.
++#[cfg(any(target_os = "android", all(test, unix)))]
++pub(crate) fn ensure_android_package(selected: &Path) -> Result<()> {
++    use std::os::unix::fs::PermissionsExt;
++
++    let selected = selected
++        .canonicalize()
++        .context("missing selected Android executable")?;
++    anyhow::ensure!(
++        selected.file_name().is_some_and(|name| name == "codex")
++            && selected
++                .parent()
++                .and_then(Path::file_name)
++                .is_some_and(|name| name == "bin"),
++        "selected Android executable is not bin/codex"
++    );
++    let selected_metadata =
++        std::fs::metadata(&selected).context("failed to inspect selected Android executable")?;
++    anyhow::ensure!(
++        selected_metadata.is_file() && selected_metadata.permissions().mode() & 0o111 != 0,
++        "selected Android codex executable is not an executable regular file"
++    );
++    let helper = selected.with_file_name("codex-code-mode-host");
++    let helper_metadata =
++        std::fs::metadata(&helper).context("Termux package is missing codex-code-mode-host")?;
++    anyhow::ensure!(
++        helper_metadata.is_file() && helper_metadata.permissions().mode() & 0o111 != 0,
++        "Termux codex-code-mode-host is not an executable regular file"
++    );
++    Ok(())
++}
++
+ /// Only latest-channel stable releases may run the public latest-version updater.
+ pub(crate) fn is_stable_standalone_release(codex_home: &Path, codex_bin: &Path) -> bool {
++    if cfg!(target_os = "android") {
++        return false;
++    }
+     let standalone = package_root(codex_home);
+     let Ok(releases) = std::fs::canonicalize(standalone.join("releases")) else {
+         return false;
+diff --git a/codex-rs/app-server-daemon/src/managed_install_tests.rs b/codex-rs/app-server-daemon/src/managed_install_tests.rs
+index 9403dc8..0a3d5bb 100644
+--- a/codex-rs/app-server-daemon/src/managed_install_tests.rs
++++ b/codex-rs/app-server-daemon/src/managed_install_tests.rs
+@@ -1,9 +1,46 @@
++#[cfg(unix)]
++use std::os::unix::fs::PermissionsExt;
++
+ use pretty_assertions::assert_eq;
+ 
+ use super::ExecutableIdentity;
+ use super::executable_identity;
+ use super::parse_codex_version;
+ 
++#[cfg(unix)]
++fn android_package_fixture() -> tempfile::TempDir {
++    let root = tempfile::tempdir().unwrap();
++    let bin = root.path().join("bin");
++    std::fs::create_dir(&bin).unwrap();
++    for name in ["codex", "codex-code-mode-host"] {
++        let path = bin.join(name);
++        std::fs::write(&path, b"fixture").unwrap();
++        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
++    }
++    root
++}
++
++#[cfg(unix)]
++#[test]
++fn android_package_accepts_official_termux_layout() {
++    let root = android_package_fixture();
++    super::ensure_android_package(&root.path().join("bin/codex")).unwrap();
++}
++
++#[cfg(unix)]
++#[test]
++fn android_package_rejects_missing_or_non_executable_sibling() {
++    for missing in ["bin/codex-code-mode-host", "bin/codex"] {
++        let root = android_package_fixture();
++        std::fs::remove_file(root.path().join(missing)).unwrap();
++        assert!(super::ensure_android_package(&root.path().join("bin/codex")).is_err());
++    }
++    let root = android_package_fixture();
++    let helper = root.path().join("bin/codex-code-mode-host");
++    std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o644)).unwrap();
++    assert!(super::ensure_android_package(&root.path().join("bin/codex")).is_err());
++}
++
+ #[test]
+ fn parses_codex_cli_version_output() {
+     assert_eq!(
+diff --git a/codex-rs/app-server-daemon/src/prepare_install.rs b/codex-rs/app-server-daemon/src/prepare_install.rs
+index ef09b6d..6780934 100644
+--- a/codex-rs/app-server-daemon/src/prepare_install.rs
++++ b/codex-rs/app-server-daemon/src/prepare_install.rs
+@@ -28,6 +28,11 @@ pub struct InstallRequest {
+ 
+ /// Prepare a missing package while the caller holds the daemon operation lock.
+ pub(super) async fn prepare(daemon: &Daemon, settings: &DaemonSettings) -> Result<()> {
++    // Termux launchers select a bundled native ELF outside the standalone
++    // release tree. Validate that package without copying or pruning it.
++    if cfg!(target_os = "android") {
++        return daemon.ensure_managed_codex_bin();
++    }
+     let source = InstallContext::current().package_layout.as_ref();
+     // Keep package replacement state out of the CLI dispatcher's async stack frame.
+     Box::pin(prepare_from_package(
+@@ -47,6 +52,10 @@ pub(super) async fn prepare(daemon: &Daemon, settings: &DaemonSettings) -> Resul
+ pub async fn update_from_cli(
+     confirm: impl FnOnce(&InstallRequest) -> Result<bool>,
+ ) -> Result<Option<crate::UpdateOutput>> {
++    anyhow::ensure!(
++        !cfg!(target_os = "android"),
++        "Android uses its locally packaged runtime; standalone package replacement is unsupported"
++    );
+     crate::ensure_supported_platform()?;
+     #[cfg(windows)]
+     crate::backend::windows::ensure_not_elevated()?;
+diff --git a/codex-rs/app-server-daemon/src/update_loop.rs b/codex-rs/app-server-daemon/src/update_loop.rs
+index 344aba5..17f08b3 100644
+--- a/codex-rs/app-server-daemon/src/update_loop.rs
++++ b/codex-rs/app-server-daemon/src/update_loop.rs
+@@ -80,6 +80,10 @@ pub(crate) async fn run(
+     http_client_factory: HttpClientFactory,
+     restore_release: Option<String>,
+ ) -> Result<()> {
++    anyhow::ensure!(
++        !cfg!(target_os = "android"),
++        "standalone automatic updates are disabled for the locally packaged Android runtime"
++    );
+     let daemon = Daemon::from_environment()?;
+     crate::backend::stderr_log::start(daemon.update_pid_file.with_extension("stderr.log"));
+     let http = RouteAwareClientPool::new_without_request_logging(
+diff --git a/codex-rs/app-server-transport/src/transport/mod.rs b/codex-rs/app-server-transport/src/transport/mod.rs
+index cd75578..1f0bab0 100644
+--- a/codex-rs/app-server-transport/src/transport/mod.rs
++++ b/codex-rs/app-server-transport/src/transport/mod.rs
+@@ -53,14 +53,21 @@ pub use websocket::start_websocket_acceptor;
+ const INTERNAL_ERROR_CODE: i64 = -32603;
+ const OVERLOADED_ERROR_CODE: i64 = -32001;
+ 
++#[cfg(not(target_os = "android"))]
+ const APP_SERVER_CONTROL_SOCKET_DIR_NAME: &str = "app-server-control";
++#[cfg(target_os = "android")]
++const APP_SERVER_CONTROL_SOCKET_DIR_NAME: &str = "app-server-control-termux-apt";
+ const APP_SERVER_CONTROL_SOCKET_FILE_NAME: &str = "app-server-control.sock";
+ const APP_SERVER_STARTUP_LOCK_FILE_NAME: &str = "app-server-startup.lock";
+ const DAEMON_RECOVERY_FILE_NAME: &str = "loaded-threads.json";
+ 
+ pub fn daemon_recovery_file_path(codex_home: &Path) -> PathBuf {
+     codex_home
+-        .join("app-server-daemon")
++        .join(if cfg!(target_os = "android") {
++            "app-server-daemon-termux-apt"
++        } else {
++            "app-server-daemon"
++        })
+         .join(DAEMON_RECOVERY_FILE_NAME)
+ }
+ 
+diff --git a/codex-rs/cli/src/remote_control_cmd.rs b/codex-rs/cli/src/remote_control_cmd.rs
+index 21cff3a..673a51c 100644
+--- a/codex-rs/cli/src/remote_control_cmd.rs
++++ b/codex-rs/cli/src/remote_control_cmd.rs
+@@ -183,7 +183,13 @@ async fn run_foreground_remote_control(
+     root_config_overrides: CliConfigOverrides,
+ ) -> anyhow::Result<()> {
+     print_remote_control_progress(json, "Starting app-server with remote control enabled...")?;
+-    #[cfg(not(windows))]
++    #[cfg(target_os = "android")]
++    let socket_dir = tempfile::Builder::new()
++        .prefix("codex-rc-")
++        .tempdir_in(std::env::temp_dir())
++        .or_else(|_| tempfile::tempdir())
++        .context("failed to create private app-server socket directory")?;
++    #[cfg(all(not(windows), not(target_os = "android")))]
+     let socket_dir = tempfile::Builder::new()
+         .prefix("codex-rc-")
+         .tempdir_in("/tmp")
+diff --git a/codex-rs/uds/src/daemon_directory.rs b/codex-rs/uds/src/daemon_directory.rs
+index 90c3c10..a728ac4 100644
+--- a/codex-rs/uds/src/daemon_directory.rs
++++ b/codex-rs/uds/src/daemon_directory.rs
+@@ -11,10 +11,21 @@ use std::path::PathBuf;
+ 
+ /// Returns the fixed executor-local directory that every sandbox must hide.
+ pub fn shared_daemon_socket_directory() -> io::Result<PathBuf> {
+-    // Resolve the system alias /tmp -> /private/tmp on macOS.
+-    let temporary_root = fs::canonicalize("/tmp")?;
+-    let uid = unsafe { libc::geteuid() };
+-    Ok(temporary_root.join(format!("codex-daemon-{uid}")))
++    #[cfg(target_os = "android")]
++    {
++        let uid = unsafe { libc::geteuid() };
++        // Termux substitutes its app-private base directory while applying
++        // this source patch. Keep the rendezvous path short for Android's
++        // Unix-domain socket limit and independent of user configuration.
++        return Ok(PathBuf::from(format!("@TERMUX_BASE_DIR@/cdx-{uid}")));
++    }
++    #[cfg(not(target_os = "android"))]
++    {
++        // Resolve the system alias /tmp -> /private/tmp on macOS.
++        let temporary_root = fs::canonicalize("/tmp")?;
++        let uid = unsafe { libc::geteuid() };
++        Ok(temporary_root.join(format!("codex-daemon-{uid}")))
++    }
+ }
+ 
+ /// Creates the reserved directory, rejecting symlinks and unsafe existing owners or modes.
+diff --git a/codex-rs/uds/src/lib_tests.rs b/codex-rs/uds/src/lib_tests.rs
+index 91040b1..0d35d57 100644
+--- a/codex-rs/uds/src/lib_tests.rs
++++ b/codex-rs/uds/src/lib_tests.rs
+@@ -6,6 +6,27 @@ use tokio::io::AsyncWriteExt;
+ 
+ use super::*;
+ 
++#[cfg(target_os = "android")]
++#[tokio::test]
++async fn android_shared_directory_supports_full_length_socket_names() {
++    let root = prepare_shared_daemon_socket_directory().expect("private Android socket root");
++    let expected = format!("@TERMUX_BASE_DIR@/cdx-{}", unsafe { libc::geteuid() });
++    assert_eq!(root, std::path::PathBuf::from(expected));
++    // This is an isolated test endpoint, not a production daemon socket.
++    let path = root.join(format!("p{:063x}.sock", std::process::id()));
++    assert!(path.as_os_str().len() < 108);
++    let mut listener = UnixListener::bind(&path)
++        .await
++        .expect("bind full-length socket");
++    let client = UnixStream::connect(&path)
++        .await
++        .expect("connect full-length socket");
++    let _peer = listener.accept().await.expect("accept full-length socket");
++    drop(client);
++    drop(listener);
++    std::fs::remove_file(path).expect("remove isolated test endpoint");
++}
++
+ #[cfg(windows)]
+ #[tokio::test]
+ async fn private_directory_rejects_volume_roots() {
