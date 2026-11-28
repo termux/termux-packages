@@ -1,0 +1,181 @@
+--- a/include/render/egl.h
++++ b/include/render/egl.h
+@@ -6,6 +6,7 @@
+ struct wlr_egl {
+ 	EGLDisplay display;
+ 	EGLContext context;
++	EGLConfig config;
+ 	EGLDeviceEXT device; // may be EGL_NO_DEVICE_EXT
+ 	struct gbm_device *gbm_device;
+ 
+@@ -24,6 +25,7 @@ struct wlr_egl {
+ 		// Client extensions
+ 		bool EXT_device_query;
+ 		bool KHR_platform_gbm;
++		bool KHR_platform_android;
+ 		bool EXT_platform_device;
+ 		bool KHR_display_reference;
+ 	} exts;
+--- a/render/egl.c
++++ b/render/egl.c
+@@ -9,6 +9,7 @@
+ #include <wlr/util/log.h>
+ #include <wlr/util/region.h>
+ #include <xf86drm.h>
++#include "render/allocator/ahb.h"
+ #include "render/egl.h"
+ #include "util/env.h"
+ 
+@@ -220,6 +221,8 @@ static struct wlr_egl *egl_create(void) {
+ 
+ 	egl->exts.KHR_platform_gbm = check_egl_ext(client_exts_str,
+ 			"EGL_KHR_platform_gbm");
++	egl->exts.KHR_platform_android = check_egl_ext(client_exts_str,
++			"EGL_KHR_platform_android");
+ 	egl->exts.EXT_platform_device = check_egl_ext(client_exts_str,
+ 			"EGL_EXT_platform_device");
+ 	egl->exts.KHR_display_reference = check_egl_ext(client_exts_str,
+@@ -260,6 +263,42 @@ static struct wlr_egl *egl_create(void) {
+ 	return egl;
+ }
+ 
++// Android EGL drivers sometimes advertise EGL_EXT_image_dma_buf_import without
++// supporting it, and sometimes support it without advertising it. Import a real
++// buffer instead of trusting the extension string.
++static bool probe_dmabuf_import(struct wlr_egl *egl) {
++	struct wlr_allocator *allocator = wlr_ahb_allocator_create();
++	if (allocator == NULL) {
++		return false;
++	}
++
++	struct wlr_drm_format_set formats = {0};
++	wlr_drm_format_set_add(&formats, DRM_FORMAT_XRGB8888, DRM_FORMAT_MOD_LINEAR);
++	struct wlr_buffer *buffer = wlr_allocator_create_buffer(allocator, 64, 64,
++		wlr_drm_format_set_get(&formats, DRM_FORMAT_XRGB8888));
++
++	bool ok = false;
++	struct wlr_dmabuf_attributes dmabuf = {0};
++	if (buffer != NULL && wlr_buffer_get_dmabuf(buffer, &dmabuf)) {
++		bool external_only;
++		egl->exts.EXT_image_dma_buf_import = true;
++		EGLImageKHR image =
++			wlr_egl_create_image_from_dmabuf(egl, &dmabuf, &external_only);
++		if (image != EGL_NO_IMAGE_KHR) {
++			wlr_egl_destroy_image(egl, image);
++			ok = true;
++		}
++		egl->exts.EXT_image_dma_buf_import = ok;
++	}
++
++	if (buffer != NULL) {
++		wlr_buffer_drop(buffer);
++	}
++	wlr_drm_format_set_finish(&formats);
++	wlr_allocator_destroy(allocator);
++	return ok;
++}
++
+ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display,
+ 		bool allow_software) {
+ 	egl->display = display;
+@@ -284,6 +323,11 @@ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display,
+ 
+ 	egl->exts.EXT_image_dma_buf_import =
+ 		check_egl_ext(display_exts_str, "EGL_EXT_image_dma_buf_import");
++#ifdef __TERMUX__
++	if (!egl->exts.EXT_image_dma_buf_import && egl->exts.KHR_image_base) {
++		egl->exts.EXT_image_dma_buf_import = probe_dmabuf_import(egl);
++	}
++#endif
+ 	if (check_egl_ext(display_exts_str,
+ 			"EGL_EXT_image_dma_buf_import_modifiers")) {
+ 		egl->exts.EXT_image_dma_buf_import_modifiers = true;
+@@ -341,11 +385,25 @@ static bool egl_init_display(struct wlr_egl *egl, EGLDisplay display,
+ 	}
+ #endif
+ 
++	egl->config = EGL_NO_CONFIG_KHR;
+ 	if (!check_egl_ext(display_exts_str, "EGL_KHR_no_config_context") &&
+ 			!check_egl_ext(display_exts_str, "EGL_MESA_configless_context")) {
+-		wlr_log(WLR_ERROR, "EGL_KHR_no_config_context or "
+-			"EGL_MESA_configless_context not supported");
+-		return false;
++		const EGLint config_attribs[] = {
++			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
++			EGL_RED_SIZE, 8,
++			EGL_GREEN_SIZE, 8,
++			EGL_BLUE_SIZE, 8,
++			EGL_ALPHA_SIZE, 8,
++			EGL_NONE,
++		};
++		EGLint num_configs = 0;
++		if (!eglChooseConfig(egl->display, config_attribs, &egl->config, 1,
++				&num_configs) || num_configs < 1) {
++			wlr_log(WLR_ERROR, "EGL_KHR_no_config_context or "
++				"EGL_MESA_configless_context not supported and no usable "
++				"EGLConfig found");
++			return false;
++		}
+ 	}
+ 
+ 	if (!check_egl_ext(display_exts_str, "EGL_KHR_surfaceless_context")) {
+@@ -434,7 +492,7 @@ static bool egl_init(struct wlr_egl *egl, EGLenum platform,
+ 	attribs[atti++] = EGL_NONE;
+ 	assert(atti <= sizeof(attribs)/sizeof(attribs[0]));
+ 
+-	egl->context = eglCreateContext(egl->display, EGL_NO_CONFIG_KHR,
++	egl->context = eglCreateContext(egl->display, egl->config,
+ 		EGL_NO_CONTEXT, attribs);
+ 	if (egl->context == EGL_NO_CONTEXT) {
+ 		wlr_log(WLR_ERROR, "Failed to create EGL context");
+@@ -570,6 +628,15 @@ struct wlr_egl *wlr_egl_create_with_drm_fd(int drm_fd) {
+ 		return NULL;
+ 	}
+ 
++#ifdef __TERMUX__
++	if (egl->exts.KHR_platform_android &&
++			egl_init(egl, EGL_PLATFORM_ANDROID_KHR, (void *)EGL_DEFAULT_DISPLAY,
++				allow_software)) {
++		wlr_log(WLR_DEBUG, "Using EGL_PLATFORM_ANDROID_KHR");
++		return egl;
++	}
++#endif
++
+ #ifndef __TERMUX__
+ 	if (egl->exts.EXT_platform_device) {
+ 		/*
+--- a/render/gles2/renderer.c
++++ b/render/gles2/renderer.c
+@@ -15,6 +15,7 @@
+ #include <wlr/util/box.h>
+ #include <wlr/util/log.h>
+ #include <xf86drm.h>
++#include "render/allocator/ahb.h"
+ #include "render/egl.h"
+ #include "render/gles2.h"
+ #include "render/pixel_format.h"
+@@ -143,6 +144,13 @@ struct wlr_gles2_buffer *gles2_buffer_get_or_create(struct wlr_gles2_renderer *r
+ 		goto error_buffer;
+ 	}
+ 
++#ifdef __TERMUX__
++	if (wlr_buffer_is_ahb(wlr_buffer) && dmabuf.n_planes == 1 &&
++			dmabuf.stride[0] / 4 > (uint32_t)dmabuf.width) {
++		dmabuf.width = dmabuf.stride[0] / 4;
++	}
++#endif
++
+ 	buffer->image = wlr_egl_create_image_from_dmabuf(renderer->egl,
+ 		&dmabuf, &buffer->external_only);
+ 	if (buffer->image == EGL_NO_IMAGE_KHR) {
+@@ -551,7 +559,9 @@ struct wlr_renderer *wlr_gles2_renderer_create(struct wlr_egl *egl) {
+ 		free(renderer);
+ 		return NULL;
+ 	}
+-	if (!check_gl_ext(exts_str, "GL_EXT_unpack_subimage")) {
++	int gles_major = 0;
++	sscanf((const char *)glGetString(GL_VERSION), "OpenGL ES %d", &gles_major);
++	if (gles_major < 3 && !check_gl_ext(exts_str, "GL_EXT_unpack_subimage")) {
+ 		wlr_log(WLR_ERROR, "GL_EXT_unpack_subimage not supported");
+ 		free(renderer);
+ 		return NULL;

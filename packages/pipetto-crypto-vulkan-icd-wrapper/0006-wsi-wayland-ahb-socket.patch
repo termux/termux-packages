@@ -1,0 +1,231 @@
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -60,6 +60,10 @@
+ 
+ #include <loader/loader_wayland_helper.h>
+ 
++#include <android/hardware_buffer.h>
++#include <poll.h>
++#include <sys/socket.h>
++
+ #ifdef MAJOR_IN_MKDEV
+ #include <sys/mkdev.h>
+ #endif
+@@ -878,6 +882,8 @@ shm_handle_format(void *data, struct wl_shm *shm, uint32_t format)
+ {
+    struct wsi_wl_display *display = data;
+ 
++   if (display->wl_dmabuf)
++      return;
+    wsi_wl_display_add_wl_shm_format(display, &display->formats, format);
+ }
+ 
+@@ -903,6 +909,10 @@ registry_handle_global(void *data, struct wl_registry *registry,
+ {
+    struct wsi_wl_display *display = data;
+ 
++   if (!display->sw && strcmp(interface, wl_shm_interface.name) == 0) {
++      display->wl_shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
++      wl_shm_add_listener(display->wl_shm, &shm_listener, display);
++   }
+    if (display->sw) {
+       if (strcmp(interface, wl_shm_interface.name) == 0) {
+          display->wl_shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
+@@ -1069,7 +1079,7 @@ wsi_wl_display_init(struct wsi_wayland *wsi_wl,
+    /* Round-trip again to get formats and modifiers */
+    wl_display_roundtrip_queue(display->wl_display, display->queue);
+ 
+-   if (wsi_wl->wsi->force_bgra8_unorm_first) {
++   {
+       /* Find BGRA8_UNORM in the list and swap it to the first position if we
+        * can find it.  Some apps get confused if SRGB is first in the list.
+        */
+@@ -2682,6 +2692,110 @@ wsi_wl_alloc_image_shm(struct wsi_image *imagew, unsigned size)
+    return ptr;
+ }
+ 
++static int wsi_wl_ahb_state;
++
++struct wsi_wl_ahb_probe {
++   bool done;
++   bool created;
++};
++
++static void
++wsi_wl_ahb_probe_created(void *data,
++                         struct zwp_linux_buffer_params_v1 *params,
++                         struct wl_buffer *buffer)
++{
++   struct wsi_wl_ahb_probe *probe = data;
++
++   probe->done = true;
++   probe->created = true;
++   wl_buffer_destroy(buffer);
++}
++
++static void
++wsi_wl_ahb_probe_failed(void *data,
++                        struct zwp_linux_buffer_params_v1 *params)
++{
++   struct wsi_wl_ahb_probe *probe = data;
++
++   probe->done = true;
++}
++
++static const struct zwp_linux_buffer_params_v1_listener wsi_wl_ahb_probe_listener = {
++   .created = wsi_wl_ahb_probe_created,
++   .failed = wsi_wl_ahb_probe_failed,
++};
++
++static bool
++wsi_wl_ahb_serve(struct wl_display *wl_display, int sock,
++                 AHardwareBuffer *ahb, int timeout_ms)
++{
++   struct pollfd pfd = { .fd = sock, .events = POLLIN };
++   char request;
++
++   wl_display_flush(wl_display);
++   return poll(&pfd, 1, timeout_ms) > 0 &&
++          read(sock, &request, 1) == 1 &&
++          AHardwareBuffer_sendHandleToUnixSocket(ahb, sock) == 0;
++}
++
++/* Checks once per process whether the compositor accepts AHardwareBuffer
++ * handles passed over a socket in place of dma-buf file descriptors.
++ */
++static bool
++wsi_wl_ahb_supported(struct wsi_wl_display *display)
++{
++   if (wsi_wl_ahb_state)
++      return wsi_wl_ahb_state > 0;
++
++   struct wsi_wl_ahb_probe probe = {0};
++   AHardwareBuffer *ahb = NULL;
++   AHardwareBuffer_Desc desc = {
++      .width = 16,
++      .height = 16,
++      .layers = 1,
++      .format = AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM,
++      .usage = AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE |
++               AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER |
++               AHARDWAREBUFFER_USAGE_CPU_READ_RARELY |
++               AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN,
++   };
++   int sock[2] = { -1, -1 };
++   bool acked = false;
++
++   if (AHardwareBuffer_allocate(&desc, &ahb) == 0 &&
++       socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sock) == 0) {
++      struct zwp_linux_buffer_params_v1 *params =
++         zwp_linux_dmabuf_v1_create_params(display->wl_dmabuf);
++
++      AHardwareBuffer_describe(ahb, &desc);
++      zwp_linux_buffer_params_v1_add_listener(params,
++                                              &wsi_wl_ahb_probe_listener,
++                                              &probe);
++      zwp_linux_buffer_params_v1_add(params, sock[1], 0, 0,
++                                     desc.stride * 4, 0, 0);
++      zwp_linux_buffer_params_v1_create(params, 16, 16,
++                                        DRM_FORMAT_ABGR8888, 0);
++      acked = wsi_wl_ahb_serve(display->wl_display, sock[0], ahb, 200);
++      while (!probe.done &&
++             wl_display_dispatch_queue(display->wl_display,
++                                       display->queue) != -1)
++         ;
++      zwp_linux_buffer_params_v1_destroy(params);
++   }
++
++   acked = acked && probe.created;
++
++   for (int i = 0; i < 2; i++) {
++      if (sock[i] >= 0)
++         close(sock[i]);
++   }
++   if (ahb)
++      AHardwareBuffer_release(ahb);
++
++   wsi_wl_ahb_state = acked ? 1 : -1;
++   return acked;
++}
++
+ static VkResult
+ wsi_wl_image_init(struct wsi_wl_swapchain *chain,
+                   struct wsi_wl_image *image,
+@@ -2726,6 +2840,22 @@ wsi_wl_image_init(struct wsi_wl_swapchain *chain,
+       if (!params)
+          goto fail_image;
+ 
++      uint32_t drm_format = chain->drm_format;
++      int ahb_sock = -1;
++      if (image->base.ahardware_buffer) {
++         AHardwareBuffer_Desc desc;
++         int sock[2] = { -1, -1 };
++
++         AHardwareBuffer_describe(image->base.ahardware_buffer, &desc);
++         if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sock) < 0) {
++            zwp_linux_buffer_params_v1_destroy(params);
++            goto fail_image;
++         }
++         zwp_linux_buffer_params_v1_add(params, sock[1], 0, 0,
++                                        desc.stride * 4, 0, 0);
++         close(sock[1]);
++         ahb_sock = sock[0];
++      } else
+       for (int i = 0; i < image->base.num_planes; i++) {
+          zwp_linux_buffer_params_v1_add(params,
+                                         image->base.dma_buf_fd,
+@@ -2740,9 +2870,16 @@ wsi_wl_image_init(struct wsi_wl_swapchain *chain,
+          zwp_linux_buffer_params_v1_create_immed(params,
+                                                  chain->extent.width,
+                                                  chain->extent.height,
+-                                                 chain->drm_format,
++                                                 drm_format,
+                                                  0);
+       zwp_linux_buffer_params_v1_destroy(params);
++      if (ahb_sock >= 0) {
++         bool served = wsi_wl_ahb_serve(display->wl_display, ahb_sock,
++                                        image->base.ahardware_buffer, 1000);
++         close(ahb_sock);
++         if (!served)
++            goto fail_image;
++      }
+ 
+       if (chain->base.image_info.explicit_sync) {
+          for (uint32_t i = 0; i < WSI_ES_COUNT; i++) {
+@@ -2983,13 +3120,20 @@ wsi_wl_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+    struct wsi_base_image_params *image_params = NULL;
+    struct wsi_cpu_image_params cpu_image_params;
+    struct wsi_drm_image_params drm_image_params;
++   struct wsi_base_image_params android_image_params = {
++      .image_type = WSI_IMAGE_TYPE_ANDROID,
++      .android_alias = true,
++   };
+    uint32_t num_drm_modifiers = 0;
+    const uint64_t *drm_modifiers = NULL;
+-   if (wsi_device->sw) {
++   bool use_shm = wsi_device->sw ||
++                  (!wsi_wl_surface->display->wl_dmabuf &&
++                   wsi_wl_surface->display->wl_shm);
++   if (use_shm) {
+       cpu_image_params = (struct wsi_cpu_image_params) {
+          .base.image_type = WSI_IMAGE_TYPE_CPU,
+       };
+-      if (wsi_device->has_import_memory_host &&
++      if (wsi_device->has_import_memory_host && wsi_device->sw &&
+           !(WSI_DEBUG & WSI_DEBUG_NOSHM)) {
+          buffer_type = WSI_WL_BUFFER_GPU_SHM;
+          cpu_image_params.alloc_shm = wsi_wl_alloc_image_shm;
+@@ -3030,6 +3174,13 @@ wsi_wl_surface_create_swapchain(VkIcdSurfaceBase *icd_surface,
+       }
+       buffer_type = WSI_WL_BUFFER_NATIVE;
+       image_params = &drm_image_params.base;
++      if ((pCreateInfo->imageFormat == VK_FORMAT_R8G8B8A8_UNORM ||
++           pCreateInfo->imageFormat == VK_FORMAT_R8G8B8A8_SRGB ||
++           pCreateInfo->imageFormat == VK_FORMAT_B8G8R8A8_UNORM ||
++           pCreateInfo->imageFormat == VK_FORMAT_B8G8R8A8_SRGB) &&
++          wsi_wl_surface->display->wl_dmabuf &&
++          wsi_wl_ahb_supported(wsi_wl_surface->display))
++         image_params = &android_image_params;
+    }
+ 
+    result = wsi_swapchain_init(wsi_device, &chain->base, device,

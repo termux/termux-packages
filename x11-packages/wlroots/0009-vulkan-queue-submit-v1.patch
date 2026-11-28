@@ -1,0 +1,94 @@
+# Submit with vkQueueSubmit instead of api.vkQueueSubmit2KHR.
+# On some devices vkQueueSubmit2KHR makes the driver lose the device
+# (VK_ERROR_DEVICE_LOST) after a number of submissions.
+
+--- a/render/vulkan/pass.c
++++ b/render/vulkan/pass.c
+@@ -220,6 +220,75 @@ static bool unwrap_color_transform(struct wlr_color_transform *transform,
+ 	return false;
+ }
+ 
++#ifdef __TERMUX__
++static VkResult queue_submit(VkQueue queue, uint32_t n, const VkSubmitInfo2KHR *in) {
++	uint32_t nw = 0, ns = 0, nc = 0;
++	for (uint32_t i = 0; i < n; i++) {
++		nw += in[i].waitSemaphoreInfoCount;
++		ns += in[i].signalSemaphoreInfoCount;
++		nc += in[i].commandBufferInfoCount;
++	}
++
++	VkSubmitInfo si[n];
++	VkTimelineSemaphoreSubmitInfoKHR ti[n];
++	VkSemaphore *sems = calloc(nw + ns + 1, sizeof(*sems));
++	uint64_t *vals = calloc(nw + ns + 1, sizeof(*vals));
++	VkPipelineStageFlags *stages = calloc(nw + 1, sizeof(*stages));
++	VkCommandBuffer *cbs = calloc(nc + 1, sizeof(*cbs));
++	if (sems == NULL || vals == NULL || stages == NULL || cbs == NULL) {
++		free(sems);
++		free(vals);
++		free(stages);
++		free(cbs);
++		return VK_ERROR_OUT_OF_HOST_MEMORY;
++	}
++
++	uint32_t iw = 0, is = nw, ic = 0;
++	for (uint32_t i = 0; i < n; i++) {
++		uint32_t w0 = iw, s0 = is, c0 = ic;
++		for (uint32_t j = 0; j < in[i].waitSemaphoreInfoCount; j++, iw++) {
++			sems[iw] = in[i].pWaitSemaphoreInfos[j].semaphore;
++			vals[iw] = in[i].pWaitSemaphoreInfos[j].value;
++			stages[iw] = in[i].pWaitSemaphoreInfos[j].stageMask ?
++				(VkPipelineStageFlags)in[i].pWaitSemaphoreInfos[j].stageMask :
++				VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
++		}
++		for (uint32_t j = 0; j < in[i].signalSemaphoreInfoCount; j++, is++) {
++			sems[is] = in[i].pSignalSemaphoreInfos[j].semaphore;
++			vals[is] = in[i].pSignalSemaphoreInfos[j].value;
++		}
++		for (uint32_t j = 0; j < in[i].commandBufferInfoCount; j++, ic++) {
++			cbs[ic] = in[i].pCommandBufferInfos[j].commandBuffer;
++		}
++		ti[i] = (VkTimelineSemaphoreSubmitInfoKHR){
++			.sType = VK_STRUCTURE_TYPE_TIMELINE_SEMAPHORE_SUBMIT_INFO_KHR,
++			.waitSemaphoreValueCount = iw - w0,
++			.pWaitSemaphoreValues = vals + w0,
++			.signalSemaphoreValueCount = is - s0,
++			.pSignalSemaphoreValues = vals + s0,
++		};
++		si[i] = (VkSubmitInfo){
++			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
++			.pNext = &ti[i],
++			.waitSemaphoreCount = iw - w0,
++			.pWaitSemaphores = sems + w0,
++			.pWaitDstStageMask = stages + w0,
++			.commandBufferCount = ic - c0,
++			.pCommandBuffers = cbs + c0,
++			.signalSemaphoreCount = is - s0,
++			.pSignalSemaphores = sems + s0,
++		};
++	}
++
++	VkResult res = vkQueueSubmit(queue, n, si, VK_NULL_HANDLE);
++	free(sems);
++	free(vals);
++	free(stages);
++	free(cbs);
++	return res;
++}
++#endif
++
+ static bool render_pass_submit(struct wlr_render_pass *wlr_pass) {
+ 	struct wlr_vk_render_pass *pass = get_render_pass(wlr_pass);
+ 	struct wlr_vk_renderer *renderer = pass->renderer;
+@@ -625,7 +694,11 @@ static bool render_pass_submit(struct wlr_render_pass *wlr_pass) {
+ 	};
+ 
+ 	VkSubmitInfo2KHR submit_info[] = { stage_submit, render_submit };
++#ifdef __TERMUX__
++	VkResult res = queue_submit(renderer->dev->queue, 2, submit_info);
++#else
+ 	VkResult res = renderer->dev->api.vkQueueSubmit2KHR(renderer->dev->queue, 2, submit_info, VK_NULL_HANDLE);
++#endif
+ 
+ 	if (res != VK_SUCCESS) {
+ 		device_lost = res == VK_ERROR_DEVICE_LOST;

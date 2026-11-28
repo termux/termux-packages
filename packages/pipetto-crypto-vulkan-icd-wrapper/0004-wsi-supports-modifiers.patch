@@ -1,0 +1,10 @@
+--- a/src/vulkan/wrapper/wrapper_physical_device.c
++++ b/src/vulkan/wrapper/wrapper_physical_device.c
+@@ -221,6 +221,7 @@ VkResult enumerate_physical_device(struct vk_instance *_instance)
+       }
+       
+       pdevice->vk.wsi_device = &pdevice->wsi_device;
++      pdevice->wsi_device.supports_modifiers = true;
+ 
+       pdevice->driver_properties = (VkPhysicalDeviceDriverProperties) {
+          .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES,

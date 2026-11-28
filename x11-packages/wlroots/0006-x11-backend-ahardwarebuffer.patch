@@ -1,0 +1,186 @@
+# Allocate AHardwareBuffers and present them through DRI3 on termux-x11 when there is no DRM device.
+
+--- a/backend/x11/backend.c
++++ b/backend/x11/backend.c
+@@ -29,6 +29,7 @@
+ 
+ #include "backend/x11.h"
+ #include "backend/x11_attach.h"
++#include "render/allocator/ahb.h"
+ #include "render/drm_format_set.h"
+ 
+ // See dri2_format_for_depth in mesa
+@@ -241,6 +242,13 @@ bool wlr_backend_is_x11(struct wlr_backend *backend) {
+ 	return backend->impl == &backend_impl;
+ }
+ 
++bool x11_backend_uses_ahb(struct wlr_backend *backend) {
++	if (!wlr_backend_is_x11(backend))
++		return false;
++	struct wlr_x11_backend *x11 = get_x11_backend_from_backend(backend);
++	return x11->have_dri3 && x11->have_ahb && x11->drm_fd < 0;
++}
++
+ static void handle_event_loop_destroy(struct wl_listener *listener, void *data) {
+ 	struct wlr_x11_backend *x11 = wl_container_of(listener, x11, event_loop_destroy);
+ 	backend_destroy(&x11->backend);
+@@ -273,7 +281,7 @@ static int query_dri3_drm_fd(struct wlr_x11_backend *x11) {
+ 	xcb_dri3_open_reply_t *open_reply =
+ 		xcb_dri3_open_reply(x11->xcb, open_cookie, NULL);
+ 	if (open_reply == NULL) {
+-		wlr_log(WLR_ERROR, "Failed to open DRI3");
++		wlr_log(x11->have_ahb ? WLR_DEBUG : WLR_ERROR, "Failed to open DRI3");
+ 		return -1;
+ 	}
+ 
+@@ -672,8 +680,11 @@ struct wlr_backend *wlr_x11_backend_create(struct wl_event_loop *loop,
+ 	if (x11->have_dri3) {
+ 		// DRI3 may return a render node (Xwayland) or an authenticated primary
+ 		// node (plain Glamor).
++		x11->have_ahb = wlr_ahb_available();
+ 		x11->drm_fd = query_dri3_drm_fd(x11);
+-		if (x11->drm_fd < 0) {
++		if (x11->drm_fd < 0 && x11->have_ahb) {
++			wlr_log(WLR_DEBUG, "Using AHardwareBuffers instead of a DRM device");
++		} else if (x11->drm_fd < 0) {
+ 			wlr_log(WLR_ERROR, "Failed to query DRI3 DRM FD");
+ 			wlr_log(WLR_INFO, "Disabling DMA-BUF support");
+ 			x11->have_dri3 = false;
+--- a/backend/x11/output.c
++++ b/backend/x11/output.c
+@@ -3,6 +3,9 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <fcntl.h>
++#include <poll.h>
++#include <sys/socket.h>
++#include <unistd.h>
+ 
+ #include <drm_fourcc.h>
+ #include <xcb/dri3.h>
+@@ -19,6 +22,7 @@
+ #include <wlr/util/log.h>
+ 
+ #include "backend/x11.h"
++#include "render/allocator/ahb.h"
+ #include "render/pixel_format.h"
+ #include "util/time.h"
+ #include "types/wlr_buffer.h"
+@@ -261,6 +265,44 @@ static xcb_pixmap_t import_dmabuf(struct wlr_x11_output *output,
+ 	return pixmap;
+ }
+ 
++// termux-x11 receives an AHardwareBuffer handle over the socket passed as the
++// DRI3 buffer instead of a dma-buf fd
++#define AHB_SOCKET_MODIFIER 1256
++
++static xcb_pixmap_t import_ahb(struct wlr_x11_output *output,
++		struct wlr_ahb_buffer *buffer) {
++	struct wlr_x11_backend *x11 = output->x11;
++	const struct wlr_x11_format *x11_fmt = x11->x11_format;
++
++	if (buffer->format != x11_fmt->drm)
++		return XCB_PIXMAP_NONE;
++
++	int sockets[2];
++	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, sockets) != 0)
++		return XCB_PIXMAP_NONE;
++
++	xcb_pixmap_t pixmap = xcb_generate_id(x11->xcb);
++	xcb_void_cookie_t cookie = xcb_dri3_pixmap_from_buffers_checked(x11->xcb,
++		pixmap, output->win, 1, buffer->base.width, buffer->base.height,
++		buffer->desc.stride * 4, 0, 0, 0, 0, 0, 0, 0, x11_fmt->depth,
++		x11_fmt->bpp, AHB_SOCKET_MODIFIER, &sockets[0]);
++	xcb_flush(x11->xcb);
++
++	struct pollfd request = { .fd = sockets[1], .events = POLLIN };
++	uint8_t byte;
++	bool sent = poll(&request, 1, 2000) == 1 &&
++		read(sockets[1], &byte, 1) == 1 &&
++		wlr_ahb_buffer_send_handle(buffer, sockets[1]);
++	close(sockets[1]);
++
++	xcb_generic_error_t *error = xcb_request_check(x11->xcb, cookie);
++	if (error != NULL || !sent) {
++		free(error);
++		return XCB_PIXMAP_NONE;
++	}
++	return pixmap;
++}
++
+ static xcb_pixmap_t import_shm(struct wlr_x11_output *output,
+ 		struct wlr_shm_attributes *shm) {
+ 	struct wlr_x11_backend *x11 = output->x11;
+@@ -303,11 +345,12 @@ static struct wlr_x11_buffer *create_x11_buffer(struct wlr_x11_output *output,
+ 
+ 	struct wlr_dmabuf_attributes dmabuf_attrs;
+ 	struct wlr_shm_attributes shm_attrs;
+-	if (wlr_buffer_get_dmabuf(wlr_buffer, &dmabuf_attrs)) {
++	if (wlr_buffer_is_ahb(wlr_buffer))
++		pixmap = import_ahb(output, wlr_ahb_buffer_from_buffer(wlr_buffer));
++	else if (wlr_buffer_get_dmabuf(wlr_buffer, &dmabuf_attrs))
+ 		pixmap = import_dmabuf(output, &dmabuf_attrs);
+-	} else if (wlr_buffer_get_shm(wlr_buffer, &shm_attrs)) {
++	else if (wlr_buffer_get_shm(wlr_buffer, &shm_attrs))
+ 		pixmap = import_shm(output, &shm_attrs);
+-	}
+ 
+ 	if (pixmap == XCB_PIXMAP_NONE) {
+ 		return NULL;
+--- a/include/backend/x11.h
++++ b/include/backend/x11.h
+@@ -121,6 +121,7 @@ struct wlr_x11_backend {
+ 
+ 	bool have_shm;
+ 	bool have_dri3;
++	bool have_ahb;
+ 	uint32_t dri3_major_version, dri3_minor_version;
+ 
+ 	size_t requested_outputs;
+@@ -192,6 +193,7 @@ void update_x11_pointer_position(struct wlr_x11_output *output,
+ 
+ void handle_x11_configure_notify(struct wlr_x11_output *output,
+ 	xcb_configure_notify_event_t *event);
++bool x11_backend_uses_ahb(struct wlr_backend *backend);
+ bool x11_has_window_manager(struct wlr_x11_backend *x11);
+ bool x11_get_root_size(struct wlr_x11_backend *x11, int32_t *width,
+ 	int32_t *height);
+--- a/render/allocator/allocator.c
++++ b/render/allocator/allocator.c
+@@ -24,6 +24,8 @@
+ #if WLR_HAS_TERMUXGUI_BACKEND
+ #include "backend/multi.h"
+ #include "backend/termuxgui.h"
++#include "backend/x11.h"
++#include "render/allocator/ahb.h"
+ #endif
+ 
+ void wlr_allocator_init(struct wlr_allocator *alloc,
+@@ -106,6 +108,8 @@ static void backend_get_allocator(struct wlr_backend *backend, void *data) {
+ 	if (wlr_backend_is_tgui(backend)) {
+ 		struct wlr_tgui_backend *tgui_backend = tgui_backend_from_backend(backend);
+ 		*allocator = wlr_tgui_backend_get_allocator(tgui_backend);
++	} else if (*allocator == NULL && x11_backend_uses_ahb(backend)) {
++		*allocator = wlr_ahb_allocator_create();
+ 	}
+ }
+ #endif
+--- a/render/allocator/meson.build
++++ b/render/allocator/meson.build
+@@ -7,10 +7,16 @@ endif
+ 
+ wlr_files += files(
+ 	'allocator.c',
++	'ahb.c',
+ 	'shm.c',
+ 	'drm_dumb.c',
+ )
+ 
++wlr_deps += declare_dependency(link_args: [
++	'-Wl,--push-state,--no-as-needed,-landroid,--pop-state',
++])
++add_project_arguments('-D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__', language: 'c')
++
+ gbm = disabler()
+ if 'gbm' in allocators or 'auto' in allocators
+ 	gbm = dependency('gbm', version: '>=21.1', required: 'gbm' in allocators)

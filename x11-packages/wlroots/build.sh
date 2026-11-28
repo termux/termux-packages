@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Modular wayland compositor library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="0.20.2"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/${TERMUX_PKG_VERSION}/wlroots-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=20c37b521dc3054b6e9627b79bdd45fc716db9ebc58bdf97e57e84d04b04610f
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libdrm, libglvnd, libpixman, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c"
+TERMUX_PKG_DEPENDS="libdrm, libegl-android, libglvnd, libpixman, libwayland, libxcb, libxkbcommon, xcb-util-renderutil, xcb-util-wm, termux-gui-c"
 TERMUX_PKG_BUILD_DEPENDS="libglvnd-dev, libwayland-cross-scanner, libwayland-protocols, xwayland"
 TERMUX_PKG_RECOMMENDS="xwayland"
 TERMUX_PKG_BREAKS="sway (<< 1.12), labwc (<< 0.20)"
@@ -26,5 +27,5 @@ termux_step_pre_configure() {
 	termux_setup_wayland_cross_pkg_config_wrapper
 
 	# XXX: use alloca for shm_open
-	export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes"
+	export CPPFLAGS+=" -Wno-alloca -Wno-strict-prototypes -DVK_USE_PLATFORM_ANDROID_KHR"
 }
